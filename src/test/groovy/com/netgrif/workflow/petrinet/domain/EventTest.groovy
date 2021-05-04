@@ -13,7 +13,7 @@ import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
-import com.netgrif.workflow.workflow.domain.EventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -89,7 +89,7 @@ class EventTest {
         roleRunner.run()
         superCreator.run()
 
-        def net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), "major", superCreator.getLoggedSuper()).get()
+        def net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)

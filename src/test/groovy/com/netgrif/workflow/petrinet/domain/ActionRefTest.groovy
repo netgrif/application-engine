@@ -8,10 +8,8 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
-import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -76,7 +74,7 @@ class ActionRefTest {
         roleRunner.run()
         superCreator.run()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper()).get()
+        def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
 
         assert net.dataSet.get("text_1").events.size() == 8
         assert net.transitions.get("task").dataSet.get("text_1").events.size() == 8

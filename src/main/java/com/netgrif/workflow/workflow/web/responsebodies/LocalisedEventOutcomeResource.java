@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.workflow.domain.EventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 

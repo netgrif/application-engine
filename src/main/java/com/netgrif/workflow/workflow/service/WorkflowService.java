@@ -28,6 +28,9 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.TaskPair;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -201,7 +204,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Case createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
         if (locale == null) {
             locale = LocaleContextHolder.getLocale();
         }
@@ -213,7 +216,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Case createCase(String netId, String title, String color, LoggedUser user) {
+    public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setProcessIdentifier(petriNet.getIdentifier());
@@ -249,8 +252,9 @@ public class WorkflowService implements IWorkflowService {
         useCase = findOne(useCase.getStringId());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         useCase = save(useCase);
-
-        return setImmediateDataFields(useCase);
+        CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
+        outcome.setACase(setImmediateDataFields(useCase));
+        return outcome;
     }
 
     @Override
@@ -264,7 +268,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void deleteCase(String caseId) {
+    public DeleteCaseEventOutcome deleteCase(String caseId) {
         Case useCase = findOne(caseId);
 
         runActions(useCase.getPetriNet().getPreDeleteActions(), useCase.getStringId());
@@ -274,8 +278,11 @@ public class WorkflowService implements IWorkflowService {
         repository.delete(useCase);
 
         runActions(useCase.getPetriNet().getPostDeleteActions());
-
+//todo publishovanie?
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome();
+        outcome.setACase(useCase);
+        return outcome;
     }
 
     @Override
@@ -296,12 +303,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+    public DeleteCaseEventOutcome deleteSubtreeRootedAt(String subtreeRootCaseId) {
         Case subtreeRoot = findOne(subtreeRootCaseId);
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
             ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
         }
-        deleteCase(subtreeRootCaseId);
+        return deleteCase(subtreeRootCaseId);
     }
 
     @Override
@@ -358,7 +365,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
 
-    public List<Field> getData(String caseId) {
+    public GetDataEventOutcome getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
         if (!optionalUseCase.isPresent())
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
@@ -373,7 +380,9 @@ public class WorkflowService implements IWorkflowService {
         });
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-        return fields;
+        GetDataEventOutcome outcome = new GetDataEventOutcome();
+        outcome.setData(fields);
+        return outcome;
     }
 
     private void resolveTaskRefs(Case useCase) {

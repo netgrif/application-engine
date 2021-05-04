@@ -9,6 +9,9 @@ import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -77,14 +80,14 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
+    public EventOutcomeWithMessageResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return new CaseResource(useCase);
+            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getACase().getStringId() + " was created succesfully", outcome);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:",e);
-            return null;
+            return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
         }
     }
 
@@ -188,30 +191,31 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+    public EventOutcomeWithMessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            DeleteCaseEventOutcome outcome;
             if(deleteSubtree) {
-                workflowService.deleteSubtreeRootedAt(caseId);
+                outcome = workflowService.deleteSubtreeRootedAt(caseId);
             } else {
-                workflowService.deleteCase(caseId);
+                outcome = workflowService.deleteCase(caseId);
             }
-            return MessageResource.successMessage("Case " + caseId + " was deleted");
+            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted", outcome);
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case ["+caseId+"] failed:",e);
-            return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
 
     @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
+    public EventOutcomeWithMessageResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId), locale);
+            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",workflowService.getData(caseId));
         } catch (UnsupportedEncodingException e) {
             log.error("Getting all case data of ["+caseId+"] failed:", e);
-            return new DataFieldsResource(new ArrayList<>(), locale);
+            return EventOutcomeWithMessageResource.errorMessage("Getting all case data of [" + caseId + "] failed:" + e.getMessage());
         }
     }
 

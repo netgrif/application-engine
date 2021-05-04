@@ -41,7 +41,7 @@ class DataActionTest {
         def $case = importHelper.createCase("Case 1", mainNet.get())
         Task task = taskService.findOne($case.tasks.first().task)
 
-        List<Field> dataGet = dataService.getData($case.tasks.first().task)
+        List<Field> dataGet = dataService.getData($case.tasks.first().task).getData()
         dataGet.first().value == ";get-pre;get-post"
 
         ChangedFieldsTree dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
@@ -49,7 +49,7 @@ class DataActionTest {
                         "value": "",
                         "type" : "text"
                 ] as Map
-        ))
+        )).getData()
         dataSet.getChangedFields()["text_field"].attributes["value"] == ";set-pre;set-post"
     }
 }
