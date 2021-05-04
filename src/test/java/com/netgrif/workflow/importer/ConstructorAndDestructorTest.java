@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,9 +46,9 @@ public class ConstructorAndDestructorTest {
 
     @Test
     public void testConstructorAndDestructor() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), "major", superCreator.getLoggedSuper());
 
-        assert net.isPresent();
+        assert outcome.getNet() != null;
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Construct"));
 
         assert caseOpt.isPresent();

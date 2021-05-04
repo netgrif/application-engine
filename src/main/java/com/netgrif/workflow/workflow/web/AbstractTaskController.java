@@ -11,6 +11,7 @@ import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableExc
 import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -85,52 +86,52 @@ public abstract class AbstractTaskController {
         return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
-    public LocalisedEventOutcomeResource assign(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.assignTask(loggedUser, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(), taskService.assignTask(loggedUser, taskId));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
+            return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
-    public LocalisedEventOutcomeResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
+    public EventOutcomeWithMessageResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         Long userId = delegatedId != null ? Long.parseLong(delegatedId) : null;
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, userId, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to [" + userId + "]");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + userId + "]",
+                    taskService.delegateTask(loggedUser, userId, taskId));
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
+            return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
-    public LocalisedEventOutcomeResource finish(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource finish(LoggedUser loggedUser, String taskId, Locale locale) {
 
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.finishTask(loggedUser, taskId), locale,
-                    "LocalisedTask " + taskId + " finished");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
+                    taskService.finishTask(loggedUser, taskId));
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+//                todo doriešiť locale
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
             } else {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
             }
         }
     }
 
-    public LocalisedEventOutcomeResource cancel(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.cancelTask(loggedUser, taskId), locale,
-                    "LocalisedTask " + taskId + " canceled");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled", taskService.cancelTask(loggedUser, taskId));
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+                //                todo locale
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
             } else {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
             }
         }
     }
@@ -194,7 +195,7 @@ public abstract class AbstractTaskController {
     }
 
     public ChangedFieldContainer setData(String taskId, ObjectNode dataBody) {
-        return dataService.setData(taskId, dataBody).flatten();
+        return dataService.setData(taskId, dataBody).getData().flatten();
     }
 
     public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {

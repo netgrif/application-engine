@@ -17,9 +17,10 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.EventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
@@ -125,11 +126,11 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+    ImportPetriNetOutcome createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    ImportPetriNetOutcome createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         return petriNetService.importPetriNet(netStream, release, author)
     }
@@ -137,7 +138,7 @@ class ImportHelper {
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
-            return createNet(filename, release, author)
+            return createNet(filename, release, author).getNet()
         }
         return Optional.of(petriNet)
     }
