@@ -1,0 +1,32 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>dynamic_choices</id>
+    <title>dynamic_choices</title>
+    <defaultRole>true</defaultRole>
+    <initials>DVT</initials>
+
+    <caseName dynamic="true">
+        new I18nString("SK $text.value" as String, ["en": "EN $text.value" as String])
+    </caseName>
+    <!-- ROLES -->
+    <data type="number">
+        <id>number</id>
+        <title>number</title>
+        <init dynamic="true">1 + 2 + 3</init>
+    </data>
+    <data type="text">
+        <id>text</id>
+        <title>text</title>
+        <init dynamic="true">
+            "text value ${number.value as Integer}" as String
+        </init>
+    </data>
+
+    <transition>
+        <id>transition</id>
+        <x>200</x>
+        <y>200</y>
+        <label>Transition</label>
+        <assignPolicy>auto</assignPolicy>
+    </transition>
+
+</document>
