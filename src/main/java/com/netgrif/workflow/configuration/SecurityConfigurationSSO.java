@@ -1,6 +1,8 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.service.OauthUserService;
+import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
@@ -15,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -81,8 +84,6 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
     private String[] serverPatterns;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
-
-
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {

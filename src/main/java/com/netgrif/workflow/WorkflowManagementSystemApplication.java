@@ -1,10 +1,13 @@
 package com.netgrif.workflow;
 
+import com.netgrif.workflow.auth.service.UserService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.ApplicationContextProvider;
 import com.netgrif.workflow.configuration.JsonRootRelProvider;
 import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -14,7 +17,6 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,6 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @SpringBootApplication
 @EnableMongoAuditing
-@EnableOAuth2Client
 public class WorkflowManagementSystemApplication {
 
     @Bean
@@ -33,6 +34,12 @@ public class WorkflowManagementSystemApplication {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new StringToVersionConverter());
         return new MongoCustomConversions(converters);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public IUserService userService() {
+        return new UserService();
     }
 
     @Bean
