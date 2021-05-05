@@ -45,20 +45,13 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super.setDefaultValue(defaultValue)
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     Field clone() {
         EnumerationMapField clone = new EnumerationMapField()
         super.clone(clone)
-
         clone.options = options
-        clone.defaultValue = defaultValue
-
+        clone.optionsExpression = optionsExpression
         return clone
     }
 }
