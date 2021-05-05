@@ -106,6 +106,7 @@ class ActionDelegate {
     /**
      * Reference of case and task in which current action is taking place.
      */
+    PetriNet petriNet
     Case useCase
     Optional<Task> task
     def map = [:]
@@ -114,15 +115,20 @@ class ActionDelegate {
     ChangedFieldsTree changedFieldsTree
 
     def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
+        return init(action, useCase.petriNet, useCase, task, actionsRunner)
+    }
+
+    def init(Action action, PetriNet petriNet, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
         this.action = action
+        this.petriNet = petriNet
         this.useCase = useCase
         this.task = task
         this.actionsRunner = actionsRunner
         action.fieldIds.each { name, id ->
-            if (useCase.petriNet.dataSet[id]) {
+            if (petriNet.dataSet[id]) {
                 set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
             } else {
-                set(name, fieldFactory.buildStaticFieldWithoutValidation(useCase.petriNet, id))
+                set(name, fieldFactory.buildStaticFieldWithoutValidation(petriNet, id))
             }
         }
         action.transitionIds.each { name, id ->
@@ -206,7 +212,7 @@ class ActionDelegate {
     }
 
     def saveChangedValue(Field field) {
-        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].value = field.value) : (useCase.dataSet[field.stringId].value = field.value)
+        field.isStatic() ? (petriNet.staticDataSet[field.stringId].value = field.value) : (useCase.dataSet[field.stringId].value = field.value)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -215,7 +221,7 @@ class ActionDelegate {
     }
 
     def saveChangedChoices(ChoiceField field) {
-        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].choices = field.choices) : (useCase.dataSet[field.stringId].choices = field.choices)
+        field.isStatic() ? (petriNet.staticDataSet[field.stringId].choices = field.choices) : (useCase.dataSet[field.stringId].choices = field.choices)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -223,7 +229,7 @@ class ActionDelegate {
     }
 
     def saveChangedAllowedNets(CaseField field) {
-        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].allowedNets = field.allowedNets) : (useCase.dataSet[field.stringId].allowedNets = field.allowedNets)
+        field.isStatic() ? (petriNet.staticDataSet[field.stringId].allowedNets = field.allowedNets) : (useCase.dataSet[field.stringId].allowedNets = field.allowedNets)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -231,7 +237,7 @@ class ActionDelegate {
     }
 
     def saveChangedOptions(MapOptionsField field) {
-        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].options = field.options) : (useCase.dataSet[field.stringId].options = field.options)
+        field.isStatic() ? (petriNet.staticDataSet[field.stringId].options = field.options) : (useCase.dataSet[field.stringId].options = field.options)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -368,10 +374,10 @@ class ActionDelegate {
             return
         }
         if (value == null) {
-            if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
+            if (field instanceof FieldWithDefault && field.defaultValue != getFieldValue(field.stringId)) {
                 field.clearValue()
                 saveChangedValue(field)
-            } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
+            } else if (!(field instanceof FieldWithDefault) && getFieldValue(field.stringId) != null) {
                 field.clearValue()
                 saveChangedValue(field)
             }
@@ -385,6 +391,10 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
+    }
+
+    def getFieldValue(String fieldId) {
+        return petriNet.dataSet[fieldId] ? useCase.dataSet[fieldId].value : petriNet.staticDataSet[fieldId].value
     }
 
     def always = { return ALWAYS_GENERATE }

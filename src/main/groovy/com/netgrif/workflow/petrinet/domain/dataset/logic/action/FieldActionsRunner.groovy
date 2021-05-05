@@ -4,6 +4,7 @@ import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
 import com.netgrif.workflow.configuration.properties.ActionsProperties
 import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
@@ -53,13 +54,21 @@ abstract class FieldActionsRunner {
     }
 
     ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task) {
+        return run(action, useCase.petriNet, useCase, task)
+    }
+
+    ChangedFieldsTree run(Action action, PetriNet net) {
+        return run(action, net, null, Optional.empty())
+    }
+
+    ChangedFieldsTree run(Action action, PetriNet net, Case useCase, Optional<Task> task) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action)
         try {
-            code.init(action, useCase, task, this)
+            code.init(action, net, useCase, task, this)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")

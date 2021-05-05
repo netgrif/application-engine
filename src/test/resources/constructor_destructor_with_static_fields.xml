@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>constructor_destructor_static</id>
+    <title>Constructor and Destructor</title>
+    <initials>CAD</initials>
+    <!-- ROLES -->
+    <role>
+        <id>process_role</id>
+        <title>Process role</title>
+    </role>
+    <roleRef>
+        <id>process_role</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>false</delete>
+        </caseLogic>
+    </roleRef>
+    <processEvents>
+        <event type="upload">
+            <id>upload</id>
+            <actions phase="post">
+
+                <action>
+                    static_text: f.static_text;
+
+                    change static_text value { "Process event POST" }
+                </action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    static_text_2: f.static_text_2;
+
+                    change static_text_2 value { "Case event POST" }
+                </action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>pdf</id>
+            <actions phase="post">
+            </actions>
+        </event>
+    </caseEvents>
+
+    <data type="text">
+        <id>static_text</id>
+        <title>Static text</title>
+
+        <action trigger="set">
+            static_text: f.static_text,
+            static_number: f.static_number;
+
+            change static_number value { static_text.value?.length() as Double }
+        </action>
+        <static>true</static>
+    </data>
+    <data type="number">
+        <id>static_number</id>
+        <title>Static number</title>
+        <static>true</static>
+    </data>
+
+    <data type="text">
+        <id>static_text_2</id>
+        <title>Static text</title>
+
+        <action trigger="set">
+            static_text_2: f.static_text_2,
+            static_number_2: f.static_number_2;
+
+            change static_number_2 value { static_text_2.value?.length() as Double }
+        </action>
+        <static>true</static>
+    </data>
+    <data type="number">
+        <id>static_number_2</id>
+        <title>Static number</title>
+        <static>true</static>
+    </data>
+
+</document>

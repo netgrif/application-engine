@@ -96,4 +96,6 @@ public interface IPetriNetService {
     void saveNetIfStaticFieldsChanged(PetriNet petriNet, Set<String> fieldIds);
 
     PetriNet saveStaticChanges(PetriNet petriNet);
+
+    ChangedFieldsTree runActions(List<Action> actions, PetriNet net);
 }

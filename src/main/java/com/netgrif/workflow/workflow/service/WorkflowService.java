@@ -220,7 +220,7 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
 
-        runActions(petriNet.getPreCreateActions());
+        runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -260,7 +260,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions());
+        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -487,16 +487,8 @@ public class WorkflowService implements IWorkflowService {
             runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
         });
         save(case$);
+        petriNetService.saveNetIfStaticFieldsChanged(case$.getPetriNet(), changedFields);
         return changedFields;
-    }
-
-    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
-        newChangedFields.forEach((s, changedField) -> {
-            if (changedFields.containsKey(s))
-                changedFields.get(s).merge(changedField);
-            else
-                changedFields.put(s, changedField);
-        });
     }
 
     private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
@@ -532,11 +524,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void runActions(List<Action> actions) {
+    public void runActions(List<Action> actions, PetriNet net) {
         log.info("Running actions without context on cases");
-
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew("");
         actions.forEach(action -> {
-            actionsRunner.run(action, null, Optional.empty());
+            changedFields.mergeChangedFields(actionsRunner.run(action, net, null, Optional.empty()));
         });
+        petriNetService.saveNetIfStaticFieldsChanged(net, changedFields);
     }
 }

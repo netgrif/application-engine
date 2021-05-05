@@ -6,11 +6,13 @@ import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
@@ -166,7 +168,7 @@ public class PetriNetService implements IPetriNetService {
         runActions(net.getPreUploadActions(), net.getStringId());
         evaluateRules(net, EventPhase.PRE);
         save(net);
-        runActions(net.getPostUploadActions(), net.getStringId());
+        runActions(net.getPostUploadActions(), net);
         evaluateRules(net, EventPhase.POST);
         save(net);
         cache.put(net.getObjectId(), net);
@@ -400,15 +402,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public void runActions(List<Action> actions, String netId) {
-        log.info("Running actions of net [" + netId + "]");
-
-        actions.forEach(action -> {
-            actionsRunner.run(action, null);
-        });
-    }
-
-    @Override
     public void saveNetIfStaticFieldsChanged(PetriNet petriNet, ChangedFieldsTree changes) {
         saveNetIfStaticFieldsChanged(petriNet, changes.getChangedFields().keySet());
     }
@@ -431,4 +424,62 @@ public class PetriNetService implements IPetriNetService {
         changed.getStaticDataSet().forEach((fieldId, field) -> actual.getStaticDataSet().put(fieldId, field.clone()));
     }
 
+    @Override
+    public void runActions(List<Action> actions, String netId) {
+        log.info("Running actions of net [" + netId + "]");
+
+        actions.forEach(action -> {
+            actionsRunner.run(action, null, null, Optional.empty());
+        });
+    }
+
+    @Override
+    public ChangedFieldsTree runActions(List<Action> actions, PetriNet net) {
+        log.info("Running actions of net [" + net.getStringId() + "]");
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew("");
+        if (actions.isEmpty())
+            return changedFields;
+
+        actions.forEach(action -> {
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, net);
+            changedFields.mergeChangedFields(changedFieldsTree);
+            if (changedFieldsTree.getChangedFields().isEmpty()) {
+                return;
+            }
+            runEventActionsOnChanged(net, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
+        });
+        return changedFields;
+    }
+
+    private void runEventActionsOnChanged(PetriNet net, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
+        newChangedField.forEach((id, changedField) -> {
+            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
+                Field field = net.getStaticField(id).get();
+                processDataEvents(field, trigger, EventPhase.PRE, net, changedFields);
+                processDataEvents(field, trigger, EventPhase.POST, net, changedFields);
+            }
+        });
+    }
+
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, PetriNet net, ChangedFieldsTree changedFields){
+        LinkedList<Action> fieldActions = new LinkedList<>();
+        if (field.getEvents() != null){
+            fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
+        }
+        if (fieldActions.isEmpty()) return;
+
+        runEventActions(net, fieldActions, changedFields, actionTrigger);
+    }
+
+    private void runEventActions(PetriNet net, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
+        actions.forEach(action -> {
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, net);
+            changedFields.mergeChangedFields(currentChangedFields);
+
+            if (currentChangedFields.getChangedFields().isEmpty())
+                return;
+
+            runEventActionsOnChanged(net, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+        });
+    }
 }
