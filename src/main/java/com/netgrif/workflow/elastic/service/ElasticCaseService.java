@@ -180,7 +180,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildNegativeViewRoleQuery(query, user);
+        buildUsersRoleQuery(request, query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -223,12 +223,39 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
 
+    protected void buildUsersRoleQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+        BoolQueryBuilder userRoleQuery = boolQuery();
+        buildUsersQuery(userRoleQuery, user);
+        negativeUserRoleQuery(userRoleQuery, user);
+
+        query.filter(userRoleQuery);
+    }
+
+    private void negativeUserRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeQuery = boolQuery();
+        buildNegativeViewRoleQuery(negativeQuery, user);
+        buildNegativeViewUsersQuery(negativeQuery, user);
+        query.should(negativeQuery);
+    }
+
+    private void buildUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder usersQuery = boolQuery();
+        usersQuery.should(termQuery("users", user.getId()));
+        query.should(usersQuery);
+    }
+
     private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder negativeRoleQuery = boolQuery();
         for (String roleId : user.getProcessRoles()) {
             negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
         }
 
+        query.mustNot(negativeRoleQuery);
+    }
+
+    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
         query.mustNot(negativeRoleQuery);
     }
 
