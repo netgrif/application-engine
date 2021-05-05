@@ -38,6 +38,11 @@ public class I18nString {
         this.translations.putAll(other.translations);
     }
 
+    public I18nString(String defaultValue, Map<String, String> translations) {
+        this(defaultValue);
+        this.translations = translations;
+    }
+
     public void addTranslation(String locale, String translation) {
         translations.put(locale, translation);
     }
