@@ -33,20 +33,11 @@ abstract class FieldActionsRunner {
     @Autowired
     private FieldFactory fieldFactory
 
-    private Map<String, Object> actionsCache = new HashMap<>()
-    private Map<String, Closure> actions = new HashMap<>()
-    private ImportCustomizer importCustomizer
+    @Autowired
     private CompilerConfiguration configuration
 
-    @Autowired
-    FieldActionsRunner(ActionsProperties actionsProperties) {
-        importCustomizer = new ImportCustomizer()
-        importCustomizer.addImports(actionsProperties.imports as String[])
-        importCustomizer.addStarImports(actionsProperties.starImports as String[])
-        importCustomizer.addStaticStars(actionsProperties.staticStarImports as String[])
-        configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers(importCustomizer)
-    }
+    private Map<String, Object> actionsCache = new HashMap<>()
+    private Map<String, Closure> actions = new HashMap<>()
 
     ChangedFieldsTree run(Action action, Case useCase) {
         return run(action, useCase, Optional.empty())

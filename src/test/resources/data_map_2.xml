@@ -14,8 +14,10 @@
             <option key="second" name="second_option">Second option</option>
             <option key="third" name="third_option">Third option</option>
         </options>
-        <init>second</init>
-        <init>first</init>
+        <inits>
+            <init>second</init>
+            <init>first</init>
+        </inits>
     </data>
     <!-- I18N -->
     <i18n locale="sk">
