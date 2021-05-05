@@ -20,37 +20,35 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
 public class UserService implements IUserService {
 
     @Autowired
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
 
     @Autowired
-    private AuthorityRepository authorityRepository;
+    protected AuthorityRepository authorityRepository;
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository;
+    protected ProcessRoleRepository processRoleRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    protected BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private IUserProcessRoleService userProcessRoleService;
+    protected IUserProcessRoleService userProcessRoleService;
 
     @Autowired
-    private IMemberService memberService;
+    protected IMemberService memberService;
 
     @Autowired
-    private INextGroupService groupService;
+    protected INextGroupService groupService;
 
     @Override
     public User saveNew(User user) {
