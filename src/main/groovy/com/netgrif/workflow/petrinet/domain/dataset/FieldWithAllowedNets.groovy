@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-abstract class FieldWithAllowedNets<T> extends FieldWithDefault<T> {
+abstract class FieldWithAllowedNets<T> extends Field<T> {
 
     private List<String> allowedNets
 
