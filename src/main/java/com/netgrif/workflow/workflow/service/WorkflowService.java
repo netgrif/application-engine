@@ -32,6 +32,7 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCas
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -95,6 +96,9 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
+
     private IElasticCaseService elasticCaseService;
 
     @Autowired
@@ -116,6 +120,7 @@ public class WorkflowService implements IWorkflowService {
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
+        resolveUserRef(useCase);
         return useCase;
     }
 
@@ -188,9 +193,12 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case resolveUserRef(Case useCase) {
         useCase.getUsers().clear();
+        useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+                useCase.getNegativeViewUsers().addAll(userIds);
+            } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
             }
         });
@@ -209,16 +217,20 @@ public class WorkflowService implements IWorkflowService {
             locale = LocaleContextHolder.getLocale();
         }
         if (title == null) {
-            PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-            title = petriNet.getDefaultCaseName().getTranslation(locale);
+            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale), color, user);
         }
         return this.createCase(netId, title, color, user);
     }
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user) {
+        return createCase(netId, (u) -> title, color, user);
+    }
+
+    public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
+        Case useCase = new Case(petriNet, petriNet.getActivePlaces());
+        useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
@@ -235,13 +247,13 @@ public class WorkflowService implements IWorkflowService {
                 .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
-
+        useCase.setTitle(makeTitle.apply(useCase));
         runActions(petriNet.getPreCreateActions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
-        log.info("[" + useCase.getStringId() + "]: Case " + title + " created");
+        log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
@@ -255,6 +267,17 @@ public class WorkflowService implements IWorkflowService {
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.setACase(setImmediateDataFields(useCase));
         return outcome;
+    }
+
+    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {
+        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        Function<Case, String> makeTitle;
+        if (petriNet.hasDynamicCaseName()) {
+            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression()).getTranslation(locale);
+        } else {
+            makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
+        }
+        return makeTitle;
     }
 
     @Override
