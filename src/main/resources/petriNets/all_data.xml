@@ -104,7 +104,10 @@
         <values>Alice</values>
         <values>Bob</values>
         <values>Carol</values>
-        <init>Alice,Bob</init>
+        <inits>
+            <init>Alice</init>
+            <init>Bob</init>
+        </inits>
     </data>
     <data type="multichoice" immediate="true">
         <id>multichoice_list</id>
@@ -126,7 +129,10 @@
             <option key="bo">Bob</option>
             <option key="ca">Carol</option>
         </options>
-        <init>al, ca</init>
+        <inits>
+            <init>al</init>
+            <init>ca</init>
+        </inits>
     </data>
 
     <data type="boolean" immediate="true">
@@ -144,6 +150,9 @@
     <data type="taskRef">
         <id>taskRef</id>
         <title>Task Ref</title>
+        <inits>
+            <init>4</init>
+        </inits>
     </data>
 
     <data type="file" immediate="true">
@@ -182,6 +191,12 @@
         <component>
             <name>fab</name>
         </component>
+    </data>
+
+    <data type="text">
+        <id>taskref_test_field</id>
+        <title>Text datafield z iného transitionu</title>
+        <init>Field načítaný pomocou taskrefu</init>
     </data>
     <!-- TRANSITIONS -->
     <transition>
@@ -359,6 +374,17 @@
                     <action trigger="set">
                         generatePDF("1","file")
                     </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>taskRef</id>
+            <title>Task refs</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>taskRef</id>
+                <logic>
+                    <behavior>editable</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -625,5 +651,22 @@
                 </logic>
             </dataRef>
 		</dataGroup>
+    </transition>
+    <transition>
+        <id>4</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task ref test transition</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>taskref</id>
+            <title>Task ref test group</title>
+            <dataRef>
+                <id>taskref_test_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
 </document>
