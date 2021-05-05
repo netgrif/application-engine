@@ -84,7 +84,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        builder.andNot(buildNegativeRolesQueryConstraint(user));
+        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
+        negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
+
+        BooleanBuilder userConstraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
+        userConstraints.orNot(negativeConstraints);
+
+        builder.and(userConstraints);
 
         return builder;
     }
@@ -96,6 +102,24 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate roleNegativeQuery(String role) {
         return QCase.case$.negativeViewRoles.contains(role);
+    }
+
+    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = negativeViewUsersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewUsersQuery(Long userId) {
+        return QCase.case$.negativeViewUsers.contains(userId);
+    }
+
+    protected Predicate buildViewUsersQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUsersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUsersQuery(Long userId) {
+        return QCase.case$.users.containsKey(userId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
