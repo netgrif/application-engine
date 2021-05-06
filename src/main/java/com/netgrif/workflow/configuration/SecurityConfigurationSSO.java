@@ -108,18 +108,19 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
         log.info("Configuration with frontend separated");
 //        @formatter:off
         http
-                .httpBasic()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+//                .httpBasic()
+//                .and()
                 .cors()
                 .and()
                 .addFilterBefore(new ApiTokenAccessFilter(tokenServices), AbstractPreAuthenticatedProcessingFilter.class)
                 .addFilterAfter(new OAuth2AuthenticationConvertingFilter(oauthUserMapper), ApiTokenAccessFilter.class)
+//                .authenticationEntryPoint (authenticationEntryPoint)
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .logout()
                 .logoutUrl("/api/auth/logout")
