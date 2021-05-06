@@ -12,8 +12,8 @@ import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-
 
 @Component
 class ImportHelper {
@@ -221,7 +220,7 @@ class ImportHelper {
 
     ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-        dataService.setData(taskId, dataSet)
+         dataService.setData(taskId, dataSet)
     }
 
     ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
