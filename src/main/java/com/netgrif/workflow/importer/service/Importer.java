@@ -1,9 +1,12 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.model.DataEventType;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.workflow.petrinet.domain.events.*;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.Event;
-import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -13,21 +16,27 @@ import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
+import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,17 +49,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class Importer {
 
-    public static final Logger log = LoggerFactory.getLogger(Importer.class);
-
-    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
-
-    private Config config;
+    @Getter
     private Document document;
     private PetriNet net;
     private ProcessRole defaultRole;
@@ -88,12 +94,18 @@ public class Importer {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
+
+    @Autowired
+    private ComponentFactory componentFactory;
+
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            initialize(config);
+            initialize();
             unmarshallXml(xml);
-            return createPetriNet(title, initials);
+            return createPetriNet();
         } catch (JAXBException e) {
             log.error("Importing Petri net failed: ", e);
         }
@@ -101,27 +113,16 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            return importPetriNet(new FileInputStream(xml), title, initials, config);
+            return importPetriNet(new FileInputStream(xml));
         } catch (FileNotFoundException e) {
             log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
 
-    @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials) {
-        return importPetriNet(xml, title, initials, new Config());
-    }
-
-    @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
-        return importPetriNet(xml, title, initials, new Config());
-    }
-
-    private void initialize(Config config) {
-        this.config = config;
+    private void initialize() {
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
@@ -143,7 +144,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
@@ -151,33 +152,78 @@ public class Importer {
     }
 
     @Transactional
-    protected Optional<PetriNet> createPetriNet(String title, String initials) {
+    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new PetriNet();
-        net.setImportId(document.getId() != null ? document.getId() : new ObjectId().toString());
-        net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
+
+        setMetaData();
+        net.setIcon(document.getIcon());
+
         document.getRole().forEach(this::createRole);
-        document.getData().forEach(this::createDataSet);
+        for (com.netgrif.workflow.importer.model.Data data : document.getData()) {createDataSet(data);}
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
-        document.getTransition().forEach(this::createTransition);
+        for (com.netgrif.workflow.importer.model.Transition transition: document.getTransition()) {createTransition(transition);}
         document.getArc().forEach(this::createArc);
-        document.getMapping().forEach(this::applyMapping);
+        for (com.netgrif.workflow.importer.model.Mapping mapping: document.getMapping()) {applyMapping(mapping);}
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
+        document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
+        document.getRoleRef().forEach(this::resolveRoleRef);
+        document.getUsersRef().forEach(this::resolveUsersRef);
+        resolveProcessEvents(document.getProcessEvents());
+        resolveCaseEvents(document.getCaseEvents());
 
-        net.setTitle(title != null ? new I18nString(title) : toI18NString(document.getTitle()));
-        net.setInitials(initials != null ? initials : document.getInitials());
-        net.setDefaultCaseName(toI18NString(document.getCaseName()));
-        net.setIdentifier(document.getId());
-
-        if (config.isNotSaveObjects()) {
-            return service.saveNew(net);
+        if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
+            net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
         } else {
-            return Optional.of(net);
+            net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        }
+
+        return Optional.of(net);
+    }
+
+    @Transactional
+    protected void resolveRoleRef(CaseRoleRef roleRef) {
+        CaseLogic logic = roleRef.getCaseLogic();
+        String roleId = getRole(roleRef.getId()).getStringId();
+
+        if (logic == null || roleId == null) {
+            return;
+        }
+        if (logic.isView() != null && !logic.isView()) {
+            net.addNegativeViewRole(roleId);
+        }
+
+        net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
+    }
+
+    @Transactional
+    protected void resolveUsersRef(CaseUsersRef usersRef) {
+        CaseLogic logic = usersRef.getCaseLogic();
+        String usersId = usersRef.getId();
+
+        if (logic == null || usersId == null) {
+            return;
+        }
+
+        net.addUsersPermission(usersId, roleFactory.getProcessPermissions(logic));
+    }
+
+    @Transactional
+    protected void resolveProcessEvents(ProcessEvents processEvents) {
+        if (processEvents != null && processEvents.getEvent() != null) {
+           net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
+        }
+    }
+
+    @Transactional
+    protected void resolveCaseEvents(CaseEvents caseEvents) {
+        if (caseEvents != null && caseEvents.getEvent() != null) {
+            net.setCaseEvents(createCaseEventsMap(caseEvents.getEvent()));
         }
     }
 
@@ -186,7 +232,7 @@ public class Importer {
         try {
             actionsRunner.getActionCode(action);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition());
+            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
         }
     }
 
@@ -218,28 +264,38 @@ public class Importer {
     }
 
     @Transactional
-    protected void applyMapping(Mapping mapping) {
+    protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
         Transition transition = getTransition(mapping.getTransitionRef());
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
         mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
-        mapping.getDataGroup().forEach(dataGroup -> addDataGroup(transition, dataGroup));
+        for (com.netgrif.workflow.importer.model.DataGroup dataGroup : mapping.getDataGroup()) { addDataGroup(transition, dataGroup); }
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
     }
 
     @Transactional
     protected void resolveDataActions(Data data) {
         if (data.getAction() != null) {
-            getField(data.getId()).setActions(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
+            getField(data.getId()).setEvents(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
         }
-        if (data.getActionRef() != null) {
-            getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
+        if (data.getEvent() != null && data.getEvent().size() > 0) {
+            getField(data.getId()).addEvents(buildEvents(data.getEvent(), null));
         }
     }
 
-    private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
-        LinkedHashSet<Action> refs = new LinkedHashSet<>();
+    @Transactional
+    protected void addActionRefs(Data data) {
+        if (data.getActionRef() != null) {
+            getField(data.getId()).addEvents(buildActionRefs(data.getActionRef()));
+        }
+    }
+
+    private LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
+        LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> refs = new LinkedHashSet<>();
         for (ActionRefType actionRef : actionRefs) {
-            refs.add(fromActionRef(actionRef));
+            Action action = actions.get(actionRef.getId());
+            com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
+            dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(fromActionRef(actionRef));
+            refs.add(dataEvent);
         }
         return refs;
     }
@@ -270,12 +326,15 @@ public class Importer {
         dataRef.forEach(ref -> {
             String fieldId = getField(ref.getId()).getStringId();
             if (ref.getLogic().getAction() != null) {
-                getTransition(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
+                getTransition(trans.getId()).addDataEvents(fieldId, buildActions(ref.getLogic().getAction(),
                         fieldId,
                         getTransition(trans.getId()).getStringId()));
             }
             if (ref.getLogic().getActionRef() != null) {
-                getTransition(trans.getId()).addActions(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
+                getTransition(trans.getId()).addDataEvents(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
+            }
+            if (ref.getEvent() != null){
+                getTransition(trans.getId()).addDataEvents(fieldId, buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId()));
             }
         });
     }
@@ -301,7 +360,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createDataSet(Data importData) {
+    protected void createDataSet(Data importData) throws MissingIconKeyException {
         Field field = fieldFactory.getField(importData, this);
 
         net.addDataSetField(field);
@@ -309,11 +368,15 @@ public class Importer {
     }
 
     @Transactional
-    protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) {
+    protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) throws MissingIconKeyException {
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        if (importTransition.getLayout() != null) {
+            transition.setLayout(new TaskLayout(importTransition));
+        }
+
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -325,10 +388,14 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        if (importTransition.getUsersRef() != null) {
+            importTransition.getUsersRef().forEach(usersRef ->
+                    addUserLogic(transition, usersRef));
+        }
         if (importTransition.getDataRef() != null) {
-            importTransition.getDataRef().forEach(dataRef ->
-                    addDataWithDefaultGroup(transition, dataRef)
-            );
+            for (com.netgrif.workflow.importer.model.DataRef dataRef : importTransition.getDataRef()) {
+                addDataWithDefaultGroup(transition, dataRef);
+            }
         }
         if (importTransition.getTrigger() != null) {
             importTransition.getTrigger().forEach(trigger ->
@@ -339,35 +406,39 @@ public class Importer {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
         if (importTransition.getDataGroup() != null) {
-            importTransition.getDataGroup().forEach(dataGroup ->
-                    addDataGroup(transition, dataGroup)
-            );
+            for (com.netgrif.workflow.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
+                addDataGroup(transition, dataGroup);
+            }
         }
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
-        }
-        if (isTransitionRoleAllowed()) {
-            addTransitionRole(transition);
         }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     transition.addEvent(addEvent(transition.getImportId(), event))
             );
         }
+        if (importTransition.getAssignedUser() != null) {
+            addAssignedUserPolicy(importTransition, transition);
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
     }
 
-    private void addTransitionRole(Transition transition) {
-        ProcessRole role = roleFactory.transitionRole(net, transition);
-        transition.addRole(role.getStringId(), Collections.singleton(RolePermission.PERFORM));
-        transition.setDefaultRoleId(role.getStringId());
+    @Transactional
+    protected void addAssignedUserPolicy(com.netgrif.workflow.importer.model.Transition importTransition, Transition transition) {
+        if (importTransition.getAssignedUser().isCancel() != null) {
+            transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
+        }
+        if (importTransition.getAssignedUser().isReassign() != null) {
+            transition.getAssignedUserPolicy().put("reassign", importTransition.getAssignedUser().isReassign());
+        }
     }
 
     @Transactional
-    protected Event addEvent(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
-        Event event = new Event();
+    protected com.netgrif.workflow.petrinet.domain.events.Event addEvent(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+        com.netgrif.workflow.petrinet.domain.events.Event event = new com.netgrif.workflow.petrinet.domain.events.Event();
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
         event.setTitle(toI18NString(imported.getTitle()));
@@ -378,15 +449,37 @@ public class Importer {
         return event;
     }
 
-    private List<Action> parsePostActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    @Transactional
+    protected com.netgrif.workflow.petrinet.domain.events.ProcessEvent addProcessEvent(com.netgrif.workflow.importer.model.ProcessEvent imported) {
+        com.netgrif.workflow.petrinet.domain.events.ProcessEvent event = new com.netgrif.workflow.petrinet.domain.events.ProcessEvent();
+        event.setImportId(imported.getId());
+        event.setType(ProcessEventType.valueOf(imported.getType().value().toUpperCase()));
+        event.setPostActions(parsePostActions(null, imported));
+        event.setPreActions(parsePreActions(null, imported));
+
+        return event;
+    }
+
+    @Transactional
+    protected com.netgrif.workflow.petrinet.domain.events.CaseEvent addCaseEvent(com.netgrif.workflow.importer.model.CaseEvent imported) {
+        com.netgrif.workflow.petrinet.domain.events.CaseEvent event = new com.netgrif.workflow.petrinet.domain.events.CaseEvent();
+        event.setImportId(imported.getId());
+        event.setType(CaseEventType.valueOf(imported.getType().value().toUpperCase()));
+        event.setPostActions(parsePostActions(null, imported));
+        event.setPreActions(parsePreActions(null, imported));
+
+        return event;
+    }
+
+    private List<Action> parsePostActions(String transitionId, com.netgrif.workflow.importer.model.BaseEvent imported) {
         return parsePhaseActions(EventPhaseType.POST, transitionId, imported);
     }
 
-    private List<Action> parsePreActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    private List<Action> parsePreActions(String transitionId, com.netgrif.workflow.importer.model.BaseEvent imported) {
         return parsePhaseActions(EventPhaseType.PRE, transitionId, imported);
     }
 
-    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.BaseEvent imported) {
         List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
@@ -401,6 +494,21 @@ public class Importer {
         return actionList;
     }
 
+    private List<Action> parsePhaseActions(EventPhaseType phase, Action.ActionTrigger trigger, String transitionId, com.netgrif.workflow.importer.model.DataEvent dataEvent) {
+        List<Action> actionList = dataEvent.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .flatMap(actions -> actions.getAction().stream()
+                        .map(action -> {
+                            action.setTrigger(trigger.name());
+                            return parseAction(transitionId, action);}))
+                .collect(Collectors.toList());
+        actionList.addAll(dataEvent.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .flatMap(actions -> actions.getActionRef().stream().map(this::fromActionRef))
+                .collect(Collectors.toList()));
+        return actionList;
+    }
+
     @Transactional
     protected void addDefaultRole(Transition transition) {
         Logic logic = new Logic();
@@ -410,22 +518,32 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
+    protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
+        if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
+            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null));
+        }
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
         dataGroup.addData(getField(dataRef.getId()).getStringId());
         transition.addDataGroup(dataGroup);
 
         addDataLogic(transition, dataRef);
+        addDataLayout(transition, dataRef);
+        addDataComponent(transition, dataRef);
     }
 
     @Transactional
-    protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) {
+    protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
+
+        String dataGroupLayout = importDataGroup.getLayout() != null ? importDataGroup.getLayout().value() : null;
+
+        dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols(), dataGroupLayout));
+
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
         dataGroup.setStretch(importDataGroup.isStretch());
@@ -434,6 +552,8 @@ public class Importer {
 
         for (DataRef dataRef : importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
+            addDataLayout(transition, dataRef);
+            addDataComponent(transition, dataRef);
         }
     }
 
@@ -455,7 +575,21 @@ public class Importer {
             return;
         }
 
+        if (logic.isView() != null && !logic.isView()) {
+            transition.addNegativeViewRole(roleId);
+        }
         transition.addRole(roleId, roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addUserLogic(Transition transition, UsersRef usersRef) {
+        Logic logic = usersRef.getLogic();
+        String userRef = usersRef.getId();
+
+        if (logic == null || userRef == null) {
+            return;
+        }
+        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
     }
 
     @Transactional
@@ -472,16 +606,103 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            transition.addDataSet(fieldId, behavior, null);
+            transition.addDataSet(fieldId, behavior, null, null, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
     }
 
     @Transactional
-    protected LinkedHashSet<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected void addDataLayout(Transition transition, DataRef dataRef) {
+        Layout layout = dataRef.getLayout();
+        try {
+            String fieldId = getField(dataRef.getId()).getStringId();
+            if (layout == null || fieldId == null) {
+                return;
+            }
+
+            String appearance = "outline";
+            if (layout.getAppearance() != null) {
+                appearance = layout.getAppearance().toString();
+            }
+
+            String alignment = null;
+            if (layout.getAlignment() != null) {
+                alignment = layout.getAlignment().value();
+            }
+
+            String template = null;
+            if (layout.getTemplate() != null) {
+                template = layout.getTemplate().toString();
+            }
+
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
+            transition.addDataSet(fieldId, null, null, fieldLayout, null);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+        }
+    }
+
+    @Transactional
+    protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
+        String fieldId = getField(dataRef.getId()).getStringId();
+        Component component;
+        if((dataRef.getComponent()) == null)
+            component = getField(dataRef.getId()).getComponent();
+        else
+            component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
+        transition.addDataSet(fieldId, null, null, null, component);
+    }
+
+    @Transactional
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId) {
+        return events.stream()
+                .map(event -> parseDataEvents(transitionId, event))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event){
+        Map<EventPhase, List<Action>> actions = new HashMap<>();
+        actions.put(EventPhase.PRE, new ArrayList<>());
+        actions.put(EventPhase.POST, new ArrayList<>());
+
+        return parseDataEvent(event, actions, transitionId);
+    }
+
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId){
+        com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(event.getId(), event.getType().value());
+        event.getActions().forEach(eventAction -> {
+            EventPhaseType phaseType = eventAction.getPhase();
+            if(eventAction.getPhase() == null){
+                phaseType = event.getType().equals(DataEventType.GET) ? EventPhaseType.PRE : EventPhaseType.POST;
+            }
+            actions.get(EventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, dataEvent.getTrigger(), transitionId, event));
+        });
+        dataEvent.setActions(actions);
+        return dataEvent;
+    }
+
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction){
+        Action action = parseAction(fieldId, transitionId, importedAction);
+        com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = createDataEvent(action);
+        dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(action);
+        return dataEvent;
+    }
+
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent createDataEvent(Action action) {
+        com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent;
+        if (action.getId() != null) {
+            dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
+        } else {
+            dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(new ObjectId().toString(), action.getTrigger().toString());
+        }
+        return dataEvent;
+    }
+
+    @Transactional
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
         return imported.stream()
-                .map(action -> parseAction(fieldId, transitionId, action))
+                .map(action -> convertAction(fieldId, transitionId, action))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -533,7 +754,7 @@ public class Importer {
     }
 
     private boolean containsParams(String definition) {
-        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s][ft].[\\w]+;[\\w\\W\\s]*");
+        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
     }
 
     @Transactional
@@ -619,7 +840,7 @@ public class Importer {
     @Transactional
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
-        Map<EventType, Event> events = createEventsMap(importRole.getEvent());
+        Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
 
         role.setImportId(importRole.getId());
         role.setEvents(events);
@@ -629,20 +850,34 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        if (config.isNotSaveObjects()) {
-            role = roleRepository.save(role);
-        } else {
-            role.set_id(new ObjectId());
-        }
+        role.set_id(new ObjectId());
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
     }
 
-    private Map<EventType, Event> createEventsMap(List<com.netgrif.workflow.importer.model.Event> events) {
-        Map<EventType, Event> finalEvents = new HashMap<>();
+    private Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.workflow.importer.model.Event> events) {
+        Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> finalEvents = new HashMap<>();
         events.forEach(event ->
                 finalEvents.put(EventType.valueOf(event.getType().value().toUpperCase()), addEvent(null, event))
+        );
+
+        return finalEvents;
+    }
+
+    private Map<ProcessEventType, com.netgrif.workflow.petrinet.domain.events.ProcessEvent> createProcessEventsMap(List<com.netgrif.workflow.importer.model.ProcessEvent> events) {
+        Map<ProcessEventType, com.netgrif.workflow.petrinet.domain.events.ProcessEvent> finalEvents = new HashMap<>();
+        events.forEach(event ->
+                finalEvents.put(ProcessEventType.valueOf(event.getType().value().toUpperCase()), addProcessEvent(event))
+        );
+
+        return finalEvents;
+    }
+
+    private Map<CaseEventType, com.netgrif.workflow.petrinet.domain.events.CaseEvent> createCaseEventsMap(List<com.netgrif.workflow.importer.model.CaseEvent> events) {
+        Map<CaseEventType, com.netgrif.workflow.petrinet.domain.events.CaseEvent> finalEvents = new HashMap<>();
+        events.forEach(event ->
+                finalEvents.put(CaseEventType.valueOf(event.getType().value().toUpperCase()), addCaseEvent(event))
         );
 
         return finalEvents;
@@ -691,10 +926,15 @@ public class Importer {
             }
         }
         // TRUE if no roles and no triggers
-        return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
+                    (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
+                    (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
+                    (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
+                    (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
+                )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
-    PetriNet getNetByImportId(Long id) {
+    PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
         if (!net.isPresent()) {
             throw new IllegalArgumentException();
@@ -782,5 +1022,27 @@ public class Importer {
                 outputStream.write(bytes, 0, read);
             }
         }
+    }
+
+    private void setMetaData() throws MissingPetriNetMetaDataException {
+        List<String> missingMetaData = new ArrayList<>();
+        if (document.getId() != null) {
+            net.setImportId(document.getId());
+            net.setIdentifier(document.getId());
+        } else {
+            missingMetaData.add("<id>");
+        }
+        if (document.getTitle() != null) {
+            net.setTitle(toI18NString(document.getTitle()));
+        } else {
+            missingMetaData.add("<title>");
+        }
+        if (document.getInitials() != null) {
+            net.setInitials(document.getInitials());
+        } else {
+            missingMetaData.add("<initials>");
+        }
+        if (!missingMetaData.isEmpty())
+            throw new MissingPetriNetMetaDataException(missingMetaData);
     }
 }

@@ -8,38 +8,46 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.workflow.auth.web.responsebodies.UserResource;
-import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.workflow.auth.web.responsebodies.*;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
 import com.netgrif.workflow.settings.service.IPreferencesService;
 import com.netgrif.workflow.settings.web.PreferencesResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Provider;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
+@ConditionalOnProperty(
+        value = "nae.user.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@Api(tags = {"User"})
 public class UserController {
-
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private IUserService userService;
@@ -56,49 +64,72 @@ public class UserController {
     @Autowired
     private IPreferencesService preferencesService;
 
-    @Value("${server.auth.enable-profile-edit}")
-    private boolean enableProfileEdit;
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
-    @GetMapping
+    @Autowired
+    private IUserFactory userResponseFactory;
+
+    @Autowired
+    private Provider<UserResourceAssembler> userResourceAssemblerProvider;
+
+    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+        UserResourceAssembler result = userResourceAssemblerProvider.get();
+        result.initialize(locale, small, selfRel);
+        return result;
+    }
+
+    @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
         Page<User> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "all"), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "all"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
 
-    @PostMapping(value = "/search")
+    @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
-        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), ((LoggedUser) auth.getPrincipal()), small, pageable);
+        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), query.getNegativeRoles(), ((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "search"), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
 
-    @GetMapping("/{id}")
+    @ApiOperation(value = "Get user by id", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getUser(@PathVariable("id") Long userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small == null ? false : small;
-        return new UserResource(userService.findById(userId, small), "profile", locale, small);
+        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)){
+            log.info("User " + loggedUser.getUsername() + " trying to get another user with ID "+userId);
+            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
+        }
+        User user = userService.findById(userId, small);
+        return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
     }
 
-    @GetMapping("/me")
+    @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
         small = small == null ? false : small;
         if (!small)
-            return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), "profile", locale);
+            return new UserResource(userResponseFactory.getUser(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
         else
-            return new UserResource(((LoggedUser) auth.getPrincipal()).transformToUser(), "profile", locale);
+            return new UserResource(userResponseFactory.getUser(((LoggedUser) auth.getPrincipal()).transformToUser(), locale), "profile");
     }
 
-    @PostMapping("/{id}")
+    @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
-        if (!enableProfileEdit) return null;
+        if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         User user = userService.findById(userId, false);
@@ -111,22 +142,30 @@ public class UserController {
             userDetailsService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
-        return new UserResource(user, "profile", locale);
+        return new UserResource(userResponseFactory.getUser(user, locale), "profile");
     }
 
-    @PostMapping("/role")
+    @ApiOperation(value = "Get all users with specified roles", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
         small = small == null ? false : small;
         Page<User> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-            .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "role"), selfLink);
+                .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
+        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "role"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/role/assign")
+    @ApiOperation(value = "Assign role to the user",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
@@ -139,21 +178,37 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/authority")
+    @ApiOperation(value = "Get all authorities of the system",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/authority", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public AuthoritiesResources getAllAuthorities(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/authority/assign")
-    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
-        userService.assignAuthority(userId, authorityId);
-        return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
+    @ApiOperation(value = "Assign authority to the user",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/{id}/authority/assign", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody String authorityId) {
+        Long authority = authorityId != null ? Long.parseLong(authorityId) : null;
+        userService.assignAuthority(userId, authority);
+        return MessageResource.successMessage("Authority " + authority + " assigned to user " + userId);
     }
 
-    @GetMapping("/preferences")
+    @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences(Authentication auth) {
-        Long userId = ((LoggedUser)auth.getPrincipal()).getId();
+        Long userId = ((LoggedUser) auth.getPrincipal()).getId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -163,7 +218,8 @@ public class UserController {
         return new PreferencesResource(preferences);
     }
 
-    @PostMapping("/preferences")
+    @ApiOperation(value = "Set user's preferences", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
         try {
             Long userId = ((LoggedUser) auth.getPrincipal()).getId();

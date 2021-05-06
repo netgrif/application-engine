@@ -5,6 +5,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.GroupRepository
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.domain.MemberRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -146,6 +147,8 @@ class Neo4jTest {
     private CaseRepository caseRepository
     @Autowired
     private SuperCreator superCreator
+    @Autowired
+    private IPetriNetService petriNetService
 
     private def stream = { String name ->
         return Neo4jTest.getClassLoader().getResourceAsStream(name)
@@ -156,7 +159,7 @@ class Neo4jTest {
         groupRepository.deleteAll()
         memberRepository.deleteAll()
 
-        def testNet = importer.importPetriNet(stream(SEARCH_NET_FILE), SEARCH_NET_NAME, SEARCH_NET_INITIALS)
+        def testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
         assert testNet.isPresent()
 
         def acase = helper.createCase("Case Group" as String, testNet.get())

@@ -69,6 +69,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superUser = superUser
             this.superMember = memberService.findByEmail(this.superUser.email)
         }
+
         return this.superUser
     }
 

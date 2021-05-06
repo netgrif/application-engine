@@ -4,7 +4,9 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +35,12 @@ class ChoiceFieldTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
+
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
@@ -44,7 +52,7 @@ class ChoiceFieldTest {
 
     @Test
     void testChoices() {
-        def netOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), "major", superCreator.getLoggedSuper())
         assert netOptional.isPresent()
         def net = netOptional.get()
 

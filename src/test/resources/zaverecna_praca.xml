@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <id>zaverecna_praca.xml</id>
+    <initials>TST</initials>
+    <title>Test</title>
 	<!-- ========== DATA ========== -->
 	<data type="text">
         <id>1</id>

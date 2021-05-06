@@ -23,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, Long>, QuerydslPredi
 
     Page<User> findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId, Pageable pageable);
 
+    List<User> findAllByUserProcessRoles_RoleIdIn(List<String> roleId);
+
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 
     boolean existsByEmail(String email);

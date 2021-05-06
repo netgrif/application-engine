@@ -2,11 +2,7 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DataType;
-import com.netgrif.workflow.petrinet.domain.views.BooleanImageView;
-import com.netgrif.workflow.petrinet.domain.views.EditorView;
-import com.netgrif.workflow.petrinet.domain.views.ListView;
-import com.netgrif.workflow.petrinet.domain.views.TreeView;
-import com.netgrif.workflow.petrinet.domain.views.View;
+import com.netgrif.workflow.petrinet.domain.views.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,10 +15,18 @@ public class ViewFactory {
             return buildListView(data);
         } else if (data.getView().getEditor() != null) {
             return new EditorView();
+        } else if (data.getView().getHtmlEditor() != null) {
+            return new HtmlEditorView();
+        } else if (data.getView().getArea() != null) {
+            return new View("area");
         } else if (data.getView().getAutocomplete() != null) {
             return new View("autocomplete");
         } else if (data.getView().getTree() != null) {
             return new TreeView();
+        } else if (data.getView().getTable() != null) {
+            return new TableView();
+        } else if (data.getView().getButtonType() != null) {
+            return new View(data.getView().getButtonType());
         } else {
             throw new UnsupportedViewException();
         }

@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import org.junit.Before
 import org.junit.Ignore
@@ -57,6 +58,9 @@ class CaseSearchTest {
 
     @Autowired
     private WebApplicationContext wac
+
+    @Autowired
+    private SuperCreator superCreator
 
     private MockMvc mvc
 
@@ -116,9 +120,9 @@ class CaseSearchTest {
 
     PetriNet getNet() {
         def netOptional = petriNetService.importPetriNet(
-                new File("src/test/resources/case_search_test.xml"),
-                new UploadedFileMeta("Case search test", "CST", "net", "major"),
-                new LoggedUser(1, "super@netgrif.com", "password", new ArrayList<GrantedAuthority>()))
+                new FileInputStream("src/test/resources/case_search_test.xml"),
+                "major",
+                superCreator.getLoggedSuper())
         assert netOptional.isPresent()
         return netOptional.get()
     }

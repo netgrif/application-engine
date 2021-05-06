@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>change_value</id>
+    <initials>TST</initials>
+    <title>Test</title>
+    <defaultRole>true</defaultRole>
+
+    <data type="caseRef">
+        <id>caseref</id>
+        <title>Caseref</title>
+        <allowedNets>
+            <allowedNet>change_value</allowedNet>
+        </allowedNets>
+    </data>
+    <data type="boolean">
+        <id>addExisting</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            caseref: f.caseref;
+            change caseref value {return [useCase.stringId]}
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="boolean">
+        <id>addNew</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            caseref: f.caseref;
+            def net = petriNetService.getNewestVersionByIdentifier("change_value");
+            def newCase = workflowService.createCase(net.stringId, "", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            def newValue = new ArrayList(caseref.value)
+            newValue.add(newCase)
+            change caseref value {return newValue}
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="boolean">
+        <id>addInvalidNet</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            caseref: f.caseref;
+            def net = petriNetService.getNewestVersionByIdentifier("test");
+            def newCase = workflowService.createCase(net.stringId, "", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            def newValue = new ArrayList(caseref.value)
+            newValue.add(newCase)
+            try {
+                change caseref value {return newValue}
+            } catch (IllegalArgumentException e) {}
+            <!-- @formatter:on -->
+        </action>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Tran</label>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>addExisting</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>addNew</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>addNew</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

@@ -29,9 +29,9 @@ class OrsrTest {
     @SuppressWarnings("GrMethodMayBeStatic")
     private assertCorrectValidOrsrInfo(OrsrReference info) {
         assert info.name == "NETGRIF, s.r.o."
-        assert info.city == "Bratislava - mestská časť Karlova Ves"
-        assert info.postalCode == "841 05"
-        assert info.street == "Jána Stanislava"
-        assert info.streetNumber == "28/A"
+        assert info.city == "Bratislava - Staré mesto"
+        assert info.postalCode == "811 02"
+        assert info.street == "Slávičie údolie"
+        assert info.streetNumber == "106"
     }
 }
