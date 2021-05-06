@@ -4,7 +4,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FileField extends FieldWithDefault<FileFieldValue> {
+class FileField extends Field<FileFieldValue> {
 
     private Boolean remote
 
@@ -17,11 +17,6 @@ class FileField extends FieldWithDefault<FileFieldValue> {
         return FieldType.FILE
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     void setValue(FileFieldValue value) {
@@ -52,7 +47,6 @@ class FileField extends FieldWithDefault<FileFieldValue> {
      * Path is generated as follow:
      * - if file is remote, path is field value / remote URI
      * - if file is local
-     *    - always starts with directory storage/
      *    - saved file name consists of Case id, field import id and original file name separated by dash
      * @param caseId
      * @return path to the saved file
@@ -61,6 +55,10 @@ class FileField extends FieldWithDefault<FileFieldValue> {
         if (this.remote)
             return this.getValue().getPath()
         return this.getValue().getPath(caseId, getStringId())
+    }
+
+    String getFilePreviewPath(String caseId) {
+        return this.getValue().getPreviewPath(caseId, getStringId())
     }
 
     boolean isRemote() {
@@ -75,9 +73,7 @@ class FileField extends FieldWithDefault<FileFieldValue> {
     Field clone() {
         FileField clone = new FileField()
         super.clone(clone)
-
         clone.remote = this.remote
-        clone.defaultValue = this.defaultValue
 
         return clone
     }

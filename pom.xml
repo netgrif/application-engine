@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>5.3.0</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -24,7 +24,14 @@
         <java.version>1.8</java.version>
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.2.1</querydsl.version>
+        <drools.version>7.36.1.Final</drools.version>
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
+        <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
+        <sonar.projectKey>Engine-backend</sonar.projectKey>
+        <sonar.host.url>https://sonar.netgrif.com</sonar.host.url>
+        <sonar.login>a77040433bc2c05b8139a35fcf696b362cefa908</sonar.login>
+        <sonar.sources>src/main</sonar.sources>
+        <sonar.exclusions>src/test/**/*</sonar.exclusions>
     </properties>
 
     <dependencies>
@@ -96,6 +103,11 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.57</version>
         </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
 
         <!-- Session -->
         <dependency>
@@ -166,18 +178,6 @@
             <version>1.10.3</version>
         </dependency>
 
-        <!--SWAGGER -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-
         <!-- QueryDSL -->
         <dependency>
             <groupId>com.querydsl</groupId>
@@ -224,6 +224,37 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Drools -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-spring</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-model-compiler</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-canonical-model</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+
+
+        <!-- Quartz -->
+        <!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+
         <!-- Dev tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -258,6 +289,33 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- For Coniguration Properties -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.0.16.Final</version>
+        </dependency>
+
+        <!--DOCS-->
+        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-swagger-ui</artifactId>-->
+<!--            <version>2.8.0</version>-->
+<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-bean-validators</artifactId>
+            <version>2.8.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -271,7 +329,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <!--<filtering>true</filtering>-->
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
@@ -300,11 +358,15 @@
                             <goal>compile</goal>
                             <goal>generateTestStubs</goal>
                             <goal>compileTests</goal>
+                            <goal>groovydoc</goal>
                             <goal>removeStubs</goal>
                             <goal>removeTestStubs</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <groovyDocJavaSources>false</groovyDocJavaSources>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mysema.maven</groupId>
@@ -341,6 +403,21 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -406,20 +483,46 @@
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>com.netgrif.maven</groupId>
-                <artifactId>version-plugin</artifactId>
-                <version>1.0.0</version>
-                <configuration>
-                    <jsonOutputDir>${version.jsonOutputPath}</jsonOutputDir>
-                </configuration>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <id>default-prepare-agent</id>
                         <goals>
-                            <goal>simple</goal>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/config/*.*</exclude>
+                        <exclude>**/domain/*.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>crt</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>der</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
             </plugin>
         </plugins>
     </build>

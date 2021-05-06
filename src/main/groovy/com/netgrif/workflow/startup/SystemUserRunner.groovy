@@ -1,5 +1,6 @@
 package com.netgrif.workflow.startup
 
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -18,10 +19,12 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IUserService service
 
+    private User systemUser
+
     @Override
     void run(String... strings) throws Exception {
-        User systemUser = service.findByEmail(SYSTEM_USER_EMAIL,false)
-        if (systemUser == null) {
+        this.systemUser = service.findByEmail(SYSTEM_USER_EMAIL,false)
+        if (this.systemUser == null) {
             User system = new User(
                     email: SYSTEM_USER_EMAIL,
                     name: SYSTEM_USER_NAME,
@@ -30,6 +33,11 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
                     state: UserState.ACTIVE
             )
             service.save(system)
+            this.systemUser = system
         }
+    }
+
+    LoggedUser getLoggedSystem() {
+        return this.systemUser.transformToLoggedUser()
     }
 }

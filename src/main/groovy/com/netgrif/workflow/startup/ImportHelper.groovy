@@ -10,14 +10,16 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+
 
 @Component
 class ImportHelper {
@@ -122,13 +125,21 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release = "major") {
-        createNet(fileName, identifier, name, initials, release, superCreator.loggedSuper)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, new UploadedFileMeta(name, initials, identifier, release), loggedUser)
+        return petriNetService.importPetriNet(netStream, release, author)
+    }
+
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+        if (!petriNet) {
+            return createNet(filename, release, author)
+        }
+        return Optional.of(petriNet)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
@@ -175,8 +186,8 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper)
     }
 
-    boolean createFilter(String title, String query, String readable, LoggedUser user) {
-        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query, readable), user)
+    boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
+        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
     }
 
     EventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
@@ -208,12 +219,12 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    ChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-         dataService.setData(taskId, dataSet)
+        dataService.setData(taskId, dataSet)
     }
 
-    ChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
+    ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 

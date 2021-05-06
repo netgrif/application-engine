@@ -1,0 +1,117 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>data_actions_test</id>
+    <version>1.0.0</version>
+    <initials>tst</initials>
+    <title>Data Actions Test</title>
+    <!--  DATA  -->
+    <data type="text">
+        <id>text_field</id>
+        <title>Text field</title>
+        <event type="get">
+            <id>get</id>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.this;
+                    change field value {
+                        field.value + ";get-pre"
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.this;
+                    change field value {
+                        field.value + ";get-post"
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+        <event type="set">
+            <id>get</id>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.this;
+                    change field value {
+                        field.value + ";set-pre"
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.this;
+                    change field value {
+                        field.value + ";set-post"
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+    </data>
+    <!--  TRANSITIONS  -->
+    <transition>
+        <id>1</id>
+        <x>267</x>
+        <y>231</y>
+        <label/>
+        <dataRef>
+            <id>text_field</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <event type="get">
+                <id>get</id>
+                <actions phase="pre">
+                    <action>
+                        <!-- @formatter:off -->
+                        field: f.this;
+                        change field value {
+                        field.value + ";get-pre"
+                        }
+                        <!-- @formatter:on -->
+                    </action>
+                </actions>
+                <actions phase="post">
+                    <action>
+                        <!-- @formatter:off -->
+                        field: f.this;
+                        change field value {
+                        field.value + ";get-post"
+                        }
+                        <!-- @formatter:on -->
+                    </action>
+                </actions>
+            </event>
+            <event type="set">
+                <id>get</id>
+                <actions phase="pre">
+                    <action>
+                        <!-- @formatter:off -->
+                        field: f.this;
+                        change field value {
+                        field.value + ";set-pre"
+                        }
+                        <!-- @formatter:on -->
+                    </action>
+                </actions>
+                <actions phase="post">
+                    <action>
+                        <!-- @formatter:off -->
+                        field: f.this;
+                        change field value {
+                        field.value + ";set-post"
+                        }
+                        <!-- @formatter:on -->
+                    </action>
+                </actions>
+            </event>
+        </dataRef>
+    </transition>
+</document>

@@ -9,14 +9,21 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
-import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
+import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +34,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@ConditionalOnProperty(
+        value = "nae.auth.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@Api(tags = {"Authentication"})
 public class AuthenticationController {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private IRegistrationService registrationService;
@@ -45,43 +57,64 @@ public class AuthenticationController {
     @Autowired
     private IUserService userService;
 
-    @Value("${server.auth.open-registration}")
-    private boolean openRegistration;
+    @Autowired
+    private IMailAttemptService mailAttemptService;
 
-    @PostMapping(value = "/signup")
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
+
+    @Autowired
+    private IUserFactory userResponseFactory;
+
+    @ApiOperation(value = "New user registration")
+    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
-        if (!registrationService.verifyToken(regRequest.token))
-            return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
+        try {
+            String email = registrationService.decodeToken(regRequest.token)[0];
+            if (!registrationService.verifyToken(regRequest.token))
+                return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!");
 
-        regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
-        User user = registrationService.registerUser(regRequest);
-        if (user == null)
-            return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! No user with this email was found.");
+            regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
+            User user = registrationService.registerUser(regRequest);
+            if (user == null)
+                return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.");
 
-        return MessageResource.successMessage("Registration complete");
+            return MessageResource.successMessage("Registration complete");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
     }
 
-    @PostMapping(value = "/invite")
+    @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if (!openRegistration && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
+            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
                 return MessageResource.errorMessage("Only admin can invite new users!");
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            if (mailAttemptService.isBlocked(newUserRequest.email)) {
+                return MessageResource.successMessage("Done");
+            }
+
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
-                return MessageResource.errorMessage("User with email " + newUserRequest.email + " has been already registered.");
+                return MessageResource.successMessage("Done");
             mailService.sendRegistrationEmail(user);
 
-            return MessageResource.successMessage("Mail was sent to " + user.getEmail());
+            mailAttemptService.mailAttempt(newUserRequest.email);
+            return MessageResource.successMessage("Done");
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Sending mail to " + newUserRequest.email + " failed!");
+            return MessageResource.errorMessage("Failed");
         }
     }
 
-    @PostMapping(value = "/token/verify")
+    @ApiOperation(value = "Verify validity of a registration token",
+            authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyToken(@RequestBody String token) {
         try {
             if (registrationService.verifyToken(token))
@@ -94,28 +127,42 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping(value = "/login")
-    public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userService.findByAuth(auth), "profile", locale);
+    @ApiOperation(value = "Verify validity of an authentication token")
+    @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource verifyAuthToken(Authentication auth) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
     }
 
-    @PostMapping(value = "/reset")
+    @ApiOperation(value = "Login to the system", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
+    public UserResource login(Authentication auth, Locale locale) {
+        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth), locale), "profile");
+    }
+
+    @ApiOperation(value = "Reset password")
+    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        if (mailAttemptService.isBlocked(recoveryEmail)) {
+            return MessageResource.successMessage("Done");
+        }
         try {
             User user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
-                return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
+                mailAttemptService.mailAttempt(user.getEmail());
+                return MessageResource.successMessage("Done");
             } else {
-                return MessageResource.errorMessage("User with email " + recoveryEmail + " has not yet registered");
+                return MessageResource.successMessage("Done");
             }
         } catch (MessagingException | IOException | TemplateException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Reset email has failed to be sent to address " + recoveryEmail);
+            return MessageResource.errorMessage("Failed");
         }
     }
 
-    @PostMapping(value = "/recover")
+    @ApiOperation(value = "Account recovery")
+    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
         try {
             if (!registrationService.verifyToken(request.token))
@@ -130,7 +177,8 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping(value = "/changePassword")
+    @ApiOperation(value = "Set a new password", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
             User user = userService.findByEmail(request.login, false);

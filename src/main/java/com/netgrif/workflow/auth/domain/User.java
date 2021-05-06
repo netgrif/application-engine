@@ -18,6 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User {
 
     public static final String UNKNOWN = "unknown";
@@ -94,9 +95,15 @@ public class User {
     @Setter
     private Set<Group> groups;
 
+    @Transient
+    @Getter
+    @Setter
+    private Set<String> nextGroups;
+
     public User() {
         groups = new HashSet<>();
         authorities = new HashSet<>();
+        nextGroups = new HashSet<>();
         userProcessRoles = new HashSet<>();
         processRoles = new HashSet<>();
     }
@@ -104,6 +111,15 @@ public class User {
     public User(Long id) {
         this();
         this.id = id;
+        nextGroups = new HashSet<>();
+    }
+
+    public User(User user){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.surname = user.getSurname();
+        this.name = user.getName();
+        this.state = user.getState();
     }
 
     public User(String email, String password, String name, String surname) {
@@ -112,6 +128,7 @@ public class User {
         this.password = password;
         this.name = name;
         this.surname = surname;
+        this.nextGroups = new HashSet<>();
     }
 
     public User(ObjectNode json) {
@@ -128,6 +145,10 @@ public class User {
         userProcessRoles.add(role);
     }
 
+    public void removeProcessRole(UserProcessRole role) {
+        userProcessRoles.remove(role);
+    }
+
     public String getFullName() {
         return name + " " + surname;
     }
@@ -139,6 +160,7 @@ public class User {
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
+        loggedUser.setAnonymous(false);
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
         if (!this.getGroups().isEmpty())

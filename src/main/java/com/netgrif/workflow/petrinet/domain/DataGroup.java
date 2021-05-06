@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +24,9 @@ public class DataGroup extends PetriNetObject {
     @Transient
     @Getter @Setter
     private DataFieldsResource fields;
+
+    @Getter @Setter
+    private DataGroupLayout layout;
 
     @Getter @Setter(AccessLevel.NONE)
     private I18nString title;
@@ -54,5 +58,16 @@ public class DataGroup extends PetriNetObject {
         if (title == null)
             return null;
         return title.getTranslation(locale);
+    }
+
+    public DataGroup clone() {
+        DataGroup group = new DataGroup();
+        group.setImportId(this.getImportId());
+        group.setTitle(this.getTitle());
+        group.setData(this.getData());
+        group.setLayout(this.getLayout());
+        group.setAlignment(this.getAlignment());
+        group.setStretch(this.getStretch());
+        return group;
     }
 }
