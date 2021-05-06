@@ -4,7 +4,6 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.importer.model.Validations;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
