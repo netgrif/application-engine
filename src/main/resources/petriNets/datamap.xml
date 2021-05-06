@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+    <id>taskref_demo2</id>
+    <version>1.0.0</version>
+    <initials>TRD</initials>
+    <title>TaskRef demo 2</title>
+    <icon>home</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role>
+        <id>1</id>
+        <name>Block</name>
+    </role>
+    <!-- DATA -->
+    <data type="enumeration">
+        <id>taskref_selector</id>
+        <title>Referenced tasks</title>
+        <placeholder>Select referenced tasks</placeholder>
+        <values>Fyzická osoba</values>
+        <values>Právnická osoba</values>
+        <values>SZČO</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            taskrefInput: f.taskref_selector,
+            taskref: f.taskref;
+
+            change taskref value {
+                if (taskrefInput.value.defaultValue.contains("Fyzická osoba")) {
+                    return [getTaskId("2")]
+                } else if (taskrefInput.value.defaultValue.contains("Právnická osoba")) {
+                    return [getTaskId("3")]
+                } else {
+                    return [getTaskId("4")]
+                }
+            }
+            <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="taskRef">
+        <id>taskref</id>
+        <title>set label</title>
+        <placeholder>placeholder</placeholder>
+        <desc>description</desc>
+        <init>value</init>
+    </data>
+
+    <data type="text">
+        <id>titule_pred</id>
+        <title>Titul pred</title>
+    </data>
+    <data type="text">
+        <id>meno</id>
+        <title>Meno</title>
+    </data>
+    <data type="text">
+        <id>priezvisko</id>
+        <title>Priezvisko</title>
+    </data>
+    <data type="text">
+        <id>titule_za</id>
+        <title>Titul za</title>
+    </data>
+    <data type="text">
+        <id>cislo_op</id>
+        <title>Číslo OP</title>
+    </data>
+    <data type="text">
+        <id>narodnost</id>
+        <title>Národnosť</title>
+    </data>
+    <data type="text">
+        <id>obchodne_meno</id>
+        <title>Obchodné meno</title>
+    </data>
+    <data type="text">
+        <id>ico</id>
+        <title>IČO</title>
+    </data>
+
+    <data type="taskRef">
+        <id>nested_taskref</id>
+        <title>Task ref with label</title>
+    </data>
+    <data type="text">
+        <id>text1</id>
+        <title>Field under task ref</title>
+        <init>This field is placed under the task ref field</init>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>340</x>
+        <y>260</y>
+        <label>Formulár</label>
+        <cols>6</cols>
+        <dataRef>
+            <id>taskref_selector</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>6</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>taskref</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>1</y>
+                <rows>1</rows>
+                <cols>6</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>text1</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>2</y>
+                <rows>1</rows>
+                <cols>6</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <event type="assign">
+            <id>1_assign</id>
+            <actions phase="post">
+                <action>
+                    <!--@formatter:off-->
+                    taskref: f.nested_taskref;
+                    change taskref value {
+                        return [
+                            getTaskId("3"),
+                            getTaskId("2")
+                        ]
+                    }
+                    <!--@formatter:on-->
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>500</x>
+        <y>180</y>
+        <label>Fyzická osoba</label>
+        <cols>6</cols>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>titule_pred</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>1</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>meno</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>1</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>2</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>priezvisko</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>3</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>2</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>titule_za</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>5</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>1</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>cislo_op</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>1</y>
+                <rows>1</rows>
+                <cols>3</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>narodnost</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>3</x>
+                <y>1</y>
+                <rows>1</rows>
+                <cols>3</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>3</id>
+        <x>500</x>
+        <y>260</y>
+        <label>Právnická osoba</label>
+        <cols>6</cols>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>obchodne_meno</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>3</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+        <dataRef>
+            <id>ico</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>3</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>3</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>4</id>
+        <x>500</x>
+        <y>340</y>
+        <label>SZČO</label>
+        <cols>6</cols>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>nested_taskref</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <layout>
+                <x>0</x>
+                <y>0</y>
+                <rows>1</rows>
+                <cols>6</cols>
+                <template>material</template>
+                <appearance>outline</appearance>
+            </layout>
+        </dataRef>
+    </transition>
+</document>

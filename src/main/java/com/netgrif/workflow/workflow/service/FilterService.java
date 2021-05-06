@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Filter;
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.repositories.FilterRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
@@ -25,6 +26,9 @@ public class FilterService implements IFilterService {
     @Autowired
     private FilterSearchService searchService;
 
+    @Autowired
+    private FilterAuthorizationService authenticationService;
+
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) throws UnauthorisedRequestException {
         Optional<Filter> result = repository.findById(filterId);
@@ -32,7 +36,7 @@ public class FilterService implements IFilterService {
             throw new IllegalArgumentException("Filter not found");
 
         Filter filter = result.get();
-        if (!user.isAdmin() && !user.getId().equals(filter.getAuthor().getId()))
+        if (!authenticationService.canCallDelete(user, filter))
             throw new UnauthorisedRequestException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
 
         repository.delete(filter);
@@ -40,13 +44,14 @@ public class FilterService implements IFilterService {
     }
 
     @Override
-    public Filter saveFilter(CreateFilterBody newFilterBody, LoggedUser user) {
+    public Filter saveFilter(CreateFilterBody newFilterBody, MergeFilterOperation operation, LoggedUser user) {
         Filter filter = new Filter();
         filter.setAuthor(user.transformToAuthor());
         filter.setTitle(new I18nString(newFilterBody.getTitle()));
         filter.setDescription(new I18nString(newFilterBody.getDescription()));
         filter.setType(newFilterBody.getType());
         filter.setVisibility(newFilterBody.getVisibility());
+        filter.setMergeOperation(operation);
         filter.setQuery(newFilterBody.getQuery());
 
         return repository.save(filter);

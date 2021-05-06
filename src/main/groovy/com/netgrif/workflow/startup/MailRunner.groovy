@@ -1,6 +1,6 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.mail.IMailService
+import com.netgrif.workflow.mail.interfaces.IMailService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

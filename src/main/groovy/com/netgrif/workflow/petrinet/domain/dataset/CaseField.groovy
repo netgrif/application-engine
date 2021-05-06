@@ -1,61 +1,48 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class CaseField extends Field<String> {
+class CaseField extends Field<List<String>> {
 
-    /**
-     * Stores PetriNet object id and immediate fields ids of given net
-     */
-    private Map<String, LinkedHashSet<String>> constraintNetIds
-
-    @Transient
-    private Map<String, Object> immediateFieldValues
+    private List<String> allowedNets
 
     CaseField() {
         super()
-        immediateFieldValues = new HashMap<>()
+        allowedNets = new ArrayList<>()
+        this.value = new ArrayList<>()
     }
 
-    CaseField(Map<String, LinkedHashSet<String>> netId) {
+    CaseField(List<String> allowedNets) {
         this()
-        constraintNetIds = netId
+        this.setAllowedNets(allowedNets)
     }
 
     @Override
     FieldType getType() {
-        return FieldType.CASEREF
+        return FieldType.CASE_REF
     }
 
     @Override
     void clearValue() {
-        this.setValue(null)
+        this.setValue(new ArrayList<String>())
     }
 
     @Override
     Field clone() {
         CaseField clone = new CaseField()
         super.clone(clone)
-        clone.constraintNetIds = this.constraintNetIds
+        clone.allowedNets = new ArrayList<>(this.allowedNets)
 
         return clone
     }
 
-    Map<String, LinkedHashSet<String>> getConstraintNetIds() {
-        return constraintNetIds
+    List<String> getAllowedNets() {
+        return allowedNets
     }
 
-    void setConstraintNetIds(Map<String, LinkedHashSet<String>> constraintNetId) {
-        this.constraintNetIds = constraintNetId
-    }
-
-    Map<String, Object> getImmediateFieldValues() {
-        return immediateFieldValues
-    }
-
-    void setImmediateFieldValues(Map<String, Object> immediateFieldValues) {
-        this.immediateFieldValues = immediateFieldValues
+    void setAllowedNets(Collection<String> allowedNets) {
+        this.allowedNets.clear()
+        this.allowedNets.addAll(allowedNets)
     }
 }

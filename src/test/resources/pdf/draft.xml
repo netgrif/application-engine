@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fields xmlns:xfdf="http://ns.adobe.com/xfdf-transition/">
     <TextField143 xfdf:original="Text Field 143">1</TextField143>
-    <TextField50 xfdf:original="Text Field 50">2</TextField50>
-    <fxtag xfdf:original="400">3</fxtag>
+    <TextField50 xfdf:original="Text Field 50">+ľščťžýáíéúäňô§</TextField50>
+    <fxtag xfdf:original="400">č</fxtag>
     <TextField51 xfdf:original="Text Field 51">4</TextField51>
     <fxtag xfdf:original="401">5</fxtag>
     <fxtag xfdf:original="1">6</fxtag>

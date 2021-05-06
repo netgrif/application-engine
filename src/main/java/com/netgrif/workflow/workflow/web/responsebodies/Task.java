@@ -1,14 +1,16 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
-import com.netgrif.workflow.petrinet.domain.EventType;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,6 +28,8 @@ public class Task {
 
     private String transitionId;
 
+    private TaskLayout layout;
+
     private String title;
 
     private String caseColor;
@@ -37,6 +41,8 @@ public class Task {
     private User user;
 
     private Map<String, Map<String, Boolean>> roles;
+
+    private Map<Long, Map<String, Boolean>> users;
 
     private LocalDateTime startDate;
 
@@ -66,16 +72,20 @@ public class Task {
 
     private String assignTitle;
 
+    private Map<String, Boolean> assignedUserPolicy;
+
     public Task(com.netgrif.workflow.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        this.layout = task.getLayout();
         this.title = task.getTitle().getTranslation(locale);
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
-        this.user = task.getUser();
+        this.user = task.getUser() != null ? User.createSmallUser(task.getUser()) : null;
         this.roles = task.getRoles();
+        this.users = task.getUsers();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
         this.finishedBy = task.getFinishedBy();
@@ -90,6 +100,7 @@ public class Task {
         this.assignTitle = task.getTranslatedEventTitle(EventType.ASSIGN, locale);
         this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
+        this.assignedUserPolicy = task.getAssignedUserPolicy();
     }
 
     public Task(ElasticTask entity) {

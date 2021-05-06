@@ -2,6 +2,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>assign_cancel_finish_with_Case_net</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <defaultRole>false</defaultRole>
     <data type="number">
         <id>field</id>

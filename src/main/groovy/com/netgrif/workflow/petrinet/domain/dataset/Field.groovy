@@ -2,10 +2,14 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.workflow.petrinet.domain.events.DataEvent
+import com.netgrif.workflow.petrinet.domain.Component
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout
 import com.netgrif.workflow.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
@@ -30,6 +34,9 @@ abstract class Field<T> extends Imported {
     private ObjectNode behavior
 
     @Transient
+    private FieldLayout layout
+
+    @Transient
     private T value
 
     private Long order
@@ -38,7 +45,7 @@ abstract class Field<T> extends Imported {
     private boolean immediate
 
     @JsonIgnore
-    private LinkedHashSet<Action> actions
+    private LinkedHashSet<DataEvent> events;
 
     @JsonIgnore
     private String encryption
@@ -49,8 +56,17 @@ abstract class Field<T> extends Imported {
 
     private Integer length
 
+    private Component component
+
+    protected T defaultValue
+
+    protected Expression initExpression
+
+    protected List<Validation> validations
+
     Field() {
         _id = new ObjectId()
+        this.events = new LinkedHashSet<>();
     }
 
     Field(Long importId) {
@@ -108,6 +124,14 @@ abstract class Field<T> extends Imported {
         this.behavior = behavior
     }
 
+    FieldLayout getLayout() {
+        return layout
+    }
+
+    void setLayout(FieldLayout layout) {
+        this.layout = layout
+    }
+
     T getValue() {
         return value
     }
@@ -132,24 +156,24 @@ abstract class Field<T> extends Imported {
         this.immediate = immediate != null && immediate
     }
 
-    LinkedHashSet<Action> getActions() {
-        return actions
+    LinkedHashSet<DataEvent> getEvents() {
+        return events
     }
 
-    void setActions(LinkedHashSet<Action> actions) {
-        this.actions = actions
+    void setEvents(LinkedHashSet<DataEvent> events) {
+        this.events = events
     }
 
-    void addActions(Collection<Action> actions) {
-        actions.each { addAction(it) }
+    void addEvents(Collection<DataEvent> dataEvents) {
+        dataEvents.each { addEvent(it) }
     }
 
-    void addAction(Action action) {
-        if (this.actions == null)
-            this.actions = new LinkedHashSet<>()
-        if (action == null) return
+    void addEvent(DataEvent event) {
+        if (this.events == null)
+            this.events = new LinkedHashSet<>()
+        if (event == null) return
 
-        this.actions.add(action)
+        this.events.add(event)
     }
 
     String getEncryption() {
@@ -160,7 +184,57 @@ abstract class Field<T> extends Imported {
         this.encryption = encryption
     }
 
-    void clearValue() {}
+    Component getComponent() {
+        return component
+    }
+
+    void setComponent(Component component) {
+        this.component = component
+    }
+
+    T getDefaultValue() {
+        return defaultValue
+    }
+
+    Expression getInitExpression() {
+        return initExpression
+    }
+
+    void setDefaultValue(T defaultValue) {
+        this.defaultValue = defaultValue
+    }
+
+    void setInitExpression(Expression expression) {
+        this.initExpression = expression
+    }
+
+    boolean isDynamicDefaultValue() {
+        return initExpression != null
+    }
+
+    void addValidation(Validation validation) {
+        if (validations == null) {
+            this.validations = new ArrayList<Validation>()
+        }
+        this.validations.add(validation)
+    }
+
+    List<Validation> getValidations() {
+        return validations
+    }
+
+    void setValidations(List<Validation> validations) {
+        this.validations = validations
+    }
+
+    void clearValue() {
+        setValue(null)
+    }
+
+    boolean hasDefault() {
+        return defaultValue != null || initExpression != null
+    }
+
 //operators overloading
     T plus(final Field field) {
         return this.value + field.value
@@ -229,11 +303,15 @@ abstract class Field<T> extends Imported {
         clone.placeholder = this.placeholder
         clone.order = this.order
         clone.immediate = this.immediate
-        clone.actions = this.actions
+        clone.events = this.events
         clone.encryption = this.encryption
         clone.view = this.view
         clone.format = this.format
         clone.length = this.length
+        clone.component = this.component
+        clone.validations = this.validations?.collect { it.clone() }
+        clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
     }
 
     abstract Field clone()

@@ -1,7 +1,9 @@
 package com.netgrif.workflow.startup
 
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -15,15 +17,18 @@ class StorageRunner extends AbstractOrderedCommandLineRunner {
     @Value('${storage.clean}')
     private boolean cleanStorage
 
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration
+
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating storage folder")
-        File storage = new File("storage/uploadedModels/model.txt")
+        File storage = new File("${fileStorageConfiguration.getStoragePath()}/uploadedModels/model.txt")
         storage.getParentFile().mkdirs()
 
         if (cleanStorage) {
             log.info("Removing files from storage folder and it's sub-folders")
-            purgeDirectory(new File("storage"))
+            purgeDirectory(new File(fileStorageConfiguration.getStoragePath()))
         }
 
         log.info("Creating log folder")

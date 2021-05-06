@@ -26,7 +26,19 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
             log.warn("Trying to delete null document!");
             return;
         }
+
         ObjectId objectId = document.getObjectId("_id");
-        service.remove(objectId.toString());
+        if (objectId != null) {
+            service.remove(objectId.toString());
+            return;
+        }
+
+        objectId = document.getObjectId("petriNetObjectId");
+        if (objectId != null) {
+           service.removeByPetriNetId(objectId.toString());
+           return;
+        }
+
+        throw new IllegalStateException("Case has been deleted neither by ID nor by process ID!");
     }
 }

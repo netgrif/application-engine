@@ -19,13 +19,27 @@ public class LocalisedFieldFactory {
             return fromText((TextField) field, locale);
         } else if (field instanceof DateField) {
             return fromDate((DateField) field, locale);
+        } else if (field instanceof DateTimeField) {
+            return fromDateTime((DateTimeField) field, locale);
         } else if (field instanceof BooleanField) {
             return fromBoolean((BooleanField) field, locale);
         } else if (field instanceof UserField) {
             return fromUser((UserField) field, locale);
+        } else if (field instanceof EnumerationMapField) {
+            return fromEnumerationMap((EnumerationMapField) field, locale);
+        } else if (field instanceof MultichoiceMapField) {
+            return fromMultichoiceMap((MultichoiceMapField) field, locale);
+        } else if (field instanceof CaseField) {
+            return fromCase((CaseField) field, locale);
+        } else if (field instanceof FileListField) {
+            return fromFileList((FileListField) field, locale);
         } else {
             return fromGeneral(field, locale);
         }
+    }
+
+    private static LocalisedField fromGeneral(Field field, Locale locale) {
+        return new LocalisedField(field, locale);
     }
 
     private static LocalisedField fromNumber(NumberField field, Locale locale) {
@@ -40,6 +54,10 @@ public class LocalisedFieldFactory {
         return new LocalisedDateField(field, locale);
     }
 
+    private static LocalisedField fromDateTime(DateTimeField field, Locale locale) {
+        return new LocalisedDateTimeField(field, locale);
+    }
+
     private static LocalisedField fromBoolean(BooleanField field, Locale locale) {
         return new LocalisedBooleanField(field, locale);
     }
@@ -52,11 +70,23 @@ public class LocalisedFieldFactory {
         return new LocalisedMultichoiceField(field, locale);
     }
 
-    public static LocalisedField fromGeneral(Field field, Locale locale) {
-        return new LocalisedField(field, locale);
+    private static LocalisedField fromEnumeration(EnumerationField field, Locale locale) {
+        return new LocalisedEnumerationField(field, locale);
     }
 
-    public static LocalisedField fromEnumeration(EnumerationField field, Locale locale) {
-        return new LocalisedEnumerationField(field, locale);
+    public static LocalisedField fromEnumerationMap(EnumerationMapField field, Locale locale) {
+        return new LocalisedEnumerationMapField(field, locale);
+    }
+
+    public static LocalisedField fromMultichoiceMap(MultichoiceMapField field, Locale locale) {
+        return new LocalisedMultichoiceMapField(field, locale);
+    }
+
+    private static LocalisedField fromCase(CaseField field, Locale locale) {
+        return new LocalisedCaseField(field, locale);
+    }
+
+    public static LocalisedField fromFileList(FileListField field, Locale locale) {
+        return new LocalisedFileListField(field, locale);
     }
 }

@@ -1,11 +1,15 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.events.DataEvent;
+import com.netgrif.workflow.petrinet.domain.events.Event;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,11 +32,21 @@ public class Transition extends Node {
 
     @Field("roles")
     @Getter @Setter
-    private Map<String, Set<RolePermission>> roles;
+    private Map<String, Map<String, Boolean>> roles;
+
+    @Getter @Setter
+    private List<String> negativeViewRoles;
+
+    @Field("users")
+    @Getter @Setter
+    private Map<String, Map<String, Boolean>> userRefs;
 
     @Field("triggers")
     @Getter @Setter
     private List<Trigger> triggers;
+
+    @Getter @Setter
+    private TaskLayout layout;
 
     @Getter @Setter
     private Integer priority;
@@ -53,40 +67,58 @@ public class Transition extends Node {
     private Map<EventType, Event> events;
 
     @Getter @Setter
+    private Map<String, Boolean> assignedUserPolicy;
+
+    @Getter @Setter
     private String defaultRoleId;
 
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
+        userRefs = new HashMap<>();
         triggers = new LinkedList<>();
+        negativeViewRoles = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
+        assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions){
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component){
         if(dataSet.containsKey(field) && dataSet.get(field) != null){
             if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if(actions != null) dataSet.get(field).getActions().addAll(actions);
+            if(events != null) dataSet.get(field).getEvents().addAll(events);
+            if(layout != null) dataSet.get(field).setLayout(layout);
+            if(component != null) dataSet.get(field).setComponent(component);
         } else {
-            dataSet.put(field,new DataFieldLogic(behavior, actions));
+            dataSet.put(field,new DataFieldLogic(behavior, events, layout, component));
         }
     }
 
-    public void addActions(String field, LinkedHashSet<Action> actions){
+    public void addDataEvents(String field, LinkedHashSet<DataEvent> events){
         if(dataSet.containsKey(field)){
-            dataSet.get(field).addActions(actions);
+            dataSet.get(field).addDataEvents(events);
         }
     }
 
-    public void addRole(String roleId, Set<RolePermission> permissions) {
+    public void addRole(String roleId, Map<String, Boolean> permissions) {
         if (roles.containsKey(roleId) && roles.get(roleId) != null) {
-            roles.get(roleId).addAll(permissions);
+            roles.get(roleId).putAll(permissions);
         } else {
             roles.put(roleId, permissions);
+        }
+    }
+
+    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+
+    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
+        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
+            userRefs.get(userRefId).putAll(permissions);
+        } else {
+            userRefs.put(userRefId, permissions);
         }
     }
 
