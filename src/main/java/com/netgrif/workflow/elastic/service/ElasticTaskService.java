@@ -2,6 +2,7 @@ package com.netgrif.workflow.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
@@ -188,7 +189,7 @@ public class ElasticTaskService implements IElasticTaskService {
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
-        buildStringQuery(request, query);
+        buildStringQuery(request, query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         if (resultAlwaysEmpty)
@@ -459,12 +460,14 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
 
-        query.must(queryStringQuery(request.query));
+        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+
+        query.must(queryStringQuery(populatedQuery));
     }
 
     /**
