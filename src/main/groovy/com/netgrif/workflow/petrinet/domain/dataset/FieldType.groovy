@@ -8,14 +8,19 @@ enum FieldType {
     DATE("date"),
     BOOLEAN("boolean"),
     FILE("file"),
+    FILELIST('fileList'),
     ENUMERATION("enumeration"),
+    ENUMERATION_MAP("enumeration_map"),
     MULTICHOICE("multichoice"),
+    MULTICHOICE_MAP("multichoice_map"),
     NUMBER("number"),
     USER("user"),
+    USERLIST("userList"),
     TABULAR("tabular"),
-    CASEREF("caseref"),
+    CASE_REF("caseRef"),
     DATETIME("dateTime"),
-    BUTTON("button")
+    BUTTON("button"),
+    TASK_REF("taskRef")
 
     String name
 

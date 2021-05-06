@@ -3,8 +3,11 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,8 @@ import java.util.List;
 
 @Service
 public class UserProcessRoleService implements IUserProcessRoleService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserProcessRoleService.class);
 
     @Autowired
     private UserProcessRoleRepository repository;
@@ -62,5 +67,11 @@ public class UserProcessRoleService implements IUserProcessRoleService {
             DEFAULT_ROLE_ID = role.getStringId();
         }
         return DEFAULT_ROLE_ID;
+    }
+
+    @Override
+    public void deleteRolesOfNet(PetriNet net) {
+        log.info("[" + net.getStringId() + "]: Deleting all user process roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        this.repository.deleteAllByNetId(net.getStringId());
     }
 }

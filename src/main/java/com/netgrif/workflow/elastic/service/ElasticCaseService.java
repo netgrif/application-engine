@@ -6,7 +6,9 @@ import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.workflow.elastic.web.CaseSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -16,6 +18,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,8 +28,8 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -36,17 +39,26 @@ public class ElasticCaseService implements IElasticCaseService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
-    @Autowired
     private ElasticCaseRepository repository;
-
-    @Autowired
     private IWorkflowService workflowService;
-
-    @Autowired
     private ElasticsearchTemplate template;
+    private Executor executors;
 
     @Autowired
-    private Executor executors;
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchTemplate template, Executor executors) {
+        this.repository = repository;
+        this.template = template;
+        this.executors = executors;
+    }
+
+    @Autowired
+    @Lazy
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -69,6 +81,14 @@ public class ElasticCaseService implements IElasticCaseService {
         executors.execute(caseId, () -> {
             repository.deleteAllByStringId(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
+        });
+    }
+
+    @Override
+    public void removeByPetriNetId(String processId) {
+        executors.execute(processId, () -> {
+            repository.deleteAllByProcessId(processId);
+            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
         });
     }
 
@@ -99,33 +119,68 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public Page<Case> search(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
-        if (request == null) {
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(request, user, pageable);
-        Page<ElasticCase> indexedCases = repository.search(query);
-        List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        List<Case> casePage;
+        long total;
+        if (query != null) {
+            Page<ElasticCase> indexedCases = repository.search(query);
+            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+            total = indexedCases.getTotalElements();
+        } else {
+            casePage = Collections.emptyList();
+            total = 0;
+        }
 
-        return new PageImpl<>(casePage, pageable, indexedCases.getTotalElements());
+        return new PageImpl<>(casePage, pageable, total);
     }
 
     @Override
-    public long count(CaseSearchRequest request, LoggedUser user) {
-        if (request == null) {
+    public long count(List<CaseSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(request, user, new FullPageRequest());
-
-        return template.count(query, ElasticCase.class);
+        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        if (query != null) {
+            return template.count(query, ElasticCase.class);
+        } else {
+            return 0;
+        }
     }
 
-    private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
+    private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
+
+        if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
+            // one of the queries evaluates to empty set => the entire result is an empty set
+            return null;
+        } else if (!isIntersection) {
+            singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            if (singleQueries.size() == 0) {
+                // all queries result in an empty set => the entire result is an empty set
+                return null;
+            }
+        }
+
+        BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
+        BoolQueryBuilder query = singleQueries.stream().reduce(new BoolQueryBuilder(), reductionOperator);
+
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        return builder
+                .withQuery(query)
+                .withPageable(pageable)
+                .build();
+    }
+
+    private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
+        buildUsersRoleQuery(request, query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -133,13 +188,15 @@ public class ElasticCaseService implements IElasticCaseService {
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
+        buildCaseIdQuery(request, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
-        return builder
-                .withQuery(query)
-                .withPageable(pageable)
-                .build();
+        if (resultAlwaysEmpty)
+            return null;
+        else
+            return query;
     }
 
     /**
@@ -165,16 +222,53 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
+
+    protected void buildUsersRoleQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+        BoolQueryBuilder userRoleQuery = boolQuery();
+        buildUsersQuery(userRoleQuery, user);
+        negativeUserRoleQuery(userRoleQuery, user);
+
+        query.filter(userRoleQuery);
+    }
+
+    private void negativeUserRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeQuery = boolQuery();
+        buildNegativeViewRoleQuery(negativeQuery, user);
+        buildNegativeViewUsersQuery(negativeQuery, user);
+        query.should(negativeQuery);
+    }
+
+    private void buildUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder usersQuery = boolQuery();
+        usersQuery.should(termQuery("users", user.getId()));
+        query.should(usersQuery);
+    }
+
+    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        for (String roleId : user.getProcessRoles()) {
+            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
+        }
+
+        query.mustNot(negativeRoleQuery);
+    }
+
+    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
+        query.mustNot(negativeRoleQuery);
+    }
+
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
-        if (request.petriNet == null || request.petriNet.isEmpty()) {
+        if (request.process == null || request.process.isEmpty()) {
             return;
         }
 
         BoolQueryBuilder petriNetQuery = boolQuery();
 
-        for (CaseSearchRequest.PetriNet petriNet : request.petriNet) {
-            if (petriNet.identifier != null) {
-                petriNetQuery.should(termQuery("processIdentifier", petriNet.identifier));
+        for (CaseSearchRequest.PetriNet process : request.process) {
+            if (process.identifier != null) {
+                petriNetQuery.should(termQuery("processIdentifier", process.identifier));
             }
         }
 
@@ -334,5 +428,70 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         query.must(queryStringQuery(request.query));
+    }
+
+    /**
+     * Case with stringId "5cb07b6ff05be15f0b972c36"
+     * <pre>
+     * {
+     *     "stringId": "5cb07b6ff05be15f0b972c36"
+     * }
+     * </pre>
+     * <p>
+     * Cases with stringId "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
+     * <pre>
+     * {
+     *     "stringId" [
+     *         "5cb07b6ff05be15f0b972c36",
+     *         "5cb07b6ff05be15f0b972c31"
+     *     ]
+     * }
+     * </pre>
+     */
+    private void buildCaseIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if(request.stringId == null || request.stringId.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder caseIdQuery = boolQuery();
+        request.stringId.forEach(caseId -> caseIdQuery.should(termQuery("stringId", caseId)));
+        query.filter(caseIdQuery);
+    }
+
+    /**
+     * Cases that are instances of processes of group "5cb07b6ff05be15f0b972c36"
+     * <pre>
+     * {
+     *     "group": "5cb07b6ff05be15f0b972c36"
+     * }
+     * </pre>
+     * <p>
+     * Cases that are instances of processes of group "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
+     * <pre>
+     * {
+     *     "group" [
+     *         "5cb07b6ff05be15f0b972c36",
+     *         "5cb07b6ff05be15f0b972c31"
+     *     ]
+     * }
+     * </pre>
+     */
+    private boolean buildGroupQuery(CaseSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
+        if (request.group == null || request.group.isEmpty()) {
+            return false;
+        }
+
+        Map<String, Object> processQuery = new HashMap<>();
+        processQuery.put("group", request.group);
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.size() == 0)
+            return true;
+
+        BoolQueryBuilder groupQuery = boolQuery();
+        groupProcesses.stream().map(PetriNetReference::getIdentifier)
+                .map(netIdentifier -> termQuery("processIdentifier", netIdentifier))
+                .forEach(groupQuery::should);
+        query.filter(groupQuery);
+        return false;
     }
 }

@@ -1,10 +1,13 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.petrinet.domain.dataset.TextField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.LocalizedValidation;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 @Data
 public class LocalisedTextField extends LocalisedField {
@@ -15,19 +18,10 @@ public class LocalisedTextField extends LocalisedField {
 
     private String formatting;
 
-    private String validationJS;
-
-    private Map<String, Boolean> validationErrors;
-
-    private Object defaultValue;
-
     public LocalisedTextField(TextField field, Locale locale) {
         super(field, locale);
         this.subType = field.getSubType();
         this.maxLength = field.getMaxLength();
         this.formatting = field.getFormatting();
-        this.validationErrors = field.getValidationErrors();
-        this.validationJS = field.getValidationJS();
-        this.defaultValue = field.getDefaultValue();
     }
 }

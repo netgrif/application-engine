@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class TextField extends ValidableField<String> {
+class TextField extends Field<String> {
 
     public static final String SIMPLE_SUBTYPE = "simple"
     public static final String AREA_SUBTYPE = "area"
@@ -31,11 +31,6 @@ class TextField extends ValidableField<String> {
         this.subType = subtype != null ? subtype : SIMPLE_SUBTYPE
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     String getSubType() {
         return subType
@@ -65,11 +60,7 @@ class TextField extends ValidableField<String> {
     Field clone() {
         TextField clone = new TextField()
         super.clone(clone)
-
         clone.subType = this.subType
-        clone.defaultValue = this.defaultValue
-        clone.validationRules = this.validationRules
-
         return clone
     }
 }

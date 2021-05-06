@@ -2,9 +2,13 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
+import com.netgrif.workflow.configuration.properties.ActionsProperties
 import com.netgrif.workflow.importer.service.FieldFactory
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.Task
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,28 +33,30 @@ abstract class FieldActionsRunner {
     @Autowired
     private FieldFactory fieldFactory
 
+    @Autowired
+    private CompilerConfiguration configuration
+
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
 
-    FieldActionsRunner() {
-        actionsCache = new HashMap<>()
+    ChangedFieldsTree run(Action action, Case useCase) {
+        return run(action, useCase, Optional.empty())
     }
 
-    Map<String, ChangedField> run(Action action, Case useCase) {
+    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action)
-
         try {
-            code.init(action, useCase, this)
+            code.init(action, useCase, task, this)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")
             throw e
         }
-        return ((ActionDelegate) code.delegate).changedFields
+        return ((ActionDelegate) code.delegate).changedFieldsTree
     }
 
     Closure getActionCode(Action action) {
@@ -58,11 +64,10 @@ abstract class FieldActionsRunner {
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
         } else {
-            code = (Closure) new GroovyShell().evaluate("{-> ${action.definition}}")
+            code = (Closure) new GroovyShell(configuration).evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
-        code.delegate = getActionDeleget()
-        return code
+        return code.rehydrate(getActionDeleget(), code.owner, code.thisObject)
     }
 
     void addToCache(String key, Object value) {

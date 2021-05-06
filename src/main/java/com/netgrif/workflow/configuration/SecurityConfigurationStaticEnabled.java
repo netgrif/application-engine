@@ -1,7 +1,7 @@
 package com.netgrif.workflow.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,13 +10,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionStrategy;
 import org.springframework.session.web.http.HttpSessionStrategy;
 import org.springframework.stereotype.Controller;
 
+@Slf4j
 @Configuration
 @Controller
 @EnableWebSecurity
@@ -27,13 +30,11 @@ import org.springframework.stereotype.Controller;
 )
 public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfigurationStaticEnabled.class);
-
     @Autowired
     private Environment env;
 
-    @Value("${server.auth.open-registration}")
-    private boolean openRegistration;
+    @Autowired
+    private RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @Value("${server.security.csrf}")
     private boolean csrf = true;
@@ -49,16 +50,16 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
 //        @formatter:off
         http
             .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
             .and()
-            .formLogin()
-                .loginPage("/")
-            .and()
             .logout()
                 .logoutUrl("/api/auth/logout")
+                .invalidateHttpSession(true)
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
             .and()
             .headers()
                 .frameOptions().disable()
@@ -71,7 +72,7 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
 
     @Override
     boolean isOpenRegistration() {
-        return openRegistration;
+        return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override

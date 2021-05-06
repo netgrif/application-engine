@@ -1,12 +1,15 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.petrinet.domain.PetriNet
+
+import com.netgrif.workflow.configuration.properties.ActionsProperties
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.stereotype.Component
 
@@ -19,17 +22,18 @@ abstract class RoleActionsRunner {
     @Lookup("roleActionDelegate")
     abstract RoleActionDelegate getRoleActionDelegate()
 
+    @Autowired
+    private CompilerConfiguration configuration
+
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
 
     void run(Action action, RoleContext roleContext) {
-
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action)
-
         try {
             code.init(action, roleContext)
             code()
@@ -44,12 +48,9 @@ abstract class RoleActionsRunner {
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
         } else {
-            code = (Closure) new GroovyShell().evaluate("{-> ${action.definition}}")
+            code = (Closure) new GroovyShell(configuration).evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
-        code.delegate = getRoleActionDelegate()
-        return code
+        return code.rehydrate(getRoleActionDelegate(), code.owner, code.thisObject)
     }
-
-
 }

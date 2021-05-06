@@ -12,7 +12,7 @@ public class DataGroupsResource extends Resources<DataGroup> {
 
     public DataGroupsResource(Collection<com.netgrif.workflow.petrinet.domain.DataGroup> content, Locale locale) {
         super(content.stream()
-                .map(dg -> new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch()))
+                .map(dg -> new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout()))
                 .collect(Collectors.toList()));
         buildLinks();
     }

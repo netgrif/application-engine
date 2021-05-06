@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <id>test</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <transaction>
         <id>1</id>
         <title>Kalkulácia poistného</title>

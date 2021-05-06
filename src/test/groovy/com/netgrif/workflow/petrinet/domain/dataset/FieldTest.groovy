@@ -1,13 +1,18 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +46,10 @@ class FieldTest {
     private SystemUserRunner systemUserRunner
 
     @Autowired
-    private DefaultRoleRunner roleRunner
+    private GroupRunner groupRunner
+
+    @Autowired
+    private TestHelper testHelper
 
     @Autowired
     private SuperCreator superCreator
@@ -53,16 +61,14 @@ class FieldTest {
     def limitsNetOptional
     PetriNet net
 
+    @Before
+    void before() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void testImport() {
-        template.db.drop()
-        userRepository.deleteAll()
-        roleRepository.deleteAll()
-        roleRunner.run()
-        superCreator.run()
-        systemUserRunner.run()
-
-        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
+        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE))
 
         assertNet()
         assertNumberField()
@@ -79,7 +85,7 @@ class FieldTest {
     private void assertNet() {
         assert limitsNetOptional.isPresent()
         net = limitsNetOptional.get()
-        assert net.dataSet.size() == 9
+        assert net.dataSet.size() == 10
     }
 
     private void assertNumberField() {
@@ -88,7 +94,9 @@ class FieldTest {
         assert field.description.defaultValue == "Number field description"
         assert field.name.defaultValue == "Number"
         assert field.placeholder.defaultValue == "Number field placeholder"
-        assert field.validationRules == "{inrange 0,inf}"
+        assert field.validations.get(0).validationRule == "inrange 0,inf"
+        assert field.validations.get(1).validationMessage.defaultValue == "Number field validation message"
+        assert field.validations.get(1).validationRule == "inrange 0,inf"
     }
 
     private void assertTextField() {
@@ -97,7 +105,9 @@ class FieldTest {
         assert field.description.defaultValue == "Text field description"
         assert field.name.defaultValue == "Text"
         assert field.placeholder.defaultValue == "Text field placeholder"
-        assert field.validationRules == "email"
+        assert field.validations.get(0).validationRule == "email"
+        assert field.validations.get(1).validationMessage.defaultValue == "Mail validation message"
+        assert field.validations.get(1).validationRule == "email"
     }
 
     private void assertEnumerationField() {
@@ -139,6 +149,11 @@ class FieldTest {
         assert field.description.defaultValue == "Date field description"
         assert field.name.defaultValue == "Date"
         assert field.placeholder.defaultValue == "Date field placeholder"
+        assert field.validations.get(0).validationRule == "between today,future"
+        assert field.validations.get(1).validationMessage.defaultValue == "Date field validation message"
+        assert field.validations.get(1).validationRule == "between today,future"
+        assert field.validations.get(2).validationMessage.defaultValue == "Date field validation message 2"
+        assert field.validations.get(2).validationRule == "between today,tommorow"
     }
 
     private void assertFileField() {
@@ -160,5 +175,12 @@ class FieldTest {
         assert field.description.defaultValue == "DateTime field description"
         assert field.name.defaultValue == "DateTime"
         assert field.placeholder.defaultValue == "DateTime field placeholder"
+    }
+
+    private void assertCaseRef() {
+        CaseField field = net.dataSet["caseRef"] as CaseField
+        assert field.name.defaultValue == "CaseRef"
+        assert field.allowedNets.size() == 2
+        assert field.allowedNets.containsAll(["processId1", "processId2"])
     }
 }

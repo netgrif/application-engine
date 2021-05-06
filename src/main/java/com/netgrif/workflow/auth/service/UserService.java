@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
@@ -48,6 +49,9 @@ public class UserService implements IUserService {
     @Autowired
     private IMemberService memberService;
 
+    @Autowired
+    private INextGroupService groupService;
+
     @Override
     public User saveNew(User user) {
         encodeUserPassword(user);
@@ -55,9 +59,20 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
+        groupService.createGroup(user);
+        groupService.addUserToDefaultGroup(user);
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
+        return savedUser;
+    }
+
+    @Override
+    public AnonymousUser saveNewAnonymous(AnonymousUser user) {
+        addDefaultRole(user);
+        addDefaultAuthorities(user);
+
+        AnonymousUser savedUser = (AnonymousUser) userRepository.save(user);
         return savedUser;
     }
 
@@ -131,6 +146,7 @@ public class UserService implements IUserService {
         if (!user.isPresent())
             throw new IllegalArgumentException("Could not find user with id ["+id+"]");
         if (!small) {
+            loadGroups(user.get());
             return loadProcessRoles(user.get());
         }
         return user.get();
@@ -139,8 +155,10 @@ public class UserService implements IUserService {
     @Override
     public User findByEmail(String email, boolean small) {
         User user = userRepository.findByEmail(email);
-        if (!small)
+        if (!small) {
+            loadGroups(user);
             return loadProcessRoles(user);
+        }
         return user;
     }
 
@@ -166,43 +184,60 @@ public class UserService implements IUserService {
     public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
-        BooleanExpression predicate = QUser.user
-                .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE))
-                .andAnyOf(
-                        QUser.user.email.containsIgnoreCase(query),
-                        QUser.user.name.containsIgnoreCase(query),
-                        QUser.user.surname.containsIgnoreCase(query));
-        Page<User> users = userRepository.findAll(predicate, pageable);
+
+        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
     }
 
     @Override
-    public Page<User> searchAllCoMembers(String query, List<String> roleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        if (roleIds == null || roleIds.isEmpty())
+    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
             return searchAllCoMembers(query, loggedUser, small, pageable);
+
+        if (negateRoleIds == null) {
+            negateRoleIds = new ArrayList<>();
+        }
 
         Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
-        BooleanExpression predicate = QUser.user
-                .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE))
-                .and(QUser.user.userProcessRoles.any().roleId.in(roleIds))
-                .andAnyOf(
-                        QUser.user.email.containsIgnoreCase(query),
-                        QUser.user.name.containsIgnoreCase(query),
-                        QUser.user.surname.containsIgnoreCase(query));
+        BooleanExpression predicate = buildPredicate(members, query);
+        if (!(roleIds == null || roleIds.isEmpty())) {
+            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
+        }
+        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
         Page<User> users = userRepository.findAll(predicate, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
+    }
+
+    private BooleanExpression buildPredicate(Set<Long> members, String query) {
+        BooleanExpression predicate = QUser.user
+                .id.in(members)
+                .and(QUser.user.state.eq(UserState.ACTIVE));
+        for (String word : query.split(" ")) {
+            predicate = predicate
+                    .andAnyOf(QUser.user.email.containsIgnoreCase(word),
+                            QUser.user.name.containsIgnoreCase(word),
+                            QUser.user.surname.containsIgnoreCase(word));
+        }
+        return predicate;
     }
 
     @Override
     public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
         Page<User> users = userRepository.findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        if (!small) {
+            users.forEach(this::loadProcessRoles);
+        }
+        return users;
+    }
+
+    @Override
+    public List<User> findAllByProcessRoles(Set<String> roleIds, boolean small) {
+        List<User> users = userRepository.findAllByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds));
         if (!small) {
             users.forEach(this::loadProcessRoles);
         }
@@ -242,7 +277,18 @@ public class UserService implements IUserService {
     @Override
     public User getLoggedUser() {
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return findByEmail(loggedUser.getEmail(), false);
+        if (!loggedUser.isAnonymous()) {
+            return findByEmail(loggedUser.getEmail(), false);
+        }
+        return loggedUser.transformToAnonymousUser();
+    }
+
+    @Override
+    public LoggedUser getAnonymousLogged() {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
+            getLoggedUser().transformToLoggedUser();
+        }
+        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Override
@@ -252,11 +298,32 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public User removeRole(User user, String roleStringId) {
+        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        user.removeProcessRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(User user) {
+        if (!userRepository.findById(user.getId()).isPresent())
+            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
+        userRepository.delete(user);
+    }
+
     private User loadProcessRoles(User user) {
         if (user == null)
             return null;
         user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
+        return user;
+    }
+
+    private User loadGroups(User user){
+        if (user == null)
+            return null;
+        user.setNextGroups(this.groupService.getAllGroupsOfUser(user));
         return user;
     }
 }
