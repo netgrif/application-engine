@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>refering</id>
+    <version>1.0.0</version>
+    <initials>REF</initials>
+    <title>Refering</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="taskRef">
+        <id>ref</id>
+        <title></title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>546</x>
+        <y>177</y>
+        <label>Transition</label>
+        <event type="assign">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    taskref: f.ref;
+
+                    def refedCase = createCase("referenced");
+                    def task = findTask({it.caseId.eq(refedCase.stringId)});
+                    change taskref value {
+                        return [task.stringId]
+                    }
+                </action>
+            </actions>
+        </event>
+        <dataRef>
+            <id>ref</id>
+            <logic><behavior>editable</behavior></logic>
+        </dataRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

@@ -4,9 +4,11 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.importer.model.Validations;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
@@ -22,8 +24,17 @@ public class DataField implements Referencable {
     @Getter
     private Object value;
 
-    @Getter @Setter
+    @Getter
     private Set<I18nString> choices;
+
+    @Getter
+    private List<String> allowedNets;
+
+    @Getter
+    private Map<String, I18nString> options;
+
+    @Getter
+    private List<Validation> validations;
 
     @Getter
     @Setter
@@ -50,6 +61,26 @@ public class DataField implements Referencable {
 
     public void setValue(Object value) {
         this.value = value;
+        update();
+    }
+
+    public void setChoices(Set<I18nString> choices) {
+        this.choices = choices;
+        update();
+    }
+
+    public void setAllowedNets(List<String> allowedNets) {
+        this.allowedNets = allowedNets;
+        update();
+    }
+
+    public void setOptions(Map<String, I18nString> options) {
+        this.options = options;
+        update();
+    }
+
+    public void setValidations(List<Validation> validations) {
+        this.validations = validations;
         update();
     }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>new_model</id>
+    <version>1.0.0</version>
+    <initials>NEW</initials>
+    <title>New Model2</title>
+    <icon>home2</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role>
+        <id>newRole_3</id>
+        <title>newRole_3</title>
+    </role>
+    <!-- DATA -->
+    <data type="text">
+        <id>newVariable_7</id>
+        <title>newVariable_7</title>
+    </data>
+    <data type="text">
+        <id>newVariable_6</id>
+        <title>newVariable_6</title>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>3</id>
+        <x>481</x>
+        <y>186</y>
+        <label>task3</label>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

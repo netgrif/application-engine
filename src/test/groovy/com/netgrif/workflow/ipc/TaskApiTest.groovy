@@ -7,7 +7,9 @@ import com.netgrif.workflow.history.domain.UserTaskEventLog
 import com.netgrif.workflow.history.domain.repository.EventLogRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -44,7 +46,13 @@ class TaskApiTest {
     private EventLogRepository eventLogRepository
 
     @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
     private TestHelper testHelper
+
+    @Autowired
+    private SuperCreator superCreator;
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -60,13 +68,10 @@ class TaskApiTest {
     }
 
     public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"
-    public static final String TASK_SEARCH_NET_TITLE = "Task search"
-    public static final String TASK_SEARCH_NET_INITIALS = "TS"
-    public static final String TASK_SEARCH_TASK = "Task"
 
     @Test
     void testTaskSearch() {
-        def netOptional = importer.importPetriNet(stream(TASK_SEARCH_NET_FILE), TASK_SEARCH_NET_TITLE, TASK_SEARCH_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
 
@@ -96,7 +101,7 @@ class TaskApiTest {
 
     @Test
     void testTaskEventActions() {
-        def netOptional = importer.importPetriNet(stream(TASK_EVENTS_NET_FILE), TASK_EVENTS_NET_TITLE, TASK_EVENTS_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
 
@@ -128,8 +133,8 @@ class TaskApiTest {
 
     @Test
     void testTaskExecution() {
-        def limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
-        def leasingNetOptional = importer.importPetriNet(stream(LEASING_NET_FILE), LEASING_NET_TITLE, LEASING_NET_INITIALS)
+        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), "major", superCreator.getLoggedSuper())
+        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert limitsNetOptional.isPresent()
         assert leasingNetOptional.isPresent()
@@ -205,7 +210,7 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = importer.importPetriNet(stream(TASK_BULK_NET_FILE), TASK_BULK_NET_TITLE, TASK_BULK_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
@@ -230,7 +235,7 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = importer.importPetriNet(stream(TASK_GETTER_NET_FILE), TASK_GETTER_NET_TITLE, TASK_GETTER_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
@@ -265,7 +270,7 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = importer.importPetriNet(stream(TASK_SETTER_NET_FILE), TASK_SETTER_NET_TITLE, TASK_SETTER_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()

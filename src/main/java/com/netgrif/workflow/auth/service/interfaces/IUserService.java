@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -21,6 +22,8 @@ public interface IUserService {
 
     User saveNew(User user);
 
+    AnonymousUser saveNewAnonymous(AnonymousUser user);
+
     User update(User user, UpdateUserRequest updates);
 
     Member upsertGroupMember(User user);
@@ -34,6 +37,8 @@ public interface IUserService {
     Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);
 
     Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
+
+    List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
     void assignAuthority(Long userId, Long authorityId);
 
@@ -51,9 +56,15 @@ public interface IUserService {
 
     User getSystem();
 
+    LoggedUser getAnonymousLogged();
+
     User addRole(User user, String roleStringId);
 
     Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
-    Page<User> searchAllCoMembers(String query, List<String> roles, LoggedUser principal, Boolean small, Pageable pageable);
+    User removeRole(User user, String roleStringId);
+
+    void deleteUser(User user);
+
+    Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 }

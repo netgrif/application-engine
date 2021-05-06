@@ -1,24 +1,35 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
-import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -27,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -53,9 +64,6 @@ public class WorkflowService implements IWorkflowService {
     private CaseRepository repository;
 
     @Autowired
-    private PetriNetRepository petriNetRepository;
-
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     @Autowired
@@ -77,22 +85,39 @@ public class WorkflowService implements IWorkflowService {
     private FieldFactory fieldFactory;
 
     @Autowired
-    @Lazy
+    private IRuleEngine ruleEngine;
+
+    @Autowired
+    private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IUserService userService;
+
+    @Autowired
+    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
+
     private IElasticCaseService elasticCaseService;
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
 
     @Override
     public Case save(Case useCase) {
-        encryptDataSet(useCase);
-        useCase = repository.save(useCase);
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
+        encryptDataSet(useCase);
+        useCase = repository.save(useCase);
+
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
         } catch (Exception e) {
-            log.error("Indexing failed ["+useCase.getStringId()+"]", e);
+            log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
+        resolveUserRef(useCase);
         return useCase;
     }
 
@@ -100,10 +125,11 @@ public class WorkflowService implements IWorkflowService {
     public Case findOne(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find Case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
+        this.setImmediateDataFieldsReadOnly(useCase);
         return useCase;
     }
 
@@ -140,7 +166,12 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        Page<Case> page = repository.findAll(searchPredicate, pageable);
+        Page<Case> page;
+        if (searchPredicate != null) {
+            page = repository.findAll(searchPredicate, pageable);
+        } else {
+            page = Page.empty();
+        }
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -149,48 +180,100 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        return repository.count(searchPredicate);
+        if (searchPredicate != null) {
+            return repository.count(searchPredicate);
+        } else {
+            return 0;
+        }
     }
 
     @Override
-    public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
-        Case useCase = caseOptional.get();
-
-        CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
-
-        List<Case> list = new LinkedList<>();
-        field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
-            Optional<PetriNet> netOptional = petriNetRepository.findById(netImportId);
-            if (!netOptional.isPresent())
-                throw new IllegalArgumentException("Could not find model with id ["+netImportId+"]");
-            list.addAll(repository.findAllByProcessIdentifier(netOptional.get().getIdentifier()));
+    public Case resolveUserRef(Case useCase) {
+        useCase.getUsers().clear();
+        useCase.getNegativeViewUsers().clear();
+        useCase.getUserRefs().forEach((id, permission) -> {
+            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+                useCase.getNegativeViewUsers().addAll(userIds);
+            } else if (userIds != null && userIds.size() != 0) {
+                useCase.addUsers(new HashSet<>(userIds), permission);
+            }
         });
+        return repository.save(useCase);
+    }
 
-        return list;
+    private List<Long> getExistingUsers(List<Long> userIds) {
+        if (userIds == null)
+            return null;
+        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+    }
+
+    @Override
+    public Case createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+        if (locale == null) {
+            locale = LocaleContextHolder.getLocale();
+        }
+        if (title == null) {
+            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale), color, user);
+        }
+        return this.createCase(netId, title, color, user);
     }
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
+        return createCase(netId, (u) -> title, color, user);
+    }
+
+    public Case createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
+        Case useCase = new Case(petriNet, petriNet.getActivePlaces());
+        useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
+        useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
+        useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
+        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
+        useCase.setTitle(makeTitle.apply(useCase));
+        runActions(petriNet.getPreCreateActions());
+        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
-        log.info("["+useCase.getStringId()+"]: Case " + title + " created");
+        log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
         useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
+        resolveTaskRefs(useCase);
 
         useCase = findOne(useCase.getStringId());
+        runActions(petriNet.getPostCreateActions(), useCase.getStringId());
+        useCase = findOne(useCase.getStringId());
+        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+        useCase = save(useCase);
+
         return setImmediateDataFields(useCase);
+    }
+
+    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {
+        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        Function<Case, String> makeTitle;
+        if (petriNet.hasDynamicCaseName()) {
+            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression()).getTranslation(locale);
+        } else {
+            makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
+        }
+        return makeTitle;
     }
 
     @Override
@@ -205,16 +288,43 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteCase(String caseId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
-        Case useCase = caseOptional.get();
-        log.info("["+caseId+"]: Deleting case " + useCase.getTitle());
+        Case useCase = findOne(caseId);
+
+        runActions(useCase.getPetriNet().getPreDeleteActions(), useCase.getStringId());
+        log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
+        runActions(useCase.getPetriNet().getPostDeleteActions());
+
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void deleteInstancesOfPetriNet(PetriNet net) {
+        log.info("[" + net.getStringId() + "]: Deleting all cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        List<Case> cases = repository.findAllByPetriNetObjectId(net.getObjectId());
+
+        for (Case c : cases) {
+            log.info("[" + c.getStringId() + "]: Deleting case " + c.getTitle());
+            taskService.deleteTasksByCase(c.getStringId());
+        }
+
+        repository.deleteAllByPetriNetObjectId(net.getObjectId());
+
+        for (Case c : cases) {
+            publisher.publishEvent(new DeleteCaseEvent(c));
+        }
+    }
+
+    @Override
+    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+        Case subtreeRoot = findOne(subtreeRootCaseId);
+        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
+            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
+        }
+        deleteCase(subtreeRootCaseId);
     }
 
     @Override
@@ -229,7 +339,7 @@ public class WorkflowService implements IWorkflowService {
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         return removeTasksFromCase(tasks, useCase);
     }
@@ -257,16 +367,24 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case searchOne(Predicate predicate) {
-        Page<Case> page = search(predicate, new PageRequest(0,1));
+        Page<Case> page = search(predicate, new PageRequest(0, 1));
         if (page.getContent().isEmpty())
             return null;
         return page.getContent().get(0);
     }
 
+    @Override
+    public Map<String, I18nString> listToMap(List<Case> cases){
+        Map<String, I18nString> options = new HashMap<>();
+        cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
+        return  options;
+    }
+
+
     public List<Field> getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
         if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = optionalUseCase.get();
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
@@ -279,6 +397,20 @@ public class WorkflowService implements IWorkflowService {
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
+    }
+
+    private void resolveTaskRefs(Case useCase) {
+        useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
+            useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
+            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
+                List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
+                                (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
+                if (!taskPairList.isEmpty()) {
+                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(field.getStringId()).getValue()).add(pair.getTask()));
+                }
+            }
+        });
+        save(useCase);
     }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
@@ -372,5 +504,75 @@ public class WorkflowService implements IWorkflowService {
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
+    }
+
+    @Override
+    public ChangedFieldsTree runActions(List<Action> actions, String useCaseId) {
+        log.info("[" + useCaseId + "]: Running actions on case");
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCaseId, "", "");
+        if (actions.isEmpty())
+            return changedFields;
+
+        Case case$ = findOne(useCaseId);
+        actions.forEach(action -> {
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty());
+            changedFields.mergeChangedFields(changedFieldsTree);
+            if (changedFieldsTree.getChangedFields().isEmpty()) {
+                return;
+            }
+            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
+        });
+        save(case$);
+        return changedFields;
+    }
+
+    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
+        newChangedFields.forEach((s, changedField) -> {
+            if (changedFields.containsKey(s))
+                changedFields.get(s).merge(changedField);
+            else
+                changedFields.put(s, changedField);
+        });
+    }
+
+    private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
+        newChangedField.forEach((s, changedField) -> {
+            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
+                Field field = useCase.getField(s);
+                processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
+                processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
+            }
+        });
+    }
+
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
+        LinkedList<Action> fieldActions = new LinkedList<>();
+        if (field.getEvents() != null){
+            fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
+        }
+        if (fieldActions.isEmpty()) return;
+
+        runEventActions(useCase, fieldActions, changedFields, actionTrigger);
+    }
+
+    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
+        actions.forEach(action -> {
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty());
+            changedFields.mergeChangedFields(currentChangedFields);
+
+            if (currentChangedFields.getChangedFields().isEmpty())
+                return;
+
+            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+        });
+    }
+
+    @Override
+    public void runActions(List<Action> actions) {
+        log.info("Running actions without context on cases");
+
+        actions.forEach(action -> {
+            actionsRunner.run(action, null, Optional.empty());
+        });
     }
 }

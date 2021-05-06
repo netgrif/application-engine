@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <id>test</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <data type="date">
         <id>1</id>
         <title>Dátum začiatku poistky</title>

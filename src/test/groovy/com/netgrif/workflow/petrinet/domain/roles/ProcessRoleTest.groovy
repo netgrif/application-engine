@@ -4,10 +4,12 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
-import com.netgrif.workflow.importer.service.Config
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
@@ -63,6 +65,12 @@ class ProcessRoleTest {
     @Autowired
     private ImportHelper importHelper
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
+
     @Before
     void before() {
         mvc = MockMvcBuilders
@@ -70,7 +78,7 @@ class ProcessRoleTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = importer.importPetriNet(new File("src/test/resources/rolref_view.xml"), CASE_NAME, CASE_INITIALS, new Config())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), "major", superCreator.getLoggedSuper())
         assert net.isPresent()
 
         netId = net.get().getStringId()

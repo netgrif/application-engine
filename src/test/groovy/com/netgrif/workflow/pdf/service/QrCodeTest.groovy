@@ -39,7 +39,7 @@ class QrCodeTest {
         def qr = new QrCode("qrcode_logo.png",'{"caseId":"5c6680281efd8c101c4be344"}')
         qr.setWidth(153*4)
         qr.setHeight(153*4)
-        def fileOpt = service.generateWithLogo(qr, new FileInputStream("src/main/resources/static/assets/default/icons/icon-512x512.png"))
+        def fileOpt = service.generateWithLogo(qr, new FileInputStream("src/test/resources/img/icon-512x512.png"))
 
         assert fileOpt.isPresent() && Files.exists(Paths.get("qrcode_logo.png"))
     }
