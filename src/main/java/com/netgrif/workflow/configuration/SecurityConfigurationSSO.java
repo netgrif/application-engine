@@ -1,9 +1,8 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.service.OauthUserService;
-import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.auth.service.interfaces.IOauthUserMapper;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
@@ -13,11 +12,12 @@ import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -25,15 +25,9 @@ import org.springframework.security.authentication.AnonymousAuthenticationProvid
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
@@ -42,7 +36,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashSet;
 
@@ -52,11 +45,9 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Configuration
 @Controller
 @EnableWebSecurity
-@Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnProperty(
-        value = "server.security.static.enabled",
-        havingValue = "false"
-)
+@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
+@ConditionalOnExpression("${nae.oauth.enabled}")
+@EnableOAuth2Sso
 public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -78,7 +69,13 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
     private IUserService userService;
 
     @Autowired
+    private IOauthUserMapper oauthUserMapper;
+
+    @Autowired
     private SecurityConfigProperties properties;
+
+    @Autowired
+    private ResourceServerTokenServices tokenServices;
 
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
@@ -116,6 +113,8 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
                 .and()
                 .cors()
                 .and()
+                .addFilterBefore(new ApiTokenAccessFilter(tokenServices), AbstractPreAuthenticatedProcessingFilter.class)
+                .addFilterAfter(new OAuth2AuthenticationConvertingFilter(oauthUserMapper), ApiTokenAccessFilter.class)
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
@@ -132,8 +131,8 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"))
-                .and()
-                .oauth2Login()
+//                .and()
+//                .oauth2Login()
 //                .userInfoEndpoint()
 //                .oidcUserService(new CustomOidcUserServiceImpl())
         ;
@@ -141,26 +140,6 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
         setCsrf(http);
     }
 
-//    public class CustomOidcUserServiceImpl implements OAuth2UserService<OidcUserRequest, OidcUser> {
-//
-//        private OidcUserService oidcUserService = new OidcUserService();
-//
-//        @Override
-//        public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-//            OidcUser oidcUser = oidcUserService.loadUser(userRequest);
-//            return oidcUser;
-//        }
-//    }
-
-    @Bean
-    WebClient webClient(ClientRegistrationRepository clientRegistrationRepository,
-                        OAuth2AuthorizedClientRepository authorizedClientRepository) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
-                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository,
-                        authorizedClientRepository);
-        oauth2.setDefaultOAuth2AuthorizedClient(true);
-        return WebClient.builder().apply(oauth2.oauth2Configuration()).build();
-    }
 
     @Override
     protected ProviderManager authenticationManager() throws Exception {
@@ -193,6 +172,41 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
     Environment getEnvironment() {
         return env;
     }
+
+//    @Bean
+//    @ConfigurationProperties("security.oauth2.client")
+//    public AuthorizationCodeResourceDetails oauth2Client() {
+//        return new AuthorizationCodeResourceDetails();
+//    }
+
+
+//
+//    @Bean
+//    @ConfigurationProperties("security.oauth2.resource")
+//    public ResourceServerProperties oauth2Resource() {
+//        return new ResourceServerProperties();
+//    }
+//
+//    @Bean
+//    public FilterRegistrationBean<OAuth2ClientContextFilter> oauth2ClientFilterRegistration(
+//            OAuth2ClientContextFilter filter) {
+//        FilterRegistrationBean<OAuth2ClientContextFilter> registration = new FilterRegistrationBean<>();
+//        registration.setFilter(filter);
+//        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+//        return registration;
+//    }
+//
+//
+//    private Filter oauth2ClientFilter() {
+//        OAuth2ClientAuthenticationProcessingFilter oauth2ClientFilter = new OAuth2ClientAuthenticationProcessingFilter("/");
+//        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oauth2Client(), oauth2ClientContext);
+//        oauth2ClientFilter.setRestTemplate(restTemplate);
+//        UserInfoTokenServices tokenServices = new UserInfoTokenServices(oauth2Resource().getUserInfoUri(),
+//                oauth2Client().getClientId());
+//        tokenServices.setRestTemplate(restTemplate);
+//        oauth2ClientFilter.setTokenServices(tokenServices);
+//        return oauth2ClientFilter;
+//    }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
