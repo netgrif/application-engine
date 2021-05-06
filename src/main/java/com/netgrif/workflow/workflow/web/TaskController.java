@@ -2,37 +2,38 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.elastic.web.TaskSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
+import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
+import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
-import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
-import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,246 +42,237 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
-public class TaskController {
+@ConditionalOnProperty(
+        value = "nae.task.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@Api(tags = {"Task"}, authorizations = @Authorization("BasicAuth"))
+public class TaskController extends AbstractTaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    @Autowired
-    private ITaskService taskService;
-
-    @Autowired
-    private IFilterService filterService;
-
-    @Autowired
-    private IDataService dataService;
-
-    @Autowired
-    private IElasticTaskService searchService;
-
-    @Autowired
-	private IUserService userService;
-
-    @Autowired
-    private ITaskAuthenticationService taskAuthenticationService;
-
-    @RequestMapping(method = RequestMethod.GET)
-    public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        Page<Task> page = taskService.getAll(loggedUser, pageable, locale);
-
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getAll(auth, pageable, assembler, locale)).withRel("all");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
+    public TaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
+        super(taskService, dataService, searchService);
     }
 
-    @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> page = taskService.findByCases(pageable, cases);
-
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getAllByCases(cases, pageable, assembler, locale)).withRel("case");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
+    @Override
+    @ApiOperation(value = "Get all tasks", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getAll(auth, pageable, assembler, locale);
     }
 
-    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET)
+    @Override
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getAllByCases(cases, pageable, assembler, locale);
+    }
+
+    @Override
+    @ApiOperation(value = "Get tasks of the case", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
-        return taskService.findAllByCase(caseId, locale);
+        return super.getTasksOfCase(caseId, locale);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @Override
+    @ApiOperation(value = "Get task by id", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public LocalisedTaskResource getOne(@PathVariable("id") String taskId, Locale locale) {
-        Task task = taskService.findById(taskId);
-        if (task == null)
-            return null;
-        return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
+        return super.getOne(taskId, locale);
     }
 
-    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Assign task",
+            notes = "Caller must be able to perform the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public LocalisedEventOutcomeResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
-
-        try {
-            taskService.assignTask(loggedUser, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
-        } catch (TransitionNotExecutableException e) {
-            log.error("Assigning task ["+taskId+"] failed: ", e);
-            return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
-        }
+        return super.assign(loggedUser, taskId, locale);
     }
 
-    @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Delegate task",
+            notes = "Caller must be able to delegate the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
-
-        try {
-            taskService.delegateTask(loggedUser, delegatedId, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
-        } catch (Exception e) {
-            log.error("Delegating task ["+taskId+"] failed: ", e);
-            return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
-        }
+        return super.delegate(loggedUser, taskId, delegatedId, locale);
     }
 
-    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Finish task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public LocalisedEventOutcomeResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        if(	!loggedUser.isAdmin()
-			&& !(
-				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
-			))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to finish task " + taskId);
-
-        try {
-            taskService.finishTask(loggedUser, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
-        } catch (Exception e) {
-            log.error("Finishing task ["+taskId+"] failed: ", e);
-            return MessageResource.errorMessage(e.getMessage());
-        }
+        return super.finish(loggedUser, taskId, locale);
     }
 
-    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Cancel task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public LocalisedEventOutcomeResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-		if(	!loggedUser.isAdmin()
-			&& !(
-				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
-			))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to cancel task " + taskId);
-
-        try {
-            taskService.cancelTask(loggedUser, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
-        } catch (Exception e) {
-            log.error("Canceling task ["+taskId+"] failed: ", e);
-            return MessageResource.errorMessage(e.getMessage());
-        }
+        return super.cancel(loggedUser, taskId, locale);
     }
 
-    @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public PagedResources<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
-
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getMy(auth, pageable, assembler, locale)).withRel("my");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
+    @Override
+    @ApiOperation(value = "Get all tasks assigned to logged user", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/my", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getMy(auth, pageable, assembler, locale);
     }
 
-    @RequestMapping(value = "/my/finished", method = RequestMethod.GET)
-    public PagedResources<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
-
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
+    @Override
+    @ApiOperation(value = "Get all finished tasks by logged user", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/my/finished", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.getMyFinished(pageable, auth, assembler, locale);
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
+    @Override
+    @ApiOperation(value = "Generic task search on Mongo database", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.search(auth, pageable, searchBody, operation, assembler, locale);
     }
 
-    @RequestMapping(value = "/search_es", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .searchElastic(auth, pageable, searchBody, assembler, locale)).withRel("search_es");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
+    @Override
+    @ApiOperation(value = "Generic task search on Elasticsearch database", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/search_es", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+        return super.searchElastic(auth, pageable, searchBody, operation, assembler, locale);
     }
 
-//    @RequestMapping(value = "/search", method = RequestMethod.POST)
-//    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<ElasticTask> assembler, Locale locale) {
-//        Page<ElasticTask> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
-//        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-//                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-//        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new ElasticTaskResourceAssembler(), selfLink);
-//        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-//        return resources;
-//    }
-
-    @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale) {
-        long count = searchService.count(query, (LoggedUser)auth.getPrincipal());
-        return CountResponse.taskCount(count);
+    @Override
+    @ApiOperation(value = "Count tasks by provided criteria", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/count", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
+        return super.count(query, operation, auth, locale);
     }
 
-    @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
+    @Override
+    @ApiOperation(value = "Get all task data", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
-        List<Field> dataFields = dataService.getData(taskId);
-        List<DataGroup> dataGroups = dataService.getDataGroups(taskId);
-
-        dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
-                group.getData().contains(field.getStringId())).collect(Collectors.toList()), locale)));
-
-        return new DataGroupsResource(dataGroups, locale);
+        return super.getData(taskId, locale);
     }
 
-    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
-    	User logged = userService.getLoggedUser();
-    	if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-    		throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save data in task " + taskId);
-
-        return dataService.setData(taskId, dataBody);
+    @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Set task data",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ChangedFieldContainer.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+        return super.setData(taskId, dataBody);
     }
 
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                    @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
-		User logged = userService.getLoggedUser();
-		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-			throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save file in task " + taskId);
-
-        if (dataService.saveFile(taskId, fieldId, multipartFile))
-            return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
-        else
-            return MessageResource.errorMessage("File " + multipartFile.getOriginalFilename() + " failed to upload");
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Upload file into the task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        return super.saveFile(taskId, fieldId, multipartFile);
     }
 
+    @ApiOperation(value = "Download task file field value", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
+        return super.getFile(taskId, fieldId);
+    }
 
-        if (fileFieldInputStream.getInputStream() == null)
-            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Remove file from the task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+        return super.deleteFile(taskId, fieldId);
+    }
 
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Upload multiple files into the task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        return super.saveFiles(taskId, fieldId, multipartFiles);
+    }
+
+    @ApiOperation(value = "Download one file from tasks file list field value", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name,
+                                                 HttpServletResponse response) throws FileNotFoundException {
+        return super.getNamedFile(taskId, fieldId, name);
+    }
+
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Remove file from tasks file list field value",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        return super.deleteNamedFile(taskId, fieldId, name);
+    }
+
+    @ApiOperation(value = "Download preview for file field value", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file_preview/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
+        return super.getFilePreview(taskId, fieldId);
     }
 }

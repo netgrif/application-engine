@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>test</id>
+	<initials>TST</initials>
+	<title>Test</title>
+	<role>
+		<id>user</id>
+		<title>User</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>2</id>

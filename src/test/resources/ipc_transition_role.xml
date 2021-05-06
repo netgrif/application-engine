@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <transitionRole>true</transitionRole>
+    <id>test</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <defaultRole>false</defaultRole>
+    <transitionRole>true</transitionRole>
     <!-- ROLES -->
     <role>
         <id>user_role</id>

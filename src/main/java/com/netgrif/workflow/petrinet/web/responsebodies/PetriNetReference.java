@@ -47,7 +47,7 @@ public class PetriNetReference extends Reference {
     }
 
     public PetriNetReference(PetriNet net, Locale locale) {
-        this(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
+        this(net.getStringId(), net.getIdentifier(), net.getVersion().toString(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
         this.icon = net.getIcon();
         this.createdDate = net.getCreationDate();
         this.author = net.getAuthor();

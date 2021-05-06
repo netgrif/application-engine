@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -69,6 +70,9 @@ class EventTest {
     @Autowired
     private SystemUserRunner userRunner
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
@@ -85,7 +89,7 @@ class EventTest {
         roleRunner.run()
         superCreator.run()
 
-        def net = importer.importPetriNet(stream(EVENT_NET_FILE), EVENT_NET_TITLE, EVENT_NET_INITS).get()
+        def net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), "major", superCreator.getLoggedSuper()).get()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)

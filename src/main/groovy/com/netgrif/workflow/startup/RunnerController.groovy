@@ -10,16 +10,19 @@ class RunnerController {
             MongoDbRunner,
             Neo4jRunner,
             StorageRunner,
+            RuleEngineRunner,
             DefaultRoleRunner,
             DefaultGroupRunner,
             AuthorityRunner,
-            SuperCreator,
             SystemUserRunner,
+            GroupRunner,
+            SuperCreator,
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
             DummyUserRunner,
             DemoRunner,
+            QuartzSchedulerRunner,
             FinisherRunner
     ]
 

@@ -6,14 +6,15 @@ import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
-import com.netgrif.workflow.importer.service.Config
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +27,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
@@ -40,11 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(["test"])
 @SpringBootTest
 class AssignActionTest {
-
-    private static final String MAIN_NET_NAME = "Test case - main"
-    private static final String MAIN_NET_INITIALS = "main"
-    private static final String SECONDARY_NET_NAME = "Test case - secondary"
-    private static final String SECONDARY_NET_INITIALS = "secondary"
 
     private static final String GROUP_NAME = "Test group"
     public static final String USER_EMAIL = "test@mail.sk"
@@ -72,6 +67,12 @@ class AssignActionTest {
 
     @Autowired
     private ProcessRoleRepository processRoleRepository
+
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
 
     private MockMvc mvc
     private PetriNet mainNet
@@ -106,10 +107,10 @@ class AssignActionTest {
     }
 
     private void createMainAndSecondaryNet() {
-        def mainNet = importer.importPetriNet(new File("src/test/resources/assignRoleMainNet_test_.xml"), MAIN_NET_NAME, MAIN_NET_INITIALS, new Config())
+        def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"), "major", superCreator.getLoggedSuper())
         assert mainNet.isPresent()
 
-        def secondaryNet = importer.importPetriNet(new File("src/test/resources/assignRoleSecondaryNet_test.xml"), SECONDARY_NET_NAME, SECONDARY_NET_INITIALS, new Config())
+        def secondaryNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleSecondaryNet_test.xml"), "major", superCreator.getLoggedSuper())
         assert secondaryNet.isPresent()
 
         this.mainNet = mainNet.get()

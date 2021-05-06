@@ -6,7 +6,14 @@ import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.workflow.petrinet.domain.events.CaseEvent;
+import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +42,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private Expression defaultCaseNameExpression;
+
+    @Getter
+    @Setter
     private String initials;
 
     @Getter
@@ -48,7 +59,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private String version; //in format 1.1.1 - MAJOR.MINOR.PATCH
+    private Version version;
 
     @Getter
     @Setter
@@ -85,6 +96,26 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, Transaction> transactions;//todo: import id
 
+    @Getter
+    @Setter
+    private Map<ProcessEventType, ProcessEvent> processEvents;
+
+    @Getter
+    @Setter
+    private Map<CaseEventType, CaseEvent> caseEvents;
+
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> permissions;
+
+    @Getter
+    @Setter
+    private List<String> negativeViewRoles;
+
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> userRefs;
+
     @Transient
     private boolean initialized;
 
@@ -95,7 +126,10 @@ public class PetriNet extends PetriNetObject {
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
-        this.version = "1.0.0";
+        this.initials = "";
+        this.title = new I18nString("");
+        this.importId = "";
+        this.version = new Version();
         defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
@@ -104,14 +138,12 @@ public class PetriNet extends PetriNetObject {
         arcs = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
+        negativeViewRoles = new LinkedList<>();
         transactions = new LinkedHashMap<>();
-    }
-
-    public PetriNet(String identifier, String title, String initials) {
-        this();
-        this.identifier = identifier;
-        setTitle(title);
-        this.initials = initials;
+        processEvents = new LinkedHashMap<>();
+        caseEvents = new LinkedHashMap<>();
+        permissions = new HashMap<>();
+        userRefs = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -124,6 +156,24 @@ public class PetriNet extends PetriNetObject {
 
     public void addRole(ProcessRole role) {
         this.roles.put(role.getStringId(), role);
+    }
+
+    public void addPermission(String roleId, Map<String, Boolean> permissions) {
+        if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
+            this.permissions.get(roleId).putAll(permissions);
+        } else {
+            this.permissions.put(roleId, permissions);
+        }
+    }
+
+    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+
+    public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
+        if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
+            this.userRefs.get(usersRefId).putAll(permissions);
+        } else {
+            this.userRefs.put(usersRefId, permissions);
+        }
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -236,21 +286,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void incrementVersion(VersionType type) {
-        List<Integer> versionParts = Arrays.stream(this.version.split("\\."))
-                .map(Integer::parseInt).collect(Collectors.toList());
-
-        if (type == VersionType.MAJOR) {
-            versionParts.set(0, versionParts.get(0) + 1);
-            versionParts.set(1, 0);
-            versionParts.set(2, 0);
-        } else if (type == VersionType.MINOR) {
-            versionParts.set(1, versionParts.get(1) + 1);
-            versionParts.set(2, 0);
-        } else if (type == VersionType.PATCH) {
-            versionParts.set(2, versionParts.get(2) + 1);
-        }
-
-        this.version = versionParts.get(0) + "." + versionParts.get(1) + "." + versionParts.get(2);
+        this.version.increment(type);
     }
 
     @Override
@@ -280,10 +316,56 @@ public class PetriNet extends PetriNetObject {
         return title.getTranslation(locale);
     }
 
-    public enum VersionType {
-        MAJOR,
-        MINOR,
-        PATCH
+    public List<Action> getPreCreateActions() {
+        return getPreCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPostCreateActions() {
+        return getPostCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPreDeleteActions() {
+        return getPreCaseActions(CaseEventType.DELETE);
+    }
+
+    public List<Action> getPostDeleteActions() {
+        return getPostCaseActions(CaseEventType.DELETE);
+    }
+
+    public List<Action> getPreUploadActions() {
+        return getPreProcessActions(ProcessEventType.UPLOAD);
+    }
+
+    public List<Action> getPostUploadActions() {
+        return getPostProcessActions(ProcessEventType.UPLOAD);
+    }
+
+    private List<Action> getPreCaseActions(CaseEventType type) {
+        if (caseEvents.containsKey(type))
+            return caseEvents.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostCaseActions(CaseEventType type) {
+        if (caseEvents.containsKey(type))
+            return caseEvents.get(type).getPostActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPreProcessActions(ProcessEventType type) {
+        if (processEvents.containsKey(type))
+            return processEvents.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostProcessActions(ProcessEventType type) {
+        if (processEvents.containsKey(type))
+            return processEvents.get(type).getPostActions();
+        return new LinkedList<>();
+    }
+
+    public boolean hasDynamicCaseName() {
+        return defaultCaseNameExpression != null;
     }
 
     @Override
@@ -297,6 +379,7 @@ public class PetriNet extends PetriNetObject {
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultCaseName(this.defaultCaseName);
+        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version);
@@ -322,6 +405,11 @@ public class PetriNet extends PetriNetObject {
                         .collect(Collectors.toList())))
         );
         clone.initializeArcs();
+        clone.setCaseEvents(this.caseEvents);
+        clone.setProcessEvents(this.processEvents);
+        clone.setPermissions(this.permissions);
+        clone.setUserRefs(this.userRefs);
+        this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         return clone;
     }
 }

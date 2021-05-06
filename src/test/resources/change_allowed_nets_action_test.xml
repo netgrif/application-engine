@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>test</id>
+    <initials>TST</initials>
+    <title>Test</title>
+    <defaultRole>true</defaultRole>
+
+    <data type="caseRef" immediate="true">
+        <id>caseref</id>
+        <title>Caseref</title>
+        <allowedNets>
+            <allowedNet>lorem</allowedNet>
+        </allowedNets>
+    </data>
+    <data type="boolean">
+        <id>setVal</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            caseref: f.caseref;
+            change caseref allowedNets { return ["hello", "world"]}
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="boolean">
+        <id>setNull</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            caseref: f.caseref;
+            change caseref allowedNets { return null}
+            <!-- @formatter:on -->
+        </action>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Tran</label>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>setVal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>setNull</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>task_reindex_test</id>
+    <initials>TST</initials>
+    <title>task_reindex_test</title>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>2</id>
+        <x>460</x>
+        <y>220</y>
+        <label>before</label>
+    </transition>
+    <transition>
+        <id>3</id>
+        <x>460</x>
+        <y>340</y>
+        <label>dead</label>
+    </transition>
+    <transition>
+        <id>5</id>
+        <x>340</x>
+        <y>140</y>
+        <label>allways</label>
+    </transition>
+    <transition>
+        <id>9</id>
+        <x>740</x>
+        <y>220</y>
+        <label>after</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>340</x>
+        <y>260</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>4</id>
+        <x>620</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>6</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>7</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>8</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>10</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>9</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
