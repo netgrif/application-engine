@@ -1,13 +1,10 @@
 package com.netgrif.workflow;
 
-import com.netgrif.workflow.auth.service.UserService;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.ApplicationContextProvider;
 import com.netgrif.workflow.configuration.JsonRootRelProvider;
 import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -34,12 +31,6 @@ public class WorkflowManagementSystemApplication {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new StringToVersionConverter());
         return new MongoCustomConversions(converters);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public IUserService userService() {
-        return new UserService();
     }
 
     @Bean

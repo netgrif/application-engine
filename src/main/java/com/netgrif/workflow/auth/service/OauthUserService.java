@@ -1,23 +1,17 @@
 package com.netgrif.workflow.auth.service;
 
+import com.netgrif.workflow.auth.domain.OauthUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.interfaces.IOauthUserService;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 
-public class OauthUserService extends UserService {
+public class OauthUserService extends UserService implements IOauthUserService {
 
     @Override
-    public User saveNew(User user) {
+    public OauthUser saveNewOAuth(OauthUser user) {
         addDefaultRole(user);
         addDefaultAuthorities(user);
-
-
-        User savedUser = userRepository.save(user);
-        groupService.createGroup(user);
-        groupService.addUserToDefaultGroup(user);
-        savedUser.setGroups(user.getGroups());
-        upsertGroupMember(savedUser);
-        publisher.publishEvent(new UserRegistrationEvent(savedUser));
-
-        return savedUser;
+        return userRepository.save(user);
     }
+
 }
