@@ -230,7 +230,7 @@ class ImportHelper {
     }
 
     List<Field> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId))
+        return dataService.getData(getTaskId(taskTitle, caseId)).getData()
     }
 
     void updateSuperUser(){

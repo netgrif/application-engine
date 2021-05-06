@@ -542,7 +542,7 @@ class ActionDelegate {
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+        return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser()).getACase()
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
@@ -705,8 +705,8 @@ class ActionDelegate {
     }
 
     Map<String, Field> getData(Task task) {
-        def useCase = workflowService.findOne(task.caseId);
-        return mapData(dataService.getData(task, useCase))
+        def useCase = workflowService.findOne(task.caseId)
+        return mapData(dataService.getData(task, useCase).getData())
     }
 
     Map<String, Field> getData(Transition transition) {
@@ -718,7 +718,7 @@ class ActionDelegate {
         def task = taskService.searchOne(predicate)
         if (!task)
             return new HashMap<String, Field>()
-        return mapData(dataService.getData(task, useCase))
+        return mapData(dataService.getData(task, useCase).getData())
     }
 
     protected Map<String, Field> mapData(List<Field> data) {
