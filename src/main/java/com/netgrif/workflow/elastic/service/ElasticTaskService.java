@@ -209,7 +209,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request.users != null && !request.users.isEmpty()) {
-            Set<Long> users = new HashSet<>(request.users);
+            Set<String> users = new HashSet<>(request.users);
             users.add(user.getId());
             request.users = new ArrayList<>(users);
         } else {
@@ -275,7 +275,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder roleQuery = boolQuery();
-        for (Long userId : request.users) {
+        for (String userId : request.users) {
             roleQuery.should(termQuery("users", userId));
         }
 
@@ -383,7 +383,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder userQuery = boolQuery();
-        for (Long user : request.user) {
+        for (String user : request.user) {
             userQuery.should(termQuery("userId", user));
         }
 

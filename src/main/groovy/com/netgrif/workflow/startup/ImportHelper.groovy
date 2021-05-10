@@ -3,7 +3,7 @@ package com.netgrif.workflow.startup
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.auth.domain.*
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Group
@@ -15,6 +15,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
@@ -57,9 +58,6 @@ class ImportHelper {
 
     @Autowired
     private CaseRepository caseRepository
-
-    @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
 
     @Autowired
     private IAuthorityService authorityService
@@ -142,7 +140,7 @@ class ImportHelper {
         return Optional.of(petriNet)
     }
 
-    UserProcessRole createUserProcessRole(PetriNet net, String name) {
+    /*ProcessRole createUserProcessRole(PetriNet net, String name) {
         UserProcessRole role = userProcessRoleRepository.save(new UserProcessRole(roleId:
                 net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
         log.info("Created user process role $name")
@@ -166,9 +164,9 @@ class ImportHelper {
             map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
         }
         return map
-    }
+    }*/
 
-    User createUser(User user, Authority[] authorities, Group[] orgs, UserProcessRole[] roles) {
+    User createUser(User user, Authority[] authorities, Group[] orgs, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.groups = orgs as Set

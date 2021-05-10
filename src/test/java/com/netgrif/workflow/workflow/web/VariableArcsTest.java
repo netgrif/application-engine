@@ -3,7 +3,6 @@ package com.netgrif.workflow.workflow.web;
 import com.netgrif.workflow.MockService;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
@@ -121,7 +120,7 @@ public class VariableArcsTest {
         user = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
                 new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
-                new UserProcessRole[]{});
+                new ProcessRole[]{});
 
         List<Arc> arcs = loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;

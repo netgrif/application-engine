@@ -49,9 +49,9 @@ public interface INextGroupService {
 
     Set<String> getAllGroupsOfUser(User groupUser);
 
-    Long getGroupOwnerId(String groupId);
+    String getGroupOwnerId(String groupId);
 
-    Collection<Long> getGroupsOwnerIds(Collection<String> groupIds);
+    Collection<String> getGroupsOwnerIds(Collection<String> groupIds);
 
     String getGroupOwnerEmail(String groupId);
 

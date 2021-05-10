@@ -96,10 +96,9 @@ public abstract class AbstractTaskController {
     }
 
     public LocalisedEventOutcomeResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
-        Long userId = delegatedId != null ? Long.parseLong(delegatedId) : null;
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, userId, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to [" + userId + "]");
+            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, delegatedId, taskId), locale,
+                    "LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
