@@ -26,7 +26,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     {
        "properties":{
           "author":{
-             "type":"long"
+             "type":"text"
           },
           "authorEmail":{
              "type":"keyword"
@@ -138,7 +138,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
                 "type": "keyword"
             },
             "users": {
-                "type": "long"
+                "type": "text"
             },
             "stringId": {
                 "type": "keyword"

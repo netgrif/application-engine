@@ -19,7 +19,7 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public Set<Long> findAllCoMembersIds(String email) {
+    public Set<String> findAllCoMembersIds(String email) {
         return repository.findAllCoMembersIds(email);
     }
 

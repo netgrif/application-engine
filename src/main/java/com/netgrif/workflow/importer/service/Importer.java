@@ -836,6 +836,7 @@ public class Importer {
         }
         role.set_id(new ObjectId());
 
+        role.setNetId(net.getStringId());
         net.addRole(role);
         roles.put(importRole.getId(), role);
     }

@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.domain
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.arcs.Arc
 import com.netgrif.workflow.petrinet.domain.arcs.InhibitorArc
@@ -36,8 +36,6 @@ class PetriNetTest {
     @Autowired
     private ProcessRoleRepository processRoleRepository
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-    @Autowired
     private TestHelper testHelper
 
     @Value("classpath:net_clone.xml")
@@ -70,7 +68,6 @@ class PetriNetTest {
 
         assert net.roles.size() == 2
         assert processRoleRepository.count() == 3
-        assert userProcessRoleRepository.count() == 3
     }
 
     @Test

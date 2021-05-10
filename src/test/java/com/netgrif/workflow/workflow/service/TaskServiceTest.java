@@ -21,6 +21,7 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -130,6 +131,6 @@ public class TaskServiceTest {
 
     public LoggedUser mockLoggedUser(){
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
+        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }
