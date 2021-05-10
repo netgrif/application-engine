@@ -2,11 +2,13 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,9 +26,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private IAuthorityService authorityService
 
     @Autowired
-    private IUserProcessRoleService userProcessRoleService
-
-    @Autowired
     private IUserService userService
 
     @Autowired
@@ -34,6 +33,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private IGroupService groupService
+
+    @Autowired
+    private IProcessRoleService processRoleService
 
     @Value('${admin.password}')
     private String superAdminPassword
@@ -61,7 +63,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     password: superAdminPassword,
                     state: UserState.ACTIVE,
                     authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                    userProcessRoles: userProcessRoleService.findAll() as Set<UserProcessRole>))
+                    processRoles: processRoleService.findAll() as Set<ProcessRole>))
             this.superMember = memberService.findByEmail(this.superUser.email)
             log.info("Super user created")
         } else {
@@ -88,7 +90,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllProcessRoles() {
-        superUser.setUserProcessRoles(userProcessRoleService.findAll() as Set<UserProcessRole>)
+        superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
         superUser = userService.save(superUser)
     }
 

@@ -65,12 +65,12 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public boolean userHasUserListPermission(User user, Case useCase, ProcessRolePermission... permissions) {
-        Map<Long, Map<String, Boolean>> users = useCase.getUsers();
+        Map<String, Map<String, Boolean>> users = useCase.getUsers();
 
-        if (!users.containsKey(user.getId()))
+        if (!users.containsKey(user.get_id()))
             return false;
 
-        Map<String, Boolean> userPermissions = users.get(user.getId());
+        Map<String, Boolean> userPermissions = users.get(user.get_id());
 
         for (ProcessRolePermission permission : permissions) {
             Boolean hasPermission = userPermissions.get(permission.toString());

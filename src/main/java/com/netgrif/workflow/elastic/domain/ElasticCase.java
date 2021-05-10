@@ -63,7 +63,7 @@ public class ElasticCase {
 
     private Long creationDateSortable;
 
-    private Long author;
+    private String author;
 
     private String authorName;
 
@@ -146,7 +146,7 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullname.append(user.getName());
             }
-            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
+            return Optional.of(new DataField(String.valueOf(user.get_id()), fullname.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
             if (date == null)

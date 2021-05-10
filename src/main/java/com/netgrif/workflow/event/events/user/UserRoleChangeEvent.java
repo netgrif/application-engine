@@ -18,7 +18,7 @@ public class UserRoleChangeEvent extends UserEvent {
     }
 
     public UserRoleChangeEvent(User user, Collection<ProcessRole> roles) {
-        super(new LoggedUser(user.getId(), user.getEmail(), user.getPassword(), user.getAuthorities()));
+        super(new LoggedUser(user.getStringId(), user.getEmail(), user.getPassword(), user.getAuthorities()));
         this.roles = roles;
     }
 

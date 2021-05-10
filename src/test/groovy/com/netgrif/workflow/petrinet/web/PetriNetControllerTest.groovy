@@ -3,11 +3,12 @@ package com.netgrif.workflow.petrinet.web
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -81,14 +82,14 @@ class PetriNetControllerTest {
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
                 [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
     }

@@ -4,6 +4,7 @@ import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -18,7 +19,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
     @Getter
     @Setter
-    private Long id;
+    private String id;
 
     @Getter
     @Setter
@@ -36,7 +37,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     @Setter
     private boolean anonymous;
 
-    public LoggedUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
         this.processRoles = new HashSet<>();
@@ -47,8 +48,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         groups.forEach(org -> this.groups.add(org.getId()));
     }
 
-    public void parseProcessRoles(Set<UserProcessRole> processRoles) {
-        processRoles.forEach(role -> this.processRoles.add(role.getRoleId()));
+    public void parseProcessRoles(Set<ProcessRole> processRoles) {
+        processRoles.forEach(role -> this.processRoles.add(role.getStringId()));
     }
 
     public boolean isAdmin() {
@@ -60,14 +61,14 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     }
 
     public User transformToUser() {
-        User user = new User(this.id);
+        User user = new User(new ObjectId(this.id));
         user.setEmail(getUsername());
         String[] names = this.fullName.split(" ");
         user.setName(names[0]);
         user.setSurname(names[1]);
         user.setPassword(getPassword());
         user.setState(UserState.ACTIVE);
-        user.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
+        user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
         user.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
@@ -79,13 +80,13 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     }
 
     public AnonymousUser transformToAnonymousUser() {
-        AnonymousUser anonym = new AnonymousUser(this.id);
+        AnonymousUser anonym = new AnonymousUser(new ObjectId(this.id));
         anonym.setEmail(getUsername());
         anonym.setName("Anonymous");
         anonym.setSurname("User");
         anonym.setPassword(null);
         anonym.setState(UserState.ACTIVE);
-        anonym.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
+        anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
         anonym.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
