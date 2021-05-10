@@ -8,7 +8,7 @@ public interface IMemberService {
 
     Member save(Member member);
 
-    Set<Long> findAllCoMembersIds(String email);
+    Set<String> findAllCoMembersIds(String email);
 
     Member findByEmail(String email);
 }

@@ -56,7 +56,7 @@ public class JwtService implements IJwtService {
     public LoggedUser getLoggedUser(String token, Authority anonymousRole) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>)getAllClaimsFromToken(token).get("user");
         LoggedUser user = new LoggedUser(
-                Long.parseLong(userMap.get("id").toString()),
+                userMap.get("id").toString(),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
                 Collections.singleton(anonymousRole)
