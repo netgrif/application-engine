@@ -30,6 +30,9 @@ public class Arc extends PetriNetObject {
     @Getter @Setter
     protected Reference reference;
 
+    @Getter @Setter
+    protected Integer tokensConsumed;
+
     public Arc() {
         this.setObjectId(new ObjectId());
     }
@@ -79,25 +82,37 @@ public class Arc extends PetriNetObject {
     }
 
     public void execute() {
+        if(reference != null) {
+            if(reference.getReferencable().getMultiplicity() < 0) {
+                throw new IllegalArgumentException("Arc multiplicity cannot be less than 0, referenced object id: " + reference.getReference());
+            }
+            multiplicity = reference.getReferencable().getMultiplicity();
+        }
         if (source instanceof Transition) {
             ((Place) destination).addTokens(multiplicity);
         } else {
+            tokensConsumed = multiplicity;
             ((Place) source).removeTokens(multiplicity);
         }
     }
 
     public void rollbackExecution() {
-        ((Place) source).addTokens(multiplicity);
+        if(tokensConsumed == null) {
+            tokensConsumed = multiplicity;
+        }
+        ((Place) source).addTokens(tokensConsumed);
     }
 
     @SuppressWarnings("Duplicates")
-    public Arc clone() {
+    public Arc clone(){
         Arc clone = new Arc();
         clone.setSourceId(this.sourceId);
         clone.setDestinationId(this.destinationId);
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
+        clone.setReference(this.reference);
+        clone.setTokensConsumed(this.getTokensConsumed());
         return clone;
     }
 }

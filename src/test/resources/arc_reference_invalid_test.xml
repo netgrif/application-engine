@@ -2,6 +2,9 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../../src/main/resources/petriNets/petriflow_schema.xsd">
     <!-- TRANSITIONS -->
+    <id>arc_ref_invalid_test</id>
+    <initials>ARi</initials>
+    <title>Arc ref invalid test</title>
     <transition>
         <id>1</id>
         <x>0</x>

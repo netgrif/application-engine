@@ -18,6 +18,7 @@ public class ReadArc extends PTArc {
      */
     @Override
     public boolean isExecutable() {
+        if(this.reference != null) multiplicity = this.reference.getReferencable().getMultiplicity();
         return ((Place) source).getTokens() >= multiplicity;
     }
 
@@ -44,6 +45,7 @@ public class ReadArc extends PTArc {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
+        clone.setReference(this.reference);
         return clone;
     }
 }

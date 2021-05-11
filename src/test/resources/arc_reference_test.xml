@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../../src/main/resources/petriNets/petriflow_schema.xsd">
+    <id>arc_ref_test</id>
+    <initials>ART</initials>
+    <title>Arc ref test</title>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>

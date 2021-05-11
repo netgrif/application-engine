@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain
 
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.ImportHelper
 import org.junit.Test
@@ -28,13 +29,16 @@ class ArcReferenceTest {
     @Autowired
     private ImportHelper helper
 
+    @Autowired
+    private IUserService userService
+
     private def stream = { String name ->
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)
     }
 
     @Test
     void testReference() {
-        def net = importer.importPetriNet(stream(NET_FILE), NET_TITLE, NET_INITS).get()
+        def net = importer.importPetriNet(stream(NET_FILE)).get()
 
         assert net
     }
@@ -42,7 +46,7 @@ class ArcReferenceTest {
     @Test
     void testInvalidReference() {
         try {
-            importer.importPetriNet(stream(NET_INVALID_FILE), NET_INVALID_TITLE, NET_INVALID_INITS).get()
+            importer.importPetriNet(stream(NET_INVALID_FILE)).get()
             assert false
         } catch(IllegalArgumentException ignored) {
             assert true
