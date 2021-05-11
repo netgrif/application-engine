@@ -298,8 +298,12 @@ public class TaskService implements ITaskService {
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> {
                     if (arc instanceof ResetArc) {
-                        ((ResetArc) arc).setRemovedTokens(useCase.getResetArcTokens().get(arc.getStringId()));
+                        arc.setTokensConsumed(useCase.getResetArcTokens().get(arc.getStringId()));
                         useCase.getResetArcTokens().remove(arc.getStringId());
+                    }
+                    if (arc.getReference() != null && arc.getSource() instanceof Place){
+                        arc.setTokensConsumed(useCase.getVarArcsTokens().get(arc.getStringId()));
+                        useCase.getVarArcsTokens().remove(arc.getStringId());
                     }
                     arc.rollbackExecution();
                 });
@@ -450,6 +454,9 @@ public class TaskService implements ITaskService {
         useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
                 .filter(arc -> arc instanceof ResetArc)
                 .forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
+        useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
+                .filter(arc -> useCase.getVarArcsTokens().containsKey(arc.getStringId()))
+                .forEach(arc -> useCase.getVarArcsTokens().remove(arc.getStringId()));
         workflowService.save(useCase);
     }
 
@@ -469,6 +476,9 @@ public class TaskService implements ITaskService {
         filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
             if (arc instanceof ResetArc) {
                 useCase.getResetArcTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+            }
+            if(arc.getReference() != null && arc.getSource() instanceof Place){
+                useCase.getVarArcsTokens().put(arc.getStringId(), arc.getReference().getReferencable().getMultiplicity());
             }
             arc.execute();
         });
