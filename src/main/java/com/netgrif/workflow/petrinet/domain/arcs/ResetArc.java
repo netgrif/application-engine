@@ -14,10 +14,6 @@ import lombok.Setter;
  */
 public class ResetArc extends PTArc {
 
-    @Getter
-    @Setter
-    private Integer removedTokens;
-
     /**
      * Always returns true, because Reset arc does not alter the enabling condition.
      * @return true
@@ -37,13 +33,13 @@ public class ResetArc extends PTArc {
     @Override
     public void execute() {
         Place place = ((Place) source);
-        removedTokens = place.getTokens();
+        tokensConsumed = place.getTokens();
         place.removeAllTokens();
     }
 
     @Override
     public void rollbackExecution() {
-        ((Place) source).addTokens(removedTokens);
+        ((Place) source).addTokens(this.tokensConsumed);
     }
 
     @SuppressWarnings("Duplicates")
@@ -55,7 +51,7 @@ public class ResetArc extends PTArc {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setRemovedTokens(this.removedTokens);
+        clone.setTokensConsumed(this.tokensConsumed);
         return clone;
     }
 }

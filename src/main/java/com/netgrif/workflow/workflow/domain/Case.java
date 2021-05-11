@@ -106,6 +106,9 @@ public class Case {
     @Setter
     private Map<String, Integer> resetArcTokens;
 
+    @Getter
+    @Setter
+    private Map<String, Integer> varArcsTokens;
     /**
      * TODO: Indexed?
      */
@@ -148,6 +151,7 @@ public class Case {
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
         resetArcTokens = new HashMap<>();
+        varArcsTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
