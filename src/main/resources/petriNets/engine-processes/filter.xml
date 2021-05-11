@@ -206,7 +206,7 @@
         </dataGroup>
     </transition>
     <transition>
-        <id>t3</id>
+        <id>frontend_create</id>
         <x>380</x>
         <y>260</y>
         <layout>
@@ -263,6 +263,79 @@
             </dataRef>
         </dataGroup>
     </transition>
+    <transition>
+        <id>auto_create</id>
+        <x>500</x>
+        <y>180</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Automated new filter</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
     <!-- PLACES -->
     <place>
         <id>p1</id>
@@ -293,13 +366,13 @@
         <id>a3</id>
         <type>regular</type>
         <sourceId>p1</sourceId>
-        <destinationId>t3</destinationId>
+        <destinationId>frontend_create</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>a4</id>
         <type>regular</type>
-        <sourceId>t3</sourceId>
+        <sourceId>frontend_create</sourceId>
         <destinationId>p3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
@@ -322,6 +395,20 @@
         <type>read</type>
         <sourceId>p2</sourceId>
         <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>auto_create</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
