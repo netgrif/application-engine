@@ -519,7 +519,6 @@ class ActionDelegate {
 
     List<Case> findCases(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
-        QCase.case$.author.
         Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
     }
