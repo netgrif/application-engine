@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
+import static org.springframework.data.elasticsearch.annotations.FieldType.Long;
 
 
 @Data
@@ -22,7 +23,7 @@ public class UserField extends DataField {
     @Field(type = Text)
     private String[] fullNameValue;
 
-    @Field(type = FieldType.Long)
+    @Field(type = Long)
     private Long[] userIdValue;
 
     public UserField(UserMappingData value) {
