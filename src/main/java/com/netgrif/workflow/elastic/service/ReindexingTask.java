@@ -10,6 +10,7 @@ import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
@@ -39,14 +40,11 @@ public class ReindexingTask {
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
     private IElasticTaskService elasticTaskService;
+    private IElasticCaseMappingService caseMappingService;
+    private IElasticTaskMappingService taskMappingService;
+    private IWorkflowService workflowService;
 
     private LocalDateTime lastRun;
-
-    @Autowired
-    private IElasticCaseMappingService caseMappingService;
-
-    @Autowired
-    private IElasticTaskMappingService taskMappingService;
 
     @Autowired
     public ReindexingTask(
@@ -55,6 +53,9 @@ public class ReindexingTask {
             ElasticCaseRepository elasticCaseRepository,
             IElasticCaseService elasticCaseService,
             IElasticTaskService elasticTaskService,
+            IElasticCaseMappingService caseMappingService,
+            IElasticTaskMappingService taskMappingService,
+            IWorkflowService workflowService,
             @Value("${spring.data.elasticsearch.reindex-size}") int pageSize,
             @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
@@ -62,6 +63,9 @@ public class ReindexingTask {
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
         this.elasticTaskService = elasticTaskService;
+        this.caseMappingService = caseMappingService;
+        this.taskMappingService = taskMappingService;
+        this.workflowService = workflowService;
         this.pageSize = pageSize;
 
         lastRun = LocalDateTime.now();
@@ -100,7 +104,7 @@ public class ReindexingTask {
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
         log.info("Reindexing " + (page + 1) + " / " + numOfPages);
-        Page<Case> cases = caseRepository.findAll(predicate, PageRequest.of(page, pageSize));
+        Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {
             if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
