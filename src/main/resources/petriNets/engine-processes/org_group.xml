@@ -172,11 +172,11 @@
                 <action>
                     filtersTaskRef: f.filter_tasks;
 
-                    defaultFilters = findCases({it.processIdentifier.eq("filter").and(it.author.id.eq(userService.getSystem().id)})
+                    defaultFilters = findCases({it.processIdentifier.eq("filter").and(it.author.id.eq(userService.getSystem().id))})
 
 					filterTaskIds = []
 
-					for (Case filterCase : defaultFilters) {
+					defaultFilters.forEach { filterCase ->
 						optionCase = createCase("preference_filter_item")
 
 						initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
