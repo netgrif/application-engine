@@ -28,7 +28,7 @@
 		<id>taskRef_0</id>
 		<title></title>
 	</data>
-	<data type="caseref">
+	<data type="caseRef">
 		<id>filter_case</id>
 		<title></title>
 		<allowedNets>
@@ -46,7 +46,7 @@
 		</layout>
 		<label></label>
 		<dataRef>
-			<id>treeChildCases</id>
+			<id>filter_case</id>
 			<logic>
 				<behavior>forbidden</behavior>
 			</logic>
@@ -63,7 +63,7 @@
 					filterCaseRef: f.filter_case,
 					entryName: f.entry_name;
 
-					Case filterCase = findCase({it.stringId.eq(filterCaseRef.value[0])})
+					filterCase = findCase({it.stringId.eq(filterCaseRef.value[0])})
 
 					change entryName value {return filterCase.title}
 
