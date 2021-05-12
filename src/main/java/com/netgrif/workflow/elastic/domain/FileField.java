@@ -6,17 +6,19 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
+import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FileField extends DataField {
 
-    @Field(type = FieldType.Text)
+    @Field(type = Text)
     public String[] fileNameValue;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = Keyword)
     public String[] fileExtensionValue;
 
     public FileField(FileFieldValue value) {

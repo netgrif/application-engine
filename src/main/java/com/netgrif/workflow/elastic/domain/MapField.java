@@ -4,19 +4,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MapField extends TextField {
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = Keyword)
     public String[] keyValue;
 
     public MapField(Map.Entry<String, Collection<String>> valuePair) {
