@@ -519,6 +519,7 @@ class ActionDelegate {
 
     List<Case> findCases(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
+        QCase.case$.author.
         Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
     }
@@ -588,6 +589,7 @@ class ActionDelegate {
 
     List<Task> findTasks(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
+        QTask.task.tr
         Page<Task> result = taskService.searchAll(predicate(qTask))
         return result.content
     }
