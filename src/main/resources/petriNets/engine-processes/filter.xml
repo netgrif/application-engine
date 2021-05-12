@@ -336,6 +336,34 @@
             </dataRef>
         </dataGroup>
     </transition>
+    <transition>
+        <id>view_filter</id>
+        <x>860</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label></label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
     <!-- PLACES -->
     <place>
         <id>p1</id>
@@ -409,6 +437,13 @@
         <type>regular</type>
         <sourceId>auto_create</sourceId>
         <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a10</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>view_filter</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
