@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>preference_filter_item</id>
+	<initials>PFI</initials>
+	<title>Preference filter item</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text" immediate="true">
+		<id>entry_name</id>
+		<title>Text</title>
+	</data>
+	<data type="button">
+		<id>button_0</id>
+		<title></title>
+		<placeholder>Up</placeholder>
+	</data>
+	<data type="button">
+		<id>button_1</id>
+		<title></title>
+		<placeholder>Down</placeholder>
+	</data>
+	<data type="taskRef">
+		<id>taskRef_0</id>
+		<title></title>
+	</data>
+	<data type="caseref">
+		<id>filter_case</id>
+		<title></title>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>init</id>
+		<x>420</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+		<dataRef>
+			<id>treeChildCases</id>
+			<logic>
+				<behavior>forbidden</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+			</layout>
+			<logic>
+				<action trigger="set">
+					filterTaskRef: f.taskRef_0,
+					filterCaseRef: f.filter_case,
+					entryName: f.entry_name;
+
+					Case filterCase = findCase({it.stringId.eq(filterCaseRef.value[0])})
+
+					change entryName value {return filterCase.title}
+
+					change filterTaskRef value {return findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))})}
+				</action>
+			</logic>
+		</dataRef>
+	</transition>
+	<transition>
+		<id>view</id>
+		<x>660</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>entry_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>fill</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>300</x>
+		<y>260</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>540</x>
+		<y>260</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>view</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
