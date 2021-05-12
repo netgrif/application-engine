@@ -62,6 +62,10 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                 "predicateMetadata": [],
                 "searchCategories": []
         ])
+        createTaskFilter("My tasks", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
+                "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
+                "searchCategories": []
+        ])
     }
 
     public Optional<Case> createCaseFilter(String title, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
