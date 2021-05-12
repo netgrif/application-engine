@@ -106,17 +106,11 @@ public class Case {
     @Setter
     private Map<String, Integer> resetArcTokens;
 
-    /**
-     * TODO: Indexed?
-     */
     @Getter
     @Setter
     @JsonIgnore
     private Set<TaskPair> tasks;
 
-    /**
-     * TODO: Indexed?
-     */
     @Getter
     @Setter
     @JsonIgnore
@@ -202,9 +196,11 @@ public class Case {
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
-            if (field instanceof CaseField) {
-                this.dataSet.get(key).setValue(new ArrayList<>());
-                this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
+            if (field instanceof FieldWithAllowedNets) {
+                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+            }
+            if (field instanceof FilterField) {
+                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
             }
             if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
                 dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
@@ -239,14 +235,10 @@ public class Case {
     }
 
     public boolean removeTask(Task task) {
-//        return this.tasks.remove(new TaskPair(task.getStringId(), task.getTransitionId()));
         return this.removeTasks(Collections.singletonList(task));
     }
 
     public boolean removeTasks(List<Task> tasks) {
-//        List<TaskPair> taskPairsToRemove = tasks.stream().map(task -> new TaskPair(task.getStringId(), task.getTransitionId()))
-//                .collect(Collectors.toList());
-//        return this.tasks.removeAll(taskPairsToRemove);
         int sizeBeforeChange = this.tasks.size();
         Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
         this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());

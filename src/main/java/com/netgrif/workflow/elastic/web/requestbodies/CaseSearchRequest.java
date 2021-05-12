@@ -19,9 +19,6 @@ public class CaseSearchRequest {
     public List<String> processIdentifier;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> title;
-
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<Author> author;
 
     public Map<String, String> data;
