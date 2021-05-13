@@ -63,11 +63,11 @@
 					filterCaseRef: f.filter_case,
 					entryName: f.entry_name;
 
-					filterCase = findCase({it.stringId.eq(filterCaseRef.value[0])})
+					filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 
 					change entryName value {return filterCase.title}
 
-					change filterTaskRef value {return findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))})}
+					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 				</action>
 			</logic>
 		</dataRef>
@@ -86,7 +86,7 @@
 			<dataRef>
 				<id>entry_name</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
