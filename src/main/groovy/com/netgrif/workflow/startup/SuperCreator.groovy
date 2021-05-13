@@ -47,7 +47,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) {
         log.info("Creating Super user")
-        createSuperUser()
+//        createSuperUser()  // TODO NAE-1302
     }
 
     private User createSuperUser() {
@@ -91,12 +91,12 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     void setAllProcessRoles() {
         superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
-        superUser = userService.save(superUser)
+        superUser = userService.save(superUser) as User
     }
 
     void setAllAuthorities() {
         superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
-        superUser = userService.save(superUser)
+        superUser = userService.save(superUser) as User
     }
 
     User getSuperUser() {

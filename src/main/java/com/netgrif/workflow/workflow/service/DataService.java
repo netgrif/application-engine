@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
@@ -822,12 +823,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                User user = new User(userService.findById(node.get("value").asText(), true));
-                user.setPassword(null);
-                user.setGroups(null);
-                user.setAuthorities(null);
-//                user.setUserProcessRoles(null);
-                value = user;
+                value = makeUserFieldValue(node.get("value").asText());
                 break;
             case "number":
                 if (node.get("value") == null || node.get("value").isNull()) {
@@ -869,6 +865,11 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    protected UserFieldValue makeUserFieldValue(String id) {
+        IUser user = userService.findById(id, true);
+        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {

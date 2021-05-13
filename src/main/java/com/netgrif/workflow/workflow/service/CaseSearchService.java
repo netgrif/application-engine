@@ -109,7 +109,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(Long userId) {
+    public Predicate negativeViewUsersQuery(String userId) {
         return QCase.case$.negativeViewUsers.contains(userId);
     }
 
@@ -118,7 +118,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate viewUsersQuery(Long userId) {
+    public Predicate viewUsersQuery(String userId) {
         return QCase.case$.users.containsKey(userId);
     }
 

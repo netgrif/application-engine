@@ -27,6 +27,8 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
+        // TODO NAE-1302
+        return
         def group = groupService.findAll().find { it.name == DefaultGroupRunner.DEFAULT_GROUP_NAME }
 
         assert group != null

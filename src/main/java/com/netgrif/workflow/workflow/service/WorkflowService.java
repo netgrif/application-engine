@@ -188,7 +188,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {

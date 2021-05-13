@@ -1,22 +1,21 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.utils.DateUtils;
@@ -31,6 +30,7 @@ import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +99,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+    public void assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
         for (Task task : tasks) {
             assignTask(task, user);
         }
@@ -112,7 +112,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        User user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.findById(loggedUser.getId(), true);
         return assignTask(taskOptional.get(), user);
     }
 
@@ -124,7 +124,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException {
+    public EventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(task.getStringId(), task.getTransitionId(), useCase.getStringId(), transition.getAssignMessage());
@@ -143,7 +143,7 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    protected void assignTaskToUser(User user, Task task, String useCaseId) throws TransitionNotExecutableException {
+    protected void assignTaskToUser(IUser user, Task task, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
         useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -161,7 +161,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+    public void finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
         for (Task task : tasks) {
             finishTask(task, user);
         }
@@ -180,14 +180,14 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         Task task = taskOptional.get();
-        User user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.findById(loggedUser.getId(), true);
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
         if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
-            throw new IllegalArgumentException("User that is not assigned tried to finish task");
+            throw new IllegalArgumentException("IUser that is not assigned tried to finish task");
         }
 
         return finishTask(task, user);
@@ -195,7 +195,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException {
+    public EventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(task.getStringId(), task.getTransitionId(), useCase.getStringId(), transition.getFinishMessage());
@@ -227,7 +227,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelTasks(List<Task> tasks, User user) {
+    public void cancelTasks(List<Task> tasks, IUser user) {
         for (Task task : tasks) {
             cancelTask(task, user);
         }
@@ -240,13 +240,13 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        User user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.findById(loggedUser.getId(), true);
         return cancelTask(taskOptional.get(), user);
     }
 
     @Override
     @Transactional
-    public EventOutcome cancelTask(Task task, User user) {
+    public EventOutcome cancelTask(Task task, IUser user) {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(task.getStringId(), task.getTransitionId(), useCase.getStringId(), transition.getCancelMessage());
@@ -312,8 +312,8 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
-        User delegatedUser = userService.findById(delegatedId, true);
-        User delegateUser = userService.findById(loggedUser.getId(), true);
+        IUser delegatedUser = userService.findById(delegatedId, true);
+        IUser delegateUser = userService.findById(loggedUser.getId(), true);
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
@@ -342,9 +342,9 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    protected void delegate(User delegated, Task task, Case useCase) throws TransitionNotExecutableException {
+    protected void delegate(IUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
-            task.setUserId(delegated.get_id().toString());
+            task.setUserId(delegated.getStringId());
             save(task);
         } else {
             assignTaskToUser(delegated, task, useCase.getStringId());
@@ -630,7 +630,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> findByUser(Pageable pageable, User user) {
+    public Page<Task> findByUser(Pageable pageable, IUser user) {
         return loadUsers(taskRepository.findByUserId(pageable, user.getStringId()));
     }
 
@@ -687,7 +687,7 @@ public class TaskService implements ITaskService {
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -761,7 +761,7 @@ public class TaskService implements ITaskService {
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
-        Map<String, User> users = new HashMap<>();
+        Map<String, IUser> users = new HashMap<>();
         tasks.forEach(task -> {
             if (task.getUserId() != null) {
                 if (users.containsKey(task.getUserId()))

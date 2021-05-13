@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.service;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
@@ -65,7 +65,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
-        User user = userService.findById(userId, true);
+        IUser user = userService.findById(userId, true);
         Set<ProcessRole> requestedRoles = processRoleRepository.findAllBy_idIn(requestedRolesIds);
         if (requestedRoles.isEmpty() && requestedRolesIds.size() != 0)
             throw new IllegalArgumentException("No process roles found.");
@@ -103,7 +103,7 @@ public class ProcessRoleService implements IProcessRoleService {
         }
     }
 
-    private Set<ProcessRole> updateRequestedRoles(User user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
+    private Set<ProcessRole> updateRequestedRoles(IUser user, Set<ProcessRole> rolesNewToUser, Set<ProcessRole> rolesRemovedFromUser) {
         Set<ProcessRole> userRolesAfterPreActions = user.getProcessRoles();
         userRolesAfterPreActions.addAll(rolesNewToUser);
         userRolesAfterPreActions.removeAll(rolesRemovedFromUser);
@@ -128,7 +128,7 @@ public class ProcessRoleService implements IProcessRoleService {
         return newRoles.iterator().next().getNetId();
     }
 
-    private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, User user, Set<ProcessRole> requestedRoles) {
+    private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, IUser user, Set<ProcessRole> requestedRoles) {
         removeOldAndAssignNewRolesToUser(user, requestedRoles);
         publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(requestedRolesIds)));
     }
@@ -153,17 +153,17 @@ public class ProcessRoleService implements IProcessRoleService {
                 .collect(Collectors.toSet());
     }
 
-    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, User user, PetriNet petriNet) {
+    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet) {
         runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE, user, petriNet);
         runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE, user, petriNet);
     }
 
-    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, User user, PetriNet petriNet) {
+    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles, IUser user, PetriNet petriNet) {
         runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST, user, petriNet);
         runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST, user, petriNet);
     }
 
-    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, User user, PetriNet petriNet) {
+    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase, IUser user, PetriNet petriNet) {
         roles.forEach(role -> {
             RoleContext roleContext = new RoleContext<>(user, role, petriNet);
             runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase, roleContext);
@@ -196,7 +196,7 @@ public class ProcessRoleService implements IProcessRoleService {
         actions.forEach(action -> roleActionsRunner.run(action, roleContext));
     }
 
-    private void removeOldAndAssignNewRolesToUser(User user, Set<ProcessRole> requestedRoles) {
+    private void removeOldAndAssignNewRolesToUser(IUser user, Set<ProcessRole> requestedRoles) {
         user.getProcessRoles().clear();
         user.getProcessRoles().addAll(requestedRoles);
 
@@ -243,8 +243,8 @@ public class ProcessRoleService implements IProcessRoleService {
         List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
 
-        List<User> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
-        for(User user : usersWithRemovedRoles) {
+        List<IUser> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
+        for(IUser user : usersWithRemovedRoles) {
             log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user "+ user.getFullName() + " with id "+user.getStringId());
 
             if (user.getProcessRoles().size() == 0)

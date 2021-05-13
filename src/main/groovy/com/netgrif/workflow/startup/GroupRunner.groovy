@@ -36,7 +36,7 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        createDefaultGroup()
+//        createDefaultGroup() // TODO NAE-1302
     }
 
     Optional<PetriNet> createDefaultGroup(){
