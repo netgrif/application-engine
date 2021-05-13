@@ -55,7 +55,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         ])
         createCaseFilter("My cases", "", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
                 "predicateMetadata": [[["category": "case_author", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
-                "searchCategories": []
+                "searchCategories": ["case_author"]
         ])
 
         createTaskFilter("All tasks", "", FILTER_VISIBILITY_PUBLIC, "", [], [
@@ -64,7 +64,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         ])
         createTaskFilter("My tasks", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
                 "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
-                "searchCategories": []
+                "searchCategories": ["task_assignee"]
         ])
     }
 
