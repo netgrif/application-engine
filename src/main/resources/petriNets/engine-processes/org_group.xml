@@ -181,7 +181,7 @@
 
 						initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 						assignTask(initTask)
-						setData(iniTask, ["filter_case": ["type":"caseRef", "value": [optionCase.stringId], "allowedNets":["filter"]]])
+						setData(initTask, ["filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]]])
 						finishTask(initTask)
 
 						viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
