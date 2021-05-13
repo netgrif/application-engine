@@ -1,5 +1,6 @@
 package com.netgrif.workflow.orgstructure.groups.interfaces;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -37,15 +38,15 @@ public interface INextGroupService {
 
     void addUserToDefaultGroup(User user);
 
-    void addUser(User user, Case groupCase);
+    void addUser(IUser user, Case groupCase);
 
-    Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers);
+    Map<String, I18nString> addUser(IUser user, Map<String, I18nString> existingUsers);
 
     void removeUser(User user, Case groupCase);
 
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
-    List<User> getMembers(Case groupCase);
+    List<IUser> getMembers(Case groupCase);
 
     Set<String> getAllGroupsOfUser(User groupUser);
 

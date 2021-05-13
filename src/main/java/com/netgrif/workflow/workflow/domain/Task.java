@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -67,7 +68,7 @@ public class Task {
 
     @org.springframework.data.annotation.Transient
     @Getter @Setter
-    private User user;
+    private IUser user;
 
     @DBRef
     @Setter
@@ -95,7 +96,7 @@ public class Task {
 
     @Getter @Setter
     @Builder.Default
-    private List<Long> negativeViewUsers = new LinkedList<>();
+    private List<String> negativeViewUsers = new LinkedList<>();
 
     @Getter @Setter
     private LocalDateTime startDate;

@@ -142,7 +142,7 @@ public class Case {
 
     @Getter
     @Setter
-    private List<Long> negativeViewUsers;
+    private List<String> negativeViewUsers;
 
     public Case() {
         _id = new ObjectId();
