@@ -17,6 +17,7 @@ class RunnerController {
             SystemUserRunner,
             FilterRunner,
             GroupRunner,
+            DefaultFiltersRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
@@ -24,7 +25,6 @@ class RunnerController {
             DummyUserRunner,
             DemoRunner,
             QuartzSchedulerRunner,
-            DefaultFiltersRunner,
             FinisherRunner
     ]
 
