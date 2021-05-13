@@ -8,24 +8,21 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Set;
 
 @Document
-public class User {
+public class User extends AbstractUser implements RegisteredUser {
 
     public static final String UNKNOWN = "unknown";
 
     @Id
     @Getter
-    private ObjectId _id;
+    protected ObjectId _id;
 
     @NotNull
     @Getter
@@ -55,11 +52,6 @@ public class User {
     @Setter
     private String surname;
 
-    @NotNull
-    @Getter
-    @Setter
-    private UserState state;
-
     @Getter
     @Setter
     private String token;
@@ -68,35 +60,13 @@ public class User {
     @Setter
     private LocalDateTime expirationDate;
 
-    @Getter
-    @Setter
-    private Set<Authority> authorities;
-
-    @Getter
-    @Setter
-    private Set<ProcessRole> processRoles;
-
-    @Transient
-    @Getter
-    @Setter
-    private Set<Group> groups;
-
-    @Transient
-    @Getter
-    @Setter
-    private Set<String> nextGroups;
-
     public User() {
-        groups = new HashSet<>();
-        authorities = new HashSet<>();
-        nextGroups = new HashSet<>();
-        processRoles = new HashSet<>();
+        super();
     }
 
     public User(ObjectId id) {
         this();
         this._id = id;
-        nextGroups = new HashSet<>();
     }
 
     public User(User user){
@@ -120,18 +90,6 @@ public class User {
         this(json.get("email").asText(), null, json.get("name").asText(), json.get("surname").asText());
         ((ArrayNode) json.get("processRoles"))
                 .forEach(node -> processRoles.add(new ProcessRole(node.get("_id").asText())));
-    }
-
-    public void addAuthority(Authority authority) {
-        authorities.add(authority);
-    }
-
-    public void addProcessRole(ProcessRole role) {
-        processRoles.add(role);
-    }
-
-    public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
     }
 
     public String getFullName() {
@@ -186,7 +144,4 @@ public class User {
         return author;
     }
 
-    public boolean isRegistered() {
-        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
-    }
 }

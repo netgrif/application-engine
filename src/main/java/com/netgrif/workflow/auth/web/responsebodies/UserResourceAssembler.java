@@ -1,12 +1,12 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.ResourceAssembler;
 
 import java.util.Locale;
 
-public class UserResourceAssembler implements ResourceAssembler<User, UserResource> {
+public class UserResourceAssembler implements ResourceAssembler<IUser, UserResource> {
 
     @Autowired
     private IUserFactory userFactory;
@@ -28,10 +28,11 @@ public class UserResourceAssembler implements ResourceAssembler<User, UserResour
     }
 
     @Override
-    public UserResource toResource(User entity) {
+    public UserResource toResource(IUser entity) {
         if (!initialized) {
            throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
+
         return new UserResource(small ? userFactory.getSmallUser(entity) : userFactory.getUser(entity, locale), selfRel);
     }
 }
