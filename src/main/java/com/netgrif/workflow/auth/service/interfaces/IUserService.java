@@ -1,9 +1,6 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
-import com.netgrif.workflow.auth.domain.AnonymousUser;
-import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.OauthUser;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import org.bson.types.ObjectId;
@@ -18,55 +15,55 @@ import java.util.Set;
 @Service
 public interface IUserService {
 
-    User findByAuth(Authentication auth);
+    IUser findByAuth(Authentication auth);
 
-    User save(User user);
+    IUser save(IUser user);
 
-    User saveNew(User user);
+    IUser saveNew(IUser user);
 
     AnonymousUser saveNewAnonymous(AnonymousUser user);
 
-    User update(User user, UpdateUserRequest updates);
+    IUser update(IUser user, UpdateUserRequest updates);
 
-    Member upsertGroupMember(User user);
+    Member upsertGroupMember(IUser user);
 
-    User findById(String id, boolean small);
+    IUser findById(String id, boolean small);
 
-    User findByEmail(String email, boolean small);
+    IUser findByEmail(String email, boolean small);
 
-    List<User> findAll(boolean small);
+    List<IUser> findAll(boolean small);
 
-    Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);
+    Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);
 
-    Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
+    Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
-    List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
+    List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
-    void addDefaultRole(User user);
+    void addDefaultRole(IUser user);
 
-    void addDefaultAuthorities(User user);
+    void addDefaultAuthorities(IUser user);
 
-    void encodeUserPassword(User user);
+    void encodeUserPassword(IUser user);
 
-    boolean stringMatchesUserPassword(User user, String passwordToCompare);
+    boolean stringMatchesUserPassword(IUser user, String passwordToCompare);
 
     void assignAuthority(String userId, String authorityId);
 
-    User getLoggedOrSystem();
+    IUser getLoggedOrSystem();
 
-    User getLoggedUser();
+    IUser getLoggedUser();
 
-    User getSystem();
+    IUser getSystem();
 
     LoggedUser getAnonymousLogged();
 
-    User addRole(User user, String roleStringId);
+    IUser addRole(IUser user, String roleStringId);
 
-    Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
-    User removeRole(User user, String roleStringId);
+    IUser removeRole(IUser user, String roleStringId);
 
-    void deleteUser(User user);
+    void deleteUser(IUser user);
 
-    Page<User> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 }
