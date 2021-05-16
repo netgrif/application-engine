@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.InvalidUserTokenException;
@@ -17,6 +18,10 @@ public interface IRegistrationService {
     void resetExpiredToken();
 
     void changePassword(RegisteredUser user, String newPassword);
+
+    void encodeUserPassword(RegisteredUser user);
+
+    boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare);
 
     boolean verifyToken(String token);
 

@@ -27,10 +27,11 @@ public class OAuthUserMapper implements IOauthUserMapper {
             user = new OAuthUser();
             user.setOauthId(getId(details));
             user.setState(UserState.ACTIVE);
-            user = userService.saveNewOAuth(user);
+            user = (OAuthUser) userService.saveNew(user);
         }
         user.setName(details.get("given_name"));
         user.setSurname(details.get("family_name"));
+        user.setEmail(details.get("email"));
         return user.transformToLoggedUser();
     }
 

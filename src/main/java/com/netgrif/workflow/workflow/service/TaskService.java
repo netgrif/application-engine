@@ -112,7 +112,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        IUser user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.resolveById(loggedUser.getId(), true);
         return assignTask(taskOptional.get(), user);
     }
 
@@ -180,7 +180,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         Task task = taskOptional.get();
-        IUser user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.resolveById(loggedUser.getId(), true);
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
@@ -240,7 +240,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        IUser user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.resolveById(loggedUser.getId(), true);
         return cancelTask(taskOptional.get(), user);
     }
 
@@ -312,8 +312,8 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
-        IUser delegatedUser = userService.findById(delegatedId, true);
-        IUser delegateUser = userService.findById(loggedUser.getId(), true);
+        IUser delegatedUser = userService.resolveById(delegatedId, true);
+        IUser delegateUser = userService.resolveById(loggedUser.getId(), true);
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
@@ -364,7 +364,7 @@ public class TaskService implements ITaskService {
             return;
         String assigneeId = taskOptional.get().getUserId();
         if (assigneeId != null)
-            outcome.setAssignee(userService.findById(assigneeId, true));
+            outcome.setAssignee(userService.resolveById(assigneeId, true));
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
         outcome.setTaskId(task.getStringId());
@@ -700,7 +700,7 @@ public class TaskService implements ITaskService {
     private List<String> getExistingUsers(List<String> userIds) {
         if (userIds == null)
             return null;
-        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
@@ -767,7 +767,7 @@ public class TaskService implements ITaskService {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
-                    task.setUser(userService.findById(task.getUserId(), true));
+                    task.setUser(userService.resolveById(task.getUserId(), true));
                     users.put(task.getUserId(), task.getUser());
                 }
             }
@@ -797,6 +797,6 @@ public class TaskService implements ITaskService {
 
     private void setUser(Task task) {
         if (task.getUserId() != null)
-            task.setUser(userService.findById(task.getUserId(), true));
+            task.setUser(userService.resolveById(task.getUserId(), true));
     }
 }
