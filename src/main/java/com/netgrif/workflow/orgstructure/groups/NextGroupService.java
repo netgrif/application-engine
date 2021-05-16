@@ -222,7 +222,7 @@ public class NextGroupService implements INextGroupService {
         }
         Set<String> userIds = groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet();
         List<IUser> resultList = new ArrayList<>();
-        userIds.forEach(id -> resultList.add(userService.findById(id, true)));
+        userIds.forEach(id -> resultList.add(userService.resolveById(id, true)));
         return resultList;
     }
 

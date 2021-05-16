@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
@@ -27,6 +28,7 @@ public class User extends AbstractUser implements RegisteredUser {
     @NotNull
     @Getter
     @Setter
+    @Indexed
     private String email;
 
     @Getter
@@ -45,11 +47,13 @@ public class User extends AbstractUser implements RegisteredUser {
     @NotNull
     @Getter
     @Setter
+    @Indexed
     private String name;
 
     @NotNull
     @Getter
     @Setter
+    @Indexed
     private String surname;
 
     @Getter

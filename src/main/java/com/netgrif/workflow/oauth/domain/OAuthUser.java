@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -19,6 +20,7 @@ public class OAuthUser extends AbstractUser {
 
     @Getter
     @Setter
+    @Indexed
     protected String oauthId;
 
     @Transient
@@ -33,9 +35,13 @@ public class OAuthUser extends AbstractUser {
     public OAuthUser() {
     }
 
+    public String getDbId() {
+        return _id.toString();
+    }
+
     @JsonIgnore
     public String getStringId() {
-        return _id.toString();
+        return oauthId;
     }
 
     @Override
@@ -85,7 +91,7 @@ public class OAuthUser extends AbstractUser {
 
     @Override
     public LoggedUser transformToLoggedUser() {
-        OAuthLoggedUser loggedUser = new OAuthLoggedUser(this.getStringId(), this.getOauthId(), this.getAuthorities());
+        OAuthLoggedUser loggedUser = new OAuthLoggedUser(this.getOauthId(), this.getDbId(), this.getEmail(), this.getAuthorities());
         loggedUser.setFullName(getFullName());
         return loggedUser;
     }

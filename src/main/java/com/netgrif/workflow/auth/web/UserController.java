@@ -116,7 +116,7 @@ public class UserController {
             log.info("User " + loggedUser.getUsername() + " trying to get another user with ID "+userId);
             throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
         }
-        IUser user = userService.findById(userId, small);
+        IUser user = userService.resolveById(userId, small);
         return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
     }
 
@@ -125,7 +125,7 @@ public class UserController {
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
         small = small != null && small;
         if (!small)
-            return new UserResource(userResponseFactory.getUser(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
+            return new UserResource(userResponseFactory.getUser(userService.resolveById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
         else
             return new UserResource(userResponseFactory.getUser(((LoggedUser) auth.getPrincipal()).transformToUser(), locale), "profile");
     }
@@ -136,7 +136,7 @@ public class UserController {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        IUser user = userService.findById(userId, false);
+        IUser user = userService.resolveById(userId, false);
         if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
