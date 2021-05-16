@@ -3,13 +3,11 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
-import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -21,12 +19,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class UserService implements IUserService {
+public class UserService extends AbstractUserService {
 
     @Autowired
     protected UserRepository userRepository;
@@ -38,9 +35,6 @@ public class UserService implements IUserService {
     protected IProcessRoleService processRoleService;
 
     @Autowired
-    protected BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
     @Autowired
@@ -49,9 +43,12 @@ public class UserService implements IUserService {
     @Autowired
     protected INextGroupService groupService;
 
+    @Autowired
+    protected IRegistrationService registrationService;
+
     @Override
     public IUser saveNew(IUser user) {
-        encodeUserPassword(user);
+        registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
@@ -73,7 +70,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public IUser update(IUser user, UpdateUserRequest updates) {
+    public User update(IUser user, UpdateUserRequest updates) {
         User dbUser = (User) user;
         if (updates.telNumber != null) {
             dbUser.setTelNumber(updates.telNumber);
@@ -92,40 +89,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Member upsertGroupMember(IUser user) {
-        User dbUser = (User) user;
-        Member member = memberService.findByEmail(user.getEmail());
-        if (member == null)
-            member = new Member(dbUser.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-        member.setGroups(user.getGroups());
-        return memberService.save(member);
-    }
-
-    @Override
-    public void encodeUserPassword(IUser user) {
-        String pass = ((User) user).getPassword();
-        if (pass == null)
-            throw new IllegalArgumentException("User has no password");
-        ((User) user).setPassword(bCryptPasswordEncoder.encode(pass));
-    }
-
-    @Override
-    public boolean stringMatchesUserPassword(IUser user, String passwordToCompare) {
-        return bCryptPasswordEncoder.matches(passwordToCompare, ((User) user).getPassword());
-    }
-
-    @Override
-    public void addDefaultRole(IUser user) {
-        user.addProcessRole(processRoleService.defaultRole());
-    }
-
-    @Override
-    public void addDefaultAuthorities(IUser user) {
-        if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityRepository.findByName(Authority.user));
-            user.setAuthorities(authorities);
-        }
+    public Optional<IUser> get(String id) {
+        return Optional.ofNullable(userRepository.findById(id).orElse(null));
     }
 
     @Override
@@ -148,6 +113,11 @@ public class UserService implements IUserService {
             return loadProcessRoles(user.get());
         }*/
         return user.get();
+    }
+
+    @Override
+    public IUser resolveById(String id, boolean small) {
+        return findById(id, small);
     }
 
     @Override
@@ -245,22 +215,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
-        Optional<User> user = userRepository.findById(userId);
-        Optional<Authority> authority = authorityRepository.findById(authorityId);
-
-        if (!user.isPresent())
-            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
-        if (!authority.isPresent())
-            throw new IllegalArgumentException("Could not find authority with id ["+authorityId+"]");
-
-        user.get().addAuthority(authority.get());
-        authority.get().addUser(user.get());
-
-        userRepository.save(user.get());
-    }
-
-    @Override
     public IUser getLoggedOrSystem() {
         try {
             return getLoggedUser();
@@ -281,30 +235,6 @@ public class UserService implements IUserService {
             return findByEmail(loggedUser.getEmail(), false);
         }
         return loggedUser.transformToAnonymousUser();
-    }
-
-    @Override
-    public LoggedUser getAnonymousLogged() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
-            getLoggedUser().transformToLoggedUser();
-        }
-        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    @Override
-    public IUser addRole(IUser user, String roleStringId) {
-        User dbUser = (User) user;
-        ProcessRole role = processRoleService.findById(roleStringId);
-        dbUser.addProcessRole(role);
-        return userRepository.save(dbUser);
-    }
-
-    @Override
-    public IUser removeRole(IUser user, String roleStringId) {
-        User dbUser = (User) user;
-        ProcessRole role = processRoleService.findByImportId(roleStringId);
-        dbUser.removeProcessRole(role);
-        return userRepository.save(dbUser);
     }
 
     @Override
@@ -330,11 +260,4 @@ public class UserService implements IUserService {
         return user;
     }
 
-    public Page<IUser> changeType(Page<User> users, Pageable pageable) {
-        return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
-    }
-
-    public List<IUser> changeType(List<User> users) {
-        return users.stream().map(IUser.class::cast).collect(Collectors.toList());
-    }
 }

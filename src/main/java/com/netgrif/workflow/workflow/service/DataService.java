@@ -868,7 +868,7 @@ public class DataService implements IDataService {
     }
 
     protected UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.findById(id, true);
+        IUser user = userService.resolveById(id, true);
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 

@@ -193,7 +193,7 @@ public class AuthenticationController {
             }
 
             String password = new String(Base64.getDecoder().decode(request.password));
-            if (userService.stringMatchesUserPassword(user, password)) {
+            if (registrationService.stringMatchesUserPassword(user, password)) {
                 registrationService.changePassword(user, newPassword);
                 userDetailsService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
 

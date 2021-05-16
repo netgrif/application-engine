@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.Author
+import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
@@ -753,23 +754,23 @@ class ActionDelegate {
         mailService.sendMail(mailDraft)
     }
 
-    def changeUser(String email) {
+    def changeUserByEmail(String email) {
         [email: {cl ->
-            changeUser(email, "email", cl)
+            changeUserByEmail(email, "email", cl)
         },
          name: {cl ->
-             changeUser(email, "name", cl)
+             changeUserByEmail(email, "name", cl)
          },
          surname: {cl ->
-             changeUser(email, "surname", cl)
+             changeUserByEmail(email, "surname", cl)
          },
          tel: {cl ->
-             changeUser(email, "tel", cl)
+             changeUserByEmail(email, "tel", cl)
          },
         ]
     }
 
-    def changeUser(Long id) {
+    def changeUser(String id) {
         [email: {cl ->
             changeUser(id, "email", cl)
         },
@@ -801,17 +802,17 @@ class ActionDelegate {
         ]
     }
 
-    def changeUser(String email, String attribute, def cl) {
-        User user = userService.findByEmail(email, false)
+    def changeUserByEmail(String email, String attribute, def cl) {
+        IUser user = userService.findByEmail(email, false)
         changeUser(user, attribute, cl)
     }
 
-    def changeUser(Long id, String attribute, def cl) {
-        User user = userService.findById(id, false)
+    def changeUser(String id, String attribute, def cl) {
+        IUser user = userService.get(id, false)
         changeUser(user, attribute, cl)
     }
 
-    def changeUser(User user, String attribute, def cl) {
+    def changeUser(IUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
             return
