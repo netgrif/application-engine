@@ -13,6 +13,7 @@ import com.netgrif.workflow.orgstructure.service.IGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
@@ -36,6 +37,9 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
+
+    @Autowired
+    protected BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional
@@ -68,7 +72,7 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public void changePassword(RegisteredUser user, String newPassword) {
         user.setPassword(newPassword);
-        userService.encodeUserPassword(user);
+        encodeUserPassword(user);
         userService.save(user);
         log.info("Changed password for user " + user.getEmail() + ".");
     }
@@ -84,6 +88,19 @@ public class RegistrationService implements IRegistrationService {
             log.error(e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public void encodeUserPassword(RegisteredUser user) {
+        String pass = user.getPassword();
+        if (pass == null)
+            throw new IllegalArgumentException("User has no password");
+        user.setPassword(bCryptPasswordEncoder.encode(pass));
+    }
+
+    @Override
+    public boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare) {
+        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
     }
 
     @Override
@@ -163,7 +180,7 @@ public class RegistrationService implements IRegistrationService {
 
         user.setState(UserState.ACTIVE);
         user.setPassword(newPassword);
-        userService.encodeUserPassword(user);
+        encodeUserPassword(user);
         user.setToken(null);
         user.setExpirationDate(null);
 

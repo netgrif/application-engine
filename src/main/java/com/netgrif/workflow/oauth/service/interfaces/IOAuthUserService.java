@@ -5,8 +5,6 @@ import com.netgrif.workflow.oauth.domain.OAuthUser;
 
 public interface IOAuthUserService extends IUserService {
 
-    OAuthUser saveNewOAuth(OAuthUser user);
-
     OAuthUser findByOAuthId(String id);
 
 }

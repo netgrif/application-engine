@@ -9,10 +9,10 @@ import java.util.Collection;
 public class OAuthLoggedUser extends LoggedUser {
 
     @Getter
-    protected String oauthId;
+    protected String dbId;
 
-    public OAuthLoggedUser(String id, String oauthId, Collection<? extends GrantedAuthority> authorities) {
-        super(id, oauthId, "n/a", authorities);
-        this.oauthId = oauthId;
+    public OAuthLoggedUser(String oauthId, String dbId, String username, Collection<? extends GrantedAuthority> authorities) {
+        super(oauthId, username, "n/a", authorities);
+        this.dbId = dbId;
     }
 }

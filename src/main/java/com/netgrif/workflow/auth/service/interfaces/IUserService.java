@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,7 +28,11 @@ public interface IUserService {
 
     Member upsertGroupMember(IUser user);
 
+    Optional<IUser> get(String id);
+
     IUser findById(String id, boolean small);
+
+    IUser resolveById(String id, boolean small);
 
     IUser findByEmail(String email, boolean small);
 
@@ -42,10 +47,6 @@ public interface IUserService {
     void addDefaultRole(IUser user);
 
     void addDefaultAuthorities(IUser user);
-
-    void encodeUserPassword(IUser user);
-
-    boolean stringMatchesUserPassword(IUser user, String passwordToCompare);
 
     void assignAuthority(String userId, String authorityId);
 

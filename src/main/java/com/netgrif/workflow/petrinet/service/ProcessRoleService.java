@@ -65,7 +65,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
-        IUser user = userService.findById(userId, true);
+        IUser user = userService.resolveById(userId, true);
         Set<ProcessRole> requestedRoles = processRoleRepository.findAllBy_idIn(requestedRolesIds);
         if (requestedRoles.isEmpty() && requestedRolesIds.size() != 0)
             throw new IllegalArgumentException("No process roles found.");
