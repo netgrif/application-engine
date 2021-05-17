@@ -22,7 +22,7 @@ public class OAuthUserMapper implements IOauthUserMapper {
     @Override
     public LoggedUser transform(OAuth2Authentication auth) {
         Map<String, String> details = (Map<String, String>) auth.getUserAuthentication().getDetails();
-        OAuthUser user = userService.findByOAuthId(getId(details));
+        OAuthUser user = (OAuthUser) userService.findByOAuthId(getId(details));
         if (user == null) {
             user = new OAuthUser();
             user.setOauthId(getId(details));
