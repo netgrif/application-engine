@@ -39,6 +39,6 @@ public class UserFactory implements IUserFactory {
 
     @Override
     public User getSmallUser(IUser user) {
-        return User.createSmallUser(null);
+        return User.createSmallUser(user);
     }
 }

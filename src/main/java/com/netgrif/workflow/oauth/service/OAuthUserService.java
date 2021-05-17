@@ -39,8 +39,11 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     @Autowired
     protected UserRepository userRepository;
 
-    @Autowired
     protected IRemoteUserResourceService<RemoteUserResource> remoteUserResourceService;
+
+    public OAuthUserService(IRemoteUserResourceService<RemoteUserResource> remoteUserResourceService) {
+        this.remoteUserResourceService = remoteUserResourceService;
+    }
 
     public OAuthUser findByOAuthId(String id) {
         return repository.findByOauthId(id);
@@ -61,7 +64,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public IUser findByAuth(Authentication auth) {
-        return null;
+        return findById(((LoggedUser) auth.getPrincipal()).getId(), false);
     }
 
     @Override
@@ -133,13 +136,13 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        Page<OAuthUser> users = repository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         return changeType(users, pageable);
     }
 
     @Override
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
-        List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
+        List<OAuthUser> users = repository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
         return changeType(users);
     }
 
