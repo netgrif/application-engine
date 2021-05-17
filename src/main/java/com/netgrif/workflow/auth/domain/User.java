@@ -139,13 +139,5 @@ public class User extends AbstractUser implements RegisteredUser {
                 '}';
     }
 
-    public Author transformToAuthor() {
-        Author author = new Author();
-        author.setId(this.getStringId());
-        author.setEmail(this.getEmail());
-        author.setFullName(this.getFullName());
-
-        return author;
-    }
 
 }

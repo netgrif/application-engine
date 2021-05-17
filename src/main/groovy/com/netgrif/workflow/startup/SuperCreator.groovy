@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
@@ -37,24 +38,30 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IProcessRoleService processRoleService
 
+    @Value('${nae.oauth.enabled}')
+    private boolean oauth
+
+    @Value('${nae.oauth.super-username:#{null}}')
+    private String oauthSuper
+
     @Value('${admin.password}')
     private String superAdminPassword
 
-    private User superUser
+    private IUser superUser
 
     private Member superMember
 
     @Override
     void run(String... strings) {
         log.info("Creating Super user")
-//        createSuperUser()  // TODO NAE-1302
+        oauth ? createOAuthSuperUser() : createSuperUser()
     }
 
-    private User createSuperUser() {
+    private IUser createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
 
-        User superUser = userService.findByEmail("super@netgrif.com", false)
+        IUser superUser = userService.findByEmail("super@netgrif.com", false)
         if (superUser == null) {
             this.superUser = userService.saveNew(new User(
                     name: "Admin",
@@ -75,6 +82,13 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         return this.superUser
     }
 
+    private IUser createOAuthSuperUser() {
+        this.superUser = ((IOAuthUserService) userService).findByUsername(oauthSuper)
+        this.superMember = memberService.findByEmail(this.superUser.email)
+        this.superUser = ((IOAuthUserService) userService).saveNew(this.superUser)
+        return this.superUser
+    }
+
     void setAllToSuperUser() {
         setAllGroups()
         setAllProcessRoles()
@@ -91,15 +105,15 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     void setAllProcessRoles() {
         superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
-        superUser = userService.save(superUser) as User
+        superUser = userService.save(superUser) as IUser
     }
 
     void setAllAuthorities() {
         superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
-        superUser = userService.save(superUser) as User
+        superUser = userService.save(superUser) as IUser
     }
 
-    User getSuperUser() {
+    IUser getSuperUser() {
         return superUser
     }
 

@@ -6,11 +6,12 @@ import com.netgrif.workflow.auth.service.AbstractUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.oauth.domain.OAuthUser;
 import com.netgrif.workflow.oauth.domain.QOAuthUser;
+import com.netgrif.workflow.oauth.domain.RemoteUserResource;
 import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository;
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService;
+import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -39,10 +40,23 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     protected UserRepository userRepository;
 
     @Autowired
-    protected KeycloakUserResourceService keycloakService;
+    protected IRemoteUserResourceService<RemoteUserResource> remoteUserResourceService;
 
     public OAuthUser findByOAuthId(String id) {
         return repository.findByOauthId(id);
+    }
+
+    @Override
+    public OAuthUser findByUsername(String username) {
+        RemoteUserResource res = remoteUserResourceService.findUserByUsername(username);
+        OAuthUser oAuthUser = repository.findByOauthId(res.getId());
+        if (oAuthUser == null) {
+            oAuthUser = fromUserRepresentation(res);
+            return oAuthUser;
+        } else {
+            loadUser(oAuthUser, res);
+            return oAuthUser;
+        }
     }
 
     @Override
@@ -59,7 +73,9 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     public IUser saveNew(IUser user) {
         addDefaultRole(user);
         addDefaultAuthorities(user);
-        return save(user);
+        user = save(user);
+        upsertGroupMember(user);
+        return user;
     }
 
     @Override
@@ -99,17 +115,17 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public IUser findByEmail(String email, boolean small) {
-        return null;
+        return fromUserRepresentation(remoteUserResourceService.findByEmail(email));
     }
 
     @Override
     public List<IUser> findAll(boolean small) {
-        return keycloakService.listUsers(Pageable.unpaged()).stream().map(this::fromUserRepresentation).collect(Collectors.toList());
+        return remoteUserResourceService.listUsers(Pageable.unpaged()).stream().map(this::fromUserRepresentation).collect(Collectors.toList());
     }
 
     @Override
     public Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
-        Page<UserRepresentation> page = keycloakService.listUsers(pageable);
+        Page<RemoteUserResource> page = remoteUserResourceService.listUsers(pageable);
         return new PageImpl<>(
                 page.getContent().stream().map(this::fromUserRepresentation).collect(Collectors.toList()),
                 pageable, page.getTotalElements());
@@ -141,8 +157,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         if (cachedSystemUser != null) {
             return cachedSystemUser;
         } else {
-            UserRepresentation rep = keycloakService.findUserByUsername(systemUsername);
-            OAuthUser oAuthUser = fromUserRepresentation(rep);
+            OAuthUser oAuthUser = findByUsername(systemUsername);
             cachedSystemUser = oAuthUser;
             return oAuthUser;
         }
@@ -164,7 +179,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable) {
-        Page<UserRepresentation> page = keycloakService.searchUsers(query, pageable, true);
+        Page<RemoteUserResource> page = remoteUserResourceService.searchUsers(query, pageable, true);
         return new PageImpl<>(
                 page.getContent().stream().map(this::fromUserRepresentation).collect(Collectors.toList()),
                 pageable, page.getTotalElements());
@@ -189,7 +204,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         cachedSystemUser = null;
     }
 
-    protected OAuthUser fromUserRepresentation(UserRepresentation representation) {
+    protected OAuthUser fromUserRepresentation(RemoteUserResource representation) {
         OAuthUser oAuthUser = new OAuthUser();
         oAuthUser.setOauthId(representation.getId());
         oAuthUser.setEmail(representation.getEmail());
@@ -199,10 +214,14 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     protected void loadUser(OAuthUser user) {
-        UserRepresentation userRepresentation = keycloakService.findUser(user.getOauthId());
-        user.setName(userRepresentation.getFirstName());
-        user.setSurname(userRepresentation.getLastName());
-        user.setEmail(userRepresentation.getEmail());
+        RemoteUserResource userRepresentation = remoteUserResourceService.findUser(user.getOauthId());
+        loadUser(user, userRepresentation);
+    }
+
+    protected void loadUser(OAuthUser user, RemoteUserResource resource) {
+        user.setName(resource.getFirstName());
+        user.setSurname(resource.getLastName());
+        user.setEmail(resource.getEmail());
     }
 
     protected OAuthUser createNewUser(String id) {

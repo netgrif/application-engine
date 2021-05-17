@@ -33,10 +33,9 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public Member upsertGroupMember(IUser user) {
-        User dbUser = (User) user;
         Member member = memberService.findByEmail(user.getEmail());
         if (member == null)
-            member = new Member(dbUser.getStringId(), user.getName(), user.getSurname(), user.getEmail());
+            member = new Member(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
         member.setGroups(user.getGroups());
         return memberService.save(member);
     }
@@ -81,18 +80,16 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser addRole(IUser user, String roleStringId) {
-        User dbUser = (User) user;
         ProcessRole role = processRoleService.findById(roleStringId);
-        dbUser.addProcessRole(role);
-        return save(dbUser);
+        user.addProcessRole(role);
+        return save(user);
     }
 
     @Override
     public IUser removeRole(IUser user, String roleStringId) {
-        User dbUser = (User) user;
         ProcessRole role = processRoleService.findByImportId(roleStringId);
-        dbUser.removeProcessRole(role);
-        return save(dbUser);
+        user.removeProcessRole(role);
+        return save(user);
     }
 
     public <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {
