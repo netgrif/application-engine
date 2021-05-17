@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.roles
 
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -37,7 +37,7 @@ class TransitionRoleTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner systemUserRunner

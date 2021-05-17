@@ -1,10 +1,12 @@
 package com.netgrif.workflow.startup
 
+import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
@@ -16,13 +18,28 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
     public static final String SYSTEM_USER_NAME = "application"
     public static final String SYSTEM_USER_SURNAME = "engine"
 
+    @Value('${nae.oauth.enabled}')
+    private boolean oauth
+
     @Autowired
     private IUserService service
 
-    private User systemUser
+    private IUser systemUser
 
     @Override
     void run(String... strings) throws Exception {
+        if (oauth) {
+            createOauthSystemUser()
+        } else {
+            createSystemUser()
+        }
+    }
+
+    LoggedUser getLoggedSystem() {
+        return this.systemUser.transformToLoggedUser()
+    }
+
+    void createSystemUser() {
         this.systemUser = service.findByEmail(SYSTEM_USER_EMAIL,false)
         if (this.systemUser == null) {
             User system = new User(
@@ -37,7 +54,8 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
         }
     }
 
-    LoggedUser getLoggedSystem() {
-        return this.systemUser.transformToLoggedUser()
+    void createOauthSystemUser() {
+        IUser user = service.getSystem()
+        this.systemUser = service.saveNew(user)
     }
 }

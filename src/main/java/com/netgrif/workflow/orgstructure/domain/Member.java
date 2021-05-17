@@ -20,7 +20,7 @@ public class Member {
 
     @Getter
     @Setter
-    private Long userId;
+    private String userId;
 
     @Getter
     @Setter
@@ -49,7 +49,7 @@ public class Member {
         groups = new HashSet<>();
     }
 
-    public Member(Long userId, String name, String surname, String email) {
+    public Member(String userId, String name, String surname, String email) {
         this();
         this.userId = userId;
         this.name = name;
@@ -58,7 +58,7 @@ public class Member {
     }
 
     public static Member from(User user) {
-        return new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
+        return new Member(user.get_id().toString(), user.getName(), user.getSurname(), user.getEmail());
     }
 
     @Override

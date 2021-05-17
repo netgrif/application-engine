@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.querydsl.core.BooleanBuilder;
@@ -135,9 +136,9 @@ public class MongoSearchService<T> {
         }
     }
 
-    protected Long resolveAuthorByEmail(String email) {
-        User user = userService.findByEmail(email, true);
-        return user != null ? user.getId() : null;
+    protected String resolveAuthorByEmail(String email) {
+        IUser user = userService.findByEmail(email, true);
+        return user != null ? user.getStringId() : null;
     }
 
     public static String oid(String id) {

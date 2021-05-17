@@ -109,7 +109,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(Long userId) {
+    public Predicate negativeViewUsersQuery(String userId) {
         return QCase.case$.negativeViewUsers.contains(userId);
     }
 
@@ -118,7 +118,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate viewUsersQuery(Long userId) {
+    public Predicate viewUsersQuery(String userId) {
         return QCase.case$.users.containsKey(userId);
     }
 
@@ -168,11 +168,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         else if (query.containsKey(AUTHOR_NAME))
             return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
         else if (query.containsKey(AUTHOR_ID)) {
-            Long searchValue = -1L;
-            if (query.get(AUTHOR_ID) instanceof Long)
-                searchValue = (Long) query.get(AUTHOR_ID);
-            else if (query.get(AUTHOR_ID) instanceof Integer)
-                searchValue = ((Integer) query.get(AUTHOR_ID)).longValue();
+            String searchValue = "";
+            if (query.get(AUTHOR_ID) instanceof String)
+                searchValue = (String) query.get(AUTHOR_ID);
             return QCase.case$.author.id.eq(searchValue);
         }
         return null;
