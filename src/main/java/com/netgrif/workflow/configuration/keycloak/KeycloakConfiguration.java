@@ -1,5 +1,8 @@
 package com.netgrif.workflow.configuration.keycloak;
 
+import com.netgrif.workflow.oauth.domain.RemoteUserResource;
+import com.netgrif.workflow.oauth.service.KeycloakUserResourceService;
+import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -29,6 +32,11 @@ public class KeycloakConfiguration {
 
     @Value("${security.oauth2.client.password}")
     private String password;
+
+    @Bean
+    public IRemoteUserResourceService<?> remoteUserResourceService() {
+        return new KeycloakUserResourceService();
+    }
 
     @Bean
     public Keycloak keycloak() {

@@ -61,4 +61,13 @@ public abstract class AbstractUser implements IUser {
     public boolean isActive() {
         return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
     }
+
+    public Author transformToAuthor() {
+        Author author = new Author();
+        author.setId(this.getStringId());
+        author.setEmail(this.getEmail());
+        author.setFullName(this.getFullName());
+
+        return author;
+    }
 }

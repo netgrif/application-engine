@@ -7,6 +7,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -25,10 +26,12 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IGroupService groupService
 
+    @Value('${nae.oauth.enabled}')
+    private boolean oauth
+
     @Override
     void run(String... strings) throws Exception {
-        // TODO NAE-1302
-        return
+        if (oauth) return
         def group = groupService.findAll().find { it.name == DefaultGroupRunner.DEFAULT_GROUP_NAME }
 
         assert group != null
