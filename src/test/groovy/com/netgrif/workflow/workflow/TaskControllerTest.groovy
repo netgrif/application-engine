@@ -1,8 +1,7 @@
 package com.netgrif.workflow.workflow
 
-import com.netgrif.workflow.auth.domain.LoggedUser
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.service.ElasticTaskService
+
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
@@ -10,18 +9,13 @@ import com.netgrif.workflow.petrinet.service.ProcessRoleService;
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.MergeFilterOperation
-import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.service.DataService;
+import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskSearchService
-import com.netgrif.workflow.workflow.service.TaskService;
-import com.netgrif.workflow.workflow.service.TaskServiceTest;
+import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.web.WorkflowController
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import groovy.util.logging.Slf4j
-import org.apache.tomcat.jni.Local
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -129,7 +123,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         List<Long> userIds = [] as List
-        userIds.add(userService.findByEmail("dummy@netgrif.com", false).getId())
+        userIds.add(userService.findByEmail("dummy@netgrif.com", false).get_id())
         dataService.setData(task.stringId,  ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
@@ -146,7 +140,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findByEmail("dummy@netgrif.com", false).getId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findByEmail("dummy@netgrif.com", false).get_id(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     Page<Task> findTasksByMongo() {

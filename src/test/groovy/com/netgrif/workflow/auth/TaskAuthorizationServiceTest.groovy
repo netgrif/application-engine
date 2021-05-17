@@ -2,11 +2,12 @@ package com.netgrif.workflow.auth
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -82,22 +83,22 @@ class TaskAuthorizationServiceTest {
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as Group[],
-                [processRoles.get("role")] as UserProcessRole[])
+                [processRoles.get("role")] as ProcessRole[])
 
-        userId = user.id
+        userId = user._id
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         userWithoutRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITHOUT_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
                 [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_USER_EMAIL, "password")
     }

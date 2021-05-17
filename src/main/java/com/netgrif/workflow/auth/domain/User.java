@@ -7,32 +7,28 @@ import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Set;
 
-@Entity
-@Table(name = "user")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class User {
+@Document
+public class User extends AbstractUser implements RegisteredUser {
 
     public static final String UNKNOWN = "unknown";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
-    private Long id;
+    protected ObjectId _id;
 
     @NotNull
-    @Email
-    @Column(unique = true)
     @Getter
     @Setter
+    @Indexed
     private String email;
 
     @Getter
@@ -49,21 +45,16 @@ public class User {
     private String password;
 
     @NotNull
-    @NotBlank
     @Getter
     @Setter
+    @Indexed
     private String name;
 
     @NotNull
-    @NotBlank
     @Getter
     @Setter
+    @Indexed
     private String surname;
-
-    @NotNull
-    @Getter
-    @Setter
-    private UserState state;
 
     @Getter
     @Setter
@@ -73,49 +64,17 @@ public class User {
     @Setter
     private LocalDateTime expirationDate;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
-    @Getter
-    @Setter
-    private Set<Authority> authorities;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
-    @Getter
-    @Setter
-    private Set<UserProcessRole> userProcessRoles;
-
-    @Transient
-    @Getter
-    @Setter
-    private Set<ProcessRole> processRoles;
-
-    @Transient
-    @Getter
-    @Setter
-    private Set<Group> groups;
-
-    @Transient
-    @Getter
-    @Setter
-    private Set<String> nextGroups;
-
     public User() {
-        groups = new HashSet<>();
-        authorities = new HashSet<>();
-        nextGroups = new HashSet<>();
-        userProcessRoles = new HashSet<>();
-        processRoles = new HashSet<>();
+        super();
     }
 
-    public User(Long id) {
+    public User(ObjectId id) {
         this();
-        this.id = id;
-        nextGroups = new HashSet<>();
+        this._id = id;
     }
 
     public User(User user){
-        this.id = user.getId();
+        this._id = user.get_id();
         this.email = user.getEmail();
         this.surname = user.getSurname();
         this.name = user.getName();
@@ -133,24 +92,17 @@ public class User {
 
     public User(ObjectNode json) {
         this(json.get("email").asText(), null, json.get("name").asText(), json.get("surname").asText());
-        ((ArrayNode) json.get("userProcessRoles"))
-                .forEach(node -> userProcessRoles.add(new UserProcessRole(node.get("roleId").asText())));
-    }
-
-    public void addAuthority(Authority authority) {
-        authorities.add(authority);
-    }
-
-    public void addProcessRole(UserProcessRole role) {
-        userProcessRoles.add(role);
-    }
-
-    public void removeProcessRole(UserProcessRole role) {
-        userProcessRoles.remove(role);
+        ((ArrayNode) json.get("processRoles"))
+                .forEach(node -> processRoles.add(new ProcessRole(node.get("_id").asText())));
     }
 
     public String getFullName() {
         return name + " " + surname;
+    }
+
+    @JsonIgnore
+    public String getStringId() {
+        return _id.toString();
     }
 
     public void addGroup(Group group) {
@@ -158,11 +110,11 @@ public class User {
     }
 
     public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
+        LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
-        if (!this.getUserProcessRoles().isEmpty())
-            loggedUser.parseProcessRoles(this.getUserProcessRoles());
+        if (!this.getProcessRoles().isEmpty())
+            loggedUser.parseProcessRoles(this.getProcessRoles());
         if (!this.getGroups().isEmpty())
             loggedUser.parseGroups(this.getGroups());
 
@@ -172,7 +124,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + _id +
                 ", email='" + email + '\'' +
                 ", telNumber='" + telNumber + '\'' +
                 ", avatar='" + avatar + '\'' +
@@ -182,22 +134,10 @@ public class User {
                 ", token='" + token + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", authorities=" + authorities +
-                ", userProcessRoles=" + userProcessRoles +
                 ", processRoles=" + processRoles +
                 ", groups=" + groups +
                 '}';
     }
 
-    public Author transformToAuthor() {
-        Author author = new Author();
-        author.setId(this.getId());
-        author.setEmail(this.getEmail());
-        author.setFullName(this.getFullName());
 
-        return author;
-    }
-
-    public boolean isRegistered() {
-        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
-    }
 }
