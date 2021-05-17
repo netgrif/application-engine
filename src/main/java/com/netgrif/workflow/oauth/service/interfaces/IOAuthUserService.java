@@ -7,4 +7,6 @@ public interface IOAuthUserService extends IUserService {
 
     OAuthUser findByOAuthId(String id);
 
+    OAuthUser findByUsername(String username);
+
 }
