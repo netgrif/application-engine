@@ -78,7 +78,7 @@ public class NextGroupService implements INextGroupService {
     protected final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
-    public Case createDefaultSystemGroup(User author){
+    public Case createDefaultSystemGroup(IUser author){
         if(findDefaultGroup() != null) {
             log.info("Default system group has already been created.");
             return null;
@@ -87,12 +87,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Case createGroup(User author){
+    public Case createGroup(IUser author){
         return createGroup(author.getFullName(), author);
     }
 
     @Override
-    public Case createGroup(String title, User author){
+    public Case createGroup(String title, IUser author) {
         Case userDefaultGroup = findUserDefaultGroup(author);
         if(userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)){
             return null;
@@ -282,7 +282,7 @@ public class NextGroupService implements INextGroupService {
         return groupCase.getAuthor().getId();
     }
 
-    protected Case findUserDefaultGroup(User author){
+    protected Case findUserDefaultGroup(IUser author) {
         return workflowService.searchOne(QCase.case$.author.id.eq(author.getStringId()).and(QCase.case$.title.eq(author.getFullName())));
     }
 
@@ -301,7 +301,7 @@ public class NextGroupService implements INextGroupService {
         return taskService.findById(initTaskId);
     }
 
-    protected Map<String, Map<String, String>> getInitialGroupData(User author, String title, Case groupCase){
+    protected Map<String, Map<String, String>> getInitialGroupData(IUser author, String title, Case groupCase) {
         Map<String, Map<String,String>> taskData = new HashMap<>();
 
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
@@ -309,7 +309,7 @@ public class NextGroupService implements INextGroupService {
 
         Map<String, String> authorData = new HashMap<>();
         authorData.put("type", "user");
-        authorData.put("value", author.get_id().toString());
+        authorData.put("value", author.getStringId());
 
         Map<String, String> titleData = new HashMap<>();
         titleData.put("type", "text");

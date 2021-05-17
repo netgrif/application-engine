@@ -18,11 +18,11 @@ import java.util.Set;
         matchIfMissing = true)
 public interface INextGroupService {
 
-    Case createDefaultSystemGroup(User author);
+    Case createDefaultSystemGroup(IUser author);
 
-    Case createGroup(User author);
+    Case createGroup(IUser author);
 
-    Case createGroup(String title, User author);
+    Case createGroup(String title, IUser author);
 
     Case findGroup(String groupID);
 
