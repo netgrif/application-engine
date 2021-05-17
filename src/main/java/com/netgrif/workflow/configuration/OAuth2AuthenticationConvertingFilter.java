@@ -1,7 +1,7 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.interfaces.IOauthUserMapper;
+import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

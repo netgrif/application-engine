@@ -371,7 +371,7 @@ public final class FieldFactory {
             Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
-        field.setValue((User) useCase.getFieldValue(fieldId));
+        field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {

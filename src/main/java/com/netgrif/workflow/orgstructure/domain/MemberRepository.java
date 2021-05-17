@@ -14,7 +14,7 @@ public interface MemberRepository extends Neo4jRepository<Member, Long> {
             "MATCH (others:Group)-[CHILD_OF*]->(parent) WITH others\n" +
             "MATCH (comembers:Member)-[MEMBER_OF]->(others) RETURN comembers.userId\n" +
             "UNION MATCH (comembers:Member)-[MEMBER_OF]->(parent) RETURN comembers.userId")
-    Set<Long> findAllCoMembersIds(String email);
+    Set<String> findAllCoMembersIds(String email);
 
     Member findByEmail(String email);
 }

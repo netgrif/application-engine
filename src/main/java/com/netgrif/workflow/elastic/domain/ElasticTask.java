@@ -54,7 +54,7 @@ public class ElasticTask {
 
     private int priority;
 
-    private Long userId;
+    private String userId;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -69,9 +69,9 @@ public class ElasticTask {
     @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
-    private Set<Long> users;
+    private Set<String> users;
 
-    private Set<Long> negativeViewUsers;
+    private Set<String> negativeViewUsers;
 
     @Field(type = Keyword)
     private String icon;

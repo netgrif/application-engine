@@ -2,8 +2,9 @@ package com.netgrif.workflow.auth
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.auth.web.responsebodies.ProcessRole
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Filter
@@ -63,14 +64,14 @@ class FilterAuthorizationServiceTest {
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
                 [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
     }

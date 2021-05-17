@@ -2,7 +2,7 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
-import com.netgrif.workflow.auth.service.interfaces.IOauthUserMapper;
+import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Bean;

@@ -1,23 +1,18 @@
 package com.netgrif.workflow.auth.domain;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-@EqualsAndHashCode(callSuper = true)
-@Entity
+@Document
 @Data
-@Table(name = "anonymous_user")
-public class AnonymousUser extends User{
+public class AnonymousUser extends User {
 
     public AnonymousUser() {
         super();
     }
 
-    public AnonymousUser(Long id) {
+    public AnonymousUser(ObjectId id) {
         super(id);
     }
 
@@ -27,11 +22,11 @@ public class AnonymousUser extends User{
 
     @Override
     public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
+        LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(true);
-        if (!this.getUserProcessRoles().isEmpty())
-            loggedUser.parseProcessRoles(this.getUserProcessRoles());
+        if (!this.getProcessRoles().isEmpty())
+            loggedUser.parseProcessRoles(this.getProcessRoles());
         if (!this.getGroups().isEmpty())
             loggedUser.parseGroups(this.getGroups());
 

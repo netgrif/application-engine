@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.InvalidUserTokenException;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
@@ -75,7 +76,7 @@ public class AuthenticationController {
                 return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!");
 
             regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
-            User user = registrationService.registerUser(regRequest);
+            RegisteredUser user = registrationService.registerUser(regRequest);
             if (user == null)
                 return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.");
 
@@ -99,7 +100,7 @@ public class AuthenticationController {
                 return MessageResource.successMessage("Done");
             }
 
-            User user = registrationService.createNewUser(newUserRequest);
+            RegisteredUser user = registrationService.createNewUser(newUserRequest);
             if (user == null)
                 return MessageResource.successMessage("Done");
             mailService.sendRegistrationEmail(user);
@@ -147,7 +148,7 @@ public class AuthenticationController {
             return MessageResource.successMessage("Done");
         }
         try {
-            User user = registrationService.resetPassword(recoveryEmail);
+            RegisteredUser user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
                 mailAttemptService.mailAttempt(user.getEmail());
@@ -167,7 +168,7 @@ public class AuthenticationController {
         try {
             if (!registrationService.verifyToken(request.token))
                 return MessageResource.errorMessage("Invalid token!");
-            User user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
+            RegisteredUser user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
             if (user == null)
                 return MessageResource.errorMessage("Recovery of account has failed!");
             return MessageResource.successMessage("Account is successfully recovered. You can login now.");
@@ -181,7 +182,7 @@ public class AuthenticationController {
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
-            User user = userService.findByEmail(request.login, false);
+            RegisteredUser user = (RegisteredUser) userService.findByEmail(request.login, false);
             if (user == null || request.password == null || request.newPassword == null) {
                 return MessageResource.errorMessage("Incorrect login!");
             }
@@ -192,7 +193,7 @@ public class AuthenticationController {
             }
 
             String password = new String(Base64.getDecoder().decode(request.password));
-            if (userService.stringMatchesUserPassword(user, password)) {
+            if (registrationService.stringMatchesUserPassword(user, password)) {
                 registrationService.changePassword(user, newPassword);
                 userDetailsService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
 

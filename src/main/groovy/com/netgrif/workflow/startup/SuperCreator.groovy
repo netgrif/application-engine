@@ -2,11 +2,14 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,9 +27,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private IAuthorityService authorityService
 
     @Autowired
-    private IUserProcessRoleService userProcessRoleService
-
-    @Autowired
     private IUserService userService
 
     @Autowired
@@ -35,24 +35,33 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IGroupService groupService
 
+    @Autowired
+    private IProcessRoleService processRoleService
+
+    @Value('${nae.oauth.enabled}')
+    private boolean oauth
+
+    @Value('${nae.oauth.super-username:#{null}}')
+    private String oauthSuper
+
     @Value('${admin.password}')
     private String superAdminPassword
 
-    private User superUser
+    private IUser superUser
 
     private Member superMember
 
     @Override
     void run(String... strings) {
         log.info("Creating Super user")
-        createSuperUser()
+        oauth ? createOAuthSuperUser() : createSuperUser()
     }
 
-    private User createSuperUser() {
+    private IUser createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
 
-        User superUser = userService.findByEmail("super@netgrif.com", false)
+        IUser superUser = userService.findByEmail("super@netgrif.com", false)
         if (superUser == null) {
             this.superUser = userService.saveNew(new User(
                     name: "Admin",
@@ -61,7 +70,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     password: superAdminPassword,
                     state: UserState.ACTIVE,
                     authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                    userProcessRoles: userProcessRoleService.findAll() as Set<UserProcessRole>))
+                    processRoles: processRoleService.findAll() as Set<ProcessRole>))
             this.superMember = memberService.findByEmail(this.superUser.email)
             log.info("Super user created")
         } else {
@@ -70,6 +79,13 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superMember = memberService.findByEmail(this.superUser.email)
         }
 
+        return this.superUser
+    }
+
+    private IUser createOAuthSuperUser() {
+        this.superUser = ((IOAuthUserService) userService).findByUsername(oauthSuper)
+        this.superMember = memberService.findByEmail(this.superUser.email)
+        this.superUser = ((IOAuthUserService) userService).saveNew(this.superUser)
         return this.superUser
     }
 
@@ -88,16 +104,16 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllProcessRoles() {
-        superUser.setUserProcessRoles(userProcessRoleService.findAll() as Set<UserProcessRole>)
-        superUser = userService.save(superUser)
+        superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
+        superUser = userService.save(superUser) as IUser
     }
 
     void setAllAuthorities() {
         superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
-        superUser = userService.save(superUser)
+        superUser = userService.save(superUser) as IUser
     }
 
-    User getSuperUser() {
+    IUser getSuperUser() {
         return superUser
     }
 
