@@ -2,14 +2,15 @@ package com.netgrif.workflow.action
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -63,9 +64,6 @@ class AssignActionTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-
-    @Autowired
     private ProcessRoleRepository processRoleRepository
 
     @Autowired
@@ -90,7 +88,6 @@ class AssignActionTest {
                 .build()
 
         createMainAndSecondaryNet()
-        createUserProcessRoles()
 
         def org = importHelper.createGroup(GROUP_NAME)
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
@@ -98,12 +95,7 @@ class AssignActionTest {
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [] as UserProcessRole[])
-    }
-
-    private void createUserProcessRoles() {
-        importHelper.createUserProcessRole(this.mainNet, "admin_main")
-        importHelper.createUserProcessRole(this.secondaryNet, "admin_secondary")
+                [] as ProcessRole[])
     }
 
     private void createMainAndSecondaryNet() {
@@ -120,7 +112,7 @@ class AssignActionTest {
     private void cleanDatabases() {
         template.db.drop()
         userRepository.deleteAll()
-        userProcessRoleRepository.deleteAll()
+        processRoleRepository.deleteAll()
     }
 
     @Test
@@ -132,7 +124,7 @@ class AssignActionTest {
         String roleIdInMainNet = mainNet.getRoles().find {it.value.name.defaultValue == "admin_main"}.key
 
         def content = JsonOutput.toJson([roleIdInMainNet])
-        String userId = Integer.toString(user.id as Integer)
+        String userId = Integer.toString(user._id as Integer)
 
         mvc.perform(post(ROLE_API.replace("{}", userId))
                 .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
@@ -143,12 +135,12 @@ class AssignActionTest {
             .andExpect(status().isOk())
 
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
-        Set<UserProcessRole> roles = updatedUser.getUserProcessRoles()
+        Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
         String adminMainId = processRoleRepository.findByName_DefaultValue("admin_main").stringId
         String adminSecondaryId = processRoleRepository.findByName_DefaultValue("admin_secondary").stringId
 
-        assert roles.find {it.roleId == adminMainId}
-        assert roles.find {it.roleId == adminSecondaryId}
+        assert roles.find {it.stringId == adminMainId}
+        assert roles.find {it.stringId == adminSecondaryId}
     }
 }

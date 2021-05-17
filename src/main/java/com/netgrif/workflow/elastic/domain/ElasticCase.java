@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -63,7 +64,7 @@ public class ElasticCase {
 
     private Long creationDateSortable;
 
-    private Long author;
+    private String author;
 
     private String authorName;
 
@@ -84,9 +85,9 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
-    private Set<Long> users;
+    private Set<String> users;
 
-    private Set<Long> negativeViewUsers;
+    private Set<String> negativeViewUsers;
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
@@ -134,8 +135,8 @@ public class ElasticCase {
 
     private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
-        if (dataField.getValue() instanceof User) {
-            User user = (User) dataField.getValue();
+        if (dataField.getValue() instanceof UserFieldValue) {
+            UserFieldValue user = (UserFieldValue) dataField.getValue();
             if (user == null)
                 return Optional.of(new DataField(""," "));
             StringBuilder fullname = new StringBuilder("");
@@ -146,7 +147,7 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullname.append(user.getName());
             }
-            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
+            return Optional.of(new DataField(user.getId(), fullname.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
             if (date == null)

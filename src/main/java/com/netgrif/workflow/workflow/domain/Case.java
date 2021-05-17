@@ -134,7 +134,7 @@ public class Case {
 
     @Getter @Setter
     @Builder.Default
-    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
     @Getter @Setter
     @Builder.Default
@@ -142,7 +142,7 @@ public class Case {
 
     @Getter
     @Setter
-    private List<Long> negativeViewUsers;
+    private List<String> negativeViewUsers;
 
     public Case() {
         _id = new ObjectId();
@@ -255,7 +255,7 @@ public class Case {
         return petriNetObjectId.toString();
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions){
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);

@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.web;
 
-import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.IUser;
+import com.netgrif.workflow.auth.domain.AbstractUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
@@ -16,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -26,11 +28,11 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Provider;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -72,9 +74,10 @@ public class PublicUserController {
 
     @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
-        small = small == null ? false : small;
-        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), query.getNegativeRoles(), userService.getAnonymousLogged(), small, pageable);
+    public PagedResources<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
+        small = small != null && small;
+        Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
+                query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList()), userService.getAnonymousLogged(), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicUserController.class)
                 .search(small, query, pageable, assembler, locale)).withRel("search");
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
@@ -85,7 +88,7 @@ public class PublicUserController {
     @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences() {
-        Long userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+        String userId = userService.getAnonymousLogged().transformToAnonymousUser().getStringId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -99,7 +102,7 @@ public class PublicUserController {
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences) {
         try {
-            Long userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+            String userId = userService.getAnonymousLogged().transformToAnonymousUser().getStringId();
             preferences.setUserId(userId);
             preferencesService.save(preferences);
             return MessageResource.successMessage("User preferences saved");

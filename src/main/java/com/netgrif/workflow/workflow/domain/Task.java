@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -63,11 +64,11 @@ public class Task {
 
     @Indexed
     @Setter
-    private Long userId;
+    private String userId;
 
     @org.springframework.data.annotation.Transient
     @Getter @Setter
-    private User user;
+    private IUser user;
 
     @DBRef
     @Setter
@@ -87,7 +88,7 @@ public class Task {
 
     @Getter @Setter
     @Builder.Default
-    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
     @Getter @Setter
     @Builder.Default
@@ -95,7 +96,7 @@ public class Task {
 
     @Getter @Setter
     @Builder.Default
-    private List<Long> negativeViewUsers = new LinkedList<>();
+    private List<String> negativeViewUsers = new LinkedList<>();
 
     @Getter @Setter
     private LocalDateTime startDate;
@@ -104,7 +105,7 @@ public class Task {
     private LocalDateTime finishDate;
 
     @Getter @Setter
-    private Long finishedBy;
+    private String finishedBy;
 
     @Getter @Setter
     private String transactionId;
@@ -186,7 +187,7 @@ public class Task {
         userRefs.put(userRefId,permissions);
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions){
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);
@@ -216,7 +217,7 @@ public class Task {
     }
 
     @JsonIgnore
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
