@@ -166,7 +166,7 @@ class ImportHelper {
         return map
     }*/
 
-    User createUser(User user, Authority[] authorities, Group[] orgs, ProcessRole[] roles) {
+    IUser createUser(IUser user, Authority[] authorities, Group[] orgs, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.groups = orgs as Set

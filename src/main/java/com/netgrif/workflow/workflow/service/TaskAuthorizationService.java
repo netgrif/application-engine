@@ -3,7 +3,6 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -12,7 +11,8 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 
 @Service
 public class TaskAuthorizationService extends AbstractAuthorizationService implements ITaskAuthorizationService {

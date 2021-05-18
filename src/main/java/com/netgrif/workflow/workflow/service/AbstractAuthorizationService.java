@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.IUser;
-import com.netgrif.workflow.auth.domain.User;
 
 import java.util.HashMap;
 import java.util.Map;

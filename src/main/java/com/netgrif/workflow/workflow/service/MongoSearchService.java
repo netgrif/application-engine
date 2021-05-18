@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.IUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.querydsl.core.BooleanBuilder;
 import org.slf4j.Logger;
