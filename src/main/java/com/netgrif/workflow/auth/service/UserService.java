@@ -131,6 +131,11 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
+    public IUser findAnonymousByEmail(String email, boolean small) {
+        return findByEmail(email, small);
+    }
+
+    @Override
     public List<IUser> findAll(boolean small) {
         List<User> users = userRepository.findAll();
 //        if (!small) users.forEach(this::loadProcessRoles);

@@ -36,6 +36,8 @@ public interface IUserService {
 
     IUser findByEmail(String email, boolean small);
 
+    IUser findAnonymousByEmail(String email, boolean small);
+
     List<IUser> findAll(boolean small);
 
     Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);

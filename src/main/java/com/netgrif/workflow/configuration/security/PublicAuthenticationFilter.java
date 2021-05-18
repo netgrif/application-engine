@@ -109,7 +109,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private LoggedUser createAnonymousUser(HttpServletRequest request) {
         String hash = new ObjectId().toString();
 
-        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
+        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findAnonymousByEmail(hash + "@nae.com", false);
 
         if (anonymousUser == null) {
             anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
