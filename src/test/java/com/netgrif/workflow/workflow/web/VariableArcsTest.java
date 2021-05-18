@@ -1,9 +1,7 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.MockService;
-import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserState;
+import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
@@ -111,13 +109,13 @@ public class VariableArcsTest {
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();
         PetriNet loaded = service.getPetriNet(net.getStringId());
-        User user = new User();
+        RegisteredUser user = new User();
         user.setName("Test");
         user.setSurname("Test");
         user.setPassword("password");
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
-        user = importHelper.createUser(user,
+        user = (User) importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
                 new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
                 new ProcessRole[]{});

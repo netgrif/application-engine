@@ -2,14 +2,16 @@ package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.workflow.auth.web.responsebodies.*;
+import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
+import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
+import com.netgrif.workflow.auth.web.responsebodies.UserResource;
+import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
@@ -90,7 +92,7 @@ public class UserController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "all"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel());
         return resources;
     }
 
@@ -103,7 +105,7 @@ public class UserController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel());
         return resources;
     }
 
@@ -157,7 +159,7 @@ public class UserController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "role"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel());
         return resources;
     }
 

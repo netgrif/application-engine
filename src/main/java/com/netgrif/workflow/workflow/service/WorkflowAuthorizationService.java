@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
@@ -82,7 +81,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         return false;
     }
 
-    private Map<String, Boolean> getAggregatePermissions(User user, PetriNet net) {
+    private Map<String, Boolean> getAggregatePermissions(IUser user, PetriNet net) {
         Map<String, Boolean> aggregatePermissions = new HashMap<>();
 
         Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role ->  role.get_id().toString()).collect(Collectors.toSet());

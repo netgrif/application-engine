@@ -32,4 +32,8 @@ class UserFieldValue {
     String getEmail() {
         return email
     }
+
+    String getFullName() {
+        return name + " " + surname
+    }
 }

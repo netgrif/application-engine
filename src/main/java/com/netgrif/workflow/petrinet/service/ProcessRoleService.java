@@ -199,6 +199,7 @@ public class ProcessRoleService implements IProcessRoleService {
     private void removeOldAndAssignNewRolesToUser(IUser user, Set<ProcessRole> requestedRoles) {
         user.getProcessRoles().clear();
         user.getProcessRoles().addAll(requestedRoles);
+        user.getProcessRoles().add(defaultRole());
 
         userService.save(user);
     }

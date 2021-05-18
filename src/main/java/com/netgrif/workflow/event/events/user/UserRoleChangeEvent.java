@@ -2,7 +2,6 @@ package com.netgrif.workflow.event.events.user;
 
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 
