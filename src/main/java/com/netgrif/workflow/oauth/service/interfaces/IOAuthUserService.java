@@ -8,5 +8,4 @@ public interface IOAuthUserService extends IUserService {
     IUser findByOAuthId(String id);
 
     IUser findByUsername(String username);
-
 }
