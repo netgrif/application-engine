@@ -55,6 +55,8 @@ public interface IUser {
 
     LoggedUser transformToLoggedUser();
 
+    Author transformToAuthor();
+
     boolean isActive();
 
 }

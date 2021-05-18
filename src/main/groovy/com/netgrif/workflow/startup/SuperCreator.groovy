@@ -2,7 +2,6 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
-
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
 import com.netgrif.workflow.orgstructure.domain.Member
@@ -85,7 +84,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private IUser createOAuthSuperUser() {
         this.superUser = ((IOAuthUserService) userService).findByUsername(oauthSuper)
         this.superMember = memberService.findByEmail(this.superUser.email)
-        this.superUser = ((IOAuthUserService) userService).saveNew(this.superUser)
+        this.superUser = userService.saveNew(this.superUser)
+        this.superUser.addAuthority(authorityService.getOrCreate(Authority.admin))
+        userService.save(this.superUser)
         return this.superUser
     }
 

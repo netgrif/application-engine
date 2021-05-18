@@ -6,7 +6,9 @@ import com.netgrif.workflow.oauth.domain.OAuthUser;
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService;
 import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Map;
 
@@ -16,8 +18,9 @@ public class OAuthUserMapper implements IOauthUserMapper {
     protected IOAuthUserService userService;
 
     @Override
-    public LoggedUser transform(Object principal) {
-        Map<String, Object> details = ((Jwt) principal).getClaims();
+    public LoggedUser transform(Authentication auth) {
+        JwtAuthenticationToken oAuth2 = (JwtAuthenticationToken) auth;
+        Map<String, Object> details = ((Jwt) oAuth2.getPrincipal()).getClaims();
         OAuthUser user = (OAuthUser) userService.findByOAuthId(getId(details));
         if (user == null) {
             user = new OAuthUser();

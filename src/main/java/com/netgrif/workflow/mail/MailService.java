@@ -1,8 +1,6 @@
 package com.netgrif.workflow.mail;
 
-import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.mail.domain.MailDraft;

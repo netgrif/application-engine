@@ -2,7 +2,6 @@ package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.InvalidUserTokenException;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;

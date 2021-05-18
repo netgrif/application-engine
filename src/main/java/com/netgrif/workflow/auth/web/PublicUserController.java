@@ -1,8 +1,6 @@
 package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.IUser;
-import com.netgrif.workflow.auth.domain.AbstractUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
@@ -81,7 +79,7 @@ public class PublicUserController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicUserController.class)
                 .search(small, query, pageable, assembler, locale)).withRel("search");
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, IUser.class, selfLink.getRel());
         return resources;
     }
 
