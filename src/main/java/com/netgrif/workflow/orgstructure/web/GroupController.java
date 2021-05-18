@@ -1,23 +1,21 @@
 package com.netgrif.workflow.orgstructure.web;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsMinimalResource;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsResource;
-import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import com.netgrif.workflow.auth.domain.User;
 
 import java.util.List;
 import java.util.Set;
@@ -53,7 +51,7 @@ public class GroupController {
     @ApiOperation(value = "Get all the user's groups", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     public GroupsResource getGroupsOfUser(Authentication auth) {
-        User loggedUser = ((LoggedUser) auth.getPrincipal()).transformToUser();
+        IUser loggedUser = ((LoggedUser) auth.getPrincipal()).transformToUser();
         List<Long> groupIds = loggedUser.getGroups().stream()
                 .map(Group::getId)
                 .collect(Collectors.toList());

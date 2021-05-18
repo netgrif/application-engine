@@ -122,6 +122,11 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     @Override
+    public IUser findAnonymousByEmail(String email, boolean small) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
     public List<IUser> findAll(boolean small) {
         return remoteUserResourceService.listUsers(Pageable.unpaged()).stream().map(this::fromUserRepresentation).collect(Collectors.toList());
     }
@@ -208,6 +213,9 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     protected OAuthUser fromUserRepresentation(RemoteUserResource representation) {
+        if (representation == null)
+            return null;
+
         OAuthUser oAuthUser = new OAuthUser();
         oAuthUser.setOauthId(representation.getId());
         oAuthUser.setEmail(representation.getEmail());

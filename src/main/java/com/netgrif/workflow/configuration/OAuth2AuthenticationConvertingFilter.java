@@ -5,7 +5,8 @@ import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,12 +26,13 @@ public class OAuth2AuthenticationConvertingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof OAuth2Authentication)) {
+        if (!(authentication instanceof JwtAuthenticationToken)) {
             filterChain.doFilter(request, response);
             return;
         }
-        OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) authentication;
-        LoggedUser loggedUser = mapper.transform(oAuth2Authentication);
+
+        JwtAuthenticationToken oAuth2Authentication = (JwtAuthenticationToken) authentication;
+        LoggedUser loggedUser = mapper.transform(oAuth2Authentication.getPrincipal());
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(loggedUser, "n/a", loggedUser.getAuthorities()));
         filterChain.doFilter(request, response);
     }

@@ -6,22 +6,18 @@ import com.netgrif.workflow.oauth.domain.OAuthUser;
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService;
 import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.stereotype.Service;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Map;
 
-@Service
-@ConditionalOnExpression("${nae.oauth.enabled}")
 public class OAuthUserMapper implements IOauthUserMapper {
 
     @Autowired
     protected IOAuthUserService userService;
 
     @Override
-    public LoggedUser transform(OAuth2Authentication auth) {
-        Map<String, String> details = (Map<String, String>) auth.getUserAuthentication().getDetails();
+    public LoggedUser transform(Object principal) {
+        Map<String, Object> details = ((Jwt) principal).getClaims();
         OAuthUser user = (OAuthUser) userService.findByOAuthId(getId(details));
         if (user == null) {
             user = new OAuthUser();
@@ -29,13 +25,17 @@ public class OAuthUserMapper implements IOauthUserMapper {
             user.setState(UserState.ACTIVE);
             user = (OAuthUser) userService.saveNew(user);
         }
-        user.setName(details.get("given_name"));
-        user.setSurname(details.get("family_name"));
-        user.setEmail(details.get("email"));
+        user.setName(getProperty("given_name", details));
+        user.setSurname(getProperty("family_name", details));
+        user.setEmail(getProperty("email", details));
         return user.transformToLoggedUser();
     }
 
-    protected String getId(Map<String, String> details) {
-        return details.get("sub");
+    protected String getProperty(String key, Map<String, Object> claims) {
+        return claims.get(key).toString();
+    }
+
+    protected String getId(Map<String, Object> claims) {
+        return getProperty("sub", claims);
     }
 }
