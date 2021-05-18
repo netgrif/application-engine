@@ -2,7 +2,6 @@ package com.netgrif.workflow.orgstructure.groups;
 
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
@@ -20,8 +19,8 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import com.querydsl.core.BooleanBuilder;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
@@ -172,7 +171,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public void addUserToDefaultGroup(User user){
+    public void addUserToDefaultGroup(IUser user){
         addUser(user, findDefaultGroup());
     }
 
@@ -193,11 +192,11 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public void removeUser(User user, Case groupCase){
+    public void removeUser(IUser user, Case groupCase){
         HashSet<String> userIds = new HashSet<>();
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
 
-        userIds.add(user.get_id().toString());
+        userIds.add(user.getStringId());
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(removeUser(userIds, existingUsers, groupCase));
         workflowService.save(groupCase);
     }
@@ -227,8 +226,8 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Set<String> getAllGroupsOfUser(User groupUser) {
-        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.get_id().toString())))
+    public Set<String> getAllGroupsOfUser(IUser groupUser) {
+        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
                 .map(aCase -> aCase.get_id().toString()).getContent();
         return new HashSet<>(groupList);
     }
@@ -257,7 +256,7 @@ public class NextGroupService implements INextGroupService {
         return QCase.case$.processIdentifier.eq(GROUP_CASE_IDENTIFIER);
     }
 
-    protected boolean isGroupCase(Case aCase){
+    protected boolean isGroupCase(Case aCase) {
         if(aCase == null){
             log.error("The input case is a null object.");
             return false;
@@ -268,10 +267,10 @@ public class NextGroupService implements INextGroupService {
         return true;
     }
 
-    protected boolean authorHasDefaultGroup(User author){
+    protected boolean authorHasDefaultGroup(IUser author){
         List<Case> allGroups = findAllGroups();
         for (Case group : allGroups){
-            if(group.getAuthor().getId().equals(author.get_id())){
+            if(group.getAuthor().getId().equals(author.getStringId())){
                 return true;
             }
         }

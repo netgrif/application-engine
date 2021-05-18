@@ -1,6 +1,5 @@
 package com.netgrif.workflow.importer.service;
 
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
@@ -10,8 +9,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.domain.TaskPair;
-import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 

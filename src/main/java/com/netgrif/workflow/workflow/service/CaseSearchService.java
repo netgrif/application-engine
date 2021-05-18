@@ -1,11 +1,11 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -208,7 +207,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
                     switch (type) {
                         case USER:
-                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k),"value");
+                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k),"value");
                             Path idPath = Expressions.stringPath(valuePath,"id");
                             Expression<Long> constant = Expressions.constant(Long.valueOf(""+fieldValue));
                             predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
