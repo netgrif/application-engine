@@ -21,12 +21,11 @@ public class OAuthLoggedUser extends LoggedUser {
     }
 
     public IUser transformToUser() {
-        User user = new User(new ObjectId(this.dbId));
+        OAuthUser user = new OAuthUser(new ObjectId(this.dbId));
         user.setEmail(getUsername());
         String[] names = this.fullName.split(" ");
         user.setName(names[0]);
         user.setSurname(names[1]);
-        user.setPassword(getPassword());
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
