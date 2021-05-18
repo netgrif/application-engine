@@ -32,6 +32,11 @@ public class OAuthUser extends AbstractUser {
     @Transient
     protected String email;
 
+    public OAuthUser(ObjectId id) {
+        this();
+        this._id = id;
+    }
+
     public OAuthUser() {
     }
 

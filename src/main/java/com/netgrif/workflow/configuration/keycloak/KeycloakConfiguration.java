@@ -1,6 +1,5 @@
 package com.netgrif.workflow.configuration.keycloak;
 
-import com.netgrif.workflow.oauth.domain.RemoteUserResource;
 import com.netgrif.workflow.oauth.service.KeycloakUserResourceService;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import org.keycloak.OAuth2Constants;

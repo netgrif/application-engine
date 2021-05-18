@@ -97,7 +97,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         LoggedUser loggedUser = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
-            IUser user = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
+            IUser user = userService.findAnonymousByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
             if (user != null)
                 loggedUser = user.transformToLoggedUser();
         }
