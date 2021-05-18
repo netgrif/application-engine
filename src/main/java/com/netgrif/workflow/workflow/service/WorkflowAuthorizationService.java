@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -44,7 +45,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     }
 
     @Override
-    public boolean userHasAtLeastOneRolePermission(User user, PetriNet net, ProcessRolePermission... permissions) {
+    public boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {
@@ -64,13 +65,13 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     }
 
     @Override
-    public boolean userHasUserListPermission(User user, Case useCase, ProcessRolePermission... permissions) {
+    public boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions) {
         Map<String, Map<String, Boolean>> users = useCase.getUsers();
 
-        if (!users.containsKey(user.get_id()))
+        if (!users.containsKey(user.getStringId()))
             return false;
 
-        Map<String, Boolean> userPermissions = users.get(user.get_id());
+        Map<String, Boolean> userPermissions = users.get(user.getStringId());
 
         for (ProcessRolePermission permission : permissions) {
             Boolean hasPermission = userPermissions.get(permission.toString());
