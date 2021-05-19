@@ -7,9 +7,7 @@ import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
-import com.netgrif.workflow.oauth.service.OAuthUserMapper;
 import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
-import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,13 +60,13 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
     private IJwtService jwtService;
 
     @Autowired
-    private IProcessRoleService roleService;
-
-    @Autowired
     private IUserService userService;
 
     @Autowired
     private SecurityConfigProperties properties;
+
+    @Autowired
+    private IOauthUserMapper oauthUserMapper;
 
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
@@ -83,10 +81,6 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
         return HeaderHttpSessionIdResolver.xAuthToken();
     }
 
-    @Bean
-    public IOauthUserMapper oauthUserMapper() {
-        return new OAuthUserMapper();
-    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -111,7 +105,7 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
         http
                 .cors()
                 .and()
-                .addFilterAfter(new OAuth2AuthenticationConvertingFilter(oauthUserMapper()), BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(new OAuth2AuthenticationConvertingFilter(oauthUserMapper), BearerTokenAuthenticationFilter.class)
                 .addFilterBefore(createPublicAuthenticationFilter(), BearerTokenAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
