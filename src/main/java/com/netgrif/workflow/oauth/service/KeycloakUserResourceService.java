@@ -67,13 +67,13 @@ public class KeycloakUserResourceService implements IRemoteUserResourceService<K
         return findUserByUsername(email);
     }
 
-    protected UsersResource usersResource() {
+    public UsersResource usersResource() {
         RealmResource realmResource = keycloak.realm(realm);
         return realmResource.users();
     }
 
     protected Page<KeycloakUserResource> page(List<UserRepresentation> list, Pageable pageable, long total) {
-        return new PageImpl<>(list.stream().map(KeycloakUserResource::new).collect(Collectors.toList()), pageable, total);
+        return new PageImpl<>(list.stream().map(this::wrap).collect(Collectors.toList()), pageable, total);
     }
 
     protected KeycloakUserResource wrap(UserRepresentation representation) {
