@@ -1,6 +1,8 @@
 package com.netgrif.workflow.configuration.keycloak;
 
+import com.netgrif.workflow.oauth.service.KeycloakGroupResourceService;
 import com.netgrif.workflow.oauth.service.KeycloakUserResourceService;
+import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
@@ -33,6 +35,11 @@ public class KeycloakConfiguration {
     @Bean
     public IRemoteUserResourceService<?> remoteUserResourceService() {
         return new KeycloakUserResourceService();
+    }
+
+    @Bean
+    public IRemoteGroupResourceService<?, ?> remoteGroupResourceService() {
+        return new KeycloakGroupResourceService();
     }
 
     @Bean
