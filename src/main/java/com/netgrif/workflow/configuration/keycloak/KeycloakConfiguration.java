@@ -2,6 +2,7 @@ package com.netgrif.workflow.configuration.keycloak;
 
 import com.netgrif.workflow.oauth.service.KeycloakUserResourceService;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -26,11 +27,8 @@ public class KeycloakConfiguration {
     @Value("${security.oauth2.client.serverUrl}")
     private String serverUrl;
 
-    @Value("${security.oauth2.client.username}")
-    private String username;
-
-    @Value("${security.oauth2.client.password}")
-    private String password;
+    @Value("${security.oauth2.client.pool-size:10}")
+    private int poolSize;
 
     @Bean
     public IRemoteUserResourceService<?> remoteUserResourceService() {
@@ -42,11 +40,10 @@ public class KeycloakConfiguration {
         Keycloak keycloak = KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm)
-                .grantType(OAuth2Constants.PASSWORD)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .username(username)
-                .password(password)
+                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(poolSize).build())
                 .build();
         return keycloak;
     }

@@ -22,6 +22,7 @@ public class OAuthLoggedUser extends LoggedUser {
 
     public IUser transformToUser() {
         OAuthUser user = new OAuthUser(new ObjectId(this.dbId));
+        user.setOauthId(this.id);
         user.setEmail(getUsername());
         String[] names = this.fullName.split(" ");
         user.setName(names[0]);
