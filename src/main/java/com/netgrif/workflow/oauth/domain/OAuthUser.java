@@ -98,6 +98,11 @@ public class OAuthUser extends AbstractUser {
     public LoggedUser transformToLoggedUser() {
         OAuthLoggedUser loggedUser = new OAuthLoggedUser(this.getOauthId(), this.getDbId(), this.getEmail(), this.getAuthorities());
         loggedUser.setFullName(getFullName());
+        loggedUser.setAnonymous(false);
+        if (!this.getProcessRoles().isEmpty())
+            loggedUser.parseProcessRoles(this.getProcessRoles());
+        if (!this.getGroups().isEmpty())
+            loggedUser.parseGroups(this.getGroups());
         return loggedUser;
     }
 }
