@@ -104,7 +104,7 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        Optional<PetriNet> netOptional = helper.createNet("all_data.xml", "major")
+        Optional<PetriNet> netOptional = helper.createNet("all_data_refs.xml", "major")
         assert netOptional.isPresent()
         net = netOptional.get()
     }
@@ -142,7 +142,7 @@ class TaskControllerTest {
         List<ProcessRole> roles = processRoleService.findAll(net.stringId)
 
         for (ProcessRole role : roles) {
-            if (role.importId == "dummy") {
+            if (role.importId == "process_role") {
                 this.role = role
             }
         }

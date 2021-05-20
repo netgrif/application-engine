@@ -1,9 +1,16 @@
 package com.netgrif.workflow.orgstructure.groups
 
+import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.UserService
+import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.GroupRunner
+import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
 import org.junit.Test
@@ -18,6 +25,8 @@ import org.springframework.test.context.junit4.SpringRunner
 @SpringBootTest
 class NextGroupServiceTest {
 
+    public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
+    public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
     @Autowired
     INextGroupService nextGroupService
 
@@ -27,9 +36,25 @@ class NextGroupServiceTest {
     @Autowired
     UserService userService
 
+    @Autowired
+    TestHelper testHelper
+
+    @Autowired
+    private ImportHelper importHelper
 
     @Test
     void groupTest(){
+        testHelper.truncateDbs()
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("user")] as Authority[],
+                [] as Group[],
+                [] as UserProcessRole[])
+        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("user")] as Authority[],
+                [] as Group[],
+                [] as UserProcessRole[])
+
         Optional<PetriNet> groupNet = importGroup()
         assert groupNet.isPresent()
 
@@ -56,12 +81,12 @@ class NextGroupServiceTest {
     }
 
     Case createGroup(){
-        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail("dummy@netgrif.com", false))
+        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false))
     }
 
     List<Case> findGroup(){
         QCase qCase = new QCase("case")
-        return nextGroupService.findByPredicate(qCase.author.email.eq("dummy@netgrif.com"))
+        return nextGroupService.findByPredicate(qCase.author.email.eq(DUMMY_USER_MAIL))
     }
 
     List<Case> findAllGroups(){
@@ -71,7 +96,7 @@ class NextGroupServiceTest {
     Case addUser(){
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.addUser(userService.findByEmail("user@netgrif.com", false), group)
+        nextGroupService.addUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
         nextGroupService.addUser(userService.findByEmail("engine@netgrif.com", false), group)
         return group
     }
@@ -79,7 +104,7 @@ class NextGroupServiceTest {
     Case removeUser(){
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
-        nextGroupService.removeUser(userService.findByEmail("user@netgrif.com", false), group)
+        nextGroupService.removeUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
         return group
     }
 }
