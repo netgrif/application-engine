@@ -222,8 +222,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         return oAuthUser;
     }
 
-    @Override
-    public void loadUser(OAuthUser user, boolean small) {
+    protected void loadUser(OAuthUser user, boolean small) {
         RemoteUserResource userRepresentation = remoteUserResourceService.findUser(user.getOauthId());
         loadUser(user, userRepresentation);
         if (!small) {
@@ -231,8 +230,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         }
     }
 
-    @Override
-    public void loadUser(OAuthUser user, RemoteUserResource resource) {
+    protected void loadUser(OAuthUser user, RemoteUserResource resource) {
         user.setName(resource.getFirstName());
         user.setSurname(resource.getLastName());
         user.setEmail(resource.getEmail());
