@@ -2,6 +2,7 @@ package com.netgrif.workflow.oauth.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.UserState;
+import com.netgrif.workflow.configuration.properties.NaeOAuthProperties;
 import com.netgrif.workflow.oauth.domain.OAuthUser;
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService;
 import com.netgrif.workflow.oauth.service.interfaces.IOauthUserMapper;
@@ -15,22 +16,25 @@ import java.util.Map;
 public class OAuthUserMapper implements IOauthUserMapper {
 
     @Autowired
+    protected NaeOAuthProperties oAuthProperties;
+
+    @Autowired
     protected IOAuthUserService userService;
 
     @Override
     public LoggedUser transform(Authentication auth) {
         JwtAuthenticationToken oAuth2 = (JwtAuthenticationToken) auth;
         Map<String, Object> details = ((Jwt) oAuth2.getPrincipal()).getClaims();
-        OAuthUser user = (OAuthUser) userService.findByOAuthId(getId(details));
+        OAuthUser user = (OAuthUser) userService.findByOAuthId(getProperty(oAuthProperties.getMapper().getId(), details));
         if (user == null) {
             user = new OAuthUser();
-            user.setOauthId(getId(details));
+            user.setOauthId(getProperty(oAuthProperties.getMapper().getId(), details));
             user.setState(UserState.ACTIVE);
             user = (OAuthUser) userService.saveNew(user);
         }
-        user.setName(getProperty("given_name", details));
-        user.setSurname(getProperty("family_name", details));
-        user.setEmail(getProperty("email", details));
+        user.setName(getProperty(oAuthProperties.getMapper().getName(), details));
+        user.setSurname(getProperty(oAuthProperties.getMapper().getSurname(), details));
+        user.setEmail(getProperty(oAuthProperties.getMapper().getEmail(), details));
         return user.transformToLoggedUser();
     }
 
@@ -38,7 +42,4 @@ public class OAuthUserMapper implements IOauthUserMapper {
         return claims.get(key).toString();
     }
 
-    protected String getId(Map<String, Object> claims) {
-        return getProperty("sub", claims);
-    }
 }

@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.AbstractUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
+import com.netgrif.workflow.configuration.properties.NaeOAuthProperties;
 import com.netgrif.workflow.oauth.domain.OAuthUser;
 import com.netgrif.workflow.oauth.domain.QOAuthUser;
 import com.netgrif.workflow.oauth.domain.RemoteGroupResource;
@@ -15,7 +16,6 @@ import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +32,8 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     private OAuthUser cachedSystemUser;
 
-    @Value("${nae.oauth.system-username}")
-    private String systemUsername;
+    @Autowired
+    protected NaeOAuthProperties oAuthProperties;
 
     @Autowired
     protected OAuthUserRepository repository;
@@ -169,7 +169,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         if (cachedSystemUser != null) {
             return cachedSystemUser;
         } else {
-            OAuthUser oAuthUser = findByUsername(systemUsername);
+            OAuthUser oAuthUser = findByUsername(oAuthProperties.getSystemUsername());
             cachedSystemUser = oAuthUser;
             return oAuthUser;
         }
@@ -212,23 +212,18 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
                 .collect(Collectors.toList()), pageable, users.getTotalElements());
     }
 
-    public void clearCache() {
-        cachedSystemUser = null;
-    }
-
     protected OAuthUser fromUserRepresentation(RemoteUserResource representation) {
         if (representation == null)
             return null;
 
         OAuthUser oAuthUser = new OAuthUser();
         oAuthUser.setOauthId(representation.getId());
-        oAuthUser.setEmail(representation.getEmail());
-        oAuthUser.setSurname(representation.getLastName());
-        oAuthUser.setName(representation.getFirstName());
+        loadUser(oAuthUser, representation);
         return oAuthUser;
     }
 
-    protected void loadUser(OAuthUser user, boolean small) {
+    @Override
+    public void loadUser(OAuthUser user, boolean small) {
         RemoteUserResource userRepresentation = remoteUserResourceService.findUser(user.getOauthId());
         loadUser(user, userRepresentation);
         if (!small) {
@@ -236,10 +231,15 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         }
     }
 
-    protected void loadUser(OAuthUser user, RemoteUserResource resource) {
+    @Override
+    public void loadUser(OAuthUser user, RemoteUserResource resource) {
         user.setName(resource.getFirstName());
         user.setSurname(resource.getLastName());
         user.setEmail(resource.getEmail());
+    }
+
+    public void clearCache() {
+        cachedSystemUser = null;
     }
 
     protected OAuthUser createNewUser(String id) {
