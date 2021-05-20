@@ -6,9 +6,11 @@ import com.netgrif.workflow.auth.service.AbstractUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.oauth.domain.OAuthUser;
 import com.netgrif.workflow.oauth.domain.QOAuthUser;
+import com.netgrif.workflow.oauth.domain.RemoteGroupResource;
 import com.netgrif.workflow.oauth.domain.RemoteUserResource;
 import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository;
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService;
+import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
@@ -40,9 +42,12 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     protected UserRepository userRepository;
 
     protected IRemoteUserResourceService<RemoteUserResource> remoteUserResourceService;
+    protected IRemoteGroupResourceService<RemoteGroupResource, RemoteUserResource> remoteGroupResourceService;
 
-    public OAuthUserService(IRemoteUserResourceService<RemoteUserResource> remoteUserResourceService) {
+    public OAuthUserService(IRemoteUserResourceService<RemoteUserResource> remoteUserResourceService,
+                            IRemoteGroupResourceService<RemoteGroupResource, RemoteUserResource> remoteGroupResourceService) {
         this.remoteUserResourceService = remoteUserResourceService;
+        this.remoteGroupResourceService = remoteGroupResourceService;
     }
 
     public OAuthUser findByOAuthId(String id) {
@@ -55,11 +60,10 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         OAuthUser oAuthUser = repository.findByOauthId(res.getId());
         if (oAuthUser == null) {
             oAuthUser = fromUserRepresentation(res);
-            return oAuthUser;
         } else {
             loadUser(oAuthUser, res);
-            return oAuthUser;
         }
+        return oAuthUser;
     }
 
     @Override
@@ -102,7 +106,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     @Override
     public IUser findById(String id, boolean small) {
         OAuthUser user = findByOAuthId(id);
-        loadUser(user);
+        loadUser(user, small);
         return user;
     }
 
@@ -112,7 +116,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         if (user == null) {
             user = createNewUser(id);
         }
-        loadUser(user);
+        loadUser(user, small);
         return user;
     }
 
@@ -187,7 +191,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable) {
-        Page<RemoteUserResource> page = remoteUserResourceService.searchUsers(query, pageable, true);
+        Page<RemoteUserResource> page = remoteUserResourceService.searchUsers(query, pageable, small);
         return new PageImpl<>(
                 page.getContent().stream().map(this::fromUserRepresentation).collect(Collectors.toList()),
                 pageable, page.getTotalElements());
@@ -204,7 +208,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         }
         Page<OAuthUser> users = repository.findAll(predicate, pageable);
         return new PageImpl<>(users.getContent().stream()
-                .peek(this::loadUser)
+                .peek(it -> loadUser(it, small))
                 .collect(Collectors.toList()), pageable, users.getTotalElements());
     }
 
@@ -224,9 +228,12 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         return oAuthUser;
     }
 
-    protected void loadUser(OAuthUser user) {
+    protected void loadUser(OAuthUser user, boolean small) {
         RemoteUserResource userRepresentation = remoteUserResourceService.findUser(user.getOauthId());
         loadUser(user, userRepresentation);
+        if (!small) {
+            user.setRemoteGroups(remoteGroupResourceService.groupsOfUser(user.getOauthId()));
+        }
     }
 
     protected void loadUser(OAuthUser user, RemoteUserResource resource) {
