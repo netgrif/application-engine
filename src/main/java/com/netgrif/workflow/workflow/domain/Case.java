@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
-import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -166,12 +164,11 @@ public class Case {
         visualId = generateVisualId();
     }
 
-    public Case(String title, PetriNet petriNet, Map<String, Integer> activePlaces) {
-        this(title);
+    public Case(PetriNet petriNet, Map<String, Integer> activePlaces) {
+        this();
         this.petriNetObjectId = petriNet.getObjectId();
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
-        populateDataSet();
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
@@ -191,12 +188,16 @@ public class Case {
 
     public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
 
-    private void populateDataSet() {
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        List<Field<?>> dynamicInitFields = new LinkedList<>();
+        List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
+        List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
-            if (field instanceof FieldWithDefault) {
-                this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
-            } else {
+            if (field.isDynamicDefaultValue()) {
+                dynamicInitFields.add(field);
                 this.dataSet.put(key, new DataField());
+            } else {
+                this.dataSet.put(key, new DataField(field.getDefaultValue()));
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
@@ -205,7 +206,16 @@ public class Case {
                 this.dataSet.get(key).setValue(new ArrayList<>());
                 this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
             }
+            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
+                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+            }
+            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
+                dynamicChoicesFields.add((ChoiceField<?>) field);
+            }
         });
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
     }
 
     private String generateVisualId() {

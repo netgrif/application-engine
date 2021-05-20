@@ -12,12 +12,6 @@ class UserListField extends Field<List<String>> {
     }
 
     @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(null)
-    }
-
-    @Override
     Field clone() {
         UserListField clone = new UserListField()
         super.clone(clone)

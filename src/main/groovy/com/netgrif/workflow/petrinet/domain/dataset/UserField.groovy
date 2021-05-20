@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.netgrif.workflow.auth.domain.IUser
-import com.netgrif.workflow.auth.web.responsebodies.UserResource
+
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
@@ -26,12 +25,6 @@ class UserField extends Field<UserFieldValue> {
         return FieldType.USER
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(null)
-    }
-
     Set<String> getRoles() {
         return roles
     }
@@ -40,9 +33,7 @@ class UserField extends Field<UserFieldValue> {
     Field clone() {
         UserField clone = new UserField()
         super.clone(clone)
-
         clone.roles = this.roles
-
         return clone
     }
 }
