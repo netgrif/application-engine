@@ -3,6 +3,7 @@ package com.netgrif.workflow.startup
 import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.IGroupService
@@ -37,11 +38,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IProcessRoleService processRoleService
 
-    @Value('${nae.oauth.enabled}')
-    private boolean oauth
-
-    @Value('${nae.oauth.super-username:#{null}}')
-    private String oauthSuper
+    @Autowired
+    protected NaeOAuthProperties oAuthProperties
 
     @Value('${admin.password}')
     private String superAdminPassword
@@ -53,7 +51,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) {
         log.info("Creating Super user")
-        oauth ? createOAuthSuperUser() : createSuperUser()
+        oAuthProperties.enabled ? createOAuthSuperUser() : createSuperUser()
     }
 
     private IUser createSuperUser() {
@@ -82,7 +80,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     private IUser createOAuthSuperUser() {
-        this.superUser = ((IOAuthUserService) userService).findByUsername(oauthSuper)
+        this.superUser = ((IOAuthUserService) userService).findByUsername(oAuthProperties.getSuperUsername())
         this.superMember = memberService.findByEmail(this.superUser.email)
         this.superUser = userService.saveNew(this.superUser)
         this.superUser.addAuthority(authorityService.getOrCreate(Authority.admin))
