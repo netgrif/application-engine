@@ -438,7 +438,7 @@
 		</event>
 	</transition>
     <transition>
-        <id>t1</id>
+        <id>navigationMenuConfig</id>
         <x>740</x>
         <y>220</y>
         <layout>
@@ -550,13 +550,13 @@
 		<id>a1</id>
 		<type>regular</type>
 		<sourceId>4</sourceId>
-		<destinationId>t1</destinationId>
+		<destinationId>navigationMenuConfig</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
         <id>a2</id>
         <type>regular</type>
-        <sourceId>t1</sourceId>
+        <sourceId>navigationMenuConfig</sourceId>
         <destinationId>4</destinationId>
         <multiplicity>1</multiplicity>
 	</arc>
