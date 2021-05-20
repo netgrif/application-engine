@@ -82,6 +82,8 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
     }
 
 
+    // TODO NAE-1302 session disable
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
