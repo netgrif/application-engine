@@ -3,12 +3,10 @@ package com.netgrif.workflow.auth.web.responsebodies;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-@Service
 public class UserFactory implements IUserFactory {
 
     @Autowired
@@ -19,7 +17,7 @@ public class UserFactory implements IUserFactory {
 
     @Override
     public User getUser(IUser user, Locale locale) {
-        User result = User.createUser(user);
+        User result = getUser(user);
 
         String defaultRoleId = processRoleService.defaultRole().getStringId();
 //        Map<String, UserProcessRole> userProcessRoles = user.getUserProcessRoles().stream().collect(Collectors.toMap(UserProcessRole::getRoleId, r -> r));
@@ -40,5 +38,9 @@ public class UserFactory implements IUserFactory {
     @Override
     public User getSmallUser(IUser user) {
         return User.createSmallUser(user);
+    }
+
+    protected User getUser(IUser user) {
+        return User.createUser(user);
     }
 }

@@ -1,7 +1,8 @@
 package com.netgrif.workflow.oauth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.auth.domain.*;
+import com.netgrif.workflow.auth.domain.AbstractUser;
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -9,6 +10,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 
 @Document
@@ -23,14 +26,25 @@ public class OAuthUser extends AbstractUser {
     @Indexed
     protected String oauthId;
 
+    @Getter
+    @Setter
     @Transient
     protected String name;
 
+    @Getter
+    @Setter
     @Transient
     protected String surname;
 
+    @Getter
+    @Setter
     @Transient
     protected String email;
+
+    @Getter
+    @Setter
+    @Transient
+    protected List<RemoteGroupResource> remoteGroups;
 
     public OAuthUser(ObjectId id) {
         this();
@@ -50,21 +64,6 @@ public class OAuthUser extends AbstractUser {
     }
 
     @Override
-    public String getEmail() {
-        return email;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getSurname() {
-        return surname;
-    }
-
-    @Override
     public String getFullName() {
         return name + " " + surname;
     }
@@ -77,21 +76,6 @@ public class OAuthUser extends AbstractUser {
     @Override
     public String getTelNumber() {
         return null;
-    }
-
-    @Override
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setSurname(String surname) {
-        this.surname = surname;
     }
 
     @Override
