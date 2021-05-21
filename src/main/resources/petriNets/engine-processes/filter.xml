@@ -7,6 +7,19 @@
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
     <caseName name="case_name">New filter</caseName>
+    <!-- CASE EVENTS -->
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    caseId: f.filter_case_id;
+
+                    change caseId value {return useCase.stringId};
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <!-- PROCESS ROLE REFS -->
@@ -40,6 +53,10 @@
     <data type="text">
         <id>new_title</id>
         <title name="filter_name">Filter name</title>
+    </data>
+    <data type="text">
+        <id>filter_case_id</id>
+        <title></title>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -355,6 +372,21 @@
                 <layout>
                     <x>0</x>
                     <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_case_id</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>
