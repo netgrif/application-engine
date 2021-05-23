@@ -15,12 +15,14 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UserService extends AbstractUserService {
@@ -53,8 +55,8 @@ public class UserService extends AbstractUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
-        groupService.createGroup((User) user);
-        groupService.addUserToDefaultGroup((User) user);
+        groupService.createGroup(user);
+        groupService.addUserToDefaultGroup(user);
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
@@ -86,11 +88,6 @@ public class UserService extends AbstractUserService {
         }
         dbUser = userRepository.save(dbUser);
         return dbUser;
-    }
-
-    @Override
-    public Optional<IUser> get(String id) {
-        return Optional.ofNullable(userRepository.findById(id).orElse(null));
     }
 
     @Override

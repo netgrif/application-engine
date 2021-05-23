@@ -1,6 +1,8 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
-import com.netgrif.workflow.auth.domain.*;
+import com.netgrif.workflow.auth.domain.AnonymousUser;
+import com.netgrif.workflow.auth.domain.IUser;
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import org.bson.types.ObjectId;
@@ -10,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,8 +28,6 @@ public interface IUserService {
     IUser update(IUser user, UpdateUserRequest updates);
 
     Member upsertGroupMember(IUser user);
-
-    Optional<IUser> get(String id);
 
     IUser findById(String id, boolean small);
 

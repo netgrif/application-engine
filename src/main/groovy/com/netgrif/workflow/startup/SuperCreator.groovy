@@ -80,11 +80,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     private IUser createOAuthSuperUser() {
-        this.superUser = ((IOAuthUserService) userService).findByUsername(oAuthProperties.getSuperUsername())
-        this.superMember = memberService.findByEmail(this.superUser.email)
-        this.superUser = userService.saveNew(this.superUser)
-        this.superUser.addAuthority(authorityService.getOrCreate(Authority.admin))
-        userService.save(this.superUser)
+        IUser superUser = ((IOAuthUserService) userService).findByUsername(oAuthProperties.getSuperUsername())
+        this.superUser = userService.saveNew(superUser)
+        this.superMember = memberService.findByEmail(superUser.email)
         return this.superUser
     }
 
