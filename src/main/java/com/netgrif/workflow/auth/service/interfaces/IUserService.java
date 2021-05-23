@@ -68,4 +68,6 @@ public interface IUserService {
     void deleteUser(IUser user);
 
     Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+
+    IUser createSystemUser();
 }

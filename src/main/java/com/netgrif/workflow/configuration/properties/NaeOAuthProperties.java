@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 public class NaeOAuthProperties {
 
     public boolean enabled;
-    private String systemUsername;
-    private String superUsername;
     private boolean keycloak;
+    private boolean remoteUserBase;
+    private String superUsername;
 
     private MapperProperties mapper;
 
