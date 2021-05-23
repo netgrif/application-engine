@@ -2,6 +2,7 @@ package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
+import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
@@ -17,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.netgrif.workflow.startup.SystemUserRunner.*;
+
 public abstract class AbstractUserService implements IUserService {
 
     @Autowired
@@ -30,6 +33,9 @@ public abstract class AbstractUserService implements IUserService {
 
     @Autowired
     protected INextGroupService groupService;
+
+    @Autowired
+    protected UserRepository repository;
 
     @Override
     public Member upsertGroupMember(IUser user) {
@@ -90,6 +96,17 @@ public abstract class AbstractUserService implements IUserService {
         ProcessRole role = processRoleService.findByImportId(roleStringId);
         user.removeProcessRole(role);
         return save(user);
+    }
+
+    @Override
+    public IUser createSystemUser() {
+        User system = repository.findByEmail(SYSTEM_USER_EMAIL);
+        if (system == null) {
+            system = new User(SYSTEM_USER_EMAIL, "n/a", SYSTEM_USER_NAME, SYSTEM_USER_SURNAME);
+            system.setState(UserState.ACTIVE);
+            repository.save(system);
+        }
+        return system;
     }
 
     public <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {

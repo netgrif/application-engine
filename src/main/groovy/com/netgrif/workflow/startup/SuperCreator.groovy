@@ -51,7 +51,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) {
         log.info("Creating Super user")
-        oAuthProperties.enabled ? createOAuthSuperUser() : createSuperUser()
+        oAuthProperties.enabled && oAuthProperties.remoteUserBase ? createOAuthSuperUser() : createSuperUser()
     }
 
     private IUser createSuperUser() {
