@@ -22,6 +22,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationProvid
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -131,6 +132,7 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
                 .oauth2ResourceServer().jwt().jwkSetUri(oauthJwkUri)
                 .and()
                 .authenticationEntryPoint(authenticationEntryPoint)
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
 //        @formatter:on
         setCsrf(http);

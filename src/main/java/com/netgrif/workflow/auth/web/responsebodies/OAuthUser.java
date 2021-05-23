@@ -16,6 +16,10 @@ public class OAuthUser extends User {
 
     public OAuthUser(com.netgrif.workflow.oauth.domain.OAuthUser user) {
         super(user);
+        setTelNumber(user.getTelNumber());
+        setGroups(user.getGroups());
+        setAuthorities(user.getAuthorities());
+        setNextGroups(user.getNextGroups());
         this.remoteGroups = user.getRemoteGroups();
     }
 }

@@ -13,6 +13,7 @@ import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository;
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
+import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class OAuthUserService extends AbstractUserService implements IOAuthUserService {
 
-    private OAuthUser cachedSystemUser;
+    private IUser cachedSystemUser;
 
     @Autowired
     protected NaeOAuthProperties oAuthProperties;
@@ -50,6 +51,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         this.remoteGroupResourceService = remoteGroupResourceService;
     }
 
+    @Override
     public OAuthUser findByOAuthId(String id) {
         return repository.findByOauthId(id);
     }
@@ -99,12 +101,10 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     @Override
-    public Optional<IUser> get(String id) {
-        return Optional.ofNullable(repository.findByOauthId(id));
-    }
-
-    @Override
     public IUser findById(String id, boolean small) {
+        Optional<User> dbUser = userRepository.findById(id);
+        if (dbUser.isPresent()) return dbUser.get();
+
         OAuthUser user = findByOAuthId(id);
         loadUser(user, small);
         return user;
@@ -112,6 +112,9 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public IUser resolveById(String id, boolean small) {
+        Optional<User> dbUser = userRepository.findById(id);
+        if (dbUser.isPresent()) return dbUser.get();
+
         OAuthUser user = findByOAuthId(id);
         if (user == null) {
             user = createNewUser(id);
@@ -122,6 +125,8 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public IUser findByEmail(String email, boolean small) {
+        User dbUser = userRepository.findByEmail(email);
+        if (dbUser != null) return dbUser;
         return fromUserRepresentation(remoteUserResourceService.findByEmail(email));
     }
 
@@ -169,9 +174,9 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         if (cachedSystemUser != null) {
             return cachedSystemUser;
         } else {
-            OAuthUser oAuthUser = findByUsername(oAuthProperties.getSystemUsername());
-            cachedSystemUser = oAuthUser;
-            return oAuthUser;
+            User system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+            cachedSystemUser = system;
+            return system;
         }
     }
 
