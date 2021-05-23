@@ -56,18 +56,18 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public void assignAuthority(String userId, String authorityId) {
-        Optional<IUser> user = get(userId);
+        IUser user = resolveById(userId, true);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
-        if (!user.isPresent())
+        if (user == null)
             throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
         if (!authority.isPresent())
             throw new IllegalArgumentException("Could not find authority with id ["+authorityId+"]");
 
-        user.get().addAuthority(authority.get());
-        authority.get().addUser(user.get());
+        user.addAuthority(authority.get());
+        authority.get().addUser(user);
 
-        save(user.get());
+        save(user);
     }
 
     @Override
