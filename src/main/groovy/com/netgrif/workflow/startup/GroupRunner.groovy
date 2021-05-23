@@ -46,7 +46,7 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
             return new Optional<>(group)
         }
 
-        Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, "major", systemCreator.loggedSystem)
+        Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, "major", userService.getSystem().transformToLoggedUser())
 
         if(!groupNet.present){
             log.error("Import of petri net for groups failed!")
