@@ -31,8 +31,6 @@ import java.util.stream.Collectors;
 
 public class OAuthUserService extends AbstractUserService implements IOAuthUserService {
 
-    private IUser cachedSystemUser;
-
     @Autowired
     protected NaeOAuthProperties oAuthProperties;
 
@@ -59,13 +57,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     @Override
     public OAuthUser findByUsername(String username) {
         RemoteUserResource res = remoteUserResourceService.findUserByUsername(username);
-        OAuthUser oAuthUser = repository.findByOauthId(res.getId());
-        if (oAuthUser == null) {
-            oAuthUser = fromUserRepresentation(res);
-        } else {
-            loadUser(oAuthUser, res);
-        }
-        return oAuthUser;
+        return resolveFromDbOrProvideRepresentation(res);
     }
 
     @Override
@@ -82,6 +74,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     public IUser saveNew(IUser user) {
         addDefaultRole(user);
         addDefaultAuthorities(user);
+        user.setState(UserState.ACTIVE);
         user = save(user);
         upsertGroupMember(user);
         return user;
@@ -97,7 +90,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public IUser update(IUser user, UpdateUserRequest updates) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("User cannot be updated in this user base");
     }
 
     @Override
@@ -105,9 +98,8 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         Optional<User> dbUser = userRepository.findById(id);
         if (dbUser.isPresent()) return dbUser.get();
 
-        OAuthUser user = findByOAuthId(id);
-        loadUser(user, small);
-        return user;
+        RemoteUserResource res = remoteUserResourceService.findUser(id);
+        return resolveFromDbOrProvideRepresentation(res);
     }
 
     @Override
@@ -127,7 +119,9 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     public IUser findByEmail(String email, boolean small) {
         User dbUser = userRepository.findByEmail(email);
         if (dbUser != null) return dbUser;
-        return fromUserRepresentation(remoteUserResourceService.findByEmail(email));
+
+        RemoteUserResource res = remoteUserResourceService.findByEmail(email);
+        return resolveFromDbOrProvideRepresentation(res);
     }
 
     @Override
@@ -137,7 +131,9 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public List<IUser> findAll(boolean small) {
-        return remoteUserResourceService.listUsers(Pageable.unpaged()).stream().map(this::fromUserRepresentation).collect(Collectors.toList());
+        return remoteUserResourceService.listUsers(Pageable.unpaged()).stream()
+                .map(this::fromUserRepresentation)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -171,13 +167,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
     @Override
     public IUser getSystem() {
-        if (cachedSystemUser != null) {
-            return cachedSystemUser;
-        } else {
-            User system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
-            cachedSystemUser = system;
-            return system;
-        }
+        return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
     }
 
     @Override
@@ -217,6 +207,16 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
                 .collect(Collectors.toList()), pageable, users.getTotalElements());
     }
 
+    protected OAuthUser resolveFromDbOrProvideRepresentation(RemoteUserResource resource) {
+        OAuthUser oAuthUser = repository.findByOauthId(resource.getId());
+        if (oAuthUser == null) {
+            oAuthUser = fromUserRepresentation(resource);
+        } else {
+            loadUser(oAuthUser, resource);
+        }
+        return oAuthUser;
+    }
+
     protected OAuthUser fromUserRepresentation(RemoteUserResource representation) {
         if (representation == null)
             return null;
@@ -241,9 +241,6 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         user.setEmail(resource.getEmail());
     }
 
-    public void clearCache() {
-        cachedSystemUser = null;
-    }
 
     protected OAuthUser createNewUser(String id) {
         OAuthUser user = new OAuthUser();
