@@ -140,7 +140,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     public Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         Page<RemoteUserResource> page = remoteUserResourceService.listUsers(pageable);
         return new PageImpl<>(
-                page.getContent().stream().map(this::fromUserRepresentation).collect(Collectors.toList()),
+                page.getContent().stream().map(this::resolveFromDbOrProvideRepresentation).collect(Collectors.toList()),
                 pageable, page.getTotalElements());
     }
 
@@ -188,7 +188,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     public Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable) {
         Page<RemoteUserResource> page = remoteUserResourceService.searchUsers(query, pageable, small);
         return new PageImpl<>(
-                page.getContent().stream().map(this::fromUserRepresentation).collect(Collectors.toList()),
+                page.getContent().stream().map(this::resolveFromDbOrProvideRepresentation).collect(Collectors.toList()),
                 pageable, page.getTotalElements());
     }
 
