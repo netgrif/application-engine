@@ -1,8 +1,8 @@
 package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.*;
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
@@ -15,7 +15,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.netgrif.workflow.startup.SystemUserRunner.*;
@@ -23,7 +24,7 @@ import static com.netgrif.workflow.startup.SystemUserRunner.*;
 public abstract class AbstractUserService implements IUserService {
 
     @Autowired
-    protected AuthorityRepository authorityRepository;
+    protected IAuthorityService authorityService;
 
     @Autowired
     protected IProcessRoleService processRoleService;
@@ -55,7 +56,7 @@ public abstract class AbstractUserService implements IUserService {
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityRepository.findByName(Authority.user));
+            authorities.add(authorityService.getOrCreate(Authority.user));
             user.setAuthorities(authorities);
         }
     }
@@ -63,15 +64,9 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void assignAuthority(String userId, String authorityId) {
         IUser user = resolveById(userId, true);
-        Optional<Authority> authority = authorityRepository.findById(authorityId);
-
-        if (user == null)
-            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
-        if (!authority.isPresent())
-            throw new IllegalArgumentException("Could not find authority with id ["+authorityId+"]");
-
-        user.addAuthority(authority.get());
-        authority.get().addUser(user);
+        Authority authority = authorityService.getOne(authorityId);
+        user.addAuthority(authority);
+        authority.addUser(user);
 
         save(user);
     }

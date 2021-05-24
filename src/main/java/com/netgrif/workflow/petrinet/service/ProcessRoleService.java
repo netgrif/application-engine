@@ -261,4 +261,8 @@ public class ProcessRoleService implements IProcessRoleService {
         log.info("[" + net.getStringId() + "]: Deleting all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
         this.processRoleRepository.deleteAllBy_idIn(deletedRoleIds);
     }
+
+    public void clearCache() {
+        this.defaultRole = null;
+    }
 }
