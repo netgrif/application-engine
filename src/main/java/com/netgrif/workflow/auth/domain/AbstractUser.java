@@ -43,10 +43,14 @@ public abstract class AbstractUser implements IUser {
     }
 
     public void addAuthority(Authority authority) {
+        if (authorities.stream().anyMatch(it -> it.get_id().equals(authority.get_id())))
+            return;
         authorities.add(authority);
     }
 
     public void addProcessRole(ProcessRole role) {
+        if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
+            return;
         processRoles.add(role);
     }
 
@@ -55,6 +59,8 @@ public abstract class AbstractUser implements IUser {
     }
 
     public void addGroup(Group group) {
+        if (groups.stream().anyMatch(it -> it.getId().equals(group.getId())))
+            return;
         this.groups.add(group);
     }
 
