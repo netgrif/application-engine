@@ -171,6 +171,7 @@
 		<label></label>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<title></title>
 			<layout>grid</layout>
 			<dataRef>
 				<id>entry_name</id>
