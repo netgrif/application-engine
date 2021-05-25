@@ -93,6 +93,11 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
+    public void removeByPetriNetIdNow(String processId) {
+        removeByPetriNetId(processId);
+    }
+
+    @Override
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
             try {
