@@ -91,6 +91,22 @@
 		<id>filter_tasks</id>
 		<title></title>
 	</data>
+	<data type="taskRef">
+		<id>filter_preview</id>
+		<title></title>
+	</data>
+	<data type="enumeration_map">
+		<id>filter_autocomplete_selection</id>
+		<title>Select filter</title>
+		<options>
+		</options>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<action trigger="set">
+
+		</action>
+	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="author">Autor grupy</i18nString>
@@ -449,9 +465,44 @@
 			<cols>5</cols>
         </layout>
         <label>Configure menu</label>
+		<dataGroup>
+			<id>dg0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_autocomplete_selection</id>
+				<logic><behavior>editable</behavior></logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg1</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_preview</id>
+				<logic><behavior>visible</behavior></logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
+			<title></title>
             <dataRef>
                 <id>filter_tasks</id>
                 <logic>
