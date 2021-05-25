@@ -18,6 +18,30 @@
 		<id>button_0</id>
 		<title></title>
 		<placeholder>Up</placeholder>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			if (!task.isPresent()) {
+				return;
+			}
+
+			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+
+			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+
+			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+
+			if (currentIndex != 0) {
+				previousTaskRefValue.remove(currentIndex)
+				previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
+
+				parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+
+				setDataWithPropagation(parentTask, [
+					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				])
+			}
+		</action>
 	</data>
 	<data type="button">
 		<id>button_1</id>
@@ -34,6 +58,10 @@
 		<allowedNets>
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
+	</data>
+	<data type="text">
+		<id>parentId</id>
+		<title></title>
 	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
@@ -69,6 +97,12 @@
 
 					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 				</action>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>parentId</id>
+			<logic>
+				<behavior>editable</behavior>
 			</logic>
 		</dataRef>
 	</transition>
