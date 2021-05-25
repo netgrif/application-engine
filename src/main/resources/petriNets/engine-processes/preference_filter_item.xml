@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
 	<id>preference_filter_item</id>
 	<initials>PFI</initials>
 	<title>Preference filter item</title>
@@ -72,6 +72,36 @@
 			}
 		</action>
 	</data>
+	<data type="button">
+		<id>button_2</id>
+		<title></title>
+		<placeholder>Remove</placeholder>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			if (!task.isPresent()) {
+				return;
+			}
+
+			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+
+			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+
+			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+
+			previousTaskRefValue.remove(currentIndex)
+
+			parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+
+			setDataWithPropagation(parentTask, [
+				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+			])
+
+			async.run {
+				workflowService.deleteCase(useCase.stringId)
+			}
+		</action>
+	</data>
 	<data type="taskRef">
 		<id>taskRef_0</id>
 		<title></title>
@@ -136,6 +166,7 @@
 		<y>260</y>
 		<layout>
 			<offset>0</offset>
+			<cols>5</cols>
 		</layout>
 		<label></label>
 		<dataGroup>
@@ -144,7 +175,7 @@
 			<dataRef>
 				<id>entry_name</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -186,6 +217,20 @@
 				</layout>
 			</dataRef>
 			<dataRef>
+				<id>button_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
 				<id>taskRef_0</id>
 				<logic>
 					<behavior>editable</behavior>
@@ -194,7 +239,7 @@
 					<x>0</x>
 					<y>1</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>5</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
