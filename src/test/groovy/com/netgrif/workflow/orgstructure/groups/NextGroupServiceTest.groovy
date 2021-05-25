@@ -21,12 +21,13 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles(["dev"])
+@ActiveProfiles(["test"])
 @SpringBootTest
 class NextGroupServiceTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
     public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
+
     @Autowired
     INextGroupService nextGroupService
 
@@ -43,7 +44,7 @@ class NextGroupServiceTest {
     private ImportHelper importHelper
 
     @Test
-    void groupTest(){
+    void groupTest() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
@@ -59,7 +60,7 @@ class NextGroupServiceTest {
         assert groupNet.isPresent()
 
         Case customGroup = createGroup()
-        if(customGroup == null){
+        if (customGroup == null) {
             throw new NullPointerException()
         }
 
@@ -76,24 +77,24 @@ class NextGroupServiceTest {
         assert !removedUserGroup.getDataSet().get("members").getOptions().isEmpty()
     }
 
-    Optional<PetriNet> importGroup(){
-       return groupRunner.createDefaultGroup()
+    Optional<PetriNet> importGroup() {
+        return groupRunner.createDefaultGroup()
     }
 
-    Case createGroup(){
+    Case createGroup() {
         return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false))
     }
 
-    List<Case> findGroup(){
+    List<Case> findGroup() {
         QCase qCase = new QCase("case")
         return nextGroupService.findByPredicate(qCase.author.email.eq(DUMMY_USER_MAIL))
     }
 
-    List<Case> findAllGroups(){
+    List<Case> findAllGroups() {
         return nextGroupService.findAllGroups()
     }
 
-    Case addUser(){
+    Case addUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
         nextGroupService.addUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)
@@ -101,7 +102,7 @@ class NextGroupServiceTest {
         return group
     }
 
-    Case removeUser(){
+    Case removeUser() {
         QCase qCase = new QCase("case")
         Case group = nextGroupService.findByPredicate(qCase.title.eq("CUSTOM_GROUP_1")).get(0)
         nextGroupService.removeUser(userService.findByEmail(CUSTOMER_USER_MAIL, false), group)

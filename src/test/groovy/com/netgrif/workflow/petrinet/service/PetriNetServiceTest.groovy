@@ -110,6 +110,8 @@ class PetriNetServiceTest {
         assert user != null
         assert user.processRoles.size() == 1
 
+
+
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount
