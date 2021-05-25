@@ -35,7 +35,7 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
 
         objectId = document.getObjectId("petriNetObjectId");
         if (objectId != null) {
-           service.removeByPetriNetId(objectId.toString());
+           service.removeByPetriNetIdNow(objectId.toString());
            return;
         }
 
