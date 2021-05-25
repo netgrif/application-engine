@@ -446,6 +446,7 @@
         <y>220</y>
         <layout>
             <offset>0</offset>
+			<cols>5</cols>
         </layout>
         <label>Configure menu</label>
         <dataGroup>
