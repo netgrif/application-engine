@@ -47,6 +47,30 @@
 		<id>button_1</id>
 		<title></title>
 		<placeholder>Down</placeholder>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			if (!task.isPresent()) {
+				return;
+			}
+
+			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+
+			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+
+			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+
+			if (currentIndex != previousTaskRefValue.size() - 1) {
+				previousTaskRefValue.remove(currentIndex)
+				previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
+
+				parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+
+				setDataWithPropagation(parentTask, [
+					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				])
+			}
+		</action>
 	</data>
 	<data type="taskRef">
 		<id>taskRef_0</id>
