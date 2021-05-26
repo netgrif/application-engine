@@ -98,12 +98,19 @@
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
 		<title>Select filter</title>
-		<options>
-		</options>
 		<component>
 			<name>autocomplete_dynamic</name>
 		</component>
 		<action trigger="set">
+			filterAutocomplete: f.this;
+
+			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+
+			} else {
+				change filterAutocomplete options {
+					return findFilters(filterAutocomplete.value).collectEntries({filterCase -> [filterCase.stringId, filterCase.title]})
+				}
+			}
 
 		</action>
 	</data>
