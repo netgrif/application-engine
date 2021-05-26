@@ -102,13 +102,19 @@
 			<name>autocomplete_dynamic</name>
 		</component>
 		<action trigger="set">
-			filterAutocomplete: f.this;
+			filterAutocomplete: f.this,
+			previewTaskRef: f.filter_preview;
 
 			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-
+				change previewTaskRef value {
+					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+				}
 			} else {
 				change filterAutocomplete options {
 					return findFilters(filterAutocomplete.value).collectEntries({filterCase -> [filterCase.stringId, filterCase.title]})
+				}
+				change previewTaskRef value {
+					return []
 				}
 			}
 
