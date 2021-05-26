@@ -14,6 +14,10 @@
 		<id>entry_name</id>
 		<title>Text</title>
 	</data>
+	<data type="text">
+		<id>entry_marker</id>
+		<title></title>
+	</data>
 	<data type="button">
 		<id>button_0</id>
 		<title></title>
@@ -244,6 +248,19 @@
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>entry_marker</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
 				</layout>
 			</dataRef>
 		</dataGroup>
