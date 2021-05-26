@@ -47,7 +47,7 @@
 		<action trigger="set">
 			selection: f.members,
 			userField: f.user_selection;
-			change selection options {  nextGroupService.addUser(userField.value, selection.options) }
+			change selection options {  nextGroupService.addUser(userService.findById(userField.value.id, true), selection.options) }
 		</action>
 	</data>
 	<data type="multichoice_map">

@@ -203,7 +203,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase){
-        String authorId = this.getGroupOwnerId(groupCase).toString();
+        String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if(user.equals(authorId)){
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
