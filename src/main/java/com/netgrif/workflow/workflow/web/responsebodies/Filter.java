@@ -8,6 +8,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
+/**
+ * @deprecated
+ * since 5.3.0 - Filter engine processes should be used instead of native objects
+ */
+@Deprecated
 @Data
 @JsonRootName("filter")
 public class Filter {
