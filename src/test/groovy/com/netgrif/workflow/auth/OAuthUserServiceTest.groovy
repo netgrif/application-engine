@@ -58,11 +58,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "nae.oauth.keycloak=true"])
 class OAuthUserServiceTest {
 
-    public static final String TEST_USER = "bezak@netgrif.com"
-
-    private MockMvc mvc
-    private Authentication auth
-
     @Autowired
     private NaeOAuthProperties oAuthProperties
 
@@ -93,7 +88,9 @@ class OAuthUserServiceTest {
     @Autowired
     private TestHelper testHelper
 
-    LoggedUser fakeLogged
+    private LoggedUser fakeLogged
+    private MockMvc mvc
+    private Authentication auth
 
     @TestConfiguration
     static class TestConfig {
@@ -174,7 +171,7 @@ class OAuthUserServiceTest {
         IRemoteUserResourceService remoteUserResourceService() {
             return new IRemoteUserResourceService() {
                 LinkedList<RemoteUserResource> users = [
-                        new TestUser("bezak@netgrif.com", "1", "bezak@netgrif.com", "Timotej", "Bezák"),
+                        new TestUser("bezak@netgrif.com", "1", "bezak@netgrif.com", "Timotej", "Bezak"),
                         new TestUser("bubeliny@netgrif.com", "2", "bubeliny@netgrif.com", "Matus", "Bubeliny"),
                         new TestUser("luksic@netgrif.com", "3", "luksic@netgrif.com", "Dominik", "Luksic"),
                         new TestUser("system-user", "4", "super@netgrif.com", "Admin", "Netgrif"),
@@ -229,14 +226,13 @@ class OAuthUserServiceTest {
         fake.processRoles = superCreator.superUser.processRoles
         fake.authorities = superCreator.superUser.authorities
         userService.save(fake)
-
     }
 
     @Test
     void testSuperUserFindByUsername() {
         assert userService instanceof IOAuthUserService
-        def userResource = remoteUserResourceService.findUserByUsername(oAuthProperties.superUsername)
-        IUser remoteUser = (userService as IOAuthUserService).findByUsername(oAuthProperties.superUsername)
+        def userResource = remoteUserResourceService.findUserByUsername("system-user")
+        IUser remoteUser = (userService as IOAuthUserService).findByUsername("system-user")
 
         assert remoteUser.stringId != null && remoteUser.stringId == userResource.id
         assert remoteUser.name != null && remoteUser.name == userResource.firstName
@@ -245,18 +241,8 @@ class OAuthUserServiceTest {
     }
 
     @Test
-    void testUserSearch() {
-        Page<IUser> users = userService.searchAllCoMembers("super", [], [], userService.loggedOrSystem.transformToLoggedUser(), false, new FullPageRequest())
-        assert !users.content.isEmpty()
-        assert users[0].stringId != null
-        assert users[0].name != null
-        assert users[0].surname != null
-        assert users[0].email != null
-    }
-
-    @Test
     void testSaveNew() {
-        IUser user = (userService as IOAuthUserService).findByUsername(TEST_USER)
+        IUser user = (userService as IOAuthUserService).findByUsername("bezak@netgrif.com")
         user = userService.saveNew(user)
         assert !user.authorities.empty
         assert user.authorities.any {it.name == authorityService.getOrCreate(Authority.user).name }
@@ -283,7 +269,7 @@ class OAuthUserServiceTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath('$.email').value((auth.getPrincipal() as LoggedUser).getEmail()))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.email').value(fakeLogged.getEmail()))
                 .andExpect(MockMvcResultMatchers.jsonPath('$.authorities').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.processRoles').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.remoteGroups').exists())
@@ -294,7 +280,7 @@ class OAuthUserServiceTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath('$.email').value((auth.getPrincipal() as LoggedUser).getEmail()))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.email').value(fakeLogged.getEmail()))
                 .andExpect(MockMvcResultMatchers.jsonPath('$.authorities').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.processRoles').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.id').value(fakeLogged.getId()))
@@ -307,9 +293,9 @@ class OAuthUserServiceTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].id').exists())
-                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].name').exists())
-                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].surname').exists())
+                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].id').value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].name').value("Timotej"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].surname').value("Bezak"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].processRoles').exists())
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].authorities').exists())
     }
@@ -346,6 +332,17 @@ class OAuthUserServiceTest {
         assert user.surname == resource.lastName
         assert user.name == resource.firstName
         assert user.email == resource.email
+        assert repository.findByOauthId(user.stringId) != null
+    }
+
+    @Test
+    void testUserSearch() {
+        Page<IUser> users = userService.searchAllCoMembers("super", [], [], userService.loggedOrSystem.transformToLoggedUser(), false, new FullPageRequest())
+        assert !users.content.isEmpty()
+        assert users[0].stringId == "4"
+        assert users[0].name == "Admin"
+        assert users[0].surname == "Netgrif"
+        assert users[0].email == "super@netgrif.com"
     }
 
     @Test
