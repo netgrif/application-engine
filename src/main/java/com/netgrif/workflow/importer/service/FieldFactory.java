@@ -151,7 +151,7 @@ public final class FieldFactory {
     }
 
     private com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-        return dynamic ? new DynamicValidation(rule, null) : new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation(rule, message);
+        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions){
