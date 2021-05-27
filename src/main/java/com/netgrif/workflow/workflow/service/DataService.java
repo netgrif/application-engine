@@ -1,6 +1,8 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -175,6 +177,8 @@ public class DataService implements IDataService {
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
 
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
+                dataField.setAllowedNets(parseAllowedNetsValue(entry.getValue()));
+                dataField.setFilterMetadata(parseFilterMetadataValue(entry.getValue()));
                 ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
@@ -785,7 +789,7 @@ public class DataService implements IDataService {
     private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
-        switch (node.get("type").asText()) {
+        switch (getFieldTypeFromNode(node)) {
             case "date":
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
@@ -879,10 +883,7 @@ public class DataService implements IDataService {
     }
 
     private List<String> parseListStringValues(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
-        ArrayList<String> list = new ArrayList<>();
-        arrayNode.forEach(string -> list.add(string.asText()));
-        return list;
+        return parseListString(node, "value");
     }
 
     private List<Long> parseListLongValues(ObjectNode node) {
@@ -890,6 +891,41 @@ public class DataService implements IDataService {
         ArrayList<Long> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asLong()));
         return list;
+    }
+
+    private List<String> parseAllowedNetsValue(JsonNode jsonNode) {
+        ObjectNode node = (ObjectNode) jsonNode;
+        String fieldType = getFieldTypeFromNode(node);
+        if (Objects.equals(fieldType, "caseRef") || Objects.equals(fieldType, "filter")) {
+            return parseListStringAllowedNets(node);
+        }
+        return null;
+    }
+
+    private List<String> parseListStringAllowedNets(ObjectNode node) {
+        return parseListString(node, "allowedNets");
+    }
+
+    private List<String> parseListString(ObjectNode node, String attributeKey) {
+        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
+        ArrayList<String> list = new ArrayList<>();
+        arrayNode.forEach(string -> list.add(string.asText()));
+        return list;
+    }
+
+    private String getFieldTypeFromNode(ObjectNode node) {
+        return node.get("type").asText();
+    }
+
+    private Map<String, Object> parseFilterMetadataValue(JsonNode jsonNode) {
+        ObjectNode node = (ObjectNode) jsonNode;
+        String fieldType = getFieldTypeFromNode(node);
+        if (Objects.equals(fieldType, "filter")) {
+            JsonNode filterMetadata = node.get("filterMetadata");
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>(){});
+        }
+        return null;
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
