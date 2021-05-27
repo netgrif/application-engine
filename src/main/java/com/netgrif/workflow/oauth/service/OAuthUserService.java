@@ -16,6 +16,8 @@ import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,13 +25,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class OAuthUserService extends AbstractUserService implements IOAuthUserService {
+
+    public static final Logger log = LoggerFactory.getLogger(OAuthUserService.class);
 
     @Autowired
     protected NaeOAuthProperties oAuthProperties;
@@ -57,7 +58,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     @Override
     public OAuthUser findByUsername(String username) {
         RemoteUserResource res = remoteUserResourceService.findUserByUsername(username);
-        return resolveFromDbOrProvideRepresentation(res);
+        return res != null ? resolveFromDbOrProvideRepresentation(res) : null;
     }
 
     @Override
@@ -98,7 +99,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         Optional<User> dbUser = userRepository.findById(id);
         if (dbUser.isPresent()) return dbUser.get();
 
-        RemoteUserResource res = remoteUserResourceService.findUser(id);
+        RemoteUserResource res = getResourceById(id);
         return resolveFromDbOrProvideRepresentation(res);
     }
 
@@ -107,11 +108,12 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         Optional<User> dbUser = userRepository.findById(id);
         if (dbUser.isPresent()) return dbUser.get();
 
+        RemoteUserResource userRepresentation = getResourceById(id);
         OAuthUser user = findByOAuthId(id);
         if (user == null) {
             user = createNewUser(id);
         }
-        loadUser(user, small);
+        loadUser(user, userRepresentation, small);
         return user;
     }
 
@@ -121,7 +123,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         if (dbUser != null) return dbUser;
 
         RemoteUserResource res = remoteUserResourceService.findByEmail(email);
-        return resolveFromDbOrProvideRepresentation(res);
+        return res != null ? resolveFromDbOrProvideRepresentation(res) : null;
     }
 
     @Override
@@ -203,7 +205,15 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         }
         Page<OAuthUser> users = repository.findAll(predicate, pageable);
         return new PageImpl<>(users.getContent().stream()
-                .peek(it -> loadUser(it, small))
+                .map(it -> {
+                    try {
+                        loadUser(it, small);
+                    } catch (IllegalArgumentException e) {
+                        log.error("Failed to load user by id " + it.getOauthId(), e);
+                        return null;
+                    }
+                    return it;
+                }).filter(Objects::nonNull)
                 .collect(Collectors.toList()), pageable, users.getTotalElements());
     }
 
@@ -228,8 +238,12 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     protected void loadUser(OAuthUser user, boolean small) {
-        RemoteUserResource userRepresentation = remoteUserResourceService.findUser(user.getOauthId());
-        loadUser(user, userRepresentation);
+        RemoteUserResource userRepresentation = getResourceById(user.getOauthId());
+        loadUser(user, userRepresentation, small);
+    }
+
+    protected void loadUser(OAuthUser user, RemoteUserResource resource, boolean small) {
+        loadUser(user, resource);
         if (!small) {
             user.setRemoteGroups(remoteGroupResourceService.groupsOfUser(user.getOauthId()));
         }
@@ -241,13 +255,20 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         user.setEmail(resource.getEmail());
     }
 
-
     protected OAuthUser createNewUser(String id) {
         OAuthUser user = new OAuthUser();
         user.setOauthId(id);
         user.setState(UserState.ACTIVE);
         user = (OAuthUser) saveNew(user);
         return user;
+    }
+
+    protected RemoteUserResource getResourceById(String id) {
+        RemoteUserResource resource = remoteUserResourceService.findUser(id);
+        if (resource == null)
+            throw new IllegalArgumentException("Could not find user with");
+
+        return resource;
     }
 
 }
