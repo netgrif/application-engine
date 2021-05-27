@@ -14,8 +14,6 @@ import java.util.Map;
 
 public interface IElasticCaseService {
 
-    void removeByPetriNetIdNow(String processId);
-
     @Async
     void index(ElasticCase useCase);
 
