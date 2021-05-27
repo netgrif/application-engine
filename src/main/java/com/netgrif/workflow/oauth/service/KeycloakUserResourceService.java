@@ -6,16 +6,21 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class KeycloakUserResourceService implements IRemoteUserResourceService<KeycloakUserResource> {
+
+    public static final Logger log = LoggerFactory.getLogger(KeycloakUserResourceService.class);
 
     @Value("${security.oauth2.client.realm}")
     protected String realm;
@@ -54,12 +59,21 @@ public class KeycloakUserResourceService implements IRemoteUserResourceService<K
     @Override
     public KeycloakUserResource findUserByUsername(String username) {
         List<UserRepresentation> found = usersResource().search(username, true);
-        return wrap(found.get(0));
+        return found.get(0) != null ? wrap(found.get(0)) : null;
     }
 
     @Override
     public KeycloakUserResource findUser(String id) {
-        return wrap(usersResource().get(id).toRepresentation());
+        UserRepresentation resource = getUser(id);
+        return resource != null ? wrap(resource) : null;
+    }
+
+    protected UserRepresentation getUser(String id) {
+        try {
+            return usersResource().get(id).toRepresentation();
+        } catch (NotFoundException e) {
+            return null;
+        }
     }
 
     @Override
