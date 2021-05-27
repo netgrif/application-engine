@@ -8,22 +8,32 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import com.netgrif.workflow.oauth.domain.OAuthLoggedUser
+import com.netgrif.workflow.oauth.domain.RemoteGroupResource
 import com.netgrif.workflow.oauth.domain.RemoteUserResource
 import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository
 import com.netgrif.workflow.oauth.service.OAuthUserService
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
+import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
+import org.bson.types.ObjectId
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.hateoas.MediaTypes
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -78,7 +88,129 @@ class OAuthUserServiceTest {
     private SuperCreator superCreator
 
     @Autowired
+    private ProcessRoleRepository roleRepository
+
+    @Autowired
     private TestHelper testHelper
+
+    LoggedUser fakeLogged
+
+    @TestConfiguration
+    static class TestConfig {
+
+        static class TestUser implements RemoteUserResource {
+
+            String username
+            String id
+            String email
+            String firstName
+            String lastName
+
+            TestUser(String username, String id, String email, String firstName, String lastName) {
+                this.username = username
+                this.id = id
+                this.email = email
+                this.firstName = firstName
+                this.lastName = lastName
+            }
+
+            String getUsername() {
+                return username
+            }
+
+            String getId() {
+                return id
+            }
+
+            String getEmail() {
+                return email
+            }
+
+            String getFirstName() {
+                return firstName
+            }
+
+            String getLastName() {
+                return lastName
+            }
+        }
+
+        @Bean
+        @Primary
+        IRemoteGroupResourceService remoteGroupResourceService() {
+            return new IRemoteGroupResourceService() {
+                Page listGroups(Pageable pageable) {
+                    return null
+                }
+
+                Page searchGroups(String searchString, Pageable pageable, boolean small) {
+                    return null
+                }
+
+                long countGroups() {
+                    return 0
+                }
+
+                long countGroups(String searchString) {
+                    return 0
+                }
+
+                RemoteGroupResource find(String id) {
+                    return null
+                }
+
+                List members(String id) {
+                    return []
+                }
+
+                List groupsOfUser(String id) {
+                    return []
+                }
+            }
+        }
+
+        @Bean
+        @Primary
+        IRemoteUserResourceService remoteUserResourceService() {
+            return new IRemoteUserResourceService() {
+                LinkedList<RemoteUserResource> users = [
+                        new TestUser("bezak@netgrif.com", "1", "bezak@netgrif.com", "Timotej", "Bezák"),
+                        new TestUser("bubeliny@netgrif.com", "2", "bubeliny@netgrif.com", "Matus", "Bubeliny"),
+                        new TestUser("luksic@netgrif.com", "3", "luksic@netgrif.com", "Dominik", "Luksic"),
+                        new TestUser("system-user", "4", "super@netgrif.com", "Admin", "Netgrif"),
+                ]
+
+                Page listUsers(Pageable pageable) {
+                    return new PageImpl(users, pageable, users.size())
+                }
+
+                Page searchUsers(String searchString, Pageable pageable, boolean small) {
+                    List<RemoteUserResource> found = users.findAll { it.email.contains(searchString) } as List<RemoteUserResource>
+                    return new PageImpl(found, pageable, found.size())
+                }
+
+                long countUsers() {
+                    return users.size()
+                }
+
+                long countUsers(String searchString) {
+                    return users.size()
+                }
+
+                RemoteUserResource findUserByUsername(String username) {
+                    return users.find { it.username == username }
+                }
+
+                RemoteUserResource findUser(String id) {
+                    return users.find { it.id == id }
+                }
+
+                RemoteUserResource findByEmail(String email) {
+                    return users.find { it.email == email }
+                }
+            }
+        }
+    }
 
     @Before
     void before() {
@@ -87,7 +219,17 @@ class OAuthUserServiceTest {
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
-        auth = new UsernamePasswordAuthenticationToken(superCreator.superUser.transformToLoggedUser(), "", superCreator.superUser.authorities)
+
+        fakeLogged = new OAuthLoggedUser("4", new ObjectId().toString(), "super@netgrif.com", superCreator.superUser.authorities)
+        fakeLogged.processRoles = superCreator.superUser.processRoles.collect { it.stringId } as Set
+        fakeLogged.setFullName("Fake User")
+        auth = new UsernamePasswordAuthenticationToken(fakeLogged, "n/a", fakeLogged.authorities)
+
+        IUser fake = userService.resolveById("4", true)
+        fake.processRoles = superCreator.superUser.processRoles
+        fake.authorities = superCreator.superUser.authorities
+        userService.save(fake)
+
     }
 
     @Test
@@ -104,7 +246,7 @@ class OAuthUserServiceTest {
 
     @Test
     void testUserSearch() {
-        Page<IUser> users = userService.searchAllCoMembers(oAuthProperties.superUsername, [], [], userService.loggedOrSystem.transformToLoggedUser(), false, new FullPageRequest())
+        Page<IUser> users = userService.searchAllCoMembers("super", [], [], userService.loggedOrSystem.transformToLoggedUser(), false, new FullPageRequest())
         assert !users.content.isEmpty()
         assert users[0].stringId != null
         assert users[0].name != null
@@ -145,7 +287,7 @@ class OAuthUserServiceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath('$.authorities').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.processRoles').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.remoteGroups').exists())
-                .andExpect(MockMvcResultMatchers.jsonPath('$.id').value(superCreator.superUser.getStringId()))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.id').value(fakeLogged.getId()))
                 .andReturn()
 
         mvc.perform(get("/api/user/me?small=true")
@@ -155,7 +297,7 @@ class OAuthUserServiceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath('$.email').value((auth.getPrincipal() as LoggedUser).getEmail()))
                 .andExpect(MockMvcResultMatchers.jsonPath('$.authorities').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.processRoles').isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath('$.id').value(superCreator.superUser.getStringId()))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.id').value(fakeLogged.getId()))
                 .andReturn()
     }
 
@@ -174,7 +316,7 @@ class OAuthUserServiceTest {
 
     @Test
     void testTransformToLoggedUser() {
-        IUser user = (userService as OAuthUserService).findByUsername(oAuthProperties.superUsername)
+        IUser user = (userService as OAuthUserService).findByUsername("system-user")
         user = userService.resolveById(user.getStringId(), false)
         OAuthLoggedUser loggedUser = user.transformToLoggedUser() as OAuthLoggedUser
         assert loggedUser.id == user.stringId
@@ -198,20 +340,52 @@ class OAuthUserServiceTest {
 
     @Test
     void testResolveById() {
-        List<RemoteUserResource> resources = remoteUserResourceService.listUsers(PageRequest.of(0, 20)).content
-        List<RemoteUserResource> inDb = resources.collect { RemoteUserResource it -> repository.findByOauthId(it.id) }.findAll { it } as List<RemoteUserResource>
-        RemoteUserResource testResource = resources.find { RemoteUserResource res -> !inDb.any { it.id == res.id } } as RemoteUserResource
-
-        IUser user = userService.resolveById(testResource.id, false)
-        assert user.stringId == testResource.id
-        assert user.surname == testResource.lastName
-        assert user.name == testResource.firstName
-        assert user.email == testResource.email
+        RemoteUserResource resource = remoteUserResourceService.findUser("1")
+        IUser user = userService.resolveById(resource.id, false)
+        assert user.stringId == resource.id
+        assert user.surname == resource.lastName
+        assert user.name == resource.firstName
+        assert user.email == resource.email
     }
 
     @Test
     void testSearchAllCoMembersWithRoles() {
+        ProcessRole role1 = new ProcessRole()
+        role1.setName("Role 1")
+        role1 = roleRepository.save(role1)
 
+        ProcessRole role2 = new ProcessRole()
+        role2.setName("Role 2")
+        role2 = roleRepository.save(role2)
+
+        ProcessRole role3 = new ProcessRole()
+        role3.setName("Role 3")
+        role3 = roleRepository.save(role3)
+
+        IUser user1 = userService.resolveById("1", true)
+        IUser user2 = userService.resolveById("2", true)
+        user1.addProcessRole(role1)
+        user1.addProcessRole(role2)
+        user2.addProcessRole(role2)
+        user2.addProcessRole(role3)
+        userService.save(user1)
+        userService.save(user2)
+
+        List<IUser> foundUsers = userService.searchAllCoMembers("", [role2._id], [role3._id], superCreator.loggedSuper, true, PageRequest.of(0, 20)).content
+        assert foundUsers.size() == 1 && foundUsers[0].stringId == user1.stringId
+
+        foundUsers = userService.searchAllCoMembers(user1.getEmail(), [role2._id], [role3._id], superCreator.loggedSuper, true, PageRequest.of(0, 20)).content
+        assert foundUsers.size() == 1 && foundUsers[0].stringId == user1.stringId
+
+        foundUsers = userService.searchAllCoMembers("", [], [], superCreator.loggedSuper, true, PageRequest.of(0, 20)).content
+        assert foundUsers.any { it.stringId == user1.stringId }
+        assert foundUsers.any { it.stringId == user2.stringId }
+        assert foundUsers.any { it.stringId == "3"}
+        assert foundUsers.any { it.stringId == "4" }
+
+        foundUsers = userService.searchAllCoMembers("", [], [role3._id], superCreator.loggedSuper, true, PageRequest.of(0, 20)).content
+        assert foundUsers.size() == 3 && foundUsers[0].stringId == user1.stringId
+        assert !foundUsers.any { it.stringId == user2.stringId }
     }
 
 }
