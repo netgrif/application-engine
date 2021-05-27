@@ -40,6 +40,8 @@ public interface IUserService {
 
     List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
+    List<User> findAllByIds(Set<Long> ids, boolean small);
+
     void assignAuthority(Long userId, Long authorityId);
 
     void addDefaultRole(User user);
