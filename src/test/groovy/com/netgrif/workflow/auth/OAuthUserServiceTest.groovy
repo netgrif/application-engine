@@ -8,12 +8,13 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import com.netgrif.workflow.oauth.domain.OAuthLoggedUser
+import com.netgrif.workflow.oauth.domain.RemoteUserResource
+import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository
 import com.netgrif.workflow.oauth.service.OAuthUserService
 import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.utils.FullPageRequest
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.hateoas.MediaTypes
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -67,13 +69,13 @@ class OAuthUserServiceTest {
     private IRemoteUserResourceService remoteUserResourceService
 
     @Autowired
+    protected OAuthUserRepository repository
+
+    @Autowired
     private WebApplicationContext wac
 
     @Autowired
     private SuperCreator superCreator
-
-    @Autowired
-    private SystemUserRunner systemUserRunner
 
     @Autowired
     private TestHelper testHelper
@@ -187,6 +189,29 @@ class OAuthUserServiceTest {
         assert user.fullName == user2.fullName
         assert user.authorities.sort() == user2.authorities.sort()
         assert user.processRoles.collect { it.stringId }.sort() == user2.processRoles.collect { it.stringId }.sort()
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    void testResolveByIdThrow() {
+        userService.resolveById("FAKE_ID", false)
+    }
+
+    @Test
+    void testResolveById() {
+        List<RemoteUserResource> resources = remoteUserResourceService.listUsers(PageRequest.of(0, 20)).content
+        List<RemoteUserResource> inDb = resources.collect { RemoteUserResource it -> repository.findByOauthId(it.id) }.findAll { it } as List<RemoteUserResource>
+        RemoteUserResource testResource = resources.find { RemoteUserResource res -> !inDb.any { it.id == res.id } } as RemoteUserResource
+
+        IUser user = userService.resolveById(testResource.id, false)
+        assert user.stringId == testResource.id
+        assert user.surname == testResource.lastName
+        assert user.name == testResource.firstName
+        assert user.email == testResource.email
+    }
+
+    @Test
+    void testSearchAllCoMembersWithRoles() {
+
     }
 
 }
