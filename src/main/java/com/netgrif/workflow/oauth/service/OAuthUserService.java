@@ -199,22 +199,33 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty())) {
             return searchAllCoMembers(query, loggedUser, small, pageable);
         }
-        BooleanExpression predicate = QOAuthUser.oAuthUser.processRoles.any()._id.in(negateRoleIds != null ? negateRoleIds : new ArrayList<>()).not();
+        Page<RemoteUserResource> page = remoteUserResourceService.searchUsers(query, pageable, small);
+        BooleanExpression predicate = QOAuthUser.oAuthUser.oauthId.in(page.getContent().stream().map(RemoteUserResource::getId).collect(Collectors.toList()));
         if (roleIds != null && !roleIds.isEmpty()) {
-            predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
+            predicate = predicate.and(QOAuthUser.oAuthUser.processRoles.any()._id.in(negateRoleIds != null ? negateRoleIds : new ArrayList<>()).not());
+            predicate = predicate.and(QOAuthUser.oAuthUser.processRoles.any()._id.in(roleIds));
+            List<OAuthUser> users = (List<OAuthUser>) repository.findAll(predicate);
+            Map<String, RemoteUserResource> map = page.getContent().stream().collect(Collectors.toMap(RemoteUserResource::getId, it -> it));
+            return new PageImpl<>(users.stream()
+                    .map(it -> {
+                        try {
+                            loadUser(it, map.get(it.getOauthId()), small);
+                        } catch (IllegalArgumentException e) {
+                            log.error("Failed to load user by id " + it.getOauthId(), e);
+                            return null;
+                        }
+                        return it;
+                    }).filter(Objects::nonNull)
+                    .collect(Collectors.toList()), pageable, page.getTotalElements());
+        } else {
+            predicate = predicate.and(QOAuthUser.oAuthUser.processRoles.any()._id.in(negateRoleIds != null ? negateRoleIds : new ArrayList<>()));
+            List<OAuthUser> users = (List<OAuthUser>) repository.findAll(predicate);
+            Map<String, OAuthUser> map = users.stream().collect(Collectors.toMap(OAuthUser::getStringId, it -> it));
+            return new PageImpl<>(page.getContent().stream()
+                    .filter(it -> !map.containsKey(it.getId()))
+                    .map(this::resolveFromDbOrProvideRepresentation)
+                    .collect(Collectors.toList()), pageable, page.getTotalElements());
         }
-        Page<OAuthUser> users = repository.findAll(predicate, pageable);
-        return new PageImpl<>(users.getContent().stream()
-                .map(it -> {
-                    try {
-                        loadUser(it, small);
-                    } catch (IllegalArgumentException e) {
-                        log.error("Failed to load user by id " + it.getOauthId(), e);
-                        return null;
-                    }
-                    return it;
-                }).filter(Objects::nonNull)
-                .collect(Collectors.toList()), pageable, users.getTotalElements());
     }
 
     protected OAuthUser resolveFromDbOrProvideRepresentation(RemoteUserResource resource) {
