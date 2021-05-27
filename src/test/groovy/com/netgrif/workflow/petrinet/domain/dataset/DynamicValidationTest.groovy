@@ -64,6 +64,7 @@ class DynamicValidationTest {
         Map<String, Field> data = getData(useCase)
         assert (data["number"]).validations[0] instanceof DynamicValidation
         assert (data["number"]).validations[0].compiledRule == ("inrange ${useCase.dataSet["min"].value as Integer},${useCase.dataSet["max"].value as Integer}" as String)
+        assert (data["number"]).validations[0].validationMessage.defaultValue == "Number field validation message"
 
         assert (data["text"]).validations[0] instanceof DynamicValidation
         assert (data["text"]).validations[0].compiledRule == ("maxLength ${useCase.dataSet["max"].value as Integer}" as String)
