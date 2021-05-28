@@ -122,7 +122,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         User dbUser = userRepository.findByEmail(email);
         if (dbUser != null) return dbUser;
 
-        RemoteUserResource res = remoteUserResourceService.findByEmail(email);
+        RemoteUserResource res = remoteUserResourceService.findUserByEmail(email);
         return res != null ? resolveFromDbOrProvideRepresentation(res) : null;
     }
 
