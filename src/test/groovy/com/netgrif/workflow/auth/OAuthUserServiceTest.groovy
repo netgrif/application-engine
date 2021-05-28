@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import com.netgrif.workflow.oauth.domain.OAuthLoggedUser
-import com.netgrif.workflow.oauth.domain.OAuthUser
 import com.netgrif.workflow.oauth.domain.RemoteGroupResource
 import com.netgrif.workflow.oauth.domain.RemoteUserResource
 import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository
@@ -288,7 +287,6 @@ class OAuthUserServiceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].id').value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].name').value("Timotej"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].surname').value("Bezak"))
-                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].remoteGroups[0].name').value("Group"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].processRoles').exists())
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].authorities').exists())
     }
@@ -336,7 +334,6 @@ class OAuthUserServiceTest {
         assert users[0].name == "Admin"
         assert users[0].surname == "Netgrif"
         assert users[0].email == "super@netgrif.com"
-        assert (users[0] as OAuthUser).remoteGroups.any { it.name == "Group" }
     }
 
     @Test
