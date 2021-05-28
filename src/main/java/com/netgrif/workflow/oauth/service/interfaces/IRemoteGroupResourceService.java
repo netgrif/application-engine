@@ -19,7 +19,7 @@ public interface IRemoteGroupResourceService<T extends RemoteGroupResource, U ex
 
     T find(String id);
 
-    List<U> members(String id);
+    List<U> members(String id) throws IllegalArgumentException;
 
-    List<T> groupsOfUser(String id);
+    List<T> groupsOfUser(String id) throws IllegalArgumentException;
 }

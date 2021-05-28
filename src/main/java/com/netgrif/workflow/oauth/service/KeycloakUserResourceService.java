@@ -59,13 +59,19 @@ public class KeycloakUserResourceService implements IRemoteUserResourceService<K
     @Override
     public KeycloakUserResource findUserByUsername(String username) {
         List<UserRepresentation> found = usersResource().search(username, true);
-        return found.get(0) != null ? wrap(found.get(0)) : null;
+        return getFirstOrNull(found);
     }
 
     @Override
     public KeycloakUserResource findUser(String id) {
         UserRepresentation resource = getUser(id);
         return resource != null ? wrap(resource) : null;
+    }
+
+    @Override
+    public KeycloakUserResource findUserByEmail(String email) {
+        List<UserRepresentation> found = usersResource().search(null, null, null, email, 0, 1, true, true);
+        return getFirstOrNull(found);
     }
 
     protected UserRepresentation getUser(String id) {
@@ -76,9 +82,8 @@ public class KeycloakUserResourceService implements IRemoteUserResourceService<K
         }
     }
 
-    @Override
-    public KeycloakUserResource findByEmail(String email) {
-        return findUserByUsername(email);
+    protected KeycloakUserResource getFirstOrNull(List<UserRepresentation> found) {
+        return found.size() > 0 ? wrap(found.get(0)) : null;
     }
 
     public UsersResource usersResource() {
