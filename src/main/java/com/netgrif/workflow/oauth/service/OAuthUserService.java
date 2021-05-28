@@ -209,7 +209,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
             return new PageImpl<>(users.stream()
                     .map(it -> {
                         try {
-                            loadUser(it, map.get(it.getOauthId()), small);
+                            loadUser(it, map.get(it.getOauthId()), true);
                         } catch (IllegalArgumentException e) {
                             log.error("Failed to load user by id " + it.getOauthId(), e);
                             return null;
