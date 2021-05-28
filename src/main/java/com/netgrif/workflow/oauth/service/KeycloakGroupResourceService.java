@@ -4,7 +4,6 @@ import com.netgrif.workflow.oauth.domain.KeycloakGroupResource;
 import com.netgrif.workflow.oauth.domain.KeycloakUserResource;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -59,13 +58,13 @@ public class KeycloakGroupResourceService implements IRemoteGroupResourceService
 
     @Override
     public KeycloakGroupResource find(String id) {
-        GroupResource resource = getGroup(id);
-        return resource != null ? wrap(resource.toRepresentation()) : null;
+        GroupRepresentation resource = getGroup(id);
+        return resource != null ? wrap(resource) : null;
     }
 
-    protected GroupResource getGroup(String id) {
+    protected GroupRepresentation getGroup(String id) {
         try {
-            return groupsResource().group(id);
+            return groupsResource().group(id).toRepresentation();
         } catch (NotFoundException e) {
             return null;
         }
@@ -73,12 +72,20 @@ public class KeycloakGroupResourceService implements IRemoteGroupResourceService
 
     @Override
     public List<KeycloakUserResource> members(String id) {
-        return groupsResource().group(id).members().stream().map(KeycloakUserResource::new).collect(Collectors.toList());
+        try {
+            return groupsResource().group(id).members().stream().map(KeycloakUserResource::new).collect(Collectors.toList());
+        } catch (NotFoundException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
     }
 
     @Override
     public List<KeycloakGroupResource> groupsOfUser(String id) {
-        return userResourceService.usersResource().get(id).groups().stream().map(this::wrap).collect(Collectors.toList());
+        try {
+            return userResourceService.usersResource().get(id).groups().stream().map(this::wrap).collect(Collectors.toList());
+        } catch (NotFoundException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
     }
 
     protected GroupsResource groupsResource() {

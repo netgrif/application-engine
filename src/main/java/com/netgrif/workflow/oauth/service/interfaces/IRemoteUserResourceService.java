@@ -18,5 +18,5 @@ public interface IRemoteUserResourceService<T extends RemoteUserResource> {
 
     T findUser(String id);
 
-    T findByEmail(String email);
+    T findUserByEmail(String email);
 }
