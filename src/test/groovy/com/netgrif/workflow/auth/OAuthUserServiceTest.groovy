@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import com.netgrif.workflow.oauth.domain.OAuthLoggedUser
+import com.netgrif.workflow.oauth.domain.OAuthUser
 import com.netgrif.workflow.oauth.domain.RemoteGroupResource
 import com.netgrif.workflow.oauth.domain.RemoteUserResource
 import com.netgrif.workflow.oauth.domain.repositories.OAuthUserRepository
@@ -110,25 +111,16 @@ class OAuthUserServiceTest {
                 this.firstName = firstName
                 this.lastName = lastName
             }
+        }
 
-            String getUsername() {
-                return username
-            }
+        static class TestGroup implements RemoteGroupResource {
 
-            String getId() {
-                return id
-            }
+            String name
+            String id
 
-            String getEmail() {
-                return email
-            }
-
-            String getFirstName() {
-                return firstName
-            }
-
-            String getLastName() {
-                return lastName
+            TestGroup(String name, String id) {
+                this.name = name
+                this.id = id
             }
         }
 
@@ -161,7 +153,7 @@ class OAuthUserServiceTest {
                 }
 
                 List groupsOfUser(String id) {
-                    return []
+                    return [new TestGroup("Group", "1")]
                 }
             }
         }
@@ -202,7 +194,7 @@ class OAuthUserServiceTest {
                     return users.find { it.id == id }
                 }
 
-                RemoteUserResource findByEmail(String email) {
+                RemoteUserResource findUserByEmail(String email) {
                     return users.find { it.email == email }
                 }
             }
@@ -272,7 +264,7 @@ class OAuthUserServiceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath('$.email').value(fakeLogged.getEmail()))
                 .andExpect(MockMvcResultMatchers.jsonPath('$.authorities').isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath('$.processRoles').isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath('$.remoteGroups').exists())
+                .andExpect(MockMvcResultMatchers.jsonPath('$.remoteGroups[0].name').value("Group"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$.id').value(fakeLogged.getId()))
                 .andReturn()
 
@@ -296,6 +288,7 @@ class OAuthUserServiceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].id').value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].name').value("Timotej"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].surname').value("Bezak"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].remoteGroups[0].name').value("Group"))
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].processRoles').exists())
                 .andExpect(MockMvcResultMatchers.jsonPath('$._embedded.users[0].authorities').exists())
     }
@@ -343,6 +336,7 @@ class OAuthUserServiceTest {
         assert users[0].name == "Admin"
         assert users[0].surname == "Netgrif"
         assert users[0].email == "super@netgrif.com"
+        assert (users[0] as OAuthUser).remoteGroups.any { it.name == "Group" }
     }
 
     @Test
