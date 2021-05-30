@@ -33,9 +33,9 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.*
 import com.netgrif.workflow.workflow.service.TaskService
-import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator
+import com.netgrif.workflow.workflow.service.interfaces.ICaseFieldExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
-import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
+import com.netgrif.workflow.workflow.service.interfaces.IPetriNetFieldExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -108,10 +108,10 @@ class ActionDelegate {
     UserDetailsServiceImpl userDetailsService
 
     @Autowired
-    IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
+    ICaseFieldExpressionEvaluator caseFieldExpressionEvaluator
 
     @Autowired
-    ICaseInitValueExpressionEvaluator initValueExpressionEvaluator
+    IPetriNetFieldExpressionEvaluator petriNetFieldExpressionEvaluator
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -204,7 +204,9 @@ class ActionDelegate {
         if (!field.hasDefault()) {
             return null
         } else if (field.isDynamicDefaultValue()) {
-            return initValueExpressionEvaluator.evaluate(useCase, field)
+            return field.isStatic() ?
+                    petriNetFieldExpressionEvaluator.evaluate(petriNet, field) :
+                    caseFieldExpressionEvaluator.evaluate(useCase, field)
         }
         return field.defaultValue
     }
@@ -280,13 +282,15 @@ class ActionDelegate {
     }
 
     def saveChangedValidation(Field field) {
-        useCase.dataSet.get(field.stringId).validations = field.validations
+        field.isStatic() ? (petriNet.staticDataSet[field.stringId].validations = field.validations) : (useCase.dataSet[field.stringId].validations = field.validations)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
-            it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
+            it.compiledRule = field.isStatic() ?
+                    petriNetFieldExpressionEvaluator.compileValidation(petriNet, it.expression) :
+                    caseFieldExpressionEvaluator.compileValidation(useCase, it.expression)
         }
         addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
     }

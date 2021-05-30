@@ -9,13 +9,15 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expressi
 import java.util.Map;
 import java.util.Set;
 
-public interface IInitValueExpressionEvaluator<ENTITY> {
+public interface IFieldExpressionEvaluator<ENTITY> {
 
-    <TYPE> TYPE evaluate(ENTITY useCase, Field<TYPE> defaultField);
+    <TYPE> TYPE evaluate(ENTITY entity, Field<TYPE> defaultField);
 
     Map<String, I18nString> evaluateOptions(ENTITY entity, MapOptionsField<I18nString, ?> field);
 
     Set<I18nString> evaluateChoices(ENTITY entity, ChoiceField<?> field);
+
+    String compileValidation(ENTITY entity, Expression expression);
 
     Object evaluate(ENTITY entity, Expression expression);
 

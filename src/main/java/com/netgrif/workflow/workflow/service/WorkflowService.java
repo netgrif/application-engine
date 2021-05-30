@@ -29,7 +29,7 @@ import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
-import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.ICaseFieldExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -94,7 +94,7 @@ public class WorkflowService implements IWorkflowService {
     private IUserService userService;
 
     @Autowired
-    private ICaseInitValueExpressionEvaluator initValueExpressionEvaluator;
+    private ICaseFieldExpressionEvaluator initValueExpressionEvaluator;
 
     @Autowired
     private IElasticCaseMappingService caseMappingService;

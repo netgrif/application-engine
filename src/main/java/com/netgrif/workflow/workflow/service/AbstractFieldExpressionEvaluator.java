@@ -4,12 +4,13 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.MapOptionsField;
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.workflow.workflow.service.interfaces.IFieldExpressionEvaluator;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractInitValueExpressionEvaluator<ENTITY> implements IInitValueExpressionEvaluator<ENTITY> {
+public abstract class AbstractFieldExpressionEvaluator<ENTITY> implements IFieldExpressionEvaluator<ENTITY> {
 
     @Override
     public <T> T evaluate(ENTITY entity, Field<T> defaultField) {
@@ -38,6 +39,11 @@ public abstract class AbstractInitValueExpressionEvaluator<ENTITY> implements II
         }
         Collection<Object> collection = (Collection) result;
         return collection.stream().map(it -> (it instanceof I18nString) ? (I18nString) it : new I18nString(it.toString())).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Override
+    public String compileValidation(ENTITY entity, Expression expression) {
+        return evaluate(entity, expression).toString();
     }
 
     abstract String getStringId(ENTITY entity);

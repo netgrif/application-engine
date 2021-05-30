@@ -4,12 +4,12 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.CaseFieldsExpressionRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.ICaseFieldExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CaseInitValueExpressionEvaluator extends AbstractInitValueExpressionEvaluator<Case> implements ICaseInitValueExpressionEvaluator {
+public class CaseFieldExpressionEvaluator extends AbstractFieldExpressionEvaluator<Case> implements ICaseFieldExpressionEvaluator {
 
     @Autowired
     private CaseFieldsExpressionRunner runner;

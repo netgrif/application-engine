@@ -13,7 +13,8 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicVali
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.ICaseFieldExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.IPetriNetFieldExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
@@ -44,7 +46,10 @@ public final class FieldFactory {
     private IDataValidator dataValidator;
 
     @Autowired
-    private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+    private ICaseFieldExpressionEvaluator caseFieldExpressionEvaluator;
+
+    @Autowired
+    private IPetriNetFieldExpressionEvaluator petriNetFieldExpressionEvaluator;
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
@@ -402,15 +407,8 @@ public final class FieldFactory {
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
     private void resolveValidations(Field field, Case useCase) {
-        List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
-        if (validations != null) {
-            field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
-        }
-        if (field.getValidations() == null) return;
-
-        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
-                .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
-            valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
+        resolveValidations(field, useCase, useCase.getDataField(field.getImportId()).getValidations(), expression -> {
+            return caseFieldExpressionEvaluator.compileValidation(useCase, expression);
         });
     }
 
@@ -728,12 +726,34 @@ public final class FieldFactory {
 
     public Field buildStaticFieldWithValidation(PetriNet net, String fieldId) {
         Field field = net.getStaticField(fieldId).get();
-        return field.clone();
+        resolveValidations(field, net);
+        return field;
     }
 
     public Field buildStaticFieldWithoutValidation(PetriNet net, String fieldId) {
-        Field field = net.getStaticField(fieldId).get();
-        return field.clone();
+        return net.getStaticField(fieldId).get();
+    }
+
+    @SuppressWarnings({"all", "rawtypes", "unchecked"})
+    private void resolveValidations(Field field, PetriNet petriNet) {
+        resolveValidations(field, petriNet, field.getValidations(), expression -> {
+           return petriNetFieldExpressionEvaluator.compileValidation(petriNet, expression);
+        });
+    }
+
+    @SuppressWarnings({"all", "rawtypes", "unchecked"})
+    private <T> void resolveValidations(Field field, T entity,
+                                    List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations,
+                                    Function<Expression, String> compileValidation) {
+        if (validations != null) {
+            field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
+        }
+        if (field.getValidations() == null) return;
+
+        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
+                .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
+            valid.setCompiledRule(compileValidation.apply(valid.getExpression()));
+        });
     }
 
 }

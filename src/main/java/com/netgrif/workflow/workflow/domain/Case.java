@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.ICaseFieldExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -192,7 +192,7 @@ public class Case {
 
     public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
 
-    public void populateDataSet(ICaseInitValueExpressionEvaluator initValueExpressionEvaluator) {
+    public void populateDataSet(ICaseFieldExpressionEvaluator initValueExpressionEvaluator) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
