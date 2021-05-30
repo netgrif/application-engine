@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.CaseFieldsExpressionRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -14,11 +13,6 @@ public class CaseInitValueExpressionEvaluator extends AbstractInitValueExpressio
 
     @Autowired
     private CaseFieldsExpressionRunner runner;
-
-    @Override
-    public <T> T evaluate(Case useCase, Field<T> defaultField) {
-        return (T) evaluate(useCase, defaultField.getInitExpression());
-    }
 
     @Override
     public I18nString evaluateCaseName(Case useCase, Expression expression) {

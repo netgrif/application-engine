@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 
@@ -9,6 +10,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractInitValueExpressionEvaluator<ENTITY> implements IInitValueExpressionEvaluator<ENTITY> {
+
+    @Override
+    public <T> T evaluate(ENTITY entity, Field<T> defaultField) {
+        return (T) evaluate(entity, defaultField.getInitExpression());
+    }
 
     @Override
     public Map<String, I18nString> evaluateOptions(ENTITY entity, MapOptionsField<I18nString, ?> field) {
