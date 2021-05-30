@@ -10,15 +10,15 @@ import com.netgrif.workflow.workflow.domain.Case;
 import java.util.Map;
 import java.util.Set;
 
-public interface IInitValueExpressionEvaluator {
+public interface IInitValueExpressionEvaluator<ENTITY> {
 
-    <T> T evaluate(Case useCase, Field<T> defaultField);
+    <TYPE> TYPE evaluate(Case useCase, Field<TYPE> defaultField);
 
-    Map<String, I18nString> evaluateOptions(Case useCase, MapOptionsField<I18nString, ?> field);
+    Map<String, I18nString> evaluateOptions(ENTITY entity, MapOptionsField<I18nString, ?> field);
 
-    Set<I18nString> evaluateChoices(Case useCase, ChoiceField<?> field);
+    Set<I18nString> evaluateChoices(ENTITY entity, ChoiceField<?> field);
 
-    I18nString evaluateCaseName(Case useCase, Expression expression);
+    Object evaluate(ENTITY entity, Expression expression);
 
-    Object evaluate(Case useCase, Expression expression);
+
 }

@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -192,7 +192,7 @@ public class Case {
 
     public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
 
-    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+    public void populateDataSet(ICaseInitValueExpressionEvaluator initValueExpressionEvaluator) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
         List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
@@ -224,8 +224,10 @@ public class Case {
         dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
     }
 
-    private void populateStaticDataSet() {
-        petriNet.getStaticDataSet().forEach((key, field) -> this.staticDataSet.put(key, new StaticDataField()));
+    public void populateStaticDataSet() {
+        petriNet.getStaticDataSet().forEach((key, field) -> {
+            this.staticDataSet.put(key, new StaticDataField());
+        });
     }
 
     private String generateVisualId() {

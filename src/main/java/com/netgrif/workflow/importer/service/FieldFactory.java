@@ -109,6 +109,9 @@ public final class FieldFactory {
         field.setImportId(data.getId());
         field.setImmediate(data.isImmediate());
         field.setIsStatic(data.isStatic() != null && data.isStatic());
+        if (field.isStatic()) {
+            // TODO NAE-1283 eval dynamic
+        }
 
         if (data.getLength() != null) {
             field.setLength(data.getLength());

@@ -252,7 +252,12 @@ public class DataService implements IDataService {
     protected void setStaticDataValue(Case useCase, Task task, Field field, Map.Entry<String, JsonNode> entry, ChangedFieldsTree changedFieldsTree) {
         setDataValueAndResolveEvents(useCase, task, changedFieldsTree, field, (f) -> {
             f.setValue(parseFieldsValues(entry.getValue(), f instanceof CaseField ? ((CaseField) f).getAllowedNets() : null));
-            // TODO NAE-1283 filter meta/allowed nets
+            if (f instanceof CaseField) {
+                ((CaseField) f).setAllowedNets(parseAllowedNetsValue(entry.getValue()));
+            }
+            if (f instanceof FilterField) {
+                ((FilterField) f).setFilterMetadata(parseFilterMetadataValue(entry.getValue()));
+            }
         });
     }
 

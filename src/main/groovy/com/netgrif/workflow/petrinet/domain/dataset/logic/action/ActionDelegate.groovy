@@ -33,9 +33,9 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.*
 import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -111,7 +111,7 @@ class ActionDelegate {
     IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
 
     @Autowired
-    IInitValueExpressionEvaluator initValueExpressionEvaluator
+    ICaseInitValueExpressionEvaluator initValueExpressionEvaluator
 
     /**
      * Reference of case and task in which current action is taking place.

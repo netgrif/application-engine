@@ -18,9 +18,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -29,7 +29,7 @@ import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import com.netgrif.workflow.workflow.service.interfaces.ICaseInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -94,7 +94,7 @@ public class WorkflowService implements IWorkflowService {
     private IUserService userService;
 
     @Autowired
-    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    private ICaseInitValueExpressionEvaluator initValueExpressionEvaluator;
 
     @Autowired
     private IElasticCaseMappingService caseMappingService;
@@ -231,6 +231,7 @@ public class WorkflowService implements IWorkflowService {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet, petriNet.getActivePlaces());
         useCase.populateDataSet(initValueExpressionEvaluator);
+        useCase.populateStaticDataSet();
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
