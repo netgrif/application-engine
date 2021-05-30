@@ -6,23 +6,23 @@ import com.querydsl.core.annotations.QueryType
 
 class Validation {
 
-    private String validationRule
+    protected String validationRule
 
-    private I18nString validationMessage
+    protected I18nString validationMessage
+
+    Validation(String validationRule) {
+        this(validationRule, null)
+    }
 
     Validation(String validationRule, I18nString validationMessage) {
+        this()
         this.validationRule = validationRule
         this.validationMessage = validationMessage
     }
 
-    Validation(String validationRule) {
-        this.validationRule = validationRule
-    }
+    Validation() {}
 
-    Validation() {
-    }
-
-    LocalizedValidation getLocalizedValidation(Locale locale){
+    LocalizedValidation getLocalizedValidation(Locale locale) {
         LocalizedValidation ret = new LocalizedValidation(this.validationRule, getTranslatedValidationMessage(locale))
         return ret
     }
@@ -45,6 +45,11 @@ class Validation {
 
     void setValidationRule(String validationRule) {
         this.validationRule = validationRule
+    }
+
+    @Override
+    Validation clone() {
+        return new Validation(this.validationRule, this.validationMessage)
     }
 
     @Override

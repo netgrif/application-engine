@@ -1,3 +1,66 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10869/tab/release-report-all-issues"></a>
+## 5.4.0 (27.05.2021)
+### Bug fixes
+* [NAE-1211](https://netgrif.atlassian.net/browse/NAE-1211) - Search in several data fields does not work as intended
+
+### Improvements
+* [NAE-1228](https://netgrif.atlassian.net/browse/NAE-1228) - Re-enable class name minification
+* [NAE-1207](https://netgrif.atlassian.net/browse/NAE-1207) - Filter management
+* [NAE-412](https://netgrif.atlassian.net/browse/NAE-412) - Process and Case loading refactor
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10886/tab/release-report-all-issues"></a>
+## 5.3.1 (20.05.2021)
+### Bug fixes
+* [NAE-1306](https://netgrif.atlassian.net/browse/NAE-1306) - Custom message dynamickej validacie sa nezapise z xml do objektu siete
+* [NAE-1308](https://netgrif.atlassian.net/browse/NAE-1308) - Cancel Task zla podmienka ci ma user spravne role
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10885/tab/release-report-all-issues"></a>
+## 5.3.0 (05.05.2021)
+### Bug fixes
+None
+
+### Improvements
+* [NAE-58](https://netgrif.atlassian.net/browse/NAE-58) - Dynamic Init values
+* [NAE-1276](https://netgrif.atlassian.net/browse/NAE-1276) - Init value as choice
+
+### Features
+* [NAE-1251](https://netgrif.atlassian.net/browse/NAE-1251) - Dynamic validations
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10862/tab/release-report-all-issues"></a>
+## 5.2.0 (03.05.2021)
+### Bug fixes
+* [NAE-1171](https://netgrif.atlassian.net/browse/NAE-1171) - Filelist Field has initial value type of string
+* [NAE-1280](https://netgrif.atlassian.net/browse/NAE-1280) - Default case name i18n
+* [NAE-1279](https://netgrif.atlassian.net/browse/NAE-1279) - Browser login prompt
+
+### Improvements
+* [NAE-1242](https://netgrif.atlassian.net/browse/NAE-1242) - TaskRef init value
+* [NAE-1238](https://netgrif.atlassian.net/browse/NAE-1238) - Case event view
+* [NAE-1269](https://netgrif.atlassian.net/browse/NAE-1269) - Enable user preferences for anonym user
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10883/tab/release-report-all-issues"></a>
+## 5.1.2 (16.04.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10874/tab/release-report-all-issues"></a>
 ## 5.1.1 (12.04.2021)
 ### Bug fixes

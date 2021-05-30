@@ -25,6 +25,8 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -32,6 +34,8 @@ import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.*
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
+import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -103,6 +107,12 @@ class ActionDelegate {
     @Autowired
     UserDetailsServiceImpl userDetailsService
 
+    @Autowired
+    IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
+
+    @Autowired
+    IInitValueExpressionEvaluator initValueExpressionEvaluator
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -124,19 +134,27 @@ class ActionDelegate {
         this.useCase = useCase
         this.task = task
         this.actionsRunner = actionsRunner
-        action.fieldIds.each { name, id ->
+        this.initFieldsMap(action.fieldIds)
+        this.initTransitionsMap(action.transitionIds)
+        changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
+                task.isPresent() ? task.get().stringId : "task",
+                task.isPresent() ? task.get().transitionId : "trans")
+    }
+
+    def initFieldsMap(Map<String, String> fieldIds) {
+        fieldIds.each { name, id ->
             if (petriNet.dataSet[id]) {
                 set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
             } else {
                 set(name, fieldFactory.buildStaticFieldWithoutValidation(petriNet, id))
             }
         }
-        action.transitionIds.each { name, id ->
+    }
+
+    def initTransitionsMap(Map<String, String> transitionIds) {
+        transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
-        changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
-                task.isPresent() ? task.get().stringId : "task",
-                task.isPresent() ? task.get().transitionId : "trans")
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -181,6 +199,23 @@ class ActionDelegate {
     }
 
     def unchanged = { return UNCHANGED_VALUE }
+
+    def initValueOfField = { Field field ->
+        if (!field.hasDefault()) {
+            return null
+        } else if (field.isDynamicDefaultValue()) {
+            return initValueExpressionEvaluator.evaluate(useCase, field)
+        }
+        return field.defaultValue
+    }
+
+    def getInit() {
+        return initValueOfField
+    }
+
+    def init(Field field) {
+        return initValueOfField(field)
+    }
 
     /**
      * Changes behavior of a given field on given transition if certain condition is being met.
@@ -242,6 +277,18 @@ class ActionDelegate {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+    }
+
+    def saveChangedValidation(Field field) {
+        useCase.dataSet.get(field.stringId).validations = field.validations
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+            putIntoChangedFields(field, new ChangedField(field.stringId))
+        }
+        List<Validation> compiled = field.validations.collect { it.clone() }
+        compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
+            it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
+        }
+        addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
     }
 
     void putIntoChangedFields(Field field, ChangedField changedField) {
@@ -330,7 +377,7 @@ class ActionDelegate {
              saveChangedChoices(field)
          },
          allowedNets: { cl ->
-             if (!(field instanceof CaseField))
+             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
                  return
 
              def allowedNets = cl()
@@ -365,23 +412,26 @@ class ActionDelegate {
                 field.setOptions(newOptions)
             }
             saveChangedOptions(field)
-        }]
+        },
+         validations: { cl ->
+             changeFieldValidations(field, cl)
+         }
+        ]
     }
 
     void changeFieldValue(Field field, def cl) {
         def value = cl()
-        if (value instanceof Closure && value() == UNCHANGED_VALUE) {
-            return
-        }
-        if (value == null) {
-            if (field instanceof FieldWithDefault && field.defaultValue != getFieldValue(field.stringId)) {
-                field.clearValue()
-                saveChangedValue(field)
-            } else if (!(field instanceof FieldWithDefault) && getFieldValue(field.stringId) != null) {
-                field.clearValue()
-                saveChangedValue(field)
+        if (value instanceof Closure) {
+            if (value == initValueOfField) {
+                value = initValueOfField(field)
+
+            } else if (value() == UNCHANGED_VALUE) {
+                return
             }
-            return
+        }
+        if (value == null && getFieldValue(field.stringId) != null) {
+            field.clearValue()
+            saveChangedValue(field)
         }
         if (value != null) {
             if (field instanceof CaseField) {
@@ -391,6 +441,28 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
+    }
+
+    void changeFieldValidations(Field field, def cl) {
+        def valid = cl()
+        if (valid == UNCHANGED_VALUE)
+            return
+        List<Validation> newValidations = []
+        if (valid != null) {
+            if (valid instanceof String) {
+                newValidations = [new Validation(valid as String)]
+            } else if (valid instanceof Validation) {
+                newValidations = [valid]
+            } else if (valid instanceof Collection) {
+                if (valid.every { it instanceof Validation }) {
+                    newValidations = valid
+                } else {
+                    newValidations = valid.collect { new Validation(it as String) }
+                }
+            }
+        }
+        field.validations = newValidations
+        saveChangedValidation(field)
     }
 
     def getFieldValue(String fieldId) {
@@ -478,14 +550,14 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem) {
+    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
         if (net == null)
             throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.defaultValue, color, author)
+        return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.loggedOrSystem) {
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 
@@ -878,6 +950,14 @@ class ActionDelegate {
             cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
 
         userService.deleteUser(user)
+    }
+
+    Validation validation(String rule, I18nString message) {
+        return new Validation(rule, message)
+    }
+
+    DynamicValidation dynamicValidation(String rule, I18nString message) {
+        return new DynamicValidation(rule, message)
     }
 
 }
