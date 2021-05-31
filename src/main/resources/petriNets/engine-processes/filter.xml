@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>filter</id>
+    <initials>FTR</initials>
+    <title name="process_title">Filter</title>
+    <icon>filter_alt</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <caseName name="case_name">New filter</caseName>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="filter" immediate="true">
+        <id>filter</id>
+        <title name="filter_field">Filter</title>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>filter_type</id>
+        <title name="filter_type">Filter type</title>
+        <options>
+            <option key="Case" name="filter_type_case">Case filter</option>
+            <option key="Task" name="filter_type_task">Task filter</option>
+        </options>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>visibility</id>
+        <title name="filter_visibility">Filter visibility</title>
+        <options>
+            <option key="public" name="filter_visibility_public">Public</option>
+            <option key="private" name="filter_visibility_private">Private</option>
+        </options>
+        <init>public</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>origin_view_id</id>
+        <title name="origin_view_id">Origin ViewId</title>
+    </data>
+    <data type="text">
+        <id>new_title</id>
+        <title name="filter_name">Filter name</title>
+    </data>
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="process_title">Filter</i18nString>
+        <i18nString name="case_name">Nový Filter</i18nString>
+        <i18nString name="filter_field">Filter</i18nString>
+        <i18nString name="filter_type">Druh filtra</i18nString>
+        <i18nString name="filter_type_case">Filter prípadov</i18nString>
+        <i18nString name="filter_type_task">Filter úloh</i18nString>
+        <i18nString name="filter_visibility">Viditeľnosť filtra</i18nString>
+        <i18nString name="filter_visibility_public">Verejný</i18nString>
+        <i18nString name="filter_visibility_private">Súkromný</i18nString>
+        <i18nString name="origin_view_id">ViewId pôvodu</i18nString>
+        <i18nString name="filter_name">Názov filtra</i18nString>
+        <i18nString name="create_new_filter">Vytvoriť nový filter</i18nString>
+        <i18nString name="details">Podrobnosti</i18nString>
+        <i18nString name="save">Uložiť</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="process_title">Filter</i18nString>
+        <i18nString name="case_name">Neuer Filter</i18nString>
+        <i18nString name="filter_field">Filter</i18nString>
+        <i18nString name="filter_type">Filtertyp</i18nString>
+        <i18nString name="filter_type_case">Fallfilter</i18nString>
+        <i18nString name="filter_type_task">Aufgabenfilter</i18nString>
+        <i18nString name="filter_visibility">Filter Sichtbarkeit</i18nString>
+        <i18nString name="filter_visibility_public">Öffentlich</i18nString>
+        <i18nString name="filter_visibility_private">Persönlich</i18nString>
+        <i18nString name="origin_view_id">Herkunft ViewId</i18nString>
+        <i18nString name="filter_name">Filtername</i18nString>
+        <i18nString name="create_new_filter">Neuer Filter erstellen</i18nString>
+        <i18nString name="details">Details</i18nString>
+        <i18nString name="save">Speichern</i18nString>
+    </i18n>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>newFilter</id>
+        <x>620</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <assignPolicy>auto</assignPolicy>
+        <label name="create_new_filter">Create new filter</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id></id>
+            <title name="save">Save</title>
+            <actions phase="post">
+                <action>
+                    name: f.new_title;
+                    useCase.setTitle(name.value)
+                    workflowService.save(useCase)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>740</x>
+        <y>380</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="details">Details</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t3</id>
+        <x>380</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Set filter metadata</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>p1</id>
+        <x>260</x>
+        <y>260</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>740</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>500</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>t3</sourceId>
+        <destinationId>p3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>regular</type>
+        <sourceId>p3</sourceId>
+        <destinationId>newFilter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>regular</type>
+        <sourceId>newFilter</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

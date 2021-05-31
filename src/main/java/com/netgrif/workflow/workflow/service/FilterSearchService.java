@@ -15,6 +15,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated
+ * since 5.3.0 - Filter engine processes should be used instead of native objects
+ */
+@Deprecated
 @Service
 public class FilterSearchService extends MongoSearchService<Filter> {
 
