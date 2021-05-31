@@ -43,6 +43,10 @@ public interface IUserService {
 
     Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
+    List<IUser> findAllByIds(Set<String> ids, boolean small);
+
+    void assignAuthority(Long userId, Long authorityId);
+
     List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
     void addDefaultRole(IUser user);

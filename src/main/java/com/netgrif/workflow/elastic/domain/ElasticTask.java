@@ -69,6 +69,7 @@ public class ElasticTask {
     @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
+    @Field(type = Keyword)
     private Set<String> users;
 
     private Set<String> negativeViewUsers;
