@@ -217,6 +217,12 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
+    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
+        List<User> users = userRepository.findAllByIdIn(ids);
+        return changeType(users);
+    }
+
+    @Override
     public IUser getLoggedOrSystem() {
         try {
             return getLoggedUser();
