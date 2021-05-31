@@ -1,6 +1,7 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.IUser
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,4 +33,7 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
         return service.createSystemUser()
     }
 
+    LoggedUser getLoggedSystem() {
+        return this.systemUser.transformToLoggedUser()
+    }
 }

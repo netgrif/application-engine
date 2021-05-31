@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 
 import javax.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class KeycloakUserResourceService implements IRemoteUserResourceService<KeycloakUserResource> {
@@ -66,6 +68,11 @@ public class KeycloakUserResourceService implements IRemoteUserResourceService<K
     public KeycloakUserResource findUser(String id) {
         UserRepresentation resource = getUser(id);
         return resource != null ? wrap(resource) : null;
+    }
+
+    @Override
+    public List<KeycloakUserResource> findUsers(Set<String> ids) {
+        return ids.stream().map(this::findUser).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
