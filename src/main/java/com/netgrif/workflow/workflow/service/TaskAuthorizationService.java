@@ -126,8 +126,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be canceled, because it is not assigned!");
 
         return loggedUser.isAdmin()
-                || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL))
                 && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
     }
 
