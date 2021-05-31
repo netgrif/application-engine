@@ -31,7 +31,7 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 
-    List<User> findAllByIdIn(Set<Long> ids);
+    List<User> findAllBy_idIn(Set<ObjectId> ids);
 
     boolean existsByEmail(String email);
 

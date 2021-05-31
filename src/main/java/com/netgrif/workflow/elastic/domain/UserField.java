@@ -24,13 +24,13 @@ public class UserField extends DataField {
     private String[] fullNameValue;
 
     @Field(type = Long)
-    private Long[] userIdValue;
+    private String[] userIdValue;
 
     public UserField(UserMappingData value) {
         super(String.format("%s %s", value.fullName, value.email));
         this.emailValue = new String[1];
         this.fullNameValue = new String[1];
-        this.userIdValue = new Long[1];
+        this.userIdValue = new String[1];
         this.emailValue[0] = value.email;
         this.fullNameValue[0] = value.fullName;
         this.userIdValue[0] = value.userId;
@@ -40,7 +40,7 @@ public class UserField extends DataField {
         super(new String[values.length]);
         this.emailValue = new String[values.length];
         this.fullNameValue = new String[values.length];
-        this.userIdValue = new Long[values.length];
+        this.userIdValue = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             this.emailValue[i] = values[i].email;
             this.fullNameValue[i] = values[i].fullName;
@@ -51,7 +51,7 @@ public class UserField extends DataField {
 
     @AllArgsConstructor
     public static class UserMappingData {
-        public long userId;
+        public String userId;
         public String email;
         public String fullName;
     }

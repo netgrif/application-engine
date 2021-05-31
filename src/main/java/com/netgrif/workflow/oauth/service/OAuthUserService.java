@@ -153,6 +153,12 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     @Override
+    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
+        List<RemoteUserResource> users = remoteUserResourceService.findUsers(ids);
+        return users.stream().map(this::resolveFromDbOrProvideRepresentation).collect(Collectors.toList());
+    }
+
+    @Override
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
         List<OAuthUser> users = repository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
         return changeType(users);

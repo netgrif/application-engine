@@ -859,7 +859,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = parseListLongValues(node);
+                value = parseListStringValues(node);
                 break;
             default:
                 if (node.get("value") == null || node.get("value").isNull()) {
