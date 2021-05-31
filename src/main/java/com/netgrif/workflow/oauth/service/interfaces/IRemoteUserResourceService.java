@@ -4,6 +4,9 @@ import com.netgrif.workflow.oauth.domain.RemoteUserResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Set;
+
 public interface IRemoteUserResourceService<T extends RemoteUserResource> {
 
     Page<T> listUsers(Pageable pageable);
@@ -17,6 +20,8 @@ public interface IRemoteUserResourceService<T extends RemoteUserResource> {
     T findUserByUsername(String username);
 
     T findUser(String id);
+
+    List<T> findUsers(Set<String> ids);
 
     T findUserByEmail(String email);
 }

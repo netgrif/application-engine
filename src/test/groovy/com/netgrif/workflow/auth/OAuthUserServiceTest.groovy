@@ -54,8 +54,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest(properties = [
         "nae.oauth.enabled=true",
-        "nae.oauth.remote-user-base=true",
-        "nae.oauth.keycloak=true"])
+        "nae.oauth.remote-user-base=true"])
 class OAuthUserServiceTest {
 
     @Autowired
@@ -191,6 +190,11 @@ class OAuthUserServiceTest {
 
                 RemoteUserResource findUser(String id) {
                     return users.find { it.id == id }
+                }
+
+                @Override
+                List findUsers(Set ids) {
+                    return users.findAll { ids.contains(it.getId()) }
                 }
 
                 RemoteUserResource findUserByEmail(String email) {
