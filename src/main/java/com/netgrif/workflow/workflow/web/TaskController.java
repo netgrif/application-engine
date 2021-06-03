@@ -11,6 +11,8 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeW
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
+import com.netgrif.workflow.workflow.web.responsebodies.*;
+import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.workflow.web.responsebodies.CountResponse;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
