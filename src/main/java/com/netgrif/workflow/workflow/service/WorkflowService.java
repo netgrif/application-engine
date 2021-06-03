@@ -304,7 +304,7 @@ public class WorkflowService implements IWorkflowService {
 //todo publishovanie?
         publisher.publishEvent(new DeleteCaseEvent(useCase));
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome();
-        outcome.setACase(useCase);
+        outcome.setStringId(useCase.getStringId());
         return outcome;
     }
 

@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
 import com.netgrif.workflow.workflow.web.responsebodies.ResponseMessage;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 public class EventOutcomeWithMessage extends ResponseMessage {
 
-    private EventOutcome outcome;
+    private LocalisedEventOutcome outcome;
     private Map<String, ChangedField> changedFields;
 
     public EventOutcomeWithMessage(String errorMessage){
@@ -18,7 +18,7 @@ public class EventOutcomeWithMessage extends ResponseMessage {
         setError(errorMessage);
     }
 
-    public EventOutcomeWithMessage(String successMessage, EventOutcome outcome){
+    public EventOutcomeWithMessage(String successMessage, LocalisedEventOutcome outcome){
         super();
         setOutcome(outcome);
         setSuccess(successMessage);

@@ -6,6 +6,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataChangedFieldsEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -108,7 +109,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get all task data")
-    public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
     }
 
@@ -118,12 +119,12 @@ public class PublicTaskController extends AbstractTaskController {
     @ApiResponses({@ApiResponse(
             code = 200,
             message = "OK",
-            response = ChangedFieldContainer.class
+            response = EventOutcomeWithMessageResource.class
     ), @ApiResponse(
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public ChangedFieldContainer setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public EventOutcomeWithMessageResource setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         return super.setData(taskId, dataBody);
     }
 
