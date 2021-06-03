@@ -100,6 +100,7 @@ public class VariableArcsTest {
 
     @Before
     public void before() throws Exception {
+        testHelper.truncateDbs();
         userRunner.run("");
         repository.deleteAll();
         if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {

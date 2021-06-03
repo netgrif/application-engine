@@ -143,9 +143,9 @@ public class RuleEngineTest {
 
         assert !refreshableKieBase.shouldRefresh();
 
-        assert outcome != null;
+        assert outcome.getNet() != null;
         assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_POST);
-        assert outcome.getNet().getIdentifier().equals(NEW_INITIALS);
+        assert outcome.getNet().getInitials().equals(NEW_INITIALS);
 
         ruleRepository.deleteAll();
         factRepository.deleteAll();
