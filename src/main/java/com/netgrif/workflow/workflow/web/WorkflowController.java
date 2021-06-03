@@ -1,8 +1,6 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
@@ -11,11 +9,11 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.localised.LocalisedGetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowAuthorizationService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -25,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -46,7 +45,6 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -84,7 +82,8 @@ public class WorkflowController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getACase().getStringId() + " was created succesfully", outcome);
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getACase().getStringId() + " was created succesfully",
+                    outcome.transformToLocalisedEventOutcome(locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:",e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
@@ -200,7 +199,8 @@ public class WorkflowController {
             } else {
                 outcome = workflowService.deleteCase(caseId);
             }
-            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted", outcome);
+            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                    outcome.transformToLocalisedEventOutcome(LocaleContextHolder.getLocale()));
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case ["+caseId+"] failed:",e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
@@ -212,7 +212,7 @@ public class WorkflowController {
     public EventOutcomeWithMessageResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",workflowService.getData(caseId));
+            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",new LocalisedGetDataEventOutcome(workflowService.getData(caseId), locale));
         } catch (UnsupportedEncodingException e) {
             log.error("Getting all case data of ["+caseId+"] failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Getting all case data of [" + caseId + "] failed:" + e.getMessage());

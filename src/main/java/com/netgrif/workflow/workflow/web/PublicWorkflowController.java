@@ -38,7 +38,8 @@ public class PublicWorkflowController {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
             CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case created succesfully", outcome);
+            return EventOutcomeWithMessageResource.successMessage("Case created succesfully",
+                    outcome.transformToLocalisedEventOutcome(locale));
         } catch (Exception e) {
             log.error("Creating case failed:" + e.getMessage(), e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed: " + e.getMessage());
@@ -50,7 +51,8 @@ public class PublicWorkflowController {
     public EventOutcomeWithMessageResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",this.workflowService.getData(caseId));
+            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",
+                    this.workflowService.getData(caseId).transformToLocalisedEventOutcome(locale));
         } catch (UnsupportedEncodingException e) {
             log.error("Getting all case data of [" + caseId + "] failed:" + e.getMessage(), e);
             return EventOutcomeWithMessageResource.errorMessage("Getting all case data of [" + caseId + "] failed:" + e.getMessage());
