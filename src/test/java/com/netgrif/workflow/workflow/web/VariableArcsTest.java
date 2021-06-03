@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.MockService;
+import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
@@ -94,6 +95,9 @@ public class VariableArcsTest {
     @Autowired
     private SuperCreator superCreator;
 
+    @Autowired
+    private TestHelper testHelper;
+
     @Before
     public void before() throws Exception {
         userRunner.run("");
@@ -109,6 +113,8 @@ public class VariableArcsTest {
 
     @Test
     public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        testHelper.truncateDbs();
+
         ImportPetriNetOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
