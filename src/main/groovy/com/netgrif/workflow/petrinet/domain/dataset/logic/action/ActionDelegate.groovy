@@ -684,7 +684,7 @@ class ActionDelegate {
     def setDataWithPropagation(String taskId, Map dataSet) {
         Task task = taskService.findOne(taskId)
         Case caze = workflowService.findOne(task.caseId)
-        ChangedFieldsTree container = setData(task, dataSet)
+        ChangedFieldsTree container = setData(task, dataSet).getData()
         caze = workflowService.findOne(caze.stringId)
         this.changedFieldsTree.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
         this.changedFieldsTree.propagate(container)

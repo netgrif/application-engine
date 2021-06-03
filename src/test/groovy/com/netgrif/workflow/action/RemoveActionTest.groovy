@@ -102,9 +102,9 @@ class RemoveActionTest {
                 .build()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/removeRole_test.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        this.petriNet = net.get()
+        this.petriNet = net.getNet()
 
         def org = importHelper.createGroup("test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])

@@ -34,9 +34,9 @@ class UserServiceTest {
         helper.truncateDbs()
 
         def netOptional = importHelper.createNet("role_test.xml", VersionType.MAJOR, service.system.transformToLoggedUser())
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
-        def net = netOptional.get()
+        def net = netOptional.getNet()
         def roles = roleService.findAll(net.stringId)
         def roleCount = service.system.userProcessRoles.size()
         roles.each {

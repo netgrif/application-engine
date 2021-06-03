@@ -55,9 +55,9 @@ class PetriNetTest {
     void testClone() {
         def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
 
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
-        def net = netOptional.get()
+        def net = netOptional.getNet()
         def clone = net.clone()
 
         def arcs = clone.getArcsOfTransition(CLONE_NET_TASK)
@@ -76,16 +76,16 @@ class PetriNetTest {
     @Test
     void testVersioning() {
         def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
         def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional2.isPresent()
+        assert netOptional2.getNet() != null
 
         def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional3.isPresent()
+        assert netOptional3.getNet() != null
 
         def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
-        assert nets.findAll {it.identifier in [netOptional.get().identifier, netOptional3.get().identifier]}.size() == 2
+        assert nets.findAll {it.identifier in [netOptional.getNet().identifier, netOptional3.getNet().identifier]}.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"
     }
