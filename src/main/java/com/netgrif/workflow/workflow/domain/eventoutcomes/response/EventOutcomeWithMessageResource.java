@@ -1,8 +1,7 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
-import org.springframework.hateoas.Link;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
 import org.springframework.hateoas.Resource;
 
 import java.util.ArrayList;
@@ -11,10 +10,10 @@ import java.util.Map;
 public class EventOutcomeWithMessageResource extends Resource<EventOutcomeWithMessage> {
 
     public EventOutcomeWithMessageResource(EventOutcomeWithMessage content) {
-        super(content, new ArrayList<Link>());
+        super(content, new ArrayList<>());
     }
 
-    public static EventOutcomeWithMessageResource successMessage(String successMsg, EventOutcome outcome){
+    public static EventOutcomeWithMessageResource successMessage(String successMsg, LocalisedEventOutcome outcome){
         return new EventOutcomeWithMessageResource(new EventOutcomeWithMessage(successMsg,outcome));
     }
 
