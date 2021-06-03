@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
@@ -49,10 +50,10 @@ class DynamicChoicesTest {
 
     @Test
     void testDynamicEnum() {
-        Optional<PetriNet> optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_choices.xml"), "major", superCreator.getLoggedSuper());
 
-        assert optNet.isPresent();
-        def net = optNet.get()
+        assert optNet.getNet() != null;
+        def net = optNet.getNet()
 
         def aCase = importHelper.createCase("Case", net)
 
