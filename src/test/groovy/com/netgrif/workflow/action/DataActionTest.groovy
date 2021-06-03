@@ -1,5 +1,6 @@
 package com.netgrif.workflow.action
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
@@ -23,9 +24,6 @@ import org.springframework.test.context.junit4.SpringRunner
 class DataActionTest {
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private ImportHelper importHelper
 
     @Autowired
@@ -34,9 +32,14 @@ class DataActionTest {
     @Autowired
     private ITaskService taskService
 
+    @Autowired
+    private TestHelper testHelper
+
     @Test
     void testDataActions() {
-        def mainNet = importer.importPetriNet(new File("src/test/resources/data_actions_test.xml"))
+        testHelper.truncateDbs()
+
+        def mainNet = importHelper.createNet("data_actions_test.xml")
         assert mainNet.isPresent()
         def $case = importHelper.createCase("Case 1", mainNet.get())
         Task task = taskService.findOne($case.tasks.first().task)
@@ -50,6 +53,6 @@ class DataActionTest {
                         "type" : "text"
                 ] as Map
         )).getData()
-        dataSet.getChangedFields()["text_field"].attributes["value"] == ";set-pre;set-post"
+        assert dataSet.getChangedFields()["control_field"].attributes["value"] == ";get-pre;get-pre;get-post;get-post;set-pre;set-pre;set-post;set-post"
     }
 }
