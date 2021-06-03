@@ -1,19 +1,18 @@
 package com.netgrif.workflow.insurance.mvc
 
 import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
-import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
-import com.netgrif.workflow.WorkflowManagementSystemApplication
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -36,8 +35,6 @@ import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.http.MediaType.TEXT_PLAIN
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -127,9 +124,9 @@ class InsuranceTest {
                 .build()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        netId = net.get().getStringId()
+        netId = net.getNet().getStringId()
 
         def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
@@ -143,7 +140,7 @@ class InsuranceTest {
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
-        mapper = net.get().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
+        mapper = net.getNet().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
     }
 
     private String caseId
@@ -252,11 +249,11 @@ class InsuranceTest {
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
-                .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))
+                .andExpect(jsonPath('$.outcome.acase.title', CoreMatchers.is(CASE_NAME)))
+                .andExpect(jsonPath('$.outcome.acase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.stringId
+        caseId = response.outcome.acase.stringId
     }
 
     def searchTasks(String title, int expected) {

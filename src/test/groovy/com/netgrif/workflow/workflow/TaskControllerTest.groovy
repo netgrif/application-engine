@@ -16,6 +16,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
 import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -120,9 +121,9 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        Optional<PetriNet> netOptional = helper.createNet("all_data_refs.xml", "major")
-        assert netOptional.isPresent()
-        net = netOptional.get()
+        ImportPetriNetOutcome netOptional = helper.createNet("all_data_refs.xml", "major")
+        assert netOptional.getNet() != null
+        net = netOptional.getNet()
     }
 
     void createCase() {

@@ -13,14 +13,15 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
@@ -35,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-
 
 @Component
 class ImportHelper {
@@ -180,7 +180,7 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user)
+        return workflowService.createCase(net.getStringId(), title, "", user).getACase()
     }
 
     Case createCase(String title, PetriNet net) {
@@ -191,27 +191,27 @@ class ImportHelper {
         return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
     }
 
-    EventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
         return taskService.assignTask(author, getTaskId(taskTitle, caseId))
     }
 
-    EventOutcome assignTaskToSuper(String taskTitle, String caseId) {
+    AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
         return assignTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    EventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
         return taskService.finishTask(author, getTaskId(taskTitle, caseId))
     }
 
-    EventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
+    FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
         return finishTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    EventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
         return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
     }
 
-    EventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
+    CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
         return cancelTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
@@ -222,7 +222,7 @@ class ImportHelper {
 
     ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-        dataService.setData(taskId, dataSet)
+        dataService.setData(taskId, dataSet).getData()
     }
 
     ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {

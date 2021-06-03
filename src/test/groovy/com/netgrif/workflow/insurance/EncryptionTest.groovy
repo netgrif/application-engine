@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
@@ -78,9 +79,9 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
-        def useCase = workflowService.createCase(net.get().stringId, "Encryption test", "color", mockLoggedUser())
+        ImportPetriNetOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper())
+        assert net.getNet() != null
+        def useCase = workflowService.createCase(net.getNet().stringId, "Encryption test", "color", mockLoggedUser()).getACase()
         def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME}
         useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
         return workflowService.save(useCase).stringId
