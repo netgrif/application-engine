@@ -14,6 +14,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
@@ -68,14 +69,14 @@ class AssignRemoveTest {
 
     @Test
     public void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), "major", superCreator.getLoggedSuper());
 
-        assert netOptional.isPresent();
-        def net = netOptional.get()
+        assert netOptional.getNet() != null;
+        def net = netOptional.getNet()
         def roleCount = userService.system.userProcessRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser())
+        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getACase()
         assert userService.system.userProcessRoles.size() == roleCount + 4
 
         // delete

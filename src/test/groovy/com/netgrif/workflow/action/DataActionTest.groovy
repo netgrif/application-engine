@@ -40,8 +40,8 @@ class DataActionTest {
         testHelper.truncateDbs()
 
         def mainNet = importHelper.createNet("data_actions_test.xml")
-        assert mainNet.isPresent()
-        def $case = importHelper.createCase("Case 1", mainNet.get())
+        assert mainNet.getNet() != null
+        def $case = importHelper.createCase("Case 1", mainNet.getNet())
         Task task = taskService.findOne($case.tasks.first().task)
 
         List<Field> dataGet = dataService.getData($case.tasks.first().task).getData()

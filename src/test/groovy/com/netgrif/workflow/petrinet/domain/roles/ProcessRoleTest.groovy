@@ -82,9 +82,9 @@ class ProcessRoleTest {
                 .build()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        netId = net.get().getStringId()
+        netId = net.getNet().getStringId()
 
         def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
@@ -92,17 +92,17 @@ class ProcessRoleTest {
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }] as UserProcessRole[])
+                [processRoles.find { it.roleId == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId }] as UserProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as UserProcessRole[])
+                [processRoles.find { it.roleId == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as UserProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }, processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as UserProcessRole[])
+                [processRoles.find { it.roleId == net.getNet().roles.values().find { it.name.defaultValue == "View" }.stringId }, processRoles.find { it.roleId == net.getNet().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as UserProcessRole[])
     }
 
     private String caseId
@@ -137,11 +137,11 @@ class ProcessRoleTest {
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
-                .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))
+                .andExpect(jsonPath('$.outcome.acase.title', CoreMatchers.is(CASE_NAME)))
+                .andExpect(jsonPath('$.outcome.acase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.stringId
+        caseId = response.outcome.acase.stringId
     }
 
     def searchTasks(String title, int expected) {

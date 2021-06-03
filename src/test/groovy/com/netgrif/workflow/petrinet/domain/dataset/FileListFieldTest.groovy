@@ -86,8 +86,8 @@ class FileListFieldTest {
 
     PetriNet getNet() {
         def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileListField.xml"), "major", superCreator.getLoggedSuper())
-        assert netOptional.isPresent()
-        return netOptional.get()
+        assert netOptional.getNet() != null
+        return netOptional.getNet()
     }
 
     @Test
@@ -104,7 +104,7 @@ class FileListFieldTest {
         User user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getACase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID + '/test-file.txt')
@@ -123,7 +123,7 @@ class FileListFieldTest {
         User user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser())
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getACase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID + '/test-file-list.txt').
