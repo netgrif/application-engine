@@ -89,13 +89,13 @@ public class ProcessRole extends Imported {
     }
 
     private List<Action> getPreActions(EventType type) {
-        if (events.containsKey(type))
+        if (events != null && events.containsKey(type))
             return events.get(type).getPreActions();
         return new LinkedList<>();
     }
 
     private List<Action> getPostActions(EventType type) {
-        if (events.containsKey(type))
+        if (events != null && events.containsKey(type))
             return events.get(type).getPostActions();
         return new LinkedList<>();
     }

@@ -27,5 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long>, QuerydslPredi
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 
+    List<User> findAllByIdIn(Set<Long> ids);
+
     boolean existsByEmail(String email);
 }
