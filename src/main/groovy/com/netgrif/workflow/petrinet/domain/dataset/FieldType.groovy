@@ -20,7 +20,8 @@ enum FieldType {
     CASE_REF("caseRef"),
     DATETIME("dateTime"),
     BUTTON("button"),
-    TASK_REF("taskRef")
+    TASK_REF("taskRef"),
+    FILTER("filter")
 
     String name
 
