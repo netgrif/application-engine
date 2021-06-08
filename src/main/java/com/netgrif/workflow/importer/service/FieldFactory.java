@@ -417,11 +417,13 @@ public final class FieldFactory {
     }
 
     private void resolveComponent(Field field, Case useCase, String transitionId) {
-        if (transitionId != null) {
-            com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
-            Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-            if(transitionComponent != null)
-                field.setComponent(transitionComponent);
+        if (transitionId == null) {
+            return;
+        }
+        com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
+        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
+        if(transitionComponent != null) {
+            field.setComponent(transitionComponent);
         }
     }
 
