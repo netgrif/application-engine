@@ -121,15 +121,19 @@
 		<id>parentId</id>
 		<title></title>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>use_icon</id>
+		<title>Display menu icon?</title>
+	</data>
 	<data type="text">
 		<id>icon_preview</id>
-		<title></title>
+		<title>Menu icon preview</title>
 		<view>
 			<htmlEditor></htmlEditor>
 		</view>
 		<init></init>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>icon_name</id>
 		<title>Menu icon identifier</title>
 		<desc>Material icon identifier. List of icons with identifiers is available online.</desc>
@@ -137,8 +141,10 @@
 			iconIdentifier: f.this,
 			iconPreview: f.icon_preview;
 
-			if (iconIdentifier.value == "")
+			if (iconIdentifier.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
 				return;
+			}
 
 			change iconPreview value {
 				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value + <![CDATA["""</span>"""]]>
@@ -260,12 +266,40 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>icon_preview</id>
+				<id>use_icon</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.icon_preview,
+							iconName: f.icon_name,
+							useIcon: f.use_icon;
+
+							make iconPreview,visible on trans when {useIcon.value}
+							make iconName,editable on trans when {useIcon.value}
+							make iconPreview,hidden on trans when {!useIcon.value}
+							make iconName,hidden on trans when {!useIcon.value}
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -274,10 +308,10 @@
 			<dataRef>
 				<id>icon_name</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
-					<x>1</x>
+					<x>2</x>
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
