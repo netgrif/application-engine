@@ -117,7 +117,33 @@
 					return []
 				}
 			}
+		</action>
+	</data>
+	<data type="button">
+		<id>add_filter_to_menu</id>
+		<title></title>
+		<placeholder>Add to menu</placeholder>
+		<action trigger="set">
+			filterAutocomplete: f.filter_autocomplete_selection,
+			menuItemsTaskRef: f.filter_tasks;
 
+			if (!filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+				return;
+			}
+
+			optionCase = createCase("preference_filter_item")
+			initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
+			assignTask(initTask)
+			setData(initTask, [
+				"filter_case": ["type":"caseRef", "value": [filterAutocomplete.value], "allowedNets":["filter"]],
+				"parentId": ["type":"text", "value":useCase.stringId]
+			])
+			finishTask(initTask)
+
+			viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
+
+			change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
+			change filterAutocomplete value {return ""}
 		</action>
 	</data>
 	<!-- I18NS -->
@@ -489,6 +515,19 @@
 					<y>0</y>
 					<rows>1</rows>
 					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_filter_to_menu</id>
+				<logic><behavior>editable</behavior></logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
