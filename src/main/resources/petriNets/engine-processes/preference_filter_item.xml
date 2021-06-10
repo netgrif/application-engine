@@ -19,7 +19,7 @@
 		<title></title>
 	</data>
 	<data type="button">
-		<id>button_0</id>
+		<id>move_option_up</id>
 		<title></title>
 		<placeholder>Up</placeholder>
 		<action trigger="set">
@@ -48,7 +48,7 @@
 		</action>
 	</data>
 	<data type="button">
-		<id>button_1</id>
+		<id>move_option_down</id>
 		<title></title>
 		<placeholder>Down</placeholder>
 		<action trigger="set">
@@ -77,7 +77,7 @@
 		</action>
 	</data>
 	<data type="button">
-		<id>button_2</id>
+		<id>remove_option</id>
 		<title></title>
 		<placeholder>Remove</placeholder>
 		<action trigger="set">
@@ -107,7 +107,7 @@
 		</action>
 	</data>
 	<data type="taskRef">
-		<id>taskRef_0</id>
+		<id>filter_preview</id>
 		<title></title>
 	</data>
 	<data type="caseRef">
@@ -120,6 +120,30 @@
 	<data type="text">
 		<id>parentId</id>
 		<title></title>
+	</data>
+	<data type="text">
+		<id>icon_preview</id>
+		<title></title>
+		<view>
+			<htmlEditor></htmlEditor>
+		</view>
+		<init></init>
+	</data>
+	<data type="text">
+		<id>icon_name</id>
+		<title>Menu icon identifier</title>
+		<desc>Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			iconIdentifier: f.this,
+			iconPreview: f.icon_preview;
+
+			if (iconIdentifier.value == "")
+				return;
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
 	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
@@ -145,7 +169,7 @@
 			</layout>
 			<logic>
 				<action trigger="set">
-					filterTaskRef: f.taskRef_0,
+					filterTaskRef: f.filter_preview,
 					filterCaseRef: f.filter_case,
 					entryName: f.entry_name;
 
@@ -193,7 +217,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>button_0</id>
+				<id>move_option_up</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -208,7 +232,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>button_1</id>
+				<id>move_option_down</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -222,7 +246,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>button_2</id>
+				<id>remove_option</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -236,13 +260,37 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>taskRef_0</id>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filter_preview</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>5</cols>
 					<offset>0</offset>
@@ -257,7 +305,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
