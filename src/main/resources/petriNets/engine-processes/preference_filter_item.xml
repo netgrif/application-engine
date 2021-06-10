@@ -12,7 +12,7 @@
 	<!-- DATA -->
 	<data type="text" immediate="true">
 		<id>entry_name</id>
-		<title>Text</title>
+		<title>Menu item title</title>
 	</data>
 	<data type="text">
 		<id>entry_marker</id>
