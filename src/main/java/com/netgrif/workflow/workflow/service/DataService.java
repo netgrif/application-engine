@@ -169,8 +169,14 @@ public class DataService implements IDataService {
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
 
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
-                dataField.setAllowedNets(parseAllowedNetsValue(entry.getValue()));
-                dataField.setFilterMetadata(parseFilterMetadataValue(entry.getValue()));
+                List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
+                if (allowedNets != null) {
+                    dataField.setAllowedNets(allowedNets);
+                }
+                Map<String, Object> filterMetadata = parseFilterMetadataValue(entry.getValue());
+                if (filterMetadata != null) {
+                    dataField.setFilterMetadata(filterMetadata);
+                }
                 ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
@@ -900,6 +906,9 @@ public class DataService implements IDataService {
 
     private List<String> parseListString(ObjectNode node, String attributeKey) {
         ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
+        if (arrayNode == null) {
+            return null;
+        }
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
         return list;
@@ -914,6 +923,9 @@ public class DataService implements IDataService {
         String fieldType = getFieldTypeFromNode(node);
         if (Objects.equals(fieldType, "filter")) {
             JsonNode filterMetadata = node.get("filterMetadata");
+            if (filterMetadata == null) {
+                return null;
+            }
             ObjectMapper mapper = new ObjectMapper();
             return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>(){});
         }
