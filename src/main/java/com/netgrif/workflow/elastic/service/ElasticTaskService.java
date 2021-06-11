@@ -220,11 +220,17 @@ public class ElasticTaskService implements IElasticTaskService {
     protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildRoleQuery(request, userRoleQuery);
-        buildNegativeViewRoleQuery(userRoleQuery, user);
         buildUsersQuery(request, userRoleQuery);
-        buildNegativeViewUsersQuery(userRoleQuery, user);
+        negativeUserRoleQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
+    }
+
+    private void negativeUserRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeQuery = boolQuery();
+        buildNegativeViewRoleQuery(negativeQuery, user);
+        buildNegativeViewUsersQuery(negativeQuery, user);
+        query.should(negativeQuery);
     }
 
     private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
@@ -274,12 +280,20 @@ public class ElasticTaskService implements IElasticTaskService {
             return;
         }
 
-        BoolQueryBuilder roleQuery = boolQuery();
+        BoolQueryBuilder existingUsersQuery = boolQuery();
+        BoolQueryBuilder usersQuery = boolQuery();
+        BoolQueryBuilder exists = boolQuery();
+        BoolQueryBuilder notExists = boolQuery();
         for (Long userId : request.users) {
-            roleQuery.should(termQuery("users", userId));
+            existingUsersQuery.should(termQuery("users", userId));
         }
+        exists.must(existsQuery("users"));
+        exists.must(existingUsersQuery);
+        notExists.mustNot(existsQuery("users"));
+        usersQuery.should(exists);
+        usersQuery.should(notExists);
 
-        query.should(roleQuery);
+        query.must(usersQuery);
     }
 
 
