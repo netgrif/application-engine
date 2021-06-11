@@ -298,9 +298,7 @@ public final class FieldFactory {
         } else {
             field = new CaseField(new ArrayList<>(nets.getAllowedNet()));
         }
-        setDefaultValues(field, data, inits -> {
-            field.setDefaultValue(null);
-        });
+        setDefaultValues(field, data, inits -> {});
         return field;
     }
 
