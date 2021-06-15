@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.TestHelper;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -44,17 +45,13 @@ public class ConstructorAndDestructorTest {
     }
 
     @Test
-    public void testConstructorAndDestructor() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void testConstructorAndDestructor() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), "major", superCreator.getLoggedSuper());
 
         assert net.isPresent();
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Construct"));
 
         assert caseOpt.isPresent();
-        assert "Its working...".equals(caseOpt.get().getDataSet().get("text").getValue().toString());
-
-//        Optional<Case> caseOpt2 = caseRepository.findOne(QCase.case$.title.eq("Destruct"));
-//        assert caseOpt2.isPresent();
-
+        assert caseOpt.get().getDataSet().get("text").getValue() == "Its working...";
     }
 }

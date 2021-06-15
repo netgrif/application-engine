@@ -28,6 +28,8 @@ public interface IWorkflowService {
 
     Case resolveUserRef(Case useCase);
 
+    Case createCase(String netId, String title, String color, LoggedUser user, Locale locale);
+
     Case createCase(String netId, String title, String color, LoggedUser user);
 
     Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);

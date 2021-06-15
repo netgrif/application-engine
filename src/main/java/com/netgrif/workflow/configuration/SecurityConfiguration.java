@@ -62,6 +62,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     private IProcessRoleService roleService;
 
     @Autowired
+    private IUserService userService;
+
+    @Autowired
     private SecurityConfigProperties properties;
 
     @Value("${nae.security.server-patterns}")
@@ -96,6 +99,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 //        @formatter:off
         http
             .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
                 .cors()
                 .and()
@@ -109,9 +113,6 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .headers()
                 .frameOptions().disable()
@@ -163,7 +164,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     authority,
                     this.serverPatterns,
                     this.jwtService,
-                    this.roleService
+                    this.userService
                 );
     }
 }

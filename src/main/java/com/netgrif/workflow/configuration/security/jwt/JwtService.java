@@ -48,13 +48,8 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public boolean isExpired(String token) {
-        try {
-            getExpirationDateFromToken(token);
-        } catch (ExpiredJwtException e) {
-            return true;
-        }
-        return false;
+    public void isExpired(String token) throws ExpiredJwtException {
+        getExpirationDateFromToken(token);
     }
 
     @Override

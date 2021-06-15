@@ -13,6 +13,7 @@ class RunnerController {
             DefaultRoleRunner,
             AuthorityRunner,
             SystemUserRunner,
+            FilterRunner,
             GroupRunner,
             SuperCreator,
             FlushSessionsRunner,

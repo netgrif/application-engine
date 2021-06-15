@@ -1,5 +1,9 @@
 package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +12,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -15,7 +21,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticTaskIndex}")
+@Document(indexName = "#{@elasticTaskIndex}", type = "task")
 public class ElasticTask {
 
     @Id
@@ -50,9 +56,9 @@ public class ElasticTask {
 
     private Long userId;
 
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    private LocalDateTime startDate;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime startDate;
 
     @Field(type = Keyword)
     private String transactionId;
@@ -60,7 +66,13 @@ public class ElasticTask {
     @Field(type = Keyword)
     private Set<String> roles;
 
+    @Field(type = Keyword)
+    private Set<String> negativeViewRoles;
+
+    @Field(type = Keyword)
     private Set<Long> users;
+
+    private Set<Long> negativeViewUsers;
 
     @Field(type = Keyword)
     private String icon;
@@ -86,9 +98,11 @@ public class ElasticTask {
         if (task.getPriority() != null)
             this.priority = task.getPriority();
         this.userId = task.getUserId();
-//        this.startDate = task.getStartDate();
+        this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
+        this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.users = task.getUsers().keySet();
+        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
     }
 
     public void update(ElasticTask task) {
@@ -98,8 +112,10 @@ public class ElasticTask {
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();
         this.userId = task.getUserId();
-//        this.startDate = task.getStartDate();
+        this.startDate = task.getStartDate();
         this.roles = task.getRoles();
+        this.negativeViewRoles = task.getNegativeViewRoles();
         this.users = task.getUsers();
+        this.negativeViewUsers = task.getNegativeViewUsers();
     }
 }
