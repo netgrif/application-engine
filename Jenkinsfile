@@ -36,25 +36,24 @@ pipeline {
             }
         }
 
-        stage('Sonar') {
-            steps {
-                echo 'Sonar'
-                withSonarQubeEnv('SonarNetgrif') {
-                    sh "mvn -DskipTests=true clean package sonar:sonar"
-                }
-            }
-            post {
-                success {
-                    echo '--------------------------------------------------------------------------------------------------------'
-                    echo 'Sonar SUCCESS'
-                    echo '--------------------------------------------------------------------------------------------------------'
-                }
-                failure {
-                    bitbucketStatusNotify(buildState: 'FAILED')
-                }
-
-            }
-        }
+//        stage('Sonar') {
+//            steps {
+//                echo 'Sonar'
+//                withSonarQubeEnv('SonarNetgrif') {
+//                    sh "mvn -DskipTests=true clean package sonar:sonar"
+//                }
+//            }
+//            post {
+//                success {
+//                    echo '--------------------------------------------------------------------------------------------------------'
+//                    echo 'Sonar SUCCESS'
+//                    echo '--------------------------------------------------------------------------------------------------------'
+//                }
+//                failure {
+//                    bitbucketStatusNotify(buildState: 'FAILED')
+//                }
+//            }
+//        }
 
         stage('Build') {
             steps {
