@@ -2,6 +2,8 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataEventType;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
@@ -52,7 +54,7 @@ public class Importer {
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
-
+    @Getter
     private Document document;
     private PetriNet net;
     private ProcessRole defaultRole;
@@ -93,8 +95,11 @@ public class Importer {
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
+    @Autowired
+    private ComponentFactory componentFactory;
+
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException {
+    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             initialize();
             unmarshallXml(xml);
@@ -106,7 +111,7 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException {
+    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             return importPetriNet(new FileInputStream(xml));
         } catch (FileNotFoundException e) {
@@ -145,7 +150,7 @@ public class Importer {
     }
 
     @Transactional
-    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException {
+    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new PetriNet();
 
         document.getI18N().forEach(this::addI18N);
@@ -154,12 +159,12 @@ public class Importer {
         net.setIcon(document.getIcon());
 
         document.getRole().forEach(this::createRole);
-        document.getData().forEach(this::createDataSet);
+        for (com.netgrif.workflow.importer.model.Data data : document.getData()) {createDataSet(data);}
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
-        document.getTransition().forEach(this::createTransition);
+        for (com.netgrif.workflow.importer.model.Transition transition: document.getTransition()) {createTransition(transition);}
         document.getArc().forEach(this::createArc);
-        document.getMapping().forEach(this::applyMapping);
+        for (com.netgrif.workflow.importer.model.Mapping mapping: document.getMapping()) {applyMapping(mapping);}
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
         document.getData().forEach(this::addActionRefs);
@@ -170,7 +175,11 @@ public class Importer {
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
-        net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
+            net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
+        } else {
+            net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        }
 
         return Optional.of(net);
     }
@@ -182,6 +191,9 @@ public class Importer {
 
         if (logic == null || roleId == null) {
             return;
+        }
+        if (logic.isView() != null && !logic.isView()) {
+            net.addNegativeViewRole(roleId);
         }
 
         net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
@@ -250,11 +262,11 @@ public class Importer {
     }
 
     @Transactional
-    protected void applyMapping(Mapping mapping) {
+    protected void applyMapping(Mapping mapping) throws MissingIconKeyException {
         Transition transition = getTransition(mapping.getTransitionRef());
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
         mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
-        mapping.getDataGroup().forEach(dataGroup -> addDataGroup(transition, dataGroup));
+        for (com.netgrif.workflow.importer.model.DataGroup dataGroup : mapping.getDataGroup()) { addDataGroup(transition, dataGroup); }
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
     }
 
@@ -337,7 +349,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createDataSet(Data importData) {
+    protected void createDataSet(Data importData) throws MissingIconKeyException {
         Field field = fieldFactory.getField(importData, this);
 
         net.addDataSetField(field);
@@ -345,7 +357,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) {
+    protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) throws MissingIconKeyException {
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
@@ -370,9 +382,9 @@ public class Importer {
                     addUserLogic(transition, usersRef));
         }
         if (importTransition.getDataRef() != null) {
-            importTransition.getDataRef().forEach(dataRef ->
-                    addDataWithDefaultGroup(transition, dataRef)
-            );
+            for (com.netgrif.workflow.importer.model.DataRef dataRef : importTransition.getDataRef()) {
+                addDataWithDefaultGroup(transition, dataRef);
+            }
         }
         if (importTransition.getTrigger() != null) {
             importTransition.getTrigger().forEach(trigger ->
@@ -383,9 +395,9 @@ public class Importer {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
         if (importTransition.getDataGroup() != null) {
-            importTransition.getDataGroup().forEach(dataGroup ->
-                    addDataGroup(transition, dataGroup)
-            );
+            for (com.netgrif.workflow.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
+                addDataGroup(transition, dataGroup);
+            }
         }
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
@@ -495,7 +507,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
+    protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
         if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
@@ -512,7 +524,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) {
+    protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
@@ -552,6 +564,9 @@ public class Importer {
             return;
         }
 
+        if (logic.isView() != null && !logic.isView()) {
+            transition.addNegativeViewRole(roleId);
+        }
         transition.addRole(roleId, roleFactory.getPermissions(logic));
     }
 
@@ -618,13 +633,13 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataComponent(Transition transition, DataRef dataRef){
+    protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         String fieldId = getField(dataRef.getId()).getStringId();
         Component component;
         if((dataRef.getComponent()) == null)
             component = getField(dataRef.getId()).getComponent();
         else
-            component = new Component(dataRef.getComponent().getName(), ComponentFactory.buildPropertyMap(dataRef.getComponent().getProperty()));
+            component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
         transition.addDataSet(fieldId, null, null, null, component);
     }
 

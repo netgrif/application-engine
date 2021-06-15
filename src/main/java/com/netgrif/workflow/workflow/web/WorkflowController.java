@@ -1,6 +1,8 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
@@ -10,6 +12,7 @@ import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowAuthorizationService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -74,10 +77,10 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
+    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser);
+            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:",e);

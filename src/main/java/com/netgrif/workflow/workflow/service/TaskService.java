@@ -1,10 +1,15 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.domain.ElasticTask;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.workflow.domain.TaskPair;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -87,6 +92,9 @@ public class TaskService implements ITaskService {
     @Autowired
     private IProcessRoleService processRoleService;
 
+    @Autowired
+    private IElasticTaskMappingService taskMappingService;
+
     private IElasticTaskService elasticTaskService;
 
     @Autowired
@@ -135,10 +143,7 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
-        if(user.isAnonymous())
-            addTaskStateInformationToPublicEventOutcome(outcome, task, user);
-        else
-            addTaskStateInformationToEventOutcome(outcome, task);
+        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -189,7 +194,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId())) {
+        if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -371,16 +376,6 @@ public class TaskService implements ITaskService {
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
         outcome.setTaskId(task.getStringId());
-    }
-
-    protected void addTaskStateInformationToPublicEventOutcome(EventOutcome outcome, Task task, User user) {
-        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
-        if (!taskOptional.isPresent())
-            return;
-        if (user != null)
-            outcome.setAssignee(user);
-        outcome.setStartDate(task.getStartDate());
-        outcome.setFinishDate(task.getFinishDate());
     }
 
     /**
@@ -578,8 +573,7 @@ public class TaskService implements ITaskService {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if(searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
-            if (!user.isAnonymous())
-                page = loadUsers(page);
+            page = loadUsers(page);
             page = dataService.setImmediateFields(page);
             return page;
         } else {
@@ -683,7 +677,7 @@ public class TaskService implements ITaskService {
     @Override
     public Task save(Task task) {
         task = taskRepository.save(task);
-        elasticTaskService.index(new ElasticTask(task));
+        elasticTaskService.index(this.taskMappingService.transform(task));
         return task;
     }
 
@@ -699,9 +693,12 @@ public class TaskService implements ITaskService {
     @Override
     public Task resolveUserRef(Task task, Case useCase) {
         task.getUsers().clear();
+        task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+                task.getNegativeViewUsers().addAll(userIds);
+            } else if (userIds != null && userIds.size() != 0) {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });
@@ -749,6 +746,7 @@ public class TaskService implements ITaskService {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
+        transition.getNegativeViewRoles().forEach((roleId) -> task.addNegativeViewRole(roleId));
 
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
@@ -806,9 +804,7 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
-            task.setUser(userService.getAnonymousLogged().transformToAnonymousUser());
-        } else if (task.getUserId() != null)
+        if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
 }

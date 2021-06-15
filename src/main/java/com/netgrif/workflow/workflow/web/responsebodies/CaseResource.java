@@ -6,6 +6,7 @@ import com.netgrif.workflow.workflow.web.WorkflowController;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.ArrayList;
 
@@ -18,6 +19,6 @@ public class CaseResource extends EntityModel<Case>{
 
     private void buildLinks(){
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(WorkflowController.class).createCase(new CreateCaseBody(), null)).withRel("create"));
+                .methodOn(WorkflowController.class).createCase(new CreateCaseBody(), null, LocaleContextHolder.getLocale())).withRel("create"));
     }
 }

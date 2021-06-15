@@ -7,6 +7,7 @@ import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -106,8 +107,8 @@ public class VariableArcsTest {
     }
 
     @Test
-    public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();
@@ -120,6 +121,7 @@ public class VariableArcsTest {
         user.setEmail("VariableArcsTest@test.com");
         user = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
+                new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
                 new UserProcessRole[]{});
 
         List<Arc> arcs = loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());

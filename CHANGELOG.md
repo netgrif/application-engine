@@ -1,3 +1,153 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10888/tab/release-report-all-issues"></a>
+## 5.5.0 (11.06.2021)
+### Bug fixes
+* [NAE-1319](https://netgrif.atlassian.net/browse/NAE-1319) - Default caseRef value is set to null
+* [NAE-1316](https://netgrif.atlassian.net/browse/NAE-1316) - Currency format sa neprejavuje na number field
+
+### Improvements
+None
+
+### Features
+* [NAE-1305](https://netgrif.atlassian.net/browse/NAE-1305) - Loading na set data pre button
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10890/tab/release-report-all-issues"></a>
+## 5.4.1 (31.05.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10869/tab/release-report-all-issues"></a>
+## 5.4.0 (27.05.2021)
+### Bug fixes
+* [NAE-1211](https://netgrif.atlassian.net/browse/NAE-1211) - Search in several data fields does not work as intended
+
+### Improvements
+* [NAE-1228](https://netgrif.atlassian.net/browse/NAE-1228) - Re-enable class name minification
+* [NAE-1207](https://netgrif.atlassian.net/browse/NAE-1207) - Filter management
+* [NAE-412](https://netgrif.atlassian.net/browse/NAE-412) - Process and Case loading refactor
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10886/tab/release-report-all-issues"></a>
+## 5.3.1 (20.05.2021)
+### Bug fixes
+* [NAE-1306](https://netgrif.atlassian.net/browse/NAE-1306) - Custom message dynamickej validacie sa nezapise z xml do objektu siete
+* [NAE-1308](https://netgrif.atlassian.net/browse/NAE-1308) - Cancel Task zla podmienka ci ma user spravne role
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10885/tab/release-report-all-issues"></a>
+## 5.3.0 (05.05.2021)
+### Bug fixes
+None
+
+### Improvements
+* [NAE-58](https://netgrif.atlassian.net/browse/NAE-58) - Dynamic Init values
+* [NAE-1276](https://netgrif.atlassian.net/browse/NAE-1276) - Init value as choice
+
+### Features
+* [NAE-1251](https://netgrif.atlassian.net/browse/NAE-1251) - Dynamic validations
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10862/tab/release-report-all-issues"></a>
+## 5.2.0 (03.05.2021)
+### Bug fixes
+* [NAE-1171](https://netgrif.atlassian.net/browse/NAE-1171) - Filelist Field has initial value type of string
+* [NAE-1280](https://netgrif.atlassian.net/browse/NAE-1280) - Default case name i18n
+* [NAE-1279](https://netgrif.atlassian.net/browse/NAE-1279) - Browser login prompt
+
+### Improvements
+* [NAE-1242](https://netgrif.atlassian.net/browse/NAE-1242) - TaskRef init value
+* [NAE-1238](https://netgrif.atlassian.net/browse/NAE-1238) - Case event view
+* [NAE-1269](https://netgrif.atlassian.net/browse/NAE-1269) - Enable user preferences for anonym user
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10883/tab/release-report-all-issues"></a>
+## 5.1.2 (16.04.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10874/tab/release-report-all-issues"></a>
+## 5.1.1 (12.04.2021)
+### Bug fixes
+* [NAE-1265](https://netgrif.atlassian.net/browse/NAE-1265) - Anonym user inconsistence
+
+### Improvements
+* [NAE-1248](https://netgrif.atlassian.net/browse/NAE-1248) - Icon enum
+* [NAE-1247](https://netgrif.atlassian.net/browse/NAE-1247) - Backend autocomplete enumeration
+* [NAE-1242](https://netgrif.atlassian.net/browse/NAE-1242) - TaskRef init valueNone
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10860/tab/release-report-all-issues"></a>
+## 5.1.0 - Black Zinc (25.3.2021)
+### Bug fixes
+* [NAE-1216](https://netgrif.atlassian.net/browse/NAE-1216) - Nesprávne zobrazenie FileListFieldValue vo vygenerovanom PDF
+* [NAE-1227](https://netgrif.atlassian.net/browse/NAE-1227) - Update loggedOrSystem
+* [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
+* [NAE-1275](https://netgrif.atlassian.net/browse/NAE-1275) - MultichoiceMap init value
+
+### Improvement
+* [NAE-1217](https://netgrif.atlassian.net/browse/NAE-1217) - Upload file-ov na public view
+* [NAE-1235](https://netgrif.atlassian.net/browse/NAE-1235) - MailDraft improvement
+* [NAE-1236](https://netgrif.atlassian.net/browse/NAE-1236) - Anonym user persistance
+* [NAE-1240](https://netgrif.atlassian.net/browse/NAE-1240) - Add remove role to Action Delegate
+* [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10873/tab/release-report-all-issues"></a>
+## 5.0.7 (01.03.2021)
+### Bug fixes
+* [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10871/tab/release-report-all-issues"></a>
+## 5.0.6 (24.02.2021)
+### Bug fixes
+None
+
+### Improvements
+* [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10870/tab/release-report-all-issues"></a>
+## 5.0.5 (19.02.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10866/tab/release-report-all-issues"></a>
 ## 5.0.4 - Gray Titanium (19.02.2021)
 ### Bug fixes

@@ -33,6 +33,7 @@ public class RoleFactory {
         addDelegate(permissions, roleLogic);
         addCancel(permissions, roleLogic);
         addAssigned(permissions, roleLogic);
+        addView(permissions, roleLogic);
 
         return permissions;
     }
@@ -42,6 +43,7 @@ public class RoleFactory {
 
         addCreate(permissions, roleLogic);
         addDelete(permissions, roleLogic);
+        addCaseView(permissions, roleLogic);
 
         return permissions;
     }
@@ -74,6 +76,16 @@ public class RoleFactory {
     private void addDelete(Map<String, Boolean> permissions, CaseLogic roleLogic) {
         if (roleLogic.isDelete() != null)
             permissions.put(ProcessRolePermission.DELETE.toString(), roleLogic.isDelete());
+    }
+
+    private void addView(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isView() != null)
+            permissions.put(RolePermission.VIEW.toString(), roleLogic.isView());
+    }
+
+    private void addCaseView(Map<String, Boolean> permissions, CaseLogic roleLogic) {
+        if (roleLogic.isView() != null)
+            permissions.put(ProcessRolePermission.VIEW.toString(), roleLogic.isView());
     }
 
     ProcessRole transitionRole(PetriNet net, Transition transition) {

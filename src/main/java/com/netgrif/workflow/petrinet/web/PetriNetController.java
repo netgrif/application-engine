@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.service.Importer;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
@@ -75,7 +76,7 @@ public class PetriNetController {
     public PetriNetReferenceWithMessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
-            Authentication auth, Locale locale) throws MissingPetriNetMetaDataException {
+            Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
             File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
             file.createNewFile();

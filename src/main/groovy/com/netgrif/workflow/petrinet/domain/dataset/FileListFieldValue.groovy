@@ -16,8 +16,16 @@ class FileListFieldValue {
     }
 
     static FileListFieldValue fromString(String value) {
+        if(value == null) value = ""
+        return buildValueFromParts(Arrays.asList(value.split(",")))
+    }
+
+    static FileListFieldValue fromList(List<String> value) {
+        return buildValueFromParts(value)
+    }
+
+    private static FileListFieldValue buildValueFromParts(List<String> parts){
         FileListFieldValue newVal = new FileListFieldValue()
-        String[] parts = value.split(",")
         for (String part : parts) {
             if (!part.contains(":"))
                 newVal.getNamesPaths().add(new FileFieldValue(part, null))

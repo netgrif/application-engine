@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.TestHelper;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -61,14 +62,14 @@ public class ImporterTest {
     }
 
     @Test
-    public void importPetriNet() throws MissingPetriNetMetaDataException, IOException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), "major", superCreator.getLoggedSuper());
         assertNetProperlyImported();
     }
 
     @Test
-    public void priorityTest() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
         assert net.isPresent();
 
         Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
@@ -77,20 +78,20 @@ public class ImporterTest {
     }
 
     @Test
-    public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert net.isPresent();
     }
 
     @Test
-    public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), "major", superCreator.getLoggedSuper());
     }
 
     @Test
-    public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
 
         assertExternalMappingImport(net);
     }
