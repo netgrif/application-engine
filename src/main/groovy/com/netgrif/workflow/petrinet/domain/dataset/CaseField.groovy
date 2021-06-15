@@ -6,12 +6,12 @@ import org.springframework.data.mongodb.core.mapping.Document
 class CaseField extends FieldWithAllowedNets<List<String>>  {
 
     CaseField() {
-        super()
-        super.defaultValue = new ArrayList()
+        this(new ArrayList<String>())
     }
 
     CaseField(List<String> allowedNets) {
         super(allowedNets)
+        super.defaultValue = new ArrayList()
     }
 
     @Override

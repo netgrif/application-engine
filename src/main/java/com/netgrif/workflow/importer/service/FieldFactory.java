@@ -298,9 +298,7 @@ public final class FieldFactory {
         } else {
             field = new CaseField(new ArrayList<>(nets.getAllowedNet()));
         }
-        setDefaultValues(field, data, inits -> {
-            field.setDefaultValue(null);
-        });
+        setDefaultValues(field, data, inits -> {});
         return field;
     }
 
@@ -369,18 +367,19 @@ public final class FieldFactory {
         }
     }
 
-    public Field buildFieldWithoutValidation(Case useCase, String fieldId) {
-        return buildField(useCase, fieldId, false);
+    public Field buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
+        return buildField(useCase, fieldId, false, transitionId);
     }
 
-    public Field buildFieldWithValidation(Case useCase, String fieldId) {
-        return buildField(useCase, fieldId, true);
+    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
+        return buildField(useCase, fieldId, true, transitionId);
     }
 
-    private Field buildField(Case useCase, String fieldId, boolean withValidation) {
+    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
+        resolveComponent(field, useCase, transitionId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
         if (field instanceof MapOptionsField)
@@ -413,6 +412,17 @@ public final class FieldFactory {
         if (choices == null)
             return;
         field.setChoices(choices);
+    }
+
+    private void resolveComponent(Field field, Case useCase, String transitionId) {
+        if (transitionId == null) {
+            return;
+        }
+        com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
+        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
+        if(transitionComponent != null) {
+            field.setComponent(transitionComponent);
+        }
     }
 
     private void resolveMapOptions(MapOptionsField field, Case useCase) {
