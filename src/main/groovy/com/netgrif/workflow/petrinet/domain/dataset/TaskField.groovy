@@ -16,4 +16,8 @@ class TaskField extends Field<List<String>> {
         super.clone(clone)
         return clone
     }
+
+    void setDefaultValue(List<String> defaultValue) {
+        super.setDefaultValue(defaultValue)
+    }
 }

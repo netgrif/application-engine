@@ -22,7 +22,7 @@ public class Executor {
     private Map<String, ExecutorService> executors;
 
     public Executor(@Value("${spring.data.elasticsearch.executors:500}") long maxSize, @Value("${spring.data.elasticsearch.executors.timeout:5}") long timeout) {
-        this.executors = Collections.synchronizedMap(new MaxSizeHashMap(maxSize, timeout));
+        this.executors = Collections.synchronizedMap(new ExecutorMaxSizeHashMap(maxSize, timeout));
         log.info("Executor created, thread capacity: " + maxSize);
     }
 

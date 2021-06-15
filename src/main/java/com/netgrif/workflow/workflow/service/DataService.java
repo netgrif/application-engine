@@ -1,6 +1,8 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -101,22 +103,20 @@ public class DataService implements IDataService {
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             }
@@ -136,12 +136,6 @@ public class DataService implements IDataService {
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
         return dataSetFields;
-    }
-
-    private void resolveComponents(Field field, Transition transition){
-        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if(transitionComponent != null)
-            field.setComponent(transitionComponent);
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
@@ -178,6 +172,14 @@ public class DataService implements IDataService {
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
 
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
+                List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
+                if (allowedNets != null) {
+                    dataField.setAllowedNets(allowedNets);
+                }
+                Map<String, Object> filterMetadata = parseFilterMetadataValue(entry.getValue());
+                if (filterMetadata != null) {
+                    dataField.setFilterMetadata(filterMetadata);
+                }
                 ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
@@ -702,7 +704,7 @@ public class DataService implements IDataService {
     public List<Field> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id)).collect(Collectors.toList());
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
 
         return fields;
@@ -788,7 +790,7 @@ public class DataService implements IDataService {
     private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
-        switch (node.get("type").asText()) {
+        switch (getFieldTypeFromNode(node)) {
             case "date":
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
@@ -882,10 +884,7 @@ public class DataService implements IDataService {
     }
 
     private List<String> parseListStringValues(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
-        ArrayList<String> list = new ArrayList<>();
-        arrayNode.forEach(string -> list.add(string.asText()));
-        return list;
+        return parseListString(node, "value");
     }
 
     private List<Long> parseListLongValues(ObjectNode node) {
@@ -893,6 +892,47 @@ public class DataService implements IDataService {
         ArrayList<Long> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asLong()));
         return list;
+    }
+
+    private List<String> parseAllowedNetsValue(JsonNode jsonNode) {
+        ObjectNode node = (ObjectNode) jsonNode;
+        String fieldType = getFieldTypeFromNode(node);
+        if (Objects.equals(fieldType, "caseRef") || Objects.equals(fieldType, "filter")) {
+            return parseListStringAllowedNets(node);
+        }
+        return null;
+    }
+
+    private List<String> parseListStringAllowedNets(ObjectNode node) {
+        return parseListString(node, "allowedNets");
+    }
+
+    private List<String> parseListString(ObjectNode node, String attributeKey) {
+        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
+        if (arrayNode == null) {
+            return null;
+        }
+        ArrayList<String> list = new ArrayList<>();
+        arrayNode.forEach(string -> list.add(string.asText()));
+        return list;
+    }
+
+    private String getFieldTypeFromNode(ObjectNode node) {
+        return node.get("type").asText();
+    }
+
+    private Map<String, Object> parseFilterMetadataValue(JsonNode jsonNode) {
+        ObjectNode node = (ObjectNode) jsonNode;
+        String fieldType = getFieldTypeFromNode(node);
+        if (Objects.equals(fieldType, "filter")) {
+            JsonNode filterMetadata = node.get("filterMetadata");
+            if (filterMetadata == null) {
+                return null;
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>(){});
+        }
+        return null;
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {

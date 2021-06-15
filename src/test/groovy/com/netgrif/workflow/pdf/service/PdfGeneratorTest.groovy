@@ -54,7 +54,7 @@ class PdfGeneratorTest {
     @Autowired
     private ApplicationContext applicationContext;
 
-    public static final String[] TESTING_DATA = ["pdf_test_1.xml", "pdf_test_2.xml", "pdf_test_3.xml"]
+    public static final String[] TESTING_DATA = ["pdf_test_1.xml", "pdf_test_2.xml", "pdf_test_3.xml", "all_data_pdf.xml"]
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -67,6 +67,17 @@ class PdfGeneratorTest {
         testingLongDocument()
         testingPageNumber()
         testingCustomField()
+        testAllData()
+    }
+
+    private void testAllData() {
+        PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[3]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
+        testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
+        pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[3] + "_.pdf"))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
     private void testingNormal() {
@@ -145,5 +156,6 @@ class PdfGeneratorTest {
         }
         return dataGroupMap
     }
+
 
 }

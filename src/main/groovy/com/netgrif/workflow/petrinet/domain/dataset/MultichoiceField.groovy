@@ -38,6 +38,20 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         }
     }
 
+    void setDefaultValues(List<String> inits){
+        if(inits == null || inits.isEmpty()){
+            this.defaultValue = null
+        } else {
+            Set<I18nString> defaults = new HashSet<>()
+            inits.forEach { initValue ->
+                defaults << choices.find{ choice ->
+                    choice.defaultValue == initValue.trim()
+                }
+            }
+            super.setDefaultValue(defaults)
+        }
+    }
+
     void setValue(String value) {
         I18nString i18n = choices.find { it.contains(value) }
         if (i18n == null && value != null)
@@ -65,20 +79,13 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         super.setValue(value)
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     Field clone() {
         MultichoiceField clone = new MultichoiceField()
         super.clone(clone)
-
-        clone.defaultValue = this.defaultValue
         clone.choices = this.choices
-
+        clone.choicesExpression = this.choicesExpression
         return clone
     }
 }
