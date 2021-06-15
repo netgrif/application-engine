@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
-import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -108,17 +106,11 @@ public class Case {
     @Setter
     private Map<String, Integer> resetArcTokens;
 
-    /**
-     * TODO: Indexed?
-     */
     @Getter
     @Setter
     @JsonIgnore
     private Set<TaskPair> tasks;
 
-    /**
-     * TODO: Indexed?
-     */
     @Getter
     @Setter
     @JsonIgnore
@@ -128,6 +120,10 @@ public class Case {
     @Setter
     private Map<String, Map<String, Boolean>> permissions;
 
+    @Getter
+    @Setter
+    private List<String> negativeViewRoles;
+
     @Getter @Setter
     @Builder.Default
     private Map<Long, Map<String, Boolean>> users = new HashMap<>();
@@ -135,6 +131,10 @@ public class Case {
     @Getter @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+
+    @Getter
+    @Setter
+    private List<Long> negativeViewUsers;
 
     public Case() {
         _id = new ObjectId();
@@ -146,8 +146,10 @@ public class Case {
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
+        negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
         userRefs = new HashMap<>();
+        negativeViewUsers = new ArrayList<>();
     }
 
     public Case(String title) {
@@ -156,12 +158,11 @@ public class Case {
         visualId = generateVisualId();
     }
 
-    public Case(String title, PetriNet petriNet, Map<String, Integer> activePlaces) {
-        this(title);
+    public Case(PetriNet petriNet, Map<String, Integer> activePlaces) {
+        this();
         this.petriNetObjectId = petriNet.getObjectId();
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
-        populateDataSet();
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
@@ -179,21 +180,38 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    private void populateDataSet() {
+    public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
+
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        List<Field<?>> dynamicInitFields = new LinkedList<>();
+        List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
+        List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
-            if (field instanceof FieldWithDefault) {
-                this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
-            } else {
+            if (field.isDynamicDefaultValue()) {
+                dynamicInitFields.add(field);
                 this.dataSet.put(key, new DataField());
+            } else {
+                this.dataSet.put(key, new DataField(field.getDefaultValue()));
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
-            if (field instanceof CaseField) {
-                this.dataSet.get(key).setValue(new ArrayList<>());
-                this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
+            if (field instanceof FieldWithAllowedNets) {
+                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+            }
+            if (field instanceof FilterField) {
+                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
+            }
+            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
+                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+            }
+            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
+                dynamicChoicesFields.add((ChoiceField<?>) field);
             }
         });
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
     }
 
     private String generateVisualId() {
@@ -217,14 +235,10 @@ public class Case {
     }
 
     public boolean removeTask(Task task) {
-//        return this.tasks.remove(new TaskPair(task.getStringId(), task.getTransitionId()));
         return this.removeTasks(Collections.singletonList(task));
     }
 
     public boolean removeTasks(List<Task> tasks) {
-//        List<TaskPair> taskPairsToRemove = tasks.stream().map(task -> new TaskPair(task.getStringId(), task.getTransitionId()))
-//                .collect(Collectors.toList());
-//        return this.tasks.removeAll(taskPairsToRemove);
         int sizeBeforeChange = this.tasks.size();
         Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
         this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());

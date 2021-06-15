@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
@@ -62,7 +63,10 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean isAssignee(LoggedUser loggedUser, String taskId) {
-        return isAssignee(loggedUser.transformToUser(), taskService.findById(taskId));
+        if (loggedUser.isAnonymous())
+            return isAssignee(loggedUser.transformToAnonymousUser(), taskService.findById(taskId));
+        else
+            return isAssignee(loggedUser.transformToUser(), taskService.findById(taskId));
     }
 
     @Override
@@ -75,7 +79,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         if (!isAssigned(task))
             return false;
         else
-            return task.getUserId().equals(user.getId());
+            return task.getUserId().equals(user.getId()) || user instanceof AnonymousUser;
     }
 
     private boolean isAssigned(String taskId) {
@@ -104,8 +108,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be finished, because it is not assigned!");
 
         return loggedUser.isAdmin()
-                || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-                    && isAssignee(loggedUser, taskId)) || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM);
+                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM) || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM))
+                    && isAssignee(loggedUser, taskId));
     }
 
     private boolean canAssignedCancel(User user, String taskId) {
@@ -122,8 +126,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be canceled, because it is not assigned!");
 
         return loggedUser.isAdmin()
-                || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL))
                 && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
     }
 

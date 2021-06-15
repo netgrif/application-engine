@@ -1,13 +1,20 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +48,10 @@ class FieldTest {
     private SystemUserRunner systemUserRunner
 
     @Autowired
-    private DefaultRoleRunner roleRunner
+    private GroupRunner groupRunner
+
+    @Autowired
+    private TestHelper testHelper
 
     @Autowired
     private SuperCreator superCreator
@@ -53,15 +63,13 @@ class FieldTest {
     def limitsNetOptional
     PetriNet net
 
+    @Before
+    void before() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void testImport() {
-        template.db.drop()
-        userRepository.deleteAll()
-        roleRepository.deleteAll()
-        roleRunner.run()
-        superCreator.run()
-        systemUserRunner.run()
-
         limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE))
 
         assertNet()
@@ -74,6 +82,7 @@ class FieldTest {
         assertFileField()
         assertUserField()
         assertDateTimeField()
+        assertCaseRef()
     }
 
     private void assertNet() {
@@ -176,5 +185,7 @@ class FieldTest {
         assert field.name.defaultValue == "CaseRef"
         assert field.allowedNets.size() == 2
         assert field.allowedNets.containsAll(["processId1", "processId2"])
+        assert field.defaultValue instanceof List
+        assert field.defaultValue.isEmpty()
     }
 }
