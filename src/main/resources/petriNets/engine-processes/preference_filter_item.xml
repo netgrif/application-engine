@@ -82,7 +82,8 @@
 		<title></title>
 		<placeholder>Remove</placeholder>
 		<action trigger="set">
-			parentId: f.parentId;
+			parentId: f.parentId,
+			filterCase: f.filter_case;
 
 			if (!task.isPresent()) {
 				return;
@@ -90,16 +91,26 @@
 
 			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
 
+
 			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
 			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
 
 			previousTaskRefValue.remove(currentIndex)
 
+
+			previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
+
+			currentIndex = previousCaseRefValue.findIndexOf({id -> id == filterCase.value[0]})
+
+			previousCaseRefValue.remove(currentIndex)
+
+
 			parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
 
 			setDataWithPropagation(parentTask, [
-				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
+				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue]
 			])
 
 			async.run {
