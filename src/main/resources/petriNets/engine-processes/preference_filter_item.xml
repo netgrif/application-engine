@@ -179,13 +179,16 @@
 				<action trigger="set">
 					filterTaskRef: f.filter_preview,
 					filterCaseRef: f.filter_case,
-					entryName: f.entry_name;
+					entryName: f.entry_name,
+					icon: f.icon_name;
 
 					filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 
 					change entryName value {return filterCase.title}
 
 					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+
+					change icon value {filterCase.icon}
 				</action>
 			</logic>
 		</dataRef>
