@@ -103,7 +103,8 @@
 		</component>
 		<action trigger="set">
 			filterAutocomplete: f.this,
-			previewTaskRef: f.filter_preview;
+			previewTaskRef: f.filter_preview,
+			referencedFiltersList: f.referenced_filters;
 
 			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
 				change previewTaskRef value {
@@ -111,7 +112,9 @@
 				}
 			} else {
 				change filterAutocomplete options {
-					return findFilters(filterAutocomplete.value).collectEntries({filterCase -> [filterCase.stringId, filterCase.title]})
+					return findFilters(filterAutocomplete.value)
+						.findAll({filterCase -> !referencedFiltersList.value.contains(filterCase.stringId)})
+						.collectEntries({filterCase -> [filterCase.stringId, filterCase.title]})
 				}
 				change previewTaskRef value {
 					return []
@@ -125,7 +128,8 @@
 		<placeholder>Add to menu</placeholder>
 		<action trigger="set">
 			filterAutocomplete: f.filter_autocomplete_selection,
-			menuItemsTaskRef: f.filter_tasks;
+			menuItemsTaskRef: f.filter_tasks,
+			referencedFiltersList: f.referenced_filters;
 
 			if (!filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
 				return;
@@ -140,11 +144,20 @@
 			])
 			finishTask(initTask)
 
+			change referencedFiltersList value {return referencedFiltersList.value + filterAutocomplete.value}
+
 			viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
 
 			change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
 			change filterAutocomplete value {return ""}
 		</action>
+	</data>
+	<data type="caseRef">
+		<id>referenced_filters</id>
+		<title></title>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -225,11 +238,13 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    filtersTaskRef: f.filter_tasks;
+                    filtersTaskRef: f.filter_tasks,
+					referencedFiltersList: f.referenced_filters;
 
                     defaultFilters = findCases({it.processIdentifier.eq("filter").and(it.author.id.eq(userService.getSystem().id))})
 
 					filterTaskIds = []
+					filterCaseIds = []
 
 					defaultFilters.forEach { filterCase ->
 						optionCase = createCase("preference_filter_item")
@@ -238,16 +253,17 @@
 						assignTask(initTask)
 						setData(initTask, [
 								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
-								"parentId": ["type":"text", "value":useCase.stringId],
-								"icon_name": ["type":"text", "value":filterCase.icon]
+								"parentId": ["type":"text", "value":useCase.stringId]
 						])
 						finishTask(initTask)
 
 						viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
 						filterTaskIds.add(viewTask.stringId)
+						filterCaseIds.add(filterCase.stringId)
 					}
 
 					change filtersTaskRef value {return filterTaskIds}
+					change referencedFiltersList value {return filterCaseIds}
                 </action>
             </actions>
         </event>
