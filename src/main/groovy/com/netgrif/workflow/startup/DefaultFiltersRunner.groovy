@@ -49,40 +49,42 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     void run(String... args) throws Exception {
         // TODO don't create default filters if they already exist
         // TODO i18n
-        createCaseFilter("All cases", "", FILTER_VISIBILITY_PUBLIC, "", [], [
+        createCaseFilter("All cases", "assignment", "", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
         ])
-        createCaseFilter("My cases", "", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
+        createCaseFilter("My cases", "assignment_ind", "", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
                 "predicateMetadata": [[["category": "case_author", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
                 "searchCategories": ["case_author"]
         ])
 
-        createTaskFilter("All tasks", "", FILTER_VISIBILITY_PUBLIC, "", [], [
+        createTaskFilter("All tasks", "library_add_check", "", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
         ])
-        createTaskFilter("My tasks", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
+        createTaskFilter("My tasks", "account_box", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
                 "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
                 "searchCategories": ["task_assignee"]
         ])
     }
 
-    public Optional<Case> createCaseFilter(String title, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
-        return createFilter(title, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": FILTER_TYPE_CASE])
+    public Optional<Case> createCaseFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
+        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": FILTER_TYPE_CASE])
     }
 
-    public Optional<Case> createTaskFilter(String title, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
-        return createFilter(title, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": FILTER_TYPE_TASK])
+    public Optional<Case> createTaskFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
+        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": FILTER_TYPE_TASK])
     }
 
-    private Optional<Case> createFilter(String title, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
+    private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
         PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
             return Optional.empty()
         }
 
         Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, this.userService.getLoggedOrSystem().transformToLoggedUser())
+        filterCase.setIcon(icon)
+        filterCase = this.workflowService.save(filterCase)
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
         this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem())
         this.dataService.setData(newFilterTask, ImportHelper.populateDataset([

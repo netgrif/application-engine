@@ -3,6 +3,7 @@
 	<id>preference_filter_item</id>
 	<initials>PFI</initials>
 	<title>Preference filter item</title>
+	<icon>list</icon>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
 	<!-- TRANSACTIONS -->
@@ -124,6 +125,7 @@
 	<data type="boolean" immediate="true">
 		<id>use_icon</id>
 		<title>Display menu icon?</title>
+		<init>true</init>
 	</data>
 	<data type="text">
 		<id>icon_preview</id>
@@ -189,6 +191,12 @@
 		</dataRef>
 		<dataRef>
 			<id>parentId</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>icon_name</id>
 			<logic>
 				<behavior>editable</behavior>
 			</logic>
@@ -296,7 +304,7 @@
 			<dataRef>
 				<id>icon_preview</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
@@ -308,7 +316,7 @@
 			<dataRef>
 				<id>icon_name</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
