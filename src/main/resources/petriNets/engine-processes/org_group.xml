@@ -238,7 +238,8 @@
 						assignTask(initTask)
 						setData(initTask, [
 								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
-								"parentId": ["type":"text", "value":useCase.stringId]
+								"parentId": ["type":"text", "value":useCase.stringId],
+								"icon_name": ["type":"text", "value":filterCase.icon]
 						])
 						finishTask(initTask)
 
