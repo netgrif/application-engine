@@ -6,10 +6,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "QRTZ_JOB_DETAILS",
-       indexes = {
-        @Index(name = "IDX_QRTZ_J_REQ_RECOVERY", columnList = "SCHED_NAME,REQUESTS_RECOVERY"),
-        @Index(name = "IDX_QRTZ_J_GRP", columnList = "SCHED_NAME,JOB_GROUP"),
-})
+        indexes = {
+                @Index(name = "IDX_QRTZ_J_REQ_RECOVERY", columnList = "SCHED_NAME,REQUESTS_RECOVERY"),
+                @Index(name = "IDX_QRTZ_J_GRP", columnList = "SCHED_NAME,JOB_GROUP"),
+        })
 @IdClass(QrtzJobDetailsPK.class)
 public class QrtzJobDetails {
     private String schedName;

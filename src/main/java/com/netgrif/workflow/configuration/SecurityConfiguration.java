@@ -2,6 +2,7 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
@@ -98,27 +99,27 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         log.info("Configuration with frontend separated");
 //        @formatter:off
         http
-            .httpBasic()
+                .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
-            .and()
+                .and()
                 .cors()
                 .and()
-            .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
-            .authorizeRequests()
+                .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .logout()
+                .and()
+                .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .headers()
+                .and()
+                .headers()
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
@@ -159,12 +160,12 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
-                    authenticationManager(),
-                    new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                    authority,
-                    this.serverPatterns,
-                    this.jwtService,
-                    this.userService
-                );
+                authenticationManager(),
+                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                authority,
+                this.serverPatterns,
+                this.jwtService,
+                this.userService
+        );
     }
 }

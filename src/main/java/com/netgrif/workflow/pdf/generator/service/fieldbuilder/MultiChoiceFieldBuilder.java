@@ -16,13 +16,13 @@ public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedMultichoiceField field, int lastX, int lastY){
+    public PdfField buildField(DataGroup dataGroup, LocalisedMultichoiceField field, int lastX, int lastY) {
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
 
-        if(field.getChoices() != null)
+        if (field.getChoices() != null)
             choices = field.getChoices();
         if (field.getValue() != null)
             values.addAll((Collection<? extends String>) field.getValue());

@@ -12,8 +12,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Map;
 
 /**
- * @deprecated
- * since 5.3.0 - Filter engine processes should be used instead of native objects
+ * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
  */
 @Deprecated
 public interface IFilterService {

@@ -124,11 +124,13 @@ public class Case {
     @Setter
     private List<String> negativeViewRoles;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<Long, Map<String, Boolean>> users = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
@@ -180,7 +182,9 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
+    public void addNegativeViewRoles(List<String> roleIds) {
+        negativeViewRoles.addAll(roleIds);
+    }
 
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
@@ -257,7 +261,7 @@ public class Case {
         return petriNetObjectId.toString();
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);

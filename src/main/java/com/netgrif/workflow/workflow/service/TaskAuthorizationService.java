@@ -105,11 +105,11 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     @Override
     public boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId))
-            throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be finished, because it is not assigned!");
+            throw new IllegalTaskStateException("Task with ID '" + taskId + "' cannot be finished, because it is not assigned!");
 
         return loggedUser.isAdmin()
                 || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM) || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM))
-                    && isAssignee(loggedUser, taskId));
+                && isAssignee(loggedUser, taskId));
     }
 
     private boolean canAssignedCancel(User user, String taskId) {
@@ -123,7 +123,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     @Override
     public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId))
-            throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be canceled, because it is not assigned!");
+            throw new IllegalTaskStateException("Task with ID '" + taskId + "' cannot be canceled, because it is not assigned!");
 
         return loggedUser.isAdmin()
                 || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)

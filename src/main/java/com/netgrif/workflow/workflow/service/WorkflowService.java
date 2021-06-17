@@ -377,10 +377,10 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Map<String, I18nString> listToMap(List<Case> cases){
+    public Map<String, I18nString> listToMap(List<Case> cases) {
         Map<String, I18nString> options = new HashMap<>();
         cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
-        return  options;
+        return options;
     }
 
 
@@ -407,7 +407,7 @@ public class WorkflowService implements IWorkflowService {
             useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
-                                (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
+                        (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
                     taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(field.getStringId()).getValue()).add(pair.getTask()));
                 }
@@ -523,7 +523,7 @@ public class WorkflowService implements IWorkflowService {
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
             }
-            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
+            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET, true);
         });
         save(case$);
         return changedFields;
@@ -548,9 +548,9 @@ public class WorkflowService implements IWorkflowService {
         });
     }
 
-    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields) {
         LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getEvents() != null){
+        if (field.getEvents() != null) {
             fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
         }
         if (fieldActions.isEmpty()) return;
@@ -558,7 +558,7 @@ public class WorkflowService implements IWorkflowService {
         runEventActions(useCase, fieldActions, changedFields, actionTrigger);
     }
 
-    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
+    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger) {
         actions.forEach(action -> {
             ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty());
             changedFields.mergeChangedFields(currentChangedFields);
@@ -566,7 +566,7 @@ public class WorkflowService implements IWorkflowService {
             if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger, trigger == Action.ActionTrigger.SET);
         });
     }
 

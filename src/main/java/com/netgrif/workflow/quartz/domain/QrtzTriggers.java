@@ -19,7 +19,7 @@ import java.util.Objects;
                 @Index(name = "IDX_QRTZ_T_NFT_MISFIRE", columnList = "SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME"),
                 @Index(name = "IDX_QRTZ_T_NFT_ST_MISFIRE", columnList = "SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_STATE"),
                 @Index(name = "IDX_QRTZ_T_NFT_ST_MISFIRE_GRP", columnList = "SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_GROUP,TRIGGER_STATE"),
-})
+        })
 @IdClass(QrtzTriggersPK.class)
 public class QrtzTriggers {
     private String schedName;

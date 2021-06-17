@@ -20,7 +20,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 public class PublicAuthenticationFilter extends OncePerRequestFilter {
@@ -58,7 +61,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void authenticate(HttpServletRequest request, String jwtToken){
+    private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 UserProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousRole),
@@ -97,7 +100,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         LoggedUser loggedUser = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
-            User user = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
+            User user = userService.findByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"), false);
             if (user != null)
                 loggedUser = user.transformToLoggedUser();
         }

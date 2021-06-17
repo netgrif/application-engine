@@ -196,11 +196,11 @@ class TaskApiTest {
         leasing2 = leasing2Opt.get()
 
 //@formatter:off
-        assert limits.dataSet["limit"].value as Double  == 950_000 as Double
-        assert leasing1.dataSet["2"].value as Double    == 950_000 as Double
-        assert leasing1.dataSet["1"].value as Double    ==  30_000 as Double
-        assert leasing2.dataSet["2"].value as Double    == 950_000 as Double
-        assert leasing2.dataSet["1"].value as Double    ==  20_000 as Double
+        assert limits.dataSet["limit"].value as Double == 950_000 as Double
+        assert leasing1.dataSet["2"].value as Double == 950_000 as Double
+        assert leasing1.dataSet["1"].value as Double == 30_000 as Double
+        assert leasing2.dataSet["2"].value as Double == 950_000 as Double
+        assert leasing2.dataSet["1"].value as Double == 20_000 as Double
 //@formatter:on
     }
 

@@ -16,7 +16,7 @@ public class UserResource extends EntityModel<User> {
 
     private void buildLinks(String selfRel) {
         WebMvcLinkBuilder getLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                .getUser(getContent().getId(),false, null));
+                .getUser(getContent().getId(), false, null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
         WebMvcLinkBuilder roleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)

@@ -54,7 +54,7 @@ public class RuleEngineTest {
 
     @Autowired
     private RuleRepository ruleRepository;
-    
+
     @Autowired
     private RefreshableKieBase refreshableKieBase;
 

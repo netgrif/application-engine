@@ -11,7 +11,6 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
@@ -32,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-
 
 @Component
 class ImportHelper {
@@ -199,7 +197,7 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String, String>> data) {
         ObjectNode dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }
@@ -212,7 +210,7 @@ class ImportHelper {
         return dataService.getData(getTaskId(taskTitle, caseId))
     }
 
-    void updateSuperUser(){
+    void updateSuperUser() {
         superCreator.setAllToSuperUser();
     }
 

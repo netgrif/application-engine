@@ -18,6 +18,6 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-       return
+        return
     }
 }

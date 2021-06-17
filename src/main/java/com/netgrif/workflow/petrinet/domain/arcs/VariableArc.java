@@ -30,7 +30,7 @@ public class VariableArc extends Arc {
         if (source instanceof Transition)
             return true;
         if (field == null || field.getValue() == null)
-            throw new IllegalStateException("Field "+ fieldId + " has null value");
+            throw new IllegalStateException("Field " + fieldId + " has null value");
         double multiplicity = Double.parseDouble(field.getValue().toString());
         return ((Place) source).getTokens() >= multiplicity;
     }
@@ -38,7 +38,7 @@ public class VariableArc extends Arc {
     @Override
     public void execute() {
         double multiplicity = Double.parseDouble(field.getValue().toString());
-        if (source instanceof  Place) {
+        if (source instanceof Place) {
             removedTokens = (int) multiplicity;
             getPlace().removeTokens(removedTokens);
         } else {

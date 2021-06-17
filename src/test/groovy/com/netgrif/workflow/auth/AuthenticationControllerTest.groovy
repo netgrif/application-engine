@@ -16,13 +16,13 @@ import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import org.jsoup.Jsoup
 
 //import com.netgrif.workflow.orgstructure.domain.Group
 //import com.netgrif.workflow.orgstructure.domain.GroupRepository
 //import com.netgrif.workflow.orgstructure.domain.Member
 //import com.netgrif.workflow.orgstructure.domain.MemberRepository
 
-import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

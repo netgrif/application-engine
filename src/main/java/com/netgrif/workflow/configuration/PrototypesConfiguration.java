@@ -40,15 +40,21 @@ public class PrototypesConfiguration {
 
     @Bean("pdfDataHelper")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IPdfDataHelper nextPdfDataHelper(){return new PdfDataHelper();}
+    public IPdfDataHelper nextPdfDataHelper() {
+        return new PdfDataHelper();
+    }
 
     @Bean("pdfGenerator")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IPdfGenerator pdfGenerator(){return new PdfGenerator();}
+    public IPdfGenerator pdfGenerator() {
+        return new PdfGenerator();
+    }
 
     @Bean("pdfDrawer")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IPdfDrawer pdfDrawer(){return new PdfDrawer();}
+    public IPdfDrawer pdfDrawer() {
+        return new PdfDrawer();
+    }
 
     @Bean("userResourceAssembler")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
