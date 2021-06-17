@@ -28,7 +28,7 @@ public class HibernateNamingStrategy extends SpringPhysicalNamingStrategy {
     protected boolean shouldSetLowercase(String name, JdbcEnvironment jdbcEnvironment) {
         return isCaseInsensitive(jdbcEnvironment) && (
                 !StringUtils.isAllUpperCase(name.replaceAll("[\\_\\s\\.\\d]+", "")) ||
-                ignored.contains(name));
+                        ignored.contains(name));
     }
 
 }

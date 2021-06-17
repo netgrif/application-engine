@@ -6,4 +6,5 @@ import com.netgrif.workflow.utils.SingleItemAsListDeserializer;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 
 @JsonDeserialize(using = SingleItemAsListDeserializer.class, contentAs = TaskSearchRequest.class)
-public class SingleTaskSearchRequestAsList extends SingleItemAsList<TaskSearchRequest> {}
+public class SingleTaskSearchRequestAsList extends SingleItemAsList<TaskSearchRequest> {
+}

@@ -13,14 +13,17 @@ public class UserProcessRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Getter @Setter
+    @Getter
+    @Setter
     private Long id;
 
     @Column(unique = true)
-    @Getter @Setter
+    @Getter
+    @Setter
     private String roleId;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String netId;
 
     @JsonIgnore

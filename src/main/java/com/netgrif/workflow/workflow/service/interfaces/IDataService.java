@@ -39,7 +39,7 @@ public interface IDataService {
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, Task task,  String fieldId, boolean forPreview);
+    FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview);
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 

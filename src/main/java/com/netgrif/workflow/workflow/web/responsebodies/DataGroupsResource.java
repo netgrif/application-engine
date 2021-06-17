@@ -17,7 +17,7 @@ public class DataGroupsResource extends CollectionModel<DataGroup> {
         buildLinks();
     }
 
-    private void buildLinks(){
+    private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getData("", null)).withSelfRel());
     }

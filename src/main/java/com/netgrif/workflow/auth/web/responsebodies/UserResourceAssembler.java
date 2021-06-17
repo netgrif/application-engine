@@ -30,7 +30,7 @@ public class UserResourceAssembler implements RepresentationModelAssembler<User,
     @Override
     public UserResource toModel(User entity) {
         if (!initialized) {
-           throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
+            throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
         }
         return new UserResource(small ? userFactory.getSmallUser(entity) : userFactory.getUser(entity, locale), selfRel);
     }

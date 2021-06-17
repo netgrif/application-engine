@@ -35,7 +35,7 @@ class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
             lineCount++
         }
 
-        if(repository.count() == lineCount){
+        if (repository.count() == lineCount) {
             log.info("All $lineCount postal codes have been already imported")
             return
         }

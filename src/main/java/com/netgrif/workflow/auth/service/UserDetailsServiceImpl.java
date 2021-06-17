@@ -45,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
-            logger.info("User "+email+" with IP Address "+ip+" is blocked.");
+            logger.info("User " + email + " with IP Address " + ip + " is blocked.");
             throw new RuntimeException("blocked");
         }
 
@@ -57,17 +57,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return loggedUser;
     }
 
-    public void reloadSecurityContext(LoggedUser loggedUser){
+    public void reloadSecurityContext(LoggedUser loggedUser) {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(token);
     }
 
-    private LoggedUser getLoggedUser(String email) throws UsernameNotFoundException{
+    private LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
-        if(user == null)
+        if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
-        if ( user.getPassword() == null || user.getState() != UserState.ACTIVE)
-            throw new UsernameNotFoundException("User with login "+email+" cannot be logged in!");
+        if (user.getPassword() == null || user.getState() != UserState.ACTIVE)
+            throw new UsernameNotFoundException("User with login " + email + " cannot be logged in!");
 
         return user.transformToLoggedUser();
     }
@@ -81,7 +81,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private String getClientIP() {
         String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null){
+        if (xfHeader == null) {
             return request.getRemoteAddr();
         }
         return xfHeader.split(",")[0];

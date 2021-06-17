@@ -1,8 +1,6 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
@@ -12,7 +10,6 @@ import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowAuthorizationService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -83,7 +80,7 @@ public class WorkflowController {
             Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            log.error("Creating case failed:",e);
+            log.error("Creating case failed:", e);
             return null;
         }
     }
@@ -113,7 +110,7 @@ public class WorkflowController {
     @ApiOperation(value = "Generic case search on Elasticsearch database", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        LoggedUser user =(LoggedUser) auth.getPrincipal();
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, locale, operation == MergeFilterOperation.AND);
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
@@ -178,10 +175,10 @@ public class WorkflowController {
             Case aCase = workflowService.findOne(caseId);
             taskService.reloadTasks(aCase);
 
-            return MessageResource.successMessage("Task reloaded in case ["+caseId+"]");
+            return MessageResource.successMessage("Task reloaded in case [" + caseId + "]");
         } catch (Exception e) {
-            log.error("Reloading tasks of case ["+caseId+"] failed:", e);
-            return MessageResource.errorMessage("Reloading tasks in case "+caseId+" has failed!");
+            log.error("Reloading tasks of case [" + caseId + "] failed:", e);
+            return MessageResource.errorMessage("Reloading tasks in case " + caseId + " has failed!");
         }
     }
 
@@ -191,14 +188,14 @@ public class WorkflowController {
     public MessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            if(deleteSubtree) {
+            if (deleteSubtree) {
                 workflowService.deleteSubtreeRootedAt(caseId);
             } else {
                 workflowService.deleteCase(caseId);
             }
             return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case ["+caseId+"] failed:",e);
+            log.error("Deleting case [" + caseId + "] failed:", e);
             return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
@@ -210,7 +207,7 @@ public class WorkflowController {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             return new DataFieldsResource(workflowService.getData(caseId), locale);
         } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of ["+caseId+"] failed:", e);
+            log.error("Getting all case data of [" + caseId + "] failed:", e);
             return new DataFieldsResource(new ArrayList<>(), locale);
         }
     }

@@ -34,30 +34,37 @@ public class Task {
     private ObjectId _id = new ObjectId();
 
     @Indexed
-    @Getter @Setter
+    @Getter
+    @Setter
     private String processId;
 
     @Indexed
-    @Getter @Setter
+    @Getter
+    @Setter
     private String caseId;
 
     @Indexed
     @Setter
     private String transitionId;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TaskLayout layout;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private I18nString title;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String caseColor;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String caseTitle;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer priority;
 
     @Indexed
@@ -65,7 +72,8 @@ public class Task {
     private Long userId;
 
     @org.springframework.data.annotation.Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private User user;
 
     @DBRef
@@ -76,53 +84,65 @@ public class Task {
     /**
      * Role ObjectId : [ RolePermission, true/false ]
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> roles = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private List<String> negativeViewRoles = new LinkedList<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<Long, Map<String, Boolean>> users = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private List<Long> negativeViewUsers = new LinkedList<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime startDate;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime finishDate;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Long finishedBy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String transactionId;
 
     /**
      * transient
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean requiredFilled;
 
     /**
      * ???
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     @JsonIgnore
     @Builder.Default
     private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Transient
     @Builder.Default
     private List<Field> immediateData = new LinkedList<>();
@@ -130,23 +150,28 @@ public class Task {
     @Setter
     private String icon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private DataFocusPolicy dataFocusPolicy = DataFocusPolicy.MANUAL;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<EventType, I18nString> eventTitles = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Boolean> assignedUserPolicy = new HashMap<>();
 
@@ -172,20 +197,22 @@ public class Task {
         return icon;
     }
 
-    public void addRole(String roleId, Map<String, Boolean> permissions){
-        if(roles.containsKey(roleId) && roles.get(roleId) != null)
+    public void addRole(String roleId, Map<String, Boolean> permissions) {
+        if (roles.containsKey(roleId) && roles.get(roleId) != null)
             roles.get(roleId).putAll(permissions);
         else
             roles.put(roleId, permissions);
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
-
-    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
-        userRefs.put(userRefId,permissions);
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
+        userRefs.put(userRefId, permissions);
+    }
+
+    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);
@@ -195,7 +222,7 @@ public class Task {
         });
     }
 
-    public void addAssignedUserPolicy(Map<String, Boolean> assignedUser){
+    public void addAssignedUserPolicy(Map<String, Boolean> assignedUser) {
         assignedUserPolicy.putAll(assignedUser);
     }
 

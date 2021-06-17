@@ -7,30 +7,30 @@ import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
-	boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
-	boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions);
+    boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions);
 
-	boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
-	boolean userHasUserListPermission(User user, Task task, RolePermission... permissions);
+    boolean userHasUserListPermission(User user, Task task, RolePermission... permissions);
 
     boolean isAssignee(LoggedUser loggedUser, String taskId);
 
-	boolean isAssignee(User user, String taskId);
+    boolean isAssignee(User user, String taskId);
 
-	boolean isAssignee(User user, Task task);
+    boolean isAssignee(User user, Task task);
 
-	boolean canCallAssign(LoggedUser loggedUser, String taskId);
+    boolean canCallAssign(LoggedUser loggedUser, String taskId);
 
-	boolean canCallDelegate(LoggedUser loggedUser, String taskId);
+    boolean canCallDelegate(LoggedUser loggedUser, String taskId);
 
-	boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
 
-	boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
+    boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
 
-	boolean canCallSaveData(LoggedUser loggedUser, String taskId);
+    boolean canCallSaveData(LoggedUser loggedUser, String taskId);
 
-	boolean canCallSaveFile(LoggedUser loggedUser, String taskId);
+    boolean canCallSaveFile(LoggedUser loggedUser, String taskId);
 
 }

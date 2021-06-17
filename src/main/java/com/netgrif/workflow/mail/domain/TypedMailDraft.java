@@ -20,7 +20,7 @@ public class TypedMailDraft {
 
     private Map<String, File> attachments;
 
-    public static TypedMailDraftBuilder builder(List<String> recipients){
+    public static TypedMailDraftBuilder builder(List<String> recipients) {
         return typedMailDraftBuilder().recipients(recipients).model(new HashMap<>()).attachments(new HashMap<>());
     }
 

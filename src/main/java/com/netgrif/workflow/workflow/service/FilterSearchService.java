@@ -16,8 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @deprecated
- * since 5.3.0 - Filter engine processes should be used instead of native objects
+ * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
  */
 @Deprecated
 @Service

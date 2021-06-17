@@ -29,8 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @deprecated
- * since 5.3.0 - Filter engine processes should be used instead of native objects
+ * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
  */
 @Deprecated
 @RestController

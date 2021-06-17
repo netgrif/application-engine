@@ -49,6 +49,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -254,7 +255,7 @@ class ActionDelegate {
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
-        addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+        addAttributeToChangedField(field, "options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
     }
 
     def saveChangedValidation(Field field) {
@@ -372,25 +373,25 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-        options: { cl ->
-            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
-                return
+         options    : { cl ->
+             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
+                 return
 
-            def options = cl()
-            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                return
-            if (!(options instanceof Map && options.every {it.getKey() instanceof String}))
-                return
-            field = (MapOptionsField) field
-            if (options.every {it.getValue() instanceof I18nString}) {
-                field.setOptions(options)
-            } else {
-                Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                options.each {it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String))}
-                field.setOptions(newOptions)
-            }
-            saveChangedOptions(field)
-        },
+             def options = cl()
+             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                 return
+             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                 return
+             field = (MapOptionsField) field
+             if (options.every { it.getValue() instanceof I18nString }) {
+                 field.setOptions(options)
+             } else {
+                 Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                 options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                 field.setOptions(newOptions)
+             }
+             saveChangedOptions(field)
+         },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -602,7 +603,8 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    User assignRole(String roleMongoId, User user = userService.loggedUser) { // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
+    User assignRole(String roleMongoId, User user = userService.loggedUser) {
+        // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
         User actualUser = userService.addRole(user, roleMongoId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
@@ -610,12 +612,12 @@ class ActionDelegate {
 
     User assignRole(String roleId, String netId, User user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
-        nets.forEach({net -> user = assignRole(roleId, net, user)})
+        nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
     User assignRole(String roleId, PetriNet net, User user = userService.loggedUser) {
-        User actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId}.stringId)
+        User actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
@@ -633,12 +635,12 @@ class ActionDelegate {
 
     User removeRole(String roleId, String netId, User user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
-        nets.forEach({net -> user = removeRole(roleId, net, user)})
+        nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
     User removeRole(String roleId, PetriNet net, User user = userService.loggedUser) {
-        User actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId}.stringId)
+        User actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
@@ -685,7 +687,7 @@ class ActionDelegate {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)
             changedField.wasChangedOn(task)
-            fieldAttributes.value.each {attribute ->
+            fieldAttributes.value.each { attribute ->
                 changedField.addAttribute(attribute.key, attribute.value)
             }
             return changedField
@@ -762,32 +764,32 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
-    void generatePDF(String transitionId, String fileFieldId){
+    void generatePDF(String transitionId, String fileFieldId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields){
+    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
+    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -797,68 +799,68 @@ class ActionDelegate {
         pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale){
+    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void sendMail(MailDraft mailDraft){
+    void sendMail(MailDraft mailDraft) {
         mailService.sendMail(mailDraft)
     }
 
     def changeUser(String email) {
-        [email: {cl ->
+        [email  : { cl ->
             changeUser(email, "email", cl)
         },
-         name: {cl ->
+         name   : { cl ->
              changeUser(email, "name", cl)
          },
-         surname: {cl ->
+         surname: { cl ->
              changeUser(email, "surname", cl)
          },
-         tel: {cl ->
+         tel    : { cl ->
              changeUser(email, "tel", cl)
          },
         ]
     }
 
     def changeUser(Long id) {
-        [email: {cl ->
+        [email  : { cl ->
             changeUser(id, "email", cl)
         },
-         name: {cl ->
+         name   : { cl ->
              changeUser(id, "name", cl)
          },
-         surname: {cl ->
+         surname: { cl ->
              changeUser(id, "surname", cl)
          },
-         tel: {cl ->
+         tel    : { cl ->
              changeUser(id, "tel", cl)
          },
         ]
     }
 
     def changeUser(User user) {
-        [email: {cl ->
+        [email  : { cl ->
             changeUser(user, "email", cl)
         },
-         name: {cl ->
+         name   : { cl ->
              changeUser(user, "name", cl)
          },
-         surname: {cl ->
+         surname: { cl ->
              changeUser(user, "surname", cl)
          },
-         tel: {cl ->
+         tel    : { cl ->
              changeUser(user, "tel", cl)
          },
         ]
