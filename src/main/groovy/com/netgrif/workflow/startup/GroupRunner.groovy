@@ -1,13 +1,13 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Component
 
 @ConditionalOnProperty(value = "nae.group.default.enabled",
         havingValue = "true",
@@ -39,16 +39,16 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
         createDefaultGroup()
     }
 
-    Optional<PetriNet> createDefaultGroup(){
+    Optional<PetriNet> createDefaultGroup() {
         PetriNet group
-        if((group = petriNetService.getNewestVersionByIdentifier(GROUP_PETRINET_IDENTIFIER)) != null){
+        if ((group = petriNetService.getNewestVersionByIdentifier(GROUP_PETRINET_IDENTIFIER)) != null) {
             log.info("Petri net for groups has already been imported.")
             return new Optional<>(group)
         }
 
-        Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, "major", systemCreator.loggedSystem)
+        Optional<PetriNet> groupNet = helper.createNet(GROUP_FILE_NAME, "major", systemCreator.loggedSystem)
 
-        if(!groupNet.present){
+        if (!groupNet.present) {
             log.error("Import of petri net for groups failed!")
             return groupNet
         }

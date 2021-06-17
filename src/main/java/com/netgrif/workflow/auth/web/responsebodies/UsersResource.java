@@ -26,7 +26,7 @@ public class UsersResource extends CollectionModel<UserResource> {
 
     private void buildLinks(String selfRel) {
         WebMvcLinkBuilder allLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(UserController.class).getAll(false, null,null, null, null));
+                .methodOn(UserController.class).getAll(false, null, null, null, null));
         add(selfRel.equalsIgnoreCase("all") ? allLink.withSelfRel() : allLink.withRel("all"));
     }
 }

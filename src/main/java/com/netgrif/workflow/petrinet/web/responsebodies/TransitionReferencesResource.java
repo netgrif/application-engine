@@ -15,7 +15,7 @@ public class TransitionReferencesResource extends CollectionModel<TransitionRefe
         buildLinks();
     }
 
-    private void buildLinks(){
+    private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
                 .getTransitionReferences(new ArrayList<>(), null, null)).withSelfRel());
     }

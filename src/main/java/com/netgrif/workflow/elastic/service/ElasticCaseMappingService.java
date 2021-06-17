@@ -3,13 +3,13 @@ package com.netgrif.workflow.elastic.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.domain.BooleanField;
 import com.netgrif.workflow.elastic.domain.DateField;
 import com.netgrif.workflow.elastic.domain.FileField;
 import com.netgrif.workflow.elastic.domain.NumberField;
 import com.netgrif.workflow.elastic.domain.TextField;
 import com.netgrif.workflow.elastic.domain.UserField;
+import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;

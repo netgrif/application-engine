@@ -216,7 +216,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildRoleQuery(request, userRoleQuery);
         buildNegativeViewRoleQuery(userRoleQuery, user);

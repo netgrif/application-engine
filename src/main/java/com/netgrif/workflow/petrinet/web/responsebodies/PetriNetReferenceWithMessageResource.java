@@ -14,11 +14,11 @@ public class PetriNetReferenceWithMessageResource extends CollectionModel<PetriN
         super(Collections.singleton(content), new ArrayList<Link>());
     }
 
-    public static PetriNetReferenceWithMessageResource successMessage(String msg, PetriNet net, Locale locale){
+    public static PetriNetReferenceWithMessageResource successMessage(String msg, PetriNet net, Locale locale) {
         return new PetriNetReferenceWithMessageResource(new PetriNetReferenceWithMessage(msg, net, locale));
     }
 
-    public static PetriNetReferenceWithMessageResource errorMessage(String msg){
+    public static PetriNetReferenceWithMessageResource errorMessage(String msg) {
         return new PetriNetReferenceWithMessageResource(new PetriNetReferenceWithMessage(msg));
     }
 }

@@ -164,7 +164,9 @@ public class PetriNet extends PetriNetObject {
         }
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
+    }
 
     public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {

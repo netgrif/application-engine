@@ -11,12 +11,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -24,7 +29,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticCaseIndex}", type = "case")
+@Document(indexName = "#{@elasticCaseIndex}")
 public class ElasticCase {
 
     @Id
@@ -50,6 +55,7 @@ public class ElasticCase {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ssZZZ")
     private LocalDateTime creationDate;
 
     private Long creationDateSortable;

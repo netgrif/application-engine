@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
 
-import com.netgrif.workflow.configuration.properties.ActionsProperties
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate

@@ -80,7 +80,7 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
         return outcomes;
     }
 
-    protected  <T extends Job> JobDetail buildJobDetail(String instanceStringId, StoredRule rule, Class<T> type) {
+    protected <T extends Job> JobDetail buildJobDetail(String instanceStringId, StoredRule rule, Class<T> type) {
         JobDetail jobDetail = JobBuilder.newJob().ofType(type)
                 .storeDurably(false)
                 .withIdentity(instanceStringId + "-" + rule.getStringId() + "-" + UUID.randomUUID().toString())

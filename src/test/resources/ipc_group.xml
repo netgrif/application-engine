@@ -21,7 +21,8 @@
             <actions phase="pre">
                 <action>
                     <!--@formatter:off-->
-                    createOrganisation("Test organisation", groupService.findAll().first(), [userService.findAll(true).first()] as Set)
+                    createOrganisation("Test organisation", groupService.findAll().first(),
+                    [userService.findAll(true).first()] as Set)
                     <!--@formatter:on-->
                 </action>
             </actions>
@@ -31,7 +32,7 @@
                     organisations: f.orgs;
                     def orgs = findOrganisation(userService.findAll(true).first())
                     change organisations choices {
-                        orgs.collect { it.name }
+                    orgs.collect { it.name }
                     }
                     <!--@formatter:on-->
                 </action>

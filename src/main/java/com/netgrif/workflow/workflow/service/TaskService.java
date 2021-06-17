@@ -1,15 +1,10 @@
 package com.netgrif.workflow.workflow.service;
 
-import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
-import com.netgrif.workflow.workflow.domain.TaskPair;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -571,7 +566,7 @@ public class TaskService implements ITaskService {
     @Override
     public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
-        if(searchPredicate != null) {
+        if (searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
             page = loadUsers(page);
             page = dataService.setImmediateFields(page);

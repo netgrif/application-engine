@@ -30,6 +30,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -173,7 +175,7 @@ class CaseSearchTest {
     String buildRequestBody(String process, String fullText) {
         def map = [
 
-                "process": [
+                "process" : [
                         "identifier": process
                 ],
                 "fullText": fullText
@@ -183,5 +185,3 @@ class CaseSearchTest {
         return mapper.writeValueAsString(map)
     }
 }
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status

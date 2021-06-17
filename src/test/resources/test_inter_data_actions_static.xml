@@ -13,10 +13,10 @@
             <!--@formatter:off-->
             limit: f.limit;
             execute "dynamic_edit_available" with ([
-                "2": [
-                    value: limit.value,
-                    type: "number",
-                ],
+            "2": [
+            value: limit.value,
+            type: "number",
+            ],
             ] as Map)
             <!--@formatter:on-->
         </action>
@@ -56,7 +56,7 @@
                     limit: f.limit,
                     delta: f.delta_limit;
                     change limit about {
-                        limit.value - delta.value;
+                    limit.value - delta.value;
                     }
                     <!--@formatter:on-->
                 </action>

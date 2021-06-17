@@ -154,7 +154,7 @@ public final class FieldFactory {
         return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }
 
-    private TaskField buildTaskField(Data data, List<Transition> transitions){
+    private TaskField buildTaskField(Data data, List<Transition> transitions) {
         TaskField field = new TaskField();
         setDefaultValues(field, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
@@ -175,7 +175,7 @@ public final class FieldFactory {
         setFieldChoices(field, data, importer);
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-               field.setDefaultValues(init);
+                field.setDefaultValues(init);
             }
         });
         return field;
@@ -233,7 +233,7 @@ public final class FieldFactory {
         }
 
         Map<String, I18nString> choices = (data.getOptions() == null) ? new LinkedHashMap<>() : data.getOptions().getOption().stream()
-                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
+                .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
         field.setOptions(choices);
     }
 
@@ -298,7 +298,8 @@ public final class FieldFactory {
         } else {
             field = new CaseField(new ArrayList<>(nets.getAllowedNet()));
         }
-        setDefaultValues(field, data, inits -> {});
+        setDefaultValues(field, data, inits -> {
+        });
         return field;
     }
 
@@ -336,7 +337,7 @@ public final class FieldFactory {
         FileListField fileListField = new FileListField();
         fileListField.setRemote(data.getRemote() != null);
         setDefaultValues(fileListField, data, defaultValues -> {
-            if (defaultValues != null && !defaultValues.isEmpty()){
+            if (defaultValues != null && !defaultValues.isEmpty()) {
                 fileListField.setDefaultValue(defaultValues);
             }
         });
@@ -420,7 +421,7 @@ public final class FieldFactory {
         }
         com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
         Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if(transitionComponent != null) {
+        if (transitionComponent != null) {
             field.setComponent(transitionComponent);
         }
     }
@@ -441,7 +442,7 @@ public final class FieldFactory {
 
     private void resolveFilterMetadata(FilterField field, Case useCase) {
         Map<String, Object> metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
-        if(metadata == null)
+        if (metadata == null)
             return;
         field.setFilterMetadata(metadata);
     }

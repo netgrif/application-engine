@@ -20,7 +20,7 @@ public class DashboardController {
             notes = "The provided aggregation is executed and its result is returned",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getAggregationByQuery(@RequestBody String query, @RequestParam("type") String type){
+    public String getAggregationByQuery(@RequestBody String query, @RequestParam("type") String type) {
         return dashboardService.searchByQuery(query, type);
     }
 }

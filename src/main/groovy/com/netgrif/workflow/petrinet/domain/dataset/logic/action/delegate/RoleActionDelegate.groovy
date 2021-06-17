@@ -4,7 +4,6 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.importer.model.Role
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.context.RoleContext
@@ -12,7 +11,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component
 
 @Component
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
@@ -60,7 +59,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     User assignRole(String roleImportId, User user = affectedUser, PetriNet petriNet) {
         Map<String, ProcessRole> map = petriNet.getRoles()
-        def foundEntry = map.find {entry ->
+        def foundEntry = map.find { entry ->
             entry.value.importId == roleImportId
         }
 
@@ -84,7 +83,7 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     User removeRole(String roleImportId, User user = affectedUser, PetriNet petriNet) {
         Map<String, ProcessRole> map = petriNet.getRoles()
-        def foundEntry = map.find {entry ->
+        def foundEntry = map.find { entry ->
             entry.value.importId == roleImportId
         }
 

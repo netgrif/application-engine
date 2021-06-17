@@ -17,7 +17,7 @@ public class AuthoritiesResources extends CollectionModel<Authority> {
     public AuthoritiesResources() {
     }
 
-    public void buildLinks(){
+    public void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllAuthorities(null)).withSelfRel());
     }

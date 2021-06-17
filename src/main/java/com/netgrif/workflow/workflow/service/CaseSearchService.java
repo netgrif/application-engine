@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -210,14 +209,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
                     switch (type) {
                         case USER:
-                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k),"value");
-                            Path idPath = Expressions.stringPath(valuePath,"id");
-                            Expression<Long> constant = Expressions.constant(Long.valueOf(""+fieldValue));
+                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k), "value");
+                            Path idPath = Expressions.stringPath(valuePath, "id");
+                            Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
                             predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
                             break;
                     }
                 } catch (IllegalArgumentException e) {
-                    log.error("Unrecognized Field type "+entry.getKey());
+                    log.error("Unrecognized Field type " + entry.getKey());
                 }
             } else {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
@@ -240,12 +239,12 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
 
         List<PetriNet> petriNets;
-        if(processes.isEmpty()) {
+        if (processes.isEmpty()) {
             petriNets = petriNetService.getAll();
         } else {
             petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
         }
-        if(petriNets.isEmpty())
+        if (petriNets.isEmpty())
             return null;
 
         List<BooleanExpression> predicates = new ArrayList<>();
@@ -281,9 +280,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
                         LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if(field.getType() == FieldType.ENUMERATION) {
-                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()),"value");
-                        Path defaultValuePath = Expressions.stringPath(valuePath,"defaultValue");
+                    } else if (field.getType() == FieldType.ENUMERATION) {
+                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
+                        Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");
                         Expression<String> constant = Expressions.constant(searchPhrase);
                         predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
                     }

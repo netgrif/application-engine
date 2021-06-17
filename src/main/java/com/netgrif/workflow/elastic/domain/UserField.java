@@ -5,10 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Long;
+import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 
 @Data

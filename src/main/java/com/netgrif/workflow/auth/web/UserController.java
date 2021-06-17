@@ -113,9 +113,9 @@ public class UserController {
     public UserResource getUser(@PathVariable("id") Long userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small == null ? false : small;
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)){
-            log.info("User " + loggedUser.getUsername() + " trying to get another user with ID "+userId);
-            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
+        if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
+            log.info("User " + loggedUser.getUsername() + " trying to get another user with ID " + userId);
+            throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
         User user = userService.findById(userId, small);
         return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");

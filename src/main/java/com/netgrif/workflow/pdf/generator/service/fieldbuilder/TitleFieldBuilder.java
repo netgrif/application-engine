@@ -10,13 +10,13 @@ public class TitleFieldBuilder extends FieldBuilder {
         super(resource);
     }
 
-    public PdfField createTitleField(){
+    public PdfField createTitleField() {
         PdfField titleField = new PdfTitleField("titleField", 0, 0, resource.getPageDrawableWidth(),
                 resource.getFormGridRowHeight(), resource.getDocumentTitle(), resource);
         titleField.setOriginalBottomY(countBottomPosY(titleField, resource));
         titleField.countMultiLineHeight(resource.getFontTitleSize(), resource);
         titleField.setHeight(titleField.getHeight() + resource.getLineHeight());
-        titleField.setBottomY(countBottomPosY(titleField,resource));
+        titleField.setBottomY(countBottomPosY(titleField, resource));
         return titleField;
     }
 }

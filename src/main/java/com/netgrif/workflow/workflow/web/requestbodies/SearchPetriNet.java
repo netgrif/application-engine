@@ -10,5 +10,6 @@ public class SearchPetriNet {
     public List<String> transitions;
     public Map<String, Object> dataSet;
 
-    public SearchPetriNet() {}
+    public SearchPetriNet() {
+    }
 }

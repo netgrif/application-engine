@@ -1,6 +1,5 @@
 package com.netgrif.workflow.auth.domain;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Data
 @Table(name = "anonymous_user")
-public class AnonymousUser extends User{
+public class AnonymousUser extends User {
 
     public AnonymousUser() {
         super();
@@ -32,8 +31,8 @@ public class AnonymousUser extends User{
         loggedUser.setAnonymous(true);
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
-        if (!this.getGroups().isEmpty())
-            loggedUser.parseGroups(this.getGroups());
+        if (!this.getNextGroups().isEmpty())
+            loggedUser.getGroups();
 
         return loggedUser;
     }

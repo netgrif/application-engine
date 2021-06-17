@@ -235,8 +235,8 @@ public class ProcessRoleService implements IProcessRoleService {
         Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
 
         List<User> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
-        for(User user : usersWithRemovedRoles) {
-            log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user "+ user.getFullName() + " with id "+user.getId().toString());
+        for (User user : usersWithRemovedRoles) {
+            log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user " + user.getFullName() + " with id " + user.getId().toString());
 
             if (user.getProcessRoles().size() == 0)
                 continue;

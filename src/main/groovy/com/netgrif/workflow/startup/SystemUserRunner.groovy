@@ -23,7 +23,7 @@ class SystemUserRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        this.systemUser = service.findByEmail(SYSTEM_USER_EMAIL,false)
+        this.systemUser = service.findByEmail(SYSTEM_USER_EMAIL, false)
         if (this.systemUser == null) {
             User system = new User(
                     email: SYSTEM_USER_EMAIL,

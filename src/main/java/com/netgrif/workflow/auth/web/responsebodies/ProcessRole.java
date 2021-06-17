@@ -24,7 +24,7 @@ public class ProcessRole {
 
     /**
      * The constructor doesn't set attributes regarding the Petri net.
-     *
+     * <p>
      * Use the ProcessRoleFactory to create instances that have these attributes set.
      */
     public ProcessRole(com.netgrif.workflow.petrinet.domain.roles.ProcessRole role, Locale locale) {

@@ -46,7 +46,7 @@
             field: f.this,
             other: f.109048;
             change other value {
-                return field.value;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -61,7 +61,7 @@
             field: f.this,
             other: f.109047;
             change other value {
-                return field.value;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -81,15 +81,15 @@
             coeff: f.201001;
             change coeff value {
             if (field.value=="L5")
-                return 3.8 as Double;
+            return 3.8 as Double;
             if (field.value=="L4")
-                return 3.4 as Double;
-             if (field.value=="L3")
-                return 3.2 as Double;
+            return 3.4 as Double;
+            if (field.value=="L3")
+            return 3.2 as Double;
             if (field.value=="L2")
-                return 3.0 as Double;
+            return 3.0 as Double;
             if (field.value=="L1")
-                return 2.8 as Double;
+            return 2.8 as Double;
 
             }
             <!--@formatter:on-->
@@ -99,16 +99,16 @@
             field: f.this,
             coeff: f.201018;
             change coeff value {
-                if (field.value=="L5")
-                    return 3.8 as Double;
-                if (field.value=="L4")
-                    return 3.4 as Double;
-                if (field.value=="L3")
-                    return 3.2 as Double;
-                if (field.value=="L2")
-                    return 3.0 as Double;
-                if (field.value=="L1")
-                    return 2.8 as Double;
+            if (field.value=="L5")
+            return 3.8 as Double;
+            if (field.value=="L4")
+            return 3.4 as Double;
+            if (field.value=="L3")
+            return 3.2 as Double;
+            if (field.value=="L2")
+            return 3.0 as Double;
+            if (field.value=="L1")
+            return 2.8 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -121,9 +121,9 @@
             field: f.this,
             coeff: f.201002;
             change coeff value {
-                if (field.value)
-                    return 1.2 as Double;
-                return 1.0 as Double;
+            if (field.value)
+            return 1.2 as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -136,9 +136,9 @@
             field: f.this,
             coeff: f.201003;
             change coeff value {
-                if (field.value)
-                    return 1.5 as Double;
-                return 1.0 as Double;
+            if (field.value)
+            return 1.5 as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -151,9 +151,9 @@
             field: f.this,
             coeff: f.201004;
             change coeff value {
-                if (field.value)
-                    return 1.3 as Double;
-                return 1.0 as Double;
+            if (field.value)
+            return 1.3 as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -172,14 +172,14 @@
             field: f.this,
             coeff: f.201005;
             change coeff value {
-                if (field.value=="menej ako 1")
-                    return 1.0 as Double;
-                if (field.value=="1 až 5")
-                    return 1.0 as Double;
-                if (field.value=="6 až 10")
-                    return 1.0 as Double;
-                if (field.value=="viac ako 10")
-                    return 1.0 as Double;
+            if (field.value=="menej ako 1")
+            return 1.0 as Double;
+            if (field.value=="1 až 5")
+            return 1.0 as Double;
+            if (field.value=="6 až 10")
+            return 1.0 as Double;
+            if (field.value=="viac ako 10")
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -198,16 +198,16 @@
             field: f.this,
             coeff: f.201006;
             change coeff value {
-                if (field.value=="vlastník nehnuteľnosti")
-                    return 1.0 as Double;
-                if (field.value=="vlastník má úver alebo hypotéku na nehnuteľnosť")
-                    return 1.0 as Double;
-                if (field.value=="poistený je v prenájme")
-                    return 1.1 as Double;
-                if (field.value=="iné")
-                    return 1.1 as Double;
+            if (field.value=="vlastník nehnuteľnosti")
+            return 1.0 as Double;
+            if (field.value=="vlastník má úver alebo hypotéku na nehnuteľnosť")
+            return 1.0 as Double;
+            if (field.value=="poistený je v prenájme")
+            return 1.1 as Double;
+            if (field.value=="iné")
+            return 1.1 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -224,14 +224,14 @@
             field: f.this,
             coeff: f.201007;
             change coeff value {
-                if (field.value=="1")
-                    return 0.95 as Double;
-                if (field.value=="2")
-                    return 1.0 as Double;
-                if (field.value=="3")
-                    return 1.05 as Double;
-                if (field.value=="viac ako 3")
-                    return 1.1 as Double;
+            if (field.value=="1")
+            return 0.95 as Double;
+            if (field.value=="2")
+            return 1.0 as Double;
+            if (field.value=="3")
+            return 1.05 as Double;
+            if (field.value=="viac ako 3")
+            return 1.1 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -250,14 +250,14 @@
             field: f.this,
             coeff: f.201008;
             change coeff value {
-                if (field.value=="0")
-                    return 1.0 as Double;
-                if (field.value=="1")
-                    return 1.0 as Double;
-                if (field.value=="2")
-                    return 1.05 as Double;
-                if (field.value=="viac ako 2")
-                    return 1.1 as Double;
+            if (field.value=="0")
+            return 1.0 as Double;
+            if (field.value=="1")
+            return 1.0 as Double;
+            if (field.value=="2")
+            return 1.05 as Double;
+            if (field.value=="viac ako 2")
+            return 1.1 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -270,9 +270,9 @@
             field: f.this,
             coeff: f.201012;
             change coeff value {
-                if (field.value)
-                    return 1.05 as Double;
-                return 1.0 as Double;
+            if (field.value)
+            return 1.05 as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -285,11 +285,11 @@
             field: f.this,
             coeff: f.201014;
             change coeff value {
-                if (field.value)
-                    return 1.1 as Double;
+            if (field.value)
+            return 1.1 as Double;
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -305,14 +305,14 @@
             field: f.this,
             coeff: f.201016;
             change coeff value{
-                 if (field.value=="0")
-                        return 1.0 as Double;
-                 if (field.value=="1")
-                        return 1.1 as Double;
-                 if (field.value=="2 a viac")
-                        return 1.2 as Double;
+            if (field.value=="0")
+            return 1.0 as Double;
+            if (field.value=="1")
+            return 1.1 as Double;
+            if (field.value=="2 a viac")
+            return 1.2 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
@@ -336,7 +336,7 @@
             if (field.value=="150.00 €")
             return 0.9 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -363,7 +363,7 @@
             if (field.value=="rozostavaná stavba")
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="17" trigger="set">
             <!--@formatter:off-->
@@ -381,7 +381,7 @@
             if (field.value=="rozostavaná stavba")
             return 1.2 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="18" trigger="set">
             <!--@formatter:off-->
@@ -397,7 +397,7 @@
             if (field.value=="bungalow")
             return "bungalow";
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="19" trigger="set">
             <!--@formatter:off-->
@@ -407,7 +407,7 @@
             if (field.value=="byt")
             return "škridla";
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="20" trigger="set">
             field: f.102001,
@@ -509,7 +509,7 @@
             change field value {
             return p1.value+p2.value+p3.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -538,7 +538,7 @@
             if (field.value=="drevo")
             return 1.5 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -570,7 +570,7 @@
             if (field.value=="iné")
             return 1.1 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -596,7 +596,7 @@
             if (field.value=="viac ako 20")
             return 1.06 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -624,7 +624,7 @@
             if (field.value=="viac ako 4")
             return 1.05 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="40" trigger="set">
             <!--@formatter:off-->
@@ -686,7 +686,7 @@
             if (field.value=="viac ako 2")
             return 1.03 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Domácnosť ===== -->
@@ -712,7 +712,7 @@
             if (field.value=="bungalow")
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="47" trigger="get">
             <!--@formatter:off-->
@@ -771,7 +771,7 @@
             if (field.value=="dočasná")
             return 2.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="53" trigger="set">
             <!--@formatter:off-->
@@ -827,9 +827,9 @@
             check: f.103002,
             other: f.106022;
             change other value {
-                if (check.value=="trvalá")
-                    return field.value as Double;
-                return 1.0 as Double;
+            if (check.value=="trvalá")
+            return field.value as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -839,9 +839,9 @@
             check: f.103002,
             other: f.106023;
             change other value {
-                if(check.value=="dočasná")
-                    return field.value as Double;
-                return 1.0 as Double;
+            if(check.value=="dočasná")
+            return field.value as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -855,7 +855,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -873,20 +873,21 @@
             return 0.97 as Double;
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="63" trigger="set">
             <!--@formatter:off-->
-             field: f.this,
-             check: f.108005;
-             change check value {
-                return field.value;
-                }
+            field: f.this,
+            check: f.108005;
+            change check value {
+            return field.value;
+            }
             <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
-        <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže alebo vonkajšie žalúzie alebo rolety?
+        <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže alebo vonkajšie žalúzie alebo
+            rolety?
         </title>
         <id>103005</id>
         <init>false</init>
@@ -899,7 +900,7 @@
             return 0.97 as Double;
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Zodpovednosť ===== -->
@@ -915,11 +916,11 @@
             coeff: f.204003;
             change coeff value {
             if (field.value=="Slovenská republika")
-                return 1.0*coeff1.value as Double;
-             if (field.value=="Európa")
-                return 1.2*coeff1.value as Double;
+            return 1.0*coeff1.value as Double;
+            if (field.value=="Európa")
+            return 1.2*coeff1.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="66" trigger="set">
             <!--@formatter:off-->
@@ -928,10 +929,10 @@
             excess: f.208002,
             sum: f.308009;
             change sum value {
-                def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
-                return ((n*coeff.value*excess.value)/1000.0) as Double;
+            def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
+            return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Poistenie nehnuteľnosti ===== -->
@@ -940,7 +941,7 @@
         <id>105001</id>
         <placeholder>m2</placeholder>
         <init>0</init>
-        
+
         <!---->
         <action id="67" trigger="set">
             <!--@formatter:off-->
@@ -959,7 +960,7 @@
             if (location.value=="L3")
             return 650*field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="68" trigger="set">
             <!--@formatter:off-->
@@ -970,7 +971,7 @@
             change field value {
             return p1.value+p2.value+p3.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -978,7 +979,7 @@
         <id>105002</id>
         <placeholder>m2</placeholder>
         <init>0</init>
-        
+
         <!---->
         <action id="69" trigger="set">
             <!--@formatter:off-->
@@ -997,7 +998,7 @@
             if (location.value=="L3")
             return 800*field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="70" trigger="set">
             <!--@formatter:off-->
@@ -1008,7 +1009,7 @@
             change field value {
             return p1.value+p2.value+p3.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1017,7 +1018,7 @@
         <placeholder>m2</placeholder>
         <desc>Okrem prízemia</desc>
         <init>0</init>
-        
+
         <!---->
         <action id="71" trigger="set">
             <!--@formatter:off-->
@@ -1036,7 +1037,7 @@
             if (location.value=="L3")
             return 700*field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="72" trigger="set">
             <!--@formatter:off-->
@@ -1047,7 +1048,7 @@
             change field value {
             return p1.value+p2.value+p3.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1055,7 +1056,7 @@
         <id>105004</id>
         <placeholder>m2</placeholder>
         <init>0</init>
-        
+
         <!---->
         <action id="73" trigger="set">
             <!--@formatter:off-->
@@ -1063,7 +1064,7 @@
             location: f.301002,
             coeff: f.105007;
             change coeff value {
-             if (location.value=="L5")
+            if (location.value=="L5")
             return 850*field.value as Double;
             if (location.value=="L4")
             return 700*field.value as Double;
@@ -1074,19 +1075,19 @@
             if (location.value=="L3")
             return 650*field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--<action id="74" trigger="set">-->
         <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-                    <!--field: f.305019,-->
-                    <!--check: f.105035,-->
-                    <!--exces: f.208001,-->
-                    <!--coeff: f.208003,-->
-                    <!--other: f.305003;-->
-                    <!--change other value {-->
-                    <!--return ((field.value*coeff.value*exces.value)/1000.0) as Double;-->
-                    <!--}-->
-                    <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--field: f.305019,-->
+        <!--check: f.105035,-->
+        <!--exces: f.208001,-->
+        <!--coeff: f.208003,-->
+        <!--other: f.305003;-->
+        <!--change other value {-->
+        <!--return ((field.value*coeff.value*exces.value)/1000.0) as Double;-->
+        <!--}-->
+        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
         <!--</action>-->
     </data>
     <data type="number">
@@ -1094,7 +1095,7 @@
         <id>305001</id>
         <placeholder>m2</placeholder>
         <init>0</init>
-        
+
         <action id="75" trigger="set">
             <!--@formatter:off-->
             sum: f.this,
@@ -1105,20 +1106,20 @@
             p3: f.205004,
             field: f.105006;
             change field value {
-                if (check.value != "byt")
-                    return p1.value+p2.value+p3.value as Double;
-                if (location.value=="L5")
-                    return 1900*sum.value as Double;
-                if (location.value=="L4")
-                    return 1300*sum.value as Double;
-                if (location.value=="L3")
-                    return 950*sum.value as Double;
-                if (location.value=="L2")
-                    return 700*sum.value as Double;
-                if (location.value=="L1")
-                    return 650*sum.value as Double;
+            if (check.value != "byt")
+            return p1.value+p2.value+p3.value as Double;
+            if (location.value=="L5")
+            return 1900*sum.value as Double;
+            if (location.value=="L4")
+            return 1300*sum.value as Double;
+            if (location.value=="L3")
+            return 950*sum.value as Double;
+            if (location.value=="L2")
+            return 700*sum.value as Double;
+            if (location.value=="L1")
+            return 650*sum.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="76" trigger="set">
             <!--@formatter:off-->
@@ -1137,7 +1138,7 @@
             if (location.value=="L3")
             return 950*field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="77" trigger="set">
             field: f.305001,
@@ -1149,13 +1150,13 @@
             field: f.305001,
             trans: t.363,
             other: f.106003;
-            make other,editable on trans when { field.value == null  }
+            make other,editable on trans when { field.value == null }
         </action>
         <action id="79" trigger="set">
             field: f.305001,
             trans: t.363,
             other: f.106003;
-            make other,editable on trans when { field.value == 0 as Double  }
+            make other,editable on trans when { field.value == 0 as Double }
         </action>
         <action id="80" trigger="set">
             <!--@formatter:off-->
@@ -1163,11 +1164,11 @@
             check: f.410001,
             other: f.106003;
             change other value {
-                if (check.value == "Nehnutelnost a domacnost" )
-                    return field.value as Double;
-                return other.value as Double;
+            if (check.value == "Nehnutelnost a domacnost" )
+            return field.value as Double;
+            return other.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="81" trigger="set">
             <!--@formatter:off-->
@@ -1175,7 +1176,7 @@
             f2: f.106003,
             other: f.308005;
             change other value {
-                return Boolean.logicalAnd(f1.value != 0.0, f2.value != 0.0);
+            return Boolean.logicalAnd(f1.value != 0.0, f2.value != 0.0);
             }
             <!--@formatter:on-->
         </action>
@@ -1191,7 +1192,7 @@
             other: f.105007,
             trans: t.414;
             make other,visible on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="83" trigger="set">
             <!--@formatter:off-->
@@ -1199,7 +1200,7 @@
             other: f.305003,
             trans: t.414;
             make other,visible on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="84" trigger="set">
             <!--@formatter:off-->
@@ -1207,7 +1208,7 @@
             other: f.105008,
             trans: t.414;
             make other,visible on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="85" trigger="set">
             <!--@formatter:off-->
@@ -1215,7 +1216,7 @@
             other: f.305019,
             trans: t.414;
             make other,visible on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="86" trigger="set">
             <!--@formatter:off-->
@@ -1223,7 +1224,7 @@
             other: f.105007,
             trans: t.414;
             make other,hidden on trans when { field.value == false }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="87" trigger="set">
             <!--@formatter:off-->
@@ -1231,7 +1232,7 @@
             other: f.305003,
             trans: t.414;
             make other,hidden on trans when { field.value == false }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="88" trigger="set">
             <!--@formatter:off-->
@@ -1239,7 +1240,7 @@
             other: f.105008,
             trans: t.414;
             make other,hidden on trans when { field.value == false }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="89" trigger="set">
             <!--@formatter:off-->
@@ -1247,7 +1248,7 @@
             other: f.305019,
             trans: t.414;
             make other,hidden on trans when { field.value == false }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--Remove value-->
         <action id="90" trigger="set">
@@ -1255,35 +1256,35 @@
             field: f.this,
             other: f.105007;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="91" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305003;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="92" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.105008;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="93" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305019;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="94" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.105004;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
 
@@ -1291,7 +1292,7 @@
         <title>Garáž</title>
         <id>105007</id>
         <placeholder>Odporúčaná poistná suma</placeholder>
-        
+
         <action id="95" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1299,25 +1300,25 @@
             change sum value {
             return field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Garáž</title>
         <id>305019</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="96" trigger="set">
             <!--@formatter:off-->
-                    field: f.305019,
-                    check: f.105035,
-                    exces: f.208001,
-                    coeff: f.208003,
-                    other: f.305003;
-                    change other value {
-                    return ((field.value*coeff.value*exces.value)/1000.0) as Double;
-                    }
-                    <!--@formatter:on-->
+            field: f.305019,
+            check: f.105035,
+            exces: f.208001,
+            coeff: f.208003,
+            other: f.305003;
+            change other value {
+            return ((field.value*coeff.value*exces.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1343,9 +1344,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1361,19 +1363,19 @@
             return 1.0 as Double;
             return 1.1 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="99" trigger="set">
             <!--@formatter:off-->
-                    field: f.305019,
-                    check: f.105035,
-                    exces: f.208001,
-                    coeff: f.208003,
-                    other: f.305003;
-                    change other value {
-                    return ((field.value*coeff.value*exces.value)/1000.0) as Double;
-                    }
-                    <!--@formatter:on-->
+            field: f.305019,
+            check: f.105035,
+            exces: f.208001,
+            coeff: f.208003,
+            other: f.305003;
+            change other value {
+            return ((field.value*coeff.value*exces.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1388,7 +1390,7 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--show-->
         <action id="101" trigger="set">
@@ -1397,7 +1399,7 @@
             other: f.105010,
             trans: t.413;
             make other,editable on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="102" trigger="set">
             <!--@formatter:off-->
@@ -1405,7 +1407,7 @@
             other: f.105010,
             trans: t.413;
             make other,required on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="103" trigger="set">
             <!--@formatter:off-->
@@ -1413,7 +1415,7 @@
             other: f.305004,
             trans: t.413;
             make other,visible on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--hide-->
         <action id="104" trigger="set">
@@ -1422,7 +1424,7 @@
             other: f.105010,
             trans: t.413;
             make other,hidden on trans when { !field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="105" trigger="set">
             <!--@formatter:off-->
@@ -1430,7 +1432,7 @@
             other: f.305004,
             trans: t.413;
             make other,hidden on trans when { !field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--Remove value-->
         <action id="106" trigger="set">
@@ -1438,21 +1440,21 @@
             field: f.this,
             other: f.105010;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="107" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305004;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Hospodárska budova</title>
         <id>105010</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="108" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1462,7 +1464,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="109" trigger="set">
             <!--@formatter:off-->
@@ -1481,7 +1483,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1507,9 +1509,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="111" trigger="set">
             <!--@formatter:off-->
@@ -1528,7 +1531,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1543,7 +1546,7 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--show-->
         <action id="113" trigger="set">
@@ -1552,7 +1555,7 @@
             other: f.105012,
             trans: t.413;
             make other,editable on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="114" trigger="set">
             <!--@formatter:off-->
@@ -1560,7 +1563,7 @@
             other: f.305005,
             trans: t.413;
             make other,visible on trans when { field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--hide-->
         <action id="115" trigger="set">
@@ -1569,7 +1572,7 @@
             other: f.105012,
             trans: t.413;
             make other,hidden on trans when { return !field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="116" trigger="set">
             <!--@formatter:off-->
@@ -1577,7 +1580,7 @@
             other: f.305005,
             trans: t.413;
             make other,hidden on trans when { return !field.value }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <!--Remove value-->
         <action id="117" trigger="set">
@@ -1585,21 +1588,21 @@
             field: f.this,
             other: f.105012;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="118" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305005;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Altánok</title>
         <id>105012</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="119" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1609,7 +1612,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="120" trigger="set">
             <!--@formatter:off-->
@@ -1628,7 +1631,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1654,9 +1657,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="122" trigger="set">
             <!--@formatter:off-->
@@ -1675,7 +1679,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1690,7 +1694,7 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
 
     </data>
@@ -1698,7 +1702,7 @@
         <title>Prístrešok</title>
         <id>105014</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="124" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1708,7 +1712,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="125" trigger="set">
             <!--@formatter:off-->
@@ -1727,7 +1731,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1753,9 +1757,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="127" trigger="set">
             <!--@formatter:off-->
@@ -1774,7 +1779,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1789,14 +1794,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Chodník, parkovacia plocha</title>
         <id>105016</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="129" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1806,7 +1811,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="130" trigger="set">
             <!--@formatter:off-->
@@ -1825,7 +1830,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1851,9 +1856,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="132" trigger="set">
             <!--@formatter:off-->
@@ -1872,7 +1878,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1883,18 +1889,18 @@
             field: f.this,
             coeff: f.205011;
             change coeff value {
-                if (field.value)
-                    return 1.0 as Double;
-                return 0 as Double;
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Sauna</title>
         <id>105018</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="134" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1904,7 +1910,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="135" trigger="set">
             <!--@formatter:off-->
@@ -1923,7 +1929,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -1949,9 +1955,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="137" trigger="set">
             <!--@formatter:off-->
@@ -1970,7 +1977,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -1985,14 +1992,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Elektrická brána, oplotenie</title>
         <id>105020</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="139" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2002,7 +2009,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="140" trigger="set">
             <!--@formatter:off-->
@@ -2021,7 +2028,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2047,9 +2054,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="142" trigger="set">
             <!--@formatter:off-->
@@ -2068,7 +2076,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2083,14 +2091,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Tenisový kurt</title>
         <id>105022</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="144" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2100,7 +2108,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="145" trigger="set">
             <!--@formatter:off-->
@@ -2119,7 +2127,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2145,9 +2153,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="147" trigger="set">
             <!--@formatter:off-->
@@ -2166,7 +2175,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2181,14 +2190,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Vonkajší bazén</title>
         <id>105024</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="149" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2198,7 +2207,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="150" trigger="set">
             <!--@formatter:off-->
@@ -2217,7 +2226,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2243,9 +2252,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="152" trigger="set">
             <!--@formatter:off-->
@@ -2264,7 +2274,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2279,14 +2289,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Studňa</title>
         <id>105026</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="154" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2296,7 +2306,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="155" trigger="set">
             <!--@formatter:off-->
@@ -2315,7 +2325,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2341,9 +2351,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="157" trigger="set">
             <!--@formatter:off-->
@@ -2362,7 +2373,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2377,14 +2388,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Žumpa, septik</title>
         <id>105028</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="159" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2394,7 +2405,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="160" trigger="set">
             <!--@formatter:off-->
@@ -2413,7 +2424,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2439,9 +2450,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="162" trigger="set">
             <!--@formatter:off-->
@@ -2460,7 +2472,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2475,14 +2487,14 @@
             return 1.0 as Double;
             return 0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Iné</title>
         <id>105030</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="164" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2492,7 +2504,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="165" trigger="set">
             <!--@formatter:off-->
@@ -2511,7 +2523,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2537,9 +2549,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="167" trigger="set">
             <!--@formatter:off-->
@@ -2558,16 +2571,16 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
 
-    <data type="number" >
+    <data type="number">
         <title>Celková poistná suma</title>
-        
+
         <id>305017</id>
     </data>
-    <data type="number" >
+    <data type="number">
         <title>Celkové poistné</title>
         <id>305018</id>
     </data>
@@ -2580,7 +2593,7 @@
         <title>Stavebné materiály</title>
         <id>105032</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="168" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2590,7 +2603,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2616,9 +2629,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2629,7 +2643,7 @@
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105034</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="170" trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2639,7 +2653,7 @@
             change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2665,9 +2679,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
@@ -2681,17 +2696,17 @@
         <placeholder>Spoluúčasť</placeholder>
         <action id="172" trigger="set">
             <!--@formatter:off-->
-        field: f.this,
-        coeff: f.208002;
-        change coeff value {
-        if (field.value=="0.00 €")
-        return 1.1 as Double;
-        if (field.value=="50.00 €")
-        return 1.0 as Double;
-        if (field.value=="150.00 €")
-        return 0.9 as Double;
-        }
-        <!--@formatter:on-->
+            field: f.this,
+            coeff: f.208002;
+            change coeff value {
+            if (field.value=="0.00 €")
+            return 1.1 as Double;
+            if (field.value=="50.00 €")
+            return 1.0 as Double;
+            if (field.value=="150.00 €")
+            return 0.9 as Double;
+            }
+            <!--@formatter:on-->
         </action>
         <action id="173" trigger="set">
             <!--@formatter:off-->
@@ -2703,7 +2718,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field2.value*field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field2.value*field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2761,16 +2776,16 @@
         <title>Odporúčaná poistná suma</title>
         <id>106002</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="180" trigger="set">
             <!--@formatter:off-->
             field: f.106002,
             check: f.103002,
             other: f.106022;
             change other value {
-                if (check.value=="trvalá")
-                    return field.value as Double;
-                return 1.0 as Double;
+            if (check.value=="trvalá")
+            return field.value as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2780,9 +2795,9 @@
             check: f.103002,
             other: f.106023;
             change other value {
-                if(check.value=="dočasná")
-                    return field.value as Double;
-                return 1.0 as Double;
+            if(check.value=="dočasná")
+            return field.value as Double;
+            return 1.0 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2792,7 +2807,7 @@
         <title>Poistná suma</title>
         <id>106022</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="182" trigger="set">
             <!--@formatter:off-->
             field: f.106022,
@@ -2803,7 +2818,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2813,7 +2828,7 @@
         <title>Poistná suma</title>
         <id>106023</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="183" trigger="set">
             <!--@formatter:off-->
             field: f.106023,
@@ -2824,7 +2839,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2847,9 +2862,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Doplnkové poistenie domácnosti ===== -->
@@ -2857,24 +2872,24 @@
         <title>Celková podlahová plocha</title>
         <id>106003</id>
         <init>0</init>
-        
+
         <!--<action id="185" trigger="set">-->
         <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-            <!--field: f.this,-->
-            <!--location: f.301002,-->
-            <!--coeff: f.106002;-->
-            <!--change coeff value {-->
-                <!--if (location.value=="L5")-->
-                    <!--return 1900*field.value as Double;-->
-                <!--if (location.value=="L4")-->
-                    <!--return 1300*field.value as Double;-->
-                <!--if (location.value=="L1")-->
-                    <!--return 650*field.value as Double;-->
-                <!--if (location.value=="L2")-->
-                    <!--return 700*field.value as Double;-->
-                <!--if (location.value=="L3")-->
-                    <!--return 950*field.value as Double;-->
-            <!--}-->
+        <!--field: f.this,-->
+        <!--location: f.301002,-->
+        <!--coeff: f.106002;-->
+        <!--change coeff value {-->
+        <!--if (location.value=="L5")-->
+        <!--return 1900*field.value as Double;-->
+        <!--if (location.value=="L4")-->
+        <!--return 1300*field.value as Double;-->
+        <!--if (location.value=="L1")-->
+        <!--return 650*field.value as Double;-->
+        <!--if (location.value=="L2")-->
+        <!--return 700*field.value as Double;-->
+        <!--if (location.value=="L3")-->
+        <!--return 950*field.value as Double;-->
+        <!--}-->
         <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
         <!--</action>-->
         <action id="186" trigger="set">
@@ -2882,11 +2897,11 @@
             field: f.this,
             coeff: f.106002;
             change coeff value {
-                if (field.value &gt; 100)
-                    return 25000 + (field.value - 100) * 100  as Double;
-                return 250*field.value as Double;
+            if (field.value &gt; 100)
+            return 25000 + (field.value - 100) * 100 as Double;
+            return 250*field.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="187" trigger="set">
             <!--@formatter:off-->
@@ -2894,7 +2909,7 @@
             f2: f.106003,
             other: f.308005;
             change other value {
-                return Boolean.logicalAnd(f1.value != 0.0, f2.value != 0.0);
+            return Boolean.logicalAnd(f1.value != 0.0, f2.value != 0.0);
             }
             <!--@formatter:on-->
         </action>
@@ -2906,7 +2921,7 @@
     <data type="number">
         <title>Cennosti</title>
         <id>106005</id>
-        
+
         <!---->
         <placeholder>Poistná suma</placeholder>
         <action id="188" trigger="set">
@@ -2924,7 +2939,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2947,7 +2962,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="190" trigger="set">
             <!--@formatter:off-->
@@ -2964,7 +2979,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -2975,7 +2990,7 @@
         <title>Umelecké diela</title>
         <id>106007</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="191" trigger="set">
             <!--@formatter:off-->
             c1: f.106005,
@@ -2991,7 +3006,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3012,9 +3027,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="193" trigger="set">
             <!--@formatter:off-->
@@ -3031,7 +3046,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3042,7 +3057,7 @@
         <title>Elektronické a optické zariadenia</title>
         <id>106009</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="194" trigger="set">
             <!--@formatter:off-->
             c1: f.106005,
@@ -3058,7 +3073,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3079,9 +3094,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="196" trigger="set">
             <!--@formatter:off-->
@@ -3098,7 +3113,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3108,7 +3123,7 @@
     <data type="number">
         <title>Špeciálne sklá a presklenie</title>
         <id>106011</id>
-        
+
         <placeholder>Poistná suma</placeholder>
         <action id="197" trigger="set">
             <!--@formatter:off-->
@@ -3125,7 +3140,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3148,7 +3163,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="199" trigger="set">
             <!--@formatter:off-->
@@ -3165,7 +3180,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3175,7 +3190,7 @@
     <data type="number">
         <title>Záhradé vybavenie a nábytok</title>
         <id>106013</id>
-        
+
         <placeholder>Poistná suma</placeholder>
         <action id="200" trigger="set">
             <!--@formatter:off-->
@@ -3192,7 +3207,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3213,9 +3228,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="202" trigger="set">
             <!--@formatter:off-->
@@ -3232,7 +3247,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3242,7 +3257,7 @@
     <data type="number">
         <title>Elektromotory v domácich spotrebičoch</title>
         <id>106015</id>
-        
+
         <placeholder>Poistná suma</placeholder>
         <action id="203" trigger="set">
             <!--@formatter:off-->
@@ -3259,7 +3274,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3280,9 +3295,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="205" trigger="set">
             <!--@formatter:off-->
@@ -3299,7 +3314,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3309,7 +3324,7 @@
     <data type="number">
         <title>Stavebné súčasti domácností</title>
         <id>106017</id>
-        
+
         <placeholder>Poistná suma</placeholder>
         <action id="206" trigger="set">
             <!--@formatter:off-->
@@ -3326,7 +3341,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3347,9 +3362,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="208" trigger="set">
             <!--@formatter:off-->
@@ -3366,7 +3381,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3376,7 +3391,7 @@
     <data type="number">
         <title>Športové náradie</title>
         <id>106019</id>
-        
+
         <placeholder>Poistná suma</placeholder>
         <action id="209" trigger="set">
             <!--@formatter:off-->
@@ -3393,7 +3408,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3414,9 +3429,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-          return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="211" trigger="set">
             <!--@formatter:off-->
@@ -3433,7 +3448,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3444,7 +3459,7 @@
         <title>Iné</title>
         <id>106021</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="212" trigger="set">
             <!--@formatter:off-->
             c1: f.106005,
@@ -3460,7 +3475,7 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3481,9 +3496,9 @@
             c10: f.306010,
             sum: f.308002;
             change sum value {
-           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="214" trigger="set">
             <!--@formatter:off-->
@@ -3500,18 +3515,18 @@
             change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Celková poistná suma</title>
         <id>106024</id>
-        
+
     </data>
     <data type="number">
         <title>Celkové poistné</title>
         <id>106025</id>
-        
+
     </data>
 
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
@@ -3529,11 +3544,11 @@
             field: f.this,
             coeff: f.204001;
             change coeff value {
-                if (field.value == "0.00 €")
-                    return 0.0 as Double;
-                return 0.2 as Double;
+            if (field.value == "0.00 €")
+            return 0.0 as Double;
+            return 0.2 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="216" trigger="set">
             <!--@formatter:off-->
@@ -3542,10 +3557,10 @@
             excess: f.208001,
             sum: f.308008;
             change sum value {
-                def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
-                return ((n*coeff.value*excess.value)/1000.0) as Double;
+            def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
+            return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="217" trigger="set">
             <!--@formatter:off-->
@@ -3587,9 +3602,9 @@
             field: f.this,
             coeff: f.204002;
             change coeff value {
-                if (field.value == "0.00 €")
-                    return 0.0 as Double;
-                return 0.2 as Double;
+            if (field.value == "0.00 €")
+            return 0.0 as Double;
+            return 0.2 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3600,10 +3615,10 @@
             excess: f.208002,
             sum: f.308009;
             change sum value {
-                def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
-                return ((n*coeff.value*excess.value)/1000.0) as Double;
+            def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
+            return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="222" trigger="set">
             <!--@formatter:off-->
@@ -3634,9 +3649,9 @@
             check: f.this,
             other: f.104003;
             change other value {
-                if (check.value == "0.00 €")
-                    return null;
-                return other.value;
+            if (check.value == "0.00 €")
+            return null;
+            return other.value;
             }
             <!--@formatter:on-->
         </action>
@@ -3679,7 +3694,7 @@
             field: f.this,
             other: f.308009;
             change other value { null; }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="231" trigger="set">
             <!--@formatter:off-->
@@ -3697,14 +3712,14 @@
         <placeholder>Poistné</placeholder>
         <action id="232" trigger="set">
             <!--@formatter:off-->
-        s1: f.308001,
-        s2: f.308002,
-        s3: f.308003,
-        sum: f.308004;
-        change sum value {
+            s1: f.308001,
+            s2: f.308002,
+            s3: f.308003,
+            sum: f.308004;
+            change sum value {
             return s1.value+s2.value+s3.value as Double;
-        }
-    <!--@formatter:on-->
+            }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3731,7 +3746,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -3740,13 +3756,13 @@
         <title>Odporúčaná poistná suma</title>
         <id>105006</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="234" trigger="set">
             <!--@formatter:off-->
             field: f.105006,
             other: f.105036;
             change other value {
-                return field.value as Double;
+            return field.value as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3755,7 +3771,7 @@
         <title>Poistná suma</title>
         <id>105036</id>
         <placeholder>Poistná suma</placeholder>
-        
+
         <action id="235" trigger="set">
             <!--@formatter:off-->
             field: f.105036,
@@ -3765,7 +3781,7 @@
             bic: f.201017,
             sum: f.305002;
             change sum value {
-                return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
+            return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3788,9 +3804,10 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3799,14 +3816,14 @@
         <placeholder>Poistné</placeholder>
         <action id="237" trigger="set">
             <!--@formatter:off-->
-        s1: f.308001,
-        s2: f.308002,
-        s3: f.308003,
-        sum: f.308004;
-        change sum value {
+            s1: f.308001,
+            s2: f.308002,
+            s3: f.308003,
+            sum: f.308004;
+            change sum value {
             return s1.value+s2.value+s3.value as Double;
-        }
-    <!--@formatter:on-->
+            }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3819,9 +3836,9 @@
             c2: f.308009,
             sum: f.308003;
             change sum value {
-                return c1.value+c2.value as Double;
+            return c1.value+c2.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3834,9 +3851,9 @@
             c2: f.308009,
             sum: f.308003;
             change sum value {
-                return c1.value+c2.value as Double;
+            return c1.value+c2.value as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -3850,7 +3867,7 @@
             s3: f.308003,
             sum: f.308004;
             change sum value {
-                return s1.value+s2.value+s3.value as Double;
+            return s1.value+s2.value+s3.value as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3869,9 +3886,10 @@
             c7: f.203004,
             sum: f.308006;
             change sum value {
-                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="enumeration">
@@ -3893,26 +3911,26 @@
             if (field.value == "štvrťročná")
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="243" trigger="set">
             <!--@formatter:off-->
-           check: f.108001,
+            check: f.108001,
             field: f.308006,
             sum: f.308010;
             change sum value {
             if (check.value=="ročná")
-                return field.value as Double;
+            return field.value as Double;
             if (check.value=="polročná")
-                return field.value/2 as Double;
+            return field.value/2 as Double;
             if (check.value=="štvrťročná")
-                return field.value/4 as Double;
+            return field.value/4 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="244" trigger="set">
             <!--@formatter:off-->
-           c1: f.308004,
+            c1: f.308004,
             c2: f.208004,
             c3: f.208008,
             c4: f.208005,
@@ -3921,9 +3939,10 @@
             c7: f.203004,
             sum: f.308006;
             change sum value {
-                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3938,11 +3957,11 @@
             return 0.95 as Double;
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="246" trigger="set">
             <!--@formatter:off-->
-           c1: f.308004,
+            c1: f.308004,
             c2: f.208004,
             c3: f.208008,
             c4: f.208005,
@@ -3951,9 +3970,10 @@
             c7: f.203004,
             sum: f.308006;
             change sum value {
-                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -3968,11 +3988,11 @@
             return 0.95 as Double;
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="248" trigger="set">
             <!--@formatter:off-->
-          c1: f.308004,
+            c1: f.308004,
             c2: f.208004,
             c3: f.208008,
             c4: f.208005,
@@ -3981,9 +4001,10 @@
             c7: f.203004,
             sum: f.308006;
             change sum value {
-                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
 
@@ -4019,11 +4040,11 @@
             if (field.value=="25%")
             return 0.75 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="250" trigger="set">
             <!--@formatter:off-->
-           c1: f.308004,
+            c1: f.308004,
             c2: f.208004,
             c3: f.208008,
             c4: f.208005,
@@ -4032,9 +4053,10 @@
             c7: f.203004,
             sum: f.308006;
             change sum value {
-                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -4049,11 +4071,11 @@
             return 0.9 as Double;
             return 1.0 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
         <action id="252" trigger="set">
             <!--@formatter:off-->
-           c1: f.308004,
+            c1: f.308004,
             c2: f.208004,
             c3: f.208008,
             c4: f.208005,
@@ -4062,9 +4084,10 @@
             c7: f.203004,
             sum: f.308006;
             change sum value {
-                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4072,24 +4095,24 @@
         <id>308006</id>
         <action id="253" trigger="set">
             <!--@formatter:off-->
-           check: f.108001,
+            check: f.108001,
             field: f.308006,
             sum: f.308010;
             change sum value {
             if (check.value=="ročná")
-                return field.value as Double;
+            return field.value as Double;
             if (check.value=="polročná")
-                return field.value/2 as Double;
+            return field.value/2 as Double;
             if (check.value=="štvrťročná")
-                return field.value/4 as Double;
+            return field.value/4 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
         <title>Výška splátky poistného</title>
         <id>308010</id>
-        
+
     </data>
     <!-- ===== Základné informácie koeficienty ===== -->
     <data type="number">
@@ -4112,7 +4135,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4145,7 +4168,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4168,7 +4191,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4191,7 +4214,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4214,7 +4237,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4237,7 +4260,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4260,7 +4283,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4283,7 +4306,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4306,7 +4329,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4329,7 +4352,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
 
@@ -4353,7 +4376,7 @@
             change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4369,7 +4392,7 @@
             bic: f.201017,
             sum: f.305002;
             change sum value {
-                return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
+            return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4383,7 +4406,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4408,9 +4431,9 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
+            return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4427,9 +4450,9 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
+            return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4446,9 +4469,9 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
+            return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4465,9 +4488,9 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
+            return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4484,9 +4507,9 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
+            return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4503,9 +4526,9 @@
             c7: f.202007,
             sum: f.202009;
             change sum value {
-                return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
+            return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4521,7 +4544,7 @@
             bic: f.201017,
             sum: f.305002;
             change sum value {
-                return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
+            return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4541,7 +4564,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4559,7 +4582,7 @@
             change sum value {
             return c1.value*c2.value*c5.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4575,7 +4598,7 @@
             change sum value {
             return c1.value*c2.value*c5.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4584,14 +4607,14 @@
         <init>1.0</init>
         <!--<action id="277" trigger="set">-->
         <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-            <!--c1: f.203001,-->
-            <!--c2: f.203002,-->
-            <!--c4: f.203004,-->
-            <!--c5: f.203005,-->
-            <!--sum: f.203006;-->
-            <!--change sum value {-->
-            <!--return c1.value*c2.value*c4.value*c5.value;-->
-            <!--}-->
+        <!--c1: f.203001,-->
+        <!--c2: f.203002,-->
+        <!--c4: f.203004,-->
+        <!--c5: f.203005,-->
+        <!--sum: f.203006;-->
+        <!--change sum value {-->
+        <!--return c1.value*c2.value*c4.value*c5.value;-->
+        <!--}-->
         <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
         <!--</action>-->
     </data>
@@ -4610,7 +4633,7 @@
             change sum value {
             return c1.value*c2.value*c5.value;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -4627,7 +4650,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum value {
-                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4692,7 +4715,7 @@
             bic: f.201017,
             sum: f.305002;
             change sum value {
-                return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
+            return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4715,7 +4738,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum value {
-                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -4864,7 +4888,7 @@
             field: f.this,
             other: f.308007;
             change other value {
-                return field.value;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -5060,9 +5084,9 @@
             f_1: f.109007,
             f_2: f.109021;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5112,9 +5136,9 @@
             check: f.109007,
             field: f.109058;
             change field value {
-                if (check.value == "fyzická osoba")
-                    return null;
-                return field.value;
+            if (check.value == "fyzická osoba")
+            return null;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -5164,9 +5188,9 @@
             check: f.109007,
             field: f.109012;
             change field value {
-                if (check.value == "fyzická osoba")
-                    return null;
-                return field.value;
+            if (check.value == "fyzická osoba")
+            return null;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -5208,9 +5232,9 @@
             check: f.109007,
             field: f.109061;
             change field value {
-                if (check.value == "právnická osoba")
-                    return field.value;
-                return null;
+            if (check.value == "právnická osoba")
+            return field.value;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5252,9 +5276,9 @@
             check: f.109007,
             field: f.109062;
             change field value {
-                if (check.value == "právnická osoba")
-                    return field.value;
-                return null;
+            if (check.value == "právnická osoba")
+            return field.value;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5269,9 +5293,9 @@
             f_1: f.109008,
             f_2: f.109022;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5286,9 +5310,9 @@
             f_1: f.109009,
             f_2: f.109023;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5303,9 +5327,9 @@
             f_1: f.109010,
             f_2: f.109024;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5320,9 +5344,9 @@
             f_1: f.109011,
             f_2: f.109025;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5337,9 +5361,9 @@
             f_1: f.109012,
             f_2: f.109026;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5360,9 +5384,9 @@
             f_1: f.109013,
             f_2: f.109027;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5377,9 +5401,9 @@
             f_1: f.109014,
             f_2: f.109028;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value;
-                return f_2.value;
+            if (field.value == false)
+            return f_1.value;
+            return f_2.value;
             }
             <!--@formatter:on-->
         </action>
@@ -5394,9 +5418,9 @@
             f_1: f.109015,
             f_2: f.109029;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5438,9 +5462,9 @@
             f_1: f.109016,
             f_2: f.109030;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5455,9 +5479,9 @@
             f_1: f.109017,
             f_2: f.109031;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5466,16 +5490,16 @@
         <title>Telefónne číslo</title>
         <id>109018</id>
         <desc>Poistník</desc>
-        
+
         <action id="335" trigger="set">
             <!--@formatter:off-->
             field: f.109020,
             f_1: f.109018,
             f_2: f.109032;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5483,7 +5507,7 @@
     <data type="text">
         <title>Email</title>
         <id>109019</id>
-        
+
         <desc>Poistník</desc>
         <action id="336" trigger="set">
             <!--@formatter:off-->
@@ -5491,9 +5515,9 @@
             f_1: f.109019,
             f_2: f.109033;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5641,9 +5665,9 @@
             f_1: f.109007,
             f_2: f.109021;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5653,9 +5677,9 @@
             f_1: f.109008,
             f_2: f.109022;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5665,9 +5689,9 @@
             f_1: f.109009,
             f_2: f.109023;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5677,9 +5701,9 @@
             f_1: f.109010,
             f_2: f.109024;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5689,9 +5713,9 @@
             f_1: f.109011,
             f_2: f.109025;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5701,9 +5725,9 @@
             f_1: f.109012,
             f_2: f.109026;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5713,9 +5737,9 @@
             f_1: f.109013,
             f_2: f.109027;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5725,9 +5749,9 @@
             f_1: f.109014,
             f_2: f.109028;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value;
-                return f_2.value;
+            if (field.value == false)
+            return f_1.value;
+            return f_2.value;
             }
             <!--@formatter:on-->
         </action>
@@ -5737,9 +5761,9 @@
             f_1: f.109015,
             f_2: f.109029;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5749,9 +5773,9 @@
             f_1: f.109016,
             f_2: f.109030;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5761,9 +5785,9 @@
             f_1: f.109017,
             f_2: f.109031;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5773,9 +5797,9 @@
             f_1: f.109018,
             f_2: f.109032;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5785,9 +5809,9 @@
             f_1: f.109019,
             f_2: f.109033;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5797,9 +5821,9 @@
             f_1: f.109058,
             f_2: f.109059;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5809,9 +5833,9 @@
             f_1: f.109061,
             f_2: f.109063;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5821,9 +5845,9 @@
             f_1: f.109062,
             f_2: f.109064;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5935,9 +5959,9 @@
             f_1: f.109058,
             f_2: f.109059;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5952,9 +5976,9 @@
             f_1: f.109061,
             f_2: f.109063;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5969,9 +5993,9 @@
             f_1: f.109062,
             f_2: f.109064;
             change f_2 value {
-                if (field.value == false)
-                    return f_1.value as String;
-                return null;
+            if (field.value == false)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6031,9 +6055,9 @@
             check: f.109021,
             field: f.109059;
             change field value {
-                if (check.value == "fyzická osoba")
-                    return null;
-                return field.value;
+            if (check.value == "fyzická osoba")
+            return null;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -6083,9 +6107,9 @@
             check: f.109021,
             field: f.109026;
             change field value {
-                if (check.value == "fyzická osoba")
-                    return null;
-                return field.value;
+            if (check.value == "fyzická osoba")
+            return null;
+            return field.value;
             }
             <!--@formatter:on-->
         </action>
@@ -6127,9 +6151,9 @@
             check: f.109021,
             field: f.109029;
             change field value {
-                if (check.value == "fyzická osoba")
-                    return field.value;
-                return null;
+            if (check.value == "fyzická osoba")
+            return field.value;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6171,9 +6195,9 @@
             check: f.109021,
             field: f.109063;
             change field value {
-                if (check.value == "právnická osoba")
-                    return field.value;
-                return null;
+            if (check.value == "právnická osoba")
+            return field.value;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6215,9 +6239,9 @@
             check: f.109021,
             field: f.109064;
             change field value {
-                if (check.value == "právnická osoba")
-                    return field.value;
-                return null;
+            if (check.value == "právnická osoba")
+            return field.value;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6312,12 +6336,12 @@
         <title>Telefónne číslo</title>
         <id>109032</id>
         <desc>Poistený</desc>
-        
+
     </data>
     <data type="text">
         <title>Email</title>
         <id>109033</id>
-        
+
         <desc>Poistený</desc>
     </data>
     <data type="text">
@@ -6423,9 +6447,9 @@
             f_1: f.109045,
             f_2: f.109036;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6435,9 +6459,9 @@
             f_1: f.109046,
             f_2: f.109037;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6447,9 +6471,9 @@
             f_1: f.109047,
             f_2: f.109038;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6459,9 +6483,9 @@
             f_1: f.109048,
             f_2: f.109039;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6476,9 +6500,9 @@
             f_1: f.109036,
             f_2: f.109041;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return f_2.value;
+            if (field.value)
+            return f_1.value as String;
+            return f_2.value;
             }
             <!--@formatter:on-->
         </action>
@@ -6493,9 +6517,9 @@
             f_1: f.109037,
             f_2: f.109042;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return f_2.value;
+            if (field.value)
+            return f_1.value as String;
+            return f_2.value;
             }
             <!--@formatter:on-->
         </action>
@@ -6510,9 +6534,9 @@
             f_1: f.109038,
             f_2: f.109043;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return f_2.value;
+            if (field.value)
+            return f_1.value as String;
+            return f_2.value;
             }
             <!--@formatter:on-->
         </action>
@@ -6527,9 +6551,9 @@
             f_1: f.109039,
             f_2: f.109044;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return f_2.value;
+            if (field.value)
+            return f_1.value as String;
+            return f_2.value;
             }
             <!--@formatter:on-->
         </action>
@@ -6621,9 +6645,9 @@
             f_1: f.109036,
             f_2: f.109041;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6633,9 +6657,9 @@
             f_1: f.109037,
             f_2: f.109042;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6645,9 +6669,9 @@
             f_1: f.109038,
             f_2: f.109043;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6657,9 +6681,9 @@
             f_1: f.109039,
             f_2: f.109044;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6695,9 +6719,9 @@
             f_1: f.109045,
             f_2: f.109036;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6712,9 +6736,9 @@
             f_1: f.109046,
             f_2: f.109037;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6729,9 +6753,9 @@
             f_1: f.109047,
             f_2: f.109038;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -6746,9 +6770,9 @@
             f_1: f.109048,
             f_2: f.109039;
             change f_2 value {
-                if (field.value)
-                    return f_1.value as String;
-                return null;
+            if (field.value)
+            return f_1.value as String;
+            return null;
             }
             <!--@formatter:on-->
         </action>
@@ -7170,22 +7194,22 @@
                     <behavior>editable</behavior>
                     <!--<action id="467" trigger="set">-->
                     <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-                        <!--f1: f.102001,-->
-                        <!--f2: f.106001,-->
-                        <!--other: f.308005;-->
-                        <!--change other value {-->
-                            <!--return Boolean.logicalAnd(f1.value != null, f2.value != null);-->
-                        <!--}-->
-                        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+                    <!--f1: f.102001,-->
+                    <!--f2: f.106001,-->
+                    <!--other: f.308005;-->
+                    <!--change other value {-->
+                    <!--return Boolean.logicalAnd(f1.value != null, f2.value != null);-->
+                    <!--}-->
+                    <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
                     <!--</action>-->
                     <action id="468" trigger="get">
                         <!--@formatter:off-->
                         other: f.410001,
                         field: f.this;
                         change field choices {
-                            if (other.value == "Nehnutelnost")
-                                return field.choices + ["rozostavaná stavba"];
-                            return field.choices;
+                        if (other.value == "Nehnutelnost")
+                        return field.choices + ["rozostavaná stavba"];
+                        return field.choices;
                         }
                         <!--@formatter:on-->
                     </action>
@@ -7311,9 +7335,9 @@
                         field: f.this,
                         coeff: f.205018;
                         change coeff value {
-                            if (field.value)
-                                return 3.0 as Double;
-                            return 0 as Double;
+                        if (field.value)
+                        return 3.0 as Double;
+                        return 0 as Double;
                         }
                         <!--@formatter:on-->
                     </action>
@@ -7408,9 +7432,9 @@
                         field: f.this,
                         coeff: f.205019;
                         change coeff value {
-                            if (field.value)
-                                return 5.0 as Double;
-                            return 0 as Double;
+                        if (field.value)
+                        return 5.0 as Double;
+                        return 0 as Double;
                         }
                         <!--@formatter:on-->
                     </action>
@@ -7457,17 +7481,17 @@
                     <!--Remove value-->
                     <action id="483" trigger="set">
                         <!--@formatter:off-->
-            check: f.105033,
-            other: f.105034;
-            change other value { null; }
-            <!--@formatter:on-->
+                        check: f.105033,
+                        other: f.105034;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="484" trigger="set">
                         <!--@formatter:off-->
-            check: f.105033,
-            other: f.105034;
-            change other value { null; }
-            <!--@formatter:on-->
+                        check: f.105033,
+                        other: f.105034;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -7502,98 +7526,98 @@
                     <behavior>editable</behavior>
                     <action id="485" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105035,
-                            trans: t.414,
-                            other: f.105004;
-                            make other,editable on trans when { isGarage.value }
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105004;
+                        make other,editable on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="486" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105035,
-                            trans: t.414,
-                            other: f.105004;
-                            make other,required on trans when { isGarage.value }
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105004;
+                        make other,required on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="487" trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.414,
-                    other: f.105004;
-                    make other,hidden on trans when { !isGarage.value }
-                <!--@formatter:on-->
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105004;
+                        make other,hidden on trans when { !isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="488" trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.414,
-                    other: f.105008;
-                    make other,editable on trans when { isGarage.value }
-                <!--@formatter:on-->
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105008;
+                        make other,editable on trans when { isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="489" trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.414,
-                    other: f.105008;
-                    make other,hidden on trans when { !isGarage.value }
-                <!--@formatter:on-->
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105008;
+                        make other,hidden on trans when { !isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="490" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105035,
-                            trans: t.414,
-                            other: f.105007;
-                            make other,required on trans when { isGarage.value }
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105007;
+                        make other,required on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="491" trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.414,
-                    other: f.105007;
-                    make other,hidden on trans when { !isGarage.value }
-                <!--@formatter:on-->
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.105007;
+                        make other,hidden on trans when { !isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="492" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105035,
-                            trans: t.414,
-                            other: f.305019;
-                            make other,editable on trans when { isGarage.value }
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.305019;
+                        make other,editable on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="493" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105035,
-                            trans: t.414,
-                            other: f.305019;
-                            make other,required on trans when { isGarage.value }
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.305019;
+                        make other,required on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="494" trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.414,
-                    other: f.305019;
-                    make other,hidden on trans when { !isGarage.value }
-                <!--@formatter:on-->
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.305019;
+                        make other,hidden on trans when { !isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="495" trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.414,
-                    other: f.305003;
-                    make other,visible on trans when { isGarage.value }
-                <!--@formatter:on-->
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.305003;
+                        make other,visible on trans when { isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="496" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105035,
-                            trans: t.414,
-                            other: f.305003;
-                            make other,hidden on trans when { !isGarage.value }
+                        isGarage: f.105035,
+                        trans: t.414,
+                        other: f.305003;
+                        make other,hidden on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                 </logic>
@@ -7618,99 +7642,99 @@
                     <!--show-->
                     <action id="497" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109054;
-                            make other,editable on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109054;
+                        make other,editable on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="498" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109055;
-                            make other,editable on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109055;
+                        make other,editable on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="499" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109056;
-                            make other,editable on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109056;
+                        make other,editable on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="500" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109057;
-                            make other,editable on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109057;
+                        make other,editable on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="501" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109054;
-                            make other,required on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109054;
+                        make other,required on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="502" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109055;
-                            make other,required on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109055;
+                        make other,required on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="503" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109056;
-                            make other,required on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109056;
+                        make other,required on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="504" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109057;
-                            make other,required on trans when { !isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109057;
+                        make other,required on trans when { !isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <!--hide-->
                     <action id="505" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109054;
-                            make other,hidden on trans when { isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109054;
+                        make other,hidden on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="506" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109055;
-                            make other,hidden on trans when { isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109055;
+                        make other,hidden on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="507" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109056;
-                            make other,hidden on trans when { isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109056;
+                        make other,hidden on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                     <action id="508" trigger="set">
                         <!--@formatter:off-->
-                            isGarage: f.105008,
-                            trans: t.588,
-                            other: f.109057;
-                            make other,hidden on trans when { isGarage.value }
+                        isGarage: f.105008,
+                        trans: t.588,
+                        other: f.109057;
+                        make other,hidden on trans when { isGarage.value }
                         <!--@formatter:on-->
                     </action>
                 </logic>
@@ -7767,35 +7791,35 @@
                     <!--set editable-->
                     <action id="509" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105009,
-                    trans: t.413,
-                    other: f.105010;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105009,
+                        trans: t.413,
+                        other: f.105010;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="510" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105009,
-                    trans: t.413,
-                    other: f.305004;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105009,
+                        trans: t.413,
+                        other: f.305004;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>                <!--set hidden-->
                     <action id="511" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105009,
-                    trans: t.413,
-                    other: f.105010;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105009,
+                        trans: t.413,
+                        other: f.105010;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="512" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105009,
-                    trans: t.413,
-                    other: f.305004;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105009,
+                        trans: t.413,
+                        other: f.305004;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -7811,16 +7835,16 @@
                     <behavior>hidden</behavior>
                     <action id="513" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105009,
-                    exces: f.208001,
-                    other: f.305004;
-                    change other value {
+                        field: f.this,
+                        check: f.105009,
+                        exces: f.208001,
+                        other: f.305004;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -7844,44 +7868,44 @@
                     <!--set editable-->
                     <action id="514" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105011,
-                    trans: t.413,
-                    other: f.105012;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105011,
+                        trans: t.413,
+                        other: f.105012;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="515" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105011,
-                    trans: t.413,
-                    other: f.105012;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105011,
+                        trans: t.413,
+                        other: f.105012;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="516" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105011,
-                    trans: t.413,
-                    other: f.305005;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105011,
+                        trans: t.413,
+                        other: f.305005;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="517" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105011,
-                    trans: t.413,
-                    other: f.105012;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105011,
+                        trans: t.413,
+                        other: f.105012;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="518" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105011,
-                    trans: t.413,
-                    other: f.305005;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105011,
+                        trans: t.413,
+                        other: f.305005;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -7897,16 +7921,16 @@
                     <behavior>hidden</behavior>
                     <action id="519" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105011,
-                    exces: f.208001,
-                    other: f.305005;
-                    change other value {
+                        field: f.this,
+                        check: f.105011,
+                        exces: f.208001,
+                        other: f.305005;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -7930,44 +7954,44 @@
                     <!--set editable-->
                     <action id="520" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105013,
-                    trans: t.413,
-                    other: f.105014;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105013,
+                        trans: t.413,
+                        other: f.105014;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="521" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105013,
-                    trans: t.413,
-                    other: f.305006;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105013,
+                        trans: t.413,
+                        other: f.305006;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="522" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105013,
-                    trans: t.413,
-                    other: f.105014;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105013,
+                        trans: t.413,
+                        other: f.105014;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="523" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105013,
-                    trans: t.413,
-                    other: f.105014;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105013,
+                        trans: t.413,
+                        other: f.105014;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="524" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105013,
-                    trans: t.413,
-                    other: f.305006;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105013,
+                        trans: t.413,
+                        other: f.305006;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -7983,16 +8007,16 @@
                     <behavior>hidden</behavior>
                     <action id="525" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105013,
-                    exces: f.208001,
-                    other: f.305006;
-                    change other value {
+                        field: f.this,
+                        check: f.105013,
+                        exces: f.208001,
+                        other: f.305006;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8016,59 +8040,59 @@
                     <!--set editable-->
                     <action id="526" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    trans: t.413,
-                    other: f.105016;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        trans: t.413,
+                        other: f.105016;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="527" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    trans: t.413,
-                    other: f.105016;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        trans: t.413,
+                        other: f.105016;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="528" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    trans: t.413,
-                    other: f.305007;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        trans: t.413,
+                        other: f.305007;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="529" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    trans: t.413,
-                    other: f.105016;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        trans: t.413,
+                        other: f.105016;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="530" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    trans: t.413,
-                    other: f.305007;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        trans: t.413,
+                        other: f.305007;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="531" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    other: f.105016;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        other: f.105016;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="532" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105015,
-                    other: f.305007;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105015,
+                        other: f.305007;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8084,16 +8108,16 @@
                     <behavior>hidden</behavior>
                     <action id="533" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105015,
-                    exces: f.208001,
-                    other: f.305007;
-                    change other value {
+                        field: f.this,
+                        check: f.105015,
+                        exces: f.208001,
+                        other: f.305007;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8118,59 +8142,59 @@
                     <!--set editable-->
                     <action id="534" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    trans: t.413,
-                    other: f.105018;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        trans: t.413,
+                        other: f.105018;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="535" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    trans: t.413,
-                    other: f.105018;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        trans: t.413,
+                        other: f.105018;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="536" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    trans: t.413,
-                    other: f.305008;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        trans: t.413,
+                        other: f.305008;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="537" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    trans: t.413,
-                    other: f.105018;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        trans: t.413,
+                        other: f.105018;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="538" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    trans: t.413,
-                    other: f.305008;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        trans: t.413,
+                        other: f.305008;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="539" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    other: f.105018;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        other: f.105018;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="540" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105017,
-                    other: f.305008;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105017,
+                        other: f.305008;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8186,16 +8210,16 @@
                     <behavior>hidden</behavior>
                     <action id="541" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105017,
-                    exces: f.208001,
-                    other: f.305008;
-                    change other value {
+                        field: f.this,
+                        check: f.105017,
+                        exces: f.208001,
+                        other: f.305008;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8219,59 +8243,59 @@
                     <!--set editable-->
                     <action id="542" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    trans: t.413,
-                    other: f.105020;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        trans: t.413,
+                        other: f.105020;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="543" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    trans: t.413,
-                    other: f.105020;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        trans: t.413,
+                        other: f.105020;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="544" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    trans: t.413,
-                    other: f.305009;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        trans: t.413,
+                        other: f.305009;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="545" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    trans: t.413,
-                    other: f.105020;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        trans: t.413,
+                        other: f.105020;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="546" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    trans: t.413,
-                    other: f.305009;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        trans: t.413,
+                        other: f.305009;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="547" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    other: f.105020;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        other: f.105020;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="548" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105019,
-                    other: f.305009;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105019,
+                        other: f.305009;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8287,16 +8311,16 @@
                     <behavior>hidden</behavior>
                     <action id="549" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105019,
-                    exces: f.208001,
-                    other: f.305009;
-                    change other value {
+                        field: f.this,
+                        check: f.105019,
+                        exces: f.208001,
+                        other: f.305009;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8320,59 +8344,59 @@
                     <!--set editable-->
                     <action id="550" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    trans: t.413,
-                    other: f.105022;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        trans: t.413,
+                        other: f.105022;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="551" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    trans: t.413,
-                    other: f.105022;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        trans: t.413,
+                        other: f.105022;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="552" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    trans: t.413,
-                    other: f.305010;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        trans: t.413,
+                        other: f.305010;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="553" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    trans: t.413,
-                    other: f.105022;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        trans: t.413,
+                        other: f.105022;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="554" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    trans: t.413,
-                    other: f.305010;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        trans: t.413,
+                        other: f.305010;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="555" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    other: f.105022;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        other: f.105022;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="556" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105021,
-                    other: f.305010;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105021,
+                        other: f.305010;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8388,16 +8412,16 @@
                     <behavior>hidden</behavior>
                     <action id="557" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105021,
-                    exces: f.208001,
-                    other: f.305010;
-                    change other value {
+                        field: f.this,
+                        check: f.105021,
+                        exces: f.208001,
+                        other: f.305010;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8421,59 +8445,59 @@
                     <!--set editable-->
                     <action id="558" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    trans: t.413,
-                    other: f.105024;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        trans: t.413,
+                        other: f.105024;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="559" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    trans: t.413,
-                    other: f.105024;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        trans: t.413,
+                        other: f.105024;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="560" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    trans: t.413,
-                    other: f.305011;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        trans: t.413,
+                        other: f.305011;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="561" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    trans: t.413,
-                    other: f.105024;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        trans: t.413,
+                        other: f.105024;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="562" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    trans: t.413,
-                    other: f.305011;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        trans: t.413,
+                        other: f.305011;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="563" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    other: f.105024;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        other: f.105024;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="564" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105023,
-                    other: f.305011;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105023,
+                        other: f.305011;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8489,16 +8513,16 @@
                     <behavior>hidden</behavior>
                     <action id="565" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105023,
-                    exces: f.208001,
-                    other: f.305011;
-                    change other value {
+                        field: f.this,
+                        check: f.105023,
+                        exces: f.208001,
+                        other: f.305011;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8522,59 +8546,59 @@
                     <!--set editable-->
                     <action id="566" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    trans: t.413,
-                    other: f.105026;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        trans: t.413,
+                        other: f.105026;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="567" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    trans: t.413,
-                    other: f.105026;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        trans: t.413,
+                        other: f.105026;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="568" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    trans: t.413,
-                    other: f.305012;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        trans: t.413,
+                        other: f.305012;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="569" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    trans: t.413,
-                    other: f.105026;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        trans: t.413,
+                        other: f.105026;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="570" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    trans: t.413,
-                    other: f.305012;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        trans: t.413,
+                        other: f.305012;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="571" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    other: f.105026;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        other: f.105026;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="572" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105025,
-                    other: f.305012;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105025,
+                        other: f.305012;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8590,16 +8614,16 @@
                     <behavior>hidden</behavior>
                     <action id="573" trigger="set">
                         <!--@formatter:off-->
-                    field: f.this,
-                    check: f.105025,
-                    exces: f.208001,
-                    other: f.305012;
-                    change other value {
+                        field: f.this,
+                        check: f.105025,
+                        exces: f.208001,
+                        other: f.305012;
+                        change other value {
                         if (check.value)
-                            return ((field.value*exces.value)/1000.0) as Double;
+                        return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
-                    }
-                    <!--@formatter:on-->
+                        }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8623,59 +8647,59 @@
                     <!--set editable-->
                     <action id="574" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    trans: t.413,
-                    other: f.105028;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        trans: t.413,
+                        other: f.105028;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="575" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    trans: t.413,
-                    other: f.105028;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        trans: t.413,
+                        other: f.105028;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="576" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    trans: t.413,
-                    other: f.305013;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        trans: t.413,
+                        other: f.305013;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="577" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    trans: t.413,
-                    other: f.105028;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        trans: t.413,
+                        other: f.105028;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="578" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    trans: t.413,
-                    other: f.305013;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        trans: t.413,
+                        other: f.305013;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="579" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    other: f.105028;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        other: f.105028;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="580" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105027,
-                    other: f.305013;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105027,
+                        other: f.305013;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -8723,59 +8747,59 @@
                     <!--set editable-->
                     <action id="582" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    trans: t.413,
-                    other: f.105030;
-                    make other,editable on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        trans: t.413,
+                        other: f.105030;
+                        make other,editable on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="583" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    trans: t.413,
-                    other: f.105030;
-                    make other,required on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        trans: t.413,
+                        other: f.105030;
+                        make other,required on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="584" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    trans: t.413,
-                    other: f.305014;
-                    make other,visible on trans when { idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        trans: t.413,
+                        other: f.305014;
+                        make other,visible on trans when { idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--set hidden-->
                     <action id="585" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    trans: t.413,
-                    other: f.105030;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        trans: t.413,
+                        other: f.105030;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <action id="586" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    trans: t.413,
-                    other: f.305014;
-                    make other,hidden on trans when { !idTrue.value }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        trans: t.413,
+                        other: f.305014;
+                        make other,hidden on trans when { !idTrue.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action id="587" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    other: f.105030;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        other: f.105030;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action id="588" trigger="set">
                         <!--@formatter:off-->
-                    idTrue: f.105029,
-                    other: f.305014;
-                    change other value { null; }
-                <!--@formatter:on-->
+                        idTrue: f.105029,
+                        other: f.305014;
+                        change other value { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -11033,7 +11057,7 @@
         <id>2015</id>
         <x>2229</x>
         <y>38</y>
-        <label>Základné  informácie</label><!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
+        <label>Základné informácie</label><!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
         <priority>1</priority>
         <transactionRef>
             <id>3</id>
@@ -12494,7 +12518,7 @@
         <id>2014</id>
         <x>2237</x>
         <y>743</y>
-        <label>Údaje o  zmluve</label> <!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
+        <label>Údaje o zmluve</label> <!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
         <priority>8</priority>
         <transactionRef>
             <id>3</id>

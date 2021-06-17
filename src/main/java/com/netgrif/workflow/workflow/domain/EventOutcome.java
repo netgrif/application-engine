@@ -23,7 +23,7 @@ public class EventOutcome {
     private User assignee;
 
     private LocalDateTime startDate;
-    
+
     private LocalDateTime finishDate;
 
     public void add(ChangedFieldsTree changedFieldsTree) {
