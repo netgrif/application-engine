@@ -100,7 +100,7 @@ public class NextGroupService implements INextGroupService {
 
         Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, groupCase);
         Task initTask = getGroupInitTask(groupCase);
-        if(initTask == null){
+        if (initTask == null) {
             log.error("Initial task of group case is not present!");
             return null;
         }
@@ -219,7 +219,7 @@ public class NextGroupService implements INextGroupService {
     public Set<Long> getAllCoMembers(User user) {
         Set<Long> users = workflowService.searchAll(
                 groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getId().toString())))
-                .map(it-> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
+                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
                 .collect(HashSet::new, Set::addAll, Set::addAll).stream()
                 .map(s -> Long.parseLong(s.toString()))
                 .collect(Collectors.toSet());

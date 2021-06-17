@@ -42,7 +42,7 @@ public class User {
 
     /**
      * This static method doesn't set attributes regarding the ProcessRoles
-     *
+     * <p>
      * Use the IUserFactory service to create instances that have these attributes set.
      */
     public static User createSmallUser(com.netgrif.workflow.auth.domain.User user) {
@@ -51,7 +51,7 @@ public class User {
 
     /**
      * This static method doesn't set attributes regarding the ProcessRoles
-     *
+     * <p>
      * Use the IUserFactory service to create instances that have these attributes set.
      */
     public static User createUser(com.netgrif.workflow.auth.domain.User user) {

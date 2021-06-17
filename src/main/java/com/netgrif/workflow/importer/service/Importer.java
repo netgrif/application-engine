@@ -1,10 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
@@ -17,7 +14,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
@@ -159,12 +158,18 @@ public class Importer {
         net.setIcon(document.getIcon());
 
         document.getRole().forEach(this::createRole);
-        for (com.netgrif.workflow.importer.model.Data data : document.getData()) {createDataSet(data);}
+        for (com.netgrif.workflow.importer.model.Data data : document.getData()) {
+            createDataSet(data);
+        }
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
-        for (com.netgrif.workflow.importer.model.Transition transition: document.getTransition()) {createTransition(transition);}
+        for (com.netgrif.workflow.importer.model.Transition transition : document.getTransition()) {
+            createTransition(transition);
+        }
         document.getArc().forEach(this::createArc);
-        for (com.netgrif.workflow.importer.model.Mapping mapping: document.getMapping()) {applyMapping(mapping);}
+        for (com.netgrif.workflow.importer.model.Mapping mapping : document.getMapping()) {
+            applyMapping(mapping);
+        }
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
         document.getData().forEach(this::addActionRefs);
@@ -214,7 +219,7 @@ public class Importer {
     @Transactional
     protected void resolveProcessEvents(ProcessEvents processEvents) {
         if (processEvents != null && processEvents.getEvent() != null) {
-           net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
+            net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
         }
     }
 
@@ -266,7 +271,9 @@ public class Importer {
         Transition transition = getTransition(mapping.getTransitionRef());
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
         mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
-        for (com.netgrif.workflow.importer.model.DataGroup dataGroup : mapping.getDataGroup()) { addDataGroup(transition, dataGroup); }
+        for (com.netgrif.workflow.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
+            addDataGroup(transition, dataGroup);
+        }
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
     }
 
@@ -331,7 +338,7 @@ public class Importer {
             if (ref.getLogic().getActionRef() != null) {
                 getTransition(trans.getId()).addDataEvents(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
             }
-            if (ref.getEvent() != null){
+            if (ref.getEvent() != null) {
                 getTransition(trans.getId()).addDataEvents(fieldId, buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId()));
             }
         });
@@ -489,7 +496,8 @@ public class Importer {
                 .flatMap(actions -> actions.getAction().stream()
                         .map(action -> {
                             action.setTrigger(trigger.name());
-                            return parseAction(transitionId, action);}))
+                            return parseAction(transitionId, action);
+                        }))
                 .collect(Collectors.toList());
         actionList.addAll(dataEvent.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
@@ -636,7 +644,7 @@ public class Importer {
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
         String fieldId = getField(dataRef.getId()).getStringId();
         Component component;
-        if((dataRef.getComponent()) == null)
+        if ((dataRef.getComponent()) == null)
             component = getField(dataRef.getId()).getComponent();
         else
             component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
@@ -650,7 +658,7 @@ public class Importer {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event){
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event) {
         Map<EventPhase, List<Action>> actions = new HashMap<>();
         actions.put(EventPhase.PRE, new ArrayList<>());
         actions.put(EventPhase.POST, new ArrayList<>());
@@ -658,11 +666,11 @@ public class Importer {
         return parseDataEvent(event, actions, transitionId);
     }
 
-    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId){
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId) {
         com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(event.getId(), event.getType().value());
         event.getActions().forEach(eventAction -> {
             EventPhaseType phaseType = eventAction.getPhase();
-            if(eventAction.getPhase() == null){
+            if (eventAction.getPhase() == null) {
                 phaseType = event.getType().equals(DataEventType.GET) ? EventPhaseType.PRE : EventPhaseType.POST;
             }
             actions.get(EventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, dataEvent.getTrigger(), transitionId, event));
@@ -671,7 +679,7 @@ public class Importer {
         return dataEvent;
     }
 
-    private com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction){
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction) {
         Action action = parseAction(fieldId, transitionId, importedAction);
         com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = createDataEvent(action);
         dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(action);
@@ -916,11 +924,11 @@ public class Importer {
         }
         // TRUE if no roles and no triggers
         return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
-                    (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
-                    (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
-                    (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
-                    (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
-                )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+                (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
+                        (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
+                        (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
+                        (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
+        )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
     PetriNet getNetByImportId(String id) {

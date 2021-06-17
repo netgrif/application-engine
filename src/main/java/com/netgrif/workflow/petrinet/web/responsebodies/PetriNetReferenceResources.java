@@ -17,7 +17,7 @@ public class PetriNetReferenceResources extends CollectionModel<PetriNetReferenc
         this(content.stream().map(PetriNetReferenceResource::new).collect(Collectors.toList()));
     }
 
-    private void buildLinks(){
+    private void buildLinks() {
         PetriNetReferenceResourceAssembler.buildLinks(this);
     }
 }

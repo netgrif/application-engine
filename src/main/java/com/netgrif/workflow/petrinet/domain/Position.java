@@ -5,10 +5,12 @@ import lombok.Setter;
 
 public class Position {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer x;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer y;
 
     public Position(int x, int y) {
@@ -16,5 +18,6 @@ public class Position {
         this.y = y;
     }
 
-    public Position() {}
+    public Position() {
+    }
 }

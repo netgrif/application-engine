@@ -35,7 +35,7 @@ public class PdfGenerator implements IPdfGenerator {
     private IPdfDrawer pdfDrawer;
 
     @Override
-    public void setupPdfGenerator(PdfResource pdfResource) throws IOException{
+    public void setupPdfGenerator(PdfResource pdfResource) throws IOException {
         setupPdfGenerator(pdfResource, 1.4f);
     }
 
@@ -66,7 +66,7 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields){
+    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields) {
         generateData(formCase.getPetriNet(), formCase, formCase.getPetriNet().getTransition(transitionId), pdfResource, excludedFields);
         return generatePdf(pdfResource);
     }
@@ -79,7 +79,7 @@ public class PdfGenerator implements IPdfGenerator {
 
     @Override
     public File generatePdf(PdfResource pdfResource) {
-        try{
+        try {
             return transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource);
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
@@ -133,7 +133,7 @@ public class PdfGenerator implements IPdfGenerator {
 
     protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
         File template = new File(((ClassPathResource) pdfResource.getTemplateResource()).getPath());
-        if(template.exists()){
+        if (template.exists()) {
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }
         pdfDrawer.newPage();

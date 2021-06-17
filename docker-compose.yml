@@ -52,12 +52,12 @@ services:
 
 
   docker-elastic:
-    image: elasticsearch:6.8.12
+    image: elasticsearch:7.13.2
     environment:
       - cluster.name=elasticsearch
-      - http.host=0.0.0.0
-      - transport.host=0.0.0.0
+      - discovery.type=single-node
     ports:
+      - 9200:9200
       - 9300:9300
 
   docker-redis:

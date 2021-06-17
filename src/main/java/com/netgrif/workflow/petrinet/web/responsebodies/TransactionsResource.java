@@ -17,7 +17,7 @@ public class TransactionsResource extends CollectionModel<TransactionResource> {
         buildLinks(netId);
     }
 
-    public TransactionsResource(Collection<Transaction> content, String netId, Locale locale){
+    public TransactionsResource(Collection<Transaction> content, String netId, Locale locale) {
         this(content.stream().map(t -> new TransactionResource(t, locale)).collect(Collectors.toList()), netId);
     }
 

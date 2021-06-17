@@ -8,7 +8,7 @@ import java.io.IOException;
 public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {
 
     public void setFieldParams(PdfField field) {
-        helperField = new PdfDataGroupField(field.getFieldId(),field.getLabel(), field.getValues(), field.getType(), resource.getBaseX() + field.getX(),
+        helperField = new PdfDataGroupField(field.getFieldId(), field.getLabel(), field.getValues(), field.getType(), resource.getBaseX() + field.getX(),
                 resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
     }
 
@@ -20,5 +20,6 @@ public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {
     }
 
     @Override
-    public void renderValue(PdfField field, int lineCounter) throws IOException {}
+    public void renderValue(PdfField field, int lineCounter) throws IOException {
+    }
 }

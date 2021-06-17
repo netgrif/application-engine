@@ -1,4 +1,5 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>dynamic_validations</id>
     <title>dynamic_validations</title>
     <defaultRole>true</defaultRole>
@@ -53,13 +54,14 @@
             number: f.number;
 
             if (number_valid_switch.value) {
-                change number validations { "odd" }
+            change number validations { "odd" }
             } else {
-                change number validations { dynamicValidation('''inrange ${min.value as Integer},${max.value as Integer}''', null) }
+            change number validations { dynamicValidation('''inrange ${min.value as Integer},${max.value as Integer}''',
+            null) }
             }
         </action>
     </data>
-    
+
     <data type="boolean">
         <id>text_valid_switch</id>
         <title>Switch</title>
@@ -69,9 +71,9 @@
             text: f.text;
 
             if (text_valid_switch.value) {
-                change text validations { "email" }
+            change text validations { "email" }
             } else {
-                change text validations { dynamicValidation('''maxLength ${max.value as Integer}''', null) }
+            change text validations { dynamicValidation('''maxLength ${max.value as Integer}''', null) }
             }
         </action>
     </data>
@@ -88,7 +90,8 @@
             <logic>
                 <behavior>editable</behavior>
             </logic>
-        </dataRef><dataRef>
+        </dataRef>
+        <dataRef>
             <id>max</id>
             <logic>
                 <behavior>editable</behavior>

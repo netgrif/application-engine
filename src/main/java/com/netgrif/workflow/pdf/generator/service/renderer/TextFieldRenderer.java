@@ -10,7 +10,7 @@ import java.util.List;
 public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
 
     public void setFieldParams(PdfField field) {
-        helperField = new PdfTextField(field.getFieldId(),field.getLabel(), field.getValues(), field.getType(),
+        helperField = new PdfTextField(field.getFieldId(), field.getLabel(), field.getValues(), field.getType(),
                 resource.getBaseX() + field.getX(), resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
     }
 
@@ -45,7 +45,7 @@ public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
             strokeLineCounter++;
             pdfDrawer.writeString(resource.getValueFont(), fontValueSize, x, y, line);
         }
-        if(resource.isTextFieldStroke()) {
+        if (resource.isTextFieldStroke()) {
             pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), strokeLineCounter, strokeWidth);
         }
         pdfDrawer.checkOpenPages();

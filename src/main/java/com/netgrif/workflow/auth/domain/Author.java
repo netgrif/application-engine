@@ -9,7 +9,8 @@ public class Author {
     private String email;
     private String fullName;
 
-    public Author(){}
+    public Author() {
+    }
 
     public Author(Long id, String email, String fullName) {
         this.id = id;

@@ -78,7 +78,7 @@ public class AdminController {
             String userIp = details.getRemoteAddress();
             log.warn("Connecting IP " + userIp);
             if (!whitelist.contains(userIp)) {
-                log.error("User "+auth.getName()+ " invalid IP Address " + userIp);
+                log.error("User " + auth.getName() + " invalid IP Address " + userIp);
                 return errorMessage("Invalid IP Address");
             }
             if (code != null) {

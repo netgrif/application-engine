@@ -107,7 +107,7 @@ public class User {
         nextGroups = new HashSet<>();
     }
 
-    public User(User user){
+    public User(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.surname = user.getSurname();

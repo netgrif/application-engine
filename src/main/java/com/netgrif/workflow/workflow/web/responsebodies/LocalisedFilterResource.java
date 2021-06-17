@@ -9,8 +9,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import java.util.ArrayList;
 
 /**
- * @deprecated
- * since 5.3.0 - Filter engine processes should be used instead of native objects
+ * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
  */
 @Deprecated
 public class LocalisedFilterResource extends EntityModel<Filter> {
@@ -24,8 +23,7 @@ public class LocalisedFilterResource extends EntityModel<Filter> {
         try {
             add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FilterController.class)
                     .deleteFilter(getContent().getStringId(), null)).withRel("delete"));
-        }
-        catch (UnauthorisedRequestException e) {
+        } catch (UnauthorisedRequestException e) {
             e.printStackTrace();
         }
     }

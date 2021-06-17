@@ -227,7 +227,7 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
 
-    protected void buildUsersRoleQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildUsersRoleQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildUsersQuery(userRoleQuery, user);
         negativeUserRoleQuery(userRoleQuery, user);
@@ -404,7 +404,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            if(field.getKey().contains("."))
+            if (field.getKey().contains("."))
                 dataQuery.must(termQuery("dataSet." + field.getKey(), field.getValue()));
             else
                 dataQuery.must(termQuery("dataSet." + field.getKey() + ".fulltextValue.keyword", field.getValue()));
@@ -456,7 +456,7 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
     private void buildCaseIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
-        if(request.stringId == null || request.stringId.isEmpty()) {
+        if (request.stringId == null || request.stringId.isEmpty()) {
             return;
         }
 

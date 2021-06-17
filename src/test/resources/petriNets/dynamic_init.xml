@@ -1,4 +1,5 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
     <id>dynamic_init</id>
     <title>dynamic_init</title>
     <defaultRole>true</defaultRole>
@@ -33,7 +34,8 @@
         <title>user</title>
         <init dynamic="true">
             def user = userService.loggedOrSystem
-            return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email: user.email)
+            return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email:
+            user.email)
         </init>
     </data>
 

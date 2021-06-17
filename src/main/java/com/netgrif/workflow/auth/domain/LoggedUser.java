@@ -82,7 +82,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setPassword(null);
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
-        anonym.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
+        anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
         anonym.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
             role.set_id(roleId);
