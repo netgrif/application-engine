@@ -2,6 +2,11 @@ package com.netgrif.workflow.elastic
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -20,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
+import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -51,8 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DeletePetriNetWithManyInstancesTest {
 
     private static final String LOCALE_SK = "sk"
-    private static final String USER_EMAIL = "super@netgrif.com"
-    private static final String USER_PASSW = "password"
+    private static final String TEST_NET = "all_data.xml"
     private static final String BASE_URL = "/api/petrinet/"
     private static final int TEST_NET_COUNT = 5000
 
@@ -87,12 +92,13 @@ class DeletePetriNetWithManyInstancesTest {
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
-        auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
 
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(petriNetResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        def net = importHelper.createNet(TEST_NET, VersionType.MAJOR, superCreator.loggedSuper)
         assert net.isPresent()
+
+        auth = testHelper.getSuperUserAuth()
 
         netId = net.get().getStringId()
 
@@ -107,13 +113,15 @@ class DeletePetriNetWithManyInstancesTest {
         assert caseRepository.count(QCase.case$.processIdentifier.eq("all_data")) == TEST_NET_COUNT
         mvc.perform(
                 delete(BASE_URL + netId)
-                        .accept(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON_VALUE)
                         .locale(Locale.forLanguageTag(LOCALE_SK))
                         .with(csrf().asHeader())
                         .with(authentication(this.auth))
         )
                 .andExpect(status().isOk())
-                .andReturn()
+                .andDo{result ->
+                    assert caseRepository.count(QCase.case$.processIdentifier.eq("all_data")) == 0
+                }
     }
 
 }
