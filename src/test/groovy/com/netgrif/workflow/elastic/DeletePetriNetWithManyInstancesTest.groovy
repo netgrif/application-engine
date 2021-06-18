@@ -2,15 +2,24 @@ package com.netgrif.workflow.elastic
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.importer.service.Importer
 import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -48,9 +57,6 @@ class DeletePetriNetWithManyInstancesTest {
     private static final int TEST_NET_COUNT = 5000
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private ImportHelper importHelper
 
     @Autowired
@@ -61,6 +67,15 @@ class DeletePetriNetWithManyInstancesTest {
 
     @Autowired
     private CaseRepository caseRepository
+
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
+
+    @Value("classpath:all_data.xml")
+    private Resource petriNetResource
 
     private Authentication auth
     private MockMvc mvc
@@ -76,7 +91,7 @@ class DeletePetriNetWithManyInstancesTest {
 
         testHelper.truncateDbs()
 
-        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
+        def net = petriNetService.importPetriNet(petriNetResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert net.isPresent()
 
         netId = net.get().getStringId()
@@ -87,6 +102,7 @@ class DeletePetriNetWithManyInstancesTest {
     }
 
     // NAE-1324
+    @Test
     void testDeletePetriNetWithManyInstances() {
         assert caseRepository.count(QCase.case$.processIdentifier.eq("all_data")) == TEST_NET_COUNT
         mvc.perform(
