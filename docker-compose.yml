@@ -52,7 +52,7 @@ services:
 
 
   docker-elastic:
-    image: elasticsearch:7.13.2
+    image: elasticsearch:7.10.1
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
