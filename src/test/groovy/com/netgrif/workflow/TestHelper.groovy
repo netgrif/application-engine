@@ -37,9 +37,6 @@ class TestHelper {
     @Autowired
     private GroupRunner groupRunner
 
-    @Value('${admin.password}')
-    private String superAdminPassword
-
     void truncateDbs() {
         template.db.drop()
         userRepository.deleteAll()
@@ -50,9 +47,5 @@ class TestHelper {
         systemUserRunner.run()
         groupRunner.run()
         superCreator.run()
-    }
-
-    Authentication getSuperUserAuth() {
-        return new UsernamePasswordAuthenticationToken("super@netgrif.com", superAdminPassword)
     }
 }
