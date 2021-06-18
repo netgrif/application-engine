@@ -9,7 +9,10 @@ import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 
 @Component
@@ -34,6 +37,9 @@ class TestHelper {
     @Autowired
     private GroupRunner groupRunner
 
+    @Value('${admin.password}')
+    private String superAdminPassword
+
     void truncateDbs() {
         template.db.drop()
         userRepository.deleteAll()
@@ -44,5 +50,9 @@ class TestHelper {
         systemUserRunner.run()
         groupRunner.run()
         superCreator.run()
+    }
+
+    Authentication getSuperUserAuth() {
+        return new UsernamePasswordAuthenticationToken("super@netgrif.com", superAdminPassword)
     }
 }
