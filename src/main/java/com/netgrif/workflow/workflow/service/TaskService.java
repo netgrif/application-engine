@@ -22,10 +22,8 @@ import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.*;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
@@ -143,6 +141,7 @@ public class TaskService implements ITaskService {
         outcome.addChangedFieldsTree(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
+        addMessageToOutcome(transition, EventType.ASSIGN, outcome);
 //        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
@@ -227,7 +226,7 @@ public class TaskService implements ITaskService {
         outcome.addChangedFieldsTree(dataService.runActions(transition.getPostFinishActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
-//        addTaskStateInformationToEventOutcome(outcome, task);
+        addMessageToOutcome(transition, EventType.FINISH, outcome);
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
@@ -273,7 +272,7 @@ public class TaskService implements ITaskService {
         outcome.addChangedFieldsTree(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
-//        addTaskStateInformationToEventOutcome(outcome, task);
+        addMessageToOutcome(transition, EventType.CANCEL, outcome);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
@@ -346,7 +345,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
 
-//        addTaskStateInformationToEventOutcome(outcome, task);
+        addMessageToOutcome(transition, EventType.DELEGATE, outcome);
 
         publisher.publishEvent(new UserDelegateTaskEvent(delegateUser, task, useCase, delegatedUser));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
@@ -806,5 +805,12 @@ public class TaskService implements ITaskService {
     private void setUser(Task task) {
         if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
+    }
+
+    private EventOutcome addMessageToOutcome(Transition transition, EventType type, TaskEventOutcome outcome) {
+        if(transition.getEvents().containsKey(type)){
+            outcome.setMessage(transition.getEvents().get(type).getMessage());
+        }
+        return outcome;
     }
 }
