@@ -178,13 +178,15 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
+        addRolesQueryConstraint(request, user);
+        addUsersQueryConstraint(request, user);
+
         BoolQueryBuilder query = boolQuery();
 
-        buildUsersRoleQuery(request, query, user);
+        buildPermissionQuery(request, query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
-        buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
@@ -197,6 +199,26 @@ public class ElasticCaseService implements IElasticCaseService {
             return null;
         else
             return query;
+    }
+
+    protected void addRolesQueryConstraint(CaseSearchRequest request, LoggedUser user) {
+        if (request.role != null && !request.role.isEmpty()) {
+            Set<String> roles = new HashSet<>(request.role);
+            roles.addAll(user.getProcessRoles());
+            request.role = new ArrayList<>(roles);
+        } else {
+            request.role = new ArrayList<>(user.getProcessRoles());
+        }
+    }
+
+    protected void addUsersQueryConstraint(CaseSearchRequest request, LoggedUser user) {
+        if (request.users != null && !request.users.isEmpty()) {
+            Set<Long> users = new HashSet<>(request.users);
+            users.add(user.getId());
+            request.users = new ArrayList<>(users);
+        } else {
+            request.users = Collections.singletonList(user.getId());
+        }
     }
 
     /**
@@ -223,30 +245,40 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
 
-    protected void buildUsersRoleQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildPermissionQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersQuery(userRoleQuery, user);
-        negativeUserRoleQuery(userRoleQuery, user);
+        buildUsersAndRolesQuery(request, userRoleQuery, user);
+        negativeUsersAndRolesQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
     }
 
-    private void negativeUserRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder negativeQuery = boolQuery();
         buildNegativeViewRoleQuery(negativeQuery, user);
         buildNegativeViewUsersQuery(negativeQuery, user);
         query.should(negativeQuery);
     }
 
-    private void buildUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+    private void buildUsersAndRolesQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder usersQuery = boolQuery();
+        BoolQueryBuilder roleQuery = boolQuery();
         BoolQueryBuilder exists = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
+
         exists.must(existsQuery("users"));
         exists.must(termQuery("users", user.getId()));
         notExists.mustNot(existsQuery("users"));
+
         usersQuery.should(exists);
         usersQuery.should(notExists);
+
+        if (request.role != null && !request.role.isEmpty()) {
+            for (String roleId : request.role) {
+                roleQuery.should(termQuery("enabledRoles", roleId));
+            }
+            usersQuery.should(roleQuery);
+        }
         query.must(usersQuery);
     }
 
@@ -375,18 +407,6 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
-    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
-        if (request.role == null || request.role.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder roleQuery = boolQuery();
-        for (String roleId : request.role) {
-            roleQuery.should(termQuery("enabledRoles", roleId));
-        }
-
-        query.filter(roleQuery);
-    }
 
     /**
      * Cases where "text_field" has value EXACTLY "text" AND "number_field" has value EXACTLY "125".<br>
