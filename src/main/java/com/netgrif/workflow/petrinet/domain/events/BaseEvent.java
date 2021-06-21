@@ -10,6 +10,8 @@ import java.util.List;
 @Data
 public class BaseEvent extends Imported {
 
+    private String id;
+
     private I18nString title;
 
     private I18nString message;
