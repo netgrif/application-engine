@@ -41,13 +41,13 @@ public class Task {
 
     private Map<String, Map<String, Boolean>> roles;
 
-    private Map<Long, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> users;
 
     private LocalDateTime startDate;
 
     private LocalDateTime finishDate;
 
-    private Long finishedBy;
+    private String finishedBy;
 
     private String transactionId;
 

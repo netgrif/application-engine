@@ -1,5 +1,8 @@
 package com.netgrif.workflow.workflow
 
+
+import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
@@ -136,7 +139,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         List<Long> userIds = [] as List
-        userIds.add(userService.findByEmail("dummy@netgrif.com", false).getId())
+        userIds.add(userService.findByEmail("dummy@netgrif.com", false).get_id())
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
@@ -153,7 +156,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findByEmail("dummy@netgrif.com", false).getId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findByEmail("dummy@netgrif.com", false).get_id(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     Page<Task> findTasksByMongo() {

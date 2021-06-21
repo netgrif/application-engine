@@ -1,11 +1,13 @@
 package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
@@ -60,9 +62,6 @@ import static com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService.
 public class PetriNetService implements IPetriNetService {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
-
-    @Autowired
-    private IUserProcessRoleService userProcessRoleService;
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -157,7 +156,6 @@ public class PetriNetService implements IPetriNetService {
             net.incrementVersion(releaseType);
         }
         processRoleService.saveAll(net.getRoles().values());
-        userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
         net.setAuthor(author.transformToAuthor());
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");

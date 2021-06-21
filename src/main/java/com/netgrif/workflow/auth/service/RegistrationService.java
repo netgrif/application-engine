@@ -2,7 +2,6 @@ package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -19,7 +18,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,9 +27,6 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository;
 
     @Autowired
     private IUserService userService;
@@ -110,12 +105,16 @@ public class RegistrationService implements IRegistrationService {
         userService.addDefaultRole(user);
         userService.addDefaultAuthorities(user);
 
-//        if (newUser.groups != null && !newUser.groups.isEmpty()) {
-//            user.setGroups(groupService.findAllById(newUser.groups));
-//        }
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
         }
+
+        /*if (newUser.groups != null && !newUser.groups.isEmpty()) {
+            user.setGroups(groupService.findAllById(newUser.groups));
+        }
+        /*if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
+            user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
+        }*/
 
         User saved = userRepository.save(user);
 //        saved.setGroups(user.getGroups());

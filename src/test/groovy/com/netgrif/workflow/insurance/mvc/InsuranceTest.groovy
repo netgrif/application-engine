@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -120,7 +121,7 @@ class InsuranceTest {
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [org] as Group[],
-                [processRoles.get("agent"), processRoles.get("company")] as UserProcessRole[])
+                [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 

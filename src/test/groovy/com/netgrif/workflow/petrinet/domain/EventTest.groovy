@@ -1,10 +1,11 @@
 package com.netgrif.workflow.petrinet.domain
 
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
@@ -65,7 +66,7 @@ class EventTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner userRunner

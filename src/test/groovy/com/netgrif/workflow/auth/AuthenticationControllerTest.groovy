@@ -4,7 +4,7 @@ import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.web.AuthenticationController
@@ -13,15 +13,17 @@ import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.mail.EmailType
 import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.orgstructure.domain.GroupRepository
+import com.netgrif.workflow.orgstructure.domain.Member
+import com.netgrif.workflow.orgstructure.domain.MemberRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import org.jsoup.Jsoup
 
-//import com.netgrif.workflow.orgstructure.domain.Group
-//import com.netgrif.workflow.orgstructure.domain.GroupRepository
-//import com.netgrif.workflow.orgstructure.domain.Member
-//import com.netgrif.workflow.orgstructure.domain.MemberRepository
+
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -81,7 +83,7 @@ class AuthenticationControllerTest {
     private GreenMail smtpServer
 
 //    private Group group
-    private Map<String, UserProcessRole> processRoles
+    private Map<String, ProcessRole> processRoles
 
     @BeforeEach
     void before() {
@@ -100,7 +102,7 @@ class AuthenticationControllerTest {
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
         controller.invite(new NewUserRequest(email: EMAIL, groups: null, processRoles: processRoles.values().collect {
-            it.roleId
+            it.stringId
         }), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
