@@ -825,11 +825,11 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                User user = new User(userService.findById(node.get("value").asLong(), true));
+                User user = new User(userService.findById(node.get("value").asText(), true));
                 user.setPassword(null);
 //                user.setGroups(null);
                 user.setAuthorities(null);
-                user.setUserProcessRoles(null);
+//                user.setUserProcessRoles(null);
                 value = user;
                 break;
             case "number":

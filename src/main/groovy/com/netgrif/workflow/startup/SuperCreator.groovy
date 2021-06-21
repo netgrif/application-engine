@@ -2,7 +2,9 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import org.slf4j.Logger
@@ -22,13 +24,13 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private IAuthorityService authorityService
 
     @Autowired
-    private IUserProcessRoleService userProcessRoleService
-
-    @Autowired
     private IUserService userService
 
     @Autowired
     private INextGroupService groupService
+
+    @Autowired
+    private IProcessRoleService processRoleService
 
     @Value('${admin.password}')
     private String superAdminPassword
@@ -54,7 +56,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     password: superAdminPassword,
                     state: UserState.ACTIVE,
                     authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                    userProcessRoles: userProcessRoleService.findAll() as Set<UserProcessRole>))
+                    processRoles: processRoleService.findAll() as Set<ProcessRole>))
             log.info("Super user created")
         } else {
             log.info("Super user detected")
@@ -79,7 +81,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllProcessRoles() {
-        superUser.setUserProcessRoles(userProcessRoleService.findAll() as Set<UserProcessRole>)
+        superUser.setProcessRoles(processRoleService.findAll() as Set<ProcessRole>)
         superUser = userService.save(superUser)
     }
 

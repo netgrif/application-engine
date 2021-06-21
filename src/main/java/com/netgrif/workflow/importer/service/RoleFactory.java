@@ -1,8 +1,6 @@
 package com.netgrif.workflow.importer.service;
 
 
-import com.netgrif.workflow.auth.domain.UserProcessRole;
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.importer.model.CaseLogic;
 import com.netgrif.workflow.importer.model.Logic;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -22,9 +20,6 @@ public class RoleFactory {
 
     @Autowired
     private ProcessRoleRepository repository;
-
-    @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository;
 
     Map<String, Boolean> getPermissions(Logic roleLogic) {
         Map<String, Boolean> permissions = new HashMap<>();
@@ -94,7 +89,6 @@ public class RoleFactory {
         role.setImportId(net.getStringId() + "_" + transition.getImportId());
 //        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());
         role = repository.save(role);
-        userProcessRoleRepository.save(new UserProcessRole(role.getStringId()));
         return role;
     }
 }

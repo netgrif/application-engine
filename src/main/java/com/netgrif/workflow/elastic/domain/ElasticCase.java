@@ -60,7 +60,7 @@ public class ElasticCase {
 
     private Long creationDateSortable;
 
-    private Long author;
+    private String author;
 
     private String authorName;
 

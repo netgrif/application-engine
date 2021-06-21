@@ -188,7 +188,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers) {
-        existingUsers.put(user.getId().toString(), new I18nString(user.getEmail()));
+        existingUsers.put(user.get_id().toString(), new I18nString(user.getEmail()));
         return existingUsers;
     }
 
@@ -197,7 +197,7 @@ public class NextGroupService implements INextGroupService {
         HashSet<String> userIds = new HashSet<>();
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
 
-        userIds.add(user.getId().toString());
+        userIds.add(user.get_id().toString());
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(removeUser(userIds, existingUsers, groupCase));
         workflowService.save(groupCase);
     }
@@ -236,24 +236,24 @@ public class NextGroupService implements INextGroupService {
         }
         Set<String> userIds = groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet();
         List<User> resultList = new ArrayList<>();
-        userIds.forEach(id -> resultList.add(userService.findById(Long.parseLong(id), true)));
+        userIds.forEach(id -> resultList.add(userService.findById(id, true)));
         return resultList;
     }
 
     @Override
     public Set<String> getAllGroupsOfUser(User groupUser) {
-        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
+        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.get_id().toString())))
                 .map(aCase -> aCase.get_id().toString()).getContent();
         return new HashSet<>(groupList);
     }
 
     @Override
-    public Long getGroupOwnerId(String groupId) {
+    public String getGroupOwnerId(String groupId) {
         return this.getGroupOwnerId(this.findGroup(groupId));
     }
 
     @Override
-    public Collection<Long> getGroupsOwnerIds(Collection<String> groupIds) {
+    public Collection<String> getGroupsOwnerIds(Collection<String> groupIds) {
         return this.findByIds(groupIds).stream().map(this::getGroupOwnerId).collect(Collectors.toList());
     }
 
@@ -284,20 +284,20 @@ public class NextGroupService implements INextGroupService {
 
     private boolean authorHasDefaultGroup(User author) {
         List<Case> allGroups = findAllGroups();
-        for (Case group : allGroups) {
-            if (group.getAuthor().getId().equals(author.getId())) {
+        for (Case group : allGroups){
+            if(group.getAuthor().getId().equals(author.get_id())) {
                 return true;
             }
         }
         return false;
     }
 
-    private Long getGroupOwnerId(Case groupCase) {
+    private String getGroupOwnerId(Case groupCase) {
         return groupCase.getAuthor().getId();
     }
 
     private Case findUserDefaultGroup(User author) {
-        return workflowService.searchOne(QCase.case$.author.id.eq(author.getId()).and(QCase.case$.title.eq(author.getFullName())));
+        return workflowService.searchOne(QCase.case$.author.id.eq(author.getStringId()).and(QCase.case$.title.eq(author.getFullName())));
     }
 
     private Task getGroupInitTask(Case groupCase) {
@@ -323,7 +323,7 @@ public class NextGroupService implements INextGroupService {
 
         Map<String, String> authorData = new HashMap<>();
         authorData.put("type", "user");
-        authorData.put("value", author.getId().toString());
+        authorData.put("value", author.get_id().toString());
 
         Map<String, String> titleData = new HashMap<>();
         titleData.put("type", "text");

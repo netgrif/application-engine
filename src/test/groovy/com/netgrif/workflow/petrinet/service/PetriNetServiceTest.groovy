@@ -1,8 +1,7 @@
 package com.netgrif.workflow.petrinet.service
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -10,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
@@ -49,7 +49,7 @@ class PetriNetServiceTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IUserProcessRoleService userProcessRoleService
+    private IProcessRoleService userProcessRoleService
 
     @Autowired
     private IUserService userService
@@ -59,9 +59,6 @@ class PetriNetServiceTest {
 
     @Autowired
     private ProcessRoleRepository processRoleRepository
-
-    @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -75,7 +72,6 @@ class PetriNetServiceTest {
     @Test
     void processDelete() {
         long processRoleCount = processRoleRepository.count()
-        long userProcessRoleCount = userProcessRoleRepository.count()
         long processCount = petriNetRepository.count()
         int caseCount = workflowService.getAll(new FullPageRequest()).size()
         long taskCount = taskRepository.count()
@@ -89,7 +85,6 @@ class PetriNetServiceTest {
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
         assert taskRepository.count() == taskCount + 2
         assert processRoleRepository.count() == processRoleCount + 2
-        assert userProcessRoleRepository.count() == userProcessRoleCount + 2
 
         def user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
@@ -105,7 +100,6 @@ class PetriNetServiceTest {
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
-        assert userProcessRoleRepository.count() == userProcessRoleCount
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 0

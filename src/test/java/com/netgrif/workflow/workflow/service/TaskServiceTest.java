@@ -131,6 +131,6 @@ public class TaskServiceTest {
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(1L, "super@netgrif.com", "password", Collections.singleton(authorityUser));
+        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser));
     }
 }
