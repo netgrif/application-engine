@@ -69,7 +69,7 @@ public class Task {
 
     @Indexed
     @Setter
-    private Long userId;
+    private String userId;
 
     @org.springframework.data.annotation.Transient
     @Getter
@@ -97,7 +97,7 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
     @Getter
     @Setter
@@ -119,7 +119,7 @@ public class Task {
 
     @Getter
     @Setter
-    private Long finishedBy;
+    private String finishedBy;
 
     @Getter
     @Setter
@@ -212,7 +212,7 @@ public class Task {
         userRefs.put(userRefId, permissions);
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions) {
+    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);
@@ -242,7 +242,7 @@ public class Task {
     }
 
     @JsonIgnore
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 

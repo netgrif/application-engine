@@ -28,6 +28,9 @@ public class ProcessRole extends Imported {
 
     private I18nString name;
 
+    @Getter @Setter
+    private String netId;
+
     @Setter
     private String description;
 
@@ -37,6 +40,10 @@ public class ProcessRole extends Imported {
 
     public ProcessRole() {
         _id = new ObjectId();
+    }
+
+    public ProcessRole(String id) {
+        _id = new ObjectId(id);
     }
 
     public String getStringId() {

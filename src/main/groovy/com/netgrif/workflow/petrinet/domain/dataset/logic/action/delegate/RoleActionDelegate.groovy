@@ -1,8 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate
 
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
@@ -25,9 +24,6 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
 
     @Autowired
     IProcessRoleService processRoleService
-
-    @Autowired
-    IUserProcessRoleService userProcessRoleService
 
     Action action
     ProcessRole processRole
@@ -88,9 +84,9 @@ class RoleActionDelegate extends AbstractActionDelegate<RoleContext> {
         }
 
         String roleId = foundEntry.key
-        UserProcessRole role = userProcessRoleService.findByRoleId(roleId)
+        ProcessRole role = processRoleService.findById(roleId)
 
-        user.getUserProcessRoles().remove(role)
+        user.getProcessRoles().remove(role)
         return userService.save(user)
     }
 }

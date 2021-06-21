@@ -66,12 +66,12 @@ class UserListTest {
 
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "users_1": [
-                        "value": [superCreator.getSuperUser().getId()],
+                        "value": [superCreator.getSuperUser().get_id()],
                         "type" : "userList"
                 ]
         ]))
 
-        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getId())
+        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().get_id())
+        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().get_id())
     }
 }

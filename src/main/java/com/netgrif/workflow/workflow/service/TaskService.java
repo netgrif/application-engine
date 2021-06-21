@@ -154,7 +154,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCaseId + "]: Assigning task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
         startExecution(transition, useCase);
-        task.setUserId(user.getId());
+        task.setUserId(user.getStringId());
         task.setStartDate(LocalDateTime.now());
 
         useCase = workflowService.save(useCase);
@@ -314,7 +314,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome delegateTask(LoggedUser loggedUser, Long delegatedId, String taskId) throws TransitionNotExecutableException {
+    public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         User delegatedUser = userService.findById(delegatedId, true);
         User delegateUser = userService.findById(loggedUser.getId(), true);
         Optional<Task> taskOptional = taskRepository.findById(taskId);
@@ -347,7 +347,7 @@ public class TaskService implements ITaskService {
 
     protected void delegate(User delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
-            task.setUserId(delegated.getId());
+            task.setUserId(delegated.get_id().toString());
             save(task);
         } else {
             assignTaskToUser(delegated, task, useCase.getStringId());
@@ -365,7 +365,7 @@ public class TaskService implements ITaskService {
         Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
         if (!taskOptional.isPresent())
             return;
-        Long assigneeId = taskOptional.get().getUserId();
+        String assigneeId = taskOptional.get().getUserId();
         if (assigneeId != null)
             outcome.setAssignee(userService.findById(assigneeId, true));
         outcome.setStartDate(task.getStartDate());
@@ -403,7 +403,7 @@ public class TaskService implements ITaskService {
                 deleteUnassignedNotExecutableTasks(tasks, transition, useCase);
             }
         });
-        Long sysemId = userService.getSystem().getId();
+        String sysemId = userService.getSystem().getStringId();
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
         if (tasks.stream().anyMatch(task -> Objects.equals(task.getUserId(), sysemId) && task.getStartDate() != null)) {
             return;
@@ -634,7 +634,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByUser(Pageable pageable, User user) {
-        return loadUsers(taskRepository.findByUserId(pageable, user.getId()));
+        return loadUsers(taskRepository.findByUserId(pageable, user.getStringId()));
     }
 
     @Override
@@ -690,7 +690,7 @@ public class TaskService implements ITaskService {
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -700,7 +700,7 @@ public class TaskService implements ITaskService {
         return taskRepository.save(task);
     }
 
-    private List<Long> getExistingUsers(List<Long> userIds) {
+    private List<String> getExistingUsers(List<String> userIds) {
         if (userIds == null)
             return null;
         return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
@@ -732,7 +732,7 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                task.setUserId(userService.getSystem().getId());
+                task.setUserId(userService.getSystem().getStringId());
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
@@ -764,7 +764,7 @@ public class TaskService implements ITaskService {
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
-        Map<Long, User> users = new HashMap<>();
+        Map<String, User> users = new HashMap<>();
         tasks.forEach(task -> {
             if (task.getUserId() != null) {
                 if (users.containsKey(task.getUserId()))

@@ -3,14 +3,15 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
-@Entity
-@Table(name = "authority")
+@Document
 public class Authority implements GrantedAuthority {
 
     public static final long serialVersionUID = 2839744057647464485L;
@@ -25,22 +26,19 @@ public class Authority implements GrantedAuthority {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
-    private Long id;
+    private ObjectId _id;
 
     @NotNull
-    @Column(unique = true)
     @JsonIgnore
     @Getter
     @Setter
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "authorities")
     @Getter
     @Setter
-    private Set<User> users;
+    private Set<String> users;
 
     public Authority() {
     }
@@ -58,7 +56,7 @@ public class Authority implements GrantedAuthority {
     }
 
     public void addUser(User user) {
-        users.add(user);
+        users.add(user.get_id().toString());
     }
 
     @Override
@@ -79,7 +77,7 @@ public class Authority implements GrantedAuthority {
     @Override
     public String toString() {
         return "Authority{" +
-                "id=" + id +
+                "id=" + _id +
                 ", name='" + name + '\'' +
                 '}';
     }
