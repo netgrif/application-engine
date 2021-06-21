@@ -11,6 +11,7 @@ import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
@@ -18,9 +19,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -28,9 +29,11 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.TaskPair;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -269,6 +272,7 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.setACase(setImmediateDataFields(useCase));
+        addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
     }
 
@@ -304,10 +308,10 @@ public class WorkflowService implements IWorkflowService {
         repository.delete(useCase);
 
         runActions(useCase.getPetriNet().getPostDeleteActions());
-//todo publishovanie?
         publisher.publishEvent(new DeleteCaseEvent(useCase));
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome();
         outcome.setStringId(useCase.getStringId());
+        addMessageToOutcome(petriNetService.clone(useCase.getPetriNetObjectId()), CaseEventType.DELETE, outcome);
         return outcome;
     }
 
@@ -518,6 +522,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setPetriNet(model);
     }
 
+//    todo refactor, keď sa vyrieši tvorba event outcomov pre data eventy
     @Override
     public ChangedFieldsTree runActions(List<Action> actions, String useCaseId) {
         log.info("[" + useCaseId + "]: Running actions on case");
@@ -532,7 +537,7 @@ public class WorkflowService implements IWorkflowService {
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
             }
-            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
+            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), DataEventType.SET,true);
         });
         save(case$);
         return changedFields;
@@ -547,7 +552,7 @@ public class WorkflowService implements IWorkflowService {
         });
     }
 
-    private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
+    private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, DataEventType trigger, boolean recursive) {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);
@@ -557,17 +562,17 @@ public class WorkflowService implements IWorkflowService {
         });
     }
 
-    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
+    private void processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null){
-            fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
+            fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent)field.getEvents().get(actionTrigger), phase));
         }
         if (fieldActions.isEmpty()) return;
 
         runEventActions(useCase, fieldActions, changedFields, actionTrigger);
     }
 
-    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
+    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, DataEventType trigger){
         actions.forEach(action -> {
             ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty());
             changedFields.mergeChangedFields(currentChangedFields);
@@ -575,7 +580,7 @@ public class WorkflowService implements IWorkflowService {
             if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == DataEventType.SET);
         });
     }
 
@@ -586,5 +591,12 @@ public class WorkflowService implements IWorkflowService {
         actions.forEach(action -> {
             actionsRunner.run(action, null, Optional.empty());
         });
+    }
+
+    private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {
+        if(net.getCaseEvents().containsKey(type)){
+            outcome.setMessage(net.getCaseEvents().get(type).getMessage());
+        }
+        return outcome;
     }
 }
