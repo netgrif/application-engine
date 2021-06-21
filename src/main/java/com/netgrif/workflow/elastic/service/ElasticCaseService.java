@@ -247,7 +247,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     protected void buildPermissionQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(request, userRoleQuery, user);
+        buildUsersAndRolesQuery(request, userRoleQuery);
         negativeUsersAndRolesQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
@@ -260,14 +260,19 @@ public class ElasticCaseService implements IElasticCaseService {
         query.should(negativeQuery);
     }
 
-    private void buildUsersAndRolesQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder usersQuery = boolQuery();
+    private void buildUsersAndRolesQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        BoolQueryBuilder existingUsersQuery = boolQuery();
         BoolQueryBuilder roleQuery = boolQuery();
+        BoolQueryBuilder usersQuery = boolQuery();
         BoolQueryBuilder exists = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
 
+        for (Long userId : request.users) {
+            existingUsersQuery.should(termQuery("users", userId));
+        }
+
         exists.must(existsQuery("users"));
-        exists.must(termQuery("users", user.getId()));
+        exists.must(existingUsersQuery);
         notExists.mustNot(existsQuery("users"));
 
         usersQuery.should(exists);
