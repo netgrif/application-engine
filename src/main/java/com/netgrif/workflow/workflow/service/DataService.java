@@ -10,12 +10,17 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
-import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Component;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.DataEvent;
+import com.netgrif.workflow.petrinet.domain.events.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -46,8 +51,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -93,35 +98,41 @@ public class DataService implements IDataService {
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
         List<Field> dataSetFields = new ArrayList<>();
-
+        GetDataEventOutcome outcome = new GetDataEventOutcome();
         fieldsIds.forEach(fieldId -> {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
+            Field field = useCase.getPetriNet().getField(fieldId).get();
+            resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, transition);
 
-            resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), Action.ActionTrigger.GET, EventPhase.PRE, useCase, task, transition);
-
+            //              todo dočasné riešenie, kým sa implementuje parsovanie stromu event outcomov
+            if (outcome.getMessage() == null &&
+                    field.getEvents().get(DataEventType.GET) != null &&
+                    ((DataEvent)field.getEvents().get(DataEventType.GET)).getMessage() != null){
+                outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.GET)).getMessage());
+            }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
-                    field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
+                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    validationField.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
+                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(field, transition);
-                    dataSetFields.add(field);
+                    resolveComponents(validationField, transition);
+                    dataSetFields.add(validationField);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
-                    field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
+                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    validationField.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
+                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(field, transition);
-                    dataSetFields.add(field);
+                    resolveComponents(validationField, transition);
+                    dataSetFields.add(validationField);
                 }
             }
-            resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), Action.ActionTrigger.GET, EventPhase.POST, useCase, task, transition);
+            resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, transition);
         });
 
         workflowService.save(useCase);
@@ -135,8 +146,6 @@ public class DataService implements IDataService {
 
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
-
-        GetDataEventOutcome outcome = new GetDataEventOutcome();
         outcome.setData(dataSetFields);
         return outcome;
     }
@@ -168,6 +177,7 @@ public class DataService implements IDataService {
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
+        SetDataEventOutcome outcome = new SetDataEventOutcome();
         values.fields().forEachRemaining(entry -> {
             DataField dataField = useCase.getDataSet().get(entry.getKey());
             String fieldId = entry.getKey();
@@ -175,16 +185,22 @@ public class DataService implements IDataService {
                 fieldId = fieldId.replace(task.getStringId() + "-", "");
                 dataField = useCase.getDataField(fieldId);
             }
+            Field field = useCase.getPetriNet().getField(fieldId).get();
             if (dataField != null) {
-                ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
-                        Action.ActionTrigger.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
+                ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(field,
+                        DataEventType.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
-
+//              todo dočasné riešenie, kým sa implementuje parsovanie stromu event outcomov
+                if (outcome.getMessage() == null &&
+                    field.getEvents().get(DataEventType.SET) != null &&
+                    ((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage() != null){
+                    outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage());
+                }
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
                 dataField.setAllowedNets(parseAllowedNetsValue(entry.getValue()));
                 dataField.setFilterMetadata(parseFilterMetadataValue(entry.getValue()));
-                ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
-                        Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
+                ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(field,
+                        DataEventType.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
 
             } else try {
@@ -203,7 +219,6 @@ public class DataService implements IDataService {
         workflowService.resolveUserRef(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
-        SetDataEventOutcome outcome = new SetDataEventOutcome();
         outcome.setData(changedFieldsTree);
         return outcome;
     }
@@ -342,10 +357,9 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
-        });
+        DataEvent event = field.getEvents().get(DataEventType.GET);
+        event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
+        event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
@@ -369,10 +383,9 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
-        field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
-        });
+        DataEvent event = field.getEvents().get(DataEventType.GET);
+        event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
+        event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
@@ -522,9 +535,9 @@ public class DataService implements IDataService {
             log.debug("fieldId is not referenced through taskRef", e);
         }
 
-        ChangedFieldsTree changedFieldsPre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
+        ChangedFieldsTree changedFieldsPre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),DataEventType.SET,
                 EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-        ChangedFieldsTree changedFieldsPost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
+        ChangedFieldsTree changedFieldsPost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
         changedFieldsPre.mergeChangedFields(changedFieldsPost);
 
@@ -734,7 +747,7 @@ public class DataService implements IDataService {
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
             }
-            runEventActionsOnChanged(case$, task, transition, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
+            runEventActionsOnChanged(case$, task, transition, changedFields, changedFieldsTree.getChangedFields(), DataEventType.SET,true);
         });
         workflowService.save(case$);
         return changedFields;
@@ -749,38 +762,45 @@ public class DataService implements IDataService {
         });
     }
 
-    private ChangedFieldsTree resolveDataEvents(Field field, Action.ActionTrigger trigger, EventPhase phase, Case useCase, Task task, Transition transition) {
+//  todo  chceme aby vracal event outcomy dat, ktore boli triggernute eventom
+//  todo  resolve data events bude vracať generalizovaný data event outcome s changed fields tree ???
+    private ChangedFieldsTree resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Transition transition) {
         ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCase.getStringId(), task);
         processDataEvents(field, trigger, phase, useCase, task, changedFields, transition);
         return changedFields;
     }
 
-    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, Task task, ChangedFieldsTree changedFields, Transition transition){
+//        todo process events bude vracať generalizovaný data event outcome s changed fields tree ???
+    private void processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, ChangedFieldsTree changedFields, Transition transition){
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null){
-            fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
+            fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent) field.getEvents().get(actionTrigger), phase));
         }
         if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty())
-            fieldActions.addAll(DataFieldLogic.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents(), actionTrigger, phase));
+            fieldActions.addAll(DataFieldLogic.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
 
         if (fieldActions.isEmpty()) return;
 
+//        todo run event actions bude vracať generalizovaný data event outcome s changed fields tree ???
         runEventActions(useCase, task, transition, fieldActions, changedFields, actionTrigger);
     }
 
-    private void runEventActions(Case useCase, Task task, Transition transition, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
+//        todo runEventActions bude vracať generalizovaný data event outcome s changed fields tree ???
+    private void runEventActions(Case useCase, Task task, Transition transition, List<Action> actions, ChangedFieldsTree changedFields, DataEventType trigger){
         actions.forEach(action -> {
+    //        todo run bude vracať generalizovaný data event outcome s changed fields tree ???
             ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.of(task));
             changedFields.mergeChangedFields(currentChangedFields);
 
             if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            runEventActionsOnChanged(useCase, task, transition, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+            runEventActionsOnChanged(useCase, task, transition, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == DataEventType.SET);
         });
     }
 
-    private void runEventActionsOnChanged(Case useCase, Task task, Transition transition, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
+//        todo runEventActionsOnChanged bude vracať generalizovaný data event outcome s changed fields tree ???
+    private void runEventActionsOnChanged(Case useCase, Task task, Transition transition, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, DataEventType trigger, boolean recursive) {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);

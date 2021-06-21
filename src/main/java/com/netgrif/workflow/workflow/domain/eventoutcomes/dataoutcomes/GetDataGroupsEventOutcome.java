@@ -3,7 +3,6 @@ package com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.localised.LocalisedGetDataGroupsEventOutcome;
 import lombok.Data;
 

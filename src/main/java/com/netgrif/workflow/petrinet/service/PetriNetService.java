@@ -14,6 +14,8 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.Version;
@@ -25,7 +27,9 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -171,7 +175,15 @@ public class PetriNetService implements IPetriNetService {
         evaluateRules(net, EventPhase.POST);
         save(net);
         cache.put(net.getObjectId(), net);
+        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
+        return outcome;
+    }
+
+    private ImportPetriNetOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetOutcome outcome) {
+        if(net.getProcessEvents().containsKey(type)){
+            outcome.setMessage(net.getProcessEvents().get(type).getMessage());
+        }
         return outcome;
     }
 
