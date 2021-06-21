@@ -166,6 +166,7 @@ public class Case {
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
+        excludeNegativeViewRoles(petriNet.getPermissions());
     }
 
     public String getStringId() {
@@ -263,6 +264,14 @@ public class Case {
                 users.get(userId).putAll(permissions);
             } else {
                 users.put(userId, permissions);
+            }
+        });
+    }
+
+    private void excludeNegativeViewRoles(Map<String, Map<String, Boolean>> permissions) {
+        permissions.forEach((role, perms) -> {
+            if (perms.containsKey("view") && !perms.get("view")) {
+                this.enabledRoles.remove(role);
             }
         });
     }
