@@ -25,7 +25,6 @@
 
     <!-- CUSTOM CONFIG -->
     <logger name="org.apache.pdfbox.pdmodel" level="ERROR"/>
-    <logger name="org.neo4j.ogm.drivers.http.request" level="ERROR"/>
     <logger name="com.netgrif.workflow.configuration.logging.ControllerRequestLoggingFilter">
         <level value="DEBUG"/>
     </logger>
