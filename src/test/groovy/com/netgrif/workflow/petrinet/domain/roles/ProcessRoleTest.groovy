@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.domain.roles
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.VersionType
@@ -89,15 +89,15 @@ class ProcessRoleTest {
         def processRoles = importHelper.createUserProcessRoles(["View": "View", "Perform": "Perform"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("View")] as UserProcessRole[])
+                [processRoles.get("View")] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("Perform")] as UserProcessRole[])
+                [processRoles.get("Perform")] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("View"), processRoles.get("Perform")] as UserProcessRole[])
+                [processRoles.get("View"), processRoles.get("Perform")] as ProcessRole[])
     }
 
     private String caseId

@@ -67,11 +67,11 @@ public class FilterSearchService extends MongoSearchService<Filter> {
 
     public Predicate author(Object query) {
         if (query instanceof Long)
-            return authorLong((Long) query);
+            return authorLong((String) query);
         return null;
     }
 
-    private Predicate authorLong(Long query) {
+    private Predicate authorLong(String query) {
         return QFilter.filter.author.id.eq(query);
     }
 

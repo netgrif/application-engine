@@ -4,6 +4,8 @@ import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
+import com.netgrif.workflow.orgstructure.domain.Member;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -26,7 +28,7 @@ public interface IUserService {
     User update(User user, UpdateUserRequest updates);
 
 
-    User findById(Long id, boolean small);
+    User findById(String id, boolean small);
 
     User findByEmail(String email, boolean small);
 
@@ -50,6 +52,8 @@ public interface IUserService {
 
     boolean stringMatchesUserPassword(User user, String passwordToCompare);
 
+    void assignAuthority(String userId, String authorityId);
+
     User getLoggedOrSystem();
 
     User getLoggedUser();
@@ -66,5 +70,5 @@ public interface IUserService {
 
     void deleteUser(User user);
 
-    Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<User> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 }

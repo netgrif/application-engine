@@ -7,6 +7,8 @@ import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.GroupRunner
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
 import org.junit.Before
@@ -37,7 +39,7 @@ class FieldTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner systemUserRunner

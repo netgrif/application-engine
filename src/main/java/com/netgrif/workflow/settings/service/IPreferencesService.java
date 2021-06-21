@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface IPreferencesService {
-    Preferences get(Long userId);
+    Preferences get(String userId);
 
     Preferences save(Preferences preferences);
 }

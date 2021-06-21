@@ -1,6 +1,8 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.events.Event
+import com.netgrif.workflow.petrinet.domain.events.EventType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import org.slf4j.Logger
@@ -31,7 +33,8 @@ class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
         ProcessRole defaultRole = new ProcessRole(
                 importId: "0",
                 name: new I18nString(ProcessRole.DEFAULT_ROLE),
-                description: "Default system process role"
+                description: "Default system process role",
+                events: new LinkedHashMap<EventType, Event>()
         )
         defaultRole = repository.save(defaultRole)
 
