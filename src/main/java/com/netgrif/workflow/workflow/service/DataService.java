@@ -105,11 +105,15 @@ public class DataService implements IDataService {
             Field field = useCase.getPetriNet().getField(fieldId).get();
             resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, transition);
 
-            //              todo dočasné riešenie, kým sa implementuje parsovanie stromu event outcomov
-            if (outcome.getMessage() == null &&
-                    field.getEvents().get(DataEventType.GET) != null &&
-                    ((DataEvent)field.getEvents().get(DataEventType.GET)).getMessage() != null){
-                outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.GET)).getMessage());
+            //todo dočasné riešenie na testovanie, kým sa implementuje parsovanie stromu event outcomov
+            if (outcome.getMessage() == null) {
+                if (field.getEvents().containsKey(DataEventType.GET) &&
+                        ((DataEvent)field.getEvents().get(DataEventType.GET)).getMessage() != null){
+                    outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.GET)).getMessage());
+                } else if (useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().containsKey(DataEventType.GET) &&
+                        useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.GET).getMessage() != null){
+                    outcome.setMessage(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.GET).getMessage());
+                }
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
@@ -190,11 +194,15 @@ public class DataService implements IDataService {
                 ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(field,
                         DataEventType.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
-//              todo dočasné riešenie, kým sa implementuje parsovanie stromu event outcomov
-                if (outcome.getMessage() == null &&
-                    field.getEvents().get(DataEventType.SET) != null &&
-                    ((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage() != null){
-                    outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage());
+//todo dočasné riešenie na testovanie, kým sa implementuje parsovanie stromu event outcomov
+                if (outcome.getMessage() == null) {
+                    if (field.getEvents().containsKey(DataEventType.SET) &&
+                        ((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage() != null){
+                        outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage());
+                    } else if (useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().containsKey(DataEventType.SET) &&
+                                useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null){
+                        outcome.setMessage(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.SET).getMessage());
+                    }
                 }
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
                 dataField.setAllowedNets(parseAllowedNetsValue(entry.getValue()));
@@ -770,10 +778,10 @@ public class DataService implements IDataService {
         return changedFields;
     }
 
-//        todo process events bude vracať generalizovaný data event outcome s changed fields tree ???
+    //todo process events bude vracať generalizovaný data event outcome s changed fields tree ???
     private void processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, ChangedFieldsTree changedFields, Transition transition){
         LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getEvents() != null){
+        if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)){
             fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent) field.getEvents().get(actionTrigger), phase));
         }
         if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty())

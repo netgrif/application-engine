@@ -294,6 +294,7 @@ public class Importer {
     }
 
     private void addActionsToEvent(List<Action> actions, DataEventType type, Map<DataEventType, DataEvent> events){
+        if (actions.isEmpty()) return;
         if(events.get(type) != null){
             events.get(type).addToActionsByDefaultPhase(actions);
             return;
@@ -708,11 +709,15 @@ public class Importer {
         List<com.netgrif.workflow.importer.model.DataEvent> filteredEvents = events.stream()
                                 .filter(event -> DataEventType.GET.toString().equalsIgnoreCase(event.getType().toString()))
                                 .collect(Collectors.toList());
-        parsedEvents.put(DataEventType.GET, parseDataEvent(filteredEvents,transitionId));
+        if(!filteredEvents.isEmpty()){
+            parsedEvents.put(DataEventType.GET, parseDataEvent(filteredEvents,transitionId));
+        }
 
         filteredEvents = events.stream().filter(event -> DataEventType.SET.toString().equalsIgnoreCase(event.getType().toString()))
                 .collect(Collectors.toList());
-        parsedEvents.put(DataEventType.SET, parseDataEvent(filteredEvents,transitionId));
+        if (!filteredEvents.isEmpty()){
+            parsedEvents.put(DataEventType.SET, parseDataEvent(filteredEvents,transitionId));
+        }
 
         return parsedEvents;
     }
