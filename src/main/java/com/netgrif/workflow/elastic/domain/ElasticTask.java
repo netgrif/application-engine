@@ -75,7 +75,8 @@ public class ElasticTask {
     @Field(type = Keyword)
     private Set<String> users;
 
-    private Set<Long> negativeViewUsers;
+    @Field(type = Keyword)
+    private Set<String> negativeViewUsers;
 
     @Field(type = Keyword)
     private String icon;

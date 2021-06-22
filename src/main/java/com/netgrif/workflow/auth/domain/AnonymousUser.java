@@ -28,7 +28,7 @@ public class AnonymousUser extends User{
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());
         if (!this.getNextGroups().isEmpty())
-            loggedUser.parseGroups(this.getGroups());
+            loggedUser.setGroups(this.getNextGroups());
 
         return loggedUser;
     }

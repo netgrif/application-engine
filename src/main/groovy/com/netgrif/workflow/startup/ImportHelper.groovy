@@ -144,7 +144,7 @@ class ImportHelper {
         return map
     }*/
 
-    User createUser(User user, Authority[] authorities, Group[] orgs, ProcessRole[] roles) {
+    User createUser(User user, Authority[] authorities,  ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE

@@ -4,7 +4,6 @@ import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
-import com.netgrif.workflow.orgstructure.domain.Member;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,8 +40,6 @@ public interface IUserService {
     List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
     List<User> findAllByIds(Set<Long> ids, boolean small);
-
-    void assignAuthority(Long userId, Long authorityId);
 
     void addDefaultRole(User user);
 

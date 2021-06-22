@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,10 +105,10 @@ public class RegistrationService implements IRegistrationService {
         user.setState(UserState.INVITED);
         userService.addDefaultRole(user);
         userService.addDefaultAuthorities(user);
-
-        if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
-            user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
-        }
+//TODO: POZRIIIi
+//        if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
+//            user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
+//        }
 
         /*if (newUser.groups != null && !newUser.groups.isEmpty()) {
             user.setGroups(groupService.findAllById(newUser.groups));

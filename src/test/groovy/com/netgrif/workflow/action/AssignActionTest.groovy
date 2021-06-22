@@ -69,9 +69,9 @@ class AssignActionTest {
 
     @Autowired
     private SuperCreator superCreator
-
-    @Autowired
-    private TestHelper testHelper
+//
+//    @Autowired
+//    private TestHelper testHelper
 
     private MockMvc mvc
     private PetriNet mainNet
@@ -94,7 +94,7 @@ class AssignActionTest {
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
+//                [org] as Group[],
                 [] as ProcessRole[])
     }
 
