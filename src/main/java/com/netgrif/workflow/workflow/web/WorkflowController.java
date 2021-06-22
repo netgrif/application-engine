@@ -5,11 +5,11 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.localised.LocalisedGetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -17,6 +17,7 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedGetDataEventOutcome;
 import com.querydsl.core.types.Predicate;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class WorkflowController {
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getACase().getStringId() + " was created succesfully",
-                    outcome.transformToLocalisedEventOutcome(locale));
+                    LocalisedEventOutcomeFactory.from(outcome,locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:",e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
@@ -200,7 +201,7 @@ public class WorkflowController {
                 outcome = workflowService.deleteCase(caseId);
             }
             return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                    outcome.transformToLocalisedEventOutcome(LocaleContextHolder.getLocale()));
+                    LocalisedEventOutcomeFactory.from(outcome,LocaleContextHolder.getLocale()));
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case ["+caseId+"] failed:",e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
