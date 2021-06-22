@@ -2,16 +2,16 @@ package com.netgrif.workflow.petrinet.web.responsebodies;
 
 
 import com.netgrif.workflow.petrinet.web.PetriNetController;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProcessRolesResource extends CollectionModel<ProcessRolesAndPermissions> {
+public class ProcessRolesResource extends EntityModel<ProcessRolesAndPermissions> {
 
     public ProcessRolesResource(ProcessRolesAndPermissions content, String netId) {
-        super(Collections.singleton(content), new ArrayList<>());
+        super(content, new ArrayList<>());
         buildLinks(netId);
     }
 

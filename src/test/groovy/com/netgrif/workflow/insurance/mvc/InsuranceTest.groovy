@@ -3,11 +3,11 @@ package com.netgrif.workflow.insurance.mvc
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator

@@ -7,9 +7,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -43,9 +41,6 @@ public class UserService implements IUserService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
-
-    @Autowired
-    private IUserProcessRoleService userProcessRoleService;
 
     @Autowired
     private INextGroupService groupService;
@@ -132,8 +127,6 @@ public class UserService implements IUserService {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent())
             throw new IllegalArgumentException("Could not find user with id [" + id + "]");
-        if (!small) {
-            throw new IllegalArgumentException("Could not find user with id ["+id+"]");
         /*if (!small) {
             loadGroups(user.get());
             return loadProcessRoles(user.get());
@@ -160,8 +153,8 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
-      // TODO: 8/27/18 make all pageable
-     //   Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        // TODO: 8/27/18 make all pageable
+        //   Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
@@ -170,18 +163,19 @@ public class UserService implements IUserService {
             users.forEach(this::loadProcessRoles);*/
         return users;
     }
-/* TODO: POZRI SEM
-    @Override
-    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        Set<Long> members = groupService.getAllCoMembers(loggedUser.transformToUser());
-        members.add(loggedUser.getId());
 
-        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
-        if (!small)
-            users.forEach(this::loadProcessRoles);
-        return null;
-    }
- */
+    /* TODO: POZRI SEM
+        @Override
+        public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+            Set<Long> members = groupService.getAllCoMembers(loggedUser.transformToUser());
+            members.add(loggedUser.getId());
+
+            Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
+            if (!small)
+                users.forEach(this::loadProcessRoles);
+            return null;
+        }
+     */
     @Override
     public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
@@ -252,9 +246,9 @@ public class UserService implements IUserService {
     @Override
     public List<User> findAllByIds(Set<Long> ids, boolean small) {
         List<User> users = userRepository.findAllByIdIn(ids);
-        if (!small) {
+      /*  if (!small) {
             users.forEach(this::loadProcessRoles);
-        }
+        }*/
         return users;
     }
 

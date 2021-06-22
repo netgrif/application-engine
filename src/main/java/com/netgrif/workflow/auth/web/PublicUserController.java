@@ -89,7 +89,7 @@ public class PublicUserController {
     @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences() {
-        Long userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+        String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -103,7 +103,7 @@ public class PublicUserController {
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences) {
         try {
-            Long userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+            String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
             preferences.setUserId(userId);
             preferencesService.save(preferences);
             return MessageResource.successMessage("User preferences saved");

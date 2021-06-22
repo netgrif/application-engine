@@ -107,7 +107,7 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private List<Long> negativeViewUsers = new LinkedList<>();
+    private List<String> negativeViewUsers = new LinkedList<>();
 
     @Getter
     @Setter
@@ -183,6 +183,11 @@ public class Task {
     @JsonIgnore
     public ObjectId getObjectId() {
         return _id;
+    }
+
+    @JsonIgnore
+    public String getId() {
+        return _id.toString();
     }
 
     public String getStringId() {
