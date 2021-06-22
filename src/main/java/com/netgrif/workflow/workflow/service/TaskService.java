@@ -362,6 +362,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(caseId);
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
         ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
+        resolveUserRef(useCase);
         return workflowService.save(useCase);
     }
 
