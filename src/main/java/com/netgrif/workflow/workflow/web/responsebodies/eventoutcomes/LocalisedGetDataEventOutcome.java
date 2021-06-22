@@ -1,6 +1,6 @@
-package com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.localised;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
 
-import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.Data;
