@@ -1,7 +1,6 @@
-package com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.localised;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.workflow.workflow.web.responsebodies.Task;
 import lombok.Data;
@@ -15,12 +14,12 @@ public abstract class LocalisedTaskEventOutcome extends LocalisedEventOutcome {
 
     private ChangedFieldsTree data;
 
+    protected LocalisedTaskEventOutcome() {
+    }
+
     protected LocalisedTaskEventOutcome(TaskEventOutcome outcome, Locale locale) {
         super(outcome, locale);
         this.task = new Task(outcome.getTask(), locale);
         this.data = outcome.getData();
-    }
-
-    protected LocalisedTaskEventOutcome() {
     }
 }

@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.localised;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
 
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
 import lombok.Data;

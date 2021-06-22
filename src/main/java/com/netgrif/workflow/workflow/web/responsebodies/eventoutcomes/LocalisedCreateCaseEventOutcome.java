@@ -1,7 +1,6 @@
-package com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.localised;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
 
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import lombok.Data;
 
