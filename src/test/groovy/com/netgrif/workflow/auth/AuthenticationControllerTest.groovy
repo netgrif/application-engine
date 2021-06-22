@@ -13,10 +13,6 @@ import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.mail.EmailType
 import com.netgrif.workflow.petrinet.domain.VersionType
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.domain.GroupRepository
-import com.netgrif.workflow.orgstructure.domain.Member
-import com.netgrif.workflow.orgstructure.domain.MemberRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper

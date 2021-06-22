@@ -53,6 +53,6 @@ public interface INextGroupService {
 
     Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 
-    Set<Long> getAllCoMembers(User user);
+    Set<String> getAllCoMembers(User user);
 
 }

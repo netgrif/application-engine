@@ -80,9 +80,10 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
-    private Set<Long> users;
+    private Set<String> users;
 
-    private Set<Long> negativeViewUsers;
+    @Field(type = Keyword)
+    private Set<String> negativeViewUsers;
 
     /**
      * Data that is stored in the elasticsearch database.

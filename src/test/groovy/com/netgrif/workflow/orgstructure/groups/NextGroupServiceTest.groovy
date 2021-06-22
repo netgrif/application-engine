@@ -2,11 +2,11 @@ package com.netgrif.workflow.orgstructure.groups
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.UserService
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
@@ -44,11 +44,11 @@ class NextGroupServiceTest {
 
         importHelper.createUser(new User(name: "Test", surname: "Dummy", email: "dummy@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Dummy", email: "user@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         Case customGroup = createGroup()
         if (customGroup == null) {

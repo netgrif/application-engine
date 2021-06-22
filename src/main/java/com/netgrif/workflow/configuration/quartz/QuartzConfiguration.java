@@ -47,6 +47,9 @@ public class QuartzConfiguration {
     @Autowired
     private QuartzProperties quartzProperties;
 
+//    @Autowired
+//    AutowiringSpringBeanJobFactory jobFactory;
+
     @QuartzDataSource
     public DataSource quartzDataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
@@ -66,6 +69,10 @@ public class QuartzConfiguration {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setApplicationContext(applicationContext);
         schedulerFactory.setAutoStartup(false);
+
+//        schedulerFactory.setJobFactory(jobFactory);
+//        schedulerFactory.setOverwriteExistingJobs(true);
+//        schedulerFactory.setSchedulerName("onloadcode-job-scheduler");
 
         Properties properties = PropertiesLoaderUtils.loadProperties(new ClassPathResource(defaultQuartzPropsPath));
         properties.putAll(quartzProperties.getProperties());

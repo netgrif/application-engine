@@ -216,15 +216,13 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Set<Long> getAllCoMembers(User user) {
-        Set<Long> users = workflowService.searchAll(
-                groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getId().toString())))
+    public Set<String> getAllCoMembers(User user) {
+        Set<String> users = workflowService.searchAll(
+                groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.get_id().toString())))
                 .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
-                .collect(HashSet::new, Set::addAll, Set::addAll).stream()
-                .map(s -> Long.parseLong(s.toString()))
-                .collect(Collectors.toSet());
-        users.remove(user.getId());
-        users.remove(userService.getSystem().getId());
+                .collect(HashSet::new, Set::addAll, Set::addAll);
+        users.remove(user.getStringId());
+        users.remove(userService.getSystem().getStringId());
         return users;
     }
 

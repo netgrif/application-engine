@@ -1,4 +1,4 @@
-package com.netgrif.workflow.petrinet.web
+package com.netgrif.workflow.petrinet.webprocessRolesAndPermissionses
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
