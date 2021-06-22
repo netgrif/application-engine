@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.roles
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.VersionType

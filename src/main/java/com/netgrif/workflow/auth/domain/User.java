@@ -136,6 +136,11 @@ public class User {
         return _id.toString();
     }
 
+    @JsonIgnore
+    public String getId() {
+        return _id.toString();
+    }
+
     public void addGroup(String group) {
         this.nextGroups.add(group);
     }

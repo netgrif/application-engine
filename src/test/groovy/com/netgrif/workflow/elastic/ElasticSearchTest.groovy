@@ -3,13 +3,13 @@ package com.netgrif.workflow.elastic
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.groups.NextGroupService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
@@ -118,7 +118,7 @@ class ElasticSearchTest {
         def processRoles = importHelper.createUserProcessRoles(["process_role": "Process role"], net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("process_role")] as UserProcessRole[])
+                [processRoles.get("process_role")] as ProcessRole[])
 
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net.get() : net2.get())

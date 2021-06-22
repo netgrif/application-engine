@@ -107,7 +107,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.users.containsKey(userId);
     }
 
-    public Predicate negativeViewUsersQuery(Long userId) {
+    public Predicate negativeViewUsersQuery(String userId) {
         return QTask.task.negativeViewUsers.contains(userId);
     }
 
