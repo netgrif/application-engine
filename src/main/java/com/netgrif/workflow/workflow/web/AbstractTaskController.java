@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -91,7 +92,7 @@ public abstract class AbstractTaskController {
     public EventOutcomeWithMessageResource assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(),
-                    taskService.assignTask(loggedUser, taskId).transformToLocalisedEventOutcome(locale));
+                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId),locale));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -102,7 +103,7 @@ public abstract class AbstractTaskController {
         Long userId = delegatedId != null ? Long.parseLong(delegatedId) : null;
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + userId + "]",
-                    taskService.delegateTask(loggedUser, userId, taskId).transformToLocalisedEventOutcome(locale));
+                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, userId, taskId),locale));
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -113,7 +114,7 @@ public abstract class AbstractTaskController {
 
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
-                    taskService.finishTask(loggedUser, taskId).transformToLocalisedEventOutcome(locale));
+                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId),locale));
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -127,7 +128,7 @@ public abstract class AbstractTaskController {
     public EventOutcomeWithMessageResource cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
-                    taskService.cancelTask(loggedUser, taskId).transformToLocalisedEventOutcome(locale));
+                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId),locale));
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -195,13 +196,13 @@ public abstract class AbstractTaskController {
         List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
         GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(dataGroups);
         return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
-                outcome.transformToLocalisedEventOutcome(locale));
+                LocalisedEventOutcomeFactory.from(outcome,locale));
     }
 
     public EventOutcomeWithMessageResource setData(String taskId, ObjectNode dataBody) {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been set sucessfully",
-                new SetDataChangedFieldsEventOutcome(dataService.setData(taskId, dataBody))
-                        .transformToLocalisedEventOutcome(LocaleContextHolder.getLocale()));
+                LocalisedEventOutcomeFactory.from(new SetDataChangedFieldsEventOutcome(dataService.setData(taskId, dataBody))
+                        ,LocaleContextHolder.getLocale()));
     }
 
     public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
