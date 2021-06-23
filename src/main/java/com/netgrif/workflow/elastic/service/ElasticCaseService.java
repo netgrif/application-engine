@@ -221,30 +221,6 @@ public class ElasticCaseService implements IElasticCaseService {
         }
     }
 
-    /**
-     * Cases with processIdentifier "id" <br>
-     * <pre>
-     * {
-     *     "petriNet": {
-     *         "identifier": "id"
-     *     }
-     * }</pre><br>
-     * <p>
-     * Cases with processIdentifiers "1" OR "2" <br>
-     * <pre>
-     * {
-     *     "petriNet": [
-     *         {
-     *             "identifier": "1"
-     *         },
-     *         {
-     *             "identifier": "2"
-     *         }
-     *     ]
-     * }
-     * </pre>
-     */
-
     protected void buildPermissionQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildUsersAndRolesQuery(request, userRoleQuery);
@@ -263,28 +239,30 @@ public class ElasticCaseService implements IElasticCaseService {
     private void buildUsersAndRolesQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         BoolQueryBuilder existingUsersQuery = boolQuery();
         BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder usersQuery = boolQuery();
-        BoolQueryBuilder exists = boolQuery();
+        BoolQueryBuilder usersRoleQuery = boolQuery();
+        BoolQueryBuilder usersExist = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
+
+        notExists.mustNot(existsQuery("users"));
+        notExists.mustNot(existsQuery("enabledRoles"));
 
         for (Long userId : request.users) {
             existingUsersQuery.should(termQuery("users", userId));
         }
 
-        exists.must(existsQuery("users"));
-        exists.must(existingUsersQuery);
-        notExists.mustNot(existsQuery("users"));
+        usersExist.must(existsQuery("users"));
+        usersExist.must(existingUsersQuery);
 
-        usersQuery.should(exists);
-        usersQuery.should(notExists);
+        usersRoleQuery.should(usersExist);
+        usersRoleQuery.should(notExists);
 
         if (request.role != null && !request.role.isEmpty()) {
             for (String roleId : request.role) {
                 roleQuery.should(termQuery("enabledRoles", roleId));
             }
-            usersQuery.should(roleQuery);
+            usersRoleQuery.should(roleQuery);
         }
-        query.must(usersQuery);
+        query.must(usersRoleQuery);
     }
 
     private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
