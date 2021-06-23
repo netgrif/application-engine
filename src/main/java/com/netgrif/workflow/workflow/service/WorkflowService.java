@@ -237,8 +237,13 @@ public class WorkflowService implements IWorkflowService {
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    if (role.getValue().containsKey("delete"))
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete")));
+                    else
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("view", role.getValue().get("view")));
+                })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
