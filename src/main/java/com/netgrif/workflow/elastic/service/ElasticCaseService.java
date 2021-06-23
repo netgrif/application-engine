@@ -187,6 +187,7 @@ public class ElasticCaseService implements IElasticCaseService {
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
+        buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
@@ -390,6 +391,18 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
+    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.role == null || request.role.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder roleQuery = boolQuery();
+        for (String roleId : request.role) {
+            roleQuery.should(termQuery("enabledRoles", roleId));
+        }
+
+        query.filter(roleQuery);
+    }
 
     /**
      * Cases where "text_field" has value EXACTLY "text" AND "number_field" has value EXACTLY "125".<br>
