@@ -178,12 +178,9 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
-        addRolesQueryConstraint(request, user);
-        addUsersQueryConstraint(request, user);
-
         BoolQueryBuilder query = boolQuery();
 
-        buildPermissionQuery(request, query, user);
+        buildPermissionQuery(query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -202,31 +199,10 @@ public class ElasticCaseService implements IElasticCaseService {
             return query;
     }
 
-    protected void addRolesQueryConstraint(CaseSearchRequest request, LoggedUser user) {
-        if (request.role != null && !request.role.isEmpty()) {
-            Set<String> roles = new HashSet<>(request.role);
-            roles.addAll(user.getProcessRoles());
-            request.role = new ArrayList<>(roles);
-        } else {
-            request.role = new ArrayList<>(user.getProcessRoles());
-        }
-    }
-
-    protected void addUsersQueryConstraint(CaseSearchRequest request, LoggedUser user) {
-        if (request.users != null && !request.users.isEmpty()) {
-            Set<Long> users = new HashSet<>(request.users);
-            users.add(user.getId());
-            request.users = new ArrayList<>(users);
-        } else {
-            request.users = Collections.singletonList(user.getId());
-        }
-    }
-
-    protected void buildPermissionQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildPermissionQuery(BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(request, userRoleQuery);
+        buildUsersAndRolesQuery(userRoleQuery, user);
         negativeUsersAndRolesQuery(userRoleQuery, user);
-
         query.filter(userRoleQuery);
     }
 
@@ -237,32 +213,26 @@ public class ElasticCaseService implements IElasticCaseService {
         query.should(negativeQuery);
     }
 
-    private void buildUsersAndRolesQuery(CaseSearchRequest request, BoolQueryBuilder query) {
-        BoolQueryBuilder existingUsersQuery = boolQuery();
+    private void buildUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder roleQuery = boolQuery();
         BoolQueryBuilder usersRoleQuery = boolQuery();
         BoolQueryBuilder usersExist = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
 
         notExists.mustNot(existsQuery("users"));
-        notExists.mustNot(existsQuery("enabledRoles"));
-
-        for (Long userId : request.users) {
-            existingUsersQuery.should(termQuery("users", userId));
-        }
+        notExists.mustNot(existsQuery("viewRoles"));
 
         usersExist.must(existsQuery("users"));
-        usersExist.must(existingUsersQuery);
+        usersExist.must(termQuery("users", user.getId()));
 
         usersRoleQuery.should(usersExist);
         usersRoleQuery.should(notExists);
 
-        if (request.role != null && !request.role.isEmpty()) {
-            for (String roleId : request.role) {
-                roleQuery.should(termQuery("enabledRoles", roleId));
-            }
-            usersRoleQuery.should(roleQuery);
+        for (String roleId : user.getProcessRoles()) {
+            roleQuery.should(termQuery("viewRoles", roleId));
         }
+        usersRoleQuery.should(roleQuery);
+
         query.must(usersRoleQuery);
     }
 

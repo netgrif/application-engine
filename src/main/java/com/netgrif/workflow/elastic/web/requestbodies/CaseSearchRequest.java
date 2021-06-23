@@ -39,9 +39,6 @@ public class CaseSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> group;
 
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<Long> users;
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
