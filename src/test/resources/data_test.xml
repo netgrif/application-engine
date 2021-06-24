@@ -54,7 +54,7 @@
         <values>multichoice</values>
         <values>multichoice2</values>
         <values>multichoice3</values>
-        <init>multichoice</init>
+        <init>multichoice, multichoice2</init>
     </data>
     <!-- BOOLEAN -->
     <data type="boolean">
