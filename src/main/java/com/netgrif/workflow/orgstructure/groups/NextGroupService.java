@@ -1,6 +1,7 @@
 package com.netgrif.workflow.orgstructure.groups;
 
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
@@ -25,6 +26,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.elasticsearch.common.inject.internal.ErrorsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -53,6 +55,9 @@ public class NextGroupService implements INextGroupService {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private IDataService dataService;
@@ -176,6 +181,17 @@ public class NextGroupService implements INextGroupService {
         addUser(user, findDefaultGroup());
     }
 
+
+    //TODO : Chyba?
+    @Override
+    public void addUser(User user, String groupId){
+        Case groupCase = this.findGroup(groupId);
+        if(groupCase != null){
+            this.addUser(user, groupCase);
+        }
+    }
+
+
     @Override
     public void addUser(User user, Case groupCase) {
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
@@ -184,8 +200,12 @@ public class NextGroupService implements INextGroupService {
         }
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(user, existingUsers));
         workflowService.save(groupCase);
+        user.addGroup(groupCase.getStringId());
+        userRepository.save(user);
     }
 
+
+    //TODO: Private ?
     @Override
     public Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers) {
         existingUsers.put(user.get_id().toString(), new I18nString(user.getEmail()));

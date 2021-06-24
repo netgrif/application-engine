@@ -13,6 +13,8 @@ public interface IProcessRoleService {
 
     ProcessRole findById(String id);
 
+    Set<ProcessRole> findByIds(Set<String> ids);
+
     ProcessRole findByImportId(String importId);
 
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);

@@ -1,25 +1,13 @@
 package com.netgrif.workflow.business;
 
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Setter;
+import org.bson.types.ObjectId;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.io.Serializable;
 
-@Entity
 @Data
-public class PostalCode implements Serializable {
+public class PostalCode {
 
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Setter(AccessLevel.NONE)
-    private Long id;
+    private ObjectId _id;
 
     private String code;
 
