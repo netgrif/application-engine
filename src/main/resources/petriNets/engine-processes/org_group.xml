@@ -67,7 +67,7 @@
 			<option key="add" name="user_action_selection_add">Add existing user</option>
 			<option key="invite" name="user_action_selection_invite">Invite new user</option>
 		</options>
-		<init>Add existing user</init>
+		<init>add</init>
 		<action trigger="set">
 			action_selection: f.user_action_selection,
 			user_selection: f.user_selection,
