@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>1</id>
     <initials>TES</initials>
     <title>Data test</title>
@@ -11,7 +10,6 @@
         <title>Number</title>
         <placeholder>Number field placeholder</placeholder>
         <desc>Number field description</desc>
-        <init>10</init>
         <valid>inrange 0,inf</valid>
         <validations>
             <validation>
@@ -19,14 +17,14 @@
                 <message>Number field validation message</message>
             </validation>
         </validations>
+        <init>10</init>
     </data>
     <!-- TEXT -->
     <data type="text">
         <id>text</id>
         <title>Text</title>
-        <init>text</init>
-        <desc>Text field description</desc>
         <placeholder>Text field placeholder</placeholder>
+        <desc>Text field description</desc>
         <valid>email</valid>
         <validations>
             <validation>
@@ -34,36 +32,36 @@
                 <message>Mail validation message</message>
             </validation>
         </validations>
+        <init>text</init>
     </data>
     <!-- ENUMERATION -->
     <data type="enumeration">
         <id>enumeration</id>
         <title>Enumeration</title>
-        <init>enumeration</init>
-        <desc>Enumeration field description</desc>
         <placeholder>Enumeration field placeholder</placeholder>
+        <desc>Enumeration field description</desc>
         <values>enumeration</values>
         <values>enumeration2</values>
         <values>enumeration3</values>
+        <init>enumeration</init>
     </data>
     <!-- MULTICHOICE -->
     <data type="multichoice">
         <id>multichoice</id>
         <title>Multichoice</title>
-        <init>multichoice, multichoice2</init>
-        <desc>Multichoice field description</desc>
         <placeholder>Multichoice field placeholder</placeholder>
+        <desc>Multichoice field description</desc>
         <values>multichoice</values>
         <values>multichoice2</values>
         <values>multichoice3</values>
+        <init>multichoice</init>
     </data>
     <!-- BOOLEAN -->
     <data type="boolean">
         <id>boolean</id>
         <title>Boolean</title>
-        <init>true</init>
-        <desc>Boolean field description</desc>
         <placeholder>Boolean field placeholder</placeholder>
+        <desc>Boolean field description</desc>
         <valid>requiredTrue</valid>
         <validations>
             <validation>
@@ -71,13 +69,14 @@
                 <message>Boolean field validation message</message>
             </validation>
         </validations>
+        <init>true</init>
     </data>
     <!-- DATE -->
     <data type="date">
         <id>date</id>
         <title>Date</title>
-        <desc>Date field description</desc>
         <placeholder>Date field placeholder</placeholder>
+        <desc>Date field description</desc>
         <valid>between today,future</valid>
         <validations>
             <validation>
@@ -94,24 +93,22 @@
     <data type="file">
         <id>file</id>
         <title>File</title>
-        <desc>File field description</desc>
         <placeholder>File field placeholder</placeholder>
+        <desc>File field description</desc>
     </data>
     <!-- USER -->
     <data type="user">
         <id>user</id>
         <title>User</title>
-        <!--<init></init>-->
-        <desc>User field description</desc>
         <placeholder>User field placeholder</placeholder>
-        <!--<valid></valid>-->
+        <desc>User field description</desc>
     </data>
     <!-- DATETIME -->
     <data type="dateTime">
         <id>dateTime</id>
         <title>DateTime</title>
-        <desc>DateTime field description</desc>
         <placeholder>DateTime field placeholder</placeholder>
+        <desc>DateTime field description</desc>
         <valid>between today,future</valid>
         <validations>
             <validation>
@@ -133,7 +130,28 @@
             <allowedNet>processId2</allowedNet>
         </allowedNets>
     </data>
-
+    <data type="userList">
+        <id>emptyUserList</id>
+        <title>empty user list</title>
+    </data>
+    <data type="multichoice">
+        <id>emptyMultichoice</id>
+        <title>empty multichoice</title>
+    </data>
+    <data type="taskRef">
+        <id>emptyTaskRef</id>
+        <title>empty task ref</title>
+    </data>
+    <data type="multichoice_map">
+        <id>emptyMultichoiceMap</id>
+        <title>empty multichoice map</title>
+    </data>
+    <data type="fileList">
+        <id>emptyFileList</id>
+        <title>empty file list</title>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
         <x>1</x>
@@ -195,6 +213,36 @@
         </dataRef>
         <dataRef>
             <id>caseRef</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyUserList</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyMultichoice</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyTaskRef</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyMultichoiceMap</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>emptyFileList</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
