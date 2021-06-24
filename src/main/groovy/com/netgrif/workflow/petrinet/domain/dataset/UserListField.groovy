@@ -4,6 +4,7 @@ class UserListField extends Field<List<Long>> {
 
     UserListField(){
         super()
+        this.defaultValue = new ArrayList<>()
     }
 
     @Override
