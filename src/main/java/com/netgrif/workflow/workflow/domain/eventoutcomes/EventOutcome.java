@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes;
 
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -14,16 +15,17 @@ public abstract class EventOutcome {
 
     private List<EventOutcome> outcomes = new ArrayList<>();
 
-    protected EventOutcome(I18nString message, List<EventOutcome> outcomes) {
-        this.message = message;
-        this.outcomes = outcomes;
+    protected EventOutcome() {
     }
 
     protected EventOutcome(I18nString message) {
+        this();
         this.message = message;
     }
 
-    protected EventOutcome() {
+    protected EventOutcome(I18nString message, List<EventOutcome> outcomes) {
+        this(message);
+        this.outcomes = outcomes;
     }
 
     public void addOutcome(EventOutcome eventOutcome) {
@@ -33,6 +35,4 @@ public abstract class EventOutcome {
     public void addOutcomes(List<EventOutcome> outcomes){
         this.outcomes.addAll(outcomes);
     }
-
-    public abstract LocalisedEventOutcome transformToLocalisedEventOutcome(Locale locale);
 }

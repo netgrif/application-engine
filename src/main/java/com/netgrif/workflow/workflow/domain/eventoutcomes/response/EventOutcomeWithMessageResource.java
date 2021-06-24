@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome;
 import org.springframework.hateoas.Resource;
 
 import java.util.ArrayList;
