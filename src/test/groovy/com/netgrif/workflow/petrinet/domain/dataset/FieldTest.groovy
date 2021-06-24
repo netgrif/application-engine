@@ -81,6 +81,10 @@ class FieldTest {
         assertUserField()
         assertDateTimeField()
         assertCaseRef()
+        assertUserList()
+        assertTaskRef()
+        assertMultichoiceMap()
+        assertFileList()
     }
 
     private void assertNet() {
@@ -197,5 +201,30 @@ class FieldTest {
         assert field.description.defaultValue == "User list description"
         assert field.defaultValue instanceof List
         assert field.defaultValue.isEmpty()
+    }
+
+    private void assertTaskRef() {
+        TaskField field = net.dataSet["emptyTaskRef"] as TaskField
+        assert field.name.defaultValue == "Empty task ref"
+        assert field.defaultValue instanceof List
+        assert field.defaultValue.isEmpty()
+    }
+
+    private void assertMultichoiceMap() {
+        MultichoiceMapField field = net.dataSet["emptyMultichoiceMap"] as MultichoiceMapField
+        assert field.name.defaultValue == "Empty multichoice map"
+        assert field.description.defaultValue == "Multichoice map description"
+        assert field.placeholder.defaultValue == "Multichoice map placeholder"
+        assert field.defaultValue instanceof Set
+        assert field.defaultValue.isEmpty()
+    }
+
+    private void assertFileList() {
+        FileListField field = net.dataSet["emptyFileList"] as FileListField
+        assert field.name.defaultValue == "Empty file list"
+        assert field.description.defaultValue == "File list description"
+        assert field.placeholder.defaultValue == "File list placeholder"
+        assert field.defaultValue instanceof FileListFieldValue
+        assert field.defaultValue.getNamesPaths().isEmpty()
     }
 }

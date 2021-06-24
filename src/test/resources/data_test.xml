@@ -144,17 +144,21 @@
     <!--  TASK REF  -->
     <data type="taskRef">
         <id>emptyTaskRef</id>
-        <title>empty task ref</title>
+        <title>Empty task ref</title>
     </data>
     <!--  MULTICHOICE MAP  -->
     <data type="multichoice_map">
         <id>emptyMultichoiceMap</id>
-        <title>empty multichoice map</title>
+        <title>Empty multichoice map</title>
+        <desc>Multichoice map description</desc>
+        <placeholder>Multichoice map placeholder</placeholder>
     </data>
     <!--  FILE LIST  -->
     <data type="fileList">
         <id>emptyFileList</id>
-        <title>empty file list</title>
+        <title>Empty file list</title>
+        <desc>File list description</desc>
+        <placeholder>File list placeholder</placeholder>
     </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
