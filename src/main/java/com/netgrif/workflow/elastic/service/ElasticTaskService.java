@@ -255,29 +255,31 @@ public class ElasticTaskService implements IElasticTaskService {
 
         BoolQueryBuilder existingUsersQuery = boolQuery();
         BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder usersQuery = boolQuery();
-        BoolQueryBuilder exists = boolQuery();
+        BoolQueryBuilder usersRoleQuery = boolQuery();
+        BoolQueryBuilder usersExist = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
+
+        notExists.mustNot(existsQuery("userRefs"));
+        notExists.mustNot(existsQuery("roles"));
 
         for (Long userId : request.users) {
             existingUsersQuery.should(termQuery("users", userId));
         }
 
-        exists.must(existsQuery("users"));
-        exists.must(existingUsersQuery);
-        notExists.mustNot(existsQuery("users"));
+        usersExist.must(existsQuery("userRefs"));
+        usersExist.must(existingUsersQuery);
 
-        usersQuery.should(exists);
-        usersQuery.should(notExists);
+        usersRoleQuery.should(usersExist);
+        usersRoleQuery.should(notExists);
 
         if (request.role != null && !request.role.isEmpty()) {
             for (String roleId : request.role) {
                 roleQuery.should(termQuery("roles", roleId));
             }
-            usersQuery.should(roleQuery);
+            usersRoleQuery.should(roleQuery);
         }
 
-        query.must(usersQuery);
+        query.must(usersRoleQuery);
     }
 
 

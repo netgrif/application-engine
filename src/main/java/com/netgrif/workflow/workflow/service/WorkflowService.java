@@ -121,6 +121,7 @@ public class WorkflowService implements IWorkflowService {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
         resolveUserRef(useCase);
+        taskService.resolveUserRef(useCase);
         return useCase;
     }
 
@@ -196,7 +197,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
