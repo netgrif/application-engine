@@ -1,5 +1,7 @@
-package com.netgrif.workflow.workflow.domain.eventoutcomes;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
 
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
 
 import java.util.List;
@@ -7,25 +9,25 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Data
-public class LocalisedEventOutcome {
+public abstract class LocalisedEventOutcome {
 
     private String message;
 
     private List<LocalisedEventOutcome> outcomes;
 
-    public LocalisedEventOutcome(EventOutcome outcome, Locale locale){
+    protected LocalisedEventOutcome() {
+    }
+
+    protected LocalisedEventOutcome(EventOutcome outcome, Locale locale){
         this.message = outcome.getMessage() == null ? null : outcome.getMessage().getTranslation(locale);
         this.outcomes = outcome.getOutcomes() == null ? null : outcome.getOutcomes().stream()
-                .map(eventOutcome -> eventOutcome.transformToLocalisedEventOutcome(locale))
+                .map(eventOutcome -> LocalisedEventOutcomeFactory.from(eventOutcome, locale))
                 .collect(Collectors.toList());
     }
 
-    public LocalisedEventOutcome(String message, List<LocalisedEventOutcome> outcomes) {
+    protected LocalisedEventOutcome(String message, List<LocalisedEventOutcome> outcomes) {
         this.message = message;
         this.outcomes = outcomes;
-    }
-
-    public LocalisedEventOutcome() {
     }
 
     public void addOutcome(LocalisedEventOutcome outcome) {
