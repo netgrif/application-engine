@@ -1,7 +1,7 @@
-package com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.localised;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.LocalisedEventOutcome;
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import lombok.Data;
 
