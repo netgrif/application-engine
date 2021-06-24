@@ -153,13 +153,6 @@
         <desc>Multichoice map description</desc>
         <placeholder>Multichoice map placeholder</placeholder>
     </data>
-    <!--  FILE LIST  -->
-    <data type="fileList">
-        <id>emptyFileList</id>
-        <title>Empty file list</title>
-        <desc>File list description</desc>
-        <placeholder>File list placeholder</placeholder>
-    </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
     <transition>
@@ -247,12 +240,6 @@
         </dataRef>
         <dataRef>
             <id>emptyMultichoiceMap</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>emptyFileList</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
