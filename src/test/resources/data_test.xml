@@ -56,6 +56,11 @@
         <values>multichoice3</values>
         <init>multichoice, multichoice2</init>
     </data>
+    <!--  EMPTY MULTICHOICE  -->
+    <data type="multichoice">
+        <id>emptyMultichoice</id>
+        <title>empty multichoice</title>
+    </data>
     <!-- BOOLEAN -->
     <data type="boolean">
         <id>boolean</id>
@@ -130,22 +135,23 @@
             <allowedNet>processId2</allowedNet>
         </allowedNets>
     </data>
+    <!--  USER LIST  -->
     <data type="userList">
         <id>emptyUserList</id>
-        <title>empty user list</title>
+        <title>Empty user list</title>
+        <desc>User list description</desc>
     </data>
-    <data type="multichoice">
-        <id>emptyMultichoice</id>
-        <title>empty multichoice</title>
-    </data>
+    <!--  TASK REF  -->
     <data type="taskRef">
         <id>emptyTaskRef</id>
         <title>empty task ref</title>
     </data>
+    <!--  MULTICHOICE MAP  -->
     <data type="multichoice_map">
         <id>emptyMultichoiceMap</id>
         <title>empty multichoice map</title>
     </data>
+    <!--  FILE LIST  -->
     <data type="fileList">
         <id>emptyFileList</id>
         <title>empty file list</title>
