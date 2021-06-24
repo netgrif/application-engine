@@ -8,14 +8,16 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
 
     MultichoiceMapField() {
         super()
+        this.defaultValue = new HashSet<>()
     }
 
     MultichoiceMapField(Map<String, I18nString> choices) {
         super(choices)
+        this.defaultValue = new HashSet<>()
     }
 
     MultichoiceMapField(Map<String, I18nString> choices, Set<String> defaultValues) {
-        super(choices)
+        this(choices)
         this.defaultValue = defaultValues
     }
 
@@ -52,5 +54,9 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
         clone.options = options
         clone.optionsExpression = optionsExpression
         return clone
+    }
+
+    private void setDefaultValue() {
+        this
     }
 }

@@ -170,6 +170,7 @@ class FieldTest {
         assert field.description.defaultValue == "File field description"
         assert field.name.defaultValue == "File"
         assert field.placeholder.defaultValue == "File field placeholder"
+//        assert field.defaultValue instanceof FileFieldValue || field.defaultValue instanceof String
     }
 
     private void assertUserField() {
