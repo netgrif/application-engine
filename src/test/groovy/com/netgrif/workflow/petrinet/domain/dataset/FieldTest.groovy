@@ -89,7 +89,7 @@ class FieldTest {
     private void assertNet() {
         assert limitsNetOptional.isPresent()
         net = limitsNetOptional.get()
-        assert net.dataSet.size() == 15
+        assert net.dataSet.size() == 14
     }
 
     private void assertNumberField() {
