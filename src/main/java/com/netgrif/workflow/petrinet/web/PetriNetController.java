@@ -1,17 +1,17 @@
 package com.netgrif.workflow.petrinet.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.localised.LocalisedPetriNetReferenceEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import io.swagger.annotations.*;
@@ -90,7 +90,7 @@ public class PetriNetController {
             ImportPetriNetOutcome importPetriNetOutcome = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
             fout.close();
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
-                    importPetriNetOutcome.transformToLocalisedEventOutcome(locale));
+                    LocalisedEventOutcomeFactory.from(importPetriNetOutcome,locale));
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
