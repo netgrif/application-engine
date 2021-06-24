@@ -8,6 +8,8 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,8 +34,11 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private IUserService userService;
 
-//    @Autowired
-//    private IGroupService groupService;
+    @Autowired
+    private INextGroupService groupService;
+
+    @Autowired
+    private IProcessRoleService processRole;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -103,24 +108,20 @@ public class RegistrationService implements IRegistrationService {
         user.setToken(generateTokenKey());
         user.setExpirationDate(generateExpirationDate());
         user.setState(UserState.INVITED);
-        userService.addDefaultRole(user);
         userService.addDefaultAuthorities(user);
-//TODO: POZRIIIi
-//        if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
-//            user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
-//        }
 
-        /*if (newUser.groups != null && !newUser.groups.isEmpty()) {
-            user.setGroups(groupService.findAllById(newUser.groups));
+        if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
+            user.setProcessRoles(new HashSet<>(processRole.findByIds(newUser.processRoles)));
         }
-        /*if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
-            user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
-        }*/
+        userService.addDefaultRole(user);
+        user =  userRepository.save(user);
+        if (newUser.groups != null && !newUser.groups.isEmpty()) {
+            for (String group : newUser.groups){
+                groupService.addUser(user, group);
+            }
+        }
 
-        User saved = userRepository.save(user);
-//        saved.setGroups(user.getGroups());
-//        userService.upsertGroupMember(saved);
-        return saved;
+        return userRepository.save(user);
     }
 
     @Override
