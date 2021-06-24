@@ -64,6 +64,11 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
+    public Set<ProcessRole> findByIds(Set<String> ids) {
+        return processRoleRepository.findAllBy_idIn(ids);
+    }
+
+    @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
         User user = userService.findById(userId, true);
         Set<ProcessRole> requestedRoles = processRoleRepository.findAllBy_idIn(requestedRolesIds);

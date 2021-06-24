@@ -316,7 +316,7 @@ public class UserService implements IUserService {
     @Override
     public void deleteUser(User user) {
         if (!userRepository.findById(user.getStringId()).isPresent())
-            throw new IllegalArgumentException("Could not find user with id [" + user.get_id() + "]");
+            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
         userRepository.delete(user);
     }
 

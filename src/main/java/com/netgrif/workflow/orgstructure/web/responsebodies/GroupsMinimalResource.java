@@ -1,15 +1,13 @@
 //package com.netgrif.workflow.orgstructure.web.responsebodies;
 //
-//import com.netgrif.workflow.orgstructure.domain.Group;
+//import com.netgrif.workflow.workflow.domain.Case;
 //
 //public class GroupsMinimalResource extends GroupsResource {
 //
-//    public GroupsMinimalResource(Iterable<Group> content) {
-//        super(content);
-//        for (Group group : content) {
-//            group.setChildGroups(null);
-//            group.setMembers(null);
-//            group.setParentGroup(null);
+//    public GroupsMinimalResource(Iterable<Case> content) {
+//        super(response);
+//        for (Case group : content) {
+//            group.(null);
 //        }
 //    }
 //}
