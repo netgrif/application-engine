@@ -33,9 +33,9 @@
     <data type="caseRef">
         <id>caseRef2</id>
         <title></title>
-        <allowedNetd>
-            org_group
-        </allowedNetd>
+        <allowedNets>
+            <allowedNet>org_group</allowedNet>
+        </allowedNets>
     </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
