@@ -1,58 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
-	<id>changed_fields_allowed_nets</id>
-	<initials>NEW</initials>
-	<title>New Model</title>
-	<defaultRole>true</defaultRole>
-	<transitionRole>false</transitionRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
-	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
-	<!-- DATA -->
-	<data type="text">
-		<id>text</id>
-		<title></title>
-		<action trigger="set">caseRef: f.caseRef;
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>changed_fields_allowed_nets</id>
+    <initials>NEW</initials>
+    <title>New Model</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="text">
+        <id>text</id>
+        <title></title>
+        <action trigger="set">caseRef: f.caseRef,
+            caseRef2: f.caseRef2;
 
-change caseRef allowedNets {
-    [useCase.processIdentifier]
-}</action>
-	</data>
-	<data type="caseRef">
-		<id>caseRef</id>
-		<title></title>
-	</data>
-	<!-- I18NS -->
-	<!-- TRANSITIONS -->
-	<transition>
-		<id>t1</id>
-		<x>501</x>
-		<y>247</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Task</label>
-		<dataGroup>
-			<id>DataGroup_0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>text</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<!-- PLACES -->
-	<!-- ARCS -->
+            change caseRef allowedNets {
+                [useCase.processIdentifier]
+            }
+
+            change caseRef2 allowedNets {
+                caseRef2.getAllowedNets() + useCase.processIdentifier
+            }
+        </action>
+    </data>
+    <data type="caseRef">
+        <id>caseRef</id>
+        <title></title>
+    </data>
+    <data type="caseRef">
+        <id>caseRef2</id>
+        <title></title>
+        <allowedNetd>
+            org_group
+        </allowedNetd>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t1</id>
+        <x>501</x>
+        <y>247</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Task</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
 </document>
