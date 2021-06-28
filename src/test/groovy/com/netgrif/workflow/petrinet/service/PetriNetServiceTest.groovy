@@ -14,6 +14,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.bson.types.ObjectId
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -98,6 +99,7 @@ class PetriNetServiceTest {
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 1
+        assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
@@ -108,5 +110,14 @@ class PetriNetServiceTest {
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 0
+
+        boolean exceptionThrown = false
+        try {
+            petriNetService.get(new ObjectId(testNet.stringId))
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true
+            assert e.message.contains(testNet.stringId)
+        }
+        assert exceptionThrown
     }
 }
