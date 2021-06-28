@@ -20,8 +20,10 @@ class ChangedFieldsAllowedNetsTest {
     private static final String TASK_TITLE = "Task"
     private static final String TRIGGER_FIELD_ID = "text"
     private static final String CASE_REF_FIELD_ID = "caseRef"
+    private static final String CASE_REF_FIELD_ID2 = "caseRef2"
     private static final String ALLOWED_NETS_KEY = "allowedNets"
     private static final String NET_IDENTIFIER = "changed_fields_allowed_nets"
+    private static final String NET_IDENTIFIER2 = "org_group"
 
     @Autowired
     private ImportHelper importHelper
@@ -71,5 +73,22 @@ class ChangedFieldsAllowedNetsTest {
         assert newAllowedNets instanceof ArrayList
         assert newAllowedNets.size() == 1
         assert newAllowedNets.get(0) == NET_IDENTIFIER
+
+        assert changeMap.containsKey(CASE_REF_FIELD_ID2)
+        assert changeMap.get(CASE_REF_FIELD_ID2).attributes.containsKey(ALLOWED_NETS_KEY)
+        newAllowedNets = changeMap.get(CASE_REF_FIELD_ID2).attributes.get(ALLOWED_NETS_KEY)
+        assert newAllowedNets instanceof ArrayList
+        assert newAllowedNets.size() == 2
+        assert newAllowedNets.contains(NET_IDENTIFIER)
+        assert newAllowedNets.contains(NET_IDENTIFIER2)
+
+        changeContainer = dataSet.flatten()
+        assert changeContainer.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
+        assert changeContainer.getChangedFields().get(CASE_REF_FIELD_ID2).containsKey(ALLOWED_NETS_KEY)
+        newAllowedNets = changeContainer.getChangedFields().get(CASE_REF_FIELD_ID2).get(ALLOWED_NETS_KEY)
+        assert newAllowedNets instanceof ArrayList
+        assert newAllowedNets.size() == 2
+        assert newAllowedNets.contains(NET_IDENTIFIER)
+        assert newAllowedNets.contains(NET_IDENTIFIER2)
     }
 }
