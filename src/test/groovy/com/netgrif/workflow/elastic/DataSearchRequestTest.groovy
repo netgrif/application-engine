@@ -100,7 +100,7 @@ class DataSearchRequestTest {
         repository.deleteAll()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
         def users = userService.findAll(true)
         assert users.size() >= 2
@@ -113,7 +113,7 @@ class DataSearchRequestTest {
         testUser2.authorities = []
 
         LocalDate date = LocalDate.of(2020, 7, 25);
-        Case _case = importHelper.createCase("correct", net.get())
+        Case _case = importHelper.createCase("correct", net.getNet())
         _case.dataSet["number"].value = 7.0 as Double
         _case.dataSet["boolean"].value = true
         _case.dataSet["text"].value = "hello world" as String
@@ -134,7 +134,7 @@ class DataSearchRequestTest {
         dataService.setData(actionTrigger, ImportHelper.populateDataset(["testActionTrigger": ["value":"random value", "type": "text"]]))
 
         10.times {
-            _case = importHelper.createCase("wrong${it}", net.get())
+            _case = importHelper.createCase("wrong${it}", net.getNet())
             workflowService.save(_case)
         }
 
