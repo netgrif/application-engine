@@ -189,8 +189,8 @@ public class DataService implements IDataService {
                 fieldId = fieldId.replace(task.getStringId() + "-", "");
                 dataField = useCase.getDataField(fieldId);
             }
-            Field field = useCase.getPetriNet().getField(fieldId).get();
             if (dataField != null) {
+                Field field = useCase.getPetriNet().getField(fieldId).get();
                 ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(field,
                         DataEventType.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
@@ -199,8 +199,9 @@ public class DataService implements IDataService {
                     if (field.getEvents().containsKey(DataEventType.SET) &&
                         ((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage() != null){
                         outcome.setMessage(((DataEvent)field.getEvents().get(DataEventType.SET)).getMessage());
-                    } else if (useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().containsKey(DataEventType.SET) &&
-                                useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null){
+                    } else if (useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().containsKey(fieldId)
+                            && useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().containsKey(DataEventType.SET)
+                            && useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null){
                         outcome.setMessage(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
@@ -365,9 +366,11 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        DataEvent event = field.getEvents().get(DataEventType.GET);
-        event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
-        event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
+        if(field.getEvents() != null && !field.getEvents().isEmpty() && field.getEvents().containsKey(DataEventType.GET)) {
+            DataEvent event = field.getEvents().get(DataEventType.GET);
+            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
+            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
+        }
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
@@ -391,9 +394,11 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
-        DataEvent event = field.getEvents().get(DataEventType.GET);
-        event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
-        event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
+        if(field.getEvents() != null && !field.getEvents().isEmpty() && field.getEvents().containsKey(DataEventType.GET)){
+            DataEvent event = field.getEvents().get(DataEventType.GET);
+            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
+            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
+        }
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
@@ -770,15 +775,12 @@ public class DataService implements IDataService {
         });
     }
 
-//  todo  chceme aby vracal event outcomy dat, ktore boli triggernute eventom
-//  todo  resolve data events bude vracať generalizovaný data event outcome s changed fields tree ???
     private ChangedFieldsTree resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Transition transition) {
         ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCase.getStringId(), task);
         processDataEvents(field, trigger, phase, useCase, task, changedFields, transition);
         return changedFields;
     }
 
-    //todo process events bude vracať generalizovaný data event outcome s changed fields tree ???
     private void processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, ChangedFieldsTree changedFields, Transition transition){
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)){
@@ -789,14 +791,11 @@ public class DataService implements IDataService {
 
         if (fieldActions.isEmpty()) return;
 
-//        todo run event actions bude vracať generalizovaný data event outcome s changed fields tree ???
         runEventActions(useCase, task, transition, fieldActions, changedFields, actionTrigger);
     }
 
-//        todo runEventActions bude vracať generalizovaný data event outcome s changed fields tree ???
     private void runEventActions(Case useCase, Task task, Transition transition, List<Action> actions, ChangedFieldsTree changedFields, DataEventType trigger){
         actions.forEach(action -> {
-    //        todo run bude vracať generalizovaný data event outcome s changed fields tree ???
             ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.of(task));
             changedFields.mergeChangedFields(currentChangedFields);
 
@@ -807,7 +806,6 @@ public class DataService implements IDataService {
         });
     }
 
-//        todo runEventActionsOnChanged bude vracať generalizovaný data event outcome s changed fields tree ???
     private void runEventActionsOnChanged(Case useCase, Task task, Transition transition, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, DataEventType trigger, boolean recursive) {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
