@@ -173,7 +173,7 @@ class CaseFieldTest {
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
-        assert aCase.getDataSet().get("caseref").value.size() == 0
+        assert aCase.getDataSet().get("caseref").value == null
 
         importHelper.assignTaskToSuper(CHANGE_VALUE_TASK_TITLE, aCase.stringId)
 
