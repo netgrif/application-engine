@@ -48,7 +48,7 @@ class ChangedFieldsAllowedNetsTest {
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
 
         ChangedFieldsTree dataSet = dataService.setData(taskId, ImportHelper.populateDataset(
-                [TRIGGER_FIELD_ID: [
+                [(TRIGGER_FIELD_ID): [
                         "value": "trigger",
                         "type" : "text"
                 ]]
