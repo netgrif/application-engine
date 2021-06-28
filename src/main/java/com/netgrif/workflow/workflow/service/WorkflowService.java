@@ -564,7 +564,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
         LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getEvents() != null){
+        if (field.getEvents() != null && !field.getEvents().isEmpty() && !field.getEvents().containsKey(actionTrigger)){
             fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent)field.getEvents().get(actionTrigger), phase));
         }
         if (fieldActions.isEmpty()) return;
