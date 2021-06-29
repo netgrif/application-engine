@@ -117,7 +117,7 @@ public class DataService implements IDataService {
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
@@ -127,7 +127,7 @@ public class DataService implements IDataService {
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
