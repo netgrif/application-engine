@@ -403,7 +403,7 @@ public class WorkflowService implements IWorkflowService {
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
             if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id);
+                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
                 field.setBehavior(dataField.applyOnlyVisibleBehavior());
                 fields.add(field);
             }
