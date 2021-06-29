@@ -25,6 +25,7 @@
                 caseRef2.getAllowedNets() + useCase.processIdentifier
             }
         </action>
+        <!-- By referencing the case ref fields in another action they are initialized again by the FieldFactory and their allowedNets get cleared because of a bad implementation -->
         <action trigger="set">caseRef: f.caseRef,
             caseRef2: f.caseRef2;
         </action>
