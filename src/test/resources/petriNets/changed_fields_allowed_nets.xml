@@ -25,6 +25,9 @@
                 caseRef2.getAllowedNets() + useCase.processIdentifier
             }
         </action>
+        <action trigger="set">caseRef: f.caseRef,
+            caseRef2: f.caseRef2;
+        </action>
     </data>
     <data type="caseRef">
         <id>caseRef</id>
