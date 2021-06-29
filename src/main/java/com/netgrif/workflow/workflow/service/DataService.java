@@ -102,22 +102,20 @@ public class DataService implements IDataService {
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
-                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             }
@@ -139,12 +137,6 @@ public class DataService implements IDataService {
         GetDataEventOutcome outcome = new GetDataEventOutcome();
         outcome.setData(dataSetFields);
         return outcome;
-    }
-
-    private void resolveComponents(Field field, Transition transition){
-        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if(transitionComponent != null)
-            field.setComponent(transitionComponent);
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
@@ -181,8 +173,14 @@ public class DataService implements IDataService {
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
 
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
-                dataField.setAllowedNets(parseAllowedNetsValue(entry.getValue()));
-                dataField.setFilterMetadata(parseFilterMetadataValue(entry.getValue()));
+                List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
+                if (allowedNets != null) {
+                    dataField.setAllowedNets(allowedNets);
+                }
+                Map<String, Object> filterMetadata = parseFilterMetadataValue(entry.getValue());
+                if (filterMetadata != null) {
+                    dataField.setFilterMetadata(filterMetadata);
+                }
                 ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
@@ -708,7 +706,7 @@ public class DataService implements IDataService {
     public List<Field> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id)).collect(Collectors.toList());
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
 
         return fields;
@@ -913,6 +911,9 @@ public class DataService implements IDataService {
 
     private List<String> parseListString(ObjectNode node, String attributeKey) {
         ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
+        if (arrayNode == null) {
+            return null;
+        }
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
         return list;
@@ -927,6 +928,9 @@ public class DataService implements IDataService {
         String fieldType = getFieldTypeFromNode(node);
         if (Objects.equals(fieldType, "filter")) {
             JsonNode filterMetadata = node.get("filterMetadata");
+            if (filterMetadata == null) {
+                return null;
+            }
             ObjectMapper mapper = new ObjectMapper();
             return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>(){});
         }
