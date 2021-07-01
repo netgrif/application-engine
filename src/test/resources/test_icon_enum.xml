@@ -66,6 +66,18 @@
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
+                <component>
+                    <name>icon</name>
+                    <properties>
+                        <option_icons>
+                            <icon key="1">home</icon>
+                            <icon key="2">nature</icon>
+                            <icon key="3">home</icon>
+                            <icon key="4">nature</icon>
+                            <icon key="5">home</icon>
+                        </option_icons>
+                    </properties>
+                </component>
             </dataRef>
             <dataRef>
                 <id>icon_enum_map</id>
