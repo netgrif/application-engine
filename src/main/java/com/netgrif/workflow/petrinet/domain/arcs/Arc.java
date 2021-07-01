@@ -30,9 +30,6 @@ public class Arc extends PetriNetObject {
     @Getter @Setter
     protected Reference reference;
 
-    @Getter @Setter
-    protected Integer tokensConsumed;
-
     public Arc() {
         this.setObjectId(new ObjectId());
     }
@@ -91,12 +88,11 @@ public class Arc extends PetriNetObject {
         if (source instanceof Transition) {
             ((Place) destination).addTokens(multiplicity);
         } else {
-            tokensConsumed = multiplicity;
             ((Place) source).removeTokens(multiplicity);
         }
     }
 
-    public void rollbackExecution() {
+    public void rollbackExecution(Integer tokensConsumed) {
         if(tokensConsumed == null) {
             tokensConsumed = multiplicity;
         }
@@ -112,7 +108,6 @@ public class Arc extends PetriNetObject {
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
         clone.setReference(this.reference);
-        clone.setTokensConsumed(this.getTokensConsumed());
         return clone;
     }
 }

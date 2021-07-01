@@ -191,6 +191,6 @@ public class DataField implements Referencable {
 
     @Override
     public int getMultiplicity() {
-        return Integer.parseInt(String.valueOf(value));
+        return (int) Double.parseDouble(String.valueOf(value));
     }
 }

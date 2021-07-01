@@ -220,7 +220,7 @@ class ImportHelper {
 
     ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-         dataService.setData(taskId, dataSet)
+        dataService.setData(taskId, dataSet)
     }
 
     ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {

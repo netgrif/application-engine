@@ -33,13 +33,12 @@ public class ResetArc extends PTArc {
     @Override
     public void execute() {
         Place place = ((Place) source);
-        tokensConsumed = place.getTokens();
         place.removeAllTokens();
     }
 
     @Override
-    public void rollbackExecution() {
-        ((Place) source).addTokens(this.tokensConsumed);
+    public void rollbackExecution(Integer tokensConsumed) {
+        ((Place) source).addTokens(tokensConsumed);
     }
 
     @SuppressWarnings("Duplicates")
@@ -51,7 +50,6 @@ public class ResetArc extends PTArc {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setTokensConsumed(this.tokensConsumed);
         return clone;
     }
 }
