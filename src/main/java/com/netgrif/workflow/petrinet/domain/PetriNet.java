@@ -244,16 +244,19 @@ public class PetriNet extends PetriNetObject {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
+                .filter(arc -> arc.getReference() !=null)
                 .forEach(arc -> {
-                    if (arc.getReference() != null) {
                         String referenceId = arc.getReference().getReference();
-                        if (arc.getReference().getType() == Type.PLACE) {
-                            arc.getReference().setReferencable(places.get(referenceId));
-                        } else {
-                            arc.getReference().setReferencable(dataSet.get(referenceId));
-                        }
-                    }
+                        arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
                 });
+    }
+
+    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet){
+        if (type == Type.PLACE) {
+            return places.get(referenceId);
+        } else {
+            return dataSet.get(referenceId);
+        }
     }
 
     public Map<String, Integer> getActivePlaces() {

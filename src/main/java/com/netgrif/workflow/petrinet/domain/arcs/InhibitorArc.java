@@ -31,7 +31,7 @@ public class InhibitorArc extends PTArc {
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
      */
     @Override
-    public void rollbackExecution() {
+    public void rollbackExecution(Integer tokensConsumed) {
     }
 
     @SuppressWarnings("Duplicates")
