@@ -39,7 +39,7 @@ public interface IUserService {
 
     List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
-    List<User> findAllByIds(Set<Long> ids, boolean small);
+    List<User> findAllByIds(Set<String> ids, boolean small);
 
     void addDefaultRole(User user);
 

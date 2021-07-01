@@ -136,56 +136,40 @@ public class UserService implements IUserService {
 
     @Override
     public User findByEmail(String email, boolean small) {
-        User user = userRepository.findByEmail(email);
+        return userRepository.findByEmail(email);
         /*if (!small) {
             loadGroups(user);
             return loadProcessRoles(user);
         }*/
-        return user;
     }
 
     @Override
     public List<User> findAll(boolean small) {
-        List<User> users = userRepository.findAll();
+        return userRepository.findAll();
 //        if (!small) users.forEach(this::loadProcessRoles);
-        return users;
+//        return users;
     }
 
     @Override
     public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
-        //   Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        Page<User> users = userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable);
+        return userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable);
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
-        return users;
     }
 
-    /* TODO: POZRI SEM
-        @Override
-        public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-            Set<Long> members = groupService.getAllCoMembers(loggedUser.transformToUser());
-            members.add(loggedUser.getId());
-
-            Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
-            if (!small)
-                users.forEach(this::loadProcessRoles);
-            return null;
-        }
-     */
     @Override
     public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
         members.add(loggedUser.getId());
 
-        Page<User> users = userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
+        return userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
                 .collect(Collectors.toSet()), query), pageable);
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
-        return users;
     }
 
     @Override
@@ -199,17 +183,15 @@ public class UserService implements IUserService {
 
 
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
-//            Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
         }
         predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
-        Page<User> users = userRepository.findAll(predicate, pageable);
+        return userRepository.findAll(predicate, pageable);
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
-        return users;
     }
 
     private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
@@ -227,29 +209,23 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        return userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         /*if (!small) {
             users.forEach(this::loadProcessRoles);
         }*/
-        return users;
     }
 
     @Override
     public List<User> findAllByProcessRoles(Set<String> roleIds, boolean small) {
-        List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
+        return userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
         /*if (!small) {
             users.forEach(this::loadProcessRoles);
         }*/
-        return users;
     }
 
     @Override
-    public List<User> findAllByIds(Set<Long> ids, boolean small) {
-        List<User> users = userRepository.findAllByIdIn(ids);
-      /*  if (!small) {
-            users.forEach(this::loadProcessRoles);
-        }*/
-        return users;
+    public List<User> findAllByIds(Set<String> ids, boolean small) {
+        return userRepository.findAllByIdIn(ids);
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ public class Authority implements GrantedAuthority {
     public static final String anonymous = ROLE + "ANONYMOUS";
 
 
-    @Id
+//    @Id
     @Getter
     private ObjectId _id;
 
