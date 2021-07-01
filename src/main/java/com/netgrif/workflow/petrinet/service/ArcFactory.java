@@ -23,7 +23,9 @@ public final class ArcFactory {
                 return new ReadArc();
             case VARIABLE:
                 Arc varArc = new Arc();
-                varArc.setReference(new Reference(String.valueOf(arc.getMultiplicity()), Type.DATA));
+                Reference ref = new Reference();
+                ref.setReference(String.valueOf(arc.getMultiplicity()));
+                varArc.setReference(ref);
                 return varArc;
             default:
                 throw new IllegalArgumentException(arc.getType() + " is not a valid Arc type");
