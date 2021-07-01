@@ -25,6 +25,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicVali
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.rules.domain.RuleRepository
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
@@ -40,6 +41,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import org.bson.types.ObjectId
+import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -106,6 +108,12 @@ class ActionDelegate {
 
     @Autowired
     IInitValueExpressionEvaluator initValueExpressionEvaluator
+
+    @Autowired
+    RuleRepository ruleRepository
+
+    @Autowired
+    Scheduler scheduler
 
     /**
      * Reference of case and task in which current action is taking place.

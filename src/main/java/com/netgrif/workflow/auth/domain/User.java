@@ -7,11 +7,8 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -22,7 +19,6 @@ public class User {
 
     public static final String UNKNOWN = "unknown";
 
-    @Id
     @Getter
     private ObjectId _id;
 
@@ -75,7 +71,7 @@ public class User {
     @Setter
     private Set<ProcessRole> processRoles;
 
-    @Transient
+    @JsonIgnore
     @Getter
     @Setter
     private Set<String> nextGroups;
