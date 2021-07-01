@@ -380,20 +380,6 @@ public class PetriNetService implements IPetriNetService {
                 .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
     }
 
-//    private void initializeVariableArcs(PetriNet net) {
-//        net.getArcs().values().stream()
-//                .flatMap(List::stream)
-//                .filter(arc -> arc instanceof VariableArc)
-//                .forEach(arc -> initializeVariableArc(net, (VariableArc) arc));
-//    }
-//
-//    private void initializeVariableArc(PetriNet net, VariableArc arc) {
-//        Optional<Field> field = net.getField(arc.getMultiplicity().toString());
-//        if (!field.isPresent())
-//            throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
-//        arc.setFieldId(field.get().getStringId());
-//    }
-
     @Override
     public void runActions(List<Action> actions, String netId) {
         log.info("Running actions of net [" + netId + "]");
