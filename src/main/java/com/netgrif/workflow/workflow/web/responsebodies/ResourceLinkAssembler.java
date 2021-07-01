@@ -54,7 +54,7 @@ public class ResourceLinkAssembler {
                     .count(null, MergeFilterOperation.OR, null, null)).withRel("count"));
         if (!selfRel.equalsIgnoreCase("author"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                    .findAllByAuthor(0L, "", null, null)).withRel("author"));
+                    .findAllByAuthor(null, "", null, null)).withRel("author"));
     }
 
 

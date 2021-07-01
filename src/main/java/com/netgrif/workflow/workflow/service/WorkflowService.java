@@ -280,7 +280,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable) {
+    public Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable) {
         String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
