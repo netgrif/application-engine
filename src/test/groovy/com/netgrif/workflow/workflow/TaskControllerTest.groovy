@@ -138,7 +138,7 @@ class TaskControllerTest {
 
     void setUserListValue() {
         assert task != null
-        List<Long> userIds = [] as List
+        List<String> userIds = [] as List
         userIds.add(userService.findByEmail("dummy@netgrif.com", false).get_id())
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [

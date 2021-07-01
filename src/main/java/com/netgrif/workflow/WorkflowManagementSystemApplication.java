@@ -5,6 +5,7 @@ import com.netgrif.workflow.configuration.JsonRootRelProvider;
 import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -22,7 +23,7 @@ import java.util.List;
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableAspectJAutoProxy
-@SpringBootApplication
+@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
 @EnableMongoAuditing
 public class WorkflowManagementSystemApplication {
 

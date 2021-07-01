@@ -3,7 +3,6 @@ package com.netgrif.workflow.business;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +17,7 @@ public class PostalCodeService implements IPostalCodeService {
     public void savePostalCodes(Collection<PostalCode> codes) {
         List<PostalCode> savedCodes = repository.saveAll(codes);
         if (savedCodes.isEmpty()) {
-            throw new PersistenceException("Could not save given postal codes");
+            throw new IllegalArgumentException("Could not save given postal codes");
         }
     }
 

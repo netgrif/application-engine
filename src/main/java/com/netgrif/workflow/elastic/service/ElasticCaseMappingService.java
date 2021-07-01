@@ -181,7 +181,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformUserListField(com.netgrif.workflow.workflow.domain.DataField userListField) {
-        List<Long> userIds = (List<Long>) userListField.getValue();
+        List<String> userIds = (List<String>) userListField.getValue();
         List<User> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
         return Optional.of(new UserField(users.stream().map(this::transformUserValue).toArray(UserField.UserMappingData[]::new)));
     }
