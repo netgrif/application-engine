@@ -161,14 +161,14 @@ public class Importer {
         net.setIcon(document.getIcon());
 
         document.getRole().forEach(this::createRole);
-        for (com.netgrif.workflow.importer.model.Data data : document.getData()) {createDataSet(data);}
+        document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
-        for (com.netgrif.workflow.importer.model.Transition transition: document.getTransition()) {createTransition(transition);}
+        document.getTransition().forEach(this::createTransition);
         document.getArc().forEach(this::createArc);
-        for (com.netgrif.workflow.importer.model.Mapping mapping: document.getMapping()) {applyMapping(mapping);}
-        document.getTransition().forEach(this::resolveTransitionActions);
+        document.getMapping().forEach(this::applyMapping);
         document.getData().forEach(this::resolveDataActions);
+        document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
