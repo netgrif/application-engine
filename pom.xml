@@ -28,7 +28,7 @@
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.3.1</querydsl.version>
         <drools.version>7.55.0.Final</drools.version>
-        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+<!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>netgrif_nae-backend</sonar.projectKey>
@@ -133,21 +133,7 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
-        <!-- SQL -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-jpa</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>mysql</groupId>-->
-<!--            <artifactId>mysql-connector-java</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-jpa</artifactId>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
@@ -239,11 +225,7 @@
             <artifactId>querydsl-mongodb</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.querydsl</groupId>-->
-<!--            <artifactId>querydsl-jpa</artifactId>-->
-<!--            <version>${querydsl.version}</version>-->
-<!--        </dependency>-->
+
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-core</artifactId>
@@ -266,11 +248,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>net.java.dev.jna</groupId>-->
-        <!--            <artifactId>jna</artifactId>-->
-        <!--            <scope>runtime</scope>-->
-        <!--        </dependency>-->
+
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-elasticsearch</artifactId>
