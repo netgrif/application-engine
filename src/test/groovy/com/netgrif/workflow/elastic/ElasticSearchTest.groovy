@@ -11,6 +11,7 @@ import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.groups.NextGroupService
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -83,7 +85,7 @@ class ElasticSearchTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private ElasticsearchTemplate template
+    private ElasticsearchRestTemplate template
 
     @Autowired
     private SuperCreator superCreator

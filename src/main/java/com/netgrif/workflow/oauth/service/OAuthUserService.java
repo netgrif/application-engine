@@ -77,7 +77,7 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         addDefaultAuthorities(user);
         user.setState(UserState.ACTIVE);
         user = save(user);
-        upsertGroupMember(user);
+//        upsertGroupMember(user);
         return user;
     }
 
@@ -287,5 +287,14 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
         return resource;
     }
+//TODO: JOZOOO
+    @Override
+    public void addDefaultRole(User user) {
 
+    }
+
+    @Override
+    public void addDefaultAuthorities(User user) {
+
+    }
 }

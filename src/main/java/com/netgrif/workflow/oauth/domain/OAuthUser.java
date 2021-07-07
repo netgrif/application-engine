@@ -85,8 +85,8 @@ public class OAuthUser extends AbstractUser {
         loggedUser.setAnonymous(false);
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());
-        if (!this.getGroups().isEmpty())
-            loggedUser.parseGroups(this.getGroups());
+//        if (!this.getNextGroups().isEmpty())
+//            loggedUser.setGroups(););
         return loggedUser;
     }
 }

@@ -1,6 +1,5 @@
 package com.netgrif.workflow.auth.domain;
 
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 
 import java.util.Set;
@@ -27,8 +26,6 @@ public interface IUser {
 
     Set<ProcessRole> getProcessRoles();
 
-    Set<Group> getGroups();
-
     Set<String> getNextGroups();
 
     void setEmail(String email);
@@ -42,8 +39,6 @@ public interface IUser {
     void setProcessRoles(Set<ProcessRole> processRoles);
 
     void setAuthorities(Set<Authority> authorities);
-
-    void setGroups(Set<Group> groups);
 
     void setNextGroups(Set<String> nextGroups);
 
