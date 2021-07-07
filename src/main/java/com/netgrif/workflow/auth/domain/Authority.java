@@ -54,8 +54,8 @@ public class Authority implements GrantedAuthority {
         return new Authority(PERMISSION + name);
     }
 
-    public void addUser(User user) {
-        users.add(user.get_id().toString());
+    public void addUser(IUser user) {
+        users.add(user.getStringId());
     }
 
     @Override

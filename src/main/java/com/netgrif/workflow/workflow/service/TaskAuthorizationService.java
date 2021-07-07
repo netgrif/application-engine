@@ -1,8 +1,8 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.AnonymousUser;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -26,7 +26,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions) {
+    public boolean userHasAtLeastOneRolePermission(IUser user, Task task, RolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, task.getRoles());
 
         for (RolePermission permission : permissions) {
@@ -44,7 +44,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean userHasUserListPermission(User user, Task task, RolePermission... permissions) {
+    public boolean userHasUserListPermission(IUser user, Task task, RolePermission... permissions) {
         Map<String, Map<String, Boolean>> users = task.getUsers();
 
         if (!users.containsKey(user.getId()))
@@ -70,12 +70,12 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     }
 
     @Override
-    public boolean isAssignee(User user, String taskId) {
+    public boolean isAssignee(IUser user, String taskId) {
         return isAssignee(user, taskService.findById(taskId));
     }
 
     @Override
-    public boolean isAssignee(User user, Task task) {
+    public boolean isAssignee(IUser user, Task task) {
         if (!isAssigned(task))
             return false;
         else
@@ -112,7 +112,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
                 && isAssignee(loggedUser, taskId));
     }
 
-    private boolean canAssignedCancel(User user, String taskId) {
+    private boolean canAssignedCancel(IUser user, String taskId) {
         Task task = taskService.findById(taskId);
         if (!isAssigned(task) || !task.getUserId().equals(user.getId())) {
             return true;

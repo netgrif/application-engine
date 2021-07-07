@@ -1,6 +1,6 @@
 package com.netgrif.workflow.orgstructure.groups.interfaces;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.querydsl.core.types.Predicate;
@@ -13,11 +13,11 @@ import java.util.*;
         matchIfMissing = true)
 public interface INextGroupService {
 
-    Case createDefaultSystemGroup(User author);
+    Case createDefaultSystemGroup(IUser author);
 
-    Case createGroup(User author);
+    Case createGroup(IUser author);
 
-    Case createGroup(String title, User author);
+    Case createGroup(String title, IUser author);
 
     Case findGroup(String groupID);
 
@@ -31,21 +31,21 @@ public interface INextGroupService {
 
     Map<String, I18nString> inviteUser(String email, Map<String, I18nString> existingUsers, Case groupCase);
 
-    void addUserToDefaultGroup(User user);
+    void addUserToDefaultGroup(IUser user);
 
-    void addUser(User user, String groupId);
+    void addUser(IUser user, Case groupCase);
 
-    void addUser(User user, Case groupCase);
+    void addUser(IUser user, Case groupCase);
 
-    Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers);
+    Map<String, I18nString> addUser(IUser user, Map<String, I18nString> existingUsers);
 
-    void removeUser(User user, Case groupCase);
+    void removeUser(IUser user, Case groupCase);
 
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
-    List<User> getMembers(Case groupCase);
+    List<IUser> getMembers(Case groupCase);
 
-    Set<String> getAllGroupsOfUser(User groupUser);
+    Set<String> getAllGroupsOfUser(IUser groupUser);
 
     String getGroupOwnerId(String groupId);
 

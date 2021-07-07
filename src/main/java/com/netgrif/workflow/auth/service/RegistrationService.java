@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.service;
 
+import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
@@ -13,7 +14,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-@Service
 public class RegistrationService implements IRegistrationService {
 
     @Autowired
@@ -42,6 +42,9 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
+
+    @Autowired
+    protected BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional
@@ -72,10 +75,10 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    public void changePassword(User user, String newPassword) {
+    public void changePassword(RegisteredUser user, String newPassword) {
         user.setPassword(newPassword);
-        userService.encodeUserPassword(user);
-        userRepository.save(user);
+        encodeUserPassword(user);
+        userService.save(user);
         log.info("Changed password for user " + user.getEmail() + ".");
     }
 
@@ -93,12 +96,25 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
+    public void encodeUserPassword(RegisteredUser user) {
+        String pass = user.getPassword();
+        if (pass == null)
+            throw new IllegalArgumentException("User has no password");
+        user.setPassword(bCryptPasswordEncoder.encode(pass));
+    }
+
+    @Override
+    public boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare) {
+        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
+    }
+
+    @Override
     @Transactional
     public User createNewUser(NewUserRequest newUser) {
         User user;
         if (userRepository.existsByEmail(newUser.email)) {
             user = userRepository.findByEmail(newUser.email);
-            if (user.isRegistered())
+            if (user.isActive())
                 return null;
             log.info("Renewing old user [" + newUser.email + "]");
         } else {
@@ -125,10 +141,10 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    public User registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
+    public RegisteredUser registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
         String email = decodeToken(registrationRequest.token)[0];
         log.info("Registering user " + email);
-        User user = userRepository.findByEmail(email);
+        RegisteredUser user = userRepository.findByEmail(email);
         if (user == null)
             return null;
 
@@ -140,14 +156,14 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return userService.saveNew(user);
+        return (RegisteredUser) userService.saveNew(user);
     }
 
     @Override
-    public User resetPassword(String email) {
+    public RegisteredUser resetPassword(String email) {
         log.info("Resetting password of " + email);
         User user = userRepository.findByEmail(email);
-        if (user == null || !user.isRegistered()) {
+        if (user == null || !user.isActive()) {
             String state = user == null ? "Non-existing" : "Inactive";
             log.info(state + " user [" + email + "] tried to reset his password");
             return null;
@@ -157,11 +173,11 @@ public class RegistrationService implements IRegistrationService {
         user.setPassword(null);
         user.setToken(generateTokenKey());
         user.setExpirationDate(generateExpirationDate());
-        return userService.save(user);
+        return (RegisteredUser) userService.save(user);
     }
 
     @Override
-    public User recover(String email, String newPassword) {
+    public RegisteredUser recover(String email, String newPassword) {
         log.info("Recovering user " + email);
         User user = userRepository.findByEmail(email);
         if (user == null)
@@ -169,11 +185,11 @@ public class RegistrationService implements IRegistrationService {
 
         user.setState(UserState.ACTIVE);
         user.setPassword(newPassword);
-        userService.encodeUserPassword(user);
+        encodeUserPassword(user);
         user.setToken(null);
         user.setExpirationDate(null);
 
-        return userService.save(user);
+        return (RegisteredUser) userService.save(user);
     }
 
     @Override

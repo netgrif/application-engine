@@ -1,6 +1,6 @@
 package com.netgrif.workflow.history.service;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.history.domain.IUserEventLog;
 import com.netgrif.workflow.history.domain.repository.UserEventLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ public class HistoryService implements IHistoryService {
     private UserEventLogRepository userEventLogRepository;
 
     @Override
-    public Page<IUserEventLog> findAllByUser(Pageable pageable, User user) {
+    public Page<IUserEventLog> findAllByUser(Pageable pageable, IUser user) {
         return userEventLogRepository.findAllByEmail(pageable, user.getEmail());
     }
 }

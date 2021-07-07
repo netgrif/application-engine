@@ -1,6 +1,8 @@
 package com.netgrif.workflow.orgstructure.web;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.orgstructure.web.responsebodies.Group;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsResource;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -51,7 +53,7 @@ public class GroupController {
 //    @ApiOperation(value = "Get all the user's groups", authorizations = @Authorization("BasicAuth"))
 //    @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
 //    public GroupsResource getGroupsOfUser(Authentication auth) {
-//        User loggedUser = ((LoggedUser) auth.getPrincipal()).transformToUser();
+//        IUser loggedUser = ((LoggedUser) auth.getPrincipal()).transformToUser();
 //        List<Long> groupIds = loggedUser.getGroups().stream()
 //                .map(Group::getId)
 //                .collect(Collectors.toList());
