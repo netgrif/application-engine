@@ -35,8 +35,6 @@ public interface INextGroupService {
 
     void addUser(IUser user, Case groupCase);
 
-    void addUser(IUser user, Case groupCase);
-
     Map<String, I18nString> addUser(IUser user, Map<String, I18nString> existingUsers);
 
     void removeUser(IUser user, Case groupCase);
@@ -55,6 +53,6 @@ public interface INextGroupService {
 
     Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 
-    Set<String> getAllCoMembers(User user);
+    Set<String> getAllCoMembers(IUser user);
 
 }

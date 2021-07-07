@@ -2,6 +2,7 @@ package com.netgrif.workflow.startup
 
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Profile

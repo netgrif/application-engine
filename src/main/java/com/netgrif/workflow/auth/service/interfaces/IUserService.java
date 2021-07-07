@@ -44,15 +44,9 @@ public interface IUserService {
 
     void addDefaultRole(IUser user);
 
-    List<IUser> findAllByIds(Set<String> ids, boolean small);
-
     List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
     void addDefaultAuthorities(IUser user);
-
-    void encodeUserPassword(IUser user);
-
-    boolean stringMatchesUserPassword(User user, String passwordToCompare);
 
     void assignAuthority(String userId, String authorityId);
 
@@ -72,7 +66,7 @@ public interface IUserService {
 
     void deleteUser(IUser user);
 
-    Page<User> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 
     IUser createSystemUser();
 

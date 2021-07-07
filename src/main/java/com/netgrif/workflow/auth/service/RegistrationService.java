@@ -107,7 +107,7 @@ public class RegistrationService implements IRegistrationService {
     public boolean stringMatchesUserPassword(RegisteredUser user, String passwordToCompare) {
         return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
     }
-
+//TODO: JOZOOO GROUPYY
     @Override
     @Transactional
     public User createNewUser(NewUserRequest newUser) {
@@ -132,9 +132,9 @@ public class RegistrationService implements IRegistrationService {
         userService.addDefaultRole(user);
         user =  userRepository.save(user);
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
-            for (String group : newUser.groups){
-                groupService.addUser(user, group);
-            }
+//            for (String group : newUser.groups){
+////                groupService.addUser(user, group);
+//            }
         }
 
         return userRepository.save(user);
