@@ -1,12 +1,12 @@
 package com.netgrif.workflow.pdf.generator.service.fieldbuilder;
 
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.FileListFieldValue;
+import com.netgrif.workflow.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import org.jsoup.Jsoup;
@@ -46,7 +46,7 @@ public class TextFieldBuilder extends FieldBuilder {
                 value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
                 break;
             case USER:
-                value = field.getValue() != null ? ((User) field.getValue()).getFullName() : "";
+                value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
                 break;
             default:
                 value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";

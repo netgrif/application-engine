@@ -1,6 +1,5 @@
 package com.netgrif.workflow.importer.service;
 
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
@@ -496,7 +495,7 @@ public final class FieldFactory {
             Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
-        field.setValue((User) useCase.getFieldValue(fieldId));
+        field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {

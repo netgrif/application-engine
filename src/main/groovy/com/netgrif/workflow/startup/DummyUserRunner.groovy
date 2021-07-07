@@ -15,6 +15,8 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IUserService userService
 
+    @Autowired
+    protected NaeOAuthProperties oAuthProperties
 
     @Override
     void run(String... strings) throws Exception {

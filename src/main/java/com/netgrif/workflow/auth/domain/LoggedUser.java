@@ -18,23 +18,23 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
     @Getter
     @Setter
-    private String id;
+    protected String id;
 
     @Getter
     @Setter
-    private String fullName;
+    protected String fullName;
 
     @Getter
     @Setter
-    private Set<String> groups;
+    protected Set<String> groups;
 
     @Getter
     @Setter
-    private Set<String> processRoles;
+    protected Set<String> processRoles;
 
     @Getter
     @Setter
-    private boolean anonymous;
+    protected boolean anonymous;
 
     public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
@@ -56,7 +56,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return getUsername();
     }
 
-    public User transformToUser() {
+    public IUser transformToUser() {
         User user = new User(new ObjectId(this.id));
         user.setEmail(getUsername());
         String[] names = this.fullName.split(" ");
