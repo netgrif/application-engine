@@ -3,7 +3,6 @@ package com.netgrif.workflow.auth.domain.repositories;
 import com.netgrif.workflow.auth.domain.QUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
-import com.netgrif.workflow.workflow.domain.QCase;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,6 +1,5 @@
 package com.netgrif.workflow.auth.domain;
 
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,15 +27,9 @@ public abstract class AbstractUser implements IUser {
     @Transient
     @Getter
     @Setter
-    protected Set<Group> groups;
-
-    @Transient
-    @Getter
-    @Setter
     protected Set<String> nextGroups;
 
     public AbstractUser() {
-        groups = new HashSet<>();
         authorities = new HashSet<>();
         nextGroups = new HashSet<>();
         processRoles = new HashSet<>();
@@ -58,10 +51,8 @@ public abstract class AbstractUser implements IUser {
         processRoles.remove(role);
     }
 
-    public void addGroup(Group group) {
-        if (groups.stream().anyMatch(it -> it.getId().equals(group.getId())))
-            return;
-        this.groups.add(group);
+    public void addGroup(String group) {
+        this.nextGroups.add(group);
     }
 
     public boolean isActive() {
