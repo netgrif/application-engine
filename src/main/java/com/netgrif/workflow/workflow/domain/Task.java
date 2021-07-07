@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
@@ -74,7 +74,7 @@ public class Task {
     @org.springframework.data.annotation.Transient
     @Getter
     @Setter
-    private User user;
+    private IUser user;
 
     @DBRef
     @Setter

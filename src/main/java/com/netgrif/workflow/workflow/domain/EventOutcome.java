@@ -1,6 +1,6 @@
 package com.netgrif.workflow.workflow.domain;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class EventOutcome {
 
     private ChangedFieldsTree changedFields;
 
-    private User assignee;
+    private IUser assignee;
 
     private LocalDateTime startDate;
 

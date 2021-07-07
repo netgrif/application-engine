@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.IUser;
 import lombok.Data;
 
 import java.util.Set;
@@ -31,8 +32,8 @@ public class User {
 
     private Set<String> nextGroups;
 
-    protected User(com.netgrif.workflow.auth.domain.User user) {
-        id = user.get_id().toString();
+    protected User(IUser user) {
+        id = user.getStringId();
         email = user.getEmail();
         avatar = user.getAvatar();
         name = user.getName();
@@ -42,19 +43,19 @@ public class User {
 
     /**
      * This static method doesn't set attributes regarding the ProcessRoles
-     * <p>
+     *
      * Use the IUserFactory service to create instances that have these attributes set.
      */
-    public static User createSmallUser(com.netgrif.workflow.auth.domain.User user) {
+    public static User createSmallUser(IUser user) {
         return new User(user);
     }
 
     /**
      * This static method doesn't set attributes regarding the ProcessRoles
-     * <p>
+     *
      * Use the IUserFactory service to create instances that have these attributes set.
      */
-    public static User createUser(com.netgrif.workflow.auth.domain.User user) {
+    public static User createUser(IUser user) {
         User result = new User(user);
         result.setTelNumber(user.getTelNumber());
 //        result.setGroups(user.getGroups());

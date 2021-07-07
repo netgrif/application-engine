@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
-public class AnonymousUser extends User{
+public class AnonymousUser extends User {
 
     public AnonymousUser() {
         super();

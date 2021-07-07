@@ -1,6 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ public abstract class AbstractAuthorizationService {
         return hasPermission != null && !hasPermission;
     }
 
-    protected Map<String, Boolean> getAggregatePermissions(User user, Map<String, Map<String, Boolean>> permissions) {
+    protected Map<String, Boolean> getAggregatePermissions(IUser user, Map<String, Map<String, Boolean>> permissions) {
         Map<String, Boolean> aggregatePermissions = new HashMap<>();
 
         Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role -> role.get_id().toString()).collect(Collectors.toSet());
