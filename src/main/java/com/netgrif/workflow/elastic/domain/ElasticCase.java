@@ -18,10 +18,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;

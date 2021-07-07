@@ -1,12 +1,12 @@
 package com.netgrif.workflow.event.events.user;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.utils.DateUtils;
 
 public class UserRegistrationEvent extends UserEvent {
 
-    public UserRegistrationEvent(User user) {
+    public UserRegistrationEvent(RegisteredUser user) {
         super(new LoggedUser(
                 user.getStringId(),
                 user.getEmail(),

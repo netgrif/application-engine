@@ -3,7 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
@@ -18,40 +18,41 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-public class UserService implements IUserService {
+public class UserService extends AbstractUserService {
 
     @Autowired
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
 
     @Autowired
-    private AuthorityRepository authorityRepository;
+    protected AuthorityRepository authorityRepository;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    protected IProcessRoleService processRoleService;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected IMemberService memberService;
 
     @Autowired
-    private INextGroupService groupService;
+    protected INextGroupService groupService;
+
+    @Autowired
+    protected IRegistrationService registrationService;
 
     @Override
-    public User saveNew(User user) {
+    public IUser saveNew(IUser user) {
+        registrationService.encodeUserPassword((RegisteredUser) user);
         encodeUserPassword(user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository.save((User) user);
         groupService.createGroup(user);
         groupService.addUserToDefaultGroup(user);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
@@ -63,26 +64,26 @@ public class UserService implements IUserService {
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
-        AnonymousUser savedUser = (AnonymousUser) userRepository.save(user);
-        return savedUser;
+        return userRepository.save(user);
     }
 
     @Override
-    public User update(User user, UpdateUserRequest updates) {
+    public User update(IUser user, UpdateUserRequest updates) {
+        User dbUser = (User) user;
         if (updates.telNumber != null) {
-            user.setTelNumber(updates.telNumber);
+            dbUser.setTelNumber(updates.telNumber);
         }
         if (updates.avatar != null) {
-            user.setAvatar(updates.avatar);
+            dbUser.setAvatar(updates.avatar);
         }
         if (updates.name != null) {
-            user.setName(updates.name);
+            dbUser.setName(updates.name);
         }
         if (updates.surname != null) {
-            user.setSurname(updates.surname);
+            dbUser.setSurname(updates.surname);
         }
-        user = userRepository.save(user);
-        return user;
+        dbUser = userRepository.save(dbUser);
+        return dbUser;
     }
 
     @Override
@@ -113,17 +114,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findByAuth(Authentication auth) {
+    public IUser findByAuth(Authentication auth) {
         return findByEmail(auth.getName(), false);
     }
 
     @Override
-    public User save(User user) {
-        return userRepository.save(user);
+    public IUser save(IUser user) {
+        return userRepository.save((User) user);
     }
 
     @Override
-    public User findById(String id, boolean small) {
+    public IUser findById(String id, boolean small) {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent())
             throw new IllegalArgumentException("Could not find user with id [" + id + "]");
@@ -135,7 +136,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findByEmail(String email, boolean small) {
+    public IUser resolveById(String id, boolean small) {
+        return findById(id, small);
+    }
+
+    @Override
+    public IUser resolveById(String id, boolean small) {
+        return findById(id, small);
+    }
+
+    @Override
+    public IUser findByEmail(String email, boolean small) {
         return userRepository.findByEmail(email);
         /*if (!small) {
             loadGroups(user);
@@ -144,36 +155,42 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public IUser findAnonymousByEmail(String email, boolean small) {
+        return findByEmail(email, small);
+    }
+
+
+    @Override
     public List<User> findAll(boolean small) {
-        return userRepository.findAll();
+        return changeType(userRepository.findAll());
 //        if (!small) users.forEach(this::loadProcessRoles);
 //        return users;
     }
 
     @Override
-    public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
+    public Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        return userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable);
+        return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable));
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
     }
 
     @Override
-    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+    public Page<IUser> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
         members.add(loggedUser.getId());
 
-        return userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
-                .collect(Collectors.toSet()), query), pageable);
+        return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
+                .collect(Collectors.toSet()), query), pageable));
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
     }
 
     @Override
-    public Page<User> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+    public Page<IUser> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
             return searchAllCoMembers(query, loggedUser, small, pageable);
 
@@ -189,9 +206,10 @@ public class UserService implements IUserService {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
         }
         predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
-        return userRepository.findAll(predicate, pageable);
+        Page<User> users = userRepository.findAll(predicate, pageable);
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
+        return changeType(users, pageable);
     }
 
     private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
@@ -208,24 +226,45 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        return userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
+        return changeType(userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable));
+    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
+        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         /*if (!small) {
             users.forEach(this::loadProcessRoles);
         }*/
+        return changeType(users, pageable);
     }
 
     @Override
     public List<User> findAllByProcessRoles(Set<String> roleIds, boolean small) {
         return userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
+    public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
+        List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
         /*if (!small) {
             users.forEach(this::loadProcessRoles);
         }*/
-    }
+            return changeType(users);
+        }
 
     @Override
     public List<User> findAllByIds(Set<String> ids, boolean small) {
-        return userRepository.findAllByIdIn(ids);
+        return changeType(userRepository.findAllByIdIn(ids));
+    }
+
+    @Override
+    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
+        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
+        return changeType(users);
+    }
+
+    @Override
+    public IUser getLoggedOrSystem() {
+        try {
+            return getLoggedUser();
+        } catch (NullPointerException e) {
+            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+        }
     }
 
     @Override
@@ -254,12 +293,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getSystem() {
+    public IUser getSystem() {
         return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
     }
 
     @Override
-    public User getLoggedUser() {
+    public IUser getLoggedUser() {
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!loggedUser.isAnonymous()) {
             return findByEmail(loggedUser.getEmail(), false);
@@ -290,11 +329,19 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void deleteUser(User user) {
-        if (!userRepository.findById(user.getStringId()).isPresent())
-            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
-        userRepository.delete(user);
+    public void deleteUser(IUser user) {
+        User dbUser = (User) user;
+        if (!userRepository.findById(dbUser.getStringId()).isPresent())
+            throw new IllegalArgumentException("Could not find user with id [" + dbUser.get_id() + "]");
+        userRepository.delete(dbUser);
     }
+
+//    @Override
+//    public void deleteUser(User user) {
+//        if (!userRepository.findById(user.getStringId()).isPresent())
+//            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
+//        userRepository.delete(user);
+//    }
 
 /*    private User loadProcessRoles(User user) {
         if (user == null)
@@ -310,4 +357,5 @@ public class UserService implements IUserService {
         user.setNextGroups(this.groupService.getAllGroupsOfUser(user));
         return user;
     }
+
 }

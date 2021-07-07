@@ -34,6 +34,8 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
 
     List<User> findAllByIdIn(Set<String> ids);
 
+    List<User> findAllBy_idIn(Set<ObjectId> ids);
+
     boolean existsByEmail(String email);
 
     @Override
