@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,18 +38,17 @@ public class UserService extends AbstractUserService {
     protected ApplicationEventPublisher publisher;
 
     @Autowired
-    protected IMemberService memberService;
-
-    @Autowired
     protected INextGroupService groupService;
 
     @Autowired
     protected IRegistrationService registrationService;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     public IUser saveNew(IUser user) {
         registrationService.encodeUserPassword((RegisteredUser) user);
-        encodeUserPassword(user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
@@ -84,19 +84,6 @@ public class UserService extends AbstractUserService {
         }
         dbUser = userRepository.save(dbUser);
         return dbUser;
-    }
-
-    @Override
-    public void encodeUserPassword(User user) {
-        String pass = user.getPassword();
-        if (pass == null)
-            throw new IllegalArgumentException("User has no password");
-        user.setPassword(bCryptPasswordEncoder.encode(pass));
-    }
-
-    @Override
-    public boolean stringMatchesUserPassword(User user, String passwordToCompare) {
-        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
     }
 
     @Override
@@ -141,11 +128,6 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public IUser resolveById(String id, boolean small) {
-        return findById(id, small);
-    }
-
-    @Override
     public IUser findByEmail(String email, boolean small) {
         return userRepository.findByEmail(email);
         /*if (!small) {
@@ -161,7 +143,7 @@ public class UserService extends AbstractUserService {
 
 
     @Override
-    public List<User> findAll(boolean small) {
+    public List<IUser> findAll(boolean small) {
         return changeType(userRepository.findAll());
 //        if (!small) users.forEach(this::loadProcessRoles);
 //        return users;
@@ -173,7 +155,7 @@ public class UserService extends AbstractUserService {
         Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable));
+        return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
     }
@@ -184,7 +166,7 @@ public class UserService extends AbstractUserService {
         members.add(loggedUser.getId());
 
         return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
-                .collect(Collectors.toSet()), query), pageable));
+                .collect(Collectors.toSet()), query), pageable), pageable);
         /*if (!small)
             users.forEach(this::loadProcessRoles);*/
     }
@@ -226,8 +208,8 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        return changeType(userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable));
+//    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
+//        return changeType(userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable));
     public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         /*if (!small) {
@@ -237,8 +219,6 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public List<User> findAllByProcessRoles(Set<String> roleIds, boolean small) {
-        return userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
         List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
         /*if (!small) {
@@ -248,15 +228,15 @@ public class UserService extends AbstractUserService {
         }
 
     @Override
-    public List<User> findAllByIds(Set<String> ids, boolean small) {
+    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
         return changeType(userRepository.findAllByIdIn(ids));
     }
 
-    @Override
-    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
-        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
-        return changeType(users);
-    }
+//    @Override
+//    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
+//        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
+//        return changeType(users);
+//    }
 
     @Override
     public IUser getLoggedOrSystem() {
@@ -284,15 +264,6 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public User getLoggedOrSystem() {
-        try {
-            return getLoggedUser();
-        } catch (NullPointerException e) {
-            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
-        }
-    }
-
-    @Override
     public IUser getSystem() {
         return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
     }
@@ -314,19 +285,19 @@ public class UserService extends AbstractUserService {
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    @Override
-    public User addRole(User user, String roleStringId) {
-        ProcessRole role = processRoleService.findById(roleStringId);
-        user.addProcessRole(role);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User removeRole(User user, String roleStringId) {
-        ProcessRole role = processRoleService.findByImportId(roleStringId);
-        user.removeProcessRole(role);
-        return userRepository.save(user);
-    }
+//    @Override
+//    public IUser addRole(IUser user, String roleStringId) {
+//        ProcessRole role = processRoleService.findById(roleStringId);
+//        user.addProcessRole(role);
+//        return userRepository.save(user);
+//    }
+//
+//    @Override
+//    public IUser removeRole(IUser user, String roleStringId) {
+//        ProcessRole role = processRoleService.findByImportId(roleStringId);
+//        user.removeProcessRole(role);
+//        return userRepository.save(user);
+//    }
 
     @Override
     public void deleteUser(IUser user) {

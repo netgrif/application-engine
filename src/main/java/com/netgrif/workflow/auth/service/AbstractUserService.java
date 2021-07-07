@@ -4,9 +4,7 @@ import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +27,12 @@ public abstract class AbstractUserService implements IUserService {
     @Autowired
     protected IProcessRoleService processRoleService;
 
-    @Autowired
-    protected IMemberService memberService;
 
     @Autowired
     protected INextGroupService groupService;
 
     @Autowired
     protected UserRepository repository;
-
-    @Override
-    public Member upsertGroupMember(IUser user) {
-        Member member = memberService.findByEmail(user.getEmail());
-        if (member == null)
-            member = new Member(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-        member.setGroups(user.getGroups());
-        return memberService.save(member);
-    }
 
     @Override
     public void addDefaultRole(IUser user) {
@@ -112,4 +99,7 @@ public abstract class AbstractUserService implements IUserService {
         return users.stream().map(IUser.class::cast).collect(Collectors.toList());
     }
 
+    public abstract void addDefaultRole(User user);
+
+    public abstract void addDefaultAuthorities(User user);
 }

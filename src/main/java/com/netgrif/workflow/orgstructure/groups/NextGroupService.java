@@ -184,16 +184,16 @@ public class NextGroupService implements INextGroupService {
     }
 
 
-    //TODO : Chyba?
-    @Override
-    public void addUser(IUser user, String groupId){
-        Case groupCase = this.findGroup(groupId);
-        if(groupCase != null){
-            this.addUser(user, groupCase);
-        }
-    }
+//    //TODO : Chyba?
+//    @Override
+//    public void addUser(IUser user, String groupId){
+//        Case groupCase = this.findGroup(groupId);
+//        if(groupCase != null){
+//            this.addUser(user, groupCase);
+//        }
+//    }
 
-
+//TODO: JOZOOO
     @Override
     public void addUser(IUser user, Case groupCase) {
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
@@ -202,8 +202,8 @@ public class NextGroupService implements INextGroupService {
         }
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(user, existingUsers));
         workflowService.save(groupCase);
-        user.addGroup(groupCase.getStringId());
-        userRepository.save(user);
+//        user.addGroup(groupCase.getStringId());
+//        userRepository.save(user);
     }
 
     @Override
@@ -236,9 +236,9 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Set<String> getAllCoMembers(User user) {
+    public Set<String> getAllCoMembers(IUser user) {
         Set<String> users = workflowService.searchAll(
-                groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.get_id().toString())))
+                groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
                 .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
                 .collect(HashSet::new, Set::addAll, Set::addAll);
         users.remove(user.getStringId());
@@ -303,7 +303,7 @@ public class NextGroupService implements INextGroupService {
     protected boolean authorHasDefaultGroup(IUser author) {
         List<Case> allGroups = findAllGroups();
         for (Case group : allGroups){
-            if(group.getAuthor().getId().equals(author.get_id())) {
+            if(group.getAuthor().getId().equals(author.getStringId())) {
                 return true;
             }
         }
@@ -341,7 +341,7 @@ public class NextGroupService implements INextGroupService {
 
         Map<String, String> authorData = new HashMap<>();
         authorData.put("type", "user");
-        authorData.put("value", author.get_id().toString());
+        authorData.put("value", author.getStringId());
 
         Map<String, String> titleData = new HashMap<>();
         titleData.put("type", "text");

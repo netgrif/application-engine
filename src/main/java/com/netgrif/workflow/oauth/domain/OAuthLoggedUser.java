@@ -1,7 +1,6 @@
 package com.netgrif.workflow.oauth.domain;
 
 import com.netgrif.workflow.auth.domain.*;
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import org.bson.types.ObjectId;
@@ -29,7 +28,7 @@ public class OAuthLoggedUser extends LoggedUser {
         user.setSurname(names[1]);
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
-        user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
+        user.setNextGroups(this.groups);
         user.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
             role.set_id(roleId);

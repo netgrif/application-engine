@@ -47,10 +47,10 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     public boolean userHasUserListPermission(IUser user, Task task, RolePermission... permissions) {
         Map<String, Map<String, Boolean>> users = task.getUsers();
 
-        if (!users.containsKey(user.getId()))
+        if (!users.containsKey(user.getStringId()))
             return false;
 
-        Map<String, Boolean> userPermissions = users.get(user.getId());
+        Map<String, Boolean> userPermissions = users.get(user.getStringId());
 
         for (RolePermission permission : permissions) {
             Boolean hasPermission = userPermissions.get(permission.toString());
@@ -79,7 +79,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
         if (!isAssigned(task))
             return false;
         else
-            return task.getUserId().equals(user.getId()) || user instanceof AnonymousUser;
+            return task.getUserId().equals(user.getStringId()) || user instanceof AnonymousUser;
     }
 
     private boolean isAssigned(String taskId) {
@@ -114,7 +114,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     private boolean canAssignedCancel(IUser user, String taskId) {
         Task task = taskService.findById(taskId);
-        if (!isAssigned(task) || !task.getUserId().equals(user.getId())) {
+        if (!isAssigned(task) || !task.getUserId().equals(user.getStringId())) {
             return true;
         }
         return (task.getAssignedUserPolicy() == null || task.getAssignedUserPolicy().get("cancel") == null) || task.getAssignedUserPolicy().get("cancel");

@@ -43,7 +43,6 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         this.groups = new HashSet<>();
     }
 
-
     public void parseProcessRoles(Set<ProcessRole> processRoles) {
         processRoles.forEach(role -> this.processRoles.add(role.getStringId()));
     }
