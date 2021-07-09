@@ -28,6 +28,8 @@ abstract class FieldWithAllowedNets<T> extends Field<T> {
     }
 
     void setAllowedNets(Collection<String> allowedNets) {
+        if (allowedNets == this.allowedNets)
+            return
         this.allowedNets.clear()
         this.allowedNets.addAll(allowedNets)
     }
