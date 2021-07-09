@@ -109,10 +109,6 @@ public class User extends AbstractUser implements RegisteredUser {
         return _id.toString();
     }
 
-    public void addGroup(String group) {
-        this.nextGroups.add(group);
-    }
-
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
