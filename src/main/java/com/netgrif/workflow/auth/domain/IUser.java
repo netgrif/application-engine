@@ -42,6 +42,10 @@ public interface IUser {
 
     void setNextGroups(Set<String> nextGroups);
 
+    void addGroup(String groupId);
+
+    void removeGroup(String groupId);
+
     void addAuthority(Authority authority);
 
     void addProcessRole(ProcessRole role);

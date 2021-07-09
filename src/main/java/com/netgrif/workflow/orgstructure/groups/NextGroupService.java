@@ -1,5 +1,6 @@
 package com.netgrif.workflow.orgstructure.groups;
 
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
@@ -27,7 +28,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.elasticsearch.common.inject.internal.ErrorsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -56,9 +56,6 @@ public class NextGroupService implements INextGroupService {
 
     @Autowired
     protected IUserService userService;
-
-    @Autowired
-    protected UserRepository userRepository;
 
     @Autowired
     protected IDataService dataService;
@@ -193,7 +190,6 @@ public class NextGroupService implements INextGroupService {
 //        }
 //    }
 
-//TODO: JOZOOO
     @Override
     public void addUser(IUser user, Case groupCase) {
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
@@ -202,8 +198,8 @@ public class NextGroupService implements INextGroupService {
         }
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(user, existingUsers));
         workflowService.save(groupCase);
-//        user.addGroup(groupCase.getStringId());
-//        userRepository.save(user);
+        user.addGroup(groupCase.getStringId());
+        userService.save(user);
     }
 
     @Override

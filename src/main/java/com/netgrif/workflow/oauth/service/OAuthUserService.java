@@ -287,14 +287,4 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
 
         return resource;
     }
-//TODO: JOZOOO
-    @Override
-    public void addDefaultRole(User user) {
-
-    }
-
-    @Override
-    public void addDefaultAuthorities(User user) {
-
-    }
 }
