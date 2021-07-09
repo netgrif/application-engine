@@ -99,7 +99,4 @@ public abstract class AbstractUserService implements IUserService {
         return users.stream().map(IUser.class::cast).collect(Collectors.toList());
     }
 
-    public abstract void addDefaultRole(User user);
-
-    public abstract void addDefaultAuthorities(User user);
 }

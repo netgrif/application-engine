@@ -86,12 +86,10 @@ public class UserService extends AbstractUserService {
         return dbUser;
     }
 
-    @Override
     public void addDefaultRole(User user) {
         user.addProcessRole(processRoleService.defaultRole());
     }
 
-    @Override
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
