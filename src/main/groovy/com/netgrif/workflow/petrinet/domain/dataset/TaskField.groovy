@@ -5,6 +5,11 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 class TaskField extends Field<List<String>> {
 
+    TaskField() {
+        super()
+        this.defaultValue = new ArrayList<>()
+    }
+
     @Override
     FieldType getType() {
         return FieldType.TASK_REF
