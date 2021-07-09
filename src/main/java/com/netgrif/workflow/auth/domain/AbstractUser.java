@@ -51,8 +51,12 @@ public abstract class AbstractUser implements IUser {
         processRoles.remove(role);
     }
 
-    public void addGroup(String group) {
-        this.nextGroups.add(group);
+    public void addGroup(String groupId) {
+        this.nextGroups.add(groupId);
+    }
+
+    public void removeGroup(String groupId) {
+        this.nextGroups.remove(groupId);
     }
 
     public boolean isActive() {
