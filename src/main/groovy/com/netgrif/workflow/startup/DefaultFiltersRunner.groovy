@@ -68,12 +68,16 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         ])
     }
 
-    public Optional<Case> createCaseFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
-        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": FILTER_TYPE_CASE])
+    public Optional<Case> createCaseFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, boolean withDefaultCategories = true) {
+        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, withDefaultCategories)
     }
 
-    public Optional<Case> createTaskFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
-        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": FILTER_TYPE_TASK])
+    public Optional<Case> createTaskFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, boolean withDefaultCategories = true) {
+        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, withDefaultCategories)
+    }
+
+    private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, boolean withDefaultCategories) {
+        return createFilter(title, icon, filterType, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": filterType, "defaultSearchCategories": withDefaultCategories])
     }
 
     private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
