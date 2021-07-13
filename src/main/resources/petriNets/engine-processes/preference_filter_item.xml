@@ -34,7 +34,7 @@
 
 			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
-			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+			currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
 			if (currentIndex != 0) {
 				previousTaskRefValue.remove(currentIndex)
@@ -63,7 +63,7 @@
 
 			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
-			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+			currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
 			if (currentIndex != previousTaskRefValue.size() - 1) {
 				previousTaskRefValue.remove(currentIndex)
@@ -94,14 +94,14 @@
 
 			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
-			currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId})
+			currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
 			previousTaskRefValue.remove(currentIndex)
 
 
 			previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
 
-			currentIndex = previousCaseRefValue.findIndexOf({id -> id == filterCase.value[0]})
+			currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
 
 			previousCaseRefValue.remove(currentIndex)
 
@@ -142,7 +142,7 @@
 		<id>icon_preview</id>
 		<title>Menu icon preview</title>
 		<view>
-			<htmlEditor></htmlEditor>
+			<htmlEditor/>
 		</view>
 		<init></init>
 	</data>
@@ -155,14 +155,31 @@
 			iconPreview: f.icon_preview;
 
 			if (iconIdentifier.value == "") {
-				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				change iconPreview value {"""&lt;span&gt;&lt;/span&gt;"""}
 				return;
 			}
 
 			change iconPreview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value + <![CDATA["""</span>"""]]>
+				"""&lt;link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"&gt;&lt;span class="material-icons"&gt;""" + iconIdentifier.value + """&lt;/span&gt;"""
 			}
 		</action>
+	</data>
+	<data type="boolean">
+		<id>use_i18n</id>
+		<title>Translate menu item title?</title>
+		<init>false</init>
+	</data>
+	<data type="multichoice_map">
+		<id>enabled_locales</id>
+		<title>Supported locales</title>
+	</data>
+	<data type="enumeration_map">
+		<id>edited_locale</id>
+		<title>Edit locale translation</title>
+	</data>
+	<data type="text">
+		<id>new_translation_value</id>
+		<title>Menu item translation in selected locale</title>
 	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
@@ -221,8 +238,8 @@
 		<x>660</x>
 		<y>260</y>
 		<layout>
-			<offset>0</offset>
 			<cols>5</cols>
+			<offset>0</offset>
 		</layout>
 		<label></label>
 		<dataGroup>
@@ -297,6 +314,8 @@
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
 				</layout>
 				<event type="set">
 					<id>0</id>
@@ -325,6 +344,7 @@
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
+					<offset>0</offset>
 				</layout>
 			</dataRef>
 			<dataRef>
@@ -336,7 +356,67 @@
 					<x>2</x>
 					<y>1</y>
 					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enabled_locales</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
 					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_i18n</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>edited_locale</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>new_translation_value</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
@@ -361,10 +441,12 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
