@@ -544,6 +544,7 @@
 		<label>Configure menu</label>
 		<dataGroup>
 			<id>dg0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>filter_autocomplete_selection</id>
 				<logic>
@@ -577,6 +578,7 @@
 		</dataGroup>
 		<dataGroup>
 			<id>dg1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>filter_preview</id>
 				<logic>
@@ -595,6 +597,7 @@
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>filter_tasks</id>
 				<logic>
