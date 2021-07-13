@@ -330,7 +330,7 @@
 			<dataRef>
 				<id>icon_name</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -346,7 +346,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>5</cols>
 					<offset>0</offset>
