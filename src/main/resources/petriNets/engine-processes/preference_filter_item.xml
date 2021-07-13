@@ -328,6 +328,7 @@
 
 							make iconPreview,visible on trans when {useIcon.value}
 							make iconName,editable on trans when {useIcon.value}
+
 							make iconPreview,hidden on trans when {!useIcon.value}
 							make iconName,hidden on trans when {!useIcon.value}
 						</action>
@@ -361,9 +362,43 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>enabled_locales</id>
+				<id>use_i18n</id>
 				<logic>
 					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							i18nMultichoice: f.enabled_locales,
+							i18nEnumeration: f.edited_locale,
+							i18nTextfield: f.new_translation_value,
+							useI18n: f.use_i18n;
+
+							make i18nMultichoice,editable on trans when {useI18n.value}
+							make i18nEnumeration,editable on trans when {useI18n.value}
+							make i18nTextfield,editable on trans when {useI18n.value}
+
+							make i18nMultichoice,hidden on trans when {!useI18n.value}
+							make i18nEnumeration,hidden on trans when {!useI18n.value}
+							make i18nTextfield,hidden on trans when {!useI18n.value}
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>enabled_locales</id>
+				<logic>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
@@ -373,20 +408,6 @@
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>use_i18n</id>
-				<logic>
-					<behavior>hidden</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
 				</layout>
 			</dataRef>
 			<dataRef>
