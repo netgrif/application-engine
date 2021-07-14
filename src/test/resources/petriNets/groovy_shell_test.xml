@@ -38,7 +38,7 @@
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label></label>
+		<label>task</label>
 		<event type="assign">
 			<id>t1_assign</id>
 			<actions phase="pre">
