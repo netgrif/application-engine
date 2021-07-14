@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
-import com.netgrif.workflow.configuration.groovy.IGroovyShellFactory
+import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.workflow.workflow.domain.Case
