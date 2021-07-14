@@ -1,10 +1,12 @@
 package com.netgrif.workflow.event
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.ImportHelper
 import org.junit.Before
 import org.junit.Test
@@ -34,15 +36,26 @@ class GroovyShellFactoryTest {
     private static final String USER_EMAIL = "test@test.com"
     private static final String USER_PASSW = "password"
 
+    public static final String FILE_NAME = "groovy_shell_test.xml"
+
     @Autowired
     private ImportHelper importHelper
 
     @Autowired
     private WebApplicationContext wac
 
+    @Autowired
+    private TestHelper testHelper
+
+    private PetriNet net
+
     @Before
     void before() {
+        testHelper.truncateDbs()
 
+        def testNet = importHelper.createNet(FILE_NAME)
+        assert testNet.isPresent()
+        net = testNet.get()
     }
 
     @Test
@@ -74,7 +87,8 @@ class GroovyShellFactoryTest {
 
     @Test
     void caseFieldsExpressionTest() {
-
+        def _case = importHelper.createCase("case", net)
+        assert _case.dataSet["newVariable_1"].value == "value"
     }
 
     @Test
