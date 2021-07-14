@@ -1,8 +1,10 @@
 package com.netgrif.workflow.admin
 
+import com.netgrif.workflow.configuration.groovy.IGroovyShellFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.stereotype.Component
 
@@ -15,6 +17,9 @@ abstract class AdminConsoleRunner {
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDelegate()
 
+    @Autowired
+    private IGroovyShellFactory shellFactory
+
     String run(String action) {
         log.debug("Action: $action")
         def code = getActionCode(action)
@@ -22,7 +27,7 @@ abstract class AdminConsoleRunner {
     }
 
     private Closure getActionCode(String action) {
-        def code = (Closure) new GroovyShell(this.class.getClassLoader()).evaluate("{-> ${action}}")
+        def code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${action}}")
         code.delegate = getActionDelegate()
         return code
     }

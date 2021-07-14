@@ -1,9 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
+import com.netgrif.workflow.configuration.groovy.IGroovyShellFactory
 import com.netgrif.workflow.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.workflow.workflow.domain.Case
-import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +20,7 @@ abstract class CaseFieldsExpressionRunner {
     abstract ActionDelegate getActionDelegate()
 
     @Autowired
-    private CompilerConfiguration configuration
+    private IGroovyShellFactory shellFactory
 
     private int cacheSize
 
@@ -52,7 +52,7 @@ abstract class CaseFieldsExpressionRunner {
         if (cache.containsKey(expression.stringId)) {
             code = cache.get(expression.stringId)
         } else {
-            code = (Closure) new GroovyShell(this.class.getClassLoader(), configuration).evaluate("{-> ${expression.definition}}")
+            code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${expression.definition}}")
             cache.put(expression.stringId, code)
         }
         return code.rehydrate(getActionDelegate(), code.owner, code.thisObject)
