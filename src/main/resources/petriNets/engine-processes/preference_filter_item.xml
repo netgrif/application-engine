@@ -155,12 +155,12 @@
 			iconPreview: f.icon_preview;
 
 			if (iconIdentifier.value == "") {
-				change iconPreview value {"""&lt;span&gt;&lt;/span&gt;"""}
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
 				return;
 			}
 
 			change iconPreview value {
-				"""&lt;link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"&gt;&lt;span class="material-icons"&gt;""" + iconIdentifier.value + """&lt;/span&gt;"""
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value + <![CDATA["""</span>"""]]>
 			}
 		</action>
 	</data>
