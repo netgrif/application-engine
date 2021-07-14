@@ -1,4 +1,4 @@
-package com.netgrif.workflow.configuration.groovy;
+package com.netgrif.workflow.event;
 
 import groovy.lang.GroovyShell;
 
