@@ -1,6 +1,6 @@
 package com.netgrif.workflow.admin
 
-import com.netgrif.workflow.configuration.groovy.IGroovyShellFactory
+import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
