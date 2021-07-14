@@ -8,6 +8,8 @@ import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.workflow.domain.QTask
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +49,11 @@ class GroovyShellFactoryTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private ITaskService taskService
+
     private PetriNet net
+
 
     @Before
     void before() {
@@ -74,7 +80,9 @@ class GroovyShellFactoryTest {
         def adminAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        // call the validation method in ActionDelegate that takes an I18nString as an argument. Creates the string without specifing the entire package
+        // call the validation method in ActionDelegate that takes an I18nString as an argument.
+        // if I18nString was not imported from GroovyShellConfiguration (application.properties) throws an error
+        // if I18nString was imported by a bad class loader throws a "method with signature not found" error
         mvc.perform(post("/api/admin/run")
                 .content("validation(\"String\", new I18nString(\"I18nString\"))")
                 .contentType(MediaType.TEXT_PLAIN_VALUE)
@@ -98,6 +106,10 @@ class GroovyShellFactoryTest {
 
     @Test
     void fieldActionsTest() {
-
+        def _case = importHelper.createCase("case", net)
+        importHelper.assignTaskToSuper("task", _case.getStringId())
+        def task = taskService.searchOne(QTask.task.transitionId.eq("t1"))
+        assert task != null
+        assert task.getUserId() != null
     }
 }
