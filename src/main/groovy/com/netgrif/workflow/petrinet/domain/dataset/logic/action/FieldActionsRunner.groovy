@@ -2,13 +2,11 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
-import com.netgrif.workflow.configuration.properties.ActionsProperties
+import com.netgrif.workflow.configuration.groovy.IGroovyShellFactory
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,7 +32,7 @@ abstract class FieldActionsRunner {
     private FieldFactory fieldFactory
 
     @Autowired
-    private CompilerConfiguration configuration
+    private IGroovyShellFactory shellFactory
 
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
@@ -64,7 +62,7 @@ abstract class FieldActionsRunner {
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
         } else {
-            code = (Closure) new GroovyShell(configuration).evaluate("{-> ${action.definition}}")
+            code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
         return code.rehydrate(getActionDeleget(), code.owner, code.thisObject)
