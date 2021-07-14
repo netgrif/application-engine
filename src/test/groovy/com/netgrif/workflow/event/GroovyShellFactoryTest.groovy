@@ -67,6 +67,9 @@ class GroovyShellFactoryTest {
                 .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(adminAuth)))
                 .andExpect(status().isOk())
+                .andDo({
+                    assert !it.getResponse().getContentAsString().contains("error")
+                })
     }
 
     @Test
