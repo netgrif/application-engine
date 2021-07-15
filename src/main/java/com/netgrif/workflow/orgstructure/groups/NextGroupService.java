@@ -181,14 +181,13 @@ public class NextGroupService implements INextGroupService {
     }
 
 
-//    //TODO : Chyba?
-//    @Override
-//    public void addUser(IUser user, String groupId){
-//        Case groupCase = this.findGroup(groupId);
-//        if(groupCase != null){
-//            this.addUser(user, groupCase);
-//        }
-//    }
+    @Override
+    public void addUser(IUser user, String groupId){
+        Case groupCase = this.findGroup(groupId);
+        if(groupCase != null){
+            this.addUser(user, groupCase);
+        }
+    }
 
     @Override
     public void addUser(IUser user, Case groupCase) {

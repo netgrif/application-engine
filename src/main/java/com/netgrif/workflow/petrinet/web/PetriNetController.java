@@ -158,9 +158,7 @@ public class PetriNetController {
         return fileResource;
     }
 
-    //TODO: aaaa
     @ApiOperation(value = "Search processes", authorizations = @Authorization("BasicAuth"))
-//    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @RequestMapping(value = "/search", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {

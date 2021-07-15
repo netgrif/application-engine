@@ -33,6 +33,8 @@ public interface INextGroupService {
 
     void addUserToDefaultGroup(IUser user);
 
+    void addUser(IUser user, String groupCase);
+
     void addUser(IUser user, Case groupCase);
 
     Map<String, I18nString> addUser(IUser user, Map<String, I18nString> existingUsers);
