@@ -11,8 +11,12 @@
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
-	<data type="text" immediate="true">
+	<data type="enumeration" immediate="true">
 		<id>entry_name</id>
+		<title></title>
+	</data>
+	<data type="text" >
+		<id>entry_default_name</id>
 		<title>Menu item title</title>
 	</data>
 	<data type="text">
@@ -207,12 +211,15 @@
 				<action trigger="set">
 					filterTaskRef: f.filter_preview,
 					filterCaseRef: f.filter_case,
+					entryDefaultName: f.entry_default_name,
 					entryName: f.entry_name,
 					icon: f.icon_name;
 
 					filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 
-					change entryName value {return filterCase.title}
+					change entryDefaultName value {return filterCase.title}
+
+					change entryName value {return filterCase.dataSet["i18n_filter_name"].value}
 
 					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
@@ -247,9 +254,15 @@
 			<title></title>
 			<layout>grid</layout>
 			<dataRef>
-				<id>entry_name</id>
+				<id>entry_default_name</id>
 				<logic>
 					<behavior>editable</behavior>
+					<action trigger="set">
+						entryName: f.entry_name,
+						entryDefaultName: f.entry_default_name;
+
+						change entryName value {return new com.netgrif.workflow.petrinet.domain.I18nString(entryDefaultName.value)}
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -462,6 +475,21 @@
 				</logic>
 				<layout>
 					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>entry_name</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
 					<y>4</y>
 					<rows>1</rows>
 					<cols>1</cols>
