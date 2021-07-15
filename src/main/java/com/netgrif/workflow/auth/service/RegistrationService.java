@@ -123,6 +123,7 @@ public class RegistrationService implements IRegistrationService {
             log.info("Creating new user [" + newUser.email + "]");
         }
         user.setToken(generateTokenKey());
+        user.setPassword("");
         user.setExpirationDate(generateExpirationDate());
         user.setState(UserState.INVITED);
         userService.addDefaultAuthorities(user);
