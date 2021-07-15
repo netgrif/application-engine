@@ -315,9 +315,7 @@ public final class FieldFactory {
 
     private UserListField buildUserListField(Data data) {
         UserListField field = new UserListField();
-        setDefaultValues(field, data, inits -> {
-            field.setDefaultValue(null);
-        });
+        setDefaultValues(field, data, inits -> {});
         return field;
     }
 
