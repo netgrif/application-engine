@@ -3,7 +3,6 @@ package com.netgrif.workflow.auth.domain;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -24,7 +23,6 @@ public abstract class AbstractUser implements IUser {
     @Setter
     protected Set<ProcessRole> processRoles;
 
-    @Transient
     @Getter
     @Setter
     protected Set<String> nextGroups;

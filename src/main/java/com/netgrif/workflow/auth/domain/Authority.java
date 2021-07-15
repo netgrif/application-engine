@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -24,7 +25,7 @@ public class Authority implements GrantedAuthority {
     public static final String anonymous = ROLE + "ANONYMOUS";
 
 
-//    @Id
+    @Id
     @Getter
     private ObjectId _id;
 
@@ -56,6 +57,10 @@ public class Authority implements GrantedAuthority {
 
     public void addUser(IUser user) {
         users.add(user.getStringId());
+    }
+
+    public String getStringId() {
+        return _id.toString();
     }
 
     @Override

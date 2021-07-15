@@ -17,10 +17,10 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnExpression("${nae.oauth.keycloak}")
 public class KeycloakConfiguration {
 
-    @Value("${security.oauth2.client.clientId}")
+    @Value("${nae.oauth.keycloak.clientId}")
     private String clientId;
 
-    @Value("${security.oauth2.client.clientSecret}")
+    @Value("${nae.oauth.keycloak.clientSecret}")
     private String clientSecret;
 
     @Value("${security.oauth2.client.realm}")
