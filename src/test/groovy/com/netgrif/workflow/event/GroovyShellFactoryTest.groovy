@@ -8,7 +8,9 @@ import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.QTask
@@ -110,6 +112,8 @@ class GroovyShellFactoryTest {
 
     @Test
     void roleActionsTest() {
+        roleService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
+
         def user = userService.findByEmail(userService.getSystem().getEmail(), false)
         def processRoleCount = user.processRoles.size()
         def roles = roleService.findAll(net.getStringId())
