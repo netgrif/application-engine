@@ -2,11 +2,14 @@ package com.netgrif.workflow.event
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
@@ -51,6 +54,12 @@ class GroovyShellFactoryTest {
 
     @Autowired
     private ITaskService taskService
+
+    @Autowired
+    private IProcessRoleService roleService
+
+    @Autowired
+    private IUserService userService
 
     private PetriNet net
 
@@ -101,7 +110,17 @@ class GroovyShellFactoryTest {
 
     @Test
     void roleActionsTest() {
-
+        def user = userService.findByEmail(userService.getSystem().getEmail(), false)
+        def processRoleCount = user.processRoles.size()
+        def roles = roleService.findAll(net.getStringId())
+        assert roles.size() == 1
+        roleService.assignRolesToUser(
+                user.getId(),
+                new HashSet<String>(roles.collect({it.getStringId()})),
+                new LoggedUser(-1, "a", "", [])
+        )
+        user = userService.findByEmail(userService.getSystem().getEmail(), false)
+        assert user.processRoles.size() == processRoleCount + 1
     }
 
     @Test
