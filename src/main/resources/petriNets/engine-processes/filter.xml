@@ -54,6 +54,10 @@
         <id>new_title</id>
         <title name="filter_name">Filter name</title>
     </data>
+    <data type="enumeration">
+        <id>i18n_filter_name</id>
+        <title></title>
+    </data>
     <data type="text">
         <id>filter_case_id</id>
         <title></title>
@@ -140,6 +144,12 @@
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
+                    <action trigger="set">
+                        userTitle: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(userTitle.value) }
+                    </action>
                 </logic>
                 <layout>
                     <x>0</x>
