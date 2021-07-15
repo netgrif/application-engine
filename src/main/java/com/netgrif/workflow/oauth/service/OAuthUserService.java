@@ -77,7 +77,6 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
         addDefaultAuthorities(user);
         user.setState(UserState.ACTIVE);
         user = save(user);
-//        upsertGroupMember(user);
         return user;
     }
 

@@ -50,25 +50,22 @@ public class ElasticsearchConfiguration {
 
     @Bean
     public RestHighLevelClient client() {
-
-        Arrays.stream(url.split(",")).forEach(it -> {
-            String[] ipPort = it.split(":");
-            if (ipPort.length > 2) {
-                int parsePort = Integer.parseInt(ipPort[ipPort.length - 1]);
-                ipPort[ipPort.length - 1] = "";
-                String url = String.join(":", ipPort);
-                new HttpHost(url, parsePort, "http");
-            } else if (ipPort.length == 2) {
-                url = ipPort[0];
-                port = Integer.parseInt(ipPort[1]);
-                new HttpHost(ipPort[0], 9200, "http");
-            } else if (ipPort.length == 1) {
-                new HttpHost(ipPort[0], 9200, "http");
-            }
-        });
-
-        //todo: JOZO url
-
+// More Url Elastic
+//        Arrays.stream(url.split(",")).forEach(it -> {
+//            String[] ipPort = it.split(":");
+//            if (ipPort.length > 2) {
+//                int parsePort = Integer.parseInt(ipPort[ipPort.length - 1]);
+//                ipPort[ipPort.length - 1] = "";
+//                String url = String.join(":", ipPort);
+//                new HttpHost(url, parsePort, "http");
+//            } else if (ipPort.length == 2) {
+//                url = ipPort[0];
+//                port = Integer.parseInt(ipPort[1]);
+//                new HttpHost(ipPort[0], 9200, "http");
+//            } else if (ipPort.length == 1) {
+//                new HttpHost(ipPort[0], 9200, "http");
+//            }
+//        });
         return new RestHighLevelClient(
                 RestClient.builder(new HttpHost(url, 9200, "http")));
     }
