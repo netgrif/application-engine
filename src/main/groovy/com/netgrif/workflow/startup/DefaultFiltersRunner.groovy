@@ -1,6 +1,7 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -24,6 +25,9 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private static final String FILTER_ORIGIN_VIEW_ID_FIELD_ID = "origin_view_id"
     private static final String FILTER_VISIBILITY_FIELD_ID = "visibility"
     private static final String FILTER_FIELD_ID = "filter"
+    private static final String FILTER_I18N_TITLE_FIELD_ID = "i18n_filter_name"
+    private static final String GERMAN_ISO_3166_CODE = "de"
+    private static final String SLOVAK_ISO_3166_CODE = "sk"
 
     private static final String FILTER_TYPE_CASE = "Case"
     private static final String FILTER_TYPE_TASK = "Task"
@@ -48,39 +52,50 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         // TODO don't create default filters if they already exist
-        // TODO i18n
         createCaseFilter("All cases", "assignment", "", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
+        ], [
+                (GERMAN_ISO_3166_CODE): "Alle Fälle",
+                (SLOVAK_ISO_3166_CODE): "Všetky prípady"
         ])
         createCaseFilter("My cases", "assignment_ind", "", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
                 "predicateMetadata": [[["category": "case_author", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
                 "searchCategories": ["case_author"]
+        ], [
+                (GERMAN_ISO_3166_CODE): "Meine Fälle",
+                (SLOVAK_ISO_3166_CODE): "Moje prípady"
         ])
 
         createTaskFilter("All tasks", "library_add_check", "", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
+        ], [
+                (GERMAN_ISO_3166_CODE): "Alle Aufgaben",
+                (SLOVAK_ISO_3166_CODE): "Všetky úlohy"
         ])
         createTaskFilter("My tasks", "account_box", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
                 "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
                 "searchCategories": ["task_assignee"]
+        ], [
+                (GERMAN_ISO_3166_CODE): "Meine Aufgaben",
+                (SLOVAK_ISO_3166_CODE): "Moje úlohy"
         ])
     }
 
-    public Optional<Case> createCaseFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, boolean withDefaultCategories = true) {
-        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, withDefaultCategories)
+    public Optional<Case> createCaseFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, Map<String, String> titleTranslations, boolean withDefaultCategories = true) {
+        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories)
     }
 
-    public Optional<Case> createTaskFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, boolean withDefaultCategories = true) {
-        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, withDefaultCategories)
+    public Optional<Case> createTaskFilter(String title, String icon, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, Map<String, String> titleTranslations, boolean withDefaultCategories = true) {
+        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories)
     }
 
-    private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, boolean withDefaultCategories) {
-        return createFilter(title, icon, filterType, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": filterType, "defaultSearchCategories": withDefaultCategories])
+    private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, Map<String, String> titleTranslations, boolean withDefaultCategories) {
+        return createFilter(title, icon, filterType, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata << ["filterType": filterType, "defaultSearchCategories": withDefaultCategories], titleTranslations)
     }
 
-    private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata) {
+    private Optional<Case> createFilter(String title, String icon, String filterType, String filterOriginViewId, String filterVisibility, String filterQuery, List<String> allowedNets, Map<String, Object> filterMetadata, Map<String, String> titleTranslations) {
         PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
             return Optional.empty()
@@ -111,6 +126,14 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                     "filterMetadata": filterMetadata
             ]
         ]))
+
+        I18nString translatedTitle = new I18nString(title)
+        titleTranslations.forEach({locale, translation -> translatedTitle.addTranslation(locale, translation)})
+
+        filterCase = this.workflowService.findOne(filterCase.getStringId())
+        filterCase.dataSet[FILTER_I18N_TITLE_FIELD_ID].value = translatedTitle
+        workflowService.save(filterCase)
+
         this.taskService.finishTask(newFilterTask, this.userService.getLoggedOrSystem())
         return Optional.of(this.workflowService.findOne(filterCase.getStringId()))
     }
