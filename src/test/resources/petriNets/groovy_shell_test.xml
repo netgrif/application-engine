@@ -13,7 +13,7 @@
 		<event type="assign">
 			<actions phase="pre">
 				<action>
-					validation("String", new I18nString("I18nString"))
+					processRoleService.groovyShellTestMethod("String", new I18nString("I18nString"))
 				</action>
 			</actions>
 		</event>
