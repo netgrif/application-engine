@@ -17,7 +17,7 @@
 	</data>
 	<data type="text" >
 		<id>entry_default_name</id>
-		<title>Menu item title</title>
+		<title name="menu_item_title">Menu item title</title>
 	</data>
 	<data type="text">
 		<id>entry_marker</id>
@@ -26,7 +26,7 @@
 	<data type="button">
 		<id>move_option_up</id>
 		<title></title>
-		<placeholder>Up</placeholder>
+		<placeholder name="move_up">Up</placeholder>
 		<action trigger="set">
 			parentId: f.parentId;
 
@@ -55,7 +55,7 @@
 	<data type="button">
 		<id>move_option_down</id>
 		<title></title>
-		<placeholder>Down</placeholder>
+		<placeholder name="move_down">Down</placeholder>
 		<action trigger="set">
 			parentId: f.parentId;
 
@@ -84,7 +84,7 @@
 	<data type="button">
 		<id>remove_option</id>
 		<title></title>
-		<placeholder>Remove</placeholder>
+		<placeholder name="remove">Remove</placeholder>
 		<action trigger="set">
 			parentId: f.parentId,
 			filterCase: f.filter_case;
@@ -139,12 +139,12 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_icon</id>
-		<title>Display menu icon?</title>
+		<title name="display_icon">Display menu icon?</title>
 		<init>true</init>
 	</data>
 	<data type="text">
 		<id>icon_preview</id>
-		<title>Menu icon preview</title>
+		<title name="icon_preview">Menu icon preview</title>
 		<view>
 			<htmlEditor/>
 		</view>
@@ -152,8 +152,8 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>icon_name</id>
-		<title>Menu icon identifier</title>
-		<desc>Material icon identifier. List of icons with identifiers is available online.</desc>
+		<title name="icon_identifier">Menu icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
 		<action trigger="set">
 			iconIdentifier: f.this,
 			iconPreview: f.icon_preview;
@@ -168,24 +168,44 @@
 			}
 		</action>
 	</data>
-	<data type="boolean">
-		<id>use_i18n</id>
-		<title>Translate menu item title?</title>
-		<init>false</init>
-	</data>
-	<data type="multichoice_map">
-		<id>enabled_locales</id>
-		<title>Supported locales</title>
-	</data>
-	<data type="enumeration_map">
-		<id>edited_locale</id>
-		<title>Edit locale translation</title>
-	</data>
-	<data type="text">
-		<id>new_translation_value</id>
-		<title>Menu item translation in selected locale</title>
-	</data>
+<!--	<data type="boolean">-->
+<!--		<id>use_i18n</id>-->
+<!--		<title>Translate menu item title?</title>-->
+<!--		<init>false</init>-->
+<!--	</data>-->
+<!--	<data type="multichoice_map">-->
+<!--		<id>enabled_locales</id>-->
+<!--		<title>Supported locales</title>-->
+<!--	</data>-->
+<!--	<data type="enumeration_map">-->
+<!--		<id>edited_locale</id>-->
+<!--		<title>Edit locale translation</title>-->
+<!--	</data>-->
+<!--	<data type="text">-->
+<!--		<id>new_translation_value</id>-->
+<!--		<title>Menu item translation in selected locale</title>-->
+<!--	</data>-->
 	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="menu_item_title">Názov položky menu</i18nString>
+		<i18nString name="move_up">Posunúť nahor</i18nString>
+		<i18nString name="move_down">Posunúť nadol</i18nString>
+		<i18nString name="remove">Odstrániť</i18nString>
+		<i18nString name="display_icon">Zobrazovať ikonu?</i18nString>
+		<i18nString name="icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
+		<i18nString name="move_up">nach oben</i18nString>
+		<i18nString name="move_down">nach unten</i18nString>
+		<i18nString name="remove">entfernen</i18nString>
+		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
+		<i18nString name="icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="icon_identifier">Ikone ID</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>init</id>
