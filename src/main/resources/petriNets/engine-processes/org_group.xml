@@ -98,7 +98,7 @@
 	</data>
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
-		<title>Select filter</title>
+		<title name="select_menu_item_filter">Select filter</title>
 		<component>
 			<name>autocomplete_dynamic</name>
 		</component>
@@ -126,7 +126,7 @@
 	<data type="button">
 		<id>add_filter_to_menu</id>
 		<title></title>
-		<placeholder>Add to menu</placeholder>
+		<placeholder name="add_menu_item">Add to menu</placeholder>
 		<action trigger="set">
 			filterAutocomplete: f.filter_autocomplete_selection,
 			menuItemsTaskRef: f.filter_tasks,
@@ -179,6 +179,14 @@
 		<i18nString name="user_action_selection_invite">Pozvať nového používateľa</i18nString>
 		<i18nString name="invite_by_mail">Zadaj e-mail adresu</i18nString>
 		<i18nString name="invite_by_mail_desc">Zadaj e-mail adresu</i18nString>
+		<i18nString name="select_menu_item_filter">Zvoľte filter</i18nString>
+		<i18nString name="add_menu_item">Pridať ako položku menu</i18nString>
+		<i18nString name="menu_configuration">Konfigurácia menu</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="select_menu_item_filter">Filter auswählen</i18nString>
+		<i18nString name="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
+		<i18nString name="menu_configuration">Menükonfiguration</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -541,7 +549,7 @@
 			<cols>5</cols>
 			<offset>0</offset>
 		</layout>
-		<label>Configure menu</label>
+		<label name="menu_configuration">Configure menu</label>
 		<dataGroup>
 			<id>dg0</id>
 			<layout>grid</layout>
