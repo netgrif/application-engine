@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -52,6 +53,9 @@ public class UserService implements IUserService {
     @Autowired
     private INextGroupService groupService;
 
+    @Autowired
+    private GroupConfigurationProperties groupProperties;
+
     @Override
     public User saveNew(User user) {
         encodeUserPassword(user);
@@ -59,8 +63,13 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
-        groupService.createGroup(user);
-        groupService.addUserToDefaultGroup(user);
+
+        if (groupProperties.getDefaultEnabled())
+            groupService.createGroup(user);
+
+        if (groupProperties.getSystemEnabled())
+            groupService.addUserToDefaultGroup(user);
+
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
