@@ -24,6 +24,7 @@ class RunnerController {
             DummyUserRunner,
             DemoRunner,
             QuartzSchedulerRunner,
+            PdfRunner,
             FinisherRunner
     ]
 
