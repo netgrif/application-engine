@@ -41,6 +41,10 @@ public class PdfResource extends PdfProperties {
 
     private Resource fontValueResource;
 
+    private String outputFolder;
+
+    private String outputDefaultName;
+
     private Resource outputResource;
 
     private Resource templateResource;
