@@ -113,15 +113,14 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-
+        resolveUserRef(useCase);
+        taskService.resolveUserRef(useCase);
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
-        resolveUserRef(useCase);
-        taskService.resolveUserRef(useCase);
         return useCase;
     }
 
