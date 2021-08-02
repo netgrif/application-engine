@@ -4,6 +4,7 @@ import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
 import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.petrinet.domain.Function
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
@@ -37,16 +38,16 @@ abstract class FieldActionsRunner {
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
 
-    ChangedFieldsTree run(Action action, Case useCase) {
-        return run(action, useCase, Optional.empty())
+    ChangedFieldsTree run(Action action, Case useCase, List<Function> functions) {
+        return run(action, useCase, Optional.empty(), functions)
     }
 
-    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task) {
+    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task, List<Function> functions) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
-        def code = getActionCode(action)
+        def code = getActionCode(action, functions)
         try {
             code.init(action, useCase, task, this)
             code()
@@ -57,7 +58,7 @@ abstract class FieldActionsRunner {
         return ((ActionDelegate) code.delegate).changedFieldsTree
     }
 
-    Closure getActionCode(Action action) {
+    Closure getActionCode(Action action, List<Function> functions) {
         def code
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
@@ -65,7 +66,14 @@ abstract class FieldActionsRunner {
             code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
-        return code.rehydrate(getActionDeleget(), code.owner, code.thisObject)
+        def actionDelegate = getActionDeleget()
+        if (functions) {
+            def shell = this.shellFactory.getGroovyShell()
+            functions.each {
+                actionDelegate.metaClass."${it.name}" = (Closure) shell.evaluate(it.definition)
+            }
+        }
+        return code.rehydrate(actionDelegate, code.owner, code.thisObject)
     }
 
     void addToCache(String key, Object value) {
