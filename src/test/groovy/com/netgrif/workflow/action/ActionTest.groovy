@@ -30,6 +30,6 @@ class ActionTest {
             println LocalDate.MAX
             println new ObjectId().toString()
         ''', "set")
-        runner.run(testAction, dummy, Optional.of(task))
+        runner.run(testAction, dummy, Optional.of(task), null)
     }
 }
