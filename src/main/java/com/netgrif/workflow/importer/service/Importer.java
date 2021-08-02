@@ -67,9 +67,13 @@ public class Importer {
     private Map<String, I18nString> i18n;
     private Map<String, Action> actions;
     private Map<String, Action> actionRefs;
+    private List<com.netgrif.workflow.petrinet.domain.Function> functions;
 
     @Autowired
     private FieldFactory fieldFactory;
+
+    @Autowired
+    private FunctionFactory functionFactory;
 
     @Autowired
     private IPetriNetService service;
@@ -130,6 +134,7 @@ public class Importer {
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
+        this.functions = new LinkedList<>();
     }
 
     @Transactional
@@ -169,6 +174,7 @@ public class Importer {
         document.getData().forEach(this::resolveDataActions);
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
+        document.getFunction().forEach(this::createFunction);
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUsersRef);
@@ -200,6 +206,14 @@ public class Importer {
     }
 
     @Transactional
+    protected void createFunction(com.netgrif.workflow.importer.model.Function function) {
+        com.netgrif.workflow.petrinet.domain.Function fun = functionFactory.getFunction(function);
+
+        net.addFunction(fun);
+        functions.add(fun);
+    }
+
+    @Transactional
     protected void resolveUsersRef(CaseUsersRef usersRef) {
         CaseLogic logic = usersRef.getCaseLogic();
         String usersId = usersRef.getId();
@@ -228,7 +242,7 @@ public class Importer {
     @Transactional
     protected void evaluateActions(String s, Action action) {
         try {
-            actionsRunner.getActionCode(action);
+            actionsRunner.getActionCode(action, functions);
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
         }
