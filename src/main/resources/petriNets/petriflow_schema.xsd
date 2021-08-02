@@ -51,6 +51,16 @@
             <xs:attribute type="xs:boolean" name="immediate"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="function">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute type="xs:boolean" name="static"/>
+                    <xs:attribute type="xs:string" name="name"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="role">
         <xs:complexType>
             <xs:sequence>
@@ -183,6 +193,7 @@
                 <xs:element ref="caseEvents" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="function" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="mapping" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="i18n" maxOccurs="unbounded" minOccurs="0"/>
@@ -384,7 +395,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:choice>
                 <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="properties" />
+                <xs:element ref="properties"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
@@ -409,8 +420,8 @@
     <xs:element name="properties">
         <xs:complexType>
             <xs:sequence>
-                    <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="option_icons" type="icons" minOccurs="0"/>
+                <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="option_icons" type="icons" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -491,10 +502,10 @@
         </xs:complexType>
     </xs:element>
     <xs:complexType name="usersRef">
-            <xs:sequence>
-                <xs:element ref="id"/>
-                <xs:element ref="logic"/>
-            </xs:sequence>
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="logic"/>
+        </xs:sequence>
     </xs:complexType>
     <xs:complexType name="caseRoleRef">
         <xs:sequence>
