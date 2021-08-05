@@ -26,6 +26,8 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         importFilterProcess()
+        importAllDataProcess()
+        importtaskref_demo2Process()
     }
 
     Optional<PetriNet> importFilterProcess() {
@@ -36,6 +38,38 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         }
 
         Optional<PetriNet> filterNet = helper.createNet(FILTER_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)
+
+        if (!filterNet.isPresent()) {
+            log.error("Import of Petri net for filters failed!")
+        }
+
+        return filterNet
+    }
+
+    Optional<PetriNet> importAllDataProcess() {
+        PetriNet filter = petriNetService.getNewestVersionByIdentifier("all_data")
+        if (filter != null) {
+            log.info("Petri net for filters has already been imported.")
+            return new Optional<>(filter)
+        }
+
+        Optional<PetriNet> filterNet = helper.createNet("all_data.xml", VersionType.MAJOR, systemCreator.loggedSystem)
+
+        if (!filterNet.isPresent()) {
+            log.error("Import of Petri net for filters failed!")
+        }
+
+        return filterNet
+    }
+
+    Optional<PetriNet> importtaskref_demo2Process() {
+        PetriNet filter = petriNetService.getNewestVersionByIdentifier("taskref_demo2")
+        if (filter != null) {
+            log.info("Petri net for filters has already been imported.")
+            return new Optional<>(filter)
+        }
+
+        Optional<PetriNet> filterNet = helper.createNet("datamap.xml", VersionType.MAJOR, systemCreator.loggedSystem)
 
         if (!filterNet.isPresent()) {
             log.error("Import of Petri net for filters failed!")

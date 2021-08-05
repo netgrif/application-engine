@@ -13,6 +13,7 @@ public final class FunctionFactory {
 
         function1.setDefinition(function.getValue());
         function1.setName(function.getName());
+        function1.setStatic(function.isStatic() != null && function.isStatic());
 
         return function1;
     }
