@@ -17,6 +17,16 @@ public class Function extends PetriNetObject {
     @Setter
     private String name;
 
+    private boolean _static;
+
+    public boolean isStatic() {
+        return _static;
+    }
+
+    public void setStatic(boolean value) {
+        this._static = value;
+    }
+
     public Function() {
         this.setObjectId(new ObjectId());
     }
@@ -27,6 +37,7 @@ public class Function extends PetriNetObject {
         clone.setImportId(this.importId);
         clone.setDefinition(this.definition);
         clone.setName(this.name);
+        clone.setStatic(this._static);
         return clone;
     }
 }
