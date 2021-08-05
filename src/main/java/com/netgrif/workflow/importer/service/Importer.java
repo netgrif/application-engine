@@ -1,10 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
@@ -17,7 +14,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
@@ -209,6 +208,9 @@ public class Importer {
     protected void createFunction(com.netgrif.workflow.importer.model.Function function) {
         com.netgrif.workflow.petrinet.domain.Function fun = functionFactory.getFunction(function);
 
+        fun.setObjectId(new ObjectId());
+        fun.setImportId(fun.getObjectId().toString());
+        
         net.addFunction(fun);
         functions.add(fun);
     }
