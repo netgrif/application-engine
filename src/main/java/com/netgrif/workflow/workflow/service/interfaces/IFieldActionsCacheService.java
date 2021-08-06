@@ -19,11 +19,11 @@ public interface IFieldActionsCacheService {
 
     List<CachedFunction> getCachedFunctions(List<Function> functions);
 
-    Map<String, List<CachedFunction>> getStaticFunctionCache();
+    Map<String, List<CachedFunction>> getNamespaceFunctionCache();
 
     void clearActionCache();
 
-    void clearStaticFunctionCache();
+    void clearNamespaceFunctionCache();
 
     void clearFunctionCache();
 }

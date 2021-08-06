@@ -18,9 +18,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -248,7 +248,7 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.setTitle(makeTitle.apply(useCase));
-        runActions(petriNet.getPreCreateActions(), petriNet.getFunctions());
+        runActions(petriNet.getPreCreateActions(), petriNet.getProcessFunctions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -299,7 +299,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet().getFunctions());
+        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet().getProcessFunctions());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -518,7 +518,7 @@ public class WorkflowService implements IWorkflowService {
 
         Case case$ = findOne(useCaseId);
         actions.forEach(action -> {
-            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty(), case$.getPetriNet().getFunctions());
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty(), case$.getPetriNet().getProcessFunctions());
             changedFields.mergeChangedFields(changedFieldsTree);
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
@@ -560,7 +560,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
-            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty(), useCase.getPetriNet().getFunctions());
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty(), useCase.getPetriNet().getProcessFunctions());
             changedFields.mergeChangedFields(currentChangedFields);
 
             if (currentChangedFields.getChangedFields().isEmpty())

@@ -318,6 +318,14 @@ public class PetriNet extends PetriNetObject {
         return title.getTranslation(locale);
     }
 
+    public List<Function> getProcessFunctions() {
+        return functions.stream().filter(function -> FunctionScope.PROCESS.equals(function.getScope())).collect(Collectors.toList());
+    }
+
+    public List<Function> getNamespaceFunctions() {
+        return functions.stream().filter(function -> FunctionScope.NAMESPACE.equals(function.getScope())).collect(Collectors.toList());
+    }
+
     public List<Action> getPreCreateActions() {
         return getPreCaseActions(CaseEventType.CREATE);
     }
