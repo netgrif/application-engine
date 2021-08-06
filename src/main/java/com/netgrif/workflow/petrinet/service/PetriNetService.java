@@ -408,7 +408,7 @@ public class PetriNetService implements IPetriNetService {
         log.info("Running actions of net [" + petriNet.getStringId() + "]");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, petriNet.getFunctions());
+            actionsRunner.run(action, null, petriNet.getProcessFunctions());
         });
     }
 

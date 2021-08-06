@@ -15,7 +15,7 @@ class RunnerController {
             DefaultGroupRunner,
             AuthorityRunner,
             SystemUserRunner,
-            StaticFunctionsCacheRunner,
+            FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,
             SuperCreator,
