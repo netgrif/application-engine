@@ -66,13 +66,12 @@ abstract class FieldActionsRunner {
                 actionDelegate.metaClass."${it.function.name}" = it.code
             }
         }
-        actionsCacheService.getStaticFunctionCache().each { entry ->
-            def object = new Object()
-            object.metaClass.log = actionDelegate.log
+        actionsCacheService.getNamespaceFunctionCache().each { entry ->
+            def namespace = new FunctionNamespace(entry.key)
             entry.getValue().each {
-                object.metaClass."${it.function.name}" = it.code
+                namespace.metaClass."${it.function.name}" = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)
             }
-            actionDelegate.metaClass."${entry.key}" = object
+            actionDelegate.metaClass."${entry.key}" = namespace
         }
         return code.rehydrate(actionDelegate, code.owner, code.thisObject)
     }
@@ -96,4 +95,13 @@ abstract class FieldActionsRunner {
     IOrsrService getOrsrService() {
         return orsrService
     }
+
+    public static class FunctionNamespace {
+        private String namespace;
+
+        public FunctionNamespace(String namespace) {
+            this.namespace = namespace
+        }
+    }
+
 }
