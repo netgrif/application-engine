@@ -29,24 +29,24 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     private final Long actionCacheMaxSize;
     private final Long functionCacheMaxSize;
-    private final Long staticFunctionCacheMaxSize;
+    private final Long namespaceFunctionCacheMaxSize;
     private IPetriNetService petriNetService;
 
     private Map<String, Closure> actionsCache;
-    private Map<String, List<CachedFunction>> staticFunctionsCache;
+    private Map<String, List<CachedFunction>> namespaceFunctionsCache;
     private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
     public FieldActionsCacheService(@Value("${nae.field-runner.actions.cache-size}") Long actionCacheMaxSize,
-                                    @Value("${nae.field-runner.functions.namespace.cache-size}") Long staticFunctionCacheMaxSize,
+                                    @Value("${nae.field-runner.functions.namespace.cache-size}") Long namespaceFunctionCacheMaxSize,
                                     @Value("${nae.field-runner.functions.cache-size}") Long functionCacheMaxSize,
                                     IGroovyShellFactory shellFactory) {
         this.actionCacheMaxSize = actionCacheMaxSize;
         this.functionCacheMaxSize = functionCacheMaxSize;
-        this.staticFunctionCacheMaxSize = staticFunctionCacheMaxSize;
+        this.namespaceFunctionCacheMaxSize = namespaceFunctionCacheMaxSize;
         this.actionsCache = new MaxSizeHashMap<>(actionCacheMaxSize);
-        this.functionsCache = new MaxSizeHashMap<>(actionCacheMaxSize);
-        this.staticFunctionsCache = new MaxSizeHashMap<>(staticFunctionCacheMaxSize);
+        this.functionsCache = new MaxSizeHashMap<>(functionCacheMaxSize);
+        this.namespaceFunctionsCache = new MaxSizeHashMap<>(namespaceFunctionCacheMaxSize);
         this.shell = shellFactory.getGroovyShell();
     }
 
@@ -64,14 +64,14 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                     .collect(Collectors.toList());
 
             if (!functions.isEmpty()) {
-                staticFunctionsCache.put(petriNet.getIdentifier(), functions);
+                namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
             }
         }
     }
 
     @Override
     public void removeCachePetriNetFunctions(PetriNet petriNet) {
-        staticFunctionsCache.remove(petriNet.getIdentifier());
+        namespaceFunctionsCache.remove(petriNet.getIdentifier());
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNet.getIdentifier()));
     }
 
@@ -98,7 +98,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
-        return new HashMap<>(staticFunctionsCache);
+        return new HashMap<>(namespaceFunctionsCache);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void clearNamespaceFunctionCache() {
-        this.staticFunctionsCache = new MaxSizeHashMap<>(staticFunctionCacheMaxSize);
+        this.namespaceFunctionsCache = new MaxSizeHashMap<>(namespaceFunctionCacheMaxSize);
     }
 
     @Override
