@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.elastic.service.executors.MaxSizeHashMap;
 import com.netgrif.workflow.event.IGroovyShellFactory;
 import com.netgrif.workflow.petrinet.domain.Function;
+import com.netgrif.workflow.petrinet.domain.FunctionScope;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -37,7 +38,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     private final GroovyShell shell;
 
     public FieldActionsCacheService(@Value("${nae.field-runner.actions.cache-size}") Long actionCacheMaxSize,
-                                    @Value("${nae.field-runner.functions.static.cache-size}") Long staticFunctionCacheMaxSize,
+                                    @Value("${nae.field-runner.functions.namespace.cache-size}") Long staticFunctionCacheMaxSize,
                                     @Value("${nae.field-runner.functions.cache-size}") Long functionCacheMaxSize,
                                     IGroovyShellFactory shellFactory) {
         this.actionCacheMaxSize = actionCacheMaxSize;
@@ -58,10 +59,13 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     @Override
     public void cachePetriNetFunctions(PetriNet petriNet) {
         if (petriNet != null) {
-            List<CachedFunction> functions = petriNet.getFunctions().stream().filter(Function::isStatic).map(function ->
-                    CachedFunction.build(shell, function)
-            ).collect(Collectors.toList());
-            staticFunctionsCache.put(petriNet.getIdentifier(), functions);
+            List<CachedFunction> functions = petriNet.getNamespaceFunctions().stream()
+                    .map(function -> CachedFunction.build(shell, function))
+                    .collect(Collectors.toList());
+
+            if (!functions.isEmpty()) {
+                staticFunctionsCache.put(petriNet.getIdentifier(), functions);
+            }
         }
     }
 
@@ -83,7 +87,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     @Override
     public List<CachedFunction> getCachedFunctions(List<Function> functions) {
         List<CachedFunction> cachedFunctions = new ArrayList<>(functions.size());
-        functions.forEach(function -> {
+        functions.stream().filter(function -> FunctionScope.PROCESS.equals(function.getScope())).forEach(function -> {
             if (!functionsCache.containsKey(function.getStringId())) {
                 functionsCache.put(function.getStringId(), CachedFunction.build(shell, function));
             }
@@ -93,7 +97,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public Map<String, List<CachedFunction>> getStaticFunctionCache() {
+    public Map<String, List<CachedFunction>> getNamespaceFunctionCache() {
         return new HashMap<>(staticFunctionsCache);
     }
 
@@ -103,7 +107,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public void clearStaticFunctionCache() {
+    public void clearNamespaceFunctionCache() {
         this.staticFunctionsCache = new MaxSizeHashMap<>(staticFunctionCacheMaxSize);
     }
 
