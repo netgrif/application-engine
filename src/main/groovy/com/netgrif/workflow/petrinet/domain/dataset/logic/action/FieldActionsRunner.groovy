@@ -67,9 +67,9 @@ abstract class FieldActionsRunner {
             }
         }
         actionsCacheService.getNamespaceFunctionCache().each { entry ->
-            def namespace = new FunctionNamespace(entry.key)
+            def namespace = new Object()
             entry.getValue().each {
-                namespace.metaClass."${it.function.name}" = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)
+                namespace.metaClass."${it.function.name}" = it.code.rehydrate(actionDelegate, actionDelegate, actionDelegate)
             }
             actionDelegate.metaClass."${entry.key}" = namespace
         }
@@ -94,14 +94,6 @@ abstract class FieldActionsRunner {
 
     IOrsrService getOrsrService() {
         return orsrService
-    }
-
-    public static class FunctionNamespace {
-        private String namespace;
-
-        public FunctionNamespace(String namespace) {
-            this.namespace = namespace
-        }
     }
 
 }
