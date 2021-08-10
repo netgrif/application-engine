@@ -6,6 +6,10 @@
     <title>Data Actions Test</title>
     <!--  DATA  -->
     <data type="text">
+        <id>control_field</id>
+        <init></init>
+    </data>
+    <data type="text">
         <id>text_field</id>
         <title>Text field</title>
         <event type="get">
@@ -13,7 +17,7 @@
             <actions phase="pre">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.this;
+                    field: f.control_field;
                     change field value {
                         field.value + ";get-pre"
                     }
@@ -23,7 +27,7 @@
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.this;
+                    field: f.control_field;
                     change field value {
                         field.value + ";get-post"
                     }
@@ -36,7 +40,7 @@
             <actions phase="pre">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.this;
+                    field: f.control_field;
                     change field value {
                         field.value + ";set-pre"
                     }
@@ -46,7 +50,7 @@
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
-                    field: f.this;
+                    field: f.control_field;
                     change field value {
                         field.value + ";set-post"
                     }
@@ -71,7 +75,7 @@
                 <actions phase="pre">
                     <action>
                         <!-- @formatter:off -->
-                        field: f.this;
+                        field: f.control_field;
                         change field value {
                         field.value + ";get-pre"
                         }
@@ -81,7 +85,7 @@
                 <actions phase="post">
                     <action>
                         <!-- @formatter:off -->
-                        field: f.this;
+                        field: f.control_field;
                         change field value {
                         field.value + ";get-post"
                         }
@@ -94,7 +98,7 @@
                 <actions phase="pre">
                     <action>
                         <!-- @formatter:off -->
-                        field: f.this;
+                        field: f.control_field;
                         change field value {
                         field.value + ";set-pre"
                         }
@@ -104,7 +108,7 @@
                 <actions phase="post">
                     <action>
                         <!-- @formatter:off -->
-                        field: f.this;
+                        field: f.control_field;
                         change field value {
                         field.value + ";set-post"
                         }
