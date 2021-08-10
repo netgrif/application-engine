@@ -1,13 +1,18 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +46,10 @@ class FieldTest {
     private SystemUserRunner systemUserRunner
 
     @Autowired
-    private DefaultRoleRunner roleRunner
+    private GroupRunner groupRunner
+
+    @Autowired
+    private TestHelper testHelper
 
     @Autowired
     private SuperCreator superCreator
@@ -53,15 +61,13 @@ class FieldTest {
     def limitsNetOptional
     PetriNet net
 
+    @Before
+    void before() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void testImport() {
-        template.db.drop()
-        userRepository.deleteAll()
-        roleRepository.deleteAll()
-        roleRunner.run()
-        superCreator.run()
-        systemUserRunner.run()
-
         limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE))
 
         assertNet()
@@ -74,12 +80,16 @@ class FieldTest {
         assertFileField()
         assertUserField()
         assertDateTimeField()
+        assertCaseRef()
+        assertUserList()
+        assertTaskRef()
+        assertMultichoiceMap()
     }
 
     private void assertNet() {
         assert limitsNetOptional.isPresent()
         net = limitsNetOptional.get()
-        assert net.dataSet.size() == 10
+        assert net.dataSet.size() == 14
     }
 
     private void assertNumberField() {
@@ -128,6 +138,10 @@ class FieldTest {
         assert field.choices.find { it.defaultValue == "multichoice" }
         assert field.choices.find { it.defaultValue == "multichoice2" }
         assert field.choices.find { it.defaultValue == "multichoice3" }
+
+        MultichoiceField emptyField = net.dataSet["emptyMultichoice"] as MultichoiceField
+        assert emptyField.defaultValue instanceof HashSet
+        assert emptyField.defaultValue.isEmpty()
     }
 
     private void assertBooleanField() {
@@ -176,5 +190,31 @@ class FieldTest {
         assert field.name.defaultValue == "CaseRef"
         assert field.allowedNets.size() == 2
         assert field.allowedNets.containsAll(["processId1", "processId2"])
+        assert field.defaultValue instanceof List
+        assert field.defaultValue.isEmpty()
+    }
+
+    private void assertUserList() {
+        UserListField field = net.dataSet["emptyUserList"] as UserListField
+        assert field.name.defaultValue == "Empty user list"
+        assert field.description.defaultValue == "User list description"
+        assert field.defaultValue instanceof List
+        assert field.defaultValue.isEmpty()
+    }
+
+    private void assertTaskRef() {
+        TaskField field = net.dataSet["emptyTaskRef"] as TaskField
+        assert field.name.defaultValue == "Empty task ref"
+        assert field.defaultValue instanceof List
+        assert field.defaultValue.isEmpty()
+    }
+
+    private void assertMultichoiceMap() {
+        MultichoiceMapField field = net.dataSet["emptyMultichoiceMap"] as MultichoiceMapField
+        assert field.name.defaultValue == "Empty multichoice map"
+        assert field.description.defaultValue == "Multichoice map description"
+        assert field.placeholder.defaultValue == "Multichoice map placeholder"
+        assert field.defaultValue instanceof Set
+        assert field.defaultValue.isEmpty()
     }
 }

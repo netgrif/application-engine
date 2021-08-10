@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.CaseEvent;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
@@ -36,6 +37,10 @@ public class PetriNet extends PetriNetObject {
     @Getter
     @Setter
     private I18nString defaultCaseName;
+
+    @Getter
+    @Setter
+    private Expression defaultCaseNameExpression;
 
     @Getter
     @Setter
@@ -103,6 +108,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private List<String> negativeViewRoles;
+
+    @Getter
+    @Setter
     private Map<String, Map<String, Boolean>> userRefs;
 
     @Transient
@@ -127,6 +136,7 @@ public class PetriNet extends PetriNetObject {
         arcs = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
+        negativeViewRoles = new LinkedList<>();
         transactions = new LinkedHashMap<>();
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
@@ -153,6 +163,8 @@ public class PetriNet extends PetriNetObject {
             this.permissions.put(roleId, permissions);
         }
     }
+
+    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
 
     public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
@@ -347,6 +359,10 @@ public class PetriNet extends PetriNetObject {
         return new LinkedList<>();
     }
 
+    public boolean hasDynamicCaseName() {
+        return defaultCaseNameExpression != null;
+    }
+
     @Override
     public String getStringId() {
         return _id.toString();
@@ -358,6 +374,7 @@ public class PetriNet extends PetriNetObject {
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultCaseName(this.defaultCaseName);
+        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version);
@@ -387,6 +404,7 @@ public class PetriNet extends PetriNetObject {
         clone.setProcessEvents(this.processEvents);
         clone.setPermissions(this.permissions);
         clone.setUserRefs(this.userRefs);
+        this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         return clone;
     }
 }
