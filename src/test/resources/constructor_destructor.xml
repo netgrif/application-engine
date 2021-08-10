@@ -20,7 +20,7 @@
             <id>upload</id>
             <actions phase="post">
                 <action>
-                    createCase("construtor_destructor", "Construct")
+                    createCase("constructor_destructor", "Construct")
                 </action>
             </actions>
         </event>
