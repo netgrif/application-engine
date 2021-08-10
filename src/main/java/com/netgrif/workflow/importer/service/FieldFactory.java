@@ -97,6 +97,9 @@ public final class FieldFactory {
             case MULTICHOICE_MAP:
                 field = buildMultichoiceMapField(data, importer);
                 break;
+            case FILTER:
+                field = buildFilterField(data);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -148,7 +151,7 @@ public final class FieldFactory {
     }
 
     private com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-        return dynamic ? new DynamicValidation(rule, null) : new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation(rule, message);
+        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions){
@@ -295,9 +298,7 @@ public final class FieldFactory {
         } else {
             field = new CaseField(new ArrayList<>(nets.getAllowedNet()));
         }
-        setDefaultValues(field, data, inits -> {
-            field.setDefaultValue(null);
-        });
+        setDefaultValues(field, data, inits -> {});
         return field;
     }
 
@@ -314,9 +315,7 @@ public final class FieldFactory {
 
     private UserListField buildUserListField(Data data) {
         UserListField field = new UserListField();
-        setDefaultValues(field, data, inits -> {
-            field.setDefaultValue(null);
-        });
+        setDefaultValues(field, data, inits -> {});
         return field;
     }
 
@@ -342,6 +341,15 @@ public final class FieldFactory {
         return fileListField;
     }
 
+    private FilterField buildFilterField(Data data) {
+        AllowedNets nets = data.getAllowedNets();
+        if (nets == null) {
+            return new FilterField();
+        } else {
+            return new FilterField(new ArrayList<>(nets.getAllowedNet()));
+        }
+    }
+
     private void setActions(Field field, Data data) {
         if (data.getAction() != null && data.getAction().size() != 0) {
 //            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
@@ -357,22 +365,27 @@ public final class FieldFactory {
         }
     }
 
-    public Field buildFieldWithoutValidation(Case useCase, String fieldId) {
-        return buildField(useCase, fieldId, false);
+    public Field buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
+        return buildField(useCase, fieldId, false, transitionId);
     }
 
-    public Field buildFieldWithValidation(Case useCase, String fieldId) {
-        return buildField(useCase, fieldId, true);
+    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
+        return buildField(useCase, fieldId, true, transitionId);
     }
 
-    private Field buildField(Case useCase, String fieldId, boolean withValidation) {
+    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
+        resolveComponent(field, useCase, transitionId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
         if (field instanceof MapOptionsField)
             resolveMapOptions((MapOptionsField) field, useCase);
+        if (field instanceof FieldWithAllowedNets)
+            resolveAllowedNets((FieldWithAllowedNets) field, useCase);
+        if (field instanceof FilterField)
+            resolveFilterMetadata((FilterField) field, useCase);
         if (withValidation)
             resolveValidations(field, useCase);
         return field;
@@ -399,11 +412,36 @@ public final class FieldFactory {
         field.setChoices(choices);
     }
 
+    private void resolveComponent(Field field, Case useCase, String transitionId) {
+        if (transitionId == null) {
+            return;
+        }
+        com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
+        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
+        if(transitionComponent != null) {
+            field.setComponent(transitionComponent);
+        }
+    }
+
     private void resolveMapOptions(MapOptionsField field, Case useCase) {
         Map options = useCase.getDataField(field.getImportId()).getOptions();
         if (options == null)
             return;
         field.setOptions(options);
+    }
+
+    private void resolveAllowedNets(FieldWithAllowedNets field, Case useCase) {
+        List<String> allowedNets = useCase.getDataField(field.getImportId()).getAllowedNets();
+        if (allowedNets == null)
+            return;
+        field.setAllowedNets(allowedNets);
+    }
+
+    private void resolveFilterMetadata(FilterField field, Case useCase) {
+        Map<String, Object> metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
+        if(metadata == null)
+            return;
+        field.setFilterMetadata(metadata);
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
@@ -630,9 +668,14 @@ public final class FieldFactory {
     }
 
     private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
-        if (field.getType().equals(FieldType.CASE_REF)) {
-            List<String> allowedNets = new ArrayList<>(useCase.getDataSet().get(fieldId).getAllowedNets());
-            ((CaseField) field).setAllowedNets(allowedNets);
+        DataField dataField = useCase.getDataSet().get(fieldId);
+        if (field.getType().equals(FieldType.CASE_REF) || field.getType().equals(FieldType.FILTER)) {
+            List<String> allowedNets = new ArrayList<>(dataField.getAllowedNets());
+            ((FieldWithAllowedNets) field).setAllowedNets(allowedNets);
+        }
+        if (field.getType().equals(FieldType.FILTER)) {
+            Map<String, Object> filterMetadata = new HashMap<>(dataField.getFilterMetadata());
+            ((FilterField) field).setFilterMetadata(filterMetadata);
         }
     }
 
