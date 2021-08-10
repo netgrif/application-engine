@@ -1,3 +1,38 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
+## 5.5.2 (19.07.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10896/tab/release-report-all-issues"></a>
+## 5.5.1 (09.07.2021)
+### Bug fixes
+* [NAE-1374](https://netgrif.atlassian.net/browse/NAE-1374) - setData does not propagate changed allowedNets to frontend
+* [NAE-1323](https://netgrif.atlassian.net/browse/NAE-1323) - Initial value of collection fields is broken
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10888/tab/release-report-all-issues"></a>
+## 5.5.0 (11.06.2021)
+### Bug fixes
+* [NAE-1319](https://netgrif.atlassian.net/browse/NAE-1319) - Default caseRef value is set to null
+* [NAE-1316](https://netgrif.atlassian.net/browse/NAE-1316) - Currency format sa neprejavuje na number field
+
+### Improvements
+None
+
+### Features
+* [NAE-1305](https://netgrif.atlassian.net/browse/NAE-1305) - Loading na set data pre button
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10890/tab/release-report-all-issues"></a>
 ## 5.4.1 (31.05.2021)
 ### Bug fixes
