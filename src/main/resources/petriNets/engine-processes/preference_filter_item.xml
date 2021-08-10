@@ -168,6 +168,70 @@
 			}
 		</action>
 	</data>
+	<data type="button">
+		<id>add_roles</id>
+		<title></title>
+		<placeholder name="addRoles">Add roles</placeholder>
+<!--		TODO na set(stlacenie) pridavat aktualnu value z available_processes ako prvu cast value
+			TODO enumeration fieldu selected_roles,
+			TODO ako druhu cast vlozit vybrane mena roli z multichoiceMap fieldu
+			TODO Ako key dat id role-->
+
+
+<!--		TODO otazka:  format fieldu available processes? value je key, jednoduchsie by bolo mat v key ten
+ 			TODO zlozeny identifikator NetName:Verzia-->
+
+<!--		<action trigger="set">-->
+<!--			addButton: f.this,-->
+<!--			selectedRoles: f.selected_roles,-->
+<!--			processesAvailable: f.processes_available,-->
+<!--			rolesAvailable: f.roles_available;-->
+
+<!--			change selectedRoles options {return }-->
+<!--		</action>-->
+	</data>
+	<data type="button">
+		<id>remove_roles</id>
+		<title></title>
+		<placeholder name="removeRoles">Remove roles</placeholder>
+
+		<!--		<action trigger="set">-->
+<!--			removeButton: f.this,-->
+<!--			selectedRoles: f.selected_roles,-->
+<!--			processesAvailable: f.processes_available,-->
+<!--			rolesAvailable: f.roles_available;-->
+
+<!--			change selectedRoles options {return }-->
+<!--		</action>-->
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>processes_available</id>
+		<title name="available_processes">Your processes</title>
+		<action trigger="get">
+			processes: f.this;
+
+			change processes options {return getNetsByLoggedUser()}
+
+			<!--			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser().getId())}-->
+		</action>
+		<action trigger="set">
+			processes: f.this,
+			roles: f.roles_available;
+
+			change roles options {return getRolesByNet(processes)}
+
+			<!--			change roles options {return configurableMenuService.getNetRoles(processes)}-->
+		</action>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>roles_available</id>
+		<title name="available_roles">Roles from selected process</title>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>selected_roles</id>
+		<title name="roles_selected">Selected roles</title>
+	</data>
+
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
 <!--		<title>Translate menu item title?</title>-->
@@ -338,13 +402,86 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>use_icon</id>
+				<id>processes_available</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
 					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>roles_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>selected_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -375,7 +512,7 @@
 				</logic>
 				<layout>
 					<x>1</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -388,7 +525,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
