@@ -248,7 +248,7 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.setTitle(makeTitle.apply(useCase));
-        runActions(petriNet.getPreCreateActions(), petriNet.getProcessFunctions());
+        runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -299,7 +299,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet().getProcessFunctions());
+        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -571,11 +571,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void runActions(List<Action> actions, List<com.netgrif.workflow.petrinet.domain.Function> functions) {
+    public void runActions(List<Action> actions, PetriNet petriNets) {
         log.info("Running actions without context on cases");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, Optional.empty(), functions);
+            actionsRunner.run(action, null, Optional.empty(), petriNets.getProcessFunctions());
         });
     }
 }
