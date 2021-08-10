@@ -217,7 +217,7 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field> data = getData(taskId);
+        List<Field> data = getData(task, useCase);
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
