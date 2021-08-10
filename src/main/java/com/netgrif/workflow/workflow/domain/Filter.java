@@ -9,6 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
+/**
+ * @deprecated
+ * since 5.3.0 - Filter engine processes should be used instead of native objects
+ */
+@Deprecated
 @Document
 @Data
 public class Filter {
