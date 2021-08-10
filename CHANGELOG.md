@@ -1,3 +1,74 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
+## 5.5.2 (19.07.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10896/tab/release-report-all-issues"></a>
+## 5.5.1 (09.07.2021)
+### Bug fixes
+* [NAE-1374](https://netgrif.atlassian.net/browse/NAE-1374) - setData does not propagate changed allowedNets to frontend
+* [NAE-1323](https://netgrif.atlassian.net/browse/NAE-1323) - Initial value of collection fields is broken
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10888/tab/release-report-all-issues"></a>
+## 5.5.0 (11.06.2021)
+### Bug fixes
+* [NAE-1319](https://netgrif.atlassian.net/browse/NAE-1319) - Default caseRef value is set to null
+* [NAE-1316](https://netgrif.atlassian.net/browse/NAE-1316) - Currency format sa neprejavuje na number field
+
+### Improvements
+None
+
+### Features
+* [NAE-1305](https://netgrif.atlassian.net/browse/NAE-1305) - Loading na set data pre button
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10890/tab/release-report-all-issues"></a>
+## 5.4.1 (31.05.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10869/tab/release-report-all-issues"></a>
+## 5.4.0 (27.05.2021)
+### Bug fixes
+* [NAE-1211](https://netgrif.atlassian.net/browse/NAE-1211) - Search in several data fields does not work as intended
+
+### Improvements
+* [NAE-1228](https://netgrif.atlassian.net/browse/NAE-1228) - Re-enable class name minification
+* [NAE-1207](https://netgrif.atlassian.net/browse/NAE-1207) - Filter management
+* [NAE-412](https://netgrif.atlassian.net/browse/NAE-412) - Process and Case loading refactor
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10886/tab/release-report-all-issues"></a>
+## 5.3.1 (20.05.2021)
+### Bug fixes
+* [NAE-1306](https://netgrif.atlassian.net/browse/NAE-1306) - Custom message dynamickej validacie sa nezapise z xml do objektu siete
+* [NAE-1308](https://netgrif.atlassian.net/browse/NAE-1308) - Cancel Task zla podmienka ci ma user spravne role
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10885/tab/release-report-all-issues"></a>
 ## 5.3.0 (05.05.2021)
 ### Bug fixes
