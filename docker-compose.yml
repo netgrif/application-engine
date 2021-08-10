@@ -59,6 +59,7 @@ services:
       - transport.host=0.0.0.0
     ports:
       - 9300:9300
+      - 9200:9200
 
   docker-redis:
     image: redis:5
