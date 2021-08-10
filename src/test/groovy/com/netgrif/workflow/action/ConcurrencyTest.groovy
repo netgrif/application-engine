@@ -22,9 +22,6 @@ class ConcurrencyTest {
     private static final Logger log = LoggerFactory.getLogger(ConcurrencyTest)
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private ImportHelper importHelper
 
     @Autowired
@@ -32,7 +29,7 @@ class ConcurrencyTest {
 
     @Test
     void test() {
-        def mainNet = importer.importPetriNet(new File("src/test/resources/action_delegate_concurrency_test.xml"), "action_delegate_concurrency_test", "TST")
+        def mainNet = importHelper.createNet("action_delegate_concurrency_test.xml")
         assert mainNet.isPresent()
 
         List<Case> cases = []
