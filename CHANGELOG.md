@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
+## 5.5.2 (19.07.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10896/tab/release-report-all-issues"></a>
 ## 5.5.1 (09.07.2021)
 ### Bug fixes
