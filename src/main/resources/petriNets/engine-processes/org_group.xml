@@ -136,8 +136,8 @@
 				return;
 			}
 
-			optionCase = createCase("preference_filter_item")
-			initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
+			def optionCase = createCase("preference_filter_item")
+			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 			assignTask(initTask)
 			setData(initTask, [
 				"filter_case": ["type":"caseRef", "value": [filterAutocomplete.value], "allowedNets":["filter"]],
@@ -147,7 +147,7 @@
 
 			change referencedFiltersList value {return referencedFiltersList.value + filterAutocomplete.value}
 
-			viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
+			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
 
 			change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
 			change filterAutocomplete value {return ""}
@@ -260,9 +260,9 @@
 					filterCaseIds = []
 
 					defaultFilters.forEach { filterCase -&gt;
-						optionCase = createCase("preference_filter_item")
+						def optionCase = createCase("preference_filter_item")
 
-						initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
+						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 						assignTask(initTask)
 						setData(initTask, [
 								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
@@ -270,7 +270,7 @@
 						])
 						finishTask(initTask)
 
-						viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
+						def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
 						filterTaskIds.add(viewTask.stringId)
 						filterCaseIds.add(filterCase.stringId)
 					}

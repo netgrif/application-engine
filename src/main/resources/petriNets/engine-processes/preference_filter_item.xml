@@ -34,17 +34,17 @@
 				return;
 			}
 
-			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
 
-			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
-			currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
 			if (currentIndex != 0) {
 				previousTaskRefValue.remove(currentIndex)
 				previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
 
-				parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+				def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
 
 				setDataWithPropagation(parentTask, [
 					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
@@ -63,17 +63,17 @@
 				return;
 			}
 
-			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
 
-			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
-			currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
 			if (currentIndex != previousTaskRefValue.size() - 1) {
 				previousTaskRefValue.remove(currentIndex)
 				previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
 
-				parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+				def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
 
 				setDataWithPropagation(parentTask, [
 					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
@@ -93,24 +93,24 @@
 				return;
 			}
 
-			parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
 
 
-			previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
 
-			currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
 			previousTaskRefValue.remove(currentIndex)
 
 
-			previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
+			def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
 
-			currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
+			def currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
 
 			previousCaseRefValue.remove(currentIndex)
 
 
-			parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+			def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
 
 			setDataWithPropagation(parentTask, [
 				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
@@ -235,7 +235,7 @@
 					entryName: f.entry_name,
 					icon: f.icon_name;
 
-					filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+					def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 
 					change entryDefaultName value {return filterCase.title}
 
