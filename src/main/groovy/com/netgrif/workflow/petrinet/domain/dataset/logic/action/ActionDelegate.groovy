@@ -592,7 +592,6 @@ class ActionDelegate {
 
     List<Task> findTasks(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
-        QTask.task.tr
         Page<Task> result = taskService.searchAll(predicate(qTask))
         return result.content
     }
