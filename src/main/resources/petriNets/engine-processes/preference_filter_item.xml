@@ -105,7 +105,7 @@
 
 			def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
 
-			def currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
+			currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
 
 			previousCaseRefValue.remove(currentIndex)
 
