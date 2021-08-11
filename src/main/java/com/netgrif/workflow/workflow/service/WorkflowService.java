@@ -518,7 +518,7 @@ public class WorkflowService implements IWorkflowService {
 
         Case case$ = findOne(useCaseId);
         actions.forEach(action -> {
-            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty(), case$.getPetriNet().getProcessFunctions());
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty(), case$.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(changedFieldsTree);
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
@@ -560,7 +560,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
-            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty(), useCase.getPetriNet().getProcessFunctions());
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty(), useCase.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(currentChangedFields);
 
             if (currentChangedFields.getChangedFields().isEmpty())
@@ -575,7 +575,7 @@ public class WorkflowService implements IWorkflowService {
         log.info("Running actions without context on cases");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, Optional.empty(), petriNets.getProcessFunctions());
+            actionsRunner.run(action, null, Optional.empty(), petriNets.getFunctions());
         });
     }
 }
