@@ -3,7 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.domain.ElasticTask;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
@@ -84,6 +84,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private IProcessRoleService processRoleService;
+
+    @Autowired
+    private IElasticTaskMappingService taskMappingService;
 
     private IElasticTaskService elasticTaskService;
 
@@ -676,7 +679,7 @@ public class TaskService implements ITaskService {
     @Override
     public Task save(Task task) {
         task = taskRepository.save(task);
-        elasticTaskService.index(new ElasticTask(task));
+        elasticTaskService.index(this.taskMappingService.transform(task));
         return task;
     }
 
