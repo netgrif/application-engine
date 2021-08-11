@@ -34,6 +34,8 @@ services:
       MYSQL_DATABASE: nae_dev
       MYSQL_USER: netgrif_nae
       MYSQL_PASSWORD: netgrif_nae
+    volumes:
+      - ./docker-config:/docker-entrypoint-initdb.d
 
   docker-mongo:
     image: mongo:4.2
