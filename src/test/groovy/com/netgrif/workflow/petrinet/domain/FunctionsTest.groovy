@@ -47,6 +47,8 @@ class FunctionsTest {
 
     private static final FUNCTION_TEST_IDENTIFIER = "function_test"
 
+    private static final FUNCTION_OVERLOADING_IDENTIFIER = "function_overloading"
+
     @Value("classpath:petriNets/function_res.xml")
     private Resource functionResNetResource
 
@@ -58,6 +60,18 @@ class FunctionsTest {
 
     @Value("classpath:petriNets/function_test_v2.xml")
     private Resource functionTestNetResourceV2
+
+    @Value("classpath:petriNets/function_overloading.xml")
+    private Resource functionOverloadingNetResource
+
+    @Value("classpath:petriNets/function_overloading_v2.xml")
+    private Resource functionOverloadingNetResourceV2
+
+    @Value("classpath:petriNets/function_overloading_fail.xml")
+    private Resource functionOverloadingFailNetResource
+
+    @Value("classpath:petriNets/function_overloading_fail_v2.xml")
+    private Resource functionOverloadingFailNetResourceV2
 
     @Test
     void testNamespaceFunction() {
@@ -144,10 +158,45 @@ class FunctionsTest {
         assert aCase.getFieldValue("number2") == 20 * 20
     }
 
+    @Test(expected = Exception.class)
+    void testNamespaceMethodOverloadingFail() {
+        petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+    }
+
+    @Test
+    void testNamespaceMethodOverloading() {
+        testMethodOverloading(functionOverloadingNetResource)
+    }
+
+    @Test(expected = Exception.class)
+    void testProcessMethodOverloadingFail() {
+        petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+    }
+
+    @Test
+    void testProcessMethodOverloading() {
+        testMethodOverloading(functionOverloadingNetResourceV2)
+    }
+
+    private void testMethodOverloading(Resource resource) {
+        def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+
+        assert petriNet.isPresent()
+
+        Case aCase = workflowService.createCase(petriNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+        aCase = workflowService.findOne(aCase.getStringId())
+
+        assert aCase.getFieldValue("number2") == 20 * 20
+        assert aCase.getFieldValue("text") == "20.0 20.0"
+    }
+
     @After
     void after() {
         def resNets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
         resNets += petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
+        resNets += petriNetService.getByIdentifier(FUNCTION_OVERLOADING_IDENTIFIER)
+        
         if (!resNets) {
             resNets.each {
                 petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
