@@ -1,5 +1,6 @@
 package com.netgrif.workflow.importer.service;
 
+import com.netgrif.workflow.event.IGroovyShellFactory;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
@@ -31,6 +32,7 @@ import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
+import groovy.lang.Closure;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -100,6 +102,9 @@ public class Importer {
 
     @Autowired
     private ComponentFactory componentFactory;
+
+    @Autowired
+    private IGroovyShellFactory shellFactory;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -174,6 +179,7 @@ public class Importer {
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         document.getFunction().forEach(this::createFunction);
+        evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUsersRef);
@@ -230,7 +236,7 @@ public class Importer {
     @Transactional
     protected void resolveProcessEvents(ProcessEvents processEvents) {
         if (processEvents != null && processEvents.getEvent() != null) {
-           net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
+            net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
         }
     }
 
@@ -238,6 +244,15 @@ public class Importer {
     protected void resolveCaseEvents(CaseEvents caseEvents) {
         if (caseEvents != null && caseEvents.getEvent() != null) {
             net.setCaseEvents(createCaseEventsMap(caseEvents.getEvent()));
+        }
+    }
+
+    @Transactional
+    protected void evaluateFunctions() {
+        try {
+            actionsRunner.getActionCode((Closure) shellFactory.getGroovyShell().evaluate("{->}"), functions);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not evaluate functions: " + e.getMessage(), e);
         }
     }
 
