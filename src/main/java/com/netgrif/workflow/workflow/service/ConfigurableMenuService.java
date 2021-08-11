@@ -1,11 +1,9 @@
 package com.netgrif.workflow.workflow.service;
 
-import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
@@ -34,12 +32,12 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
         List<PetriNet> nets = petriNetRepository.findAll()
                 .stream()
-                .filter(n -> n.getAuthor().getId().equals(authorId))
+                .filter(n -> n.getAuthor().getId().equals(authorId) && !n.getRoles().isEmpty())
                 .collect(Collectors.toList());
 
         Map<String, I18nString> options = new HashMap<>();
 
-        for( PetriNet net : nets) {
+        for(PetriNet net : nets) {
             I18nString titleAndVersion = new I18nString(net.getTitle().toString() + " :" + net.getVersion().toString());
             options.put(net.getIdentifier(), titleAndVersion);
         }
@@ -48,38 +46,44 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     @Override
-    public Map<String, I18nString> getNetRoles (EnumerationMapField processField, String netId) {
-//    public Map<String, I18nString> getNetRoles (String netId, String netVersion) {
-//        String versionString = netVersion.split(":")[1];
+    public Map<String, I18nString> getNetRoles (EnumerationMapField processField, String netId, HashSet<String> addedRoleIds) {
 
         String versionString = processField.getOptions().get(netId).toString().split(":")[1];
         StringToVersionConverter converter = new StringToVersionConverter();
         Version version = converter.convert(versionString);
         PetriNet net = petriNetService.getPetriNet(netId, version);
 
-//        PetriNet net = petriNetService.getPetriNet(netId, version);
         Map<String, I18nString> roles = new HashMap<>();
 
         for (ProcessRole role : net.getRoles().values()) {
-            roles.put(role.getStringId(), role.getName());
+            if(!addedRoleIds.contains(role.getStringId())) roles.put(role.getStringId(), role.getName());
         }
-
         return roles;
     }
 
 
     @Override
-    public Map<String, String> addSelectedRoles(String netId, String netVersion, String roleId) {
+    public void removeSelectedRoles(MultichoiceMapField addedRoles) {
 
-        Map<String, String> selectedRoles = new HashMap<>();
-        return selectedRoles;
+        for(String roleId : addedRoles.getValue()) {
+            addedRoles.getOptions().remove(roleId);
+        }
     }
 
     @Override
-    public Map<String, String> addSelectedRoles(EnumerationMapField netField, MultichoiceMapField roles) {
+    public Map<String, I18nString> addSelectedRoles(MultichoiceMapField addedRoles, EnumerationMapField netField, MultichoiceMapField netRoles) {
 
+        /* key bude ID role (key z roles)
+           value zloz z 1.roles value + 2. netField value*/
 
-        Map<String, String> selectedRoles = new HashMap<>();
-        return selectedRoles;
+        String netAndVersion = " (" + netField.getOptions().get(netField.getValue()) + ")";
+        Map<String, I18nString> updatedRoles = addedRoles.getOptions();
+
+        for(String roleId : netRoles.getValue()) {
+            String roleNetVersion = netRoles.getOptions().get(roleId).toString() + netAndVersion;
+            updatedRoles.put(roleId, new I18nString(roleNetVersion));
+        }
+
+        return updatedRoles;
     }
 }
