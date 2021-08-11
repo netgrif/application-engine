@@ -58,18 +58,21 @@ abstract class FieldActionsRunner {
     }
 
     Closure getActionCode(Action action, List<Function> functions) {
-        def code = actionsCacheService.getCompiledAction(action)
+        return getActionCode(actionsCacheService.getCompiledAction(action), functions)
+    }
+
+    Closure getActionCode(Closure code, List<Function> functions) {
         def actionDelegate = getActionDeleget()
 
         if (functions) {
             actionsCacheService.getCachedFunctions(functions).each {
-                actionDelegate.metaClass."${it.function.name}" = it.code
+                actionDelegate.metaClass."${it.function.name}" << it.code
             }
         }
         actionsCacheService.getNamespaceFunctionCache().each { entry ->
             def namespace = new Object()
             entry.getValue().each {
-                namespace.metaClass."${it.function.name}" = it.code.rehydrate(actionDelegate, actionDelegate, actionDelegate)
+                namespace.metaClass."${it.function.name}" << it.code.rehydrate(actionDelegate, actionDelegate, actionDelegate)
             }
             actionDelegate.metaClass."${entry.key}" = namespace
         }

@@ -64,6 +64,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
                     .collect(Collectors.toList());
 
             if (!functions.isEmpty()) {
+                evaluateCachedFunctions(functions);
                 namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
             }
         }
@@ -93,7 +94,45 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             }
             cachedFunctions.add(functionsCache.get(function.getStringId()));
         });
+        try {
+            evaluateCachedFunctions(cachedFunctions);
+        } catch (IllegalArgumentException ex) {
+            cachedFunctions.forEach(cachedFunction -> functionsCache.remove(cachedFunction.getFunction().getStringId()));
+            throw ex;
+        }
         return cachedFunctions;
+    }
+
+    private void evaluateCachedFunctions(List<CachedFunction> cachedFunctions) {
+        cachedFunctions.stream()
+                .collect(Collectors.groupingBy(this::createKey))
+                .forEach((key, value) -> {
+                    if (value.size() > 1) {
+                        throw new IllegalArgumentException("Duplicate method signature " + key);
+                    }
+                });
+    }
+
+    private String createKey(CachedFunction cachedFunction) {
+        return cachedFunction.getFunction().getName() + arrayToString(cachedFunction.getCode().getParameterTypes());
+    }
+
+    private String arrayToString(Class[] a) {
+        if (a == null)
+            return "null";
+
+        int iMax = a.length - 1;
+        if (iMax == -1)
+            return "()";
+
+        StringBuilder b = new StringBuilder();
+        b.append('(');
+        for (int i = 0; ; i++) {
+            b.append(a[i].getName());
+            if (i == iMax)
+                return b.append(')').toString();
+            b.append(", ");
+        }
     }
 
     @Override
