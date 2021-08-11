@@ -91,7 +91,7 @@ class AuthenticationControllerTest {
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
         group = importHelper.createGroup(GROUP_NAME)
-        processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+        processRoles = importHelper.getProcessRoles(net.get())
     }
 
     @Test
@@ -107,7 +107,7 @@ class AuthenticationControllerTest {
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
         String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.lastIndexOf(" This is"))
 
-        controller.signup(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
+        controller.signup(new RegistrationRequest(token: token, name: NAME, surname: SURNAME, password: PASSWORD))
 
         User user = userRepository.findByEmail(EMAIL)
         Member member = memberRepository.findByEmail(EMAIL)
