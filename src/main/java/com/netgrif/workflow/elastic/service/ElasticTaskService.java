@@ -93,6 +93,14 @@ public class ElasticTaskService implements IElasticTaskService {
         });
     }
 
+    @Override
+    public void removeByPetriNetId(String petriNetId) {
+        executor.execute(() -> {
+            repository.deleteAllByProcessId(petriNetId);
+            log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
+        });
+    }
+
     @Async
     @Override
     public void index(ElasticTask task) {
@@ -218,7 +226,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildRoleQuery(request, userRoleQuery);
         buildNegativeViewRoleQuery(userRoleQuery, user);
