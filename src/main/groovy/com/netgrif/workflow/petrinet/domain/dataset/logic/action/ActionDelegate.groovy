@@ -962,11 +962,23 @@ class ActionDelegate {
         return res;
     }
 
-    Map<String, I18nString> getRolesByNet (EnumerationMapField field) {
+    Map<String, I18nString> getRolesByNet (EnumerationMapField field, HashSet addedRoleIds) {
         String selectedProcessName = field.value
-        Map<String, I18nString> res = configurableMenuService.getNetRoles(field, selectedProcessName)
+        Map<String, I18nString> res = configurableMenuService.getNetRoles(field, selectedProcessName, addedRoleIds)
+        //TODO volat funkcie rovno zo siete
         return res;
     }
 
+
+    Map<String, I18nString> addRoles (MultichoiceMapField addedRoles, EnumerationMapField enumNetField, MultichoiceMapField multiRolesField) {
+        Map<String, I18nString> res = configurableMenuService.addSelectedRoles(addedRoles, enumNetField, multiRolesField)
+        return res;
+        //TODO check ako sa dostat k vybranym roliam multichoicu
+    }
+
+    Map<String, I18nString> removeRoles (MultichoiceMapField addedRoles) {
+        Map<String, I18nString> res = configurableMenuService.removeSelectedRoles(addedRoles)
+        return res;
+    }
 
 }
