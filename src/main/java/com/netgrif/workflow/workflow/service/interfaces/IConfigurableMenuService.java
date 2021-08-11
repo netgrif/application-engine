@@ -5,14 +5,15 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceMapField;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public interface IConfigurableMenuService {
 
     Map<String, I18nString> getNetsByAuthor(Long authorId);
-    Map<String, I18nString> getNetRoles (EnumerationMapField field, String value);
-    Map<String, String> addSelectedRoles(String netId, String netVersion, String roleId);
-    Map<String, String> addSelectedRoles(EnumerationMapField netField, MultichoiceMapField roles);
+    Map<String, I18nString> getNetRoles (EnumerationMapField field, String value, HashSet<String> addedRoleIds);
+    Map<String, I18nString> addSelectedRoles(MultichoiceMapField selected, EnumerationMapField netField, MultichoiceMapField roles);
+    void removeSelectedRoles(MultichoiceMapField addedRoles);
 
 }
