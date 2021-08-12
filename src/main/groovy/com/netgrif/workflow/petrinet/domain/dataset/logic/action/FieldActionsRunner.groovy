@@ -38,11 +38,11 @@ abstract class FieldActionsRunner {
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
 
-    ChangedFieldsTree run(Action action, Case useCase, List<Function> functions) {
+    ChangedFieldsTree run(Action action, Case useCase, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), functions)
     }
 
-    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task, List<Function> functions) {
+    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
@@ -60,18 +60,16 @@ abstract class FieldActionsRunner {
 
     Closure getActionCode(Action action, List<Function> functions) {
         def code
+        def shell = this.shellFactory.getGroovyShell()
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
         } else {
-            code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${action.definition}}")
+            code = (Closure) shell.evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
         def actionDelegate = getActionDeleget()
-        if (functions) {
-            def shell = this.shellFactory.getGroovyShell()
-            functions.each {
-                actionDelegate.metaClass."${it.name}" = (Closure) shell.evaluate(it.definition)
-            }
+        functions.each {
+            actionDelegate.metaClass."${it.name}" = (Closure) shell.evaluate(it.definition)
         }
         return code.rehydrate(actionDelegate, code.owner, code.thisObject)
     }
