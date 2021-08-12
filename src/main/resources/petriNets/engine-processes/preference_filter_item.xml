@@ -177,7 +177,9 @@
 			processesAvailable: f.processes_available,
 			rolesAvailable: f.roles_available;
 
+<!--			change addedRoles value {[]}-->
 			change addedRoles options {return addRoles(addedRoles, processesAvailable, rolesAvailable)}
+			change rolesAvailable value {[]}
 			change rolesAvailable options {[:]}
 			change processesAvailable value {null}
 <!--		TODO premenovat processToSelect a rolesToSelect-->
@@ -192,8 +194,10 @@
 			processesAvailable: f.processes_available,
 			rolesAvailable: f.roles_available;
 
-			removeRoles(addedRoles)
-			change rolesAvailable value {null}
+			change addedRoles options {return removeRoles(addedRoles)}
+			change addedRoles value {[]}
+
+			change rolesAvailable value {[]}
 			change rolesAvailable options {[:]}
 
 			change processesAvailable value {null}
@@ -214,7 +218,7 @@
 			addedRoles: f.added_roles,
 			rolesAvailable: f.roles_available;
 
-			change rolesAvailable options {return getRolesByNet(processes, addedRoles.getValue())}
+			change rolesAvailable options {return getRolesByNet(processes, addedRoles)}
 			change rolesAvailable value {null}
 			<!--			change roles options {return configurableMenuService.getNetRoles(processes)}-->
 		</action>
@@ -225,7 +229,7 @@
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>added_roles</id>
-		<title name="roles_selected">Added roles</title>
+		<title name="roles_added">Added roles</title>
 	</data>
 
 <!--	<data type="boolean">-->
