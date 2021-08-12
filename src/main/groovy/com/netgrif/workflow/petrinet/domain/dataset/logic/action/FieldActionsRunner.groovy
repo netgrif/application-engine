@@ -37,11 +37,11 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
-    ChangedFieldsTree run(Action action, Case useCase, List<Function> functions) {
+    ChangedFieldsTree run(Action action, Case useCase, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), functions)
     }
 
-    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task, List<Function> functions) {
+    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task, List<Function> functions = []) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
@@ -64,10 +64,8 @@ abstract class FieldActionsRunner {
     Closure getActionCode(Closure code, List<Function> functions) {
         def actionDelegate = getActionDeleget()
 
-        if (functions) {
-            actionsCacheService.getCachedFunctions(functions).each {
-                actionDelegate.metaClass."${it.function.name}" << it.code
-            }
+        actionsCacheService.getCachedFunctions(functions).each {
+            actionDelegate.metaClass."${it.function.name}" << it.code
         }
         actionsCacheService.getNamespaceFunctionCache().each { entry ->
             def namespace = new Object()
