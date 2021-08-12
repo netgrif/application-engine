@@ -213,9 +213,6 @@ public class Importer {
     @Transactional
     protected void createFunction(com.netgrif.workflow.importer.model.Function function) {
         com.netgrif.workflow.petrinet.domain.Function fun = functionFactory.getFunction(function);
-
-        fun.setObjectId(new ObjectId());
-        fun.setImportId(fun.getObjectId().toString());
         
         net.addFunction(fun);
         functions.add(fun);
