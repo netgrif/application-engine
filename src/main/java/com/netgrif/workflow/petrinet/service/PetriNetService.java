@@ -382,7 +382,7 @@ public class PetriNetService implements IPetriNetService {
         this.repository.deleteBy_id(petriNet.getObjectId());
         this.cache.remove(petriNet.getObjectId());
         // net functions must by removed from cache after it was deleted from repository
-        this.functionCacheService.removeCachePetriNetFunctions(petriNet);
+        this.functionCacheService.reloadCachedFunctions(petriNet);
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
