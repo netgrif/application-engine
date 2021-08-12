@@ -1,6 +1,5 @@
 package com.netgrif.workflow.importer.service;
 
-import com.netgrif.workflow.event.IGroovyShellFactory;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
@@ -32,7 +31,7 @@ import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
-import groovy.lang.Closure;
+import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -104,7 +103,7 @@ public class Importer {
     private ComponentFactory componentFactory;
 
     @Autowired
-    private IGroovyShellFactory shellFactory;
+    private IFieldActionsCacheService actionsCacheService;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -247,7 +246,7 @@ public class Importer {
     @Transactional
     protected void evaluateFunctions() {
         try {
-            actionsRunner.getActionCode((Closure) shellFactory.getGroovyShell().evaluate("{->}"), functions);
+            actionsCacheService.evaluateFunctions(functions);
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not evaluate functions: " + e.getMessage(), e);
         }
