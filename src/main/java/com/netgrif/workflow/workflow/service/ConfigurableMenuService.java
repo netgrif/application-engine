@@ -46,7 +46,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     @Override
-    public Map<String, I18nString> getNetRoles (EnumerationMapField processField, String netId, HashSet<String> addedRoleIds) {
+    public Map<String, I18nString> getNetRoles (EnumerationMapField processField, String netId, MultichoiceMapField addedRoles) {
 
         String versionString = processField.getOptions().get(netId).toString().split(":")[1];
         StringToVersionConverter converter = new StringToVersionConverter();
@@ -56,18 +56,20 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         Map<String, I18nString> roles = new HashMap<>();
 
         for (ProcessRole role : net.getRoles().values()) {
-            if(!addedRoleIds.contains(role.getStringId())) roles.put(role.getStringId(), role.getName());
+            if(!addedRoles.getOptions().containsKey(role.getStringId())) roles.put(role.getStringId(), role.getName());
         }
         return roles;
     }
 
 
     @Override
-    public void removeSelectedRoles(MultichoiceMapField addedRoles) {
+    public Map<String, I18nString> removeSelectedRoles(MultichoiceMapField addedRoles) {
 
         for(String roleId : addedRoles.getValue()) {
             addedRoles.getOptions().remove(roleId);
         }
+
+        return addedRoles.getOptions();
     }
 
     @Override
