@@ -61,7 +61,7 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
         if (petriNet == null) {
             return;
         }
-        
+
         List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.NAMESPACE).stream()
                 .map(function -> CachedFunction.build(shell, function))
                 .collect(Collectors.toList());
@@ -69,11 +69,13 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
         if (!functions.isEmpty()) {
             evaluateCachedFunctions(functions);
             namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
+        } else {
+            namespaceFunctionsCache.remove(petriNet.getIdentifier());
         }
     }
 
     @Override
-    public void removeCachePetriNetFunctions(PetriNet petriNet) {
+    public void reloadCachedFunctions(PetriNet petriNet) {
         namespaceFunctionsCache.remove(petriNet.getIdentifier());
         cachePetriNetFunctions(petriNetService.getNewestVersionByIdentifier(petriNet.getIdentifier()));
     }
@@ -96,13 +98,12 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
             }
             cachedFunctions.add(functionsCache.get(function.getStringId()));
         });
-        try {
-            evaluateCachedFunctions(cachedFunctions);
-        } catch (IllegalArgumentException ex) {
-            cachedFunctions.forEach(cachedFunction -> functionsCache.remove(cachedFunction.getFunction().getStringId()));
-            throw ex;
-        }
         return cachedFunctions;
+    }
+
+    @Override
+    public void evaluateFunctions(List<Function> functions) {
+        evaluateCachedFunctions(functions.stream().map(function -> CachedFunction.build(shell, function)).collect(Collectors.toList()));
     }
 
     private void evaluateCachedFunctions(List<CachedFunction> cachedFunctions) {
@@ -116,10 +117,10 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     private String createKey(CachedFunction cachedFunction) {
-        return cachedFunction.getFunction().getName() + arrayToString(cachedFunction.getCode().getParameterTypes());
+        return cachedFunction.getFunction().getName() + stringifyParameterTypes(cachedFunction.getCode().getParameterTypes());
     }
 
-    private String arrayToString(Class[] a) {
+    private String stringifyParameterTypes(Class[] a) {
         if (a == null)
             return "null";
 
