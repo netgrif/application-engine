@@ -378,6 +378,7 @@ public class PetriNetService implements IPetriNetService {
 
         log.info("[" + processId + "]: Deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());
+        this.cache.remove(petriNet.getObjectId());
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
