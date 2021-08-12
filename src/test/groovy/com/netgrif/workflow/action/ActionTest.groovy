@@ -1,6 +1,6 @@
 package com.netgrif.workflow.action
 
-import com.netgrif.workflow.ipc.CaseApiTest
+
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner
 import com.netgrif.workflow.workflow.domain.Case
@@ -30,6 +30,6 @@ class ActionTest {
             println LocalDate.MAX
             println new ObjectId().toString()
         ''', "set")
-        runner.run(testAction, dummy, Optional.of(task), null)
+        runner.run(testAction, dummy, Optional.of(task))
     }
 }
