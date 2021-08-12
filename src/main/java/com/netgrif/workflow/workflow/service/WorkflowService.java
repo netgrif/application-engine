@@ -308,18 +308,9 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
         log.info("[" + net.getStringId() + "]: Deleting all cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<Case> cases = repository.findAllByPetriNetObjectId(net.getObjectId());
 
-        for (Case c : cases) {
-            log.info("[" + c.getStringId() + "]: Deleting case " + c.getTitle());
-            taskService.deleteTasksByCase(c.getStringId());
-        }
-
+        taskService.deleteTasksByPetriNetId(net.getStringId());
         repository.deleteAllByPetriNetObjectId(net.getObjectId());
-
-        for (Case c : cases) {
-            publisher.publishEvent(new DeleteCaseEvent(c));
-        }
     }
 
     @Override
