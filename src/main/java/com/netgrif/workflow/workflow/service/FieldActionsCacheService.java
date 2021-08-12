@@ -58,15 +58,17 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
 
     @Override
     public void cachePetriNetFunctions(PetriNet petriNet) {
-        if (petriNet != null) {
-            List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.NAMESPACE).stream()
-                    .map(function -> CachedFunction.build(shell, function))
-                    .collect(Collectors.toList());
+        if (petriNet == null) {
+            return;
+        }
+        
+        List<CachedFunction> functions = petriNet.getFunctions(FunctionScope.NAMESPACE).stream()
+                .map(function -> CachedFunction.build(shell, function))
+                .collect(Collectors.toList());
 
-            if (!functions.isEmpty()) {
-                evaluateCachedFunctions(functions);
-                namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
-            }
+        if (!functions.isEmpty()) {
+            evaluateCachedFunctions(functions);
+            namespaceFunctionsCache.put(petriNet.getIdentifier(), functions);
         }
     }
 
