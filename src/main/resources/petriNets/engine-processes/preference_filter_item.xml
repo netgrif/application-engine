@@ -193,7 +193,9 @@
 			rolesAvailable: f.roles_available;
 
 			removeRoles(addedRoles)
+			change rolesAvailable value {null}
 			change rolesAvailable options {[:]}
+
 			change processesAvailable value {null}
 		</action>
 	</data>
@@ -210,10 +212,10 @@
 		<action trigger="set">
 			processes: f.this,
 			addedRoles: f.added_roles,
-			roles: f.roles_available;
+			rolesAvailable: f.roles_available;
 
-			change roles options {return getRolesByNet(processes, addedRoles.getValue())}
-			change roles value {null}
+			change rolesAvailable options {return getRolesByNet(processes, addedRoles.getValue())}
+			change rolesAvailable value {null}
 			<!--			change roles options {return configurableMenuService.getNetRoles(processes)}-->
 		</action>
 	</data>
