@@ -11,6 +11,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -73,6 +74,11 @@ class FunctionsTest {
     @Value("classpath:petriNets/function_overloading_fail_v2.xml")
     private Resource functionOverloadingFailNetResourceV2
 
+    @Before
+    void before() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void testNamespaceFunction() {
         assert userService.findByEmail("test@test.com", true) == null
@@ -110,7 +116,7 @@ class FunctionsTest {
         petriNetService.deletePetriNet(functionTestNet.get().stringId, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = NullPointerException.class)
     void testNamespaceFunctionException() {
         def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
         if (nets) {
@@ -126,7 +132,28 @@ class FunctionsTest {
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = NullPointerException.class)
+    void testNewNetVersionMissingMethodException() {
+        def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
+        if (nets) {
+            nets.each {
+                petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+            }
+        }
+
+        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        assert functionTestNet.isPresent()
+
+        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+
+        functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        assert functionTestNet.isPresent()
+
+        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+    }
+
+    @Test(expected = MissingMethodException.class)
     void testProcessFunctionException() {
         def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
         assert functionTestNet.isPresent()
@@ -158,7 +185,7 @@ class FunctionsTest {
         assert aCase.getFieldValue("number2") == 20 * 20
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = IllegalArgumentException.class)
     void testNamespaceMethodOverloadingFail() {
         petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
     }
@@ -168,7 +195,7 @@ class FunctionsTest {
         testMethodOverloading(functionOverloadingNetResource)
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = IllegalArgumentException.class)
     void testProcessMethodOverloadingFail() {
         petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
     }
@@ -193,14 +220,6 @@ class FunctionsTest {
 
     @After
     void after() {
-        def resNets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
-        resNets += petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
-        resNets += petriNetService.getByIdentifier(FUNCTION_OVERLOADING_IDENTIFIER)
-        
-        if (!resNets) {
-            resNets.each {
-                petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
-            }
-        }
+        testHelper.truncateDbs()
     }
 }

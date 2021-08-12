@@ -66,7 +66,21 @@
             }
         }
     </function>
+    <function scope="namespace" name="foo">
+        { def foo ->
+            return foo
+        }
+    </function>
     <!-- DATA -->
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <action trigger="set">
+            text: f.text;
+
+            function_test.foo(text.value)
+        </action>
+    </data>
     <data type="number">
         <id>number</id>
         <title>Number</title>
