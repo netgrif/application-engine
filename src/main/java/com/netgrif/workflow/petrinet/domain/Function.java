@@ -23,6 +23,7 @@ public class Function extends PetriNetObject {
 
     public Function() {
         this.setObjectId(new ObjectId());
+        this.setImportId(this.getObjectId().toString());
     }
 
     public Function clone() {
