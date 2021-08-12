@@ -380,6 +380,7 @@ public class PetriNetService implements IPetriNetService {
 
         log.info("[" + processId + "]: Deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());
+        this.cache.remove(petriNet.getObjectId());
         // net functions must by removed from cache after it was deleted from repository
         this.functionCacheService.removeCachePetriNetFunctions(petriNet);
     }
