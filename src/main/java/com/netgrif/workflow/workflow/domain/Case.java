@@ -266,4 +266,14 @@ public class Case {
             }
         });
     }
+
+    public Set<String> getViewRoles() {
+        Set<String> roles = new HashSet<>();
+        this.permissions.forEach((role, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                roles.add(role);
+            }
+        });
+        return roles;
+    }
 }
