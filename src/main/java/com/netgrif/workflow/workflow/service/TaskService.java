@@ -802,6 +802,11 @@ public class TaskService implements ITaskService {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
     }
 
+    @Override
+    public void deleteTasksByPetriNetId(String petriNetId) {
+        taskRepository.deleteAllByProcessId(petriNetId);
+    }
+
     private void setUser(Task task) {
         if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
