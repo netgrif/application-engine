@@ -27,8 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FieldActionsCacheService implements IFieldActionsCacheService {
 
-    @Autowired
-    private FieldActionsCacheProperties properties;
+    private final FieldActionsCacheProperties properties;
 
     private IPetriNetService petriNetService;
 
@@ -37,7 +36,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     private Map<String, CachedFunction> functionsCache;
     private final GroovyShell shell;
 
-    public FieldActionsCacheService(IGroovyShellFactory shellFactory) {
+    public FieldActionsCacheService(FieldActionsCacheProperties properties, IGroovyShellFactory shellFactory) {
+        this.properties = properties;
         this.actionsCache = new MaxSizeHashMap<>(properties.getActions());
         this.functionsCache = new MaxSizeHashMap<>(properties.getFunctions());
         this.namespaceFunctionsCache = new MaxSizeHashMap<>(properties.getNamespaceFunctions());
