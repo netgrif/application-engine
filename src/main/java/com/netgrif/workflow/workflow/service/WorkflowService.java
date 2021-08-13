@@ -113,14 +113,14 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-
+        resolveUserRef(useCase);
+        taskService.resolveUserRef(useCase);
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
-        resolveUserRef(useCase);
         return useCase;
     }
 
@@ -196,7 +196,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
@@ -237,16 +237,18 @@ public class WorkflowService implements IWorkflowService {
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    if (role.getValue().containsKey("delete"))
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete")));
+                    else
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("view", role.getValue().get("view")));
+                })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
-        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        );
+        useCase.setUserRefs(petriNet.getUserRefs());
+
         useCase.setTitle(makeTitle.apply(useCase));
         runActions(petriNet.getPreCreateActions(), petriNet.getFunctions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
