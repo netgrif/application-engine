@@ -138,6 +138,42 @@
         </layout>
         <label>read_place_ref</label>
     </transition>
+	<transition>
+		<id>var_arc_out</id>
+		<x>186</x>
+		<y>853</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>var_arc_out</label>
+	</transition>
+	<transition>
+		<id>place_ref_arc_out</id>
+		<x>182</x>
+		<y>939</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>place_ref_arc_out</label>
+	</transition>
+	<transition>
+		<id>add_tokens</id>
+		<x>691</x>
+		<y>100</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>add_tokens</label>
+	</transition>
+	<transition>
+		<id>remove_tokens</id>
+		<x>943</x>
+		<y>100</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>remove_tokens</label>
+	</transition>
     <!-- PLACES -->
     <place>
         <id>regular_var_start</id>
@@ -336,6 +372,22 @@
         <x>1258</x>
         <y>449</y>
         <label>read_place_ref_res</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>var_arc_out_end</id>
+		<x>460</x>
+		<y>849</y>
+		<label>var_arc_out_end</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>place_ref_arc_out_end</id>
+		<x>456</x>
+		<y>941</y>
+		<label>place_ref_arc_out_end</label>
         <tokens>0</tokens>
         <static>false</static>
     </place>
@@ -396,7 +448,7 @@
         <type>reset</type>
         <sourceId>reset_var_start</sourceId>
         <destinationId>reset_var</destinationId>
-        <multiplicity>1</multiplicity>
+		<multiplicity>2</multiplicity>
         <reference>reset_var</reference>
     </arc>
     <arc>
@@ -404,7 +456,7 @@
         <type>reset</type>
         <sourceId>reset_place_ref_start</sourceId>
         <destinationId>reset_place_ref</destinationId>
-        <multiplicity>1</multiplicity>
+		<multiplicity>2</multiplicity>
         <reference>p9</reference>
     </arc>
     <arc>
@@ -515,5 +567,35 @@
         <sourceId>inhib_place_ref</sourceId>
         <destinationId>inhib_place_ref_res</destinationId>
         <multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>var_arc_out</sourceId>
+		<destinationId>var_arc_out_end</destinationId>
+		<multiplicity>2</multiplicity>
+		<reference>regular_var</reference>
+	</arc>
+	<arc>
+		<id>a26</id>
+		<type>regular</type>
+		<sourceId>place_ref_arc_out</sourceId>
+		<destinationId>place_ref_arc_out_end</destinationId>
+		<multiplicity>2</multiplicity>
+		<reference>p9</reference>
+	</arc>
+	<arc>
+		<id>a27</id>
+		<type>regular</type>
+		<sourceId>add_tokens</sourceId>
+		<destinationId>p9</destinationId>
+		<multiplicity>800</multiplicity>
+	</arc>
+	<arc>
+		<id>a28</id>
+		<type>regular</type>
+		<sourceId>p9</sourceId>
+		<destinationId>remove_tokens</destinationId>
+		<multiplicity>800</multiplicity>
     </arc>
 </document>
