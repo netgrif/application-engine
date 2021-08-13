@@ -695,7 +695,7 @@ public class TaskService implements ITaskService {
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 task.addUsers(new HashSet<>(userIds), permission);
@@ -745,7 +745,7 @@ public class TaskService implements ITaskService {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
-        transition.getNegativeViewRoles().forEach((roleId) -> task.addNegativeViewRole(roleId));
+        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
 
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());

@@ -67,6 +67,9 @@ public class ElasticTask {
     private Set<String> roles;
 
     @Field(type = Keyword)
+    private Set<String> userRefs;
+
+    @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
     @Field(type = Keyword)
@@ -100,6 +103,7 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
+        this.userRefs = task.getUserRefs().keySet();
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.users = task.getUsers().keySet();
         this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
@@ -114,6 +118,7 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
+        this.userRefs = task.getUserRefs();
         this.negativeViewRoles = task.getNegativeViewRoles();
         this.users = task.getUsers();
         this.negativeViewUsers = task.getNegativeViewUsers();
