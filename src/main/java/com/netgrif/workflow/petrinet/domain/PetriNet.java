@@ -114,6 +114,10 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, Map<String, Boolean>> userRefs;
 
+    @Getter
+    @Setter
+    private List<Function> functions;
+
     @Transient
     private boolean initialized;
 
@@ -142,6 +146,7 @@ public class PetriNet extends PetriNetObject {
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
+        functions = new LinkedList<>();
     }
 
     public void addPlace(Place place) {
@@ -165,6 +170,8 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+
+    public void addFunction(Function function) { functions.add(function); }
 
     public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
@@ -405,6 +412,7 @@ public class PetriNet extends PetriNetObject {
         clone.setPermissions(this.permissions);
         clone.setUserRefs(this.userRefs);
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
+        this.getFunctions().forEach(clone::addFunction);
         return clone;
     }
 }

@@ -165,10 +165,10 @@ public class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(author, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
-        runActions(net.getPreUploadActions(), net.getStringId());
+        runActions(net.getPreUploadActions(), net);
         evaluateRules(net, EventPhase.PRE);
         save(net);
-        runActions(net.getPostUploadActions(), net.getStringId());
+        runActions(net.getPostUploadActions(), net);
         evaluateRules(net, EventPhase.POST);
         save(net);
         cache.put(net.getObjectId(), net);
@@ -401,11 +401,11 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public void runActions(List<Action> actions, String netId) {
-        log.info("Running actions of net [" + netId + "]");
+    public void runActions(List<Action> actions, PetriNet petriNet) {
+        log.info("Running actions of net [" + petriNet.getStringId() + "]");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null);
+            actionsRunner.run(action, null, petriNet.getFunctions());
         });
     }
 
