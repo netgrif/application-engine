@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "nae.field-runner.cache-size")
 public class FieldActionsCacheProperties {
 
-    private Long actions;
+    private Long actions = 500L;
 
-    private Long functions;
+    private Long functions = 500L;
 
-    private Long namespaceFunctions;
+    private Long namespaceFunctions = 500L;
 }
