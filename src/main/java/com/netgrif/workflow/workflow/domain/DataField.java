@@ -199,6 +199,11 @@ public class DataField implements Referencable {
 
     @Override
     public int getMultiplicity() {
-        return (int) Double.parseDouble(String.valueOf(value));
+        double parsedValue = Double.parseDouble(String.valueOf(value));
+        if(parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)){
+            return (int) Double.parseDouble(String.valueOf(value));
+        } else {
+            throw new IllegalArgumentException("Variable arc must be an non negative integer");
+        }
     }
 }

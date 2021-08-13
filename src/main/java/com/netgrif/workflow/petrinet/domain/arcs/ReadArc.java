@@ -18,7 +18,7 @@ public class ReadArc extends PTArc {
      */
     @Override
     public boolean isExecutable() {
-        if(this.reference != null) multiplicity = this.reference.getReferencable().getMultiplicity();
+        if(this.reference != null) multiplicity = this.reference.getMultiplicity();
         return ((Place) source).getTokens() >= multiplicity;
     }
 
