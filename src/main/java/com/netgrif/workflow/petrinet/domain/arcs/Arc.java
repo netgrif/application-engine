@@ -15,19 +15,23 @@ public class Arc extends PetriNetObject {
     @Transient
     protected Node source;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected String sourceId;
 
     @Transient
     protected Node destination;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected String destinationId;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected Integer multiplicity;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected Reference reference;
 
     public Arc() {
@@ -79,11 +83,8 @@ public class Arc extends PetriNetObject {
     }
 
     public void execute() {
-        if(reference != null) {
-            if(reference.getReferencable().getMultiplicity() < 0) {
-                throw new IllegalArgumentException("Arc multiplicity cannot be less than 0, referenced object id: " + reference.getReference());
-            }
-            multiplicity = reference.getReferencable().getMultiplicity();
+        if (reference != null) {
+            multiplicity = reference.getMultiplicity();
         }
         if (source instanceof Transition) {
             ((Place) destination).addTokens(multiplicity);
@@ -93,14 +94,17 @@ public class Arc extends PetriNetObject {
     }
 
     public void rollbackExecution(Integer tokensConsumed) {
-        if(tokensConsumed == null) {
+        if (tokensConsumed == null && this.reference != null) {
+            throw new IllegalArgumentException("Cannot rollback variable arc, because it was never executed");
+        }
+        if (this.reference == null) {
             tokensConsumed = multiplicity;
         }
         ((Place) source).addTokens(tokensConsumed);
     }
 
     @SuppressWarnings("Duplicates")
-    public Arc clone(){
+    public Arc clone() {
         Arc clone = new Arc();
         clone.setSourceId(this.sourceId);
         clone.setDestinationId(this.destinationId);

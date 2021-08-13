@@ -294,17 +294,8 @@ public class TaskService implements ITaskService {
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> {
-                    if (arc instanceof ResetArc) {
-                        arc.rollbackExecution(useCase.getResetArcTokens().get(arc.getStringId()));
-                        useCase.getResetArcTokens().remove(arc.getStringId());
-                    } else if (arc.getReference() != null){
-                        arc.rollbackExecution(useCase.getVarArcsTokens().get(arc.getStringId()));
-                        useCase.getVarArcsTokens().remove(arc.getStringId());
-                    } else if(arc instanceof ReadArc || arc instanceof InhibitorArc) {
-                        arc.rollbackExecution(0);
-                    } else {
-                        arc.rollbackExecution(arc.getMultiplicity());
-                    }
+                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
+                    useCase.getConsumedTokens().remove(arc.getStringId());
                 });
         workflowService.updateMarking(useCase);
 
@@ -451,8 +442,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCaseId + "]: Finish execution of task [" + transition.getTitle() + "] in case [" + useCase.getTitle() + "]");
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
         Supplier<Stream<Arc>> arcStreamSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream();
-        arcStreamSupplier.get().filter(ResetArc.class::isInstance).forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
-        arcStreamSupplier.get().filter(arc -> useCase.getVarArcsTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getVarArcsTokens().remove(arc.getStringId()));
+        arcStreamSupplier.get().filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
         workflowService.save(useCase);
     }
 
@@ -471,10 +461,10 @@ public class TaskService implements ITaskService {
 
         filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
             if (arc instanceof ResetArc) {
-                useCase.getResetArcTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+                useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
             }
             if(arc.getReference() != null && arc.getSource() instanceof Place){
-                useCase.getVarArcsTokens().put(arc.getStringId(), arc.getReference().getReferencable().getMultiplicity());
+                useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
             }
             arc.execute();
         });

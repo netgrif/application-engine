@@ -43,13 +43,8 @@ class ArcReferenceTest {
         assert net
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     void testInvalidReference() {
-        try {
-            importer.importPetriNet(stream(NET_INVALID_FILE)).get()
-            assert false
-        } catch(IllegalArgumentException ignored) {
-            assert true
-        }
+        importer.importPetriNet(stream(NET_INVALID_FILE)).get()
     }
 }

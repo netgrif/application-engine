@@ -99,16 +99,9 @@ public class Case {
     @Indexed
     private Author author;
 
-    /**
-     * TODO: reset = variable
-     */
     @Getter
     @Setter
-    private Map<String, Integer> resetArcTokens;
-
-    @Getter
-    @Setter
-    private Map<String, Integer> varArcsTokens;
+    private Map<String, Integer> consumedTokens;
 
     @Getter
     @Setter
@@ -145,8 +138,7 @@ public class Case {
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
-        resetArcTokens = new HashMap<>();
-        varArcsTokens = new HashMap<>();
+        consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
