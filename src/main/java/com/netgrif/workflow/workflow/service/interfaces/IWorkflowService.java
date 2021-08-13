@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.Function;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -67,5 +68,5 @@ public interface IWorkflowService {
 
     ChangedFieldsTree runActions(List<Action> actions, String useCaseId);
 
-    void runActions(List<Action> actions);
+    void runActions(List<Action> actions, List<Function> functions);
 }
