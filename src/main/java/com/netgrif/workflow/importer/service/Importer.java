@@ -348,7 +348,7 @@ public class Importer {
         arc.setDestination(getNode(importArc.getDestinationId()));
         if (importArc.getReference() != null) {
             if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
-                throw new IllegalArgumentException("Place of Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
+                throw new IllegalArgumentException("Place or Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
             }
             Reference reference = new Reference();
             reference.setReference(importArc.getReference());

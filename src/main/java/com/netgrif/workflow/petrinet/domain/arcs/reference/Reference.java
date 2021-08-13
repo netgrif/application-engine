@@ -22,4 +22,12 @@ public class Reference {
         this.reference = reference;
         this.type = type;
     }
+
+    public int getMultiplicity() {
+        int multiplicity = this.referencable.getMultiplicity();
+        if (multiplicity < 0) {
+            throw new IllegalStateException("Referenced object " + reference + " has invalid multiplicity: " + multiplicity);
+        }
+        return multiplicity;
+    }
 }

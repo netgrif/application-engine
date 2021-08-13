@@ -1,8 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.arcs;
 
 import com.netgrif.workflow.petrinet.domain.Place;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Reset arc does not alter the enabling condition, but involve a change of the marking on <i>p</i> by firing of <i>t</i>:
