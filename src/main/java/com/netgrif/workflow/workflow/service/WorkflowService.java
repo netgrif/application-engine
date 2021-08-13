@@ -257,7 +257,7 @@ public class WorkflowService implements IWorkflowService {
         publisher.publishEvent(new CreateCaseEvent(useCase));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
-        useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
+        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
         useCase = findOne(useCase.getStringId());
         resolveTaskRefs(useCase);
@@ -499,7 +499,7 @@ public class WorkflowService implements IWorkflowService {
     private void setPetriNet(Case useCase) {
         PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
         model.initializeTokens(useCase.getActivePlaces());
-        model.initializeVarArcs(useCase.getDataSet());
+        model.initializeArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
     }
 
