@@ -10,7 +10,6 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -216,10 +215,5 @@ class FunctionsTest {
 
         assert aCase.getFieldValue("number2") == 20 * 20
         assert aCase.getFieldValue("text") == "20.0 20.0"
-    }
-
-    @After
-    void after() {
-        testHelper.truncateDbs()
     }
 }
