@@ -29,7 +29,6 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> getNetsByAuthor(Long authorId){
 
-
         List<PetriNet> nets = petriNetRepository.findAll()
                 .stream()
                 .filter(n -> n.getAuthor().getId().equals(authorId) && !n.getRoles().isEmpty())
@@ -46,8 +45,9 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     @Override
-    public Map<String, I18nString> getNetRoles (EnumerationMapField processField, String netId, MultichoiceMapField addedRoles) {
+    public Map<String, I18nString> getAvailableRolesFromNet (EnumerationMapField processField, MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles) {
 
+        String netId = processField.getValue();
         String versionString = processField.getOptions().get(netId).toString().split(":")[1];
         StringToVersionConverter converter = new StringToVersionConverter();
         Version version = converter.convert(versionString);
@@ -56,7 +56,10 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         Map<String, I18nString> roles = new HashMap<>();
 
         for (ProcessRole role : net.getRoles().values()) {
-            if(!addedRoles.getOptions().containsKey(role.getStringId())) roles.put(role.getStringId(), role.getName());
+            if (!permittedRoles.getOptions().containsKey(role.getStringId())
+                && !bannedRoles.getOptions().containsKey(role.getStringId()))
+
+                roles.put(role.getStringId(), role.getName());
         }
         return roles;
     }
@@ -65,24 +68,23 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> removeSelectedRoles(MultichoiceMapField addedRoles) {
 
+        Map<String, I18nString> updatedRoles = new LinkedHashMap<>(addedRoles.getOptions());
+
         for(String roleId : addedRoles.getValue()) {
-            addedRoles.getOptions().remove(roleId);
+            updatedRoles.remove(roleId);
         }
 
-        return addedRoles.getOptions();
+        return updatedRoles;
     }
 
     @Override
-    public Map<String, I18nString> addSelectedRoles(MultichoiceMapField addedRoles, EnumerationMapField netField, MultichoiceMapField netRoles) {
-
-        /* key bude ID role (key z roles)
-           value zloz z 1.roles value + 2. netField value*/
+    public Map<String, I18nString> addSelectedRoles(MultichoiceMapField addedRoles, EnumerationMapField netField, MultichoiceMapField rolesAvailable) {
 
         String netAndVersion = " (" + netField.getOptions().get(netField.getValue()) + ")";
-        Map<String, I18nString> updatedRoles = addedRoles.getOptions();
+        Map<String, I18nString> updatedRoles = new LinkedHashMap<>(addedRoles.getOptions());
 
-        for(String roleId : netRoles.getValue()) {
-            String roleNetVersion = netRoles.getOptions().get(roleId).toString() + netAndVersion;
+        for(String roleId : rolesAvailable.getValue()) {
+            String roleNetVersion = rolesAvailable.getOptions().get(roleId).toString() + netAndVersion;
             updatedRoles.put(roleId, new I18nString(roleNetVersion));
         }
 
