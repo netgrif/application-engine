@@ -9,8 +9,6 @@ import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
-import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
@@ -191,7 +189,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
-        initializeVariableArcs(petriNet);
+        petriNet.initializeArcs();
 
         return Optional.of(repository.save(petriNet));
     }
@@ -388,20 +386,6 @@ public class PetriNetService implements IPetriNetService {
     private Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
-    }
-
-    private void initializeVariableArcs(PetriNet net) {
-        net.getArcs().values().stream()
-                .flatMap(List::stream)
-                .filter(arc -> arc instanceof VariableArc)
-                .forEach(arc -> initializeVariableArc(net, (VariableArc) arc));
-    }
-
-    private void initializeVariableArc(PetriNet net, VariableArc arc) {
-        Optional<Field> field = net.getField(arc.getMultiplicity().toString());
-        if (!field.isPresent())
-            throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
-        arc.setFieldId(field.get().getStringId());
     }
 
     @Override
