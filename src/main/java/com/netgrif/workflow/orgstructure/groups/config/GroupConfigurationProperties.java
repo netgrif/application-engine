@@ -11,7 +11,13 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "nae.group")
 public class GroupConfigurationProperties {
 
-    private Boolean defaultEnabled;
+    /**
+     * Determines whether user's default groups are enabled and can be created
+     * */
+    private boolean defaultEnabled = true;
 
-    private Boolean systemEnabled;
+    /**
+     * Determines whether default system group is enabled and can be created
+     * */
+    private boolean systemEnabled = true;
 }
