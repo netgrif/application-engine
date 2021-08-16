@@ -17,8 +17,13 @@ public class Function extends PetriNetObject {
     @Setter
     private String name;
 
+    @Getter
+    @Setter
+    private FunctionScope scope;
+
     public Function() {
         this.setObjectId(new ObjectId());
+        this.setImportId(this.getObjectId().toString());
     }
 
     public Function clone() {
@@ -27,6 +32,7 @@ public class Function extends PetriNetObject {
         clone.setImportId(this.importId);
         clone.setDefinition(this.definition);
         clone.setName(this.name);
+        clone.setScope(this.scope);
         return clone;
     }
 }

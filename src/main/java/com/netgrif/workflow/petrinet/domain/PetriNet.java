@@ -326,6 +326,10 @@ public class PetriNet extends PetriNetObject {
         return title.getTranslation(locale);
     }
 
+    public List<Function> getFunctions(FunctionScope scope) {
+        return functions.stream().filter(function -> function.getScope().equals(scope)).collect(Collectors.toList());
+    }
+
     public List<Action> getPreCreateActions() {
         return getPreCaseActions(CaseEventType.CREATE);
     }
