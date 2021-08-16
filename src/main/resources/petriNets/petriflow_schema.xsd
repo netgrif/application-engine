@@ -55,7 +55,7 @@
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="xs:string">
-                    <xs:attribute type="xs:boolean" name="static"/>
+                    <xs:attribute type="scope" name="scope" use="required"/>
                     <xs:attribute type="xs:string" name="name" use="required"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -223,10 +223,6 @@
             <xs:selector xpath="./data"/>
             <xs:field xpath="id"/>
         </xs:unique>
-        <xs:unique name="functionUniqueName">
-            <xs:selector xpath="./function"/>
-            <xs:field xpath="@name"/>
-        </xs:unique>
         <xs:unique name="mappingId">
             <xs:selector xpath="./mapping"/>
             <xs:field xpath="id"/>
@@ -265,6 +261,12 @@
             <xs:enumeration value="taskRef"/>
             <xs:enumeration value="caseRef"/>
             <xs:enumeration value="filter"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="scope">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="namespace"/>
+            <xs:enumeration value="process"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="arc_type">
