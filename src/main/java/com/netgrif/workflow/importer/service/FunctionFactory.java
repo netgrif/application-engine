@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.petrinet.domain.Function;
+import com.netgrif.workflow.petrinet.domain.FunctionScope;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ public final class FunctionFactory {
 
         function1.setDefinition(function.getValue());
         function1.setName(function.getName());
+        function1.setScope(FunctionScope.valueOf(function.getScope().name()));
 
         return function1;
     }
