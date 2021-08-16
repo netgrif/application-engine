@@ -2,12 +2,12 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
-import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.Function
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,10 +33,9 @@ abstract class FieldActionsRunner {
     private FieldFactory fieldFactory
 
     @Autowired
-    private IGroovyShellFactory shellFactory
+    private IFieldActionsCacheService actionsCacheService
 
     private Map<String, Object> actionsCache = new HashMap<>()
-    private Map<String, Closure> actions = new HashMap<>()
 
     ChangedFieldsTree run(Action action, Case useCase, List<Function> functions = []) {
         return run(action, useCase, Optional.empty(), functions)
@@ -59,17 +58,21 @@ abstract class FieldActionsRunner {
     }
 
     Closure getActionCode(Action action, List<Function> functions) {
-        def code
-        def shell = this.shellFactory.getGroovyShell()
-        if (actions.containsKey(action.importId)) {
-            code = actions.get(action.importId)
-        } else {
-            code = (Closure) shell.evaluate("{-> ${action.definition}}")
-            actions.put(action.importId, code)
-        }
+        return getActionCode(actionsCacheService.getCompiledAction(action), functions)
+    }
+
+    Closure getActionCode(Closure code, List<Function> functions) {
         def actionDelegate = getActionDeleget()
-        functions.each {
-            actionDelegate.metaClass."${it.name}" = (Closure) shell.evaluate(it.definition)
+
+        actionsCacheService.getCachedFunctions(functions).each {
+            actionDelegate.metaClass."${it.function.name}" << it.code
+        }
+        actionsCacheService.getNamespaceFunctionCache().each { entry ->
+            def namespace = new Object()
+            entry.getValue().each {
+                namespace.metaClass."${it.function.name}" << it.code.rehydrate(actionDelegate, actionDelegate, actionDelegate)
+            }
+            actionDelegate.metaClass."${entry.key}" = namespace
         }
         return code.rehydrate(actionDelegate, code.owner, code.thisObject)
     }
@@ -93,4 +96,5 @@ abstract class FieldActionsRunner {
     IOrsrService getOrsrService() {
         return orsrService
     }
+
 }

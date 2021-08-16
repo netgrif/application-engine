@@ -18,9 +18,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -250,7 +250,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setUserRefs(petriNet.getUserRefs());
 
         useCase.setTitle(makeTitle.apply(useCase));
-        runActions(petriNet.getPreCreateActions(), petriNet.getFunctions());
+        runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -302,7 +302,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet().getFunctions());
+        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -565,11 +565,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void runActions(List<Action> actions, List<com.netgrif.workflow.petrinet.domain.Function> functions) {
+    public void runActions(List<Action> actions, PetriNet petriNets) {
         log.info("Running actions without context on cases");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, Optional.empty(), functions);
+            actionsRunner.run(action, null, Optional.empty(), petriNets.getFunctions());
         });
     }
 }
