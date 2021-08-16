@@ -64,10 +64,10 @@ public class UserService implements IUserService {
 
         User savedUser = userRepository.save(user);
 
-        if (groupProperties.getDefaultEnabled())
+        if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
 
-        if (groupProperties.getSystemEnabled())
+        if (groupProperties.isSystemEnabled())
             groupService.addUserToDefaultGroup(user);
 
         savedUser.setGroups(user.getGroups());
