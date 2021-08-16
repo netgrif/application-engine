@@ -957,28 +957,4 @@ class ActionDelegate {
         return filterSearchService.autocompleteFindFilters(userInput)
     }
 
-    Map<String, I18nString> getNetsByLoggedUser () {
-        Map<String, I18nString> res = configurableMenuService.getNetsByAuthor(loggedUser().getId())
-        return res;
-    }
-
-    Map<String, I18nString> getRolesByNet (EnumerationMapField field, MultichoiceMapField addedRoles) {
-        String selectedProcessName = field.value
-        Map<String, I18nString> res = configurableMenuService.getNetRoles(field, selectedProcessName, addedRoles)
-        //TODO volat funkcie rovno zo siete, netName sa moze volat vo funkcii cez getValue
-        return res;
-    }
-
-
-    Map<String, I18nString> addRoles (MultichoiceMapField addedRoles, EnumerationMapField enumNetField, MultichoiceMapField multiRolesField) {
-        Map<String, I18nString> res = configurableMenuService.addSelectedRoles(addedRoles, enumNetField, multiRolesField)
-        return res;
-        //TODO check ako sa dostat k vybranym roliam multichoicu
-    }
-
-    Map<String, I18nString> removeRoles (MultichoiceMapField addedRoles) {
-        Map<String, I18nString> res = configurableMenuService.removeSelectedRoles(addedRoles)
-        return res;
-    }
-
 }
