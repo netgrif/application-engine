@@ -169,58 +169,88 @@
 		</action>
 	</data>
 	<data type="button">
-		<id>add_roles</id>
+		<id>add_permitted_roles</id>
 		<title></title>
-		<placeholder name="addRoles">Add selected roles</placeholder>
+		<placeholder name="permitRoles">Allow view for roles</placeholder>
 		<action trigger="set">
-			addedRoles: f.added_roles,
+			permittedRoles: f.permitted_roles,
 			processesAvailable: f.processes_available,
 			rolesAvailable: f.roles_available;
 
-<!--			change addedRoles value {[]}-->
-			change addedRoles options {return addRoles(addedRoles, processesAvailable, rolesAvailable)}
+			change permittedRoles options {return configurableMenuService.addSelectedRoles(permittedRoles, processesAvailable, rolesAvailable)}
+
 			change rolesAvailable value {[]}
 			change rolesAvailable options {[:]}
 			change processesAvailable value {null}
-<!--		TODO premenovat processToSelect a rolesToSelect-->
 		</action>
 	</data>
 	<data type="button">
-		<id>remove_roles</id>
+		<id>remove_permitted_roles</id>
 		<title></title>
-		<placeholder name="removeRoles">Remove selected roles</placeholder>
+		<placeholder name="removePermissions">Remove from allowed roles</placeholder>
 		<action trigger="set">
-			addedRoles: f.added_roles,
+			permittedRoles: f.permitted_roles,
 			processesAvailable: f.processes_available,
 			rolesAvailable: f.roles_available;
 
-			change addedRoles options {return removeRoles(addedRoles)}
-			change addedRoles value {[]}
+			change permittedRoles options {return configurableMenuService.removeSelectedRoles(permittedRoles)}
 
+			change permittedRoles value {[]}
 			change rolesAvailable value {[]}
 			change rolesAvailable options {[:]}
-
 			change processesAvailable value {null}
 		</action>
 	</data>
+	<data type="button">
+		<id>add_banned_roles</id>
+		<title></title>
+		<placeholder name="banRoles">Ban view for roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_banned_roles</id>
+		<title></title>
+		<placeholder name="removeBannedRoles">Remove from banned roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options {return configurableMenuService.removeSelectedRoles(bannedRoles)}
+
+			change bannedRoles value {[]}
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+
 	<data type="enumeration_map" immediate="true">
 		<id>processes_available</id>
 		<title name="available_processes">Your processes</title>
 		<action trigger="get">
 			processes: f.this;
 
-			change processes options {return getNetsByLoggedUser()}
-
-			<!--			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser().getId())}-->
+			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser().getId())}
 		</action>
 		<action trigger="set">
 			processes: f.this,
-			addedRoles: f.added_roles,
+			permittedRoles: f.permitted_roles,
+			bannedRoles: f.banned_roles,
 			rolesAvailable: f.roles_available;
 
-			change rolesAvailable options {return getRolesByNet(processes, addedRoles)}
-			change rolesAvailable value {null}
-			<!--			change roles options {return configurableMenuService.getNetRoles(processes)}-->
+			change rolesAvailable options {return configurableMenuService.getAvailableRolesFromNet(processes, permittedRoles, bannedRoles)}
+			change rolesAvailable value {[]}
 		</action>
 	</data>
 	<data type="multichoice_map" immediate="true">
@@ -228,10 +258,13 @@
 		<title name="available_roles">Available roles from selected process</title>
 	</data>
 	<data type="multichoice_map" immediate="true">
-		<id>added_roles</id>
-		<title name="roles_added">Added roles</title>
+		<id>permitted_roles</id>
+		<title name="roles_added">Permitted roles</title>
 	</data>
-
+	<data type="multichoice_map" immediate="true">
+		<id>banned_roles</id>
+		<title name="roles_added">Banned roles</title>
+	</data>
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
 <!--		<title>Translate menu item title?</title>-->
@@ -259,6 +292,14 @@
 		<i18nString name="icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
 		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="add_permitted_roles">Pridaj k povoleným roliam</i18nString>
+		<i18nString name="remove_permitted_roles">Odstráň z povolených rolí</i18nString>
+		<i18nString name="add_banned_roles">Pridaj k zakázaným roliam</i18nString>
+		<i18nString name="remove_banned_roles">Odstráň zo zakázaných rolí</i18nString>
+		<i18nString name="processes_available">Vaše procesy</i18nString>
+		<i18nString name="roles_available">Dostupné role</i18nString>
+		<i18nString name="permitted_roles">Povolené role</i18nString>
+		<i18nString name="banned_roles">Zakázané role</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -269,6 +310,14 @@
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="icon_identifier">Ikone ID</i18nString>
 		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="add_permitted_roles">Zu zulässigen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_permitted_roles">Aus zulässigen Rollen entfernen</i18nString>
+		<i18nString name="add_banned_roles">Zu gesperrten Rollen hinzufügen</i18nString>
+		<i18nString name="remove_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
+		<i18nString name="processes_available">Ihre Prozesse</i18nString>
+		<i18nString name="roles_available">Verfügbare Rollen</i18nString>
+		<i18nString name="permitted_roles">Zulässige Rollen</i18nString>
+		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -409,7 +458,7 @@
 				<layout>
 					<x>0</x>
 					<y>1</y>
-					<rows>1</rows>
+					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
@@ -424,7 +473,7 @@
 				<layout>
 					<x>1</x>
 					<y>1</y>
-					<rows>1</rows>
+					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
@@ -432,7 +481,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>add_roles</id>
+				<id>add_permitted_roles</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -446,7 +495,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>added_roles</id>
+				<id>permitted_roles</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -461,7 +510,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>remove_roles</id>
+				<id>remove_permitted_roles</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -475,13 +524,56 @@
 				</layout>
 			</dataRef>
 			<dataRef>
+				<id>add_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
 				<id>use_icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -512,7 +604,7 @@
 				</logic>
 				<layout>
 					<x>1</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -525,7 +617,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
