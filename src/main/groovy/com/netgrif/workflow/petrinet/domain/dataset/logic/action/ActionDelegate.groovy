@@ -774,7 +774,7 @@ class ActionDelegate {
     void generatePDF(String transitionId, String fileFieldId){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + "/" + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
@@ -785,7 +785,7 @@ class ActionDelegate {
     void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + "/" + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
@@ -796,7 +796,7 @@ class ActionDelegate {
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = new FileFieldValue(pdfResource.getOutputDefaultName(), ((ClassPathResource)pdfResource.getOutputFolder()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -812,7 +812,7 @@ class ActionDelegate {
     void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + "/" + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
