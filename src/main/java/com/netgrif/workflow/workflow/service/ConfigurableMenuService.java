@@ -37,8 +37,9 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         Map<String, I18nString> options = new HashMap<>();
 
         for(PetriNet net : nets) {
+            String[] versionSplit = net.getVersion().toString().split("\\.");
             I18nString titleAndVersion = new I18nString(net.getTitle().toString() + " :" + net.getVersion().toString());
-            options.put(net.getIdentifier(), titleAndVersion);
+            options.put(net.getIdentifier() + ":" + versionSplit[0] + "-" + versionSplit[1] + "-" + versionSplit[2], titleAndVersion);
         }
 
         return options;
@@ -47,8 +48,8 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> getAvailableRolesFromNet (EnumerationMapField processField, MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles) {
 
-        String netId = processField.getValue();
-        String versionString = processField.getOptions().get(netId).toString().split(":")[1];
+        String netId = processField.getValue().split(":")[0];
+        String versionString = processField.getOptions().get(processField.getValue()).toString().split(":")[1].replace("-", ".");
         StringToVersionConverter converter = new StringToVersionConverter();
         Version version = converter.convert(versionString);
         PetriNet net = petriNetService.getPetriNet(netId, version);
@@ -78,9 +79,9 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     }
 
     @Override
-    public Map<String, I18nString> addSelectedRoles(MultichoiceMapField addedRoles, EnumerationMapField netField, MultichoiceMapField rolesAvailable) {
+    public Map<String, I18nString> addSelectedRoles(MultichoiceMapField addedRoles, EnumerationMapField processField, MultichoiceMapField rolesAvailable) {
 
-        String netAndVersion = " (" + netField.getOptions().get(netField.getValue()) + ")";
+        String netAndVersion = " (" + processField.getOptions().get(processField.getValue()) + ")";
         Map<String, I18nString> updatedRoles = new LinkedHashMap<>(addedRoles.getOptions());
 
         for(String roleId : rolesAvailable.getValue()) {
