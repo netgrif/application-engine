@@ -1,7 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.layout;
 
 import com.netgrif.workflow.importer.model.Transition;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
