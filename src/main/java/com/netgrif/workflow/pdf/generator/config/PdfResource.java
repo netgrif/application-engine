@@ -2,7 +2,7 @@ package com.netgrif.workflow.pdf.generator.config;
 
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
@@ -23,23 +23,27 @@ public class PdfResource extends PdfProperties {
 
     private PDType0Font valueFont;
 
-    private PDImageXObject checkboxChecked;
+    private PDFormXObject checkboxChecked;
 
-    private PDImageXObject checkboxUnchecked;
+    private PDFormXObject checkboxUnchecked;
 
-    private PDImageXObject radioChecked;
+    private PDFormXObject radioChecked;
 
-    private PDImageXObject radioUnchecked;
+    private PDFormXObject radioUnchecked;
 
-    private PDImageXObject booleanChecked;
+    private PDFormXObject booleanChecked;
 
-    private PDImageXObject booleanUnchecked;
+    private PDFormXObject booleanUnchecked;
 
     private Resource fontTitleResource;
 
     private Resource fontLabelResource;
 
     private Resource fontValueResource;
+
+    private String outputFolder;
+
+    private String outputDefaultName;
 
     private Resource outputResource;
 
