@@ -55,6 +55,7 @@ services:
     image: elasticsearch:6.8.12
     environment:
       - cluster.name=elasticsearch
+      - discovery.type=single-node
       - http.host=0.0.0.0
       - transport.host=0.0.0.0
     ports:
