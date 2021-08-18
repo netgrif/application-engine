@@ -2,14 +2,14 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
-import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
-import com.netgrif.workflow.petrinet.domain.events.DataEvent
 import com.netgrif.workflow.petrinet.domain.Component
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.workflow.petrinet.domain.events.DataEvent
 import com.netgrif.workflow.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
@@ -63,6 +63,8 @@ abstract class Field<T> extends Imported {
     protected Expression initExpression
 
     protected List<Validation> validations
+
+    private Autocomplete autocomplete
 
     Field() {
         _id = new ObjectId()
@@ -284,6 +286,14 @@ abstract class Field<T> extends Imported {
         this.length = length
     }
 
+    Autocomplete getAutocomplete() {
+        return autocomplete
+    }
+
+    void setAutocomplete(Autocomplete autocomplete) {
+        this.autocomplete = autocomplete
+    }
+
     @Override
     String toString() {
         return name.defaultValue
@@ -312,6 +322,7 @@ abstract class Field<T> extends Imported {
         clone.validations = this.validations?.collect { it.clone() }
         clone.defaultValue = this.defaultValue
         clone.initExpression = this.initExpression
+        clone.autocomplete = this.autocomplete
     }
 
     abstract Field clone()

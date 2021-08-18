@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import com.netgrif.workflow.petrinet.domain.dataset.Autocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -87,19 +88,24 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component){
-        if(dataSet.containsKey(field) && dataSet.get(field) != null){
-            if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if(events != null) dataSet.get(field).getEvents().addAll(events);
-            if(layout != null) dataSet.get(field).setLayout(layout);
-            if(component != null) dataSet.get(field).setComponent(component);
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component, Autocomplete autocomplete) {
+        if (dataSet.containsKey(field) && dataSet.get(field) != null) {
+            if (behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
+            if (events != null) dataSet.get(field).getEvents().addAll(events);
+            if (layout != null) dataSet.get(field).setLayout(layout);
+            if (component != null) dataSet.get(field).setComponent(component);
+            if (autocomplete != null) dataSet.get(field).setAutocomplete(autocomplete);
         } else {
-            dataSet.put(field,new DataFieldLogic(behavior, events, layout, component));
+            dataSet.put(field, new DataFieldLogic(behavior, events, layout, autocomplete));
         }
     }
 
-    public void addDataEvents(String field, LinkedHashSet<DataEvent> events){
-        if(dataSet.containsKey(field)){
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component) {
+        addDataSet(field, behavior, events, layout, null);
+    }
+
+    public void addDataEvents(String field, LinkedHashSet<DataEvent> events) {
+        if (dataSet.containsKey(field)) {
             dataSet.get(field).addDataEvents(events);
         }
     }

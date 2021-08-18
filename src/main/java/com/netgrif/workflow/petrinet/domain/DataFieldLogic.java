@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.petrinet.domain.dataset.Autocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -32,13 +33,17 @@ public class DataFieldLogic {
     @Setter
     private Component component;
 
+    @Getter
+    @Setter
+    private Autocomplete autocomplete;
+
     public DataFieldLogic() {
         this.behavior = new HashSet<>();
         this.events = new LinkedHashSet<>();
         this.layout = new FieldLayout();
     }
 
-    public DataFieldLogic(Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component) {
+    public DataFieldLogic(Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Autocomplete autocomplete) {
         this();
         if (behavior != null)
             this.behavior.addAll(behavior);
@@ -46,8 +51,7 @@ public class DataFieldLogic {
             this.events.addAll(events);
         if (layout != null)
             this.layout = layout;
-        if (component != null)
-            this.component = getComponent();
+        this.autocomplete = autocomplete;
     }
 
     public void addDataEvents(Collection<DataEvent> events){

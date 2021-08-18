@@ -104,6 +104,9 @@ public final class FieldFactory {
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
 
+        if (data.getAutocomplete() != null)
+            field.setAutocomplete(Autocomplete.valueOf(data.getAutocomplete().name()));
+
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
         field.setImmediate(data.isImmediate());
@@ -376,6 +379,7 @@ public final class FieldFactory {
     private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
 
+        resolveAutocomplete(field, useCase, transitionId);
         resolveDataValues(field, useCase, fieldId);
         resolveComponent(field, useCase, transitionId);
         if (field instanceof ChoiceField)
@@ -403,6 +407,17 @@ public final class FieldFactory {
                 .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
             valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
         });
+    }
+
+    private void resolveAutocomplete(Field field, Case useCase, String transitionId) {
+        if (transitionId == null) {
+            return;
+        }
+        com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
+        Autocomplete autocomplete = transition.getDataSet().get(field.getImportId()).getAutocomplete();
+        if (autocomplete != null) {
+            field.setAutocomplete(autocomplete);
+        }
     }
 
     private void resolveChoices(ChoiceField field, Case useCase) {

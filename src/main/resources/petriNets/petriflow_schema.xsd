@@ -41,6 +41,7 @@
                     <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element type="dataEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
                 </xs:choice>
+                <xs:element ref="autocomplete" minOccurs="0"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
                 <xs:element ref="remote" minOccurs="0"/>
@@ -251,6 +252,63 @@
             <xs:enumeration value="filter"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="autocomplete_type">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="off"/>
+            <xs:enumeration value="name"/>
+            <xs:enumeration value="honorific-prefix"/>
+            <xs:enumeration value="given-name"/>
+            <xs:enumeration value="additional-name"/>
+            <xs:enumeration value="family-name"/>
+            <xs:enumeration value="honorific-suffix"/>
+            <xs:enumeration value="nickname"/>
+            <xs:enumeration value="email"/>
+            <xs:enumeration value="username"/>
+            <xs:enumeration value="new-password"/>
+            <xs:enumeration value="current-password"/>
+            <xs:enumeration value="one-time-code"/>
+            <xs:enumeration value="organization-title"/>
+            <xs:enumeration value="organization"/>
+            <xs:enumeration value="street-address"/>
+            <xs:enumeration value="address-line1"/>
+            <xs:enumeration value="address-line2"/>
+            <xs:enumeration value="address-line3"/>
+            <xs:enumeration value="address-level4"/>
+            <xs:enumeration value="address-level3"/>
+            <xs:enumeration value="address-level2"/>
+            <xs:enumeration value="address-level1"/>
+            <xs:enumeration value="country"/>
+            <xs:enumeration value="country-name"/>
+            <xs:enumeration value="postal-code"/>
+            <xs:enumeration value="cc-name"/>
+            <xs:enumeration value="cc-given-name"/>
+            <xs:enumeration value="cc-additional-name"/>
+            <xs:enumeration value="cc-family-name"/>
+            <xs:enumeration value="cc-number"/>
+            <xs:enumeration value="cc-exp"/>
+            <xs:enumeration value="cc-exp-month"/>
+            <xs:enumeration value="cc-exp-year"/>
+            <xs:enumeration value="cc-csc"/>
+            <xs:enumeration value="cc-type"/>
+            <xs:enumeration value="transaction-currency"/>
+            <xs:enumeration value="transaction-amount"/>
+            <xs:enumeration value="language"/>
+            <xs:enumeration value="bday"/>
+            <xs:enumeration value="bday-day"/>
+            <xs:enumeration value="bday-month"/>
+            <xs:enumeration value="bday-year"/>
+            <xs:enumeration value="sex"/>
+            <xs:enumeration value="tel"/>
+            <xs:enumeration value="tel-country-code"/>
+            <xs:enumeration value="tel-national"/>
+            <xs:enumeration value="tel-area-code"/>
+            <xs:enumeration value="tel-local"/>
+            <xs:enumeration value="tel-extension"/>
+            <xs:enumeration value="impp"/>
+            <xs:enumeration value="url"/>
+            <xs:enumeration value="photo"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="arc_type">
         <xs:restriction base="xs:string">
             <xs:enumeration value="regular"/>
@@ -330,6 +388,7 @@
             <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:element name="autocomplete" type="autocomplete_type"/>
     <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
@@ -457,6 +516,7 @@
                 <xs:element ref="view" minOccurs="0"/>
                 <xs:element ref="cancel" minOccurs="0"/>
                 <xs:element ref="assigned" minOccurs="0"/>
+                <xs:element ref="autocomplete" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>

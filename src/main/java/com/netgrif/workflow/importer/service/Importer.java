@@ -1,10 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
@@ -12,12 +9,15 @@ import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.dataset.Autocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
@@ -595,7 +595,12 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            transition.addDataSet(fieldId, behavior, null, null, null);
+            Autocomplete autocomplete = null;
+            if (logic.getAutocomplete() != null) {
+                autocomplete = Autocomplete.fromString(logic.getAutocomplete().value());
+            }
+
+            transition.addDataSet(fieldId, behavior, null, null, null, autocomplete);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -626,7 +631,7 @@ public class Importer {
             }
 
             FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
-            transition.addDataSet(fieldId, null, null, fieldLayout, null);
+            transition.addDataSet(fieldId, null, null, fieldLayout, null, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -640,7 +645,7 @@ public class Importer {
             component = getField(dataRef.getId()).getComponent();
         else
             component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
-        transition.addDataSet(fieldId, null, null, null, component);
+        transition.addDataSet(fieldId, null, null, null, component, null);
     }
 
     @Transactional
