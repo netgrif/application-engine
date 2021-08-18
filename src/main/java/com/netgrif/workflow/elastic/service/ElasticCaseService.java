@@ -180,7 +180,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildUsersRoleQuery(request, query, user);
+        buildPermissionQuery(query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -199,49 +199,41 @@ public class ElasticCaseService implements IElasticCaseService {
             return query;
     }
 
-    /**
-     * Cases with processIdentifier "id" <br>
-     * <pre>
-     * {
-     *     "petriNet": {
-     *         "identifier": "id"
-     *     }
-     * }</pre><br>
-     * <p>
-     * Cases with processIdentifiers "1" OR "2" <br>
-     * <pre>
-     * {
-     *     "petriNet": [
-     *         {
-     *             "identifier": "1"
-     *         },
-     *         {
-     *             "identifier": "2"
-     *         }
-     *     ]
-     * }
-     * </pre>
-     */
-
-    protected void buildUsersRoleQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildPermissionQuery(BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersQuery(userRoleQuery, user);
-        negativeUserRoleQuery(userRoleQuery, user);
-
+        buildUsersAndRolesQuery(userRoleQuery, user);
+        negativeUsersAndRolesQuery(userRoleQuery, user);
         query.filter(userRoleQuery);
     }
 
-    private void negativeUserRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder negativeQuery = boolQuery();
         buildNegativeViewRoleQuery(negativeQuery, user);
         buildNegativeViewUsersQuery(negativeQuery, user);
         query.should(negativeQuery);
     }
 
-    private void buildUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder usersQuery = boolQuery();
-        usersQuery.should(termQuery("users", user.getId()));
-        query.should(usersQuery);
+    private void buildUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder roleQuery = boolQuery();
+        BoolQueryBuilder usersRoleQuery = boolQuery();
+        BoolQueryBuilder usersExist = boolQuery();
+        BoolQueryBuilder notExists = boolQuery();
+
+        notExists.mustNot(existsQuery("userRefs"));
+        notExists.mustNot(existsQuery("viewRoles"));
+
+        usersExist.must(existsQuery("userRefs"));
+        usersExist.must(termQuery("users", user.getId()));
+
+        usersRoleQuery.should(usersExist);
+        usersRoleQuery.should(notExists);
+
+        for (String roleId : user.getProcessRoles()) {
+            roleQuery.should(termQuery("viewRoles", roleId));
+        }
+        usersRoleQuery.should(roleQuery);
+
+        query.must(usersRoleQuery);
     }
 
     private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
@@ -254,9 +246,9 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeRoleQuery);
+        BoolQueryBuilder negativeUsersQuery = boolQuery();
+        negativeUsersQuery.should(termQuery("negativeViewUsers", user.getId()));
+        query.mustNot(negativeUsersQuery);
     }
 
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
