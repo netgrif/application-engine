@@ -48,19 +48,19 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> getAvailableRolesFromNet (EnumerationMapField processField, MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles) {
 
-        String netId = processField.getValue().split(":")[0];
+        String netImportId = processField.getValue().split(":")[0];
         String versionString = processField.getOptions().get(processField.getValue()).toString().split(":")[1].replace("-", ".");
         StringToVersionConverter converter = new StringToVersionConverter();
         Version version = converter.convert(versionString);
-        PetriNet net = petriNetService.getPetriNet(netId, version);
+        PetriNet net = petriNetService.getPetriNet(netImportId, version);
 
         Map<String, I18nString> roles = new HashMap<>();
 
         for (ProcessRole role : net.getRoles().values()) {
-            if (!permittedRoles.getOptions().containsKey(role.getStringId())
-                && !bannedRoles.getOptions().containsKey(role.getStringId()))
+            if (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
+                && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId))
 
-                roles.put(role.getStringId(), role.getName());
+                roles.put(role.getImportId() + ":" + netImportId, role.getName());
         }
         return roles;
     }
@@ -71,8 +71,8 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
         Map<String, I18nString> updatedRoles = new LinkedHashMap<>(addedRoles.getOptions());
 
-        for(String roleId : addedRoles.getValue()) {
-            updatedRoles.remove(roleId);
+        for(String roleAndNetKey : addedRoles.getValue()) {
+            updatedRoles.remove(roleAndNetKey);
         }
 
         return updatedRoles;
@@ -81,12 +81,12 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     @Override
     public Map<String, I18nString> addSelectedRoles(MultichoiceMapField addedRoles, EnumerationMapField processField, MultichoiceMapField rolesAvailable) {
 
-        String netAndVersion = " (" + processField.getOptions().get(processField.getValue()) + ")";
+        String netName = " (" + processField.getOptions().get(processField.getValue()).toString().split(":")[0] + ")";
         Map<String, I18nString> updatedRoles = new LinkedHashMap<>(addedRoles.getOptions());
 
-        for(String roleId : rolesAvailable.getValue()) {
-            String roleNetVersion = rolesAvailable.getOptions().get(roleId).toString() + netAndVersion;
-            updatedRoles.put(roleId, new I18nString(roleNetVersion));
+        for(String roleAndNetKey : rolesAvailable.getValue()) {
+            String roleNetNames = rolesAvailable.getOptions().get(roleAndNetKey).toString() + netName;
+            updatedRoles.put(roleAndNetKey, new I18nString(roleNetNames));
         }
 
         return updatedRoles;
