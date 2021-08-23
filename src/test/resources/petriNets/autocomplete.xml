@@ -1,0 +1,202 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>autocomplete</id>
+    <initials>ACP</initials>
+    <title>Autocomplete</title>
+    <defaultRole>true</defaultRole>
+
+    <data type="text">
+        <id>name</id>
+        <title>Autocompleted name</title>
+    </data>
+    <data type="text">
+        <id>surname</id>
+        <title>Autocompleted surname</title>
+        <autocomplete>street-address</autocomplete>
+    </data>
+    <data type="text">
+        <id>address</id>
+        <title>Autocompleted address</title>
+        <autocomplete>street-address</autocomplete>
+    </data>
+    <data type="text">
+        <id>bday</id>
+        <title>Autocompleted birthday</title>
+    </data>
+    <data type="text">
+        <id>new_password</id>
+        <title>New password</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+
+    <data type="text">
+        <id>name2</id>
+        <title>Name</title>
+    </data>
+    <data type="text">
+        <id>surname2</id>
+        <title>Surname</title>
+    </data>
+    <data type="text">
+        <id>address2</id>
+        <title>Address</title>
+    </data>
+    <data type="text">
+        <id>bday2</id>
+        <title>Birthday</title>
+    </data>
+    <data type="text">
+        <id>new_password2</id>
+        <title>New password</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+
+    <transition>
+        <id>test</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Autocomplete test</label>
+        <dataGroup>
+            <id>1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <autocomplete>given-name</autocomplete>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <autocomplete>family-name</autocomplete>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>address</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>bday</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <autocomplete>bday</autocomplete>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_password</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <autocomplete>new-password</autocomplete>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+
+            <dataRef>
+                <id>name2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>surname2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>address2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>bday2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_password2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

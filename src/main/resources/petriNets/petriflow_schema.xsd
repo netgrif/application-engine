@@ -254,59 +254,410 @@
     </xs:simpleType>
     <xs:simpleType name="autocomplete_type">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="off"/>
-            <xs:enumeration value="name"/>
-            <xs:enumeration value="honorific-prefix"/>
-            <xs:enumeration value="given-name"/>
-            <xs:enumeration value="additional-name"/>
-            <xs:enumeration value="family-name"/>
-            <xs:enumeration value="honorific-suffix"/>
-            <xs:enumeration value="nickname"/>
-            <xs:enumeration value="email"/>
-            <xs:enumeration value="username"/>
-            <xs:enumeration value="new-password"/>
-            <xs:enumeration value="current-password"/>
-            <xs:enumeration value="one-time-code"/>
-            <xs:enumeration value="organization-title"/>
-            <xs:enumeration value="organization"/>
-            <xs:enumeration value="street-address"/>
-            <xs:enumeration value="address-line1"/>
-            <xs:enumeration value="address-line2"/>
-            <xs:enumeration value="address-line3"/>
-            <xs:enumeration value="address-level4"/>
-            <xs:enumeration value="address-level3"/>
-            <xs:enumeration value="address-level2"/>
-            <xs:enumeration value="address-level1"/>
-            <xs:enumeration value="country"/>
-            <xs:enumeration value="country-name"/>
-            <xs:enumeration value="postal-code"/>
-            <xs:enumeration value="cc-name"/>
-            <xs:enumeration value="cc-given-name"/>
-            <xs:enumeration value="cc-additional-name"/>
-            <xs:enumeration value="cc-family-name"/>
-            <xs:enumeration value="cc-number"/>
-            <xs:enumeration value="cc-exp"/>
-            <xs:enumeration value="cc-exp-month"/>
-            <xs:enumeration value="cc-exp-year"/>
-            <xs:enumeration value="cc-csc"/>
-            <xs:enumeration value="cc-type"/>
-            <xs:enumeration value="transaction-currency"/>
-            <xs:enumeration value="transaction-amount"/>
-            <xs:enumeration value="language"/>
-            <xs:enumeration value="bday"/>
-            <xs:enumeration value="bday-day"/>
-            <xs:enumeration value="bday-month"/>
-            <xs:enumeration value="bday-year"/>
-            <xs:enumeration value="sex"/>
-            <xs:enumeration value="tel"/>
-            <xs:enumeration value="tel-country-code"/>
-            <xs:enumeration value="tel-national"/>
-            <xs:enumeration value="tel-area-code"/>
-            <xs:enumeration value="tel-local"/>
-            <xs:enumeration value="tel-extension"/>
-            <xs:enumeration value="impp"/>
-            <xs:enumeration value="url"/>
-            <xs:enumeration value="photo"/>
+            <xs:enumeration value="off">
+                <xs:annotation>
+                    <xs:documentation>
+                        The browser is not permitted to automatically enter or select a value for this field. It is
+                        possible that the document or application provides its own autocomplete feature, or that
+                        security concerns require that the field's value not be automatically entered.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="name">
+                <xs:annotation>
+                    <xs:documentation>
+                        The field expects the value to be a person's full name. Using "name" rather than breaking the
+                        name down into its components is generally preferred because it avoids dealing with the wide
+                        diversity of human names and how they are structured; however, you can use the following
+                        autocomplete values if you do need to break the name down into its components:
+                        "honorific-prefix", "given-name", "additional-name", "family-name", "honorific-suffix" and
+                        "nickname"
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="honorific-prefix">
+                <xs:annotation>
+                    <xs:documentation>
+                        The prefix or title, such as "Mrs.", "Mr.", "Miss", "Ms.", "Dr.", or "Mlle.".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="given-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        The given (or "first") name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="additional-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        The middle name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="family-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        The family (or "last") name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="honorific-suffix">
+                <xs:annotation>
+                    <xs:documentation>
+                        The suffix, such as "Jr.", "B.Sc.", "PhD.", "MBASW", or "IV".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="nickname">
+                <xs:annotation>
+                    <xs:documentation>
+                        A nickname or handle.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="email">
+                <xs:annotation>
+                    <xs:documentation>
+                        An email address.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="username">
+                <xs:annotation>
+                    <xs:documentation>
+                        A username or account name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="new-password">
+                <xs:annotation>
+                    <xs:documentation>
+                        A new password. When creating a new account or changing passwords, this should be used for an
+                        "Enter your new password" or "Confirm new password" field, as opposed to a general "Enter your
+                        current password" field that might be present. This may be used by the browser both to avoid
+                        accidentally filling in an existing password and to offer assistance in creating a secure
+                        password.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="current-password">
+                <xs:annotation>
+                    <xs:documentation>
+                        The user's current password.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="one-time-code">
+                <xs:annotation>
+                    <xs:documentation>
+                        A one-time code used for verifying user identity.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="organization-title">
+                <xs:annotation>
+                    <xs:documentation>
+                        A job title, or the title a person has within an organization, such as "Senior Technical
+                        Writer", "President", or "Assistant Troop Leader".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="organization">
+                <xs:annotation>
+                    <xs:documentation>
+                        A company or organization name, such as "Acme Widget Company" or "Girl Scouts of America".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="street-address">
+                <xs:annotation>
+                    <xs:documentation>
+                        A street address. This can be multiple lines of text, and should fully identify the location of
+                        the address within its second administrative level (typically a city or town), but should not
+                        include the city name, ZIP or postal code, or country name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-line1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Each individual line of the street address. These should only be present if the "street-address"
+                        is not present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-line2">
+                <xs:annotation>
+                    <xs:documentation>
+                        Each individual line of the street address. These should only be present if the "street-address"
+                        is not present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-line3">
+                <xs:annotation>
+                    <xs:documentation>
+                        Each individual line of the street address. These should only be present if the "street-address"
+                        is not present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-level4">
+                <xs:annotation>
+                    <xs:documentation>
+                        The finest-grained administrative level, in addresses which have four levels.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-level3">
+                <xs:annotation>
+                    <xs:documentation>
+                        The third administrative level, in addresses with at least three administrative levels.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-level2">
+                <xs:annotation>
+                    <xs:documentation>
+                        The second administrative level, in addresses with at least two of them. In countries with two
+                        administrative levels, this would typically be the city, town, village, or other locality in
+                        which the address is located.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="address-level1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The first administrative level in the address. This is typically the province in which the
+                        address is located. In the United States, this would be the state. In Switzerland, the canton.
+                        In the United Kingdom, the post town.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="country">
+                <xs:annotation>
+                    <xs:documentation>
+                        A country or territory code.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="country-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        A country or territory name.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="postal-code">
+                <xs:annotation>
+                    <xs:documentation>
+                        A postal code (in the United States, this is the ZIP code).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        The full name as printed on or associated with a payment instrument such as a credit card. Using
+                        a full name field is preferred, typically, over breaking the name into pieces.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-given-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        A given (first) name as given on a payment instrument like a credit card.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-additional-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        A middle name as given on a payment instrument or credit card.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-family-name">
+                <xs:annotation>
+                    <xs:documentation>
+                        A family name, as given on a credit card.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-number">
+                <xs:annotation>
+                    <xs:documentation>
+                        A credit card number or other number identifying a payment method, such as an account number.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-exp">
+                <xs:annotation>
+                    <xs:documentation>
+                        A payment method expiration date, typically in the form "MM/YY" or "MM/YYYY".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-exp-month">
+                <xs:annotation>
+                    <xs:documentation>
+                        The month in which the payment method expires.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-exp-year">
+                <xs:annotation>
+                    <xs:documentation>
+                        The year in which the payment method expires.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-csc">
+                <xs:annotation>
+                    <xs:documentation>
+                        The security code for the payment instrument; on credit cards, this is the 3-digit verification
+                        number on the back of the card.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cc-type">
+                <xs:annotation>
+                    <xs:documentation>
+                        The type of payment instrument (such as "Visa" or "Master Card").
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="transaction-currency">
+                <xs:annotation>
+                    <xs:documentation>
+                        The currency in which the transaction is to take place.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="transaction-amount">
+                <xs:annotation>
+                    <xs:documentation>
+                        The amount, given in the currency specified by "transaction-currency", of the transaction, for a
+                        payment form.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="language">
+                <xs:annotation>
+                    <xs:documentation>
+                        A preferred language, given as a valid BCP 47 language tag.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="bday">
+                <xs:annotation>
+                    <xs:documentation>
+                        A birth date, as a full date.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="bday-day">
+                <xs:annotation>
+                    <xs:documentation>
+                        The day of the month of a birth date.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="bday-month">
+                <xs:annotation>
+                    <xs:documentation>
+                        The month of the year of a birth date.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="bday-year">
+                <xs:annotation>
+                    <xs:documentation>
+                        The year of a birth date.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="sex">
+                <xs:annotation>
+                    <xs:documentation>
+                        A gender identity (such as "Female", "Fa'afafine", "Male"), as freeform text without newlines.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="tel">
+                <xs:annotation>
+                    <xs:documentation>
+                        A full telephone number, including the country code. If you need to break the phone number up
+                        into its components, you can use these values for those fields: "tel-country-code",
+                        "tel-national", "tel-area-code" and "tel-local"
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="tel-country-code">
+                <xs:annotation>
+                    <xs:documentation>
+                        The country code, such as "1" for the United States, Canada, and other areas in North America
+                        and parts of the Caribbean.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="tel-national">
+                <xs:annotation>
+                    <xs:documentation>
+                        The entire phone number without the country code component, including a country-internal prefix.
+                        For the phone number "1-855-555-6502", this field's value would be "855-555-6502".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="tel-area-code">
+                <xs:annotation>
+                    <xs:documentation>
+                        The area code, with any country-internal prefix applied if appropriate.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="tel-local">
+                <xs:annotation>
+                    <xs:documentation>
+                        The phone number without the country or area code. This can be split further into two parts, for
+                        phone numbers which have an exchange number and then a number within the exchange. For the phone
+                        number "555-6502", use "tel-local-prefix" for "555" and "tel-local-suffix" for "6502".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="tel-extension">
+                <xs:annotation>
+                    <xs:documentation>
+                        A telephone extension code within the phone number, such as a room or suite number in a hotel or
+                        an office extension in a company.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="impp">
+                <xs:annotation>
+                    <xs:documentation>
+                        A URL for an instant messaging protocol endpoint, such as "xmpp:username@example.net".
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="url">
+                <xs:annotation>
+                    <xs:documentation>
+                        A URL, such as a home page or company web site address as appropriate given the context of the
+                        other fields in the form.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="photo">
+                <xs:annotation>
+                    <xs:documentation>
+                        The URL of an image representing the person, company, or contact information given in the other
+                        fields in the form.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="arc_type">
