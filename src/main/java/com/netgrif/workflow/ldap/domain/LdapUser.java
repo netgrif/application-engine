@@ -1,15 +1,10 @@
 package com.netgrif.workflow.ldap.domain;
 
 
-import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
 
 
 @Data
@@ -23,6 +18,18 @@ public class LdapUser extends User {
     protected String uid;
 
     protected String homeDirectory;
+//
+//    protected String homeDirectory;
+//
+//    protected String homeDirectory;
+//
+//    protected String homeDirectory;
+//
+//    protected String homeDirectory;
+//
+//    protected String homeDirectory;
+
+
 
 
     public LdapUser() {
@@ -52,16 +59,16 @@ public class LdapUser extends User {
 
 
 
-    @Override
-    public LoggedUser transformToLoggedUser() {
-        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getUid(), getHomeDirectory(), this.getAuthorities());
-        loggedUser.setFullName(this.getFullName());
-        //TODO: JOZIKEEE
-//        if (!this.getProcessRoles().isEmpty())
-//            loggedUser.parseProcessRoles(this.getProcessRoles());
-//        loggedUser.setGroups(this.getNextGroups());
-        return loggedUser;
-    }
+//    @Override
+//    public LoggedUser transformToLoggedUser() {
+//        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getUid(), getHomeDirectory(), this.getAuthorities());
+//        loggedUser.setFullName(this.getFullName());
+//        //TODO: JOZIKEEE
+////        if (!this.getProcessRoles().isEmpty())
+////            loggedUser.parseProcessRoles(this.getProcessRoles());
+////        loggedUser.setGroups(this.getNextGroups());
+//        return loggedUser;
+//    }
 
 
     public void loadFromUser(User user) {
