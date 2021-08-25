@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
@@ -187,7 +188,7 @@ public class ElasticCaseService implements IElasticCaseService {
         buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
-        buildStringQuery(request, query);
+        buildStringQuery(request, query, user);
         buildCaseIdQuery(request, query);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
@@ -417,12 +418,14 @@ public class ElasticCaseService implements IElasticCaseService {
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+    private void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
 
-        query.must(queryStringQuery(request.query));
+        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+
+        query.must(queryStringQuery(populatedQuery));
     }
 
     /**
