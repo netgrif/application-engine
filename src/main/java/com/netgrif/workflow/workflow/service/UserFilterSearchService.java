@@ -41,4 +41,21 @@ public class UserFilterSearchService implements IUserFilterSearchService {
         }
         return Collections.emptyList();
     }
+
+    @Override
+    public List<Case> findAllUserFilters() {
+        Page<Case> page = this.caseSearchService.search(Collections.singletonList(
+                CaseSearchRequest.builder()
+                        .process(Collections.singletonList(new CaseSearchRequest.PetriNet(FilterRunner.FILTER_PETRI_NET_IDENTIFIER)))
+                        .build()
+                ),
+                this.userService.getLoggedOrSystem().transformToLoggedUser(),
+                PageRequest.of(0, 100),
+                LocaleContextHolder.getLocale(),
+                true);
+        if (page.hasContent()) {
+            return page.getContent();
+        }
+        return Collections.emptyList();
+    }
 }
