@@ -18,6 +18,7 @@ class RunnerController {
             FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,
+            DefaultFiltersRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
