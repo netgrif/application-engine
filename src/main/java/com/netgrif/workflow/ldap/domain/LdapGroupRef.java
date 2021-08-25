@@ -11,7 +11,6 @@ import java.util.List;
 
 
 @Entry(
-        base = "ou=groups",
         objectClasses = {"groupOfNames"}
 )
 
