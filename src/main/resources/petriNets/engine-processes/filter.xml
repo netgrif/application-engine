@@ -7,6 +7,19 @@
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
     <caseName name="case_name">New filter</caseName>
+    <!-- CASE EVENTS -->
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    caseId: f.filter_case_id;
+
+                    change caseId value {return useCase.stringId};
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <!-- PROCESS ROLE REFS -->
@@ -40,6 +53,14 @@
     <data type="text">
         <id>new_title</id>
         <title name="filter_name">Filter name</title>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>i18n_filter_name</id>
+        <title></title>
+    </data>
+    <data type="text">
+        <id>filter_case_id</id>
+        <title></title>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -123,6 +144,12 @@
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
+                    <action trigger="set">
+                        userTitle: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(userTitle.value) }
+                    </action>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -206,7 +233,7 @@
         </dataGroup>
     </transition>
     <transition>
-        <id>t3</id>
+        <id>frontend_create</id>
         <x>380</x>
         <y>260</y>
         <layout>
@@ -263,6 +290,122 @@
             </dataRef>
         </dataGroup>
     </transition>
+    <transition>
+        <id>auto_create</id>
+        <x>500</x>
+        <y>180</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Automated new filter</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>view_filter</id>
+        <x>860</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label></label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_case_id</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
     <!-- PLACES -->
     <place>
         <id>p1</id>
@@ -293,13 +436,13 @@
         <id>a3</id>
         <type>regular</type>
         <sourceId>p1</sourceId>
-        <destinationId>t3</destinationId>
+        <destinationId>frontend_create</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>a4</id>
         <type>regular</type>
-        <sourceId>t3</sourceId>
+        <sourceId>frontend_create</sourceId>
         <destinationId>p3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
@@ -322,6 +465,27 @@
         <type>read</type>
         <sourceId>p2</sourceId>
         <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>auto_create</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a10</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>view_filter</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
