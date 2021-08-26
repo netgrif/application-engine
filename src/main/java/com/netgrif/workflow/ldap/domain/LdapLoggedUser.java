@@ -5,6 +5,8 @@ import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
+import com.netgrif.workflow.orgstructure.domain.Group;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,13 +60,12 @@ public class LdapLoggedUser extends LoggedUser {
         user.setHomeDirectory(homeDirectory);
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
-//        user.setNextGroups(this.getGroups().);
-//        user.setProcessRoles(processRoles.stream().map(roleId -> {
-//            ProcessRole role = new ProcessRole();
-//            role.set_id(roleId);
-//            return role;
-//        }).collect(Collectors.toSet()));
-//TODO: JOZIKEEE
+        user.setGroups(this.getGroups().stream().map(Group::new).collect(Collectors.toSet()));
+        user.setProcessRoles(this.getProcessRoles().stream().map(roleId -> {
+            ProcessRole role = new ProcessRole();
+            role.set_id(roleId);
+            return role;
+        }).collect(Collectors.toSet()));
         return user;
     }
 }
