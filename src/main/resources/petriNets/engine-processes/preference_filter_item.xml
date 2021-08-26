@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+	<id>preference_filter_item</id>
+	<initials>PFI</initials>
+	<title>Preference filter item</title>
+	<icon>list</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="enumeration" immediate="true">
+		<id>entry_name</id>
+		<title></title>
+	</data>
+	<data type="text" >
+		<id>entry_default_name</id>
+		<title name="menu_item_title">Menu item title</title>
+	</data>
+	<data type="text">
+		<id>entry_marker</id>
+		<title></title>
+	</data>
+	<data type="button">
+		<id>move_option_up</id>
+		<title></title>
+		<placeholder name="move_up">Up</placeholder>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			if (!task.isPresent()) {
+				return;
+			}
+
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+
+			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+
+			if (currentIndex != 0) {
+				previousTaskRefValue.remove(currentIndex)
+				previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
+
+				def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+
+				setDataWithPropagation(parentTask, [
+					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				])
+			}
+		</action>
+	</data>
+	<data type="button">
+		<id>move_option_down</id>
+		<title></title>
+		<placeholder name="move_down">Down</placeholder>
+		<action trigger="set">
+			parentId: f.parentId;
+
+			if (!task.isPresent()) {
+				return;
+			}
+
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+
+			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+
+			if (currentIndex != previousTaskRefValue.size() - 1) {
+				previousTaskRefValue.remove(currentIndex)
+				previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
+
+				def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+
+				setDataWithPropagation(parentTask, [
+					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				])
+			}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_option</id>
+		<title></title>
+		<placeholder name="remove">Remove</placeholder>
+		<action trigger="set">
+			parentId: f.parentId,
+			filterCase: f.filter_case;
+
+			if (!task.isPresent()) {
+				return;
+			}
+
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+
+
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+
+			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
+
+			previousTaskRefValue.remove(currentIndex)
+
+
+			def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
+
+			currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
+
+			previousCaseRefValue.remove(currentIndex)
+
+
+			def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+
+			setDataWithPropagation(parentTask, [
+				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
+				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue]
+			])
+
+			async.run {
+				workflowService.deleteCase(useCase.stringId)
+			}
+		</action>
+	</data>
+	<data type="taskRef">
+		<id>filter_preview</id>
+		<title></title>
+	</data>
+	<data type="caseRef">
+		<id>filter_case</id>
+		<title></title>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="text">
+		<id>parentId</id>
+		<title></title>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_icon</id>
+		<title name="display_icon">Display menu icon?</title>
+		<init>true</init>
+	</data>
+	<data type="text">
+		<id>icon_preview</id>
+		<title name="icon_preview">Menu icon preview</title>
+		<view>
+			<htmlEditor/>
+		</view>
+		<init></init>
+	</data>
+	<data type="text" immediate="true">
+		<id>icon_name</id>
+		<title name="icon_identifier">Menu icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			iconIdentifier: f.this,
+			iconPreview: f.icon_preview;
+
+			if (iconIdentifier.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+<!--	<data type="boolean">-->
+<!--		<id>use_i18n</id>-->
+<!--		<title>Translate menu item title?</title>-->
+<!--		<init>false</init>-->
+<!--	</data>-->
+<!--	<data type="multichoice_map">-->
+<!--		<id>enabled_locales</id>-->
+<!--		<title>Supported locales</title>-->
+<!--	</data>-->
+<!--	<data type="enumeration_map">-->
+<!--		<id>edited_locale</id>-->
+<!--		<title>Edit locale translation</title>-->
+<!--	</data>-->
+<!--	<data type="text">-->
+<!--		<id>new_translation_value</id>-->
+<!--		<title>Menu item translation in selected locale</title>-->
+<!--	</data>-->
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="menu_item_title">Názov položky menu</i18nString>
+		<i18nString name="move_up">Posunúť nahor</i18nString>
+		<i18nString name="move_down">Posunúť nadol</i18nString>
+		<i18nString name="remove">Odstrániť</i18nString>
+		<i18nString name="display_icon">Zobrazovať ikonu?</i18nString>
+		<i18nString name="icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
+		<i18nString name="move_up">nach oben</i18nString>
+		<i18nString name="move_down">nach unten</i18nString>
+		<i18nString name="remove">entfernen</i18nString>
+		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
+		<i18nString name="icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="icon_identifier">Ikone ID</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+	</i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>init</id>
+		<x>420</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+		<dataRef>
+			<id>filter_case</id>
+			<logic>
+				<behavior>forbidden</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+			</layout>
+			<logic>
+				<action trigger="set">
+					filterTaskRef: f.filter_preview,
+					filterCaseRef: f.filter_case,
+					entryDefaultName: f.entry_default_name,
+					entryName: f.entry_name,
+					icon: f.icon_name;
+
+					def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+
+					change entryDefaultName value {return filterCase.title}
+
+					change entryName value {return filterCase.dataSet["i18n_filter_name"].value}
+
+					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+
+					change icon value {filterCase.icon}
+				</action>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>parentId</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>icon_name</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+	</transition>
+	<transition>
+		<id>view</id>
+		<x>660</x>
+		<y>260</y>
+		<layout>
+			<cols>5</cols>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<title></title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>entry_default_name</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						entryName: f.entry_name,
+						entryDefaultName: f.entry_default_name;
+
+						change entryName value {return new com.netgrif.workflow.petrinet.domain.I18nString(entryDefaultName.value)}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_option_up</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>fill</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_option_down</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_option</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.icon_preview,
+							iconName: f.icon_name,
+							useIcon: f.use_icon;
+
+							make iconPreview,visible on trans when {useIcon.value}
+							make iconName,editable on trans when {useIcon.value}
+
+							make iconPreview,hidden on trans when {!useIcon.value}
+							make iconName,hidden on trans when {!useIcon.value}
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+				</layout>
+			</dataRef>
+<!--			<dataRef>-->
+<!--				<id>use_i18n</id>-->
+<!--				<logic>-->
+<!--					<behavior>editable</behavior>-->
+<!--				</logic>-->
+<!--				<layout>-->
+<!--					<x>0</x>-->
+<!--					<y>2</y>-->
+<!--					<rows>1</rows>-->
+<!--					<cols>1</cols>-->
+<!--					<offset>0</offset>-->
+<!--					<template>material</template>-->
+<!--				</layout>-->
+<!--				<event type="set">-->
+<!--					<id>0</id>-->
+<!--					<actions phase="post">-->
+<!--						<action>-->
+<!--							trans: t.this,-->
+<!--							i18nMultichoice: f.enabled_locales,-->
+<!--							i18nEnumeration: f.edited_locale,-->
+<!--							i18nTextfield: f.new_translation_value,-->
+<!--							useI18n: f.use_i18n;-->
+
+<!--							make i18nMultichoice,editable on trans when {useI18n.value}-->
+<!--							make i18nEnumeration,editable on trans when {useI18n.value}-->
+<!--							make i18nTextfield,editable on trans when {useI18n.value}-->
+
+<!--							make i18nMultichoice,hidden on trans when {!useI18n.value}-->
+<!--							make i18nEnumeration,hidden on trans when {!useI18n.value}-->
+<!--							make i18nTextfield,hidden on trans when {!useI18n.value}-->
+<!--						</action>-->
+<!--					</actions>-->
+<!--				</event>-->
+<!--			</dataRef>-->
+<!--			<dataRef>-->
+<!--				<id>enabled_locales</id>-->
+<!--				<logic>-->
+<!--					<behavior>hidden</behavior>-->
+<!--				</logic>-->
+<!--				<layout>-->
+<!--					<x>1</x>-->
+<!--					<y>2</y>-->
+<!--					<rows>1</rows>-->
+<!--					<cols>1</cols>-->
+<!--					<offset>0</offset>-->
+<!--					<template>material</template>-->
+<!--					<appearance>outline</appearance>-->
+<!--				</layout>-->
+<!--			</dataRef>-->
+<!--			<dataRef>-->
+<!--				<id>edited_locale</id>-->
+<!--				<logic>-->
+<!--					<behavior>hidden</behavior>-->
+<!--				</logic>-->
+<!--				<layout>-->
+<!--					<x>2</x>-->
+<!--					<y>2</y>-->
+<!--					<rows>1</rows>-->
+<!--					<cols>1</cols>-->
+<!--					<offset>0</offset>-->
+<!--					<template>material</template>-->
+<!--					<appearance>outline</appearance>-->
+<!--				</layout>-->
+<!--			</dataRef>-->
+<!--			<dataRef>-->
+<!--				<id>new_translation_value</id>-->
+<!--				<logic>-->
+<!--					<behavior>hidden</behavior>-->
+<!--				</logic>-->
+<!--				<layout>-->
+<!--					<x>3</x>-->
+<!--					<y>2</y>-->
+<!--					<rows>1</rows>-->
+<!--					<cols>2</cols>-->
+<!--					<offset>0</offset>-->
+<!--					<template>material</template>-->
+<!--					<appearance>outline</appearance>-->
+<!--				</layout>-->
+<!--			</dataRef>-->
+			<dataRef>
+				<id>filter_preview</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>5</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>entry_marker</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>entry_name</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>300</x>
+		<y>260</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>540</x>
+		<y>260</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>view</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
