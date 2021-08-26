@@ -36,24 +36,28 @@ public class AuthenticationService implements IAuthenticationService {
         cache = new ConcurrentHashMap<>();
     }
 
+    public static String getClientIP(HttpServletRequest request) {
+        String xHeader = request.getHeader("X-Forwarded-For");
+        if (xHeader == null)
+            return request.getRemoteAddr();
+        return xHeader.split(",")[0];
+
+    }
 
     @EventListener
     public void onAuthenticationFailure(AuthenticationFailureBadCredentialsEvent event) {
         loginFailed(((WebAuthenticationDetails) event.getAuthentication().getDetails()).getRemoteAddress());
     }
 
-
     @EventListener
     public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {
         loginSucceeded(((WebAuthenticationDetails) event.getAuthentication().getDetails()).getRemoteAddress());
     }
 
-
     @Override
     public void loginSucceeded(String key) {
         cache.remove(key);
     }
-
 
     @Override
     public void loginFailed(String key) {
@@ -66,13 +70,11 @@ public class AuthenticationService implements IAuthenticationService {
         cache.put(key, attempt);
     }
 
-
     @Override
     public boolean isIPBlocked(String key) {
         timeout(key);
         return cache.get(key) != null && cache.get(key).getBlockTime() != null;
     }
-
 
     private void timeout(String key) {
         Attempt attempt = cache.get(key);
@@ -83,18 +85,8 @@ public class AuthenticationService implements IAuthenticationService {
 
     }
 
-
-    public static String getClientIP(HttpServletRequest request) {
-        String xHeader = request.getHeader("X-Forwarded-For");
-        if (xHeader == null)
-            return request.getRemoteAddr();
-        return xHeader.split(",")[0];
-
-    }
-
-
-   @Data
-   public class Attempt {
+    @Data
+    public class Attempt {
 
         private Integer count;
         private LocalDateTime blockTime;
@@ -105,7 +97,7 @@ public class AuthenticationService implements IAuthenticationService {
 
 
         public void increase() {
-           this.count++;
+            this.count++;
         }
     }
 

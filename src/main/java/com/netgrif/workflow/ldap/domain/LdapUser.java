@@ -18,19 +18,6 @@ public class LdapUser extends User {
     protected String uid;
 
     protected String homeDirectory;
-//
-//    protected String homeDirectory;
-//
-//    protected String homeDirectory;
-//
-//    protected String homeDirectory;
-//
-//    protected String homeDirectory;
-//
-//    protected String homeDirectory;
-
-
-
 
     public LdapUser() {
     }
@@ -43,32 +30,19 @@ public class LdapUser extends User {
 
 
     public LdapUser(String dn, String commonName, String uid, String homeDirectory,
-                    String email, String password, String name, String surname) {
+                    String email, String password, String name, String surname, String telNumber) {
         super(email, password, name, surname);
-        this.dn = dn;
-        this.commonName = commonName;
-        this.uid = uid;
-        this.homeDirectory = homeDirectory;
+        this.setDn(dn);
+        this.setTelNumber(telNumber);
+        this.setCommonName(commonName);
+        this.setUid(uid);
+        this.setHomeDirectory(homeDirectory);
     }
 
 
     public LdapUser(String email, String password, String name, String surname) {
         super(email, password, name, surname);
     }
-
-
-
-
-//    @Override
-//    public LoggedUser transformToLoggedUser() {
-//        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getUid(), getHomeDirectory(), this.getAuthorities());
-//        loggedUser.setFullName(this.getFullName());
-//        //TODO: JOZIKEEE
-////        if (!this.getProcessRoles().isEmpty())
-////            loggedUser.parseProcessRoles(this.getProcessRoles());
-////        loggedUser.setGroups(this.getNextGroups());
-//        return loggedUser;
-//    }
 
 
     public void loadFromUser(User user) {
