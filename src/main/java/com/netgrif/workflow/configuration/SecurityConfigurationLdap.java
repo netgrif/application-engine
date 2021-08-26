@@ -9,10 +9,10 @@ import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.ldap.domain.LdapUserRef;
-import com.netgrif.workflow.ldap.service.LdapUserService;
-import org.springframework.ldap.core.support.LdapContextSource;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRefRepository;
+import com.netgrif.workflow.ldap.service.LdapUserService;
 import com.netgrif.workflow.ldap.service.interfaces.ILdapUserRefService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -49,7 +50,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
@@ -231,9 +231,8 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         );
     }
 
-    public LdapContextSource contextSource () {
-        LdapContextSource contextSource= new LdapContextSource();
-
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
         contextSource.setUrl(ldapUrl);
         contextSource.setBase(ldapProperties.getBase());
         contextSource.setUserDn(ldapUsername);
@@ -248,12 +247,14 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> authorities) {
             User user = ldapUserService.findByDn(dirContextOperations.getDn());
             if (user == null) {
-                Optional<LdapUserRef> ldapUserOptional = ldapUserRefRepository.findById(dirContextOperations.getDn());
-                if (!ldapUserOptional.isPresent()) {
+                LdapUserRef ldapUserOptional = ldapUserRefService.findById(dirContextOperations.getDn());
+                if (ldapUserOptional == null) {
                     log.warn("Unknown user [" + username + "] tried to log in");
                     return null;
                 }
-                user = ldapUserRefService.createUser(ldapUserOptional.get());
+                user = ldapUserRefService.createUser(ldapUserOptional);
+            } else if( user instanceof LdapUser ){
+                ldapUserRefService.updateById(dirContextOperations.getDn(), user);
             }
             assert user != null;
             return user.transformToLoggedUser();
