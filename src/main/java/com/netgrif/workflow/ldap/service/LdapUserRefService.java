@@ -93,15 +93,13 @@ public class LdapUserRefService implements ILdapUserRefService {
     }
 
     private String verificationData(DirContextOperations context, String attribute) {
-        if (attribute != null) {
-            if (!attribute.equals("")) {
+        if (attribute != null && !attribute.equals("")) {
                 try {
                     return context.getStringAttribute(attribute);
                 } catch (Exception e) {
                     log.warn("");
                     return null;
                 }
-            }
         }
         return null;
     }
