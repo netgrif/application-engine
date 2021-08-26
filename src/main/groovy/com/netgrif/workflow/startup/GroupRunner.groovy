@@ -34,6 +34,7 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
 
     private static final String GROUP_FILE_NAME = "engine-processes/org_group.xml";
     private static final String GROUP_PETRINET_IDENTIFIER = "org_group"
+    public static final String DEFAULT_GROUP_TITLE = "Default system group"
 
     @Override
     void run(String... args) throws Exception {
