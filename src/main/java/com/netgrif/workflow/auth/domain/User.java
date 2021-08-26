@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class User {
 
     public static final String UNKNOWN = "unknown";
@@ -26,64 +26,64 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
-    private Long id;
+    protected Long id;
 
     @NotNull
     @Email
     @Column(unique = true)
     @Getter
     @Setter
-    private String email;
+    protected String email;
 
     @Getter
     @Setter
-    private String telNumber;
+    protected String telNumber;
 
     @Getter
     @Setter
-    private String avatar;
+    protected String avatar;
 
     @JsonIgnore
     @Getter
     @Setter
-    private String password;
+    protected String password;
 
     @NotNull
     @NotBlank
     @Getter
     @Setter
-    private String name;
+    protected String name;
 
     @NotNull
     @NotBlank
     @Getter
     @Setter
-    private String surname;
+    protected String surname;
 
     @NotNull
     @Getter
     @Setter
-    private UserState state;
+    protected UserState state;
 
     @Getter
     @Setter
-    private String token;
+    protected String token;
 
     @Getter
     @Setter
-    private LocalDateTime expirationDate;
+    protected LocalDateTime expirationDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
     @Getter
     @Setter
-    private Set<Authority> authorities;
+    protected Set<Authority> authorities;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
     @Getter
     @Setter
-    private Set<UserProcessRole> userProcessRoles;
+    protected Set<UserProcessRole> userProcessRoles;
 
     @Transient
     @Getter
@@ -93,12 +93,12 @@ public class User {
     @Transient
     @Getter
     @Setter
-    private Set<Group> groups;
+    protected Set<Group> groups;
 
     @Transient
     @Getter
     @Setter
-    private Set<String> nextGroups;
+    protected Set<String> nextGroups;
 
     public User() {
         groups = new HashSet<>();
