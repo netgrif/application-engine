@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>function_test</id>
+    <initials>SFT</initials>
+    <title>Test</title>
+    <!-- ROLE -->
+    <role>
+        <id>admin</id>
+        <name>Admin</name>
+    </role>
+    <role>
+        <id>user</id>
+        <name>User</name>
+    </role>
+    <function scope="process" name="showFields">
+        { def fields, def transitionIds, def condition, behavior = editable, behavior2 = required ->
+            if (evaluateCompactedCondition(condition)) {
+                transitionIds.each { transitionId ->
+                    fields.each {
+                        behaveField(it as String, transitionId, behavior as Closure)
+                        behaveField(it as String, transitionId, behavior2 as Closure)
+                    }
+
+                }
+            } else {
+                transitionIds.each { transitionId ->
+                    fields.each {
+                        behaveField(it as String, transitionId, hidden as Closure)
+                        behaveField(it as String, transitionId, optional as Closure)
+                    }
+                }
+            }
+        }
+    </function>
+    <function scope="process" name="behaveField">
+        { def fieldId, def transitionId, def behavior ->
+            make useCase.getField(fieldId), behavior on useCase.petriNet.transitions[transitionId] when { true }
+        }
+    </function>
+    <function scope="process" name="evaluateCompactedCondition">
+        { def compactedCondition ->
+            for (def disjunction = compactedCondition.iterator(); disjunction.hasNext();) {
+                if (!evaluateCompactedDisjunction(disjunction.next()))
+                    return false
+            }
+            return true
+        }
+    </function>
+    <function scope="process" name="evaluateCompactedDisjunction">
+        { def compactedDisjunction ->
+            String fieldId = compactedDisjunction.get(0)
+            String fieldType = compactedDisjunction.get(1)
+
+            if (compactedDisjunction.size() == 2) {
+                // empty condition
+                return ((useCase.dataSet[fieldId].value as String)?.isEmpty() as boolean || useCase.dataSet[fieldId]?.value == null) as boolean
+            } else {
+                if (fieldType == "E" || fieldType == "B")
+                    return compactedDisjunction[2..compactedDisjunction.size() - 1].contains(useCase.dataSet[fieldId].value as String) as boolean
+                else if (fieldType == "M") {
+                    return ![0, null].contains((useCase.dataSet[fieldId].value as Set)?.stream()?.map { str -> str as String }?.collect(Collectors.toSet())?.intersect(compactedDisjunction[2..compactedDisjunction.size() - 1])?.size()) as boolean
+                } else if (fieldType == "BTN") {
+                    if (useCase.dataSet[fieldId].value == null) return false
+                    return compactedDisjunction[2..compactedDisjunction.size() - 1].contains((useCase.dataSet[fieldId]?.value as int) % 2 as String) as Boolean
+                } else return false
+            }
+        }
+    </function>
+    <!-- DATA -->
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <action trigger="set">
+            text: f.text;
+
+            function_test.foo(text.value)
+        </action>
+    </data>
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+    </data>
+    <data type="enumeration">
+        <id>enum</id>
+        <title>Enum</title>
+        <values>ano</values>
+        <values>nie</values>
+        <action trigger="set">
+            showFields(["number"], ["0"], [["enum", "E", "ano"]])
+        </action>
+    </data>
+    <data type="number">
+        <id>number2</id>
+        <title>Number</title>
+    </data>
+    <data type="boolean">
+        <id>createUser</id>
+        <title>Boolean</title>
+        <init>false</init>
+        <action trigger="set">
+            def user = new com.netgrif.workflow.auth.domain.User("test@test.com", "password", "test", "test")
+            user.state = com.netgrif.workflow.auth.domain.UserState.ACTIVE
+            function_res.createUser(user)
+        </action>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>0</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Test</label>
+        <dataGroup>
+            <id>0</id>
+            <layout>flow</layout>
+            <dataRef>
+                <id>number</id>
+                <logic><behavior>editable</behavior></logic>
+            </dataRef>
+            <dataRef>
+                <id>enum</id>
+                <logic><behavior>editable</behavior></logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
