@@ -31,7 +31,6 @@ public class LdapUserService extends UserService {
     private ProcessRoleRepository processRoleRepository;
 
 
-
     public LdapUser findByDn(Name dn) {
         return ldapUserRepository.findByDn(dn.toString());
     }
