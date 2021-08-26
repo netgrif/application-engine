@@ -56,6 +56,11 @@ public class Importer {
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
+
+    public static final String DEFAULT_FIELD_TEMPLATE = "material";
+    public static final String DEFAULT_FIELD_APPEARANCE = "outline";
+    public static final String DEFAULT_FIELD_ALIGNMENT = null;
+
     @Getter
     private Document document;
     private PetriNet net;
@@ -648,22 +653,22 @@ public class Importer {
                 return;
             }
 
-            String appearance = "outline";
-            if (layout.getAppearance() != null) {
-                appearance = layout.getAppearance().toString();
-            }
-
-            String alignment = null;
-            if (layout.getAlignment() != null) {
-                alignment = layout.getAlignment().value();
-            }
-
-            String template = null;
+            String template = DEFAULT_FIELD_TEMPLATE;
             if (layout.getTemplate() != null) {
                 template = layout.getTemplate().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
+            String appearance = DEFAULT_FIELD_APPEARANCE;
+            if (layout.getAppearance() != null) {
+                appearance = layout.getAppearance().toString();
+            }
+
+            String alignment = DEFAULT_FIELD_ALIGNMENT;
+            if (layout.getAlignment() != null) {
+                alignment = layout.getAlignment().value();
+            }
+
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), template, appearance, alignment);
             transition.addDataSet(fieldId, null, null, fieldLayout, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
