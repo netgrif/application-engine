@@ -171,6 +171,18 @@
             <!-- NEVER EVER CHANGE THIS VERSION TO 2.0.7 -->
             <version>2.0.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-all</artifactId>
+            <version>1.13</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>de.rototor.pdfbox</groupId>
+            <artifactId>graphics2d</artifactId>
+            <version>0.32</version>
+        </dependency>
+
 
         <!-- Jsoup -->
         <dependency>
@@ -247,6 +259,23 @@
             <version>${drools.version}</version>
         </dependency>
 
+        <!-- LDAP -->
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-ldap</artifactId>
+        </dependency>
 
         <!-- Quartz -->
         <!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
