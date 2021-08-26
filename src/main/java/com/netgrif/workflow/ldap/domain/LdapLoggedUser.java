@@ -5,14 +5,8 @@ import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
-
-
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
-
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
