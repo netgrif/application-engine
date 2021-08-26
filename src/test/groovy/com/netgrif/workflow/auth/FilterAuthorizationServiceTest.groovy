@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
@@ -51,8 +52,13 @@ class FilterAuthorizationServiceTest {
     @Autowired
     private FilterRepository filterRepository
 
+    @Autowired
+    private TestHelper testHelper
+
     @Before
     void before() {
+        testHelper.truncateDbs()
+
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
