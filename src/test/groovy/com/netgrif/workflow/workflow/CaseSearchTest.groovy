@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.service.CaseSearchService
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -177,10 +178,10 @@ class CaseSearchTest {
 
     String buildRequestBody(String fullText) {
         def map = [
-                "process": [
-                        "identifier": "case_search_test.xml"
+                (CaseSearchService.PETRINET): [
+                        (CaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
                 ],
-                "fullText": fullText
+                (CaseSearchService.FULLTEXT): fullText
         ]
 
         ObjectMapper mapper = new ObjectMapper()
