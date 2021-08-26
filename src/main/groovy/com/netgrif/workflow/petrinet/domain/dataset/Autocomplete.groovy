@@ -1,5 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import lombok.Getter
+
 enum Autocomplete {
     OFF("off"),
     NAME("name"),
@@ -55,7 +57,8 @@ enum Autocomplete {
     URL("url"),
     PHOTO("photo");
 
-    String value
+    @Getter
+    private final String value
 
     Autocomplete(String value) {
         this.value = value
