@@ -84,7 +84,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        BooleanBuilder constraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
+
+        BooleanBuilder constraints = new BooleanBuilder(role(new ArrayList<>(user.getProcessRoles())));
+        constraints.or(buildViewUsersQueryConstraint(user));
 
         BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
         negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
