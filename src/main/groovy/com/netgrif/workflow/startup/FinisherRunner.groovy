@@ -8,23 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
-@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 @Component
 class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(FinisherRunner)
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private PetriNetService petriNetService
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private CaseRepository caseRepository
 
     @Override
     void run(String... strings) throws Exception {

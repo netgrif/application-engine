@@ -76,7 +76,7 @@ class ImportHelper {
     @Autowired
     private IFilterService filterService
 
-    @Autowired
+    @Autowired(required = false)
     private SuperCreator superCreator
 
     @Autowired
