@@ -18,21 +18,19 @@
         <title name="upload_file">Upload filter file</title>
         <placeholder name="upload_file_placeholder">Insert file containing filters</placeholder>
         <desc name="upload_file_desc">Insert xml file that contains filters</desc>
-        <action trigger="get" phase="pre">
-<!--            TODO: delete file after upload/on load-->
-        </action>
     </data>
     <data type="button">
         <id>import_file</id>
         <title></title>
         <placeholder name="import_file_placeholder">Import filters</placeholder>
         <desc name="import_file_desc">Import filters from uploaded xml file</desc>
-        <action trigger="set" phase="post">
-            filterImportExportService.importFilters()
-        </action>
         <component>
             <name>raised</name>
         </component>
+    </data>
+    <data type="taskRef">
+        <id>imported_filters</id>
+        <title></title>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -83,6 +81,11 @@
                 <id>import_file</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        importedFiltersRef: f.imported_filters;
+
+                        change importedFiltersRef value { importFilters() }
+                    </action>
                 </logic>
                 <layout>
                     <x>2</x>
@@ -95,6 +98,37 @@
                 </layout>
             </dataRef>
         </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>imported_filters</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id></id>
+            <actions phase="post">
+                <action>
+                    importedFilters: f.imported_filters,
+                    importFile: f.importFile;
+
+                    change importedFilters value { null }
+                    change importFile value { null }
+                </action>
+            </actions>
+        </event>
     </transition>
     <!-- PLACES -->
     <place>

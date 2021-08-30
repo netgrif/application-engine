@@ -7,13 +7,16 @@ import com.google.common.collect.Lists;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.workflow.domain.*;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -36,7 +41,20 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String EXPORT_NET_IDENTIFIER = "export_filters";
     private static final String IMPORT_NET_IDENTIFIER = "import_filters";
 
-    private static final String EXPORT_FILE_FIELD = "export_file";
+    private static final String UPLOAD_FILE_FIELD = "upload_file";
+
+    private static final String DEFAULT_SEARCH_CATEGORIES = "defaultSearchCategories";
+    private static final String INHERIT_ALLOWED_NETS = "inheritAllowedNets";
+
+    private static final String FILTER_TYPE_CASE = "Case";
+    private static final String FILTER_TYPE_TASK = "Task";
+
+    private static final String IMPORT_FILTER_TRANSITION = "import_filter";
+
+    private static final String FIELD_VISIBILITY = "visibility";
+    private static final String FIELD_FILTER_TYPE = "filter_type";
+    private static final String FIELD_FILTER = "filter";
+    private static final String FIELD_NAME = "i18n_filter_name";
 
     @Autowired
     IUserService userService;
@@ -46,6 +64,12 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Autowired
     IPetriNetService petriNetService;
+
+    @Autowired
+    DefaultFiltersRunner defaultFiltersRunner;
+
+    @Autowired
+    private ITaskService taskService;
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
@@ -77,8 +101,76 @@ public class FilterImportExportService implements IFilterImportExportService {
     }
 
     @Override
-    public void importFilters() {
+    public List<String> importFilters() throws IOException {
+        FilterImportExportList filterList = loadFromXML();
+        List<String> importedFiltersIds = new ArrayList<>();
 
+        filterList.getFilters().forEach(filter -> {
+            Optional<Case> filterCase = Optional.empty();
+            if (filter.getType().equals(FILTER_TYPE_CASE)) {
+                filterCase = defaultFiltersRunner.createCaseFilter(
+                        filter.getFilterName().getDefaultValue(),
+                        filter.getIcon(),
+                        "",
+                        filter.getVisibility(),
+                        filter.getFilterValue(),
+                        filter.getAllowedNets(),
+                        filter.getFilterMetadata(),
+                        filter.getFilterName().getTranslations(),
+                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
+                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
+                );
+            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
+                filterCase = defaultFiltersRunner.createTaskFilter(
+                        filter.getFilterName().getDefaultValue(),
+                        filter.getIcon(),
+                        "",
+                        filter.getVisibility(),
+                        filter.getFilterValue(),
+                        filter.getAllowedNets(),
+                        filter.getFilterMetadata(),
+                        filter.getFilterName().getTranslations(),
+                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
+                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
+                );
+            }
+
+            if (filterCase.isPresent()) {
+                Task importFilterTask = taskService.searchOne(QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION).and(QTask.task.caseId.eq(filterCase.get().getStringId())));
+                importedFiltersIds.add(importFilterTask.getStringId());
+            }
+        });
+
+        return importedFiltersIds;
+    }
+
+    @Transactional
+    protected FilterImportExportList loadFromXML() throws IOException {
+        Case exportCase = workflowService.searchOne(
+                QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
+                        .and(QCase.case$.author.id.eq(userService.getLoggedUser().getId()))
+        );
+
+        FileFieldValue ffv = (FileFieldValue) exportCase.getDataSet().get(UPLOAD_FILE_FIELD).getValue();
+
+        File f = new File(ffv.getPath());
+        XmlMapper xmlMapper = new XmlMapper();
+        String xml = inputStreamToString(new FileInputStream(f));
+        FilterImportExportList filterList = xmlMapper.readValue(xml, FilterImportExportList.class);
+
+        filterList.getFilters().forEach(filter -> {
+            Object defaultSearchCategories = filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES);
+            Object inheritAllowedNets = filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS);
+
+            filter.getFilterMetadata().put(DEFAULT_SEARCH_CATEGORIES, defaultSearchCategories.equals("true"));
+            filter.getFilterMetadata().put(INHERIT_ALLOWED_NETS, inheritAllowedNets.equals("true"));
+
+            if (filter.getAllowedNets() == null) {
+                filter.setAllowedNets(new ArrayList<>());
+            }
+        });
+
+        return filterList;
     }
 
     @Transactional
@@ -102,20 +194,36 @@ public class FilterImportExportService implements IFilterImportExportService {
     private FilterImportExport createExportClass(Case filter) {
         FilterImportExport exportFilter = new FilterImportExport();
         exportFilter.setTitle(filter.getTitle());
+        exportFilter.setIcon(filter.getIcon());
         filter.getImmediateData().forEach(immediateData -> {
-            if (immediateData.getClass().equals(FilterField.class) && immediateData.getName().getDefaultValue().equals("Filter")) {
-                exportFilter.setFilterName(immediateData.getName());
-                exportFilter.setFilterValue(((FilterField) immediateData).getValue());
-                exportFilter.setFilterMetadata(((FilterField) immediateData).getFilterMetadata());
-            } else if (immediateData.getClass().equals(EnumerationMapField.class)) {
-                if (immediateData.getName().equals("Filter visibility")) {
+            switch (immediateData.getImportId()) {
+                case FIELD_FILTER:
+                    exportFilter.setFilterValue(((FilterField) immediateData).getValue());
+                    exportFilter.setFilterMetadata(((FilterField) immediateData).getFilterMetadata());
+                    exportFilter.setAllowedNets(((FilterField) immediateData).getAllowedNets());
+                    break;
+                case FIELD_VISIBILITY:
                     exportFilter.setVisibility(immediateData.getValue().toString());
-                } else if (immediateData.getName().equals("Filter type")) {
+                    break;
+                case FIELD_FILTER_TYPE:
                     exportFilter.setType(immediateData.getValue().toString());
-                }
+                    break;
+                case FIELD_NAME:
+                    exportFilter.setFilterName((I18nString) immediateData.getValue());
             }
         });
         return exportFilter;
+    }
+
+    private String inputStreamToString(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        String line;
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+        br.close();
+        return sb.toString();
     }
 }
 
