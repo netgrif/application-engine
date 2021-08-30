@@ -76,7 +76,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         ])
         createTaskFilter("My tasks", "account_box", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
                 "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
-                "searchCategories": ["task_assignee"]
+                "searchCategories": ["task_assignee", "kokot_v_hube"]
         ], [
                 (GERMAN_ISO_3166_CODE): "Meine Aufgaben",
                 (SLOVAK_ISO_3166_CODE): "Moje úlohy"
@@ -176,7 +176,8 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
-            Map<String, String> titleTranslations
+            Map<String, String> titleTranslations,
+            boolean isUserFilter = false
     ) {
         PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
