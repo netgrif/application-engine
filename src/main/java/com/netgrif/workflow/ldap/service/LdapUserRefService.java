@@ -16,6 +16,7 @@ import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import javax.naming.Name;
 
 @Service
 @Slf4j
+@ConditionalOnExpression("${nae.ldap.enabled}")
 public class LdapUserRefService implements ILdapUserRefService {
 
     @Value("${spring.ldap.groups:null}")
