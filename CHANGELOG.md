@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10906/tab/release-report-all-issues"></a>
+## 5.6.1 (30.08.2021)
+### Bug fixes
+* [NAE-1424](https://netgrif.atlassian.net/browse/NAE-1424) - LDAP integration security vulnerability
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10891/tab/release-report-all-issues"></a>
 ## 5.6.0 (26.08.2021)
 ### Bug fixes
