@@ -62,6 +62,10 @@
         <id>filter_case_id</id>
         <title></title>
     </data>
+    <data type="text">
+        <id>filter_icon</id>
+        <title name="filter_icon">Filter icon</title>
+    </data>
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="process_title">Filter</i18nString>
@@ -78,6 +82,9 @@
         <i18nString name="create_new_filter">Vytvoriť nový filter</i18nString>
         <i18nString name="details">Podrobnosti</i18nString>
         <i18nString name="save">Uložiť</i18nString>
+        <i18nString name="filter_case_name">Názov prípadu</i18nString>
+        <i18nString name="import_filter">Importovať filter</i18nString>
+        <i18nString name="filter_icon">Ikona filtra</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="process_title">Filter</i18nString>
@@ -94,6 +101,9 @@
         <i18nString name="create_new_filter">Neuer Filter erstellen</i18nString>
         <i18nString name="details">Details</i18nString>
         <i18nString name="save">Speichern</i18nString>
+        <i18nString name="filter_case_name">Fallname</i18nString>
+        <i18nString name="import_filter">Importfilter</i18nString>
+        <i18nString name="filter_icon">Filter-Icon</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
@@ -405,6 +415,119 @@
                 </layout>
             </dataRef>
         </dataGroup>
+    </transition>
+    <transition>
+        <id>import_filter</id>
+        <x>740</x>
+        <y>180</y>
+        <label name="import_filter">Import filter</label>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="get">
+                        name: f.new_title;
+
+                        change name value { useCase.getTitle() }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="get">
+                        icon: f.filter_icon;
+
+                        change icon value { useCase.getIcon() }
+                    </action>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id></id>
+            <actions phase="post">
+                <action>
+                    icon: f.filter_icon,
+                    name: f.new_title,
+                    i18nName: f.i18n_filter_name;
+
+                    change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
+                    useCase.setIcon(icon.value)
+                    useCase.setTitle(name.value)
+                    workflowService.save(useCase)
+                </action>
+            </actions>
+        </event>
     </transition>
     <!-- PLACES -->
     <place>
