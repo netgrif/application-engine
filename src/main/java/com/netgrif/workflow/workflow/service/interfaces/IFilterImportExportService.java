@@ -4,13 +4,14 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 public interface IFilterImportExportService {
 
     FileFieldValue exportFilters(Set<String> filtersToExport) throws IOException;
 
-    void importFilters();
+    List<String> importFilters() throws IOException;
 
     void createFilterImport(User author);
 

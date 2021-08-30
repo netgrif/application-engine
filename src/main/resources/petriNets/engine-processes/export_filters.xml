@@ -36,7 +36,7 @@
             export_file: f.export_file,
             trans: t.exportFilter;
 
-            change export_file value { filterImportExportService.exportFilters(exportable_filters.value) }
+            change export_file value { exportFilters(exportable_filters.value) }
             change exportable_filters value { [] }
             make export_file, visible on trans when {exportable_filters.value.length != 0}
             make export_file, hidden on trans when {exportable_filters.value.length == 0}
