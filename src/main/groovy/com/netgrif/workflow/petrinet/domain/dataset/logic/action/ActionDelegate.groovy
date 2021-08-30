@@ -966,4 +966,8 @@ class ActionDelegate {
         }
         return filterImportExportService.exportFilters(filtersToExport)
     }
+
+    List<String> importFilters() {
+        return filterImportExportService.importFilters()
+    }
 }
