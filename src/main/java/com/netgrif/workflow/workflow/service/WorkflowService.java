@@ -18,9 +18,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -113,14 +113,14 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-
+        resolveUserRef(useCase);
+        taskService.resolveUserRef(useCase);
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
-        resolveUserRef(useCase);
         return useCase;
     }
 
@@ -196,7 +196,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
@@ -237,26 +237,29 @@ public class WorkflowService implements IWorkflowService {
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    if (role.getValue().containsKey("delete"))
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete")));
+                    else
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("view", role.getValue().get("view")));
+                })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
-        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        );
+        useCase.setUserRefs(petriNet.getUserRefs());
+
         useCase.setTitle(makeTitle.apply(useCase));
-        runActions(petriNet.getPreCreateActions());
+        runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
-        useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
+        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
+        useCase = findOne(useCase.getStringId());
         resolveTaskRefs(useCase);
 
         useCase = findOne(useCase.getStringId());
@@ -299,7 +302,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions());
+        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getPetriNet());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -307,18 +310,9 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
         log.info("[" + net.getStringId() + "]: Deleting all cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<Case> cases = repository.findAllByPetriNetObjectId(net.getObjectId());
 
-        for (Case c : cases) {
-            log.info("[" + c.getStringId() + "]: Deleting case " + c.getTitle());
-            taskService.deleteTasksByCase(c.getStringId());
-        }
-
+        taskService.deleteTasksByPetriNetId(net.getStringId());
         repository.deleteAllByPetriNetObjectId(net.getObjectId());
-
-        for (Case c : cases) {
-            publisher.publishEvent(new DeleteCaseEvent(c));
-        }
     }
 
     @Override
@@ -505,7 +499,7 @@ public class WorkflowService implements IWorkflowService {
     private void setPetriNet(Case useCase) {
         PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
         model.initializeTokens(useCase.getActivePlaces());
-        model.initializeVarArcs(useCase.getDataSet());
+        model.initializeArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
     }
 
@@ -518,7 +512,7 @@ public class WorkflowService implements IWorkflowService {
 
         Case case$ = findOne(useCaseId);
         actions.forEach(action -> {
-            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty());
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty(), case$.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(changedFieldsTree);
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
@@ -560,7 +554,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
-            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty());
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty(), useCase.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(currentChangedFields);
 
             if (currentChangedFields.getChangedFields().isEmpty())
@@ -571,11 +565,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void runActions(List<Action> actions) {
+    public void runActions(List<Action> actions, PetriNet petriNets) {
         log.info("Running actions without context on cases");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null, Optional.empty());
+            actionsRunner.run(action, null, Optional.empty(), petriNets.getFunctions());
         });
     }
 }

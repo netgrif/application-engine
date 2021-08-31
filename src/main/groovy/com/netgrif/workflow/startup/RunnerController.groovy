@@ -15,6 +15,7 @@ class RunnerController {
             DefaultGroupRunner,
             AuthorityRunner,
             SystemUserRunner,
+            FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,
             DefaultFiltersRunner,
@@ -25,6 +26,7 @@ class RunnerController {
             DummyUserRunner,
             DemoRunner,
             QuartzSchedulerRunner,
+            PdfRunner,
             FinisherRunner
     ]
 
