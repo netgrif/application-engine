@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-enum Autocomplete {
+enum HtmlAutocomplete {
     OFF("off"),
     NAME("name"),
     HONORIFIC_PREFIX("honorific-prefix"),
@@ -57,12 +57,12 @@ enum Autocomplete {
 
     private final String value
 
-    Autocomplete(String value) {
+    HtmlAutocomplete(String value) {
         this.value = value
     }
 
-    static Autocomplete fromString(String value) {
-        for (Autocomplete autocomplete : values()) {
+    static HtmlAutocomplete fromString(String value) {
+        for (HtmlAutocomplete autocomplete : values()) {
             if (autocomplete.value == value.toLowerCase()) {
                 return autocomplete
             }

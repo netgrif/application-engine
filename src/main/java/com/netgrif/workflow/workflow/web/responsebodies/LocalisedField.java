@@ -3,7 +3,6 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
-import com.netgrif.workflow.petrinet.domain.dataset.Autocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
@@ -67,10 +66,8 @@ public class LocalisedField {
         view = field.getView();
         length = field.getLength();
         component = field.getComponent();
-        if (field.getAutocomplete() == null) {
-            autocomplete = Autocomplete.OFF.getValue();
-        } else
-            autocomplete = field.getAutocomplete().getValue();
+        if (field.getHtmlAutocomplete() != null)
+            autocomplete = field.getHtmlAutocomplete().getValue();
         validations = loadValidations(field, locale);
     }
 

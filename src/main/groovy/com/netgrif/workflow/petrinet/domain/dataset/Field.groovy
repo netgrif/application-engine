@@ -64,7 +64,7 @@ abstract class Field<T> extends Imported {
 
     protected List<Validation> validations
 
-    private Autocomplete autocomplete
+    private HtmlAutocomplete htmlAutocomplete
 
     Field() {
         _id = new ObjectId()
@@ -286,12 +286,12 @@ abstract class Field<T> extends Imported {
         this.length = length
     }
 
-    Autocomplete getAutocomplete() {
-        return autocomplete
+    HtmlAutocomplete getHtmlAutocomplete() {
+        return htmlAutocomplete
     }
 
-    void setAutocomplete(Autocomplete autocomplete) {
-        this.autocomplete = autocomplete
+    void setHtmlAutocomplete(HtmlAutocomplete htmlAutocomplete) {
+        this.htmlAutocomplete = htmlAutocomplete
     }
 
     @Override
@@ -322,7 +322,7 @@ abstract class Field<T> extends Imported {
         clone.validations = this.validations?.collect { it.clone() }
         clone.defaultValue = this.defaultValue
         clone.initExpression = this.initExpression
-        clone.autocomplete = this.autocomplete
+        clone.htmlAutocomplete = this.htmlAutocomplete
     }
 
     abstract Field clone()

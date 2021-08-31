@@ -20,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class AutocompleteTest {
+class HtmlAutocompleteTest {
 
     @Autowired
     private TestHelper testHelper
@@ -61,9 +61,9 @@ class AutocompleteTest {
         assert task != null
         def fields = dataService.getData(task, aCase)
 
-        assert fields.find { it.getImportId() == "name" }.autocomplete == Autocomplete.GIVEN_NAME
-        assert fields.find { it.getImportId() == "name2" }.autocomplete == null
-        assert fields.find { it.getImportId() == "surname" }.autocomplete == Autocomplete.FAMILY_NAME
-        assert fields.find { it.getImportId() == "address" }.autocomplete == Autocomplete.STREET_ADDRESS
+        assert fields.find { it.getImportId() == "name" }.htmlAutocomplete == HtmlAutocomplete.GIVEN_NAME
+        assert fields.find { it.getImportId() == "name2" }.htmlAutocomplete == null
+        assert fields.find { it.getImportId() == "surname" }.htmlAutocomplete == HtmlAutocomplete.FAMILY_NAME
+        assert fields.find { it.getImportId() == "address" }.htmlAutocomplete == HtmlAutocomplete.STREET_ADDRESS
     }
 }

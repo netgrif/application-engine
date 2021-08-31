@@ -11,8 +11,8 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
-import com.netgrif.workflow.petrinet.domain.dataset.Autocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.HtmlAutocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -639,12 +639,12 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            Autocomplete autocomplete = null;
-            if (logic.getAutocomplete() != null) {
-                autocomplete = Autocomplete.fromString(logic.getAutocomplete().value());
+            HtmlAutocomplete htmlAutocomplete = null;
+            if (logic.getHtmlAutocomplete() != null) {
+                htmlAutocomplete = HtmlAutocomplete.fromString(logic.getHtmlAutocomplete().value());
             }
 
-            transition.addDataSet(fieldId, behavior, null, null, null, autocomplete);
+            transition.addDataSet(fieldId, behavior, null, null, null, htmlAutocomplete);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }

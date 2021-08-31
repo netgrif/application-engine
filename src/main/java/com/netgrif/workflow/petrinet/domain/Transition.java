@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain;
 
-import com.netgrif.workflow.petrinet.domain.dataset.Autocomplete;
+import com.netgrif.workflow.petrinet.domain.dataset.HtmlAutocomplete;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -88,15 +88,15 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component, Autocomplete autocomplete) {
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component, HtmlAutocomplete htmlAutocomplete) {
         if (dataSet.containsKey(field) && dataSet.get(field) != null) {
             if (behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
             if (events != null) dataSet.get(field).getEvents().addAll(events);
             if (layout != null) dataSet.get(field).setLayout(layout);
             if (component != null) dataSet.get(field).setComponent(component);
-            if (autocomplete != null) dataSet.get(field).setAutocomplete(autocomplete);
+            if (htmlAutocomplete != null) dataSet.get(field).setHtmlAutocomplete(htmlAutocomplete);
         } else {
-            dataSet.put(field, new DataFieldLogic(behavior, events, layout, autocomplete));
+            dataSet.put(field, new DataFieldLogic(behavior, events, layout, htmlAutocomplete));
         }
     }
 

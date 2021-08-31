@@ -11,12 +11,12 @@
     <data type="text">
         <id>surname</id>
         <title>Autocompleted surname</title>
-        <autocomplete>street-address</autocomplete>
+        <htmlAutocomplete>street-address</htmlAutocomplete>
     </data>
     <data type="text">
         <id>address</id>
         <title>Autocompleted address</title>
-        <autocomplete>street-address</autocomplete>
+        <htmlAutocomplete>street-address</htmlAutocomplete>
     </data>
     <data type="text">
         <id>bday</id>
@@ -66,7 +66,7 @@
                 <id>name</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <autocomplete>given-name</autocomplete>
+                    <htmlAutocomplete>given-name</htmlAutocomplete>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -80,7 +80,7 @@
                 <id>surname</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <autocomplete>family-name</autocomplete>
+                    <htmlAutocomplete>family-name</htmlAutocomplete>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -107,7 +107,7 @@
                 <id>bday</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <autocomplete>bday</autocomplete>
+                    <htmlAutocomplete>bday</htmlAutocomplete>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -121,7 +121,7 @@
                 <id>new_password</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <autocomplete>new-password</autocomplete>
+                    <htmlAutocomplete>new-password</htmlAutocomplete>
                 </logic>
                 <layout>
                     <x>0</x>

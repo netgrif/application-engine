@@ -104,8 +104,8 @@ public final class FieldFactory {
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
 
-        if (data.getAutocomplete() != null)
-            field.setAutocomplete(Autocomplete.valueOf(data.getAutocomplete().name()));
+        if (data.getHtmlAutocomplete() != null)
+            field.setHtmlAutocomplete(HtmlAutocomplete.fromString(data.getHtmlAutocomplete().value()));
 
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
@@ -414,9 +414,9 @@ public final class FieldFactory {
             return;
         }
         com.netgrif.workflow.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
-        Autocomplete autocomplete = transition.getDataSet().get(field.getImportId()).getAutocomplete();
-        if (autocomplete != null) {
-            field.setAutocomplete(autocomplete);
+        HtmlAutocomplete htmlAutocomplete = transition.getDataSet().get(field.getImportId()).getHtmlAutocomplete();
+        if (htmlAutocomplete != null) {
+            field.setHtmlAutocomplete(htmlAutocomplete);
         }
     }
 

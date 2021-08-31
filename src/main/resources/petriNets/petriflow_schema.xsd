@@ -41,7 +41,7 @@
                     <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element type="dataEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
                 </xs:choice>
-                <xs:element ref="autocomplete" minOccurs="0"/>
+                <xs:element ref="htmlAutocomplete" minOccurs="0"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
                 <xs:element ref="remote" minOccurs="0"/>
@@ -270,7 +270,7 @@
             <xs:enumeration value="process"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="autocomplete_type">
+    <xs:simpleType name="htmlAutocomplete_type">
         <xs:restriction base="xs:string">
             <xs:enumeration value="off">
                 <xs:annotation>
@@ -757,7 +757,7 @@
             <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:element name="autocomplete" type="autocomplete_type"/>
+    <xs:element name="htmlAutocomplete" type="htmlAutocomplete_type"/>
     <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
@@ -886,7 +886,7 @@
                 <xs:element ref="view" minOccurs="0"/>
                 <xs:element ref="cancel" minOccurs="0"/>
                 <xs:element ref="assigned" minOccurs="0"/>
-                <xs:element ref="autocomplete" minOccurs="0"/>
+                <xs:element ref="htmlAutocomplete" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
