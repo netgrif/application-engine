@@ -235,13 +235,14 @@
 		</action>
 	</data>
 
-	<data type="enumeration_map" immediate="true">
+	<data type="enumeration_map">
 		<id>processes_available</id>
 		<title name="available_processes">Your processes</title>
+		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
 		<action trigger="get">
 			processes: f.this;
 
-			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser().getId())}
+			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser(), LocaleContextHolder.locale)}
 		</action>
 		<action trigger="set">
 			processes: f.this,
@@ -260,10 +261,12 @@
 	<data type="multichoice_map" immediate="true">
 		<id>allowed_roles</id>
 		<title name="roles_allowed">Allowed roles</title>
+		<desc name="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>banned_roles</id>
 		<title name="roles_banned">Banned roles</title>
+		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
 	</data>
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
@@ -297,9 +300,12 @@
 		<i18nString name="add_banned_roles">Pridaj k zakázaným roliam</i18nString>
 		<i18nString name="remove_banned_roles">Odstráň zo zakázaných rolí</i18nString>
 		<i18nString name="processes_available">Vaše procesy</i18nString>
-		<i18nString name="roles_available">Dostupné role</i18nString>
-		<i18nString name="allowed_roles">Povolené role</i18nString>
-		<i18nString name="banned_roles">Zakázané role</i18nString>
+		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
+		<i18nString name="roles_available">Dostupné roly</i18nString>
+		<i18nString name="allowed_roles">Povolené roly</i18nString>
+		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam videť.</i18nString>
+		<i18nString name="banned_roles">Zakázané roly</i18nString>
+		<i18nString name="banned_roles_desc">Zoznam rolí ktorým bude upravovaný menu záznam skrytý.</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -312,12 +318,15 @@
 		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
 		<i18nString name="add_allowed_roles">Zu zulässigen Rollen hinzufügen</i18nString>
 		<i18nString name="remove_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
-		<i18nString name="add_banned_roles">Zu gesperrten Rollen hinzufügen</i18nString>
+		<i18nString name="add_banned_roles">Zu verbotenen Rollen hinzufügen</i18nString>
 		<i18nString name="remove_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
 		<i18nString name="processes_available">Ihre Prozesse</i18nString>
+		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
 		<i18nString name="roles_available">Verfügbare Rollen</i18nString>
 		<i18nString name="allowed_roles">Zulässige Rollen</i18nString>
+		<i18nString name="allowed_roles_desc">Liste der Rollen, die diesen Menüeintrag anzeigen dürfen.</i18nString>
 		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
+		<i18nString name="banned_roles_desc">Liste der Rollen, die diesen Menüeintrag nicht anzeigen dürfen.</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
