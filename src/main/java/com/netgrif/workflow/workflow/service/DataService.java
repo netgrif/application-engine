@@ -11,9 +11,11 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
@@ -44,8 +46,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -193,8 +195,6 @@ public class DataService implements IDataService {
             }
         });
         updateDataset(useCase);
-        taskService.resolveUserRef(useCase);
-        workflowService.resolveUserRef(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
 
@@ -217,7 +217,7 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field> data = getData(taskId);
+        List<Field> data = getData(task, useCase);
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
@@ -336,8 +336,8 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
         field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, useCase.getPetriNet().getFunctions()));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, useCase.getPetriNet().getFunctions()));
         });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
@@ -363,8 +363,8 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
         field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task), useCase.getPetriNet().getFunctions()));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task), useCase.getPetriNet().getFunctions()));
         });
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
@@ -722,7 +722,7 @@ public class DataService implements IDataService {
 
         Case case$ = workflowService.findOne(useCaseId);
         actions.forEach(action -> {
-            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.of(task));
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.of(task), case$.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(changedFieldsTree);
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
@@ -763,7 +763,7 @@ public class DataService implements IDataService {
 
     private void runEventActions(Case useCase, Task task, Transition transition, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
-            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.of(task));
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.of(task), useCase.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(currentChangedFields);
 
             if (currentChangedFields.getChangedFields().isEmpty())

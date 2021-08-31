@@ -6,6 +6,7 @@ import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -90,6 +91,14 @@ public class ElasticTaskService implements IElasticTaskService {
         executor.execute(() -> {
             repository.deleteAllByStringId(taskId);
             log.info("[?]: Task \"" + taskId + "\" deleted");
+        });
+    }
+
+    @Override
+    public void removeByPetriNetId(String petriNetId) {
+        executor.execute(() -> {
+            repository.deleteAllByProcessId(petriNetId);
+            log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
         });
     }
 
@@ -182,7 +191,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
         BoolQueryBuilder query = boolQuery();
 
-        buildUsersRoleQuery(request, query, user);
+        buildPermissionQuery(request, query, user);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -218,14 +227,19 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildPermissionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder userRoleQuery = boolQuery();
-        buildRoleQuery(request, userRoleQuery);
-        buildNegativeViewRoleQuery(userRoleQuery, user);
-        buildUsersQuery(request, userRoleQuery);
-        buildNegativeViewUsersQuery(userRoleQuery, user);
+        buildUsersAndRolesQuery(request, userRoleQuery);
+        negativeUsersAndRolesQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
+    }
+
+    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeQuery = boolQuery();
+        buildNegativeViewRoleQuery(negativeQuery, user);
+        buildNegativeViewUsersQuery(negativeQuery, user);
+        query.should(negativeQuery);
     }
 
     private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
@@ -243,44 +257,38 @@ public class ElasticTaskService implements IElasticTaskService {
         query.mustNot(negativeRoleQuery);
     }
 
-    /**
-     * Tasks with role "5cb07b6ff05be15f0b972c31"
-     * {
-     * "role": "5cb07b6ff05be15f0b972c31"
-     * }
-     * <p>
-     * Tasks with role "5cb07b6ff05be15f0b972c31" OR "5cb07b6ff05be15f0b972c36"
-     * {
-     * "role": [
-     * "5cb07b6ff05be15f0b972c31",
-     * "5cb07b6ff05be15f0b972c36"
-     * ]
-     * }
-     */
-    private void buildRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.role == null || request.role.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder roleQuery = boolQuery();
-        for (String roleId : request.role) {
-            roleQuery.should(termQuery("roles", roleId));
-        }
-
-        query.should(roleQuery);
-    }
-
-    private void buildUsersQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildUsersAndRolesQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.users == null || request.users.isEmpty()) {
             return;
         }
 
+        BoolQueryBuilder existingUsersQuery = boolQuery();
         BoolQueryBuilder roleQuery = boolQuery();
+        BoolQueryBuilder usersRoleQuery = boolQuery();
+        BoolQueryBuilder usersExist = boolQuery();
+        BoolQueryBuilder notExists = boolQuery();
+
+        notExists.mustNot(existsQuery("userRefs"));
+        notExists.mustNot(existsQuery("roles"));
+
         for (Long userId : request.users) {
-            roleQuery.should(termQuery("users", userId));
+            existingUsersQuery.should(termQuery("users", userId));
         }
 
-        query.should(roleQuery);
+        usersExist.must(existsQuery("userRefs"));
+        usersExist.must(existingUsersQuery);
+
+        usersRoleQuery.should(usersExist);
+        usersRoleQuery.should(notExists);
+
+        if (request.role != null && !request.role.isEmpty()) {
+            for (String roleId : request.role) {
+                roleQuery.should(termQuery("roles", roleId));
+            }
+            usersRoleQuery.should(roleQuery);
+        }
+
+        query.must(usersRoleQuery);
     }
 
 
