@@ -1,7 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import lombok.Getter
-
 enum Autocomplete {
     OFF("off"),
     NAME("name"),
@@ -57,7 +55,6 @@ enum Autocomplete {
     URL("url"),
     PHOTO("photo");
 
-    @Getter
     private final String value
 
     Autocomplete(String value) {
@@ -71,5 +68,9 @@ enum Autocomplete {
             }
         }
         throw new IllegalArgumentException("No autocomplete from value [$value]")
+    }
+
+    String getValue() {
+        return this.value
     }
 }
