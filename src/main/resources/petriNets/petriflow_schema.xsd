@@ -52,6 +52,16 @@
             <xs:attribute type="xs:boolean" name="immediate"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="function">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute type="scope" name="scope" use="required"/>
+                    <xs:attribute type="xs:string" name="name" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="role">
         <xs:complexType>
             <xs:sequence>
@@ -137,6 +147,7 @@
                 <xs:element ref="sourceId"/>
                 <xs:element ref="destinationId"/>
                 <xs:element ref="multiplicity"/>
+                <xs:element ref="reference" minOccurs="0"/>
                 <xs:element ref="breakPoint" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
@@ -184,6 +195,7 @@
                 <xs:element ref="caseEvents" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="function" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="mapping" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="i18n" maxOccurs="unbounded" minOccurs="0"/>
@@ -250,6 +262,12 @@
             <xs:enumeration value="taskRef"/>
             <xs:enumeration value="caseRef"/>
             <xs:enumeration value="filter"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="scope">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="namespace"/>
+            <xs:enumeration value="process"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="autocomplete_type">
@@ -748,6 +766,7 @@
     <xs:element name="sourceId" type="xs:string"/>
     <xs:element name="destinationId" type="xs:string"/>
     <xs:element name="multiplicity" type="nonNegativeInteger"/>
+    <xs:element name="reference" type="xs:string"/>
     <xs:element name="breakPoint">
         <xs:complexType>
             <xs:sequence>
@@ -794,7 +813,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:choice>
                 <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="properties" />
+                <xs:element ref="properties"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
@@ -819,8 +838,8 @@
     <xs:element name="properties">
         <xs:complexType>
             <xs:sequence>
-                    <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="option_icons" type="icons" minOccurs="0"/>
+                <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="option_icons" type="icons" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -902,10 +921,10 @@
         </xs:complexType>
     </xs:element>
     <xs:complexType name="usersRef">
-            <xs:sequence>
-                <xs:element ref="id"/>
-                <xs:element ref="logic"/>
-            </xs:sequence>
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="logic"/>
+        </xs:sequence>
     </xs:complexType>
     <xs:complexType name="caseRoleRef">
         <xs:sequence>
