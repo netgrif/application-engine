@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -21,12 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
 public class UserService implements IUserService {
 
     @Autowired
@@ -54,6 +53,9 @@ public class UserService implements IUserService {
     private INextGroupService groupService;
 
     @Autowired
+    private GroupConfigurationProperties groupProperties;
+
+    @Autowired
     private IFilterImportExportService filterImportExportService;
 
     @Override
@@ -65,8 +67,13 @@ public class UserService implements IUserService {
         User savedUser = userRepository.save(user);
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
-        groupService.createGroup(user);
-        groupService.addUserToDefaultGroup(user);
+
+        if (groupProperties.isDefaultEnabled())
+            groupService.createGroup(user);
+
+        if (groupProperties.isSystemEnabled())
+            groupService.addUserToDefaultGroup(user);
+
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
