@@ -242,7 +242,7 @@
 		<action trigger="get">
 			processes: f.this;
 
-			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser(), LocaleContextHolder.locale)}
+			change processes options {return configurableMenuService.getNetsByAuthor(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
 		</action>
 		<action trigger="set">
 			processes: f.this,
