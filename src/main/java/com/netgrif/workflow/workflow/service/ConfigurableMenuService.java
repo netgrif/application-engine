@@ -6,19 +6,13 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceMapField;
-import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.service.PetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.service.interfaces.IConfigurableMenuService;
-import groovy.lang.Closure;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,26 +22,22 @@ import java.util.stream.Collectors;
 public class ConfigurableMenuService implements IConfigurableMenuService {
 
     @Autowired
-    private PetriNetRepository petriNetRepository;
-    @Autowired
     private PetriNetService petriNetService;
     @Autowired
     private StringToVersionConverter converter;
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     /**
-     * Format of returned users netsMap field keys: NET_IMPORT_ID:VERSION
-     * Mongo doesn't allow dots inside map keys that's why they are replaced with dashes in version string.
+     * Returns processes whose author is currently logged user.
+     *      Format of returned multichoiceMap field keys: NET_IMPORT_ID:VERSION
+     *      Mongo doesn't allow dots inside map keys, that's why they are replaced with dashes in version string.
+     * @param user currently logged user
      */
     @Override
     public Map<String, I18nString> getNetsByAuthor(User user, Locale locale){
         LoggedUser author = user.transformToLoggedUser();
-        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(author, locale);
-//
-//        Query query = Query.query(Criteria.where("author").is(author));
-//        query.fields().include("author");
-//        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
+        Map<String, Object> requestQuery = new HashMap<>();
+        requestQuery.put("author.email", user.getEmail());
+        List<PetriNetReference> nets = this.petriNetService.search(requestQuery, author, new FullPageRequest(), locale).getContent();
 
         Map<String, I18nString> options = new HashMap<>();
 
@@ -56,18 +46,6 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
             I18nString titleAndVersion = new I18nString(net.getTitle() + " :" + net.getVersion());
             options.put(net.getIdentifier() + ":" + versionSplit[0] + "-" + versionSplit[1] + "-" + versionSplit[2], titleAndVersion);
         }
-
-//        List<PetriNet> nets = petriNetRepository.findAll()
-//                .stream()
-//                .filter(n -> n.getAuthor().getId().equals(authorId) && !n.getRoles().isEmpty())
-//                .collect(Collectors.toList());
-//
-//
-//        for(PetriNet net : nets) {
-//            String[] versionSplit = net.getVersion().toString().split("\\.");
-//            I18nString titleAndVersion = new I18nString(net.getTitle().toString() + " :" + net.getVersion().toString());
-//            options.put(net.getIdentifier() + ":" + versionSplit[0] + "-" + versionSplit[1] + "-" + versionSplit[2], titleAndVersion);
-//        }
 
         return options;
     }
