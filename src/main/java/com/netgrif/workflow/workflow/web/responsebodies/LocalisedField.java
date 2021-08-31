@@ -44,7 +44,7 @@ public class LocalisedField {
 
     private Component component;
 
-    private String autocomplete;
+    private String htmlAutocomplete;
 
     private List<LocalizedValidation> validations;
 
@@ -67,7 +67,7 @@ public class LocalisedField {
         length = field.getLength();
         component = field.getComponent();
         if (field.getHtmlAutocomplete() != null)
-            autocomplete = field.getHtmlAutocomplete().getValue();
+            htmlAutocomplete = field.getHtmlAutocomplete().getValue();
         validations = loadValidations(field, locale);
     }
 
