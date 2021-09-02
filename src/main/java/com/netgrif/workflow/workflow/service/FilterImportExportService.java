@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -107,33 +104,33 @@ public class FilterImportExportService implements IFilterImportExportService {
 
         filterList.getFilters().forEach(filter -> {
             Optional<Case> filterCase = Optional.empty();
-            if (filter.getType().equals(FILTER_TYPE_CASE)) {
-                filterCase = defaultFiltersRunner.createCaseFilter(
-                        filter.getFilterName().getDefaultValue(),
-                        filter.getIcon(),
-                        "",
-                        filter.getVisibility(),
-                        filter.getFilterValue(),
-                        filter.getAllowedNets(),
-                        filter.getFilterMetadata(),
-                        filter.getFilterName().getTranslations(),
-                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
-                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
-                );
-            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
-                filterCase = defaultFiltersRunner.createTaskFilter(
-                        filter.getFilterName().getDefaultValue(),
-                        filter.getIcon(),
-                        "",
-                        filter.getVisibility(),
-                        filter.getFilterValue(),
-                        filter.getAllowedNets(),
-                        filter.getFilterMetadata(),
-                        filter.getFilterName().getTranslations(),
-                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
-                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
-                );
-            }
+//            if (filter.getType().equals(FILTER_TYPE_CASE)) {
+//                filterCase = defaultFiltersRunner.createCaseFilter(
+//                        filter.getFilterName().getDefaultValue(),
+//                        filter.getIcon(),
+//                        "",
+//                        filter.getVisibility(),
+//                        filter.getFilterValue(),
+//                        filter.getAllowedNets(),
+//                        filter.getFilterMetadata(),
+//                        filter.getFilterName().getTranslations(),
+//                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
+//                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
+//                );
+//            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
+//                filterCase = defaultFiltersRunner.createTaskFilter(
+//                        filter.getFilterName().getDefaultValue(),
+//                        filter.getIcon(),
+//                        "",
+//                        filter.getVisibility(),
+//                        filter.getFilterValue(),
+//                        filter.getAllowedNets(),
+//                        filter.getFilterMetadata(),
+//                        filter.getFilterName().getTranslations(),
+//                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
+//                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
+//                );
+//            }
 
             if (filterCase.isPresent()) {
                 Task importFilterTask = taskService.searchOne(QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION).and(QTask.task.caseId.eq(filterCase.get().getStringId())));
@@ -159,11 +156,11 @@ public class FilterImportExportService implements IFilterImportExportService {
         FilterImportExportList filterList = xmlMapper.readValue(xml, FilterImportExportList.class);
 
         filterList.getFilters().forEach(filter -> {
-            Object defaultSearchCategories = filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES);
-            Object inheritAllowedNets = filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS);
-
-            filter.getFilterMetadata().put(DEFAULT_SEARCH_CATEGORIES, defaultSearchCategories.equals("true"));
-            filter.getFilterMetadata().put(INHERIT_ALLOWED_NETS, inheritAllowedNets.equals("true"));
+//            Object defaultSearchCategories = filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES);
+//            Object inheritAllowedNets = filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS);
+//
+//            filter.getFilterMetadata().put(DEFAULT_SEARCH_CATEGORIES, defaultSearchCategories.equals("true"));
+//            filter.getFilterMetadata().put(INHERIT_ALLOWED_NETS, inheritAllowedNets.equals("true"));
 
             if (filter.getAllowedNets() == null) {
                 filter.setAllowedNets(new ArrayList<>());
@@ -199,8 +196,11 @@ public class FilterImportExportService implements IFilterImportExportService {
             switch (immediateData.getImportId()) {
                 case FIELD_FILTER:
                     exportFilter.setFilterValue(((FilterField) immediateData).getValue());
-                    exportFilter.setFilterMetadata(((FilterField) immediateData).getFilterMetadata());
+//                    exportFilter.setFilterMetadata(((FilterField) immediateData).getFilterMetadata());
                     exportFilter.setAllowedNets(((FilterField) immediateData).getAllowedNets());
+
+                    exportFilter.setFilterMetadataExport(((FilterField) immediateData).getFilterMetadata());
+
                     break;
                 case FIELD_VISIBILITY:
                     exportFilter.setVisibility(immediateData.getValue().toString());
