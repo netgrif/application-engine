@@ -176,8 +176,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
-            Map<String, String> titleTranslations,
-            boolean isUserFilter = false
+            Map<String, String> titleTranslations
     ) {
         PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
