@@ -375,10 +375,12 @@ public class Importer {
     protected void createArc(com.netgrif.workflow.importer.model.Arc importArc) {
         Arc arc = arcFactory.getArc(importArc);
         arc.setImportId(importArc.getId());
-        arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
         arc.setDestination(getNode(importArc.getDestinationId()));
-        if (importArc.getReference() != null) {
+        if (importArc.getReference() == null && arc.getReference() == null) {
+            arc.setMultiplicity(importArc.getMultiplicity());
+        }
+        if (importArc.getReference() != null){
             if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
                 throw new IllegalArgumentException("Place or Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
             }
