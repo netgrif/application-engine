@@ -386,8 +386,11 @@ public class Importer {
             }
             Reference reference = new Reference();
             reference.setReference(importArc.getReference());
-            reference.setType((places.containsKey(importArc.getReference())) ? Type.PLACE : Type.DATA);
             arc.setReference(reference);
+        }
+//        needed to do it here because of backwards compatibility of variable arcs
+        if (arc.getReference() != null){
+            arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }
 
         net.addArc(arc);
