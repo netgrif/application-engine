@@ -28,6 +28,11 @@
         <title>inhib_var</title>
         <init>2</init>
     </data>
+	<data type="number">
+		<id>5000</id>
+		<title>regular_var_old</title>
+		<init>2</init>
+	</data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
     <transition>
@@ -283,10 +288,10 @@
         <static>false</static>
     </place>
     <place>
-        <id>p9</id>
+        <id>1500</id>
         <x>820</x>
         <y>100</y>
-        <label></label>
+		<label>1500</label>
         <tokens>2</tokens>
         <static>false</static>
     </place>
@@ -480,7 +485,7 @@
         <sourceId>regular_place_ref_start</sourceId>
         <destinationId>regular_place_ref</destinationId>
         <multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a4</id>
@@ -524,7 +529,7 @@
         <sourceId>reset_place_ref_start</sourceId>
         <destinationId>reset_place_ref</destinationId>
 		<multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a10</id>
@@ -568,7 +573,7 @@
         <sourceId>inhib_place_ref_start</sourceId>
         <destinationId>inhib_place_ref</destinationId>
         <multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a16</id>
@@ -591,7 +596,7 @@
         <sourceId>read_place_ref_start</sourceId>
         <destinationId>read_place_ref</destinationId>
         <multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a19</id>
@@ -649,29 +654,28 @@
 		<sourceId>out_place_ref_arc</sourceId>
 		<destinationId>out_place_ref_arc_res</destinationId>
 		<multiplicity>2</multiplicity>
-		<reference>p9</reference>
+		<reference>1500</reference>
 	</arc>
 	<arc>
 		<id>a27</id>
 		<type>regular</type>
 		<sourceId>add_tokens</sourceId>
-		<destinationId>p9</destinationId>
+		<destinationId>1500</destinationId>
 		<multiplicity>800</multiplicity>
 	</arc>
 	<arc>
 		<id>a28</id>
 		<type>regular</type>
-		<sourceId>p9</sourceId>
+		<sourceId>1500</sourceId>
 		<destinationId>remove_tokens</destinationId>
 		<multiplicity>800</multiplicity>
 	</arc>
 	<arc>
 		<id>a29</id>
-		<type>regular</type>
+		<type>variable</type>
 		<sourceId>regular_var_old_start</sourceId>
 		<destinationId>regular_var_old</destinationId>
-		<multiplicity>2</multiplicity>
-		<reference>regular_var</reference>
+		<multiplicity>5000</multiplicity>
 	</arc>
 	<arc>
 		<id>a30</id>
@@ -682,11 +686,10 @@
 	</arc>
 	<arc>
 		<id>a31</id>
-		<type>regular</type>
+		<type>variable</type>
 		<sourceId>regular_place_ref_old_start</sourceId>
 		<destinationId>regular_place_ref_old</destinationId>
-		<multiplicity>2</multiplicity>
-		<reference>p9</reference>
+		<multiplicity>1500</multiplicity>
 	</arc>
 	<arc>
 		<id>a32</id>
@@ -697,10 +700,9 @@
 	</arc>
 	<arc>
 		<id>a33</id>
-		<type>regular</type>
+		<type>variable</type>
 		<sourceId>out_var_arc_old</sourceId>
 		<destinationId>out_var_arc_old_res</destinationId>
-		<multiplicity>2</multiplicity>
-		<reference>regular_var</reference>
+		<multiplicity>5000</multiplicity>
     </arc>
 </document>
