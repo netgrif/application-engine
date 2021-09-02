@@ -122,7 +122,7 @@
             <actions phase="post">
                 <action>
                     importedFilters: f.imported_filters,
-                    importFile: f.importFile;
+                    importFile: f.import_file;
 
                     change importedFilters value { null }
                     change importFile value { null }
