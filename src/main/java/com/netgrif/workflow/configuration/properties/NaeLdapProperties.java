@@ -13,25 +13,24 @@ public class NaeLdapProperties {
 
     private boolean enabled = false;
 
-    @Value("${spring.ldap.urls}")
+    @Value("${spring.ldap.urls:#{\"\"}}")
     private String url;
 
-    @Value("${spring.ldap.username}")
+    @Value("${spring.ldap.username:#{\"\"}}")
     private String username;
 
-    @Value("${spring.ldap.password}")
+    @Value("${spring.ldap.password:#{\"\"}}")
     private String password;
 
-    @Value("${spring.ldap.base}")
+    @Value("${spring.ldap.base:#{\"\"}}")
     private String base;
-
     private String superUsername;
 
     private String userFilter;
 
     private String peopleSearchBase;
 
-    private String peopleClass;
+    private String[] peopleClass =  {"inetOrgPerson","person"};
 
     private String groupSearchBase;
 
