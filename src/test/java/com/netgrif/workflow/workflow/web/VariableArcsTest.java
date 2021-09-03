@@ -234,8 +234,8 @@ public class VariableArcsTest {
         List<TaskReference> tasksAfterPlaceRefReset = null;
         for (TaskReference taskRef : tasks) {
             Task task;
-            if(tasksAfterPlaceRefReset != null){
-                task = taskService.findOne(tasksAfterPlaceRefReset.stream().filter(taskReference -> taskReference.getTitle().equals(taskRef.getTitle())).collect(Collectors.toList()).get(0).getStringId());
+            if (tasksAfterPlaceRefReset != null) {
+                task = taskService.findOne(tasksAfterPlaceRefReset.stream().filter(taskReference -> taskReference.getTitle().equals(taskRef.getTitle())).findFirst().orElseThrow(() -> new IllegalStateException("Cannot find task reference")).getStringId());
             } else {
                 task = taskService.findOne(taskRef.getStringId());
             }
