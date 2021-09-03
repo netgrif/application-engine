@@ -20,16 +20,21 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private SystemUserRunner systemCreator
 
-    private static final String FILTER_FILE_NAME = "engine-processes/filter.xml";
+    private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
 
     private static final String PREFERRED_FILTER_ITEM_FILE_NAME = "engine-processes/preference_filter_item.xml"
     private static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "preference_filter_item"
 
+    private static final String EXPORT_MENU_FILE_NAME = "engine-processes/export_menu.xml"
+    private static final String EXPORT_MENU_NET_IDENTIFIER = "export_menu"
+
     @Override
     void run(String... args) throws Exception {
         importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
         importProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
+        importProcess("Petri net for exporting menu", EXPORT_MENU_NET_IDENTIFIER, EXPORT_MENU_FILE_NAME)
+
     }
 
     Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>export_menu</id>
+    <initials>FTE</initials>
+    <title name="export_menu">Export of menu</title>
+    <icon>file_download</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <caseName name="export_menu">Export of menu</caseName>
+    <!-- CASE EVENTS -->
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="button">
+        <id>export_btn</id>
+        <placeholder name="export_btn_placeholder">Export menu</placeholder>
+        <desc name="export_btn_desc">Export configured menu into xml file</desc>
+        <action trigger="set" phase="post">
+            export_file: f.export_file,
+            trans: t.exportMenu;
+
+            List &lt;com.netgrif.workflow.workflow.domain.Case&gt; cases = findCases( { it.processIdentifier.eq("preference_filter_item") &amp;&amp; it.dataSet["parentId"].eq(new org.bson.types.ObjectId(parentId.value)) } );
+
+            change export_file value { menuImportExport.exportMenu(cases) }
+        </action>
+        <component>
+            <name>raised</name>
+        </component>
+    </data>
+    <data type="file">
+        <id>export_file</id>
+        <title name="export_file">Exported menu</title>
+        <placeholder name="export_file_placeholder">Exported menu file</placeholder>
+        <desc name="export_file_desc">Download exported menu file in xml format</desc>
+    </data>
+    <!-- I18NS -->
+<!--    <i18n locale="sk">-->
+<!--        <i18nString name="export_filters">Export filtrov</i18nString>-->
+<!--        <i18nString name="exportable_filters">ExportovateÄ¾nÃ© filtre</i18nString>-->
+<!--        <i18nString name="exportable_filters_placeholder">Zoznam vÅ¡etkÃ½ch exportovateÄ¾nÃ½ch filtrov</i18nString>-->
+<!--        <i18nString name="exportable_filters_desc">Vyberte jeden alebo viac filtrov na export</i18nString>-->
+<!--        <i18nString name="export_btn_placeholder">ExportovaÅ¥ filtre</i18nString>-->
+<!--        <i18nString name="export_btn_desc">Export vybranÃ½ch filtrov do sÃºboru xml</i18nString>-->
+<!--        <i18nString name="export_file">ExportovanÃ½ filter</i18nString>-->
+<!--        <i18nString name="export_file_placeholder">ExportovanÃ½ sÃºbor filtra</i18nString>-->
+<!--        <i18nString name="export_file_desc">Stiahnutie exportovanÃ©ho sÃºboru filtra vo formÃ¡te xml</i18nString>-->
+<!--    </i18n>-->
+<!--    <i18n locale="de">-->
+<!--        <i18nString name="export_filters">Exportieren von Filtern</i18nString>-->
+<!--        <i18nString name="exportable_filters">Exportierbare Filter</i18nString>-->
+<!--        <i18nString name="exportable_filters_placeholder">Liste aller exportierbaren Filter</i18nString>-->
+<!--        <i18nString name="exportable_filters_desc">WÃ¤hlen Sie einen oder mehrere Filter fÃ¼r den Export</i18nString>-->
+<!--        <i18nString name="export_btn_placeholder">Filter exportieren</i18nString>-->
+<!--        <i18nString name="export_btn_desc">AusgewÃ¤hlte Filter in xml-Datei exportieren</i18nString>-->
+<!--        <i18nString name="export_file">Exportierter Filter</i18nString>-->
+<!--        <i18nString name="export_file_placeholder">Exportierte Filterdatei</i18nString>-->
+<!--        <i18nString name="export_file_desc">Herunterladen der exportierten Filterdatei im xml-Format</i18nString>-->
+<!--    </i18n>-->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>exportMenu</id>
+        <x>200</x>
+        <y>100</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <assignPolicy>auto</assignPolicy>
+        <label name="export_btn_placeholder">Export menu</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>export_btn</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>export_file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>p1</id>
+        <x>100</x>
+        <y>100</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>exportMenu</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>exportMenu</sourceId>
+        <destinationId>p1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
