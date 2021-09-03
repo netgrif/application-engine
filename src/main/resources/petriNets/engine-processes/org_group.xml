@@ -153,6 +153,29 @@
 			change filterAutocomplete value {return ""}
 		</action>
 	</data>
+	<data type="file">
+		<id>export_menu_file</id>
+		<title name="export_file">Exported menu</title>
+		<placeholder name="export_file_placeholder">Exported menu file</placeholder>
+		<desc name="export_file_desc">Download exported menu file in xml format</desc>
+	</data>
+	<data type="button">
+		<id>export_menu_btn</id>
+		<title></title>
+		<placeholder name="export_menu_btn_placeholder">Export menu</placeholder>
+		<desc name="export_menu_btn_desc">Export configured menu into xml file</desc>
+		<action trigger="set">
+			export_file: f.export_menu_file,
+			groupId: f.group_id;
+
+<!--			List &lt;com.netgrif.workflow.workflow.domain.Case&gt; cases = findCases( { it.processIdentifier.eq("preference_filter_item") &amp;&amp; it.dataSet["parentId"].value.eq(new org.bson.types.ObjectId(groupId.value)) } ); -->
+			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change export_menu_file value { menuImportExport.exportMenu(cases) }
+		</action>
+		<component>
+			<name>raised</name>
+		</component>
+	</data>
 	<data type="caseRef">
 		<id>referenced_filters</id>
 		<title></title>
@@ -576,6 +599,36 @@
 				<layout>
 					<x>4</x>
 					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
