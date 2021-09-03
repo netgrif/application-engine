@@ -245,6 +245,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
 
         @Override
         public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> authorities) {
+            dirContextOperations.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
             User user = ldapUserService.findByDn(dirContextOperations.getDn());
             if (user == null) {
                 LdapUserRef ldapUserOptional = ldapUserRefService.findById(dirContextOperations.getDn());

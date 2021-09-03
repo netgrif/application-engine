@@ -9,9 +9,6 @@ import javax.naming.Name;
 import java.util.List;
 
 
-@Entry(
-        objectClasses = {"inetOrgPerson", "person"}
-)
 @Data
 public class LdapUserRef {
 
