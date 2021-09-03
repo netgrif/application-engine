@@ -300,7 +300,7 @@ public class VariableArcsTest {
             taskService.finishTask(task, testUser);
             finishCase = workflowService.findOne(task.getCaseId());
             assert finishCase.getActivePlaces().containsKey(taskRef.getTitle() + "_res") &&
-                    finishCase.getActivePlaces().get(taskRef.getTitle() + "_res") == new Double((Integer) finishCase.getDataSet().get("regular_var").getValue()).intValue();
+                    finishCase.getActivePlaces().get(taskRef.getTitle() + "_res") == finishCase.getDataSet().get("regular_var").getValue();
         }
     }
 
