@@ -1,3 +1,15 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10909/tab/release-report-all-issues"></a>
+## 5.6.2 (03.09.2021)
+### Bug fixes
+* [NAE-1441](https://netgrif.atlassian.net/browse/NAE-1441) - Var arcs backwards incompatibility
+* [NAE-1442](https://netgrif.atlassian.net/browse/NAE-1442) - LdapUserRef incorrect @Id annotation
+
+### Improvements
+* [NAE-1443](https://netgrif.atlassian.net/browse/NAE-1443) - LDAP objectClasses not loaded from properties
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10906/tab/release-report-all-issues"></a>
 ## 5.6.1 (30.08.2021)
 ### Bug fixes

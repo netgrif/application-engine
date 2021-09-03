@@ -231,8 +231,14 @@ public class VariableArcsTest {
     }
 
     private void assertCancelTasks(String arcType, List<TaskReference> tasks) throws TransitionNotExecutableException {
+        List<TaskReference> tasksAfterPlaceRefReset = null;
         for (TaskReference taskRef : tasks) {
-            Task task = taskService.findOne(taskRef.getStringId());
+            Task task;
+            if (tasksAfterPlaceRefReset != null) {
+                task = taskService.findOne(tasksAfterPlaceRefReset.stream().filter(taskReference -> taskReference.getTitle().equals(taskRef.getTitle())).findFirst().orElseThrow(() -> new IllegalStateException("Cannot find task reference")).getStringId());
+            } else {
+                task = taskService.findOne(taskRef.getStringId());
+            }
             int dataRefMultiplicityBeforeChange = 0;
             int tokensBeforeAssign = 0;
             if (!arcType.equals("inhib")) {
@@ -280,23 +286,21 @@ public class VariableArcsTest {
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
                 taskService.assignTask(testUser.transformToLoggedUser(), removeTokensTask.getStringId());
                 taskService.finishTask(removeTokensTask, testUser);
+                tasksAfterPlaceRefReset = taskService.findAllByCase(cancelCase.getStringId(), LocaleContextHolder.getLocale());
             }
         }
     }
 
-    private void assertOutArcsCancelTasks(List<TaskReference> tasks) throws TransitionNotExecutableException {
-        List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().equals("var_arc_out") || task.getTitle().equals("place_var_arc_out")).collect(Collectors.toList());
-        for (TaskReference taskRef : filteredTasks) {
+    private void assertOutArcsCancelTasks(List<TaskReference> allTasks) throws TransitionNotExecutableException {
+        List<TaskReference> tasks = allTasks.stream().filter(task -> task.getTitle().startsWith("out_")).collect(Collectors.toList());
+        for (TaskReference taskRef : tasks) {
             Task task = taskService.findOne(taskRef.getStringId());
+            assert !finishCase.getActivePlaces().containsKey(taskRef.getTitle() + "_res");
             taskService.assignTask(task, testUser);
-            cancelCase = workflowService.findOne(task.getCaseId());
-
-            assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end");
-
-            taskService.cancelTask(task, testUser);
-            cancelCase = workflowService.findOne(task.getCaseId());
-
-            assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
+            taskService.finishTask(task, testUser);
+            finishCase = workflowService.findOne(task.getCaseId());
+            assert finishCase.getActivePlaces().containsKey(taskRef.getTitle() + "_res") &&
+                    finishCase.getActivePlaces().get(taskRef.getTitle() + "_res") == finishCase.getDataSet().get("regular_var").getValue();
         }
     }
 
