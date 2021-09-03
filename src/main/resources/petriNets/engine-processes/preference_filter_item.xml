@@ -234,8 +234,7 @@
 			change processesAvailable value {null}
 		</action>
 	</data>
-
-	<data type="enumeration_map">
+	<data type="enumeration_map" immediate="true">
 		<id>processes_available</id>
 		<title name="available_processes">Your processes</title>
 		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
