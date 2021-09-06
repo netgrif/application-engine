@@ -1,18 +1,24 @@
 package com.netgrif.workflow.petrinet.domain.layout;
 
 import lombok.Data;
+import com.netgrif.workflow.importer.model.DataGroup;
+import lombok.NoArgsConstructor;
 
 @Data
-public class DataGroupLayout extends Layout {
+@NoArgsConstructor
+public class DataGroupLayout extends FormLayout {
 
-    private String type;
-
-    public DataGroupLayout(Integer rows, Integer cols, String type) {
-        super(rows, cols);
-        this.type = type;
+    public DataGroupLayout(Integer rows, Integer cols, String type, Boolean hideEmptyRows, String compactDirection) {
+        super(rows, cols, type, hideEmptyRows, compactDirection);
     }
 
-    public DataGroupLayout() {
-        super();
+    public DataGroupLayout(DataGroup data) {
+        super(
+                data.getRows(),
+                data.getCols(),
+                data.getLayout() != null ? data.getLayout().value() : null,
+                data.isHideEmptyRows(),
+                data.getCompactDirection() != null ? data.getCompactDirection().value() : null
+        );
     }
 }
