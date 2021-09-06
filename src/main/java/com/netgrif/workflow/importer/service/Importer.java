@@ -559,7 +559,7 @@ public class Importer {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
         if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
-            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null));
+            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null, null, null));
         }
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
@@ -577,9 +577,7 @@ public class Importer {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
 
-        String dataGroupLayout = importDataGroup.getLayout() != null ? importDataGroup.getLayout().value() : null;
-
-        dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols(), dataGroupLayout));
+        dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
