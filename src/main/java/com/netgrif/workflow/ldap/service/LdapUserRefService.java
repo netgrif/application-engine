@@ -80,6 +80,7 @@ public class LdapUserRefService implements ILdapUserRefService {
     public LdapUserRef findById(Name id) {
         DirContextOperations context
                 = ldapUserConfiguration.ldapTemplate().lookupContext(id);
+        context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
         LdapUserRef user = new LdapUserRef();
         user.setDn(context.getDn());
         user.setCn(verificationData(context, ldapProperties.getMapCn()));
@@ -110,6 +111,7 @@ public class LdapUserRefService implements ILdapUserRefService {
     @Override
     public User updateById(Name id, User savedUser) {
         DirContextOperations context = ldapUserConfiguration.ldapTemplate().lookupContext(id);
+        context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
         LdapUserRef user = new LdapUserRef();
         user.setCn(verificationData(context, ldapProperties.getMapCn()));
         user.setUid(verificationData(context, ldapProperties.getMapUid()));
