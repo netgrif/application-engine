@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
 
 //    @Autowired
 //    private IMemberService memberService;
@@ -62,7 +62,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(token);
     }
 
-    private LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
+    protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
