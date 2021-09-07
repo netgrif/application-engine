@@ -82,26 +82,23 @@ class TaskAuthorizationServiceTest {
                 .build()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.getProcessRoles(this.net)
+//        def processRoles = importHelper.getProcessRoles(this.net)
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-//                [] as Group[],
-                [processRoles.get("role")] as ProcessRole[])
+                ["Role"] as ProcessRole[])
 
         userId = user._id
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-//                [] as Group[],
                 [] as ProcessRole[])
 
         userWithoutRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITHOUT_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
-//                [] as Group[],
                 [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_USER_EMAIL, "password")

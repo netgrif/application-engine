@@ -136,7 +136,7 @@ class AssignActionTest {
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
 
         def content = JsonOutput.toJson([roleIdInMainNet])
-        String userId = Integer.toString(user._id as Integer)
+        String userId = user.getStringId()
 
         def result = mvc.perform(MockMvcRequestBuilders.post(ROLE_API.replace("{}", userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)

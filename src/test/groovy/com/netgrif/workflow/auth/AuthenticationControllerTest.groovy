@@ -91,7 +91,7 @@ class AuthenticationControllerTest {
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
 //        group = importHelper.createGroup(GROUP_NAME)
-        processRoles = importHelper.getProcessRoles(net.get())
+//        processRoles = importHelper.get(net.get())
     }
 
     @Test
