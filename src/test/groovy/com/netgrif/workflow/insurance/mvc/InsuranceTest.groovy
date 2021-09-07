@@ -138,11 +138,10 @@ class InsuranceTest {
         netId = net.get().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-//        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+//        def processRoles = importHelper.createProcessRoles(["agent": "Agent", "company": "Company"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
-//                [org] as Group[],
-                [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
+                ["Agent", "Company"] as ProcessRole[])
 
         List<ProcessRole> roles = processRoleService.findAll(netId)
         processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll {it.importId in ["1", "2"]}.collect{it.stringId} as Set,userService.getLoggedOrSystem().transformToLoggedUser())
