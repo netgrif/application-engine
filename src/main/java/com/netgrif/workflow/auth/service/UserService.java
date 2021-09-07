@@ -46,6 +46,12 @@ public class UserService extends AbstractUserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private INextGroupService groupService;
+
+    @Autowired
+    private GroupConfigurationProperties groupProperties;
+
     @Override
     public IUser saveNew(IUser user) {
         registrationService.encodeUserPassword((RegisteredUser) user);
@@ -59,12 +65,34 @@ public class UserService extends AbstractUserService {
         return savedUser;
     }
 
+//    @Override
+//    public User saveNew(User user) {
+//        encodeUserPassword(user);
+//        addDefaultRole(user);
+//        addDefaultAuthorities(user);
+//
+//        User savedUser = userRepository.save(user);
+//
+//        if (groupProperties.isDefaultEnabled())
+//            groupService.createGroup(user);
+//
+//        if (groupProperties.isSystemEnabled())
+//            groupService.addUserToDefaultGroup(user);
+//
+//        savedUser.setGroups(user.getGroups());
+//        upsertGroupMember(savedUser);
+//        publisher.publishEvent(new UserRegistrationEvent(savedUser));
+//        return savedUser;
+//    }
+//
+
     @Override
     public AnonymousUser saveNewAnonymous(AnonymousUser user) {
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
-        return userRepository.save(user);
+        AnonymousUser savedUser = (AnonymousUser) userRepository.save(user);
+        return savedUser;
     }
 
     @Override

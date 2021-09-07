@@ -17,8 +17,6 @@ class ImporterTestGroovy {
     @Autowired
     private ImportHelper importHelper
 
-    @Autowired
-
     public static final String FILE_NAME = "importer_upsert.xml"
     public static final String IDENTIFIER = "importer_upsert"
 

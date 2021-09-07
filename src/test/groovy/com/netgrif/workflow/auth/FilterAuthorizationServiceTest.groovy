@@ -54,6 +54,7 @@ class FilterAuthorizationServiceTest {
     @Autowired
     private FilterRepository filterRepository
 
+
     @Autowired
     private TestHelper testHelper
 

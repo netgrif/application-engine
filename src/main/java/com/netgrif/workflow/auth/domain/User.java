@@ -27,24 +27,25 @@ public class User extends AbstractUser implements RegisteredUser {
     @Getter
     @Setter
     @Indexed
-    private String email;
+    protected String email;
 
     @Getter
     @Setter
-    private String telNumber;
+    protected String telNumber;
 
     @Getter
     @Setter
-    private String avatar;
+    protected String avatar;
 
     @JsonIgnore
     @Getter
     @Setter
-    private String password;
+    protected String password;
 
     @NotNull
     @Getter
     @Setter
+    protected String name;
     @Indexed
     private String name;
 
@@ -53,14 +54,20 @@ public class User extends AbstractUser implements RegisteredUser {
     @Setter
     @Indexed
     private String surname;
+    protected String surname;
+
+    @NotNull
+    @Getter
+    @Setter
+    protected UserState state;
 
     @Getter
     @Setter
-    private String token;
+    protected String token;
 
     @Getter
     @Setter
-    private LocalDateTime expirationDate;
+    protected LocalDateTime expirationDate;
 
     public User() {
         super();

@@ -23,9 +23,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DataActionTest {
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private ImportHelper importHelper
 
     @Autowired
@@ -33,6 +30,9 @@ class DataActionTest {
 
     @Autowired
     private ITaskService taskService
+
+    @Autowired
+    private TestHelper testHelper
 
     @Autowired
     private IPetriNetService petriNetService
@@ -51,21 +51,22 @@ class DataActionTest {
 
     @Test
     void testDataActions() {
-        //        def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_actions_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-//        def mainNet = importer.importPetriNet(new File("src/test/resources/data_actions_test.xml")) TODO: FIX Importer -> parseAction Event action can not reference field using 'this'
-//        assert mainNet.isPresent()
-//        def $case = importHelper.createCase("Case 1", mainNet.get())
-//        Task task = taskService.findOne($case.tasks.first().task)
-//
-//        List<Field> dataGet = dataService.getData($case.tasks.first().task)
-//        dataGet.first().value == ";get-pre;get-post"
-//
-//        ChangedFieldsTree dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
-//                "text_field": [
-//                        "value": "",
-//                        "type" : "text"
-//                ] as Map
-//        ))
-//        dataSet.getChangedFields()["text_field"].attributes["value"] == ";set-pre;set-post"
+        testHelper.truncateDbs()
+
+        def mainNet = importHelper.createNet("data_actions_test.xml")
+        assert mainNet.isPresent()
+        def $case = importHelper.createCase("Case 1", mainNet.get())
+        Task task = taskService.findOne($case.tasks.first().task)
+
+        List<Field> dataGet = dataService.getData($case.tasks.first().task)
+        dataGet.first().value == ";get-pre;get-post"
+
+        ChangedFieldsTree dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
+                "text_field": [
+                        "value": "",
+                        "type" : "text"
+                ] as Map
+        ))
+        assert dataSet.getChangedFields()["control_field"].attributes["value"] == ";get-pre;get-pre;get-post;get-post;set-pre;set-pre;set-post;set-post"
     }
 }

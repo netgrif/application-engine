@@ -24,9 +24,6 @@ class ConcurrencyTest {
     private static final Logger log = LoggerFactory.getLogger(ConcurrencyTest)
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private ImportHelper importHelper
 
     @Autowired
@@ -40,7 +37,7 @@ class ConcurrencyTest {
 
     @Test
     void test() {
-        def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/action_delegate_concurrency_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        def mainNet = importHelper.createNet("action_delegate_concurrency_test.xml")
         assert mainNet.isPresent()
 
         List<Case> cases = []

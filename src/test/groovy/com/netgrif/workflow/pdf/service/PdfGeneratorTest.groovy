@@ -1,5 +1,6 @@
 package com.netgrif.workflow.pdf.service
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.service.UserService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
@@ -26,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles(["dev"])
+@ActiveProfiles(["test"])
 @SpringBootTest
 class PdfGeneratorTest {
 
@@ -54,6 +55,9 @@ class PdfGeneratorTest {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private TestHelper testHelper
+
     public static final String[] TESTING_DATA = ["pdf_test_1.xml", "pdf_test_2.xml", "pdf_test_3.xml", "all_data_pdf.xml"]
 
     private def stream = { String name ->
@@ -62,6 +66,8 @@ class PdfGeneratorTest {
 
     @Test
     void testPdfGenerator() {
+        testHelper.truncateDbs()
+
         testingNormal()
         testingWithTemplate()
         testingLongDocument()
