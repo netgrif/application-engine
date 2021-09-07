@@ -37,8 +37,6 @@
         <sonar.login>d05e959459d94af54b421cbe400960681fa87fdb</sonar.login>
         <sonar.sources>src/main</sonar.sources>
         <sonar.exclusions>src/test/**/*</sonar.exclusions>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>

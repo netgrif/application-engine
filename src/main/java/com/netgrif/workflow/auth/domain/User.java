@@ -45,21 +45,14 @@ public class User extends AbstractUser implements RegisteredUser {
     @NotNull
     @Getter
     @Setter
+    @Indexed
     protected String name;
-    @Indexed
-    private String name;
 
     @NotNull
     @Getter
     @Setter
     @Indexed
-    private String surname;
     protected String surname;
-
-    @NotNull
-    @Getter
-    @Setter
-    protected UserState state;
 
     @Getter
     @Setter
