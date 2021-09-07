@@ -3,8 +3,9 @@ package com.netgrif.workflow.petrinet.domain.arcs.reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Transient;
+import org.springframework.data.annotation.Transient;
+//TODO: JOZIKE
+//import javax.persistence.Transient;
 
 @Data
 @NoArgsConstructor
