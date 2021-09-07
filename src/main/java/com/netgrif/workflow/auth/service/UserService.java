@@ -7,7 +7,6 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -247,19 +246,19 @@ public class UserService extends AbstractUserService {
         /*if (!small) {
             users.forEach(this::loadProcessRoles);
         }*/
-            return changeType(users);
-        }
-
-    @Override
-    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
-        return changeType(userRepository.findAllByIdIn(ids));
+        return changeType(users);
     }
 
 //    @Override
 //    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
-//        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
-//        return changeType(users);
+//        return changeType(userRepository.findAllByIdIn(ids));
 //    }
+
+    @Override
+    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
+        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
+        return changeType(users);
+    }
 
     @Override
     public IUser getLoggedOrSystem() {

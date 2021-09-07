@@ -125,7 +125,7 @@ class RemoveActionTest {
 
         //Has no role, we assign role admin
         def content = JsonOutput.toJson([adminRoleId])
-        String userId = Integer.toString(user._id as Integer)
+        String userId = user.getStringId()
 
         mvc.perform(post(ROLE_API.replace("{}", userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)
