@@ -26,4 +26,6 @@ public interface IElasticTaskService {
     long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
     void remove(String taskId);
+
+    void removeByPetriNetId(String petriNetId);
 }

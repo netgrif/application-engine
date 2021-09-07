@@ -75,6 +75,12 @@ public class ElasticCase {
     private Set<String> enabledRoles;
 
     @Field(type = Keyword)
+    private Set<String> viewRoles;
+
+    @Field(type = Keyword)
+    private Set<String> userRefs;
+
+    @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
     private Set<String> users;
@@ -106,6 +112,8 @@ public class ElasticCase {
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = new HashSet<>(useCase.getViewRoles());
+        userRefs = new HashSet<>(useCase.getUserRefs().keySet());
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
         users = new HashSet<>(useCase.getUsers().keySet());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
@@ -120,6 +128,8 @@ public class ElasticCase {
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
+        viewRoles = useCase.getViewRoles();
+        userRefs = useCase.getUserRefs();
         negativeViewRoles = useCase.getNegativeViewRoles();
         users = useCase.getUsers();
         negativeViewUsers = useCase.getNegativeViewUsers();

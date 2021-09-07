@@ -66,5 +66,5 @@ public interface IWorkflowService {
 
     ChangedFieldsTree runActions(List<Action> actions, String useCaseId);
 
-    void runActions(List<Action> actions);
+    void runActions(List<Action> actions, PetriNet petriNet);
 }

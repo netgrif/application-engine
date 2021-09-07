@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
@@ -81,7 +82,7 @@ class TaskAuthorizationServiceTest {
                 .build()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["role": "role"], this.net)
+        def processRoles = importHelper.getProcessRoles(this.net)
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
@@ -162,17 +163,17 @@ class TaskAuthorizationServiceTest {
     void testDelegateAuthorization() {
         mvc.perform(post(DELEGATE_TASK_URL + taskId)
                 .content(userId.toString())
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(this.userWithoutRoleAuth)))
                 .andExpect(status().isForbidden())
         mvc.perform(post(DELEGATE_TASK_URL + taskId)
                 .content(userId.toString())
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
         mvc.perform(post(DELEGATE_TASK_URL + taskId2)
                 .content(userId.toString())
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(this.adminAuth)))
                 .andExpect(status().isOk())
     }

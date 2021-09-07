@@ -9,6 +9,13 @@ import com.netgrif.workflow.auth.web.responsebodies.UserFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
+import com.netgrif.workflow.auth.service.UserService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 public class UserServiceConfiguration {
@@ -31,4 +38,9 @@ public class UserServiceConfiguration {
         return new UserFactory();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsServiceImpl();
+    }
 }
