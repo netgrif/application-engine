@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import com.netgrif.workflow.ldap.filters.LoginAttemptsFilter;
+//import com.netgrif.workflow.ldap.filters.LoginAttemptsFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,11 +53,11 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     }
 
 
-    void configureFilters(HttpSecurity http) {
-        if (sessionUtilsProperties.isEnabledFilter()) {
-            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
-        }
-    }
+//    void configureFilters(HttpSecurity http) {
+//        if (sessionUtilsProperties.isEnabledFilter()) {
+//            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
+//        }
+//    }
 
 
     abstract boolean isOpenRegistration();
