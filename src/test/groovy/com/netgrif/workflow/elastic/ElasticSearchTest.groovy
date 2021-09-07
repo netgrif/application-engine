@@ -6,7 +6,6 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.elastic.domain.ElasticTask
@@ -80,9 +79,6 @@ class ElasticSearchTest {
 
     @Autowired
     private IWorkflowService workflowService
-
-    @Autowired
-    private IPetriNetService petriNetService
 
     @Autowired
     private ElasticsearchRestTemplate template

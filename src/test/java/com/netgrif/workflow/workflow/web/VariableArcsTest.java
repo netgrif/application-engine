@@ -5,7 +5,6 @@ import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
@@ -88,7 +87,7 @@ public class VariableArcsTest {
 
     private PetriNet loaded;
 
-    private User testUser;
+    private IUser testUser;
 
     private Case finishCase;
 
@@ -119,8 +118,9 @@ public class VariableArcsTest {
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
-                new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
-                new UserProcessRole[]{});
+                new ProcessRole[]{});
+        //                new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
+
 
         finishCase = importHelper.createCase("finish case", loaded);
         cancelCase = importHelper.createCase("assign case", loaded);
