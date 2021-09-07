@@ -46,11 +46,8 @@ public class UserService extends AbstractUserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    private INextGroupService groupService;
-
-    @Autowired
-    private GroupConfigurationProperties groupProperties;
+//    @Autowired
+//    private GroupConfigurationProperties groupProperties;
 
     @Override
     public IUser saveNew(IUser user) {
