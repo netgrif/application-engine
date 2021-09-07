@@ -55,7 +55,7 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
             log.error("Import of petri net for groups failed!")
             return groupNet
         }
-        if (groupProperties.isSystemEnabled())
+//        if (groupProperties.isSystemEnabled()) TODO: JOZIKE Properties
             nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem())
         return groupNet;
     }
