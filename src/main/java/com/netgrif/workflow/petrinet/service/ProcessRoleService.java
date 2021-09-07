@@ -176,6 +176,9 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase, RoleContext roleContext) {
+        if (eventMap == null) {
+            return;
+        }
         eventMap.forEach((eventType, event) -> {
 
             if (eventType != requiredEventType) {

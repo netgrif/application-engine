@@ -44,7 +44,7 @@ services:
 
 
   docker-mongo:
-    image: mongo:4.2
+    image: mongo:4.4
     ports:
     - 27017:27017
 #      environment:
@@ -56,6 +56,9 @@ services:
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
+      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
     ports:
       - 9200:9200
       - 9300:9300
