@@ -1,15 +1,10 @@
 package com.netgrif.workflow.orgstructure.groups
 
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.UserService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
@@ -49,30 +44,29 @@ class NextGroupServiceTest {
 
     @Test
     void groupTest() {
-    void groupTest() {
         testHelper.truncateDbs()
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         Optional<PetriNet> groupNet = importGroup()
         assert groupNet.isPresent()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-
-        importHelper.createUser(new User(name: "Test", surname: "Dummy", email: "dummy@netgrif.com", password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
-
-        importHelper.createUser(new User(name: "Test", surname: "Dummy", email: "user@netgrif.com", password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
+//        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+//
+//        importHelper.createUser(new User(name: "Test", surname: "Dummy", email: "dummy@netgrif.com", password: "password", state: UserState.ACTIVE),
+//                [auths.get("user")] as Authority[],
+//                [] as ProcessRole[])
+//
+//        importHelper.createUser(new User(name: "Test", surname: "Dummy", email: "user@netgrif.com", password: "password", state: UserState.ACTIVE),
+//                [auths.get("user")] as Authority[],
+//                [] as ProcessRole[])
 
         Case customGroup = createGroup()
         if (customGroup == null) {
@@ -98,6 +92,7 @@ class NextGroupServiceTest {
 
     Case createGroup() {
         return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false))
+    }
 
     List<Case> findGroup() {
         QCase qCase = new QCase("case")
