@@ -28,7 +28,7 @@
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.3.1</querydsl.version>
         <drools.version>7.55.0.Final</drools.version>
-<!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+        <!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>netgrif_nae-backend</sonar.projectKey>
@@ -37,6 +37,8 @@
         <sonar.login>d05e959459d94af54b421cbe400960681fa87fdb</sonar.login>
         <sonar.sources>src/main</sonar.sources>
         <sonar.exclusions>src/test/**/*</sonar.exclusions>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
