@@ -1,7 +1,5 @@
 package com.netgrif.workflow.orgstructure.groups;
 
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
@@ -11,7 +9,6 @@ import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
 import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.ImportHelper;
@@ -29,9 +26,9 @@ import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
