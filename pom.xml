@@ -28,7 +28,7 @@
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.3.1</querydsl.version>
         <drools.version>7.55.0.Final</drools.version>
-<!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+        <!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>netgrif_nae-backend</sonar.projectKey>
@@ -40,7 +40,6 @@
     </properties>
 
     <dependencies>
-
         <!-- Batch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -70,11 +69,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.hateoas</groupId>-->
-        <!--            <artifactId>spring-hateoas</artifactId>-->
-        <!--            <version>1.0.2.RELEASE</version>-->
-        <!--        </dependency>-->
 
         <!-- Mail -->
         <dependency>
@@ -133,7 +127,6 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
@@ -151,6 +144,8 @@
             <version>2.3.3</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -163,7 +158,6 @@
             <version>5.3.2</version>
             <scope>test</scope>
         </dependency>
-
 
         <!-- Groovy -->
         <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
@@ -301,12 +295,14 @@
             <version>3.9.1.Final</version>
         </dependency>
 
+        <!-- QRGen -->
         <dependency>
             <groupId>net.glxn.qrgen</groupId>
             <artifactId>core</artifactId>
             <version>2.0</version>
         </dependency>
 
+        <!-- Oauth -->
         <dependency>
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
@@ -331,6 +327,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <!-- Quartz -->
         <!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
         <dependency>
@@ -399,30 +396,30 @@
             <id>mulesoft</id>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
-<!--        <repository>-->
-<!--            <id>jcenter-snapshots</id>-->
-<!--            <name>jcenter</name>-->
-<!--            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>-->
-<!--        </repository>-->
-<!--        <repository>-->
-<!--            <id>spring-snapshots</id>-->
-<!--            <url>https://repo.spring.io/snapshot</url>-->
-<!--            <snapshots>-->
-<!--                <enabled>true</enabled>-->
-<!--            </snapshots>-->
-<!--        </repository>-->
-<!--        <repository>-->
-<!--            <id>spring-milestones</id>-->
-<!--            <url>https://repo.spring.io/milestone</url>-->
-<!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>jcenter-snapshots</id>-->
+        <!--            <name>jcenter</name>-->
+        <!--            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>-->
+        <!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>spring-snapshots</id>-->
+        <!--            <url>https://repo.spring.io/snapshot</url>-->
+        <!--            <snapshots>-->
+        <!--                <enabled>true</enabled>-->
+        <!--            </snapshots>-->
+        <!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>spring-milestones</id>-->
+        <!--            <url>https://repo.spring.io/milestone</url>-->
+        <!--        </repository>-->
     </repositories>
-<!--    <pluginRepositories>-->
-<!--        <pluginRepository>-->
-<!--            <id>spring-milestones</id>-->
-<!--            <name>Spring Milestones</name>-->
-<!--            <url>https://repo.spring.io/milestone</url>-->
-<!--        </pluginRepository>-->
-<!--    </pluginRepositories>-->
+    <!--    <pluginRepositories>-->
+    <!--        <pluginRepository>-->
+    <!--            <id>spring-milestones</id>-->
+    <!--            <name>Spring Milestones</name>-->
+    <!--            <url>https://repo.spring.io/milestone</url>-->
+    <!--        </pluginRepository>-->
+    <!--    </pluginRepositories>-->
 
     <build>
         <resources>
