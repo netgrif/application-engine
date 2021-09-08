@@ -18,7 +18,7 @@ public class TaskLayout extends FormLayout {
                 data.getLayout().getRows(),
                 data.getLayout().getCols(),
                 data.getLayout().getType() != null ? data.getLayout().getType().value() : null,
-                data.getLayout().isHideEmptyRows(),
+                data.getLayout().getHideEmptyRows() != null ? data.getLayout().getHideEmptyRows().value() : null,
                 data.getLayout().getCompactDirection() != null ? data.getLayout().getCompactDirection().value() : null
         );
         this.offset = data.getLayout().getOffset();
