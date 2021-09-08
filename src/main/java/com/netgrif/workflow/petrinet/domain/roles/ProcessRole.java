@@ -28,7 +28,8 @@ public class ProcessRole extends Imported {
 
     private I18nString name;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String netId;
 
     @Setter

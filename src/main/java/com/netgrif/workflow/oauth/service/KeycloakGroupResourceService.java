@@ -3,6 +3,7 @@ package com.netgrif.workflow.oauth.service;
 import com.netgrif.workflow.oauth.domain.KeycloakGroupResource;
 import com.netgrif.workflow.oauth.domain.KeycloakUserResource;
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -17,6 +18,7 @@ import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class KeycloakGroupResourceService implements IRemoteGroupResourceService<KeycloakGroupResource, KeycloakUserResource> {
 
     @Value("${security.oauth2.client.realm}")
@@ -66,6 +68,7 @@ public class KeycloakGroupResourceService implements IRemoteGroupResourceService
         try {
             return groupsResource().group(id).toRepresentation();
         } catch (NotFoundException e) {
+            log.error(e.getMessage(), e);
             return null;
         }
     }
@@ -75,6 +78,7 @@ public class KeycloakGroupResourceService implements IRemoteGroupResourceService
         try {
             return groupsResource().group(id).members().stream().map(KeycloakUserResource::new).collect(Collectors.toList());
         } catch (NotFoundException e) {
+            log.error(e.getMessage(), e);
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
@@ -84,6 +88,7 @@ public class KeycloakGroupResourceService implements IRemoteGroupResourceService
         try {
             return userResourceService.usersResource().get(id).groups().stream().map(this::wrap).collect(Collectors.toList());
         } catch (NotFoundException e) {
+            log.error(e.getMessage(), e);
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
