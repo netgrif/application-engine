@@ -21,7 +21,6 @@ public class User extends AbstractUser implements RegisteredUser {
     public static final String UNKNOWN = "unknown";
 
     @Id
-    @Indexed
     @Getter
     protected ObjectId _id;
 
