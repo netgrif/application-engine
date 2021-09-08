@@ -117,16 +117,16 @@ class ImportHelper {
         }
         return Optional.of(petriNet)
     }
-
-    /*ProcessRole createUserProcessRole(PetriNet net, String name) {
-        UserProcessRole role = userProcessRoleRepository.save(new UserProcessRole(roleId:
+/*
+    ProcessRole createUserProcessRole(PetriNet net, String name) {
+        ProcessRole role = userProcessRoleRepository.save(new ProcessRole(roleId:
                 net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
         log.info("Created user process role $name")
         return role
     }
 
-    Map<String, UserProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
-        HashMap<String, UserProcessRole> userRoles = new HashMap<>()
+    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
+        HashMap<String, ProcessRole> userRoles = new HashMap<>()
         roles.each { it ->
             userRoles.put(it.key, createUserProcessRole(net, it.value))
         }
@@ -135,15 +135,15 @@ class ImportHelper {
         return userRoles
     }
 
-    Map<String, UserProcessRole> getProcessRoles(PetriNet net) {
-        List<UserProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
-        Map<String, UserProcessRole> map = [:]
+    Map<String, ProcessRole> getProcessRoles(PetriNet net) {
+        List<ProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
+        Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
         }
         return map
-    }*/
-
+    }
+*/
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
