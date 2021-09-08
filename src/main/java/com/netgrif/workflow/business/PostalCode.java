@@ -2,11 +2,13 @@ package com.netgrif.workflow.business;
 
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 
 
 @Data
 public class PostalCode {
 
+    @Id
     private ObjectId _id;
 
     private String code;
