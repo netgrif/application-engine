@@ -65,7 +65,6 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
             KieHelper kieHelper = new KieHelper();
             buildRules(storedRules, kieHelper);
             KieBase base = kieHelper.build();
-            ;
             testSession = base.newKieSession();
             testSession.fireAllRules();
         } catch (Exception e) {
