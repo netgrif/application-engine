@@ -383,6 +383,10 @@
                 <xs:element ref="init"/>
             </xs:choice>
         </xs:complexType>
+        <xs:unique name="optionUniqueKey">
+            <xs:selector xpath="./option"/>
+            <xs:field xpath="@key"/>
+        </xs:unique>
     </xs:element>
     <xs:element name="inits">
         <xs:complexType>
