@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 public abstract class FormLayout extends Layout {
 
     private String type;
-    private Boolean hideEmptyRows;
+    private String hideEmptyRows;
     private String compactDirection;
 
-    public FormLayout(Integer rows, Integer cols, String type, Boolean hideEmptyRows, String compactDirection) {
+    public FormLayout(Integer rows, Integer cols, String type, String hideEmptyRows, String compactDirection) {
         super(rows, cols);
         this.type = type;
         this.hideEmptyRows = hideEmptyRows;
