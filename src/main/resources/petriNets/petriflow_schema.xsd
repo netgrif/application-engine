@@ -587,7 +587,14 @@
             <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:element name="hideEmptyRows" type="xs:boolean"/>
+    <xs:simpleType name="hideEmptyRows">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="all"/>
+            <xs:enumeration value="compacted"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="hideEmptyRows" type="hideEmptyRows"/>
     <xs:simpleType name="compactDirection">
         <xs:restriction base="xs:string">
             <xs:enumeration value="none"/>
