@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
 
+import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
@@ -21,7 +22,7 @@ abstract class RoleActionsRunner {
     abstract RoleActionDelegate getRoleActionDelegate()
 
     @Autowired
-    private CompilerConfiguration configuration
+    private IGroovyShellFactory shellFactory
 
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
@@ -46,7 +47,7 @@ abstract class RoleActionsRunner {
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
         } else {
-            code = (Closure) new GroovyShell(configuration).evaluate("{-> ${action.definition}}")
+            code = (Closure) this.shellFactory.getGroovyShell().evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
         return code.rehydrate(getRoleActionDelegate(), code.owner, code.thisObject)

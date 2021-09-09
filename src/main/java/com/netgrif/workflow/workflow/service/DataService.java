@@ -12,11 +12,17 @@ import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.*;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.DataEvent;
 import com.netgrif.workflow.petrinet.domain.events.DataEventType;
@@ -240,8 +246,6 @@ public class DataService implements IDataService {
             }
         });
         updateDataset(useCase);
-        taskService.resolveUserRef(useCase);
-        workflowService.resolveUserRef(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
         return outcome;
@@ -262,7 +266,7 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field> data = getData(taskId).getData();
+        List<Field> data = getData(task, useCase).getData();
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
