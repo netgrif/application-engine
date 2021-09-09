@@ -1,3 +1,69 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10909/tab/release-report-all-issues"></a>
+## 5.6.2 (03.09.2021)
+### Bug fixes
+* [NAE-1441](https://netgrif.atlassian.net/browse/NAE-1441) - Var arcs backwards incompatibility
+* [NAE-1442](https://netgrif.atlassian.net/browse/NAE-1442) - LdapUserRef incorrect @Id annotation
+
+### Improvements
+* [NAE-1443](https://netgrif.atlassian.net/browse/NAE-1443) - LDAP objectClasses not loaded from properties
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10906/tab/release-report-all-issues"></a>
+## 5.6.1 (30.08.2021)
+### Bug fixes
+* [NAE-1424](https://netgrif.atlassian.net/browse/NAE-1424) - LDAP integration security vulnerability
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10891/tab/release-report-all-issues"></a>
+## 5.6.0 (26.08.2021)
+### Bug fixes
+* [NAE-1396](https://netgrif.atlassian.net/browse/NAE-1396) - Nefunkčná property na zamedzenie vytvárania grúp pre jednotlivých userov
+* [NAE-1382](https://netgrif.atlassian.net/browse/NAE-1382) - Case ktory ma prvy transition ako executable auto znefunkcni siet
+* [NAE-1372](https://netgrif.atlassian.net/browse/NAE-1372) - Change user list does not work in post create action
+* [NAE-1324](https://netgrif.atlassian.net/browse/NAE-1324) - Delete Petri net with many instances crashes the application
+* [NAE-1312](https://netgrif.atlassian.net/browse/NAE-1312) - Merge issue from NAE-1238_usersRef
+
+### Improvements
+* [NAE-1400](https://netgrif.atlassian.net/browse/NAE-1400) - Fix multiple access to repository while getting data
+* [NAE-1399](https://netgrif.atlassian.net/browse/NAE-1399) - PDF generator improvement
+* [NAE-1392](https://netgrif.atlassian.net/browse/NAE-1392) - Implement GroovyShell Factory
+* [NAE-1104](https://netgrif.atlassian.net/browse/NAE-1104) - User filters
+* [NAE-335](https://netgrif.atlassian.net/browse/NAE-335) - Variable arc definition rework
+* [NAE-297](https://netgrif.atlassian.net/browse/NAE-297) - Petriflow functions
+
+### Features
+* [NAE-1407](https://netgrif.atlassian.net/browse/NAE-1407) - Static functions
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
+## 5.5.2 (19.07.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10896/tab/release-report-all-issues"></a>
+## 5.5.1 (09.07.2021)
+### Bug fixes
+* [NAE-1374](https://netgrif.atlassian.net/browse/NAE-1374) - setData does not propagate changed allowedNets to frontend
+* [NAE-1323](https://netgrif.atlassian.net/browse/NAE-1323) - Initial value of collection fields is broken
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10888/tab/release-report-all-issues"></a>
 ## 5.5.0 (11.06.2021)
 ### Bug fixes

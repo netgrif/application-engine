@@ -22,24 +22,28 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     private SystemUserRunner systemCreator
 
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml";
-    private static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
+    public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
+
+    private static final String PREFERRED_FILTER_ITEM_FILE_NAME = "engine-processes/preference_filter_item.xml"
+    private static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "preference_filter_item"
 
     @Override
     void run(String... args) throws Exception {
-        importFilterProcess()
+        importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
+        importProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
     }
 
-    ImportPetriNetEventOutcome importFilterProcess() {
-        PetriNet filter = petriNetService.getNewestVersionByIdentifier(FILTER_PETRI_NET_IDENTIFIER)
+    ImportPetriNetEventOutcome importFilterProcess(String message, String netIdentifier, String netFileName) {
+        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (filter != null) {
-            log.info("Petri net for filters has already been imported.")
+            log.info("${message} has already been imported.")
             return new ImportPetriNetEventOutcome()
         }
 
-        ImportPetriNetEventOutcome filterNet = helper.createNet(FILTER_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)
+        ImportPetriNetEventOutcome filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
 
         if (filterNet.getNet() == null) {
-            log.error("Import of Petri net for filters failed!")
+            log.error("Import of ${message} failed!")
         }
 
         return filterNet
