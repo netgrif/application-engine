@@ -36,9 +36,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ConditionalOnProperty(value = "nae.group.default.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
 @Service
 @Slf4j
 public class NextGroupService implements INextGroupService {

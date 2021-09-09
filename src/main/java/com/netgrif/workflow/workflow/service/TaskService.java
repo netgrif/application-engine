@@ -7,9 +7,7 @@ import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskMappingServic
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.arcs.Arc;
-import com.netgrif.workflow.petrinet.domain.arcs.ArcOrderComparator;
-import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
+import com.netgrif.workflow.petrinet.domain.arcs.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
@@ -309,11 +307,8 @@ public class TaskService implements ITaskService {
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> {
-                    if (arc instanceof ResetArc) {
-                        ((ResetArc) arc).setRemovedTokens(useCase.getResetArcTokens().get(arc.getStringId()));
-                        useCase.getResetArcTokens().remove(arc.getStringId());
-                    }
-                    arc.rollbackExecution();
+                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
+                    useCase.getConsumedTokens().remove(arc.getStringId());
                 });
         workflowService.updateMarking(useCase);
 
@@ -447,9 +442,8 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[" + useCaseId + "]: Finish execution of task [" + transition.getTitle() + "] in case [" + useCase.getTitle() + "]");
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
-        useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
-                .filter(arc -> arc instanceof ResetArc)
-                .forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
+        Supplier<Stream<Arc>> arcStreamSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream();
+        arcStreamSupplier.get().filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
         workflowService.save(useCase);
     }
 
@@ -468,7 +462,10 @@ public class TaskService implements ITaskService {
 
         filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
             if (arc instanceof ResetArc) {
-                useCase.getResetArcTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+                useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+            }
+            if(arc.getReference() != null && arc.getSource() instanceof Place){
+                useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
             }
             arc.execute();
         });
@@ -688,7 +685,7 @@ public class TaskService implements ITaskService {
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 task.addUsers(new HashSet<>(userIds), permission);
@@ -738,7 +735,7 @@ public class TaskService implements ITaskService {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
-        transition.getNegativeViewRoles().forEach((roleId) -> task.addNegativeViewRole(roleId));
+        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
 
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
@@ -793,6 +790,11 @@ public class TaskService implements ITaskService {
     @Override
     public void deleteTasksByCase(String caseId) {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
+    }
+
+    @Override
+    public void deleteTasksByPetriNetId(String petriNetId) {
+        taskRepository.deleteAllByProcessId(petriNetId);
     }
 
     private void setUser(Task task) {

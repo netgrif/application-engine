@@ -1,6 +1,8 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -9,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
-@ConditionalOnProperty(value = "nae.group.default.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
 @Component
 @Slf4j
 public class GroupRunner extends AbstractOrderedCommandLineRunner {
@@ -31,8 +30,12 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IPetriNetService petriNetService
 
+    @Autowired
+    private GroupConfigurationProperties groupProperties
+
     private static final String GROUP_FILE_NAME = "engine-processes/org_group.xml";
     private static final String GROUP_PETRINET_IDENTIFIER = "org_group"
+    public static final String DEFAULT_GROUP_TITLE = "Default system group"
 
     @Override
     void run(String... args) throws Exception {
@@ -52,7 +55,8 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
             log.error("Import of petri net for groups failed!")
             return groupNet
         }
-        nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem())
+        if (groupProperties.isSystemEnabled())
+            nextGroupService.createDefaultSystemGroup(userService.getLoggedOrSystem())
         return groupNet;
     }
 }
