@@ -10,18 +10,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
-import java.util.Arrays;
-
 @Configuration
 public class ElasticsearchConfiguration {
 
-    @Value("${spring.data.elasticsearch.cluster-name:elasticsearch}")
-    private String clusterName;
-
-    @Value("${spring.data.elasticsearch.url:127.0.0.1}")
+    @Value("${spring.data.elasticsearch.url}")
     private String url;
 
-    @Value("${spring.data.elasticsearch.port:9300}")
+    @Value("${spring.data.elasticsearch.searchport}")
     private int port;
 
     @Value("${spring.data.elasticsearch.index.case}")
@@ -52,7 +47,7 @@ public class ElasticsearchConfiguration {
     public RestHighLevelClient client() {
 
         return new RestHighLevelClient(
-                RestClient.builder(new HttpHost(url, 9200, "http")));
+                RestClient.builder(new HttpHost(url, port, "http")));
     }
 
     @Bean
