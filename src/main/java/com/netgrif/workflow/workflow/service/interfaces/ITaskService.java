@@ -96,6 +96,8 @@ public interface ITaskService {
 
     void deleteTasksByCase(String caseId);
 
+    void deleteTasksByPetriNetId(String petriNetId);
+
     List<TaskReference> findAllByCase(String caseId, Locale locale);
 
     Task save(Task task);
