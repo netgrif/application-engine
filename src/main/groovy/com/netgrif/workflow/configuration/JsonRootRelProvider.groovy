@@ -22,7 +22,7 @@ class JsonRootRelProvider implements LinkRelationProvider {
 
     @Override
     boolean supports(LookupContext delimiter) {
-        return LinkRelationProvider.supports(aClass)
+        return LinkRelationProvider.supports(delimiter)
     }
 
 }
