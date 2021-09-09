@@ -52,8 +52,6 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    GetDataEventOutcome getData(String caseId);
-
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
@@ -67,8 +65,4 @@ public interface IWorkflowService {
     Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
-
-    ChangedFieldsTree runActions(List<Action> actions, String useCaseId);
-
-    void runActions(List<Action> actions);
 }

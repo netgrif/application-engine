@@ -1,10 +1,23 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes;
 
+import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
-import lombok.Data;
 
-@Data
-public class DeleteCaseEventOutcome extends EventOutcome {
+import java.util.List;
 
-    private String stringId;
+public class DeleteCaseEventOutcome extends CaseEventOutcome {
+
+    public DeleteCaseEventOutcome(Case aCase) {
+        super(aCase);
+    }
+
+    public DeleteCaseEventOutcome(I18nString message,Case aCase) {
+        super(message,aCase);
+    }
+
+    public DeleteCaseEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase) {
+        super(message, outcomes, aCase);
+    }
 }

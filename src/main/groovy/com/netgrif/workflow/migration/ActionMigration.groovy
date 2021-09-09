@@ -3,7 +3,7 @@ package com.netgrif.workflow.migration
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
@@ -23,7 +23,7 @@ class ActionMigration {
 
     void migrateActions(String petriNetPath){
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        ImportPetriNetOutcome newPetriNet = petriNetService.importPetriNet(netStream, "major", userService.loggedOrSystem.transformToLoggedUser())
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, "major", userService.loggedOrSystem.transformToLoggedUser())
         List<PetriNet> oldPetriNets
 
         if(newPetriNet.getNet() != null) {

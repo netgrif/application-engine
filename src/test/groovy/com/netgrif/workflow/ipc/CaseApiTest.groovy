@@ -2,12 +2,11 @@ package com.netgrif.workflow.ipc
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +39,7 @@ class CaseApiTest {
     @Autowired
     private SuperCreator superCreator
 
-    private ImportPetriNetOutcome testNet
+    private ImportPetriNetEventOutcome testNet
 
     private def stream = { String name ->
         return CaseApiTest.getClassLoader().getResourceAsStream(name)
