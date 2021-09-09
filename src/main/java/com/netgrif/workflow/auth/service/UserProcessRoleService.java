@@ -46,12 +46,10 @@ public class UserProcessRoleService implements IUserProcessRoleService {
     public List<UserProcessRole> saveRoles(Collection<ProcessRole> values, String netId) {
         List<UserProcessRole> userProcessRoles = new LinkedList<>();
         for (ProcessRole value : values) {
-            if (!value.getStringId().equals(getDefaultRoleId())) {
-                UserProcessRole userRole = new UserProcessRole();
-                userRole.setRoleId(value.getStringId());
-                userRole.setNetId(netId);
-                userProcessRoles.add(userRole);
-            }
+            UserProcessRole userRole = new UserProcessRole();
+            userRole.setRoleId(value.getStringId());
+            userRole.setNetId(netId);
+            userProcessRoles.add(userRole);
         }
         return repository.saveAll(userProcessRoles);
     }
