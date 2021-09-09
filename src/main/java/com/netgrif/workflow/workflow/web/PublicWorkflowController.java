@@ -44,17 +44,4 @@ public class PublicWorkflowController {
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed: " + e.getMessage());
         }
     }
-
-    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
-    @ApiOperation(value = "Get all case data")
-    public EventOutcomeWithMessageResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",
-                    LocalisedEventOutcomeFactory.from(this.workflowService.getData(caseId),locale));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of [" + caseId + "] failed:" + e.getMessage(), e);
-            return EventOutcomeWithMessageResource.errorMessage("Getting all case data of [" + caseId + "] failed:" + e.getMessage());
-        }
-    }
 }

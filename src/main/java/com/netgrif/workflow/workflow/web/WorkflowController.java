@@ -208,18 +208,6 @@ public class WorkflowController {
         }
     }
 
-    @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public EventOutcomeWithMessageResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",new LocalisedGetDataEventOutcome(workflowService.getData(caseId), locale));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of ["+caseId+"] failed:", e);
-            return EventOutcomeWithMessageResource.errorMessage("Getting all case data of [" + caseId + "] failed:" + e.getMessage());
-        }
-    }
-
     @ApiOperation(value = "Download case file field value", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {

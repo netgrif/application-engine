@@ -3,7 +3,7 @@ package com.netgrif.workflow.startup
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -29,14 +29,14 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         importFilterProcess()
     }
 
-    ImportPetriNetOutcome importFilterProcess() {
+    ImportPetriNetEventOutcome importFilterProcess() {
         PetriNet filter = petriNetService.getNewestVersionByIdentifier(FILTER_PETRI_NET_IDENTIFIER)
         if (filter != null) {
             log.info("Petri net for filters has already been imported.")
-            return new ImportPetriNetOutcome()
+            return new ImportPetriNetEventOutcome()
         }
 
-        ImportPetriNetOutcome filterNet = helper.createNet(FILTER_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)
+        ImportPetriNetEventOutcome filterNet = helper.createNet(FILTER_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)
 
         if (filterNet.getNet() == null) {
             log.error("Import of Petri net for filters failed!")

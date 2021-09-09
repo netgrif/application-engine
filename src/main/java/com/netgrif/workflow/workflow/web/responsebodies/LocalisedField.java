@@ -46,6 +46,8 @@ public class LocalisedField {
 
     private List<LocalizedValidation> validations;
 
+    private String parentTaskId;
+
     public LocalisedField() {}
 
     public LocalisedField(Field field, Locale locale) {
@@ -64,6 +66,7 @@ public class LocalisedField {
         length = field.getLength();
         component = field.getComponent();
         validations = loadValidations(field, locale);
+        parentTaskId = field.getParentTaskId();
     }
 
     private List<LocalizedValidation> loadValidations(Field field, Locale locale) {
