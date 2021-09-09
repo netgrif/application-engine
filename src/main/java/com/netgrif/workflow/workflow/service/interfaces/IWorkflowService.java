@@ -1,10 +1,9 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -33,7 +32,7 @@ public interface IWorkflowService {
 
     Case createCase(String netId, String title, String color, LoggedUser user);
 
-    Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
+    Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
 
     void deleteCase(String caseId);
 
@@ -55,7 +54,7 @@ public interface IWorkflowService {
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
-//    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
+//    List<Case> getCaseFi  eldChoices(Pageable pageable, String caseId, String fieldId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
 

@@ -2,32 +2,28 @@ package com.netgrif.workflow.elastic
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
-import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.elastic.service.ReindexingTask
-import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.QCase
-import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
-import com.netgrif.workflow.workflow.service.interfaces.ITaskService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDateTime
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -46,18 +42,25 @@ class ElasticTaskTest {
     private ImportHelper helper
     @Autowired
     private ReindexingTask reindexingTask
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
+
 
     @Value("classpath:task_reindex_test.xml")
     private Resource netResource
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
 
     @Test
     void taskReindexTest() {
-        def optional = helper.createNet("all_data.xml", "major")
+        def optional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+
         assert optional.isPresent()
 
         def net = optional.get()

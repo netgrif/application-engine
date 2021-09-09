@@ -11,6 +11,7 @@ public abstract class PTArc extends Arc {
 
     /**
      * Sets source of this arc.
+     *
      * @param source Node object of class Place
      * @throws IllegalArgumentException if <i>source</i> is of class Transition
      */
@@ -23,6 +24,7 @@ public abstract class PTArc extends Arc {
 
     /**
      * Sets destination of this arc.
+     *
      * @param destination Node object of class Transition
      * @throws IllegalArgumentException if <i>destination</i> is of class Place
      */

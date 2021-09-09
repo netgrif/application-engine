@@ -1,22 +1,23 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class MapFieldTest {
@@ -35,14 +36,14 @@ class MapFieldTest {
     @Value("classpath:data_map.xml")
     private Resource netResource
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
 
     @Test
     void testImport() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional.isPresent()
 
         def net = netOptional.get()
@@ -66,7 +67,7 @@ class MapFieldTest {
 
     @Test
     void testValue() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional.isPresent()
 
         Case aCase = importHelper.createCase("Case", netOptional.get())
@@ -74,7 +75,7 @@ class MapFieldTest {
         assert aCase.dataSet["enumeration"] != null
         assert aCase.dataSet["enumeration"].value == "second"
 
-        Field field = aCase.immediateData.find {f -> f.stringId == "enumeration"}
+        Field field = aCase.immediateData.find { f -> f.stringId == "enumeration" }
 
         assert field != null
 
@@ -88,7 +89,7 @@ class MapFieldTest {
 
         aCase = cases[0]
 
-        field = aCase.immediateData.find {f -> f.stringId == "enumeration"}
+        field = aCase.immediateData.find { f -> f.stringId == "enumeration" }
 
         assert field != null
 
@@ -98,15 +99,12 @@ class MapFieldTest {
     }
 
 
-
-
-
     @Value("classpath:data_map_2.xml")
     private Resource netResource2
 
     @Test
     void testImportMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional.isPresent()
 
         def net = netOptional.get()
@@ -130,25 +128,25 @@ class MapFieldTest {
 
     @Test
     void testValueMultichoice() {
-        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional.isPresent()
 
         Case aCase = importHelper.createCase("Case", netOptional.get())
 
         assert aCase.dataSet["multichoice"] != null
         assert aCase.dataSet["multichoice"].value.size() == 2
-        assert aCase.dataSet["multichoice"].value.find {v -> v == "second"}
-        assert aCase.dataSet["multichoice"].value.find {v -> v == "first"}
+        assert aCase.dataSet["multichoice"].value.find { v -> v == "second" }
+        assert aCase.dataSet["multichoice"].value.find { v -> v == "first" }
 
-        Field field = aCase.immediateData.find {f -> f.stringId == "multichoice"}
+        Field field = aCase.immediateData.find { f -> f.stringId == "multichoice" }
 
         assert field != null
 
         MultichoiceMapField enumMap = (MultichoiceMapField) field
 
         assert enumMap.value.size() == 2
-        assert enumMap.value.find {v -> v == "second"}
-        assert enumMap.value.find {v -> v == "first"}
+        assert enumMap.value.find { v -> v == "second" }
+        assert enumMap.value.find { v -> v == "first" }
 
         List<Case> cases = workflowService.findAllById([aCase.stringId])
 
@@ -156,14 +154,14 @@ class MapFieldTest {
 
         aCase = cases[0]
 
-        field = aCase.immediateData.find {f -> f.stringId == "multichoice"}
+        field = aCase.immediateData.find { f -> f.stringId == "multichoice" }
 
         assert field != null
 
         enumMap = (MultichoiceMapField) field
 
         assert enumMap.value.size() == 2
-        assert enumMap.value.find {v -> v == "second"}
-        assert enumMap.value.find {v -> v == "first"}
+        assert enumMap.value.find { v -> v == "second" }
+        assert enumMap.value.find { v -> v == "first" }
     }
 }

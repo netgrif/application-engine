@@ -64,10 +64,10 @@ class DynamicEnumerationTest {
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(aCase.getStringId())).stream().collect(Collectors.toList()).get(0);
         importHelper.assignTask("Autocomplete", aCase.getStringId(), superCreator.getLoggedSuper())
 
-        dataService.setData(task.stringId,  ImportHelper.populateDataset([
+        dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "autocomplete": [
                         "value": "Case",
-                        "type": "enumeration"
+                        "type" : "enumeration"
                 ]
         ]))
 

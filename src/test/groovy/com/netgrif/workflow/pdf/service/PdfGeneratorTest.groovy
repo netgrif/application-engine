@@ -1,6 +1,5 @@
 package com.netgrif.workflow.pdf.service
 
-
 import com.netgrif.workflow.auth.service.UserService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
@@ -8,7 +7,6 @@ import com.netgrif.workflow.pdf.generator.config.PdfResource
 import com.netgrif.workflow.pdf.generator.config.types.PdfPageNumberFormat
 import com.netgrif.workflow.pdf.generator.domain.PdfField
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField
-import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.DataGroup
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -18,16 +16,16 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.core.io.ClassPathResource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["dev"])
 @SpringBootTest
 class PdfGeneratorTest {
@@ -82,9 +80,9 @@ class PdfGeneratorTest {
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
-    private void testingNormal(){
+    private void testingNormal() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[0]), "major", userService.getSystem().transformToLoggedUser())
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[0]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[0] + "_.pdf"))
@@ -92,9 +90,9 @@ class PdfGeneratorTest {
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
-    private void testingWithTemplate(){
+    private void testingWithTemplate() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[1]), "major", userService.getSystem().transformToLoggedUser())
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[1]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[1] + "_.pdf"))
@@ -107,9 +105,9 @@ class PdfGeneratorTest {
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
-    private void testingLongDocument(){
+    private void testingLongDocument() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), "major", userService.getSystem().transformToLoggedUser())
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[2] + "_.pdf"))
@@ -117,9 +115,9 @@ class PdfGeneratorTest {
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
-    private void testingPageNumber(){
+    private void testingPageNumber() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), "major", userService.getSystem().transformToLoggedUser())
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
         pdfResource.setNumberFormat(Locale.US)
@@ -130,7 +128,7 @@ class PdfGeneratorTest {
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
-    private void testingCustomField(){
+    private void testingCustomField() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         PdfField pdf = new PdfTextField("footer_company_title",
                 null,
@@ -142,7 +140,7 @@ class PdfGeneratorTest {
                 pdfResource.getLineHeight(),
                 pdfResource)
 
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), "major", userService.getSystem().transformToLoggedUser())
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_custom_field.pdf"))
@@ -151,7 +149,7 @@ class PdfGeneratorTest {
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
-    private Map<String, DataGroup> getDataGroupMap(List<DataGroup> dataGroupList){
+    private Map<String, DataGroup> getDataGroupMap(List<DataGroup> dataGroupList) {
         Map<String, DataGroup> dataGroupMap = new HashMap<>()
         dataGroupList.each {
             dataGroupMap.put(it.stringId, it)

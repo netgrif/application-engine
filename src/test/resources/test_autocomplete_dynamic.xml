@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
-	<id>test_autocomplete_dynamic</id>
-	<title>Autocomplete Dynamic Net</title>
-	<initials>ADN</initials>
+    <id>test_autocomplete_dynamic</id>
+    <title>Autocomplete Dynamic Net</title>
+    <initials>ADN</initials>
     <!-- ROLES -->
     <!-- DATA -->
     <data type="enumeration">
@@ -15,7 +15,7 @@
             <!-- @formatter:off -->
             field: f.autocomplete;
             change field choices {
-                return findCases { it.title.contains(field.value.toString()) }.collect({it.title})
+            return findCases { it.title.contains(field.value.toString()) }.collect({it.title})
             }
             <!-- @formatter:on -->
         </action>

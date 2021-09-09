@@ -1,22 +1,25 @@
 package com.netgrif.workflow.insurance.mvc
 
-import com.netgrif.workflow.auth.domain.UserState
-
-import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
+
 import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+
+//import com.netgrif.workflow.orgstructure.domain.Group
+
 import org.hamcrest.CoreMatchers
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,7 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -40,7 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -101,25 +104,24 @@ class InsuranceTest {
     @Autowired
     private SuperCreator superCreator
 
-    @Before
+    @BeforeEach
     void before() {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
 
         netId = net.get().getStringId()
 
-        def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("agent"), processRoles.get("company")] as UserProcessRole[])
+//                [org] as Group[],
+                [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
@@ -746,12 +748,12 @@ class InsuranceTest {
     def setDataOffer() {
         def data = [
                 (mapper[109001]): [
-                        value:"2018-02-21",
-                        type :FIELD_DATE
+                        value: "2018-02-21",
+                        type : FIELD_DATE
                 ],
                 (mapper[109006]): [
-                        value:"prevodom",
-                        type :FIELD_ENUM
+                        value: "prevodom",
+                        type : FIELD_ENUM
                 ]
         ]
         setData(data)

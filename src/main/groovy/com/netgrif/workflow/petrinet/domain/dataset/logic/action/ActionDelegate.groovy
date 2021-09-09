@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.Author
-import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -12,11 +12,7 @@ import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
 import com.netgrif.workflow.mail.interfaces.IMailService
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.workflow.orgstructure.service.GroupService
-import com.netgrif.workflow.orgstructure.service.MemberService
 import com.netgrif.workflow.pdf.generator.config.PdfResource
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
@@ -29,6 +25,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicVali
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.rules.domain.RuleRepository
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
@@ -44,6 +41,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import org.bson.types.ObjectId
+import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,6 +51,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -87,12 +86,6 @@ class ActionDelegate {
     AsyncRunner async
 
     @Autowired
-    GroupService groupService
-
-    @Autowired
-    MemberService memberService
-
-    @Autowired
     IPdfGenerator pdfGenerator
 
     @Autowired
@@ -115,6 +108,12 @@ class ActionDelegate {
 
     @Autowired
     IInitValueExpressionEvaluator initValueExpressionEvaluator
+
+    @Autowired
+    RuleRepository ruleRepository
+
+    @Autowired
+    Scheduler scheduler
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -264,7 +263,7 @@ class ActionDelegate {
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
-        addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+        addAttributeToChangedField(field, "options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
     }
 
     def saveChangedValidation(Field field) {
@@ -382,25 +381,25 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-        options: { cl ->
-            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
-                return
+         options    : { cl ->
+             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
+                 return
 
-            def options = cl()
-            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                return
-            if (!(options instanceof Map && options.every {it.getKey() instanceof String}))
-                return
-            field = (MapOptionsField) field
-            if (options.every {it.getValue() instanceof I18nString}) {
-                field.setOptions(options)
-            } else {
-                Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                options.each {it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String))}
-                field.setOptions(newOptions)
-            }
-            saveChangedOptions(field)
-        },
+             def options = cl()
+             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                 return
+             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                 return
+             field = (MapOptionsField) field
+             if (options.every { it.getValue() instanceof I18nString }) {
+                 field.setOptions(options)
+             } else {
+                 Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                 options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                 field.setOptions(newOptions)
+             }
+             saveChangedOptions(field)
+         },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -534,55 +533,55 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
+    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
         if (net == null)
             throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
         return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
         taskService.assignTask(user.transformToLoggedUser(), taskId)
         return taskService.findOne(taskId)
     }
 
-    Task assignTask(Task task, User user = userService.loggedOrSystem) {
+    Task assignTask(Task task, IUser user = userService.loggedOrSystem) {
         taskService.assignTask(task, user)
         return taskService.findOne(task.stringId)
     }
 
-    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
+    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem) {
         taskService.assignTasks(tasks, assignee)
     }
 
-    void cancelTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+    void cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
         taskService.cancelTask(user.transformToLoggedUser(), taskId)
     }
 
-    void cancelTask(Task task, User user = userService.loggedOrSystem) {
+    void cancelTask(Task task, IUser user = userService.loggedOrSystem) {
         taskService.cancelTask(task, userService.loggedOrSystem)
     }
 
-    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
+    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem) {
         taskService.cancelTasks(tasks, user)
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
         taskService.finishTask(user.transformToLoggedUser(), taskId)
     }
 
-    void finishTask(Task task, User user = userService.loggedOrSystem) {
+    void finishTask(Task task, IUser user = userService.loggedOrSystem) {
         taskService.finishTask(task, user)
     }
 
-    void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
+    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem) {
         taskService.finishTasks(tasks, finisher)
     }
 
@@ -612,48 +611,49 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    User assignRole(String roleMongoId, User user = userService.loggedUser) { // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
-        User actualUser = userService.addRole(user, roleMongoId)
+    IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
+        // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
+        IUser actualUser = userService.addRole(user, roleMongoId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
-    User assignRole(String roleId, String netId, User user = userService.loggedUser) {
+    IUser assignRole(String roleId, String netId, IUser user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
-        nets.forEach({net -> user = assignRole(roleId, net, user)})
+        nets.forEach({ net -> user = assignRole(roleId, net, user) })
         return user
     }
 
-    User assignRole(String roleId, PetriNet net, User user = userService.loggedUser) {
-        User actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId}.stringId)
+    IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
+        IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
-    User assignRole(String roleId, String netId, Version version, User user = userService.loggedUser) {
+    IUser assignRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return assignRole(roleId, net, user)
     }
 
-    User removeRole(String roleMongoId, User user = userService.loggedUser) {
-        User actualUser = userService.removeRole(user, roleMongoId)
+    IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
+        IUser actualUser = userService.removeRole(user, roleMongoId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
-    User removeRole(String roleId, String netId, User user = userService.loggedUser) {
+    IUser removeRole(String roleId, String netId, IUser user = userService.loggedUser) {
         List<PetriNet> nets = petriNetService.getByIdentifier(netId)
-        nets.forEach({net -> user = removeRole(roleId, net, user)})
+        nets.forEach({ net -> user = removeRole(roleId, net, user) })
         return user
     }
 
-    User removeRole(String roleId, PetriNet net, User user = userService.loggedUser) {
-        User actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId}.stringId)
+    IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
+        IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
-    User removeRole(String roleId, String netId, Version version, User user = userService.loggedUser) {
+    IUser removeRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
         PetriNet net = petriNetService.getPetriNet(netId, version)
         return removeRole(roleId, net, user)
     }
@@ -695,7 +695,7 @@ class ActionDelegate {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)
             changedField.wasChangedOn(task)
-            fieldAttributes.value.each {attribute ->
+            fieldAttributes.value.each { attribute ->
                 changedField.addAttribute(attribute.key, attribute.value)
             }
             return changedField
@@ -727,76 +727,36 @@ class ActionDelegate {
         }
     }
 
-    Set<Group> findOrganisation(User user = loggedUser()) {
-        return memberService.findByEmail(user.email)?.groups
-    }
-
-    Group createOrganisation(String name, Group parent = null, Set<User> users = [] as Set) {
-        Group org = new Group(name)
-        if (parent)
-            org.setParentGroup(parent)
-        users.collect { user ->
-            org.addMember(findMember(user))
-        }
-        return groupService.save(org)
-    }
-
-    def deleteOrganisation(Group organisation) {
-        groupService.delete(organisation)
-    }
-
-    Group saveOrganisation(Group organisation) {
-        return groupService.save(organisation)
-    }
-
-    Group removeMember(Group organisation, User user) {
-        organisation.members.removeAll { it.email == user.email }
-        return groupService.save(organisation)
-    }
-
-    Group addMember(Group organisation, User user) {
-        def member = findMember(user)
-        organisation.members.add(member)
-        return groupService.save(organisation)
-    }
-
-    Member findMember(User user) {
-        def member = memberService.findByEmail(user.email)
-        if (member == null)
-            return memberService.save(Member.from(user))
-        return member
-    }
-
-    User loggedUser() {
+    IUser loggedUser() {
         return userService.loggedUser
     }
 
-    void generatePDF(String transitionId, String fileFieldId){
+    void generatePDF(String transitionId, String fileFieldId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields){
+    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
+    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -806,84 +766,84 @@ class ActionDelegate {
         pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale){
+    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void sendMail(MailDraft mailDraft){
+    void sendMail(MailDraft mailDraft) {
         mailService.sendMail(mailDraft)
     }
 
-    def changeUser(String email) {
-        [email: {cl ->
-            changeUser(email, "email", cl)
+    def changeUserByEmail(String email) {
+        [email  : { cl ->
+            changeUserByEmail(email, "email", cl)
         },
-         name: {cl ->
-             changeUser(email, "name", cl)
+         name   : { cl ->
+             changeUserByEmail(email, "name", cl)
          },
-         surname: {cl ->
-             changeUser(email, "surname", cl)
+         surname: { cl ->
+             changeUserByEmail(email, "surname", cl)
          },
-         tel: {cl ->
-             changeUser(email, "tel", cl)
+         tel    : { cl ->
+             changeUserByEmail(email, "tel", cl)
          },
         ]
     }
 
-    def changeUser(Long id) {
-        [email: {cl ->
+    def changeUser(String id) {
+        [email  : { cl ->
             changeUser(id, "email", cl)
         },
-         name: {cl ->
+         name   : { cl ->
              changeUser(id, "name", cl)
          },
-         surname: {cl ->
+         surname: { cl ->
              changeUser(id, "surname", cl)
          },
-         tel: {cl ->
+         tel    : { cl ->
              changeUser(id, "tel", cl)
          },
         ]
     }
 
-    def changeUser(User user) {
-        [email: {cl ->
+    def changeUser(IUser user) {
+        [email  : { cl ->
             changeUser(user, "email", cl)
         },
-         name: {cl ->
+         name   : { cl ->
              changeUser(user, "name", cl)
          },
-         surname: {cl ->
+         surname: { cl ->
              changeUser(user, "surname", cl)
          },
-         tel: {cl ->
+         tel    : { cl ->
              changeUser(user, "tel", cl)
          },
         ]
     }
 
-    def changeUser(String email, String attribute, def cl) {
-        User user = userService.findByEmail(email, false)
+    def changeUserByEmail(String email, String attribute, def cl) {
+        IUser user = userService.findByEmail(email, false)
         changeUser(user, attribute, cl)
     }
 
-    def changeUser(Long id, String attribute, def cl) {
-        User user = userService.findById(id, false)
+    def changeUser(String id, String attribute, def cl) {
+        IUser user = userService.findById(id, false)
         changeUser(user, attribute, cl)
     }
 
-    def changeUser(User user, String attribute, def cl) {
+    def changeUser(IUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
             return
@@ -907,7 +867,7 @@ class ActionDelegate {
     }
 
     MessageResource inviteUser(NewUserRequest newUserRequest) {
-        User user = registrationService.createNewUser(newUserRequest);
+        IUser user = registrationService.createNewUser(newUserRequest);
         if (user == null)
             return MessageResource.successMessage("Done");
         mailService.sendRegistrationEmail(user);
@@ -917,13 +877,13 @@ class ActionDelegate {
     }
 
     void deleteUser(String email) {
-        User user = userService.findByEmail(email, false)
+        IUser user = userService.findByEmail(email, false)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
     }
 
-    void deleteUser(User user) {
+    void deleteUser(IUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)
             taskService.cancelTasks(tasks, user)
