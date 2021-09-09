@@ -270,12 +270,10 @@ public class Case {
 
     public void decideEnabledRoles(PetriNet net) {
         this.viewRoles = filterViewRoles();
-        if (this.viewRoles.isEmpty()) {
-            this.viewRoles.addAll(enabledRoles);
-        }
     }
 
     public void addDefaultRoleToViewRoles(String defaultRoleId) {
+        this.viewRoles.addAll(enabledRoles);
         this.viewRoles.add(defaultRoleId);
     }
 
