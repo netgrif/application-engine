@@ -5,7 +5,6 @@ import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -17,7 +16,7 @@ import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
@@ -37,7 +36,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 @SpringBootTest(
@@ -102,7 +100,7 @@ public class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
@@ -139,7 +137,7 @@ public class RuleEngineTest {
 
         assert refreshableKieBase.shouldRefresh();
 
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert !refreshableKieBase.shouldRefresh();
 
@@ -160,7 +158,7 @@ public class RuleEngineTest {
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
         assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
@@ -367,7 +365,7 @@ public class RuleEngineTest {
     }
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
         return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getACase();
     }
 

@@ -16,15 +16,18 @@ public class DataGroup {
 
     private Boolean stretch;
 
+    private String parentTaskId;
+
     private DataGroup() {
     }
 
-    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout) {
+    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId) {
         this();
         this.fields = fields;
         this.title = title;
         this.alignment = alignment;
         this.stretch = stretch;
         this.layout = layout;
+        this.parentTaskId = parentTaskId;
     }
 }

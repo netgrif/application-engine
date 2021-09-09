@@ -5,7 +5,6 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
-import com.netgrif.workflow.auth.service.AuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
@@ -16,7 +15,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -121,7 +120,7 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        ImportPetriNetOutcome netOptional = helper.createNet("all_data_refs.xml", "major")
+        ImportPetriNetEventOutcome netOptional = helper.createNet("all_data_refs.xml", "major")
         assert netOptional.getNet() != null
         net = netOptional.getNet()
     }

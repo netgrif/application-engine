@@ -25,7 +25,7 @@ import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -116,7 +115,7 @@ public class VariableArcsTest {
     public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         testHelper.truncateDbs();
 
-        ImportPetriNetOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();

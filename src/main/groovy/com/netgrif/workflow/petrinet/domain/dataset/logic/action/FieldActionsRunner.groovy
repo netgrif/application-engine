@@ -7,6 +7,7 @@ import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
@@ -39,11 +40,11 @@ abstract class FieldActionsRunner {
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
 
-    ChangedFieldsTree run(Action action, Case useCase) {
+    List<EventOutcome> run(Action action, Case useCase) {
         return run(action, useCase, Optional.empty())
     }
 
-    ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task) {
+    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
@@ -56,7 +57,7 @@ abstract class FieldActionsRunner {
             log.error("Action: $action.definition")
             throw e
         }
-        return ((ActionDelegate) code.delegate).changedFieldsTree
+        return ((ActionDelegate) code.delegate).outcomes
     }
 
     Closure getActionCode(Action action) {
