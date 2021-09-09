@@ -15,6 +15,12 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.VersionType;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.Version;
@@ -28,6 +34,7 @@ import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IEventService;
+import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -98,6 +105,9 @@ public class PetriNetService implements IPetriNetService {
     private FieldActionsRunner actionsRunner;
 
     @Autowired
+    private IFieldActionsCacheService functionCacheService;
+
+    @Autowired
     private IEventService eventService;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
@@ -166,6 +176,7 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.saveAll(net.getRoles().values());
         userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
         net.setAuthor(author.transformToAuthor());
+        functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(author, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
@@ -202,7 +213,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
-        initializeVariableArcs(petriNet);
+        petriNet.initializeArcs();
 
         return Optional.of(repository.save(petriNet));
     }
@@ -391,6 +402,9 @@ public class PetriNetService implements IPetriNetService {
 
         log.info("[" + processId + "]: Deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());
+        this.cache.remove(petriNet.getObjectId());
+        // net functions must by removed from cache after it was deleted from repository
+        this.functionCacheService.reloadCachedFunctions(petriNet);
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
@@ -398,26 +412,12 @@ public class PetriNetService implements IPetriNetService {
                 .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
     }
 
-    private void initializeVariableArcs(PetriNet net) {
-        net.getArcs().values().stream()
-                .flatMap(List::stream)
-                .filter(arc -> arc instanceof VariableArc)
-                .forEach(arc -> initializeVariableArc(net, (VariableArc) arc));
-    }
-
-    private void initializeVariableArc(PetriNet net, VariableArc arc) {
-        Optional<Field> field = net.getField(arc.getMultiplicity().toString());
-        if (!field.isPresent())
-            throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
-        arc.setFieldId(field.get().getStringId());
-    }
-
     @Override
-    public void runActions(List<Action> actions, String netId) {
-        log.info("Running actions of net [" + netId + "]");
+    public void runActions(List<Action> actions, PetriNet petriNet) {
+        log.info("Running actions of net [" + petriNet.getStringId() + "]");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null);
+            actionsRunner.run(action, null, petriNet.getFunctions());
         });
     }
 

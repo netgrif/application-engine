@@ -106,7 +106,7 @@ public class TaskServiceTest {
         user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
-        assert outcome.getACase().getResetArcTokens().size() == 0;
+        assert outcome.getACase().getConsumedTokens().size() == 0;
         assert outcome.getACase().getActivePlaces().size() == 1;
         assert outcome.getACase().getActivePlaces().values().contains(5);
 
@@ -117,14 +117,14 @@ public class TaskServiceTest {
         service.assignTask(user.transformToLoggedUser(), task.getStringId());
         Case useCase = caseRepository.findById(outcome.getACase().getStringId()).get();
 
-        assert useCase.getResetArcTokens().size() == 1;
-        assert useCase.getResetArcTokens().values().contains(5);
+        assert useCase.getConsumedTokens().size() == 1;
+        assert useCase.getConsumedTokens().values().contains(5);
         assert useCase.getActivePlaces().size() == 0;
 
         service.cancelTask(user.transformToLoggedUser(), task.getStringId());
         useCase = caseRepository.findById(useCase.getStringId()).get();
 
-        assert useCase.getResetArcTokens().size() == 0;
+        assert useCase.getConsumedTokens().size() == 0;
         assert useCase.getActivePlaces().size() == 1;
         assert useCase.getActivePlaces().values().contains(5);
     }
