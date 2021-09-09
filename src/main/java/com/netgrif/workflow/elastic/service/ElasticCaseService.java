@@ -220,17 +220,17 @@ public class ElasticCaseService implements IElasticCaseService {
         BoolQueryBuilder usersExist = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
 
-        notExists.mustNot(existsQuery("userRefs"));
-        notExists.mustNot(existsQuery("viewRoles"));
+        notExists.mustNot(existsQuery("viewUserRefs"));
+        notExists.mustNot(existsQuery("enabledRoles"));
 
-        usersExist.must(existsQuery("userRefs"));
+        usersExist.must(existsQuery("viewUserRefs"));
         usersExist.must(termQuery("users", user.getId()));
 
         usersRoleQuery.should(usersExist);
         usersRoleQuery.should(notExists);
 
         for (String roleId : user.getProcessRoles()) {
-            roleQuery.should(termQuery("viewRoles", roleId));
+            roleQuery.should(termQuery("enabledRoles", roleId));
         }
         usersRoleQuery.should(roleQuery);
 
