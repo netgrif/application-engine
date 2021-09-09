@@ -53,7 +53,8 @@
     </data>
     <data type="number">
         <id>20</id>
-        <title name="cost_of_replacement">How much would it cost to replace the entire contents of your home as new?</title>
+        <title name="cost_of_replacement">How much would it cost to replace the entire contents of your home as new?
+        </title>
     </data>
     <data type="multichoice">
         <id>22</id>

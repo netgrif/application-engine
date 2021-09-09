@@ -10,7 +10,7 @@ import java.io.IOException;
 public class MultiChoiceRenderer extends SelectionFieldRenderer<MultichoiceField> {
 
     public void setFieldParams(PdfMultiChoiceField field) {
-        helperField = new PdfMultiChoiceField(field.getFieldId(),field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
+        helperField = new PdfMultiChoiceField(field.getFieldId(), field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
                 resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
     }
 

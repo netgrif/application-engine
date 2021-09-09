@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+        xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>insurance</id>
     <initials>IPD</initials>
     <title>Insurance Portal Demo</title>
@@ -931,7 +931,8 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže alebo vonkajšie žalúzie alebo rolety?
+        <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže alebo vonkajšie žalúzie alebo
+            rolety?
         </title>
         <id>103005</id>
         <init>false</init>
@@ -1194,13 +1195,13 @@
             field: f.305001,
             trans: t.363,
             other: f.106003;
-            make other,editable on trans when { field.value == null  }
+            make other,editable on trans when { field.value == null }
         </action>
         <action trigger="set">
             field: f.305001,
             trans: t.363,
             other: f.106003;
-            make other,editable on trans when { field.value == 0 as Double  }
+            make other,editable on trans when { field.value == 0 as Double }
         </action>
         <action trigger="set">
             <!--@formatter:off-->
@@ -1388,7 +1389,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -1552,7 +1554,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -1699,7 +1702,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -1798,7 +1802,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -1896,7 +1901,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -1994,7 +2000,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2092,7 +2099,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2190,7 +2198,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2288,7 +2297,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2386,7 +2396,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2484,7 +2495,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2582,7 +2594,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2607,12 +2620,12 @@
         </action>
     </data>
 
-    <data type="number" >
+    <data type="number">
         <title>Celková poistná suma</title>
         <valid>inrange 1,50000</valid>
         <id>305017</id>
     </data>
-    <data type="number" >
+    <data type="number">
         <title>Celkové poistné</title>
         <id>305018</id>
     </data>
@@ -2661,7 +2674,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2710,7 +2724,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -2928,7 +2943,7 @@
             coeff: f.106002;
             change coeff about {
             if (field.value &gt; 100)
-            return 25000 + (field.value - 100) * 100  as Double;
+            return 25000 + (field.value - 100) * 100 as Double;
             return 250*field.value as Double;
             }
             <!--@formatter:on-->
@@ -3776,7 +3791,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -3833,7 +3849,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -3914,7 +3931,8 @@
             c7: f.203004,
             sum: f.308006;
             change sum about {
-            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3966,7 +3984,8 @@
             c7: f.203004,
             sum: f.308006;
             change sum about {
-            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3996,7 +4015,8 @@
             c7: f.203004,
             sum: f.308006;
             change sum about {
-            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4026,7 +4046,8 @@
             c7: f.203004,
             sum: f.308006;
             change sum about {
-            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4077,7 +4098,8 @@
             c7: f.203004,
             sum: f.308006;
             change sum about {
-            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4107,7 +4129,8 @@
             c7: f.203004,
             sum: f.308006;
             change sum about {
-            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
+            return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as
+            Double;
             }
             <!--@formatter:on-->
         </action>
@@ -4760,7 +4783,8 @@
             c15: f.305016,
             sum: f.308001;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            return
+            c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
         </action>
@@ -7350,7 +7374,7 @@
                         f2: f.106001,
                         other: f.308005;
                         change other about {
-                            return Boolean.logicalAnd(f1.value != null, f2.value != null);
+                        return Boolean.logicalAnd(f1.value != null, f2.value != null);
                         }
                         <!--@formatter:on-->
                     </action>
@@ -11227,7 +11251,7 @@
         <id>2015</id>
         <x>2229</x>
         <y>38</y>
-        <label>Základné  informácie</label><!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
+        <label>Základné informácie</label><!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
         <priority>1</priority>
         <transactionRef>
             <id>3</id>
@@ -12693,7 +12717,7 @@
         <id>2014</id>
         <x>2237</x>
         <y>743</y>
-        <label>Údaje o  zmluve</label> <!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
+        <label>Údaje o zmluve</label> <!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
         <priority>8</priority>
         <transactionRef>
             <id>3</id>

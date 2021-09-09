@@ -64,7 +64,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
         try {
             KieHelper kieHelper = new KieHelper();
             buildRules(storedRules, kieHelper);
-            KieBase base = kieHelper.build();;
+            KieBase base = kieHelper.build();
             testSession = base.newKieSession();
             testSession.fireAllRules();
         } catch (Exception e) {
@@ -79,7 +79,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
 
     protected KieHelper buildAllRules(KieHelper kieHelper) throws IOException {
         Long count = ruleRepository.count();
-        long numOfPages = ((count/pageSize) + 1);
+        long numOfPages = ((count / pageSize) + 1);
 
         log.debug("Compiling rules, count=" + count + ", pages=" + numOfPages);
         for (int page = 0; page < numOfPages; page++) {

@@ -1,15 +1,14 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,39 +34,47 @@ public class Task {
     private ObjectId _id = new ObjectId();
 
     @Indexed
-    @Getter @Setter
+    @Getter
+    @Setter
     private String processId;
 
     @Indexed
-    @Getter @Setter
+    @Getter
+    @Setter
     private String caseId;
 
     @Indexed
     @Setter
     private String transitionId;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TaskLayout layout;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private I18nString title;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String caseColor;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String caseTitle;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer priority;
 
     @Indexed
     @Setter
-    private Long userId;
+    private String userId;
 
     @org.springframework.data.annotation.Transient
-    @Getter @Setter
-    private User user;
+    @Getter
+    @Setter
+    private IUser user;
 
     @DBRef
     @Setter
@@ -77,53 +84,65 @@ public class Task {
     /**
      * Role ObjectId : [ RolePermission, true/false ]
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> roles = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private List<String> negativeViewRoles = new LinkedList<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
-    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
-    private List<Long> negativeViewUsers = new LinkedList<>();
+    private List<String> negativeViewUsers = new LinkedList<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime startDate;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime finishDate;
 
-    @Getter @Setter
-    private Long finishedBy;
+    @Getter
+    @Setter
+    private String finishedBy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String transactionId;
 
     /**
      * transient
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean requiredFilled;
 
     /**
      * ???
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     @JsonIgnore
     @Builder.Default
     private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Transient
     @Builder.Default
     private List<Field> immediateData = new LinkedList<>();
@@ -131,23 +150,28 @@ public class Task {
     @Setter
     private String icon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private DataFocusPolicy dataFocusPolicy = DataFocusPolicy.MANUAL;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<EventType, I18nString> eventTitles = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Boolean> assignedUserPolicy = new HashMap<>();
 
@@ -159,6 +183,11 @@ public class Task {
     @JsonIgnore
     public ObjectId getObjectId() {
         return _id;
+    }
+
+    @JsonIgnore
+    public String getId() {
+        return _id.toString();
     }
 
     public String getStringId() {
@@ -173,20 +202,22 @@ public class Task {
         return icon;
     }
 
-    public void addRole(String roleId, Map<String, Boolean> permissions){
-        if(roles.containsKey(roleId) && roles.get(roleId) != null)
+    public void addRole(String roleId, Map<String, Boolean> permissions) {
+        if (roles.containsKey(roleId) && roles.get(roleId) != null)
             roles.get(roleId).putAll(permissions);
         else
             roles.put(roleId, permissions);
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
-
-    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
-        userRefs.put(userRefId,permissions);
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
+        userRefs.put(userRefId, permissions);
+    }
+
+    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);
@@ -196,7 +227,7 @@ public class Task {
         });
     }
 
-    public void addAssignedUserPolicy(Map<String, Boolean> assignedUser){
+    public void addAssignedUserPolicy(Map<String, Boolean> assignedUser) {
         assignedUserPolicy.putAll(assignedUser);
     }
 
@@ -216,7 +247,7 @@ public class Task {
     }
 
     @JsonIgnore
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 

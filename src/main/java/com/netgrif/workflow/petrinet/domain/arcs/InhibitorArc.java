@@ -12,9 +12,10 @@ public class InhibitorArc extends PTArc {
 
     /**
      * Returns true if source place has fewer tokens then arc weight.
+     *
      * @return true if <br>
-     *     <center><b><i>m(p) < w</i></b><br></center>
-     *     false otherwise.
+     * <center><b><i>m(p) < w</i></b><br></center>
+     * false otherwise.
      */
     @Override
     public boolean isExecutable() {
@@ -25,7 +26,8 @@ public class InhibitorArc extends PTArc {
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
      */
     @Override
-    public void execute(){ }
+    public void execute() {
+    }
 
     /**
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
