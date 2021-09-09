@@ -162,7 +162,6 @@ public class Case {
         this.activePlaces = activePlaces;
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
-        this.enabledRoles = petriNet.getRoles().keySet();
     }
 
     public String getStringId() {
@@ -264,13 +263,35 @@ public class Case {
         });
     }
 
-    public Set<String> getViewRoles() {
-        Set<String> roles = new HashSet<>();
-        this.permissions.forEach((role, perms) -> {
+    public void decideEnabledRoles(PetriNet net) {
+        this.enabledRoles = getViewRoles();
+
+        if (this.enabledRoles.isEmpty()) {
+            this.enabledRoles.addAll(net.getRoles().keySet());
+        }
+    }
+
+    public void addDefaultRoleToViewRoles(String defaultRoleId) {
+        this.enabledRoles.add(defaultRoleId);
+    }
+
+    public Set<String> getViewUserRefs() {
+        Set<String> userRefs = new HashSet<>();
+        this.userRefs.forEach((ref, perms) -> {
             if (perms.containsKey("view") && perms.get("view")) {
-                roles.add(role);
+                userRefs.add(ref);
             }
         });
-        return roles;
+        return userRefs;
+    }
+
+    public Set<String> getViewRoles() {
+        Set<String> viewRoles = new HashSet<>();
+        this.permissions.forEach((role, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                viewRoles.add(role);
+            }
+        });
+        return viewRoles;
     }
 }

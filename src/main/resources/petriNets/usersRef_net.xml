@@ -23,7 +23,7 @@
         <id>deleteRole</id>
         <title>Delete Role</title>
     </role>
-    <roleRef>
+    <!--<roleRef>
         <id>tester</id>
         <caseLogic>
             <view>false</view>
@@ -53,7 +53,7 @@
         <caseLogic>
             <delete>true</delete>
         </caseLogic>
-    </usersRef>
+    </usersRef>-->
     <!-- PROCESS USER REFS -->
     <!-- DATA -->
     <data type="button">

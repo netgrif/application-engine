@@ -172,8 +172,8 @@ public class Importer {
 
         setMetaData();
         net.setIcon(document.getIcon());
+        net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
 
-        resolveDefaultRole();
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -200,13 +200,6 @@ public class Importer {
         }
 
         return Optional.of(net);
-    }
-
-    @Transactional
-    protected void resolveDefaultRole() {
-        if (document.isDefaultRole() != null && document.isDefaultRole()) {
-            net.addRole(defaultRole);
-        }
     }
 
     @Transactional
