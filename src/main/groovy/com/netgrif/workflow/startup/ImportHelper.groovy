@@ -18,7 +18,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
@@ -126,11 +126,11 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    ImportPetriNetOutcome createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+    ImportPetriNetEventOutcome createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    ImportPetriNetOutcome createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    ImportPetriNetEventOutcome createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         return petriNetService.importPetriNet(netStream, release, author)
     }

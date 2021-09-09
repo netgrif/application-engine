@@ -8,9 +8,8 @@ import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataExc
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.utils.FullPageRequest;
-import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -70,7 +68,7 @@ public class ImporterTest {
 
     @Test
     public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
         assert outcome.getNet() != null;
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
@@ -80,7 +78,7 @@ public class ImporterTest {
 
     @Test
     public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
     }
@@ -92,7 +90,7 @@ public class ImporterTest {
 
     @Test
     public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
 
         assertExternalMappingImport(outcome.getNet());
     }
