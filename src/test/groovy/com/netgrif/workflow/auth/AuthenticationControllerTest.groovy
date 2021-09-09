@@ -61,12 +61,6 @@ class AuthenticationControllerTest {
     @Autowired
     private UserRepository userRepository
 
-//    @Autowired
-//    private MemberRepository memberRepository
-//
-//    @Autowired
-//    private GroupRepository groupRepository
-
     @Autowired
     private AuthorityRepository authorityRepository
 
@@ -90,7 +84,6 @@ class AuthenticationControllerTest {
         assert net.isPresent()
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
-//        group = importHelper.createGroup(GROUP_NAME)
         processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
     }
 
