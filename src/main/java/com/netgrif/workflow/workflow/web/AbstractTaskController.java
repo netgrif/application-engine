@@ -5,14 +5,12 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataChangedFieldsEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -193,15 +191,15 @@ public abstract class AbstractTaskController {
 
 
     public EventOutcomeWithMessageResource getData(String taskId, Locale locale) {
-        List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
-        GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(dataGroups);
+        GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
         return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
                 LocalisedEventOutcomeFactory.from(outcome,locale));
     }
 
     public EventOutcomeWithMessageResource setData(String taskId, ObjectNode dataBody) {
+//        todo zhodiť setdatachangedfieldsoutcome?
         return EventOutcomeWithMessageResource.successMessage("Data field values have been set sucessfully",
-                LocalisedEventOutcomeFactory.from(new SetDataChangedFieldsEventOutcome(dataService.setData(taskId, dataBody))
+                LocalisedEventOutcomeFactory.from(dataService.setData(taskId, dataBody)
                         ,LocaleContextHolder.getLocale()));
     }
 

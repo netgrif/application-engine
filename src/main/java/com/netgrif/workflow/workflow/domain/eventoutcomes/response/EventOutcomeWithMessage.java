@@ -2,7 +2,7 @@ package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.workflow.web.responsebodies.ResponseMessage;
-import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome;
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
 import lombok.Data;
 
 import java.util.Map;

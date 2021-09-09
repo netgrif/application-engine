@@ -1,7 +1,7 @@
 package com.netgrif.workflow.eventoutcomes
 
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
-import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome
+import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome
 
 class LocalisedEventOutcomeFactory {
 

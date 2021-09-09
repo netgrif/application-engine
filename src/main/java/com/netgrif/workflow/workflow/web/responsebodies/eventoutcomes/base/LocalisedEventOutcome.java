@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes;
+package com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base;
 
 import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;

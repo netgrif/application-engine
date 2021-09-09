@@ -66,6 +66,9 @@ abstract class Field<T> extends Imported {
 
     protected List<Validation> validations
 
+    @Transient
+    protected String parentTaskId
+
     Field() {
         _id = new ObjectId()
         this.events = new HashMap<>()
@@ -164,6 +167,14 @@ abstract class Field<T> extends Imported {
 
     void setEvents(Map<DataEventType, DataEvent> events) {
         this.events = events
+    }
+
+    String getParentTaskId() {
+        return parentTaskId
+    }
+
+    void setParentTaskId(String parentTaskId) {
+        this.parentTaskId = parentTaskId
     }
 
     void addActions(Collection<Action> dataEvents, DataEventType type) {
