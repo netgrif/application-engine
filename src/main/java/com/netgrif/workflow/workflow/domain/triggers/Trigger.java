@@ -27,10 +27,10 @@ public abstract class Trigger extends Imported {
     public abstract Trigger clone();
 
     public enum Type {
-        AUTO ("auto"),
-        MESSAGE ("message"),
-        TIME ("time"),
-        USER ("user");
+        AUTO("auto"),
+        MESSAGE("message"),
+        TIME("time"),
+        USER("user");
 
         String name;
 

@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
-public abstract class FieldRenderer<T> extends Renderer{
+public abstract class FieldRenderer<T> extends Renderer {
 
     T field;
     PdfField helperField;
@@ -56,7 +56,7 @@ public abstract class FieldRenderer<T> extends Renderer{
 
     protected int renderPageBrake(PdfField field, int linesOnPage, int strokeLineCounter, int y) throws IOException {
         if (y < marginBottom) {
-            if(resource.isTextFieldStroke()) {
+            if (resource.isTextFieldStroke()) {
                 pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), strokeLineCounter, strokeWidth);
             }
             field.setHeight(renderHeight(field, linesOnPage));
@@ -70,15 +70,15 @@ public abstract class FieldRenderer<T> extends Renderer{
         return linesOnPage;
     }
 
-    protected int renderLinePosY(PdfField field, int linesOnPage){
+    protected int renderLinePosY(PdfField field, int linesOnPage) {
         return field.getBottomY() + field.getHeight() - lineHeight * linesOnPage;
     }
 
-    protected int renderBottomY(PdfField field){
+    protected int renderBottomY(PdfField field) {
         return field.getBottomY() + pageHeight - marginTop - marginBottom - lineHeight;
     }
 
-    protected int renderHeight(PdfField field, int linesOnPage){
+    protected int renderHeight(PdfField field, int linesOnPage) {
         return field.getHeight() - lineHeight * (linesOnPage - 1);
     }
 

@@ -10,14 +10,14 @@ import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ImporterTest {
 
     @Autowired
@@ -55,7 +55,7 @@ public class ImporterTest {
     private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }

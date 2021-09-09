@@ -1,12 +1,10 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
 import com.netgrif.workflow.petrinet.web.PetriNetController;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.hateoas.mvc.ControllerLinkBuilderFactory;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-public class PetriNetReferenceResource extends Resource<PetriNetReference> {
+public class PetriNetReferenceResource extends EntityModel<PetriNetReference> {
 
     public PetriNetReferenceResource(PetriNetReference content) {
         super(content);
@@ -14,23 +12,23 @@ public class PetriNetReferenceResource extends Resource<PetriNetReference> {
     }
 
     private void buildLinks() {
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                 .methodOn(PetriNetController.class).getOne(getContent().getStringId(), null, null))
                 .withSelfRel());
 
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                 .methodOn(PetriNetController.class).getOne(getContent().getIdentifier(), getContent().getVersion(), null, null))
                 .withRel("identifier"));
 
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                 .methodOn(PetriNetController.class).getRoles(getContent().getStringId(), null))
                 .withRel("roles"));
 
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                 .methodOn(PetriNetController.class).getTransactions(getContent().getStringId(), null))
                 .withRel("transaction"));
 
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
                 .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null, null))
                 .withRel("file"));
     }

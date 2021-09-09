@@ -2,24 +2,28 @@ package com.netgrif.workflow.auth
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+
+//import com.netgrif.workflow.orgstructure.domain.Group
+
 import groovy.json.JsonOutput
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -31,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class TaskAuthorizationServiceTest {
@@ -64,9 +68,9 @@ class TaskAuthorizationServiceTest {
     @Autowired
     private SuperCreator superCreator
 
-    @Before
+    @BeforeEach
     void beforeAll() {
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
 
         this.net = net.get()
@@ -81,23 +85,23 @@ class TaskAuthorizationServiceTest {
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Group[],
-                [processRoles.get("role")] as UserProcessRole[])
+//                [] as Group[],
+                [processRoles.get("role")] as ProcessRole[])
 
-        userId = user.id
+        userId = user._id
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+//                [] as Group[],
+                [] as ProcessRole[])
 
         userWithoutRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITHOUT_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+//                [] as Group[],
+                [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_USER_EMAIL, "password")
     }

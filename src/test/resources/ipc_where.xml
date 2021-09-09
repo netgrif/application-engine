@@ -32,12 +32,12 @@
                     <!-- @formatter:off -->
                     field: f.field;
                     execute "synchronized" where {
-                        it.title.eq("Case 1")
+                    it.title.eq("Case 1")
                     } with ([
-                        "field": [
-                            value: 69.0,
-                            type: "number"
-                        ]
+                    "field": [
+                    value: 69.0,
+                    type: "number"
+                    ]
                     ] as Map)
                     <!-- @formatter:on -->
                 </action>
@@ -63,7 +63,8 @@
                     <!-- @formatter:off -->
                     field: f.paged;
 
-                    def cases = findCases({it.title.startsWith("Case ")}, new org.springframework.data.domain.PageRequest(1, 4));
+                    def cases = findCases({it.title.startsWith("Case ")}, new
+                    org.springframework.data.domain.PageRequest(1, 4));
 
                     change field value { return cases.size(); }
                     <!-- @formatter:on -->

@@ -1,13 +1,10 @@
 package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
@@ -16,6 +13,9 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.Version;
@@ -26,7 +26,6 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
-import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -63,9 +62,6 @@ import static com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService.
 public class PetriNetService implements IPetriNetService {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
-
-    @Autowired
-    private IUserProcessRoleService userProcessRoleService;
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -142,7 +138,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
+    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
@@ -160,7 +156,6 @@ public class PetriNetService implements IPetriNetService {
             net.incrementVersion(releaseType);
         }
         processRoleService.saveAll(net.getRoles().values());
-        userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
         net.setAuthor(author.transformToAuthor());
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");

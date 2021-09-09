@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>parent</id>
     <version>1.0.0</version>
     <initials>PAR</initials>
@@ -21,11 +21,11 @@
 
             def ids = children_cases.value ? children_cases.value : []
             ids.each {
-                def caseId = it as String
-                def childCase = workflowService.findOne(caseId)
-                setDataWithPropagation("2", childCase, [
-                    "text3": ["type": "text", "value": file.value?.name as String]
-                ])
+            def caseId = it as String
+            def childCase = workflowService.findOne(caseId)
+            setDataWithPropagation("2", childCase, [
+            "text3": ["type": "text", "value": file.value?.name as String]
+            ])
             }
         </action>
     </data>
@@ -57,14 +57,15 @@
 
                     def ids = children_cases.value ? children_cases.value : []
                     ids.each {
-                        def caseId = it as String
-                        def childCase = workflowService.findOne(caseId)
-                        setDataWithPropagation("2", childCase, [
-                            "text1": ["type": "text", "value": text.value as String]
-                        ])
+                    def caseId = it as String
+                    def childCase = workflowService.findOne(caseId)
+                    setDataWithPropagation("2", childCase, [
+                    "text1": ["type": "text", "value": text.value as String]
+                    ])
                     }
 
-                    def actualValue = workflowService.findOne(useCase.stringId).dataSet["text_from_child"].value as String
+                    def actualValue = workflowService.findOne(useCase.stringId).dataSet["text_from_child"].value as
+                    String
                     make text_from_child,editable on trans when { actualValue == "ABC" }
                     make text_from_child,required on trans when { actualValue == "ABC" }
                     make text_from_child,visible on trans when { actualValue != "ABC" }
@@ -134,26 +135,26 @@
                     children_cases: f.children_cases,
                     children_tasks: f.children_tasks;
 
-					def tasks = []
-					def cases = []
+                    def tasks = []
+                    def cases = []
                     number.value.times {
-						def caze = createCase("child", "Child$it" as String)
-                        caze.dataSet["parentId"].value = useCase.stringId
+                    def caze = createCase("child", "Child$it" as String)
+                    caze.dataSet["parentId"].value = useCase.stringId
 
-                        /*def childChild = createCase("child", "Child of Child$it" as String)
-                        childChild.dataSet["parentId"].value = caze.stringId
-                        workflowService.save(childChild)
-                        caze.dataSet["children"].value = [childChild.tasks.first().task]
-                        */
+                    /*def childChild = createCase("child", "Child of Child$it" as String)
+                    childChild.dataSet["parentId"].value = caze.stringId
+                    workflowService.save(childChild)
+                    caze.dataSet["children"].value = [childChild.tasks.first().task]
+                    */
 
-                        workflowService.save(caze)
+                    workflowService.save(caze)
 
-                        tasks.add(caze.tasks.first().task)
-						cases.add(caze.stringId)
+                    tasks.add(caze.tasks.first().task)
+                    cases.add(caze.stringId)
                     }
 
-					change children_cases value { cases }
-					change children_tasks value { tasks }
+                    change children_cases value { cases }
+                    change children_tasks value { tasks }
                 </action>
             </actions>
         </event>
@@ -171,7 +172,7 @@
 
         <dataGroup>
             <id>0</id>
-			<title>Edit</title>
+            <title>Edit</title>
             <dataRef>
                 <id>file</id>
                 <logic>
@@ -200,7 +201,7 @@
 
         <dataGroup>
             <id>1</id>
-			<title>Inštancie</title>
+            <title>Inštancie</title>
             <dataRef>
                 <id>children_tasks</id>
                 <logic>

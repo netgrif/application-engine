@@ -4,39 +4,39 @@ import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.web.AuthenticationController
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
-
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.mail.EmailType
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.domain.GroupRepository
-import com.netgrif.workflow.orgstructure.domain.Member
-import com.netgrif.workflow.orgstructure.domain.MemberRepository
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import org.jsoup.Jsoup
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+
+
+
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import javax.mail.BodyPart
 import javax.mail.MessagingException
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class AuthenticationControllerTest {
@@ -62,12 +62,6 @@ class AuthenticationControllerTest {
     private UserRepository userRepository
 
     @Autowired
-    private MemberRepository memberRepository
-
-    @Autowired
-    private GroupRepository groupRepository
-
-    @Autowired
     private AuthorityRepository authorityRepository
 
     @Autowired
@@ -78,27 +72,26 @@ class AuthenticationControllerTest {
 
     private GreenMail smtpServer
 
-    private Group group
-    private Map<String, UserProcessRole> processRoles
+//    private Group group
+    private Map<String, ProcessRole> processRoles
 
-    @Before
+    @BeforeEach
     void before() {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
-        group = importHelper.createGroup(GROUP_NAME)
         processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        controller.invite(new NewUserRequest(email: EMAIL, groups: [group.id], processRoles: processRoles.values().collect {
-            it.roleId
+        controller.invite(new NewUserRequest(email: EMAIL, groups: null, processRoles: processRoles.values().collect {
+            it.stringId
         }), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
@@ -110,16 +103,16 @@ class AuthenticationControllerTest {
         controller.signup(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
 
         User user = userRepository.findByEmail(EMAIL)
-        Member member = memberRepository.findByEmail(EMAIL)
-        Group userGroup = groupRepository.findAll().first()
+//        Member member = memberRepository.findByEmail(EMAIL)
+//        Group userGroup = groupRepository.findAll().first()
 
         assert user
-        assert !member.groups.empty
-        assert member.groups.first().name == GROUP_NAME
-        assert userGroup
+//        assert !member.groups.empty
+//        assert member.groups.first().name == GROUP_NAME
+//        assert userGroup
     }
 
-    @After
+    @AfterEach
     void after() {
         smtpServer.stop()
     }

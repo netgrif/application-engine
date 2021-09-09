@@ -25,9 +25,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,6 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
 public class ElasticTaskService implements IElasticTaskService {
@@ -47,14 +46,14 @@ public class ElasticTaskService implements IElasticTaskService {
 
     private ElasticTaskRepository repository;
     private ITaskService taskService;
-    private ElasticsearchTemplate template;
+    private ElasticsearchRestTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchTemplate template) {
+    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchRestTemplate template) {
         this.repository = repository;
         this.template = template;
     }
@@ -123,7 +122,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -140,7 +139,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
@@ -148,7 +147,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    private SearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    private NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -209,7 +208,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request.users != null && !request.users.isEmpty()) {
-            Set<Long> users = new HashSet<>(request.users);
+            Set<String> users = new HashSet<>(request.users);
             users.add(user.getId());
             request.users = new ArrayList<>(users);
         } else {
@@ -217,7 +216,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildRoleQuery(request, userRoleQuery);
         buildNegativeViewRoleQuery(userRoleQuery, user);
@@ -275,7 +274,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder roleQuery = boolQuery();
-        for (Long userId : request.users) {
+        for (String userId : request.users) {
             roleQuery.should(termQuery("users", userId));
         }
 
@@ -383,7 +382,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder userQuery = boolQuery();
-        for (Long user : request.user) {
+        for (String user : request.user) {
             userQuery.should(termQuery("userId", user));
         }
 

@@ -23,53 +23,68 @@ import java.util.stream.Collectors;
 public class Transition extends Node {
 
     @Field("dataGroups")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, DataGroup> dataGroups;
 
     @Field("dataSet")
-    @Getter @Setter
+    @Getter
+    @Setter
     private LinkedHashMap<String, DataFieldLogic> dataSet;
 
     @Field("roles")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Map<String, Boolean>> roles;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<String> negativeViewRoles;
 
     @Field("users")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Map<String, Boolean>> userRefs;
 
     @Field("triggers")
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Trigger> triggers;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TaskLayout layout;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer priority;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private AssignPolicy assignPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String icon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private DataFocusPolicy dataFocusPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private FinishPolicy finishPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<EventType, Event> events;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> assignedUserPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String defaultRoleId;
 
     public Transition() {
@@ -87,19 +102,19 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component){
-        if(dataSet.containsKey(field) && dataSet.get(field) != null){
-            if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if(events != null) dataSet.get(field).getEvents().addAll(events);
-            if(layout != null) dataSet.get(field).setLayout(layout);
-            if(component != null) dataSet.get(field).setComponent(component);
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component) {
+        if (dataSet.containsKey(field) && dataSet.get(field) != null) {
+            if (behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
+            if (events != null) dataSet.get(field).getEvents().addAll(events);
+            if (layout != null) dataSet.get(field).setLayout(layout);
+            if (component != null) dataSet.get(field).setComponent(component);
         } else {
-            dataSet.put(field,new DataFieldLogic(behavior, events, layout, component));
+            dataSet.put(field, new DataFieldLogic(behavior, events, layout, component));
         }
     }
 
-    public void addDataEvents(String field, LinkedHashSet<DataEvent> events){
-        if(dataSet.containsKey(field)){
+    public void addDataEvents(String field, LinkedHashSet<DataEvent> events) {
+        if (dataSet.containsKey(field)) {
             dataSet.get(field).addDataEvents(events);
         }
     }
@@ -112,7 +127,9 @@ public class Transition extends Node {
         }
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
+    }
 
     public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
         if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
@@ -130,12 +147,12 @@ public class Transition extends Node {
         this.triggers.add(trigger);
     }
 
-    public boolean isDisplayable(String fieldId){
+    public boolean isDisplayable(String fieldId) {
         DataFieldLogic logic = dataSet.get(fieldId);
         return logic != null && logic.isDisplayable();
     }
 
-    public List<String> getImmediateData(){
+    public List<String> getImmediateData() {
         return dataSet.entrySet().stream().filter(entry -> entry.getValue().getBehavior().contains(FieldBehavior.IMMEDIATE))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
@@ -201,7 +218,7 @@ public class Transition extends Node {
     }
 
     private I18nString getMessage(EventType type) {
-        if (events.containsKey(type) )
+        if (events.containsKey(type))
             return events.get(type).getMessage();
         return null;
     }
