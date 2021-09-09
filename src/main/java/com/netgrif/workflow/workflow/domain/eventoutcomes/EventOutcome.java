@@ -1,15 +1,15 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes;
 
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedEventOutcome;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Data
 public abstract class EventOutcome {
+
+//    todo doplnenie referencie na event po implementácii event loggingu
 
     private I18nString message;
 

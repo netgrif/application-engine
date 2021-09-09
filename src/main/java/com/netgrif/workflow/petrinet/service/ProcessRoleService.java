@@ -201,6 +201,7 @@ public class ProcessRoleService implements IProcessRoleService {
         }
     }
 
+//    todo netuším čo s týmto
     private void runActions(List<Action> actions, RoleContext roleContext) {
         actions.forEach(action -> roleActionsRunner.run(action, roleContext));
     }

@@ -14,7 +14,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -27,9 +26,8 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.workflow.workflow.service.interfaces.IEventService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -99,6 +97,9 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
+    @Autowired
+    private IEventService eventService;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     protected Importer getImporter() {
@@ -144,14 +145,14 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public ImportPetriNetOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
     @Override
-    public ImportPetriNetOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         Optional<PetriNet> imported = getImporter().importPetriNet(copy(xmlFile));
-        ImportPetriNetOutcome outcome = new ImportPetriNetOutcome();
+        ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         if (!imported.isPresent()) {
             return outcome;
         }
@@ -168,10 +169,11 @@ public class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(author, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
-        runActions(net.getPreUploadActions(), net.getStringId());
+//        todo vybrainiť vykonávanie akcií na zmenených fieldoch bez kontextu
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
         save(net);
-        runActions(net.getPostUploadActions(), net.getStringId());
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.POST);
         save(net);
         cache.put(net.getObjectId(), net);
@@ -180,7 +182,7 @@ public class PetriNetService implements IPetriNetService {
         return outcome;
     }
 
-    private ImportPetriNetOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetOutcome outcome) {
+    private ImportPetriNetEventOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {
         if(net.getProcessEvents().containsKey(type)){
             outcome.setMessage(net.getProcessEvents().get(type).getMessage());
         }

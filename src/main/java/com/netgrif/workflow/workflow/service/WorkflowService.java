@@ -35,6 +35,7 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCas
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IEventService;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -104,6 +105,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IElasticCaseMappingService caseMappingService;
+
+    @Autowired
+    private IEventService eventService;
 
     private IElasticCaseService elasticCaseService;
 
@@ -253,8 +257,9 @@ public class WorkflowService implements IWorkflowService {
                 .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
+        CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         useCase.setTitle(makeTitle.apply(useCase));
-        runActions(petriNet.getPreCreateActions());
+        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty() ));
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -266,11 +271,10 @@ public class WorkflowService implements IWorkflowService {
         resolveTaskRefs(useCase);
 
         useCase = findOne(useCase.getStringId());
-        runActions(petriNet.getPostCreateActions(), useCase.getStringId());
+        outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty()));
         useCase = findOne(useCase.getStringId());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         useCase = save(useCase);
-        CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.setACase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
@@ -301,16 +305,15 @@ public class WorkflowService implements IWorkflowService {
     public DeleteCaseEventOutcome deleteCase(String caseId) {
         Case useCase = findOne(caseId);
 
-        runActions(useCase.getPetriNet().getPreDeleteActions(), useCase.getStringId());
+        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase);
+        outcome.setOutcomes(eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
         log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions());
+        outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty()));
         publisher.publishEvent(new DeleteCaseEvent(useCase));
-        DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome();
-        outcome.setStringId(useCase.getStringId());
         addMessageToOutcome(petriNetService.clone(useCase.getPetriNetObjectId()), CaseEventType.DELETE, outcome);
         return outcome;
     }
@@ -392,27 +395,6 @@ public class WorkflowService implements IWorkflowService {
         Map<String, I18nString> options = new HashMap<>();
         cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
         return  options;
-    }
-
-
-    public GetDataEventOutcome getData(String caseId) {
-        Optional<Case> optionalUseCase = repository.findById(caseId);
-        if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        Case useCase = optionalUseCase.get();
-        List<Field> fields = new ArrayList<>();
-        useCase.getDataSet().forEach((id, dataField) -> {
-            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-                field.setBehavior(dataField.applyOnlyVisibleBehavior());
-                fields.add(field);
-            }
-        });
-
-        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-        GetDataEventOutcome outcome = new GetDataEventOutcome();
-        outcome.setData(fields);
-        return outcome;
     }
 
     private void resolveTaskRefs(Case useCase) {
@@ -520,77 +502,6 @@ public class WorkflowService implements IWorkflowService {
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeVarArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
-    }
-
-//    todo refactor, keď sa vyrieši tvorba event outcomov pre data eventy
-    @Override
-    public ChangedFieldsTree runActions(List<Action> actions, String useCaseId) {
-        log.info("[" + useCaseId + "]: Running actions on case");
-        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCaseId, "", "");
-        if (actions.isEmpty())
-            return changedFields;
-
-        Case case$ = findOne(useCaseId);
-        actions.forEach(action -> {
-            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty());
-            changedFields.mergeChangedFields(changedFieldsTree);
-            if (changedFieldsTree.getChangedFields().isEmpty()) {
-                return;
-            }
-            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), DataEventType.SET,true);
-        });
-        save(case$);
-        return changedFields;
-    }
-
-    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
-        newChangedFields.forEach((s, changedField) -> {
-            if (changedFields.containsKey(s))
-                changedFields.get(s).merge(changedField);
-            else
-                changedFields.put(s, changedField);
-        });
-    }
-
-    private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, DataEventType trigger, boolean recursive) {
-        newChangedField.forEach((s, changedField) -> {
-            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
-                Field field = useCase.getField(s);
-                processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
-                processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
-            }
-        });
-    }
-
-    private void processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
-        LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getEvents() != null && !field.getEvents().isEmpty() && !field.getEvents().containsKey(actionTrigger)){
-            fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent)field.getEvents().get(actionTrigger), phase));
-        }
-        if (fieldActions.isEmpty()) return;
-
-        runEventActions(useCase, fieldActions, changedFields, actionTrigger);
-    }
-
-    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, DataEventType trigger){
-        actions.forEach(action -> {
-            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty());
-            changedFields.mergeChangedFields(currentChangedFields);
-
-            if (currentChangedFields.getChangedFields().isEmpty())
-                return;
-
-            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == DataEventType.SET);
-        });
-    }
-
-    @Override
-    public void runActions(List<Action> actions) {
-        log.info("Running actions without context on cases");
-
-        actions.forEach(action -> {
-            actionsRunner.run(action, null, Optional.empty());
-        });
     }
 
     private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {
