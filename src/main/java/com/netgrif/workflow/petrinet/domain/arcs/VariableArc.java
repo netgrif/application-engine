@@ -4,15 +4,15 @@ import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 
-import javax.persistence.Transient;
 
 @Data
 public class VariableArc extends Arc {
 
     private String fieldId;
 
-    @Transient
+    @JsonIgnore
     private DataField field;
 
     private Integer removedTokens;
@@ -30,7 +30,7 @@ public class VariableArc extends Arc {
         if (source instanceof Transition)
             return true;
         if (field == null || field.getValue() == null)
-            throw new IllegalStateException("Field "+ fieldId + " has null value");
+            throw new IllegalStateException("Field " + fieldId + " has null value");
         double multiplicity = Double.parseDouble(field.getValue().toString());
         return ((Place) source).getTokens() >= multiplicity;
     }
@@ -38,7 +38,7 @@ public class VariableArc extends Arc {
     @Override
     public void execute() {
         double multiplicity = Double.parseDouble(field.getValue().toString());
-        if (source instanceof  Place) {
+        if (source instanceof Place) {
             removedTokens = (int) multiplicity;
             getPlace().removeTokens(removedTokens);
         } else {

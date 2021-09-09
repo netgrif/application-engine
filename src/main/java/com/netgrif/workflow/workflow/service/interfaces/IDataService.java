@@ -6,7 +6,8 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileListField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -38,7 +39,7 @@ public interface IDataService {
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, Task task,  String fieldId, boolean forPreview);
+    FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview);
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 

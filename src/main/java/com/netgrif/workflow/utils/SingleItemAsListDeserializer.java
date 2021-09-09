@@ -21,14 +21,14 @@ public class SingleItemAsListDeserializer extends StdDeserializer<Object> implem
 
     protected SingleItemAsListDeserializer(Class<? extends SingleItemAsList> vc) {
         super(vc);
-        if(vc != null)
+        if (vc != null)
             this.itemClass = vc.getAnnotation(JsonDeserialize.class).contentAs();
     }
 
     @Override
     public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) {
         final JavaType type;
-        if(beanProperty != null)
+        if (beanProperty != null)
             type = beanProperty.getType();
         else
             type = deserializationContext.getContextualType();
@@ -55,7 +55,7 @@ public class SingleItemAsListDeserializer extends StdDeserializer<Object> implem
                 List<?> requests = innerDeserializer.convertValue(node, innerDeserializer.getTypeFactory().constructCollectionType(List.class, this.itemClass));
                 wrapper.getList().addAll(requests);
             } catch (IllegalArgumentException arrayException) {
-                if(node.isArray())
+                if (node.isArray())
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Single item as list deserialization failed. List deserialization exception: " + arrayException.getMessage(), arrayException);
                 else
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Single item as list deserialization failed. Single item deserialization exception: " + singleItemException.getMessage(), singleItemException);

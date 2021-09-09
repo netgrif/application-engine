@@ -28,7 +28,7 @@
                     text: f.text;
                     Thread.sleep(1000)
                     change text value {
-                        return useCase.stringId
+                    return useCase.stringId
                     }
                 </action>
             </actions>

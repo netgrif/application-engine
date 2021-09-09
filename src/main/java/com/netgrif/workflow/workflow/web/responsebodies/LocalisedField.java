@@ -46,7 +46,8 @@ public class LocalisedField {
 
     private List<LocalizedValidation> validations;
 
-    public LocalisedField() {}
+    public LocalisedField() {
+    }
 
     public LocalisedField(Field field, Locale locale) {
         this();

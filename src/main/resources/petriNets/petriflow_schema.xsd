@@ -384,7 +384,7 @@
             <xs:element name="name" type="xs:string"/>
             <xs:choice>
                 <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="properties" />
+                <xs:element ref="properties"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
@@ -409,8 +409,8 @@
     <xs:element name="properties">
         <xs:complexType>
             <xs:sequence>
-                    <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="option_icons" type="icons" minOccurs="0"/>
+                <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="option_icons" type="icons" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -491,10 +491,10 @@
         </xs:complexType>
     </xs:element>
     <xs:complexType name="usersRef">
-            <xs:sequence>
-                <xs:element ref="id"/>
-                <xs:element ref="logic"/>
-            </xs:sequence>
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="logic"/>
+        </xs:sequence>
     </xs:complexType>
     <xs:complexType name="caseRoleRef">
         <xs:sequence>

@@ -1,10 +1,10 @@
 package com.netgrif.workflow.petrinet.domain.roles;
 
-import com.netgrif.workflow.petrinet.domain.events.Event;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.Imported;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.events.Event;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -28,14 +28,23 @@ public class ProcessRole extends Imported {
 
     private I18nString name;
 
+    @Getter
+    @Setter
+    private String netId;
+
     @Setter
     private String description;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<EventType, Event> events;
 
     public ProcessRole() {
         _id = new ObjectId();
+    }
+
+    public ProcessRole(String id) {
+        _id = new ObjectId(id);
     }
 
     public String getStringId() {
@@ -50,7 +59,7 @@ public class ProcessRole extends Imported {
         this._id = _id;
     }
 
-    public void set_id(String id){
+    public void set_id(String id) {
         this._id = new ObjectId(id);
     }
 

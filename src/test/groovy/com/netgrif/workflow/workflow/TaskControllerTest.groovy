@@ -1,39 +1,39 @@
 package com.netgrif.workflow.workflow
 
-import com.netgrif.workflow.auth.domain.LoggedUser
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.service.ElasticTaskService
+
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
-import com.netgrif.workflow.petrinet.service.ProcessRoleService;
+import com.netgrif.workflow.petrinet.service.ProcessRoleService
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.MergeFilterOperation
-import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.service.DataService;
+import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskSearchService
-import com.netgrif.workflow.workflow.service.TaskService;
-import com.netgrif.workflow.workflow.service.TaskServiceTest;
-import com.netgrif.workflow.workflow.service.interfaces.IDataService;
+import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.web.WorkflowController
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import groovy.util.logging.Slf4j
-import org.apache.tomcat.jni.Local
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.Page;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.data.domain.Page
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
-@ActiveProfiles(["dev"])
-@RunWith(SpringRunner.class)
+@ActiveProfiles(["test"])
+@ExtendWith(SpringExtension.class)
 class TaskControllerTest {
 
     @Autowired
@@ -58,6 +58,15 @@ class TaskControllerTest {
     private IUserService userService
 
     @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
+
+    @Autowired
+    private TestHelper testHelper
+
+    @Autowired
     private ImportHelper helper
 
     private PetriNet net
@@ -68,20 +77,21 @@ class TaskControllerTest {
 
     private Task task
 
-    @Before
-    void init(){
+    @BeforeEach
+    void init() {
+        testHelper.truncateDbs()
         importNet()
     }
 
     @Test
-    void fullTest(){
+    void fullTest() {
         testWithRoleAndUserref()
         testWithUserref()
         testWithRole()
     }
 
 
-    void testWithRoleAndUserref(){
+    void testWithRoleAndUserref() {
         createCase()
         findTask()
         setUserListValue()
@@ -89,14 +99,14 @@ class TaskControllerTest {
         assert !findTasksByMongo().empty
     }
 
-    void testWithRole(){
+    void testWithRole() {
         createCase()
         findTask()
         setUserRole()
         assert !findTasksByMongo().empty
     }
 
-    void testWithUserref(){
+    void testWithUserref() {
         createCase()
         findTask()
         setUserListValue()
@@ -104,7 +114,7 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        Optional<PetriNet> netOptional = helper.createNet("all_data.xml", "major")
+        Optional<PetriNet> netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert netOptional.isPresent()
         net = netOptional.get()
     }
@@ -118,7 +128,7 @@ class TaskControllerTest {
     void findTask() {
         List<TaskReference> taskReferences = taskService.findAllByCase(useCase.stringId, new Locale("en"))
         assert taskReferences.size() > 0
-        for (TaskReference tr: taskReferences) {
+        for (TaskReference tr : taskReferences) {
             if (tr.title == "Task - editable") {
                 task = taskService.findById(tr.stringId)
             }
@@ -128,12 +138,12 @@ class TaskControllerTest {
 
     void setUserListValue() {
         assert task != null
-        List<Long> userIds = [] as List
-        userIds.add(userService.findByEmail("dummy@netgrif.com", false).getId())
-        dataService.setData(task.stringId,  ImportHelper.populateDataset([
+        List<String> userIds = [] as List
+        userIds.add(userService.findByEmail("dummy@netgrif.com", false).get_id())
+        dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
-                        "type": "userList"
+                        "type" : "userList"
                 ]
         ]))
     }
@@ -146,7 +156,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findByEmail("dummy@netgrif.com", false).getId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findByEmail("dummy@netgrif.com", false).get_id(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     Page<Task> findTasksByMongo() {

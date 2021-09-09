@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
-	<id>all_data</id>
-	<title>All Data</title>
-	<initials>ALL</initials>
+    <id>all_data</id>
+    <title>All Data</title>
+    <initials>ALL</initials>
     <!-- ROLES -->
     <role>
         <id>process_role</id>
@@ -198,14 +198,14 @@
         <id>1</id>
         <x>379</x>
         <y>273</y>
-		<cols>6</cols>
+        <cols>6</cols>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
             <stretch>false</stretch>
-			<rows>2</rows>
+            <rows>2</rows>
             <dataRef>
                 <id>number</id>
                 <logic>
@@ -558,17 +558,17 @@
                 </logic>
             </dataRef>
         </dataGroup>
-		<dataGroup>
-			<id>center</id>
+        <dataGroup>
+            <id>center</id>
             <title>Alignment - Center</title>
-			<alignment>center</alignment>
-			<stretch>false</stretch>
-			<dataRef>
-				<id>text</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
+            <alignment>center</alignment>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
             <dataRef>
                 <id>number</id>
                 <logic>
@@ -581,7 +581,7 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-		</dataGroup>
+        </dataGroup>
     </transition>
     <transition>
         <id>2</id>
@@ -606,23 +606,23 @@
                     optionF.addTranslation("sk", "Félix");
 
                     change enumMap options {
-                        ["david": optionD,
-                         "eve": optionE,
-                         "felix": optionF]
+                    ["david": optionD,
+                    "eve": optionE,
+                    "felix": optionF]
                     }
 
                     change enumMap value {
-                        "eve"
+                    "eve"
                     }
 
                     change multiMap options {
-                        ["david": optionD,
-                         "eve": optionE,
-                         "felix": optionF]
+                    ["david": optionD,
+                    "eve": optionE,
+                    "felix": optionF]
                     }
 
                     change multiMap value {
-                        ["eve", "felix"]
+                    ["eve", "felix"]
                     }
                 </action>
             </logic>

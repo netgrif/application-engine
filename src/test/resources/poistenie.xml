@@ -187,8 +187,8 @@
         <name>Poisťovací agent</name>
     </role>
     <!-- ========== PLACES ========== -->
-        <place>
-    <id>1</id>
+    <place>
+        <id>1</id>
         <x>60</x>
         <y>260</y>
         <label>A</label>

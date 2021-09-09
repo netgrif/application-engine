@@ -2,7 +2,7 @@ package com.netgrif.workflow.rules.service;
 
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -54,7 +54,7 @@ public class RuleEngineTest {
 
     @Autowired
     private RuleRepository ruleRepository;
-    
+
     @Autowired
     private RefreshableKieBase refreshableKieBase;
 
@@ -242,9 +242,9 @@ public class RuleEngineTest {
 
         Case caze = newCase();
         Task task = findTask(caze, TRANS_1);
-        User user = superCreator.getLoggedSuper().transformToUser();
+        IUser user = superCreator.getLoggedSuper().transformToUser();
         taskService.assignTask(task, user);
-        taskService.delegateTask(user.transformToLoggedUser(), user.getId(), task.getStringId());
+        taskService.delegateTask(user.transformToLoggedUser(), user.getStringId(), task.getStringId());
         caze = workflowService.findOne(caze.getStringId());
 
         assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
@@ -261,7 +261,7 @@ public class RuleEngineTest {
 
         Case caze = newCase();
         Task task = findTask(caze, TRANS_1);
-        User user = superCreator.getLoggedSuper().transformToUser();
+        IUser user = superCreator.getLoggedSuper().transformToUser();
         taskService.assignTask(task, user);
         taskService.finishTask(task, user);
         caze = workflowService.findOne(caze.getStringId());
@@ -280,7 +280,7 @@ public class RuleEngineTest {
 
         Case caze = newCase();
         Task task = findTask(caze, TRANS_1);
-        User user = superCreator.getLoggedSuper().transformToUser();
+        IUser user = superCreator.getLoggedSuper().transformToUser();
 
         taskService.assignTask(task, user);
         taskService.cancelTask(task, user);

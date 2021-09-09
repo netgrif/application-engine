@@ -11,6 +11,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -41,10 +42,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnProperty(
-        value = "server.security.static.enabled",
-        havingValue = "false"
-)
+@ConditionalOnExpression("!${nae.oauth.enabled} && !${server.security.static.enabled}")
 public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -85,7 +83,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOrigin("*");
+        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -99,27 +97,27 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         log.info("Configuration with frontend separated");
 //        @formatter:off
         http
-            .httpBasic()
+                .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
-            .and()
+                .and()
                 .cors()
                 .and()
-            .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
-            .authorizeRequests()
+                .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .logout()
+                .and()
+                .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .headers()
+                .and()
+                .headers()
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
@@ -160,12 +158,12 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
-                    authenticationManager(),
-                    new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                    authority,
-                    this.serverPatterns,
-                    this.jwtService,
-                    this.userService
-                );
+                authenticationManager(),
+                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                authority,
+                this.serverPatterns,
+                this.jwtService,
+                this.userService
+        );
     }
 }

@@ -1,15 +1,17 @@
 package com.netgrif.workflow.elastic
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.orgstructure.groups.NextGroupService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -79,10 +82,16 @@ class ElasticSearchTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private ElasticsearchTemplate template
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private ElasticsearchRestTemplate template
 
     @Autowired
     private SuperCreator superCreator
+
+    @Autowired
+    private TestHelper testHelper
 
     private Authentication auth
     private MockMvc mvc
@@ -91,6 +100,7 @@ class ElasticSearchTest {
 
     @Before
     void before() {
+        testHelper.truncateDbs()
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
@@ -105,8 +115,8 @@ class ElasticSearchTest {
 
         repository.deleteAll()
 
-        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
-        def net2 = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.loggedSuper)
+        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.loggedSuper)
         assert net.isPresent()
         assert net2.isPresent()
 
@@ -115,11 +125,9 @@ class ElasticSearchTest {
 
         def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["process_role": "Process role"], net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("process_role")] as UserProcessRole[])
+                [net.get().roles.values().find { it.importId == "process_role" }] as ProcessRole[])
 
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net.get() : net2.get())
@@ -146,7 +154,7 @@ class ElasticSearchTest {
                 "searchByAuthorId"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.id
+                                        "id": superCreator.superUser.stringId
                                 ]
                         ]),
                         "size": 10

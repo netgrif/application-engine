@@ -4,20 +4,16 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
-import com.netgrif.workflow.workflow.domain.QCase;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,11 +103,11 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.negativeViewRoles.contains(role);
     }
 
-    public Predicate usersQuery(Long userId) {
+    public Predicate usersQuery(String userId) {
         return QTask.task.users.containsKey(userId);
     }
 
-    public Predicate negativeViewUsersQuery(Long userId) {
+    public Predicate negativeViewUsersQuery(String userId) {
         return QTask.task.negativeViewUsers.contains(userId);
     }
 
@@ -176,7 +172,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         );
     }
 
-    public Predicate userQuery(Long userId) {
+    public Predicate userQuery(String userId) {
         return QTask.task.userId.eq(userId);
     }
 

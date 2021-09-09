@@ -11,7 +11,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -60,7 +59,7 @@ public class PdfDrawer implements IPdfDrawer {
 
     @Override
     public void closeTemplate() throws IOException {
-        if(templatePdf != null){
+        if (templatePdf != null) {
             templatePdf.close();
             templatePdf = null;
         }
@@ -78,9 +77,9 @@ public class PdfDrawer implements IPdfDrawer {
         } else if (templatePdf != null || isOnLastPage()) {
             if (templatePdf != null && pageList.size() == 0) {
                 emptyPage = templatePdf.getPage(0);
-            } else if(templatePdf != null && templatePdf.getPages().getCount() > 1) {
+            } else if (templatePdf != null && templatePdf.getPages().getCount() > 1) {
                 emptyPage = templatePdf.getPage(1);
-            } else{
+            } else {
                 emptyPage = new PDPage(resource.getPageSize());
             }
             pageList.add(emptyPage);
@@ -90,7 +89,7 @@ public class PdfDrawer implements IPdfDrawer {
         }
     }
 
-    private boolean isOnLastPage(){
+    private boolean isOnLastPage() {
         return pageList.indexOf(currentPage) == pageList.size() - 1;
     }
 
@@ -109,7 +108,7 @@ public class PdfDrawer implements IPdfDrawer {
         pageNumberRenderer.setupRenderer(this, resource);
         pageNumberRenderer.setFormat(resource.getPageNumberFormat());
 
-        for(PDPage page : pageList){
+        for (PDPage page : pageList) {
             contentStream.close();
             contentStream = new PDPageContentStream(pdf, page, PDPageContentStream.AppendMode.APPEND, true, true);
             pageNumberRenderer.renderPageNumber(pageList.indexOf(page) + 1, pageList.size());
@@ -211,15 +210,15 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.endText();
     }
 
-    private boolean checkBooleanValue(List<String> values, String text){
+    private boolean checkBooleanValue(List<String> values, String text) {
         PdfBooleanFormat format = resource.getBooleanFormat();
         if (values.get(0).equals("true")) {
-            if(!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)){
+            if (!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)) {
                 return format.getValue().get(0).equals(text);
-            }else{
+            } else {
                 return true;
             }
-        }else if(format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_EN) || format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK)){
+        } else if (format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_EN) || format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK)) {
             return format.getValue().get(1).equals(text);
         }
         return false;
