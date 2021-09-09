@@ -23,8 +23,6 @@ public class User {
 
     private String fullName;
 
-//    private Set<Group> groups;
-
     private Set<Authority> authorities;
 
     // process roles are set with the factory
