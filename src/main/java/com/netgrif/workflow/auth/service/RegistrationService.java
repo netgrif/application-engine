@@ -140,7 +140,7 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return userService.saveNew(user);
+        return userService.saveNewAndLogin(user);
     }
 
     @Override
