@@ -20,7 +20,7 @@ public interface IUserService {
 
     User save(User user);
 
-    User saveNewAndLogin(User user);
+    User saveNewAndAuthenticate(User user);
 
     User saveNew(User user);
 
