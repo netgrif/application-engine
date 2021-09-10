@@ -1,6 +1,8 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
@@ -9,23 +11,23 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.workflow.domain.*;
+import com.netgrif.workflow.workflow.domain.filters.CustomFilterDeserializer;
+import com.netgrif.workflow.workflow.domain.filters.FilterImportExport;
+import com.netgrif.workflow.workflow.domain.filters.FilterImportExportList;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.util.*;
 
@@ -151,23 +153,27 @@ public class FilterImportExportService implements IFilterImportExportService {
         FileFieldValue ffv = (FileFieldValue) exportCase.getDataSet().get(UPLOAD_FILE_FIELD).getValue();
 
         File f = new File(ffv.getPath());
-        XmlMapper xmlMapper = new XmlMapper();
         String xml = inputStreamToString(new FileInputStream(f));
-        FilterImportExportList filterList = xmlMapper.readValue(xml, FilterImportExportList.class);
+        SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
+        XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
+        Object filterList = xmlMapper.readValue(xml, Object.class);
 
-        filterList.getFilters().forEach(filter -> {
-//            Object defaultSearchCategories = filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES);
-//            Object inheritAllowedNets = filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS);
+//        Object filterList = xmlMapper.readValue(xml, Object.class);
+//        FilterImportExportList filterList = xmlMapper.readValue(xml, FilterImportExportList.class);
+
+//        filterList.getFilters().forEach(filter -> {
+////            Object defaultSearchCategories = filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES);
+////            Object inheritAllowedNets = filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS);
+////
+////            filter.getFilterMetadata().put(DEFAULT_SEARCH_CATEGORIES, defaultSearchCategories.equals("true"));
+////            filter.getFilterMetadata().put(INHERIT_ALLOWED_NETS, inheritAllowedNets.equals("true"));
 //
-//            filter.getFilterMetadata().put(DEFAULT_SEARCH_CATEGORIES, defaultSearchCategories.equals("true"));
-//            filter.getFilterMetadata().put(INHERIT_ALLOWED_NETS, inheritAllowedNets.equals("true"));
+//            if (filter.getAllowedNets() == null) {
+//                filter.setAllowedNets(new ArrayList<>());
+//            }
+//        });
 
-            if (filter.getAllowedNets() == null) {
-                filter.setAllowedNets(new ArrayList<>());
-            }
-        });
-
-        return filterList;
+        return (FilterImportExportList) filterList;
     }
 
     @Transactional
@@ -179,6 +185,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         xmlMapper.writeValue(baos, filters);
 
@@ -196,11 +203,8 @@ public class FilterImportExportService implements IFilterImportExportService {
             switch (immediateData.getImportId()) {
                 case FIELD_FILTER:
                     exportFilter.setFilterValue(((FilterField) immediateData).getValue());
-//                    exportFilter.setFilterMetadata(((FilterField) immediateData).getFilterMetadata());
                     exportFilter.setAllowedNets(((FilterField) immediateData).getAllowedNets());
-
                     exportFilter.setFilterMetadataExport(((FilterField) immediateData).getFilterMetadata());
-
                     break;
                 case FIELD_VISIBILITY:
                     exportFilter.setVisibility(immediateData.getValue().toString());
