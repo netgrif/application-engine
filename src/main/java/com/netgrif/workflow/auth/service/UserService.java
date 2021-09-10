@@ -59,7 +59,7 @@ public class UserService implements IUserService {
     private IAfterRegistrationAuthService authenticationService;
 
     @Override
-    public User saveNewAndLogin(User user) {
+    public User saveNewAndAuthenticate(User user) {
         return saveNew(user, true);
     }
 
