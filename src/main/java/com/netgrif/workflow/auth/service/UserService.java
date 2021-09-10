@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -54,13 +55,30 @@ public class UserService implements IUserService {
     @Autowired
     private GroupConfigurationProperties groupProperties;
 
+    @Autowired
+    private IAfterRegistrationAuthService authenticationService;
+
+    @Override
+    public User saveNewAndLogin(User user) {
+        return saveNew(user, true);
+    }
+
     @Override
     public User saveNew(User user) {
+        return saveNew(user, false);
+    }
+
+    private User saveNew(User user, boolean login) {
+        String rawPassword = user.getPassword();
+
         encodeUserPassword(user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
+
+        if (login)
+            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
 
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
@@ -71,6 +89,9 @@ public class UserService implements IUserService {
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
+
+        if (login)
+            authenticationService.logoutAfterRegistrationFinished();
         return savedUser;
     }
 
@@ -280,7 +301,7 @@ public class UserService implements IUserService {
     public User getLoggedOrSystem() {
         try {
             return getLoggedUser();
-        } catch (NullPointerException | ClassCastException e) {
+        } catch (NullPointerException e) {
             return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
         }
     }
