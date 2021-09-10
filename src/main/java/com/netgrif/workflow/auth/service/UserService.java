@@ -280,7 +280,7 @@ public class UserService implements IUserService {
     public User getLoggedOrSystem() {
         try {
             return getLoggedUser();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | ClassCastException e) {
             return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
         }
     }
