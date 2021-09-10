@@ -69,6 +69,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
 
+    @Value("${nae.security.anonymous-exceptions}")
+    private String[] anonymousExceptions;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -162,6 +165,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                     authority,
                     this.serverPatterns,
+                    this.anonymousExceptions,
                     this.jwtService,
                     this.userService
                 );
