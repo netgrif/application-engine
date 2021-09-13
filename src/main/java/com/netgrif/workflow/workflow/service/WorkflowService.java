@@ -261,6 +261,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setUserRefs(petriNet.getUserRefs());
 
         useCase.setTitle(makeTitle.apply(useCase));
+        CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty() ));
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);

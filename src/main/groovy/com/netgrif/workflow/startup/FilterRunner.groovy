@@ -29,8 +29,8 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
-        importProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
+        importFilterProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
+        importFilterProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
     }
 
     ImportPetriNetEventOutcome importFilterProcess(String message, String netIdentifier, String netFileName) {

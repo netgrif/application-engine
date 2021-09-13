@@ -45,7 +45,7 @@ public class EventService implements IEventService {
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
-                        runEventActionsOnChanged(useCase, task.get(), (SetDataEventOutcome) outcome, DataEventType.SET);
+                        runEventActionsOnChanged(task.orElse(null), (SetDataEventOutcome) outcome, DataEventType.SET);
                     });
             allOutcomes.addAll(outcomes);
         });
@@ -73,11 +73,12 @@ public class EventService implements IEventService {
     public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task));
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase.getPetriNet().getFunctions());
+//            todo samo fix pre všetky typy outcomov?
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
-                        runEventActionsOnChanged(useCase, task, (SetDataEventOutcome) outcome, trigger);
+                        runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
                     });
             allOutcomes.addAll(outcomes);
         });
@@ -85,13 +86,13 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public void runEventActionsOnChanged(Case useCase, Task task, SetDataEventOutcome outcome, DataEventType trigger) {
+    public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
         outcome.getChangedFields().forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && trigger == DataEventType.SET) {
-                Field field = useCase.getField(s);
-                log.info("[" + useCase.getStringId() + "] " + useCase.getTitle() + ": Running actions on changed field " + s);
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, useCase, task));
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, useCase, task));
+                Field field = outcome.getACase().getField(s);
+                log.info("[" + outcome.getACase().getStringId() + "] " + outcome.getACase().getTitle() + ": Running actions on changed field " + s);
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getACase(), outcome.getTask()));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getACase(), outcome.getTask()));
             }
         });
     }
