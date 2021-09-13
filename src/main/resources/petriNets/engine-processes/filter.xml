@@ -404,6 +404,21 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
     </transition>
     <!-- PLACES -->
