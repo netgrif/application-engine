@@ -134,7 +134,7 @@ public class VariableArcsTest {
 
         List<Arc> arcs = this.loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;
-        Case useCase = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
 
         assert caseOutcome.getACase().getPetriNet().getArcs()
                 .values()
