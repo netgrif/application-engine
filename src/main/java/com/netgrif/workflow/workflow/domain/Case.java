@@ -146,6 +146,7 @@ public class Case {
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
+        viewRoles = new HashSet<>();
         permissions = new HashMap<>();
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
