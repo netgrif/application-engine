@@ -404,7 +404,7 @@ public class WorkflowService implements IWorkflowService {
 
     private void setDefaultRoleIfEnabled(PetriNet net, Case useCase) {
         if (useCase.getViewUserRefs().isEmpty() && useCase.getViewRoles().isEmpty() && net.isDefaultRoleEnabled()) {
-            useCase.addDefaultRoleToViewRoles(processRoleService.defaultRole().getStringId());
+            useCase.addAllRolesToViewRoles(processRoleService.defaultRole().getStringId());
         }
     }
 
