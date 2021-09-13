@@ -272,7 +272,7 @@ public class Case {
         this.viewRoles = filterViewRoles();
     }
 
-    public void addDefaultRoleToViewRoles(String defaultRoleId) {
+    public void addAllRolesToViewRoles(String defaultRoleId) {
         this.viewRoles.addAll(enabledRoles);
         this.viewRoles.add(defaultRoleId);
     }
