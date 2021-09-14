@@ -82,7 +82,7 @@ class PetriNetTest {
         assert netOptional3.isPresent()
 
         def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
-        assert nets.size() == 3
+        assert nets.findAll {it.identifier in [netOptional.get().identifier, netOptional3.get().identifier]}.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"
     }

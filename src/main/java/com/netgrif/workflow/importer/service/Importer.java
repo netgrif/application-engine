@@ -9,6 +9,8 @@ import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
@@ -31,6 +33,7 @@ import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
+import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -53,6 +56,11 @@ public class Importer {
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
+
+    public static final String DEFAULT_FIELD_TEMPLATE = "material";
+    public static final String DEFAULT_FIELD_APPEARANCE = "outline";
+    public static final String DEFAULT_FIELD_ALIGNMENT = null;
+
     @Getter
     private Document document;
     private PetriNet net;
@@ -66,9 +74,13 @@ public class Importer {
     private Map<String, I18nString> i18n;
     private Map<String, Action> actions;
     private Map<String, Action> actionRefs;
+    private List<com.netgrif.workflow.petrinet.domain.Function> functions;
 
     @Autowired
     private FieldFactory fieldFactory;
+
+    @Autowired
+    private FunctionFactory functionFactory;
 
     @Autowired
     private IPetriNetService service;
@@ -96,6 +108,9 @@ public class Importer {
 
     @Autowired
     private ComponentFactory componentFactory;
+
+    @Autowired
+    private IFieldActionsCacheService actionsCacheService;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -129,6 +144,7 @@ public class Importer {
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
+        this.functions = new LinkedList<>();
     }
 
     @Transactional
@@ -158,22 +174,18 @@ public class Importer {
         net.setIcon(document.getIcon());
 
         document.getRole().forEach(this::createRole);
-        for (com.netgrif.workflow.importer.model.Data data : document.getData()) {
-            createDataSet(data);
-        }
+        document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
-        for (com.netgrif.workflow.importer.model.Transition transition : document.getTransition()) {
-            createTransition(transition);
-        }
+        document.getTransition().forEach(this::createTransition);
         document.getArc().forEach(this::createArc);
-        for (com.netgrif.workflow.importer.model.Mapping mapping : document.getMapping()) {
-            applyMapping(mapping);
-        }
-        document.getTransition().forEach(this::resolveTransitionActions);
+        document.getMapping().forEach(this::applyMapping);
         document.getData().forEach(this::resolveDataActions);
+        document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
+        document.getFunction().forEach(this::createFunction);
+        evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUsersRef);
@@ -205,6 +217,14 @@ public class Importer {
     }
 
     @Transactional
+    protected void createFunction(com.netgrif.workflow.importer.model.Function function) {
+        com.netgrif.workflow.petrinet.domain.Function fun = functionFactory.getFunction(function);
+
+        net.addFunction(fun);
+        functions.add(fun);
+    }
+
+    @Transactional
     protected void resolveUsersRef(CaseUsersRef usersRef) {
         CaseLogic logic = usersRef.getCaseLogic();
         String usersId = usersRef.getId();
@@ -231,9 +251,18 @@ public class Importer {
     }
 
     @Transactional
+    protected void evaluateFunctions() {
+        try {
+            actionsCacheService.evaluateFunctions(functions);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not evaluate functions: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
     protected void evaluateActions(String s, Action action) {
         try {
-            actionsRunner.getActionCode(action);
+            actionsRunner.getActionCode(action, functions);
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
         }
@@ -351,6 +380,15 @@ public class Importer {
         arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
         arc.setDestination(getNode(importArc.getDestinationId()));
+        if (importArc.getReference() != null) {
+            if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
+                throw new IllegalArgumentException("Place or Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
+            }
+            Reference reference = new Reference();
+            reference.setReference(importArc.getReference());
+            reference.setType((places.containsKey(importArc.getReference())) ? Type.PLACE : Type.DATA);
+            arc.setReference(reference);
+        }
 
         net.addArc(arc);
     }
@@ -618,22 +656,22 @@ public class Importer {
                 return;
             }
 
-            String appearance = "outline";
-            if (layout.getAppearance() != null) {
-                appearance = layout.getAppearance().toString();
-            }
-
-            String alignment = null;
-            if (layout.getAlignment() != null) {
-                alignment = layout.getAlignment().value();
-            }
-
-            String template = null;
+            String template = DEFAULT_FIELD_TEMPLATE;
             if (layout.getTemplate() != null) {
                 template = layout.getTemplate().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
+            String appearance = DEFAULT_FIELD_APPEARANCE;
+            if (layout.getAppearance() != null) {
+                appearance = layout.getAppearance().toString();
+            }
+
+            String alignment = DEFAULT_FIELD_ALIGNMENT;
+            if (layout.getAlignment() != null) {
+                alignment = layout.getAlignment().value();
+            }
+
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), template, appearance, alignment);
             transition.addDataSet(fieldId, null, null, fieldLayout, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);

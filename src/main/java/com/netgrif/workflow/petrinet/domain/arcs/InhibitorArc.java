@@ -19,6 +19,7 @@ public class InhibitorArc extends PTArc {
      */
     @Override
     public boolean isExecutable() {
+        if(this.reference != null) multiplicity = this.reference.getMultiplicity();
         return ((Place) source).getTokens() < multiplicity;
     }
 
@@ -33,7 +34,7 @@ public class InhibitorArc extends PTArc {
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
      */
     @Override
-    public void rollbackExecution() {
+    public void rollbackExecution(Integer tokensConsumed) {
     }
 
     @SuppressWarnings("Duplicates")
@@ -45,6 +46,7 @@ public class InhibitorArc extends PTArc {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
+        clone.setReference(this.reference);
         return clone;
     }
 }

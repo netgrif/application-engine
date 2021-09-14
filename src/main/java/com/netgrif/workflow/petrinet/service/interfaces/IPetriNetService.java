@@ -87,5 +87,5 @@ public interface IPetriNetService {
 
     void deletePetriNet(String id, LoggedUser loggedUser);
 
-    void runActions(List<Action> actions, String netId);
+    void runActions(List<Action> actions, PetriNet petriNet);
 }

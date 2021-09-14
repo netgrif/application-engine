@@ -52,6 +52,9 @@ public class LdapUserRefService implements ILdapUserRefService {
 //    private GroupConfigurationProperties groupProperties;
 
     @Autowired
+    private GroupConfigurationProperties groupProperties;
+
+    @Autowired
     private NaeLdapProperties ldapProperties;
 
 

@@ -40,7 +40,6 @@ class CaseApiTest {
     @Autowired
     private SuperCreator superCreator
 
-    private boolean initialised = false
     private Optional<PetriNet> testNet
 
     private def stream = { String name ->
@@ -49,10 +48,7 @@ class CaseApiTest {
 
     @BeforeEach
     void setup() {
-        if (!initialised) {
-            testHelper.truncateDbs()
-            initialised = true
-        }
+        testHelper.truncateDbs()
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"
@@ -74,6 +70,8 @@ class CaseApiTest {
 
     @Test
     void testSearch() {
+        testHelper.truncateDbs()
+
         testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
@@ -83,13 +81,13 @@ class CaseApiTest {
             cases << importHelper.createCase("Case $index" as String, testNet.get())
         }
 
-        importHelper.assignTaskToSuper("Task", cases[0].stringId)  //TODO: pada  assign
+        importHelper.assignTaskToSuper("Task", cases[0].stringId)
         importHelper.finishTaskAsSuper("Task", cases[0].stringId)
 
         cases = caseRepository.findAll()
         assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
-        assert cases.findAll { it.title != "Case 1" }.every { it.dataSet["field"].value == 0 }
-        assert cases.find { it.title == "Case 0" }.dataSet["count"].value == 5
-        assert cases.find { it.title == "Case 0" }.dataSet["paged"].value == 1
+        assert cases.findAll { it.title != "Case 1"  && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
+        assert cases.find {it.title == "Case 0"}.dataSet["count"].value == 5
+        assert cases.find {it.title == "Case 0"}.dataSet["paged"].value == 1
     }
 }
