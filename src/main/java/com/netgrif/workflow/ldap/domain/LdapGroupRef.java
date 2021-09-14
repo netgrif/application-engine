@@ -9,10 +9,6 @@ import javax.naming.Name;
 import java.util.List;
 
 
-@Entry(
-        objectClasses = {"groupOfNames"}
-)
-
 @Data
 public class LdapGroupRef {
 
