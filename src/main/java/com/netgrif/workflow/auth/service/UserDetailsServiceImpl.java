@@ -28,9 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     protected UserRepository userRepository;
 
-//    @Autowired
-//    private IMemberService memberService;
-
     @Autowired
     private ApplicationEventPublisher publisher;
 
