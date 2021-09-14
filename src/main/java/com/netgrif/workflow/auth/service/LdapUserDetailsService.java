@@ -2,9 +2,8 @@ package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
-import com.netgrif.workflow.auth.domain.ldapUser.LdapUser;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class LdapUserDetailsService extends UserDetailsServiceImpl {

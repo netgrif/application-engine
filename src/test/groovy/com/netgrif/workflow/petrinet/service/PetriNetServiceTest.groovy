@@ -4,16 +4,13 @@ import com.netgrif.workflow.TestHelper
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.ipc.TaskApiTest
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
@@ -80,8 +77,7 @@ class PetriNetServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
     }
 
     @Test

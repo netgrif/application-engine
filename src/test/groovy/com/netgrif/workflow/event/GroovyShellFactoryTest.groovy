@@ -4,13 +4,12 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.QTask
@@ -85,8 +84,7 @@ class GroovyShellFactoryTest {
         def auths = importHelper.createAuthorities(["systemAdmin": Authority.systemAdmin])
         importHelper.createUser(new User(name: "Admin", surname: "User", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("systemAdmin")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         def adminAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
@@ -119,7 +117,7 @@ class GroovyShellFactoryTest {
         def roles = roleService.findAll(net.getStringId())
         assert roles.size() == 1
         roleService.assignRolesToUser(
-                user.getId(),
+                user.getStringId(),
                 new HashSet<String>(roles.collect({it.getStringId()})),
                 new LoggedUser(-1, "a", "", [])
         )

@@ -10,9 +10,6 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
-
-//import com.netgrif.workflow.orgstructure.domain.Group
-
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
 import org.junit.jupiter.api.BeforeEach
@@ -71,7 +68,7 @@ class ProcessRoleTest {
     private IPetriNetService petriNetService;
 
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
+    private ProcessRoleRepository userProcessRoleRepository
 
     @Autowired
     private SuperCreator superCreator;
