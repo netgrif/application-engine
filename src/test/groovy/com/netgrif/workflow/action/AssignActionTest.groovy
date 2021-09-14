@@ -46,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class AssignActionTest {
 
+    private static final String GROUP_NAME = "Test group"
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
 
@@ -85,6 +86,7 @@ class AssignActionTest {
 
     @BeforeEach
     void before() {
+
         testHelper.truncateDbs()
 
         mvc = MockMvcBuilders
@@ -113,6 +115,7 @@ class AssignActionTest {
         this.secondaryNet = secondaryNet.get()
     }
 
+
     private void cleanDatabases() {
         template.db.drop()
         userRepository.deleteAll()
@@ -128,7 +131,7 @@ class AssignActionTest {
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
 
         def content = JsonOutput.toJson([roleIdInMainNet])
-        String userId = Integer.toString(user._id as Integer)
+        String userId = user.getStringId()
 
         def result = mvc.perform(MockMvcRequestBuilders.post(ROLE_API.replace("{}", userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)

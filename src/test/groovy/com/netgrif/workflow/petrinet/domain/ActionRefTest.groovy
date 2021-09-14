@@ -33,6 +33,7 @@ class ActionRefTest {
 
     @Autowired
     private CaseRepository caseRepository
+    public static final String NET_FILE = "actionref_test.xml"
 
     @Autowired
     private TaskService taskService

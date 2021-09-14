@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -92,7 +93,7 @@ class TaskControllerTest {
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
                 authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                userProcessRoles: [] as Set<ProcessRole>))
+                processRoles: [] as Set<ProcessRole>))
         importNet()
     }
 
@@ -127,7 +128,7 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        Optional<PetriNet> netOptional = helper.createNet("all_data_refs.xml", "major")
+        Optional<PetriNet> netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR,)
         assert netOptional.isPresent()
         net = netOptional.get()
     }
