@@ -15,8 +15,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 
-//import com.netgrif.workflow.orgstructure.domain.Group
-
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import org.junit.Assert
@@ -127,7 +125,7 @@ class RemoveActionTest {
 
         //Has no role, we assign role admin
         def content = JsonOutput.toJson([adminRoleId])
-        String userId = Integer.toString(user._id as Integer)
+        String userId = user.getStringId()
 
         mvc.perform(post(ROLE_API.replace("{}", userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)

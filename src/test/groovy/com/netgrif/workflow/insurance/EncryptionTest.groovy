@@ -13,6 +13,7 @@ import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -88,6 +89,6 @@ class EncryptionTest {
 
     LoggedUser mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUser(1L, "super@netgrif.com", "password", [authorityUser])
+        return new LoggedUser(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser])
     }
 }

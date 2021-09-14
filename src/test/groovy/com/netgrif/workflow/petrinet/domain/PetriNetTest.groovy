@@ -29,12 +29,16 @@ class PetriNetTest {
 
     @Autowired
     private Importer importer
+
     @Autowired
     private IPetriNetService petriNetService
+
     @Autowired
     private SuperCreator superCreator
+
     @Autowired
     private ProcessRoleRepository processRoleRepository
+
     @Autowired
     private TestHelper testHelper
 
