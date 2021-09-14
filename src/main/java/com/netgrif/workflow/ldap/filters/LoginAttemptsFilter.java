@@ -1,7 +1,7 @@
 package com.netgrif.workflow.ldap.filters;
 
 import com.netgrif.workflow.configuration.ApplicationContextProvider;
-import com.netgrif.workflow.ldap.service.AuthenticationService;
+import com.netgrif.workflow.configuration.security.AuthenticationService;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;

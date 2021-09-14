@@ -1,4 +1,4 @@
-package com.netgrif.workflow.ldap.service.interfaces;
+package com.netgrif.workflow.configuration.security.interfaces;
 
 
 public interface IAuthenticationService {
