@@ -1,10 +1,10 @@
-package com.netgrif.workflow.ldap.service;
+package com.netgrif.workflow.configuration.security;
 
 
-import com.netgrif.workflow.ldap.service.interfaces.IAuthenticationService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import com.netgrif.workflow.configuration.security.interfaces.IAuthenticationService;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentMap;
 
 
 @Service
-
 public class AuthenticationService implements IAuthenticationService {
 
 
