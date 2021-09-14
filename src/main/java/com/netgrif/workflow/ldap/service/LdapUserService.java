@@ -29,18 +29,6 @@ public class LdapUserService extends UserService {
     }
 
 
-    @Override
-    public IUser saveNew(IUser user) {
-        addDefaultRole(user);
-        addDefaultAuthorities(user);
-
-        IUser savedUser = ldapUserRepository.save((LdapUser) user);
-        groupService.createGroup(user);
-        groupService.addUserToDefaultGroup(user);
-        publisher.publishEvent(new UserRegistrationEvent(savedUser));
-        return savedUser;
-    }
-
     protected LdapUser getUserFromLdap(IUser user) {
         if (user instanceof LdapUser) {
             return (LdapUser) user;
