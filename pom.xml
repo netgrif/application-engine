@@ -40,7 +40,6 @@
     </properties>
 
     <dependencies>
-
         <!-- Batch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -145,6 +144,8 @@
             <version>2.3.3</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -157,7 +158,6 @@
             <version>5.3.2</version>
             <scope>test</scope>
         </dependency>
-
 
         <!-- Groovy -->
         <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
@@ -307,12 +307,14 @@
             <version>3.9.1.Final</version>
         </dependency>
 
+        <!-- QRGen -->
         <dependency>
             <groupId>net.glxn.qrgen</groupId>
             <artifactId>core</artifactId>
             <version>2.0</version>
         </dependency>
 
+        <!-- Oauth -->
         <dependency>
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
@@ -337,6 +339,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <!-- LDAP -->
         <dependency>
             <groupId>org.springframework.ldap</groupId>
@@ -416,25 +419,6 @@
             <artifactId>springfox-bean-validators</artifactId>
             <version>3.0.0</version>
         </dependency>
-
-        <!--LDAP-->
-        <dependency>
-            <groupId>org.springframework.ldap</groupId>
-            <artifactId>spring-ldap-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-ldap</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.unboundid</groupId>
-            <artifactId>unboundid-ldapsdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-ldap</artifactId>
-        </dependency>
-
     </dependencies>
 
     <repositories>
@@ -442,30 +426,30 @@
             <id>mulesoft</id>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
-<!--        <repository>-->
-<!--            <id>jcenter-snapshots</id>-->
-<!--            <name>jcenter</name>-->
-<!--            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>-->
-<!--        </repository>-->
-<!--        <repository>-->
-<!--            <id>spring-snapshots</id>-->
-<!--            <url>https://repo.spring.io/snapshot</url>-->
-<!--            <snapshots>-->
-<!--                <enabled>true</enabled>-->
-<!--            </snapshots>-->
-<!--        </repository>-->
-<!--        <repository>-->
-<!--            <id>spring-milestones</id>-->
-<!--            <url>https://repo.spring.io/milestone</url>-->
-<!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>jcenter-snapshots</id>-->
+        <!--            <name>jcenter</name>-->
+        <!--            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>-->
+        <!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>spring-snapshots</id>-->
+        <!--            <url>https://repo.spring.io/snapshot</url>-->
+        <!--            <snapshots>-->
+        <!--                <enabled>true</enabled>-->
+        <!--            </snapshots>-->
+        <!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>spring-milestones</id>-->
+        <!--            <url>https://repo.spring.io/milestone</url>-->
+        <!--        </repository>-->
     </repositories>
-<!--    <pluginRepositories>-->
-<!--        <pluginRepository>-->
-<!--            <id>spring-milestones</id>-->
-<!--            <name>Spring Milestones</name>-->
-<!--            <url>https://repo.spring.io/milestone</url>-->
-<!--        </pluginRepository>-->
-<!--    </pluginRepositories>-->
+    <!--    <pluginRepositories>-->
+    <!--        <pluginRepository>-->
+    <!--            <id>spring-milestones</id>-->
+    <!--            <name>Spring Milestones</name>-->
+    <!--            <url>https://repo.spring.io/milestone</url>-->
+    <!--        </pluginRepository>-->
+    <!--    </pluginRepositories>-->
 
     <build>
         <resources>

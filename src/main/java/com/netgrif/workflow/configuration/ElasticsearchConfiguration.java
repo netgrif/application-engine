@@ -10,18 +10,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
-import java.util.Arrays;
-
 @Configuration
 public class ElasticsearchConfiguration {
 
-    @Value("${spring.data.elasticsearch.cluster-name:elasticsearch}")
-    private String clusterName;
-
-    @Value("${spring.data.elasticsearch.url:127.0.0.1}")
+    @Value("${spring.data.elasticsearch.url}")
     private String url;
 
-    @Value("${spring.data.elasticsearch.port:9300}")
+    @Value("${spring.data.elasticsearch.searchport}")
     private int port;
 
     @Value("${spring.data.elasticsearch.index.case}")
@@ -50,24 +45,9 @@ public class ElasticsearchConfiguration {
 
     @Bean
     public RestHighLevelClient client() {
-// More Url Elastic
-//        Arrays.stream(url.split(",")).forEach(it -> {
-//            String[] ipPort = it.split(":");
-//            if (ipPort.length > 2) {
-//                int parsePort = Integer.parseInt(ipPort[ipPort.length - 1]);
-//                ipPort[ipPort.length - 1] = "";
-//                String url = String.join(":", ipPort);
-//                new HttpHost(url, parsePort, "http");
-//            } else if (ipPort.length == 2) {
-//                url = ipPort[0];
-//                port = Integer.parseInt(ipPort[1]);
-//                new HttpHost(ipPort[0], 9200, "http");
-//            } else if (ipPort.length == 1) {
-//                new HttpHost(ipPort[0], 9200, "http");
-//            }
-//        });
+
         return new RestHighLevelClient(
-                RestClient.builder(new HttpHost(url, 9200, "http")));
+                RestClient.builder(new HttpHost(url, port, "http")));
     }
 
     @Bean

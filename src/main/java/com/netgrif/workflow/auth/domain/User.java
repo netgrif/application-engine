@@ -7,6 +7,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,7 +20,7 @@ public class User extends AbstractUser implements RegisteredUser {
 
     public static final String UNKNOWN = "unknown";
 
-    @Indexed
+    @Id
     @Getter
     protected ObjectId _id;
 
