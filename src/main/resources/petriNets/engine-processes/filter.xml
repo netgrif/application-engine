@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
     <id>filter</id>
     <initials>FTR</initials>
     <title name="process_title">Filter</title>
@@ -49,6 +49,57 @@
     <data type="text" immediate="true">
         <id>origin_view_id</id>
         <title name="origin_view_id">Origin ViewId</title>
+        <event type="set">
+            <id>set</id>
+            <actions phase="post">
+                <action>
+                    origin_view_id: f.origin_view_id,
+                    ancestor_task_ref: f.taskref_and_parent,
+                    trimmed_origin_view_id: f.trimmed_origin_view_id,
+                    and_view: f.and_view,
+                    t1: t.view_filter,
+                    t2: t.view_as_ancestor;
+
+                    def match = origin_view_id.value =~ "^.*?([a-f\\d]{24})(?:-\\d+)?\$"
+                    def parentHasFilterRef = match.matches()
+
+                    if (!parentHasFilterRef &amp;&amp; origin_view_id.value == "") {
+                        make and_view, forbidden on t1 when {true}
+                        make and_view, forbidden on t2 when {true}
+                        make trimmed_origin_view_id, forbidden on t1 when {true}
+                        make trimmed_origin_view_id, forbidden on t2 when {true}
+
+                        change ancestor_task_ref value {[]}
+                        return
+                    } else if (parentHasFilterRef) {
+                        make and_view, forbidden on t1 when {true}
+                        make and_view, forbidden on t2 when {true}
+                        make trimmed_origin_view_id, forbidden on t1 when {true}
+                        make trimmed_origin_view_id, forbidden on t2 when {true}
+
+                        def ancestor_menu_item = findTask({ it._id.eq(new org.bson.types.ObjectId(match.group(1))) })
+
+                        def menu_data = getData(ancestor_menu_item)
+
+                        def ancestor_filter = findTask({ it._id.eq(menu_data.get("filter_preview").value[0]) })
+
+                        def ancestor_view_filter = findTask({it.caseId.eq(ancestor_filter.caseId).and(it.task.transitionId.eq("view_as_ancestor"))})
+
+                        change ancestor_task_ref value {[ancestor_view_filter.stringId]}
+                        return
+                    }
+
+                    match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
+                    match.matches()
+
+                    change trimmed_origin_view_id value {origin_view_id.value.substring(0, match.start(1))}
+                    make and_view, visible on t1 when {true}
+                    make and_view, visible on t2 when {true}
+                    make trimmed_origin_view_id, visible on t1 when {true}
+                    make trimmed_origin_view_id, visible on t2 when {true}
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text">
         <id>new_title</id>
@@ -64,11 +115,11 @@
     </data>
     <data type="button">
         <id>and_me</id>
-        <title name="and">AND</title>
+        <placeholder name="and">AND</placeholder>
     </data>
     <data type="button">
         <id>and_view</id>
-        <title name="and">AND</title>
+        <placeholder name="and">AND</placeholder>
     </data>
     <data type="taskRef">
         <id>taskref_and_parent</id>
