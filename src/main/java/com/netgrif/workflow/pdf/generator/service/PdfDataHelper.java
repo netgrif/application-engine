@@ -105,7 +105,6 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generatePdfDataGroup(DataGroup dataGroup, PdfField pdfField) {
-        log.info("Generating PDF field from data group titles.");
         PdfField dgField = null;
         if (dataGroup != null && dataGroup.getTitle() != null) {
             dgField = new DataGroupFieldBuilder(resource).buildField(dataGroup, pdfField);
