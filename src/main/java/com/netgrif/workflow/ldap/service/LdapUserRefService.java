@@ -2,9 +2,8 @@ package com.netgrif.workflow.ldap.service;
 
 
 import com.netgrif.workflow.auth.domain.IUser;
-import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.domain.UserState;
-import com.netgrif.workflow.auth.domain.ldapUser.LdapUser;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.ldap.LdapConfiguration;
@@ -12,6 +11,7 @@ import com.netgrif.workflow.configuration.properties.NaeLdapProperties;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.ldap.domain.LdapUserRef;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRefRepository;
+import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
@@ -23,8 +23,6 @@ import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
-import java.nio.charset.Charset;
-import java.util.Random;
 
 
 //TODO:  JOZIKE
@@ -47,9 +45,6 @@ public class LdapUserRefService implements ILdapUserRefService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
-//      TODO:
-//    @Autowired
-//    private GroupConfigurationProperties groupProperties;
 
     @Autowired
     private GroupConfigurationProperties groupProperties;
@@ -75,16 +70,13 @@ public class LdapUserRefService implements ILdapUserRefService {
         ldapUser.setPassword(generatedString);
         IUser savedUser = ldapUserService.saveNew(ldapUser);
         ldapUser.setNextGroups(this.groupService.getAllGroupsOfUser(savedUser));
-// TODO: Merge Group
 
-//        if (groupProperties.isDefaultEnabled())
-//            groupService.createGroup(savedUser);
-//
-//        if (groupProperties.isSystemEnabled())
-//            groupService.addUserToDefaultGroup(savedUser);
+        if (groupProperties.isDefaultEnabled())
+            groupService.createGroup(savedUser);
 
-//        savedUser.setGroups(savedUser.getGroups());
-//        userService.upsertGroupMember(savedUser);
+        if (groupProperties.isSystemEnabled())
+            groupService.addUserToDefaultGroup(savedUser);
+
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
 
         return ldapUserService.save(ldapUser);
