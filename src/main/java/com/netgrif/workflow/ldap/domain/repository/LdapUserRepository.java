@@ -1,7 +1,7 @@
 package com.netgrif.workflow.ldap.domain.repository;
 
 
-import com.netgrif.workflow.auth.domain.ldapUser.LdapUser;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

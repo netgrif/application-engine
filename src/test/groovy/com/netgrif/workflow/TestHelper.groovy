@@ -6,6 +6,7 @@ import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.startup.*
+import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Component

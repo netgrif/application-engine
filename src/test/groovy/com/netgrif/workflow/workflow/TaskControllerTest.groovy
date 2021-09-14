@@ -3,24 +3,14 @@ package com.netgrif.workflow.workflow
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
-import com.netgrif.workflow.auth.service.AuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
-
-import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
@@ -40,15 +30,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.data.domain.Page
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
 
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles(["test"])
-@RunWith(SpringRunner.class)
 class TaskControllerTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
@@ -87,9 +72,6 @@ class TaskControllerTest {
     private ImportHelper helper
 
     @Autowired
-    private TestHelper testHelper
-
-    @Autowired
     private IAuthorityService authorityService
 
     private PetriNet net
@@ -110,7 +92,7 @@ class TaskControllerTest {
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
                 authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
-                userProcessRoles: [] as Set<UserProcessRole>))
+                userProcessRoles: [] as Set<ProcessRole>))
         importNet()
     }
 

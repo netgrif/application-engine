@@ -2,11 +2,8 @@ package com.netgrif.workflow.ldap.service;
 
 
 import com.netgrif.workflow.auth.domain.IUser;
-import com.netgrif.workflow.auth.domain.RegisteredUser;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.ldapUser.LdapUser;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.auth.service.UserService;
-import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

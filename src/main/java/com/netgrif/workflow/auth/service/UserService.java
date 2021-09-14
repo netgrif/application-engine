@@ -6,10 +6,8 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
-import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -64,8 +62,6 @@ public class UserService extends AbstractUserService {
         if (groupProperties.isSystemEnabled())
             groupService.addUserToDefaultGroup(user);
 
-        savedUser.setGroups(user.getGroups());
-        upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
     }
@@ -122,12 +118,8 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser findById(String id, boolean small) {
         Optional<User> user = userRepository.findById(id);
-        if (!user.isPresent())
+        if (user.isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + id + "]");
-        /*if (!small) {
-            loadGroups(user.get());
-            return loadProcessRoles(user.get());
-        }*/
         return user.get();
     }
 
@@ -139,10 +131,6 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser findByEmail(String email, boolean small) {
         return userRepository.findByEmail(email);
-        /*if (!small) {
-            loadGroups(user);
-            return loadProcessRoles(user);
-        }*/
     }
 
     @Override
@@ -154,8 +142,7 @@ public class UserService extends AbstractUserService {
     @Override
     public List<IUser> findAll(boolean small) {
         return changeType(userRepository.findAll());
-//        if (!small) users.forEach(this::loadProcessRoles);
-//        return users;
+
     }
 
     @Override
@@ -165,8 +152,7 @@ public class UserService extends AbstractUserService {
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
-        /*if (!small)
-            users.forEach(this::loadProcessRoles);*/
+
     }
 
     @Override
@@ -176,8 +162,7 @@ public class UserService extends AbstractUserService {
 
         return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
                 .collect(Collectors.toSet()), query), pageable), pageable);
-        /*if (!small)
-            users.forEach(this::loadProcessRoles);*/
+
     }
 
     @Override
@@ -198,8 +183,7 @@ public class UserService extends AbstractUserService {
         }
         predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
         Page<User> users = userRepository.findAll(predicate, pageable);
-        /*if (!small)
-            users.forEach(this::loadProcessRoles);*/
+
         return changeType(users, pageable);
     }
 
@@ -217,22 +201,15 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-//    public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-//        return changeType(userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable));
+
     public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
-        /*if (!small) {
-            users.forEach(this::loadProcessRoles);
-        }*/
         return changeType(users, pageable);
     }
 
     @Override
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
         List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
-        /*if (!small) {
-            users.forEach(this::loadProcessRoles);
-        }*/
             return changeType(users);
         }
 
@@ -316,12 +293,6 @@ public class UserService extends AbstractUserService {
         userRepository.delete(dbUser);
     }
 
-//    @Override
-//    public void deleteUser(User user) {
-//        if (!userRepository.findById(user.getStringId()).isPresent())
-//            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
-//        userRepository.delete(user);
-//    }
 
 /*    private User loadProcessRoles(User user) {
         if (user == null)

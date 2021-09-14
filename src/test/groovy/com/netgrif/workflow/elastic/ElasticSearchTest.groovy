@@ -6,13 +6,8 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
-import com.netgrif.workflow.elastic.domain.ElasticTask
-import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.orgstructure.groups.NextGroupService
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
-import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -28,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -65,9 +59,6 @@ class ElasticSearchTest {
     private static final String USER_EMAIL = "test@test.com"
     private static final String USER_PASSW = "password"
     private static final String SEARCH_URL = "/api/workflow/case/search"
-
-    @Autowired
-    private IPetriNetService petriNetService
 
     @Autowired
     private WebApplicationContext wac
