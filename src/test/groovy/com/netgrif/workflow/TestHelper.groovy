@@ -34,6 +34,8 @@ class TestHelper {
     @Autowired
     private GroupRunner groupRunner
     @Autowired
+    private IFieldActionsCacheService actionsCacheService
+    @Autowired
     private FinisherRunner finisherRunner
 
     void truncateDbs() {
@@ -43,6 +45,9 @@ class TestHelper {
         roleService.clearCache()
         elasticTaskRepository.deleteAll()
         elasticCaseRepository.deleteAll()
+        actionsCacheService.clearActionCache()
+        actionsCacheService.clearFunctionCache()
+        actionsCacheService.clearNamespaceFunctionCache()
         roleRunner.run()
         systemUserRunner.run()
         groupRunner.run()

@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
+import com.netgrif.workflow.workflow.service.interfaces.IUserFilterSearchService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -114,6 +115,9 @@ class ActionDelegate {
 
     @Autowired
     Scheduler scheduler
+
+    @Autowired
+    IUserFilterSearchService filterSearchService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -774,8 +778,8 @@ class ActionDelegate {
 
     void generatePDF(String transitionId, String fileFieldId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
@@ -785,8 +789,8 @@ class ActionDelegate {
 
     void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
@@ -796,8 +800,8 @@ class ActionDelegate {
 
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -812,8 +816,8 @@ class ActionDelegate {
 
     void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource) pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
@@ -945,4 +949,7 @@ class ActionDelegate {
         return new DynamicValidation(rule, message)
     }
 
+    List<Case> findFilters(String userInput) {
+        return filterSearchService.autocompleteFindFilters(userInput)
+    }
 }

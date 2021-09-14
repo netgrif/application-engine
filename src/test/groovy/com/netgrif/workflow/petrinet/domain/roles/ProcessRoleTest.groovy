@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.hateoas.MediaTypes
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
@@ -29,8 +31,6 @@ import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.http.MediaType.TEXT_PLAIN
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -71,6 +71,9 @@ class ProcessRoleTest {
     private IPetriNetService petriNetService;
 
     @Autowired
+    private UserProcessRoleRepository userProcessRoleRepository
+
+    @Autowired
     private SuperCreator superCreator;
 
     @BeforeEach
@@ -86,18 +89,18 @@ class ProcessRoleTest {
         netId = net.get().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["View": "View", "Perform": "Perform"], net.get())
+        def processRoles = userProcessRoleRepository.findAllByNetId(netId)
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("View")] as ProcessRole[])
+                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("Perform")] as ProcessRole[])
+                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.get("View"), processRoles.get("Perform")] as ProcessRole[])
+                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }, processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
     }
 
     private String caseId
@@ -126,9 +129,9 @@ class ProcessRoleTest {
                 color: "color"
         ])
         def result = mvc.perform(post(CASE_CREATE_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -141,13 +144,15 @@ class ProcessRoleTest {
 
     def searchTasks(String title, int expected) {
         def content = JsonOutput.toJson([
-                case: caseId
+                case: [
+                        id: caseId
+                ]
         ])
         def result = mvc.perform(post(TASK_SEARCH_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())

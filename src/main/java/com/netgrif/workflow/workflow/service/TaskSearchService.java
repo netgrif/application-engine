@@ -37,10 +37,14 @@ public class TaskSearchService extends MongoSearchService<Task> {
         }
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
+
         BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
-        constraints.andNot(buildNegativeRolesQueryConstraint(user));
         constraints.or(buildUserRefQueryConstraint(user));
-        constraints.andNot(buildNegativeViewUsersConstraint(user));
+
+        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
+        negativeConstraints.or(buildNegativeViewUsersConstraint(user));
+
+        constraints.andNot(negativeConstraints);
         builder.and(constraints);
         return builder;
     }

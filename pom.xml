@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>5.5.2</version>
+    <version>6.0.0</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -70,11 +70,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.hateoas</groupId>-->
-        <!--            <artifactId>spring-hateoas</artifactId>-->
-        <!--            <version>1.0.2.RELEASE</version>-->
-        <!--        </dependency>-->
 
         <!-- Mail -->
         <dependency>
@@ -132,7 +127,6 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -193,6 +187,18 @@
             <!-- NEVER EVER CHANGE THIS VERSION TO 2.0.7 -->
             <version>2.0.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-all</artifactId>
+            <version>1.13</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>de.rototor.pdfbox</groupId>
+            <artifactId>graphics2d</artifactId>
+            <version>0.32</version>
+        </dependency>
+
 
         <!-- Jsoup -->
         <dependency>
@@ -331,6 +337,24 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- LDAP -->
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-ldap</artifactId>
+        </dependency>
+
         <!-- Quartz -->
         <!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
         <dependency>
