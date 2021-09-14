@@ -60,6 +60,7 @@
                     t1: t.view_filter,
                     t2: t.view_as_ancestor;
 
+                    // the same regex is used in frontend filter extaction service. Please keep them in sync
                     def match = origin_view_id.value =~ "^.*?([a-f\\d]{24})(?:-\\d+)?\$"
                     def parentHasFilterRef = match.matches()
 
@@ -89,6 +90,7 @@
                         return
                     }
 
+                    // the same regex is used in frontend filter extaction service. Please keep them in sync
                     match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
                     match.matches()
 
@@ -544,7 +546,7 @@
     <transition>
         <id>view_as_ancestor</id>
         <x>860</x>
-        <y>220</y>
+        <y>200</y>
         <layout>
             <offset>0</offset>
         </layout>
