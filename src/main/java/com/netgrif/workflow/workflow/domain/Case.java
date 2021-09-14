@@ -279,22 +279,16 @@ public class Case {
     }
 
     public Set<String> getViewUserRefs() {
-        Set<String> userRefs = new HashSet<>();
-        this.userRefs.forEach((ref, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
-                userRefs.add(ref);
-            }
-        });
-        return userRefs;
+        return this.userRefs.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("view") && e.getValue().get("view"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 
     private Set<String> filterViewRoles() {
-        Set<String> viewRoles = new HashSet<>();
-        this.permissions.forEach((role, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
-                viewRoles.add(role);
-            }
-        });
-        return viewRoles;
+        return this.permissions.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("view") && e.getValue().get("view"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 }
