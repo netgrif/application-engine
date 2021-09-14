@@ -58,7 +58,6 @@ class DataServiceTest {
 
     private PetriNet net
 
-    // NAE-970
     @Test
     void testTaskrefedFileFieldAction() {
         def aCase = importHelper.createCase("Case", this.net)

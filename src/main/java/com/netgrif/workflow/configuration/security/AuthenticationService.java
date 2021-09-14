@@ -1,10 +1,10 @@
 package com.netgrif.workflow.configuration.security;
 
 
+import com.netgrif.workflow.configuration.security.interfaces.IAuthenticationService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
-import com.netgrif.workflow.configuration.security.interfaces.IAuthenticationService;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;

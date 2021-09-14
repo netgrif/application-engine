@@ -39,9 +39,14 @@ class DashboardServiceTest {
     String[] testData = ["dummy", "prod", "dev", "pre-prod", "helper"]
     int[] testDataInt = [15, 20, 32, 11, 7, 12]
 
+    @BeforeEach
+    void setup() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void dashboardIntegerTest() {
-        PetriNet net1 = helper.createNet("all_data.xml", "major").get()
+        PetriNet net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)
@@ -52,7 +57,7 @@ class DashboardServiceTest {
 
     @Test
     void dashboardStringTest() {
-        PetriNet net1 = helper.createNet("all_data.xml", "major").get()
+        PetriNet net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)
