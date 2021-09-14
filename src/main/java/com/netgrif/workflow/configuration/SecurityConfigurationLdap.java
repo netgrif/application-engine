@@ -3,7 +3,7 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.IUser;
-import com.netgrif.workflow.auth.domain.ldapUser.LdapUser;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -12,6 +12,7 @@ import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
+
 import com.netgrif.workflow.ldap.domain.LdapUserRef;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRefRepository;
 import com.netgrif.workflow.ldap.service.LdapUserService;

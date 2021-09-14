@@ -56,11 +56,6 @@ class ActionRefTest {
     private ProcessRoleRepository roleRepository
 
     @Autowired
-    private IPetriNetService petriNetService;
-    private TestHelper testHelper
-
-
-    @Autowired
     private TestHelper testHelper
 
     private def stream = { String name ->
