@@ -35,9 +35,6 @@ public class ProcessRoleService implements IProcessRoleService {
     @Autowired
     private IUserService userService;
 
-    /*@Autowired
-    private UserProcessRoleRepository roleRepository;*/
-
     @Autowired
     private ProcessRoleRepository processRoleRepository;
 

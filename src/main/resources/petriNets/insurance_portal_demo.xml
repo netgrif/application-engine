@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+        xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>insurance</id>
     <initials>IPD</initials>
     <title>Insurance Portal Demo</title>
