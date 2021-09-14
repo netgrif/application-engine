@@ -71,7 +71,7 @@ class CaseSearchTest {
 
         PetriNet net = getNet()
 
-        Case case1 = importHelper.createCase("Case1-Prdel", net)
+        Case case1 = importHelper.createCase("Case1-Milan", net)
         Case case2 = importHelper.createCase("Case2", net)
         Case case3 = importHelper.createCase("Case3", net)
 
@@ -100,7 +100,7 @@ class CaseSearchTest {
                 ],
                 "3": [
                         "type" : "text",
-                        "value": "Prdel"
+                        "value": "Milan"
                 ],
                 "4": [
                         "type" : "date",
@@ -141,7 +141,7 @@ class CaseSearchTest {
 
     @Test
     void searchByMoreValues() {
-        performSearch("Prdel", "Case1")
+        performSearch("Milan", "Case1")
     }
 
     @Test
@@ -156,15 +156,15 @@ class CaseSearchTest {
 
 
     void performSearch(String input, String expect = "", Boolean includeInput = true) {
-        String request = buildRequestBody("net", input)
-        mvc.perform(post("/api/workflow/case/search")
-                .contentType(MediaType.APPLICATION_JSON)
+        String request = buildRequestBody(input)
+        mvc.perform(post("/api/workflow/case/search_mongo")
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(request)
                 .with(httpBasic("super@netgrif.com", userPassword))
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(content().contentType("application/hal+json;charset=UTF-8"))
                 .andExpect(content().string(containsString("_links")))
                 .andExpect(content().string(containsString("cases")))
                 .andExpect(content().string(containsString(expect)))
@@ -172,13 +172,12 @@ class CaseSearchTest {
                 .andReturn()
     }
 
-    String buildRequestBody(String process, String fullText) {
+    String buildRequestBody(String fullText) {
         def map = [
-
-                "process" : [
-                        "identifier": process
+                (CaseSearchService.PETRINET): [
+                        (CaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
                 ],
-                "fullText": fullText
+                (CaseSearchService.FULLTEXT): fullText
         ]
 
         ObjectMapper mapper = new ObjectMapper()

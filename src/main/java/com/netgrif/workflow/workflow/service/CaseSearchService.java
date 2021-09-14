@@ -83,13 +83,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
+        BooleanBuilder constraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
+
         BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
         negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
 
-        BooleanBuilder userConstraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
-        userConstraints.orNot(negativeConstraints);
-
-        builder.and(userConstraints);
+        constraints.andNot(negativeConstraints);
+        builder.and(constraints);
 
         return builder;
     }
