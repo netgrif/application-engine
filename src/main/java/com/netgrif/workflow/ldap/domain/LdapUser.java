@@ -65,7 +65,6 @@ public class LdapUser extends User {
         this.setTelNumber(user.getTelNumber());
         this.setNextGroups(user.getNextGroups());
         this.setProcessRoles(user.getProcessRoles());
-        this.setProcessRoles(user.getProcessRoles());
         this.setState(user.getState());
     }
 }
