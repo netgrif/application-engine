@@ -24,6 +24,7 @@ pipeline {
                 script {
                     pom = readMavenPom()
                 }
+                echo "Netgrif"
                 echo pom.getName()
                 echo pom.getVersion()
                 echo pom.getDescription()
