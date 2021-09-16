@@ -94,7 +94,15 @@
                     match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
                     match.matches()
 
-                    change trimmed_origin_view_id value {origin_view_id.value.substring(0, match.start(1))}
+                    def trimmed_id;
+
+                    if (match.start(1) == -1) {
+                        trimmed_id = origin_view_id.value
+                    } else {
+                        trimmed_id = origin_view_id.value.substring(0, match.start(1))
+                    }
+
+                    change trimmed_origin_view_id value {trimmed_id}
                     make and_view, visible on t1 when {true}
                     make and_view, visible on t2 when {true}
                     make trimmed_origin_view_id, visible on t1 when {true}
