@@ -55,11 +55,11 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     }
 
 
-//    void configureFilters(HttpSecurity http) {
-//        if (sessionUtilsProperties.isEnabledFilter()) {
-//            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
-//        }
-//    }
+    void configureFilters(HttpSecurity http) {
+        if (sessionUtilsProperties.isEnabledFilter()) {
+            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
+        }
+    }
 
     abstract boolean isOpenRegistration();
 
