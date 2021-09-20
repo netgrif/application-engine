@@ -522,8 +522,8 @@
                     i18nName: f.i18n_filter_name;
 
                     change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
-                    useCase.setIcon(icon.value)
-                    useCase.setTitle(name.value)
+                    changeCaseProperty "icon" about { icon.value }
+                    changeCaseProperty "title" about { name.value }
                     workflowService.save(useCase)
                 </action>
             </actions>

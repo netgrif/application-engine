@@ -45,10 +45,10 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private IUserService userService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Override
     void run(String... args) throws Exception {
@@ -74,9 +74,9 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                 (GERMAN_ISO_3166_CODE): "Alle Aufgaben",
                 (SLOVAK_ISO_3166_CODE): "Všetky úlohy"
         ])
-        createTaskFilter("My tasks", "account_box", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
+        createTaskFilter("My tasks", "account_box", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", ["prva_siet"], [
                 "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
-                "searchCategories": ["task_assignee", "kokot_v_hube"]
+                "searchCategories": ["task_assignee"]
         ], [
                 (GERMAN_ISO_3166_CODE): "Meine Aufgaben",
                 (SLOVAK_ISO_3166_CODE): "Moje úlohy"
@@ -97,7 +97,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                         "((creationDateSortable:[1631138400000 TO 1631224800000}) OR (creationDateSortable:[1631138400000 TO 1631311200000})) AND " +
                         "((creationDateSortable:[1631184360000 TO 1631184420000}) OR (creationDateSortable:[1631184360000 TO 1631270820000})) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data) AND ((taskIds:1) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) AND " +
-                        "((author:<<me>>) OR (!(author:7))) AND (visualId:*asdad*) AND (stringId:*asdasd*))", ["prva_siet", "druha_siet"],
+                        "((author:<<me>>) OR (!(author:7))) AND (visualId:*asdad*) AND (stringId:*asdasd*))", ["all_data"],
                 ["predicateMetadata": [
                         [[
                              "category": "case_dataset",

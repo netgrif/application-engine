@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.filters.FilterMetadataExport;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
@@ -16,9 +17,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.workflow.domain.*;
-import com.netgrif.workflow.workflow.domain.filters.CustomFilterDeserializer;
-import com.netgrif.workflow.workflow.domain.filters.FilterImportExport;
-import com.netgrif.workflow.workflow.domain.filters.FilterImportExportList;
+import com.netgrif.workflow.workflow.domain.CustomFilterDeserializer;
+import com.netgrif.workflow.filters.FilterImportExport;
+import com.netgrif.workflow.filters.FilterImportExportList;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -41,9 +42,6 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String IMPORT_NET_IDENTIFIER = "import_filters";
 
     private static final String UPLOAD_FILE_FIELD = "upload_file";
-
-    private static final String DEFAULT_SEARCH_CATEGORIES = "defaultSearchCategories";
-    private static final String INHERIT_ALLOWED_NETS = "inheritAllowedNets";
 
     private static final String FILTER_TYPE_CASE = "Case";
     private static final String FILTER_TYPE_TASK = "Task";
@@ -93,9 +91,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         log.info("Exporting selected filters");
         List<Case> selectedFilterCases = this.workflowService.findAllById(Lists.newArrayList(filtersToExport));
         FilterImportExportList filterList = new FilterImportExportList();
-        selectedFilterCases.forEach(filter -> {
-            filterList.getFilters().add(createExportClass(filter));
-        });
+        selectedFilterCases.forEach(filter -> filterList.getFilters().add(createExportClass(filter)));
         return createXML(filterList);
     }
 
@@ -106,33 +102,33 @@ public class FilterImportExportService implements IFilterImportExportService {
 
         filterList.getFilters().forEach(filter -> {
             Optional<Case> filterCase = Optional.empty();
-//            if (filter.getType().equals(FILTER_TYPE_CASE)) {
-//                filterCase = defaultFiltersRunner.createCaseFilter(
-//                        filter.getFilterName().getDefaultValue(),
-//                        filter.getIcon(),
-//                        "",
-//                        filter.getVisibility(),
-//                        filter.getFilterValue(),
-//                        filter.getAllowedNets(),
-//                        filter.getFilterMetadata(),
-//                        filter.getFilterName().getTranslations(),
-//                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
-//                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
-//                );
-//            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
-//                filterCase = defaultFiltersRunner.createTaskFilter(
-//                        filter.getFilterName().getDefaultValue(),
-//                        filter.getIcon(),
-//                        "",
-//                        filter.getVisibility(),
-//                        filter.getFilterValue(),
-//                        filter.getAllowedNets(),
-//                        filter.getFilterMetadata(),
-//                        filter.getFilterName().getTranslations(),
-//                        (boolean) filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES),
-//                        (boolean) filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS)
-//                );
-//            }
+            if (filter.getType().equals(FILTER_TYPE_CASE)) {
+                filterCase = defaultFiltersRunner.createCaseFilter(
+                        filter.getFilterName().getDefaultValue(),
+                        filter.getIcon(),
+                        "",
+                        filter.getVisibility(),
+                        filter.getFilterValue(),
+                        filter.getAllowedNets() != null ? filter.getAllowedNets() : new ArrayList<>(),
+                        filter.getFilterMetadataExport().getMapObject(),
+                        filter.getFilterName().getTranslations(),
+                        filter.getFilterMetadataExport().getDefaultSearchCategories(),
+                        filter.getFilterMetadataExport().getInheritAllowedNets()
+                );
+            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
+                filterCase = defaultFiltersRunner.createTaskFilter(
+                        filter.getFilterName().getDefaultValue(),
+                        filter.getIcon(),
+                        "",
+                        filter.getVisibility(),
+                        filter.getFilterValue(),
+                        filter.getAllowedNets() != null ? filter.getAllowedNets() : new ArrayList<>(),
+                        filter.getFilterMetadataExport().getMapObject(),
+                        filter.getFilterName().getTranslations(),
+                        filter.getFilterMetadataExport().getDefaultSearchCategories(),
+                        filter.getFilterMetadataExport().getInheritAllowedNets()
+                );
+            }
 
             if (filterCase.isPresent()) {
                 Task importFilterTask = taskService.searchOne(QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION).and(QTask.task.caseId.eq(filterCase.get().getStringId())));
@@ -156,24 +152,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         String xml = inputStreamToString(new FileInputStream(f));
         SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
-        Object filterList = xmlMapper.readValue(xml, Object.class);
-
-//        Object filterList = xmlMapper.readValue(xml, Object.class);
-//        FilterImportExportList filterList = xmlMapper.readValue(xml, FilterImportExportList.class);
-
-//        filterList.getFilters().forEach(filter -> {
-////            Object defaultSearchCategories = filter.getFilterMetadata().get(DEFAULT_SEARCH_CATEGORIES);
-////            Object inheritAllowedNets = filter.getFilterMetadata().get(INHERIT_ALLOWED_NETS);
-////
-////            filter.getFilterMetadata().put(DEFAULT_SEARCH_CATEGORIES, defaultSearchCategories.equals("true"));
-////            filter.getFilterMetadata().put(INHERIT_ALLOWED_NETS, inheritAllowedNets.equals("true"));
-//
-//            if (filter.getAllowedNets() == null) {
-//                filter.setAllowedNets(new ArrayList<>());
-//            }
-//        });
-
-        return (FilterImportExportList) filterList;
+        return xmlMapper.readValue(xml, FilterImportExportList.class);
     }
 
     @Transactional
