@@ -14,7 +14,6 @@ import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
 
 import com.netgrif.workflow.ldap.domain.LdapUserRef;
-import com.netgrif.workflow.ldap.domain.repository.LdapUserRefRepository;
 import com.netgrif.workflow.ldap.service.LdapUserService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
@@ -86,9 +85,6 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
 
     @Autowired
     private ILdapUserRefService ldapUserRefService;
-
-    @Autowired
-    private LdapUserRefRepository ldapUserRefRepository;
 
     @Autowired
     private SecurityConfigProperties properties;

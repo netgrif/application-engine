@@ -28,7 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 class ActionRefTest {
 
-    public static final String NET_FILE = "src/test/resources/actionref_test.xml"
+//    public static final String NET_FILE = "src/test/resources/actionref_test.xml"
 
 
     @Autowired
