@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain.filters;
+package com.netgrif.workflow.workflow.domain;
 
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -21,6 +21,10 @@ public class CustomFilterDeserializer extends UntypedObjectDeserializer {
         return INSTANCE;
     }
 
+    public static String[] listValues = {"filter", "allowedNet", "searchCategory", "predicateMetadataItem", "predicate",
+            "stringValue", "integerValue", "booleanValue", "mapValue", "longValue"
+    };
+
     @Override
     @SuppressWarnings({ "unchecked"})
     protected Object mapObject(JsonParser parser, DeserializationContext context) throws IOException {
@@ -39,33 +43,22 @@ public class CustomFilterDeserializer extends UntypedObjectDeserializer {
         }
 
         Map<String, Object> valueByKey = new LinkedHashMap<>();
+        List<Object> objectList = new ArrayList<>();
         String nextKey = firstKey;
         do {
             parser.nextToken();
             Object nextValue = deserialize(parser, context);
 
-            if (valueByKey.containsKey(nextKey)) {
-                Object existingValue = valueByKey.get(nextKey);
-                if (existingValue instanceof List) {
-                    List<Object> values = (List<Object>) existingValue;
-                    values.add(nextValue);
-                } else {
-                    List<Object> values = new ArrayList<>();
-                    values.add(existingValue);
-                    values.add(nextValue);
-                    valueByKey.put(nextKey, values);
-                }
+            if (Arrays.asList(listValues).contains(nextKey)) {
+                objectList.add(nextValue);
             } else {
                 valueByKey.put(nextKey, nextValue);
             }
 
         } while ((nextKey = parser.nextFieldName()) != null);
 
-        if (valueByKey.entrySet().iterator().next().getValue() instanceof List) {
-            return valueByKey.entrySet().iterator().next().getValue();
-        }
-        return valueByKey;
 
+        return objectList.size() == 0 ? valueByKey : objectList;
     }
 
 }
