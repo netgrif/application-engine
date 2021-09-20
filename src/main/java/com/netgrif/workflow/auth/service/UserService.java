@@ -215,14 +215,9 @@ public class UserService extends AbstractUserService {
 
     @Override
     public List<IUser> findAllByIds(Set<String> ids, boolean small) {
-        return changeType(userRepository.findAllByIdIn(ids));
+        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
+        return changeType(users);
     }
-
-//    @Override
-//    public List<IUser> findAllByIds(Set<String> ids, boolean small) {
-//        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
-//        return changeType(users);
-//    }
 
     @Override
     public IUser getLoggedOrSystem() {
