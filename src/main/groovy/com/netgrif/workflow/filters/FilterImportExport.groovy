@@ -1,14 +1,9 @@
-package com.netgrif.workflow.workflow.domain.filters
+package com.netgrif.workflow.filters
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.netgrif.workflow.petrinet.domain.I18nString
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 class FilterImportExport {
     String title
     I18nString filterName
@@ -16,6 +11,8 @@ class FilterImportExport {
     String visibility
     String type
     String icon
+    @JacksonXmlElementWrapper(localName = "allowedNets")
+    @JacksonXmlProperty(localName = "allowedNet")
     List<String> allowedNets
     FilterMetadataExport filterMetadataExport
 
