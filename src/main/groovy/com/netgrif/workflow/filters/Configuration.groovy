@@ -1,12 +1,7 @@
-package com.netgrif.workflow.workflow.domain.filters
+package com.netgrif.workflow.filters
 
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
+import com.fasterxml.jackson.annotation.JsonIgnore
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 class Configuration {
     String operator
     String datafield
@@ -22,5 +17,15 @@ class Configuration {
                     break
             }
         })
+    }
+
+    @JsonIgnore
+    Map<String, Object> getMapObject() {
+        Map<String, Object> mapObject = new HashMap<>()
+        mapObject.put("operator", operator)
+        if (datafield != null) {
+            mapObject.put("datafield", datafield)
+        }
+        return mapObject
     }
 }
