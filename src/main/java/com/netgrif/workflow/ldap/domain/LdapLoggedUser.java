@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -44,7 +45,7 @@ public class LdapLoggedUser extends LoggedUser {
 
 
     public IUser transformToUser() {
-        LdapUser user = new LdapUser();
+        LdapUser user = new LdapUser(new ObjectId(this.id));
         user.setEmail(getUsername());
         String[] names = this.getFullName().split(" ");
         user.setName(names[0]);
