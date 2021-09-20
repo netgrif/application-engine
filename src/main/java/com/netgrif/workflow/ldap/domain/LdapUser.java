@@ -7,6 +7,8 @@ import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.HashSet;
+
 
 @Data
 @Document(collection = "user")
@@ -23,8 +25,10 @@ public class LdapUser extends User {
     public LdapUser() {
     }
 
-    public LdapUser(String id) {
-        this._id = new ObjectId(id);
+    public LdapUser(ObjectId id) {
+        this();
+        this._id = id;
+        nextGroups = new HashSet<>();
     }
 
     public LdapUser(String dn, String commonName, String uid, String homeDirectory,

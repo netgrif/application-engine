@@ -6,6 +6,7 @@ import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
@@ -39,7 +40,7 @@ public class LdapUserService extends UserService {
 
         LdapUser userFromLdap = ldapUserRepository.findByEmail(user.getEmail());
         if (userFromLdap == null && user.getStringId() != null) {
-            userFromLdap = new LdapUser(user.getStringId());
+            userFromLdap = new LdapUser(new ObjectId(user.getStringId()));
         } else if (userFromLdap == null) {
             userFromLdap = new LdapUser();
         }
