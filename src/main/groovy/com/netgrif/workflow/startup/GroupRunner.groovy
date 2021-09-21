@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,8 +50,7 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
             return new Optional<>(group)
         }
 
-        //TODO:  JOZIKE VERSION.MAJOR
-        Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, "major", systemCreator.loggedSystem)
+        Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)
 
         if (!groupNet.present) {
             log.error("Import of petri net for groups failed!")
