@@ -185,11 +185,6 @@ public class Task {
         return _id;
     }
 
-    @JsonIgnore
-    public String getId() {
-        return _id.toString();
-    }
-
     public String getStringId() {
         return _id.toString();
     }
