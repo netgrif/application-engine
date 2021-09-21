@@ -11,6 +11,11 @@
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
+	<data type="text" >
+		<id>menu_identifier</id>
+		<title name="menu_identifier">Identifier of menu of which is this menu item part of.</title>
+		<init>default</init>
+	</data>
 	<data type="enumeration" immediate="true">
 		<id>entry_name</id>
 		<title></title>
