@@ -8,23 +8,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "menuItems",
+        "menuList",
 })
 
-@XmlRootElement(name = "menu")
-public class Menu {
+@XmlRootElement(name = "menuList")
+public class MenuList {
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    @JacksonXmlProperty(localName = "menuItem")
-    protected List<MenuEntry> menuItems;
+    @JacksonXmlProperty(localName = "menu")
+    protected List<Menu> menuList;
 
-    @JacksonXmlProperty(isAttribute = true, localName = "name")
-    protected String menuIdentifier;
+    public MenuList () {
+        this.menuList = new ArrayList<>();
+        this.menuList.add(new Menu());
+    }
 }

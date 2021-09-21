@@ -159,18 +159,64 @@
 		<placeholder name="export_file_placeholder">Exported menu file</placeholder>
 		<desc name="export_file_desc">Download exported menu file in xml format</desc>
 	</data>
+	<data type="text">
+		<id>export_menu_id</id>
+		<title name="exported_menu_id">Exported menu identifier</title>
+		<desc name="exported_menu_id_desc">Create unique name for current menu configuration.</desc>
+	</data>
+	<data type="text">
+		<id>import_results</id>
+		<title name="import_results">Import results</title>
+		<values>area</values>
+	</data>
 	<data type="button">
 		<id>export_menu_btn</id>
 		<title></title>
 		<placeholder name="export_menu_btn_placeholder">Export menu</placeholder>
-		<desc name="export_menu_btn_desc">Export configured menu into xml file</desc>
+		<desc name="export_menu_btn_desc">Export configured menu into downloadable xml file</desc>
 		<action trigger="set">
 			export_file: f.export_menu_file,
+			menuIdentifier: f.export_menu_id,
 			groupId: f.group_id;
 
 <!--			List &lt;com.netgrif.workflow.workflow.domain.Case&gt; cases = findCases( { it.processIdentifier.eq("preference_filter_item") &amp;&amp; it.dataSet["parentId"].value.eq(new org.bson.types.ObjectId(groupId.value)) } ); -->
 			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change export_menu_file value { menuImportExport.exportMenu(cases) }
+			change export_file value { menuImportExport.exportMenu(cases, menuIdentifier.value, groupId.value, export_file) }
+		</action>
+		<component>
+			<name>raised</name>
+		</component>
+	</data>
+	<data type="file">
+		<id>import_menu_file</id>
+		<title>Import menu</title>
+		<placeholder name="import_file_placeholder">Menu file to import</placeholder>
+		<desc name="import_file_desc">Upload XML file containing menu here</desc>
+	</data>
+	<data type="button">
+		<id>import_menu_btn</id>
+		<title></title>
+		<placeholder name="import_menu_btn_placeholder">Import menu</placeholder>
+		<desc name="import_menu_btn_desc">Import menu from provided xml file</desc>
+		<action trigger="set">
+			import_file: f.import_menu_file,
+			menuItemsTaskRef: f.filter_tasks,
+			referencedFiltersList: f.referenced_filters,
+			groupId: f.group_id,
+			importResults: f.import_results;
+
+			change importResults value {return ""}
+
+			def cases = findCases({ it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			def newMenuItemIds = menuImportExport.importMenu(cases, import_file.value, useCase.stringId)
+
+			newMenuItemIds.forEach { itemId -&gt;
+				def idSplit = itemId.split(',')
+				change menuItemsTaskRef value {return menuItemsTaskRef.value + idSplit[0]}
+				change referencedFiltersList value {return referencedFiltersList.value + idSplit[1]}
+			}
+			<!--TODO opytat sa na to pridavanie kuba-->
+			<!--change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}-->
 		</action>
 		<component>
 			<name>raised</name>
@@ -289,7 +335,7 @@
 						assignTask(initTask)
 						setData(initTask, [
 								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
-								"parentId": ["type":"text", "value":useCase.stringId]
+								"parentId": ["type":"text", "value":useCase.stringId], "menu_identifier": ["type":"text", value:"defaultMenu"]
 						])
 						finishTask(initTask)
 
@@ -607,7 +653,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>export_menu_btn</id>
+				<id>export_menu_id</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -630,6 +676,66 @@
 					<x>1</x>
 					<y>1</y>
 					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>import_menu_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>import_menu_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>import_results</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>2</y>
+					<rows>2</rows>
 					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
