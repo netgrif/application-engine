@@ -61,8 +61,10 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         return net.getRoles().values().stream()
                 .filter(role -> (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
                 && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))
-                .map(o -> o.getImportId() + ":" + netImportId + "," + o.getName())
-                .collect(Collectors.toMap(o -> o.split(",")[0], v -> new I18nString(v.split(",")[1])));
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getImportId() + ":" + netImportId, new I18nString(role.getName())))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+//                .map(o -> o.getImportId() + ":" + netImportId + "," + o.getName())
+//                .collect(Collectors.toMap(o -> o.split(",")[0], v -> new I18nString(v.split(",")[1])));
     }
 
     @Override
