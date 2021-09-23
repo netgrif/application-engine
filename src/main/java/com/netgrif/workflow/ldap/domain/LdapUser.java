@@ -5,6 +5,8 @@ import com.netgrif.workflow.auth.domain.User;
 import lombok.Data;
 
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 
 @Data
