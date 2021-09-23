@@ -67,9 +67,6 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (requestQuery.containsKey(FULLTEXT)) {
             builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
         }
-        if (requestQuery.containsKey(ROLE)) {
-            builder.and(role(requestQuery.get(ROLE)));
-        }
         if (requestQuery.containsKey(DATA)) {
             builder.and(data(requestQuery.get(DATA)));
         }
@@ -84,7 +81,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        BooleanBuilder constraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
+
+        BooleanBuilder constraints = new BooleanBuilder(role(user.getProcessRoles()));
+        constraints.or(buildViewUsersQueryConstraint(user));
 
         BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
         negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
@@ -155,11 +154,8 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return null;
     }
 
-    public Predicate role(Object o) {
-        if (o instanceof ArrayList) {
-            return QCase.case$.enabledRoles.any().in((ArrayList<String>) o);
-        }
-        return null;
+    public Predicate role(Set<String> o) {
+            return QCase.case$.viewRoles.any().in(o);
     }
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {

@@ -185,7 +185,6 @@ public class ElasticCaseService implements IElasticCaseService {
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
-        buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query, user);
@@ -216,22 +215,25 @@ public class ElasticCaseService implements IElasticCaseService {
 
     private void buildUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder roleQuery = boolQuery();
+        BoolQueryBuilder viewRoleQuery = boolQuery();
         BoolQueryBuilder usersRoleQuery = boolQuery();
         BoolQueryBuilder usersExist = boolQuery();
         BoolQueryBuilder notExists = boolQuery();
 
-        notExists.mustNot(existsQuery("userRefs"));
-        notExists.mustNot(existsQuery("viewRoles"));
+        notExists.mustNot(existsQuery("viewUserRefs"));
+        notExists.must(existsQuery("viewRoles"));
 
-        usersExist.must(existsQuery("userRefs"));
+        usersExist.must(existsQuery("viewUserRefs"));
         usersExist.must(termQuery("users", user.getId()));
 
         usersRoleQuery.should(usersExist);
         usersRoleQuery.should(notExists);
 
         for (String roleId : user.getProcessRoles()) {
-            roleQuery.should(termQuery("viewRoles", roleId));
+            viewRoleQuery.should(termQuery("viewRoles", roleId));
         }
+        roleQuery.must(existsQuery("viewRoles"));
+        roleQuery.must(viewRoleQuery);
         usersRoleQuery.should(roleQuery);
 
         query.must(usersRoleQuery);
@@ -342,37 +344,6 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         query.filter(taskQuery);
-    }
-
-    /**
-     * Cases with active role "5cb07b6ff05be15f0b972c36"
-     * <pre>
-     * {
-     *     "role": "5cb07b6ff05be15f0b972c36"
-     * }
-     * </pre>
-     * <p>
-     * Cases with active role "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
-     * <pre>
-     * {
-     *     "role" [
-     *         "5cb07b6ff05be15f0b972c36",
-     *         "5cb07b6ff05be15f0b972c31"
-     *     ]
-     * }
-     * </pre>
-     */
-    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
-        if (request.role == null || request.role.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder roleQuery = boolQuery();
-        for (String roleId : request.role) {
-            roleQuery.should(termQuery("enabledRoles", roleId));
-        }
-
-        query.filter(roleQuery);
     }
 
     /**
