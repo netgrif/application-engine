@@ -172,6 +172,7 @@ public class Importer {
 
         setMetaData();
         net.setIcon(document.getIcon());
+        net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
 
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
