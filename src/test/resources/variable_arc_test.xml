@@ -28,6 +28,11 @@
         <title>inhib_var</title>
         <init>2</init>
     </data>
+	<data type="number">
+		<id>5000</id>
+		<title>regular_var_old</title>
+		<init>2</init>
+	</data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
     <transition>
@@ -139,22 +144,22 @@
         <label>read_place_ref</label>
     </transition>
 	<transition>
-		<id>var_arc_out</id>
+		<id>out_var_arc</id>
 		<x>186</x>
 		<y>853</y>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>var_arc_out</label>
+		<label>out_var_arc</label>
 	</transition>
 	<transition>
-		<id>place_ref_arc_out</id>
+		<id>out_place_ref_arc</id>
 		<x>182</x>
 		<y>939</y>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>place_ref_arc_out</label>
+		<label>out_place_ref_arc</label>
 	</transition>
 	<transition>
 		<id>add_tokens</id>
@@ -173,6 +178,33 @@
 			<offset>0</offset>
 		</layout>
 		<label>remove_tokens</label>
+	</transition>
+	<transition>
+		<id>regular_var_old</id>
+		<x>836</x>
+		<y>571</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>regular_var_old</label>
+	</transition>
+	<transition>
+		<id>regular_place_ref_old</id>
+		<x>844</x>
+		<y>692</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>regular_place_ref_old</label>
+	</transition>
+	<transition>
+		<id>out_var_arc_old</id>
+		<x>171</x>
+		<y>1057</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>out_var_arc_old</label>
 	</transition>
     <!-- PLACES -->
     <place>
@@ -256,10 +288,10 @@
         <static>false</static>
     </place>
     <place>
-        <id>p9</id>
+        <id>1500</id>
         <x>820</x>
         <y>100</y>
-        <label></label>
+		<label>1500</label>
         <tokens>2</tokens>
         <static>false</static>
     </place>
@@ -376,21 +408,61 @@
 		<static>false</static>
 	</place>
 	<place>
-		<id>var_arc_out_end</id>
+		<id>out_var_arc_res</id>
 		<x>460</x>
 		<y>849</y>
-		<label>var_arc_out_end</label>
+		<label>out_var_arc_res</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<place>
-		<id>place_ref_arc_out_end</id>
+		<id>out_place_ref_arc_res</id>
 		<x>456</x>
 		<y>941</y>
-		<label>place_ref_arc_out_end</label>
+		<label>out_place_ref_arc_res</label>
         <tokens>0</tokens>
         <static>false</static>
     </place>
+	<place>
+		<id>regular_var_old_start</id>
+		<x>681</x>
+		<y>572</y>
+		<label>regular_var_old_start</label>
+		<tokens>2</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>regular_var_old_res</id>
+		<x>1005</x>
+		<y>569</y>
+		<label>regular_var_old_res</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>regular_place_ref_old_start</id>
+		<x>680</x>
+		<y>694</y>
+		<label>regular_place_ref_old_start</label>
+		<tokens>2</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>regular_place_ref_old_res</id>
+		<x>1000</x>
+		<y>691</y>
+		<label>regular_place_ref_old_res</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>out_var_arc_old_res</id>
+		<x>451</x>
+		<y>1065</y>
+		<label>out_var_arc_old_res</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
     <!-- ARCS -->
     <arc>
         <id>a1</id>
@@ -413,7 +485,7 @@
         <sourceId>regular_place_ref_start</sourceId>
         <destinationId>regular_place_ref</destinationId>
         <multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a4</id>
@@ -457,7 +529,7 @@
         <sourceId>reset_place_ref_start</sourceId>
         <destinationId>reset_place_ref</destinationId>
 		<multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a10</id>
@@ -501,7 +573,7 @@
         <sourceId>inhib_place_ref_start</sourceId>
         <destinationId>inhib_place_ref</destinationId>
         <multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a16</id>
@@ -524,7 +596,7 @@
         <sourceId>read_place_ref_start</sourceId>
         <destinationId>read_place_ref</destinationId>
         <multiplicity>2</multiplicity>
-        <reference>p9</reference>
+        <reference>1500</reference>
     </arc>
     <arc>
         <id>a19</id>
@@ -571,31 +643,66 @@
 	<arc>
 		<id>a25</id>
 		<type>regular</type>
-		<sourceId>var_arc_out</sourceId>
-		<destinationId>var_arc_out_end</destinationId>
+		<sourceId>out_var_arc</sourceId>
+		<destinationId>out_var_arc_res</destinationId>
 		<multiplicity>2</multiplicity>
 		<reference>regular_var</reference>
 	</arc>
 	<arc>
 		<id>a26</id>
 		<type>regular</type>
-		<sourceId>place_ref_arc_out</sourceId>
-		<destinationId>place_ref_arc_out_end</destinationId>
+		<sourceId>out_place_ref_arc</sourceId>
+		<destinationId>out_place_ref_arc_res</destinationId>
 		<multiplicity>2</multiplicity>
-		<reference>p9</reference>
+		<reference>1500</reference>
 	</arc>
 	<arc>
 		<id>a27</id>
 		<type>regular</type>
 		<sourceId>add_tokens</sourceId>
-		<destinationId>p9</destinationId>
+		<destinationId>1500</destinationId>
 		<multiplicity>800</multiplicity>
 	</arc>
 	<arc>
 		<id>a28</id>
 		<type>regular</type>
-		<sourceId>p9</sourceId>
+		<sourceId>1500</sourceId>
 		<destinationId>remove_tokens</destinationId>
 		<multiplicity>800</multiplicity>
+	</arc>
+	<arc>
+		<id>a29</id>
+		<type>variable</type>
+		<sourceId>regular_var_old_start</sourceId>
+		<destinationId>regular_var_old</destinationId>
+		<multiplicity>5000</multiplicity>
+	</arc>
+	<arc>
+		<id>a30</id>
+		<type>regular</type>
+		<sourceId>regular_var_old</sourceId>
+		<destinationId>regular_var_old_res</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a31</id>
+		<type>variable</type>
+		<sourceId>regular_place_ref_old_start</sourceId>
+		<destinationId>regular_place_ref_old</destinationId>
+		<multiplicity>1500</multiplicity>
+	</arc>
+	<arc>
+		<id>a32</id>
+		<type>regular</type>
+		<sourceId>regular_place_ref_old</sourceId>
+		<destinationId>regular_place_ref_old_res</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a33</id>
+		<type>variable</type>
+		<sourceId>out_var_arc_old</sourceId>
+		<destinationId>out_var_arc_old_res</destinationId>
+		<multiplicity>5000</multiplicity>
     </arc>
 </document>
