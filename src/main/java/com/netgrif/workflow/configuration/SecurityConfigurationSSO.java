@@ -89,7 +89,7 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOrigin("*");
+        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

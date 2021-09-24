@@ -1,5 +1,13 @@
 package com.netgrif.workflow.insurance.mvc
 
+import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.ProcessRoleService
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
@@ -23,6 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.hateoas.MediaTypes
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
@@ -57,9 +67,9 @@ class InsuranceTest {
 
     private static final String CASE_CREATE_URL = "/api/workflow/case"
     private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
-    private static final def TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" }
-    private static final def TASK_FINISH_URL = { id -> "/api/task/finish/$id" }
-    private static final def TASK_DATA_URL = { id -> "/api/task/$id/data" }
+    private static final Closure<String> TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" as String }
+    private static final Closure<String> TASK_FINISH_URL = { id -> "/api/task/finish/$id" as String }
+    private static final Closure<String> TASK_DATA_URL = { String id -> "/api/task/$id/data" as String }
 
     private static final String TASK_COVER_TYPE = "Nehnuteľnosť a domácnosť"
     private static final String TASK_BASIC_INFO = "Základné informácie"
@@ -104,8 +114,20 @@ class InsuranceTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private IProcessRoleService processRoleService
+
+    @Autowired
+    private IUserService userService
+
+    @Autowired
+    private TestHelper testHelper
+
+
     @BeforeEach
     void before() {
+        testHelper.truncateDbs()
+
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
@@ -117,11 +139,12 @@ class InsuranceTest {
         netId = net.get().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+//        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-//                [org] as Group[],
-                [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
+                [auths.get("user"), auths.get("admin")] as Authority[],
+                [] as ProcessRole[])
+        List<ProcessRole> roles = processRoleService.findAll(netId)
+        processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll {it.importId in ["1", "2"]}.collect{it.stringId} as Set,userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
@@ -228,9 +251,9 @@ class InsuranceTest {
                 color: "color"
         ])
         def result = mvc.perform(post(CASE_CREATE_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -243,13 +266,15 @@ class InsuranceTest {
 
     def searchTasks(String title, int expected) {
         def content = JsonOutput.toJson([
-                case: caseId
+                case: [
+                        id: caseId
+                ]
         ])
         def result = mvc.perform(post(TASK_SEARCH_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -262,7 +287,7 @@ class InsuranceTest {
 
     def assignTask() {
         mvc.perform(get(TASK_ASSIGN_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
@@ -274,7 +299,7 @@ class InsuranceTest {
 
     def finishTask() {
         mvc.perform(get(TASK_FINISH_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
@@ -285,7 +310,7 @@ class InsuranceTest {
 
     def getData() {
         mvc.perform(get(TASK_DATA_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
@@ -296,10 +321,10 @@ class InsuranceTest {
     def setData(Map data) {
         def content = JsonOutput.toJson(data)
         def result = mvc.perform(post(TASK_DATA_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())

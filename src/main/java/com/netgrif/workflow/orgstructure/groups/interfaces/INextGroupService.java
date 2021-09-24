@@ -8,9 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.*;
 
-@ConditionalOnProperty(value = "nae.group.default.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
 public interface INextGroupService {
 
     Case createDefaultSystemGroup(IUser author);

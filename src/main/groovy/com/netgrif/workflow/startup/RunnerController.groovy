@@ -13,14 +13,17 @@ class RunnerController {
             DefaultRoleRunner,
             AuthorityRunner,
             SystemUserRunner,
+            FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,
+            DefaultFiltersRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
             DemoRunner,
             QuartzSchedulerRunner,
+            PdfRunner,
             FinisherRunner
     ]
 

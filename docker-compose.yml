@@ -1,50 +1,8 @@
 version: "3.3"
 
 services:
-#  front:
-#    image: demo:4.3.0
-#    ports:
-#    - 80:80
-#    depends_on:
-#      - engine
-
-#  engine:
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
-#    image: engine:4.3.0
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - docker-mysql
-#      - docker-mongo
-#      - docker-neo4j
-#      - docker-elastic
-#      - docker-redis
-#
-#  docker-mysql:
-#    image: mysql:5.7
-#    healthcheck:
-#      test: "/usr/bin/mysql -u root -psecret -e \"show databases;\""
-#    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
-#    ports:
-#      - 3306:3306
-#    environment:
-#      MYSQL_ROOT_PASSWORD: secret
-#      MYSQL_DATABASE: nae_dev
-#      MYSQL_USER: netgrif_nae
-#      MYSQL_PASSWORD: netgrif_nae
-#  docker-neo4j:
-#    image: neo4j:3.5
-#    ports:
-#      - 7474:7474
-#      - 7687:7687
-#    environment:
-#      NEO4J_AUTH: none
-
-
   docker-mongo:
-    image: mongo:4.2
+    image: mongo:4.4
     ports:
     - 27017:27017
 #      environment:
@@ -56,6 +14,8 @@ services:
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
     ports:
       - 9200:9200
       - 9300:9300

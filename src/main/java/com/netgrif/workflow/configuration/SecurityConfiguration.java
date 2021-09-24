@@ -42,7 +42,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnExpression("!${nae.oauth.enabled} && !${server.security.static.enabled}")
+@ConditionalOnExpression("!${nae.oauth.enabled} && !${server.security.static.enabled} && !${nae.ldap.enabled}")
 public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -97,23 +97,23 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         log.info("Configuration with frontend separated");
 //        @formatter:off
         http
-                .httpBasic()
+            .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+            .and()
                 .cors()
                 .and()
-                .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
-                .authorizeRequests()
+            .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+            .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .logout()
+            .and()
+            .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-                .and()
-                .headers()
+            .and()
+            .headers()
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
