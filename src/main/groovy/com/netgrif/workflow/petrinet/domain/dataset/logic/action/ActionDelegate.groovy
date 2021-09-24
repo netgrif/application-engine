@@ -276,7 +276,6 @@ class ActionDelegate {
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("allowedNets", field.allowedNets)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.setCaseId(useCase.stringId)
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
 //        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
@@ -385,9 +384,7 @@ class ActionDelegate {
              if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
-             if (values.every {
-                 return it instanceof I18nString
-             }) {
+             if (values.every { it instanceof I18nString }) {
                  field.setChoices(values as Set<I18nString>)
              } else {
                  field.setChoicesFromStrings(values as Set<String>)
@@ -629,7 +626,6 @@ class ActionDelegate {
         String taskId = getTaskId(transitionId, aCase)
         FinishTaskEventOutcome outcome = taskService.finishTask(user.transformToLoggedUser(), taskId)
         this.outcomes.add(outcome)
-
     }
 
     void finishTask(Task task, User user = userService.loggedOrSystem) {
