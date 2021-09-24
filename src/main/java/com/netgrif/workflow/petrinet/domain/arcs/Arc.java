@@ -4,6 +4,7 @@ import com.netgrif.workflow.petrinet.domain.Node;
 import com.netgrif.workflow.petrinet.domain.PetriNetObject;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -28,6 +29,10 @@ public class Arc extends PetriNetObject {
     @Getter
     @Setter
     protected Integer multiplicity;
+
+    @Getter
+    @Setter
+    protected Reference reference;
 
     public Arc() {
         this.setObjectId(new ObjectId());
@@ -74,10 +79,16 @@ public class Arc extends PetriNetObject {
     public boolean isExecutable() {
         if (source instanceof Transition)
             return true;
+        if (this.reference != null){
+            this.multiplicity = this.reference.getMultiplicity();
+        }
         return ((Place) source).getTokens() >= multiplicity;
     }
 
     public void execute() {
+        if (reference != null) {
+            multiplicity = reference.getMultiplicity();
+        }
         if (source instanceof Transition) {
             ((Place) destination).addTokens(multiplicity);
         } else {
@@ -85,8 +96,14 @@ public class Arc extends PetriNetObject {
         }
     }
 
-    public void rollbackExecution() {
-        ((Place) source).addTokens(multiplicity);
+    public void rollbackExecution(Integer tokensConsumed) {
+        if (tokensConsumed == null && this.reference != null) {
+            throw new IllegalArgumentException("Cannot rollback variable arc, because it was never executed");
+        }
+        if (this.reference == null) {
+            tokensConsumed = multiplicity;
+        }
+        ((Place) source).addTokens(tokensConsumed);
     }
 
     @SuppressWarnings("Duplicates")
@@ -97,6 +114,7 @@ public class Arc extends PetriNetObject {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
+        clone.setReference(this.reference);
         return clone;
     }
 }

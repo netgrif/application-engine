@@ -163,7 +163,7 @@ public class TaskController extends AbstractTaskController {
 
     @Override
     @ApiOperation(value = "Count tasks by provided criteria", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/count", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
         return super.count(query, operation, auth, locale);
     }
@@ -179,7 +179,7 @@ public class TaskController extends AbstractTaskController {
     @ApiOperation(value = "Set task data",
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
