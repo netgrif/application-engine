@@ -16,19 +16,25 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IEventService;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Slf4j
+@Lazy
 @Service
 public class EventService implements IEventService {
 
     private final FieldActionsRunner actionsRunner;
 
-    public EventService(FieldActionsRunner actionsRunner) {
+    private final IWorkflowService workflowService;
+
+    public EventService(FieldActionsRunner actionsRunner, IWorkflowService workflowService) {
         this.actionsRunner = actionsRunner;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -41,11 +47,30 @@ public class EventService implements IEventService {
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task);
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
                         runEventActionsOnChanged(task.orElse(null), (SetDataEventOutcome) outcome, DataEventType.SET);
+                    });
+            allOutcomes.addAll(outcomes);
+        });
+        if (useCase != null) {
+            workflowService.save(useCase);
+        }
+        return allOutcomes;
+    }
+
+    @Override
+    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
+        List<EventOutcome> allOutcomes = new ArrayList<>();
+        actions.forEach(action -> {
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase.getPetriNet().getFunctions());
+//            todo samo fix pre všetky typy outcomov?
+            outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
+                    .forEach(outcome -> {
+                        if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
+                        runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
                     });
             allOutcomes.addAll(outcomes);
         });
@@ -67,22 +92,6 @@ public class EventService implements IEventService {
         if (fieldActions.isEmpty()) return Collections.emptyList();
 
         return runEventActions(useCase, task, fieldActions, actionTrigger);
-    }
-
-    @Override
-    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
-        List<EventOutcome> allOutcomes = new ArrayList<>();
-        actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase.getPetriNet().getFunctions());
-//            todo samo fix pre všetky typy outcomov?
-            outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
-                    .forEach(outcome -> {
-                        if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
-                        runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
-                    });
-            allOutcomes.addAll(outcomes);
-        });
-        return allOutcomes;
     }
 
     @Override
@@ -197,3 +206,4 @@ public class EventService implements IEventService {
     }
 
 }
+

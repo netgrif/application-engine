@@ -1,13 +1,11 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes;
 
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CaseEventOutcome;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 

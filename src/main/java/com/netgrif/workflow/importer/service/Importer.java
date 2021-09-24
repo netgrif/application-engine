@@ -18,7 +18,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.DataEvent;
 import com.netgrif.workflow.petrinet.domain.events.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
