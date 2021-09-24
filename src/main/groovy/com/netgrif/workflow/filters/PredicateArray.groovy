@@ -5,7 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 
 class PredicateArray {
-    @JacksonXmlElementWrapper(localName = "predicates")
+    @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "predicate")
     List<Predicate> predicates
 
