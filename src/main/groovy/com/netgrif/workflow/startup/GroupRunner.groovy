@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
+@ConditionalOnProperty(value = "nae.group.default.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 @Component
 @Slf4j
 public class GroupRunner extends AbstractOrderedCommandLineRunner {
