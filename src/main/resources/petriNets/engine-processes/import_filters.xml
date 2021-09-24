@@ -117,15 +117,27 @@
                 </layout>
             </dataRef>
         </dataGroup>
-        <event type="assign">
+        <event type="finish">
             <id></id>
-            <actions phase="post">
+            <actions phase="pre">
                 <action>
-                    importedFilters: f.imported_filters,
-                    importFile: f.import_file;
+                    importedFilters: f.imported_filters;
 
+                    taskService.finishTasks(taskService.findAllById(importedFilters.value), userService.getLoggedUser())
                     change importedFilters value { null }
-                    change importFile value { null }
+                </action>
+            </actions>
+        </event>
+        <event type="cancel">
+            <id></id>
+            <actions phase="pre">
+                <action>
+                    importedFilters: f.imported_filters;
+
+                    taskService.findAllById(importedFilters.value).forEach({filterTask ->
+                        workflowService.deleteCase(filterTask.caseId)
+                    })
+                    change importedFilters value { null }
                 </action>
             </actions>
         </event>
