@@ -16,7 +16,7 @@ public class LdapUserDetailsService extends UserDetailsServiceImpl {
         } else if (user.getState() != UserState.ACTIVE) {
             throw new UsernameNotFoundException("User with login "+email+" cannot be logged in!");
         } else if (user instanceof LdapUser) {
-            throw new UsernameNotFoundException("User " + email + " is an LDAP user");
+            throw new UsernameNotFoundException("Ldap has not verified the user " + email + "!");
         }
 
         return user.transformToLoggedUser();
