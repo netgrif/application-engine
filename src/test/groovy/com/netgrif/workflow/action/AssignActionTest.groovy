@@ -1,5 +1,6 @@
 package com.netgrif.workflow.action
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 
@@ -21,12 +22,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
@@ -41,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class AssignActionTest {
 
+    private static final String GROUP_NAME = "Test group"
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
 
@@ -69,9 +75,9 @@ class AssignActionTest {
 
     @Autowired
     private SuperCreator superCreator
-//
-//    @Autowired
-//    private TestHelper testHelper
+
+    @Autowired
+    private TestHelper testHelper
 
     private MockMvc mvc
     private PetriNet mainNet
@@ -93,7 +99,7 @@ class AssignActionTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                [auths.get("user"), auths.get("admin")] as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
     }
@@ -108,6 +114,7 @@ class AssignActionTest {
         this.mainNet = mainNet.get()
         this.secondaryNet = secondaryNet.get()
     }
+
 
     private void cleanDatabases() {
         template.db.drop()
@@ -124,15 +131,16 @@ class AssignActionTest {
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
 
         def content = JsonOutput.toJson([roleIdInMainNet])
-        String userId = Integer.toString(user._id as Integer)
+        String userId = user.getStringId()
 
-        mvc.perform(post(ROLE_API.replace("{}", userId))
-                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
+        def result = mvc.perform(MockMvcRequestBuilders.post(ROLE_API.replace("{}", userId))
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf().asHeader())
-                .with(authentication(this.authentication)))
-                .andExpect(status().isOk())
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
+                .with(SecurityMockMvcRequestPostProcessors.authentication(this.authentication)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
 
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()

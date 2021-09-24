@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.petrinet.domain.DataGroup
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
@@ -39,8 +40,15 @@ class DataServiceTest {
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private TestHelper testHelper
+
+
     @BeforeEach
     void beforeAll() {
+        testHelper.truncateDbs()
+
+
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
         net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
@@ -50,7 +58,6 @@ class DataServiceTest {
 
     private PetriNet net
 
-    // NAE-970
     @Test
     void testTaskrefedFileFieldAction() {
         def aCase = importHelper.createCase("Case", this.net)
@@ -62,7 +69,7 @@ class DataServiceTest {
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
 
         List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH)
-        assert datagroups.stream().filter({ it -> it.fields.size() > 0 }).count() == 3
+        assert datagroups.stream().filter({it -> it.fields.size() > 0}).count() == 3
         LocalisedField fileField = findField(datagroups, FILE_FIELD_TITLE)
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
