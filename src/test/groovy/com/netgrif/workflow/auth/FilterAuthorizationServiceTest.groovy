@@ -3,8 +3,8 @@ package com.netgrif.workflow.auth
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.web.responsebodies.ProcessRole
 import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.FilterRepository
@@ -53,6 +53,7 @@ class FilterAuthorizationServiceTest {
 
     @Autowired
     private FilterRepository filterRepository
+
 
     @Autowired
     private TestHelper testHelper

@@ -161,9 +161,6 @@ class OAuthUserServiceTest {
         IRemoteUserResourceService remoteUserResourceService() {
             return new IRemoteUserResourceService() {
                 LinkedList<RemoteUserResource> users = [
-                        new TestUser("bezak@netgrif.com", "1", "bezak@netgrif.com", "Timotej", "Bezak"),
-                        new TestUser("bubeliny@netgrif.com", "2", "bubeliny@netgrif.com", "Matus", "Bubeliny"),
-                        new TestUser("luksic@netgrif.com", "3", "luksic@netgrif.com", "Dominik", "Luksic"),
                         new TestUser("system-user", "4", "super@netgrif.com", "Admin", "Netgrif"),
                 ]
 

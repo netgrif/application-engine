@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>5.5.2</version>
+    <version>6.0.0</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -28,7 +28,7 @@
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.3.1</querydsl.version>
         <drools.version>7.55.0.Final</drools.version>
-        <!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+<!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>netgrif_nae-backend</sonar.projectKey>
@@ -187,6 +187,18 @@
             <!-- NEVER EVER CHANGE THIS VERSION TO 2.0.7 -->
             <version>2.0.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-all</artifactId>
+            <version>1.13</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>de.rototor.pdfbox</groupId>
+            <artifactId>graphics2d</artifactId>
+            <version>0.32</version>
+        </dependency>
+
 
         <!-- Jsoup -->
         <dependency>
@@ -326,6 +338,24 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- LDAP -->
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-ldap</artifactId>
         </dependency>
 
         <!-- Quartz -->

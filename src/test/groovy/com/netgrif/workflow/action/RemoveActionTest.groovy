@@ -1,5 +1,6 @@
 package com.netgrif.workflow.action
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 
@@ -14,8 +15,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 
-//import com.netgrif.workflow.orgstructure.domain.Group
-
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import org.junit.Assert
@@ -25,19 +24,27 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.result.ContentResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.RequestResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
+import static org.hamcrest.core.StringContains.containsString
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ExtendWith(SpringExtension.class)
@@ -75,13 +82,16 @@ class RemoveActionTest {
     @Autowired
     private SuperCreator superCreator;
 
+    @Autowired
+    private TestHelper testHelper
+
     private MockMvc mvc
     private PetriNet petriNet
     private Authentication authentication
 
     @BeforeEach
     void before() {
-        cleanDatabases()
+        testHelper.truncateDbs()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
@@ -109,41 +119,43 @@ class RemoveActionTest {
     @Test
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        authentication = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSWORD)
+        authentication = new UsernamePasswordAuthenticationToken("super@netgrif.com", "NAEnetgrif15Awesome")
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
         //Has no role, we assign role admin
         def content = JsonOutput.toJson([adminRoleId])
-        String userId = Integer.toString(user._id as Integer)
+        String userId = user.getStringId()
 
         mvc.perform(post(ROLE_API.replace("{}", userId))
-                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.authentication)))
                 .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
         String managerRoleId = processRoleRepository.findByName_DefaultValue("manager").stringId
-
-        assert roles.find {it.stringId == adminRoleId}
-        assert roles.find {it.stringId == managerRoleId}
+        //TODO: JOZIKE it.stringId
+        assert roles.find { it.roleId == adminRoleId }
+        assert roles.find { it.roleId == managerRoleId }
 
         //On frontend user had two roles admin and manage, and admin was removed, so now to the backend
         //only manager role came, and as part of admin action, this one should get removed inside action
         content = JsonOutput.toJson([managerRoleId])
 
         mvc.perform(post(ROLE_API.replace("{}", userId))
-                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.authentication)))
                 .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
         updatedUser = userRepository.findByEmail(USER_EMAIL)
         roles = updatedUser.getUserProcessRoles()

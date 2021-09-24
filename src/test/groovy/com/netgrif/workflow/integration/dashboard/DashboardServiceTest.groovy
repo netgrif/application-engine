@@ -46,7 +46,7 @@ class DashboardServiceTest {
 
     @Test
     void dashboardIntegerTest() {
-        PetriNet net1 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).get()
+        PetriNet net1 = helper.createNet("all_data.xml", VersionType.MAJOR).get()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)

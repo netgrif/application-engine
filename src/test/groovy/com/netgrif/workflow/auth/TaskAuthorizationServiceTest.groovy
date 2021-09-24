@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
@@ -81,26 +82,23 @@ class TaskAuthorizationServiceTest {
                 .build()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["role": "role"], this.net)
+//        def processRoles = importHelper.getProcessRoles(this.net)
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-//                [] as Group[],
-                [processRoles.get("role")] as ProcessRole[])
+                ["Role"] as ProcessRole[])
 
         userId = user._id
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-//                [] as Group[],
                 [] as ProcessRole[])
 
         userWithoutRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITHOUT_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
-//                [] as Group[],
                 [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_USER_EMAIL, "password")
@@ -162,17 +160,17 @@ class TaskAuthorizationServiceTest {
     void testDelegateAuthorization() {
         mvc.perform(post(DELEGATE_TASK_URL + taskId)
                 .content(userId.toString())
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(this.userWithoutRoleAuth)))
                 .andExpect(status().isForbidden())
         mvc.perform(post(DELEGATE_TASK_URL + taskId)
                 .content(userId.toString())
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
         mvc.perform(post(DELEGATE_TASK_URL + taskId2)
                 .content(userId.toString())
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .with(authentication(this.adminAuth)))
                 .andExpect(status().isOk())
     }
