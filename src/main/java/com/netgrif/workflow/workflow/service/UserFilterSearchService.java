@@ -29,7 +29,12 @@ public class UserFilterSearchService implements IUserFilterSearchService {
         Page<Case> page = this.caseSearchService.search(Collections.singletonList(
                 CaseSearchRequest.builder()
                         .process(Collections.singletonList(new CaseSearchRequest.PetriNet(FilterRunner.FILTER_PETRI_NET_IDENTIFIER)))
-                        .query(String.format("title:%s*", userInput))
+                        .query(
+                                String.format("(title:%s*) AND ((dataSet.visibility.keyValue:private AND authorEmail.keyword:%s) OR (dataSet.visibility.keyValue:public))",
+                                userInput,
+                                userService.getLoggedUser().getEmail())
+                        )
+                        .transition(Collections.singletonList("view_filter"))
                         .build()
                 ),
                 this.userService.getLoggedOrSystem().transformToLoggedUser(),

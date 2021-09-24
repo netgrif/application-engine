@@ -14,6 +14,7 @@ class FilterImportExport {
     @JacksonXmlElementWrapper(localName = "allowedNets")
     @JacksonXmlProperty(localName = "allowedNet")
     List<String> allowedNets
+    @JacksonXmlProperty(localName = "filterMetadata")
     FilterMetadataExport filterMetadataExport
 
     void setFilterMetadataExport(Map<String, Object> value) {

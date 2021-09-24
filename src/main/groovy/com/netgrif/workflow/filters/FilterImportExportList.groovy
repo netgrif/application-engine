@@ -4,10 +4,10 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 
-@JacksonXmlRootElement(localName = "filterList")
+@JacksonXmlRootElement(localName = "filters")
 class FilterImportExportList {
 
-    @JacksonXmlElementWrapper(localName = "filters")
+    @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "filter")
     List<FilterImportExport> filters
 
