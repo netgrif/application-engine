@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1.0">
+    <!-- ===== FILTERS ===== -->
+    <xs:element name="filters">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="filter">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="title"/>
+                <xs:element ref="filterName" minOccurs="0"/>
+                <xs:element ref="filterValue" minOccurs="0"/>
+                <xs:element ref="visibility"/>
+                <xs:element ref="type"/>
+                <xs:element ref="icon"/>
+                <xs:element ref="allowedNets" minOccurs="0"/>
+                <xs:element ref="filterMetadata"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="title" type="xs:string"/>
+    <xs:element name="filterName">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="defaultValue" minOccurs="0"/>
+                <xs:element ref="translations" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="defaultValue" type="xs:string"/>
+    <xs:element name="translations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="filterValue" type="xs:string"/>
+    <xs:element name="visibility">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="public|private"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="type">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="Case|Task"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="icon" type="xs:string"/>
+    <xs:element name="filterMetadata">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="filterType"/>
+                <xs:element ref="defaultSearchCategories"/>
+                <xs:element ref="inheritAllowedNets"/>
+                <xs:element ref="searchCategories" minOccurs="0"/>
+                <xs:element ref="predicateMetadata" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="filterType">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="Case|Task"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="defaultSearchCategories" type="xs:boolean"/>
+    <xs:element name="inheritAllowedNets" type="xs:boolean"/>
+    <xs:element name="searchCategories">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="searchCategory" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="searchCategory" type="xs:string"/>
+    <xs:element name="predicateMetadata">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="predicateMetadataItem" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="predicateMetadataItem">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="predicate" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="predicate">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="category"/>
+                <xs:element ref="configuration"/>
+                <xs:choice>
+                    <xs:element ref="stringValues"/>
+                    <xs:element ref="integerValues"/>
+                    <xs:element ref="booleanValues"/>
+                    <xs:element ref="mapValues"/>
+                    <xs:element ref="longValues"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="category" type="xs:string"/>
+    <xs:element name="configuration">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="operator"/>
+                <xs:element ref="datafield" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="operator" type="xs:string"/>
+    <xs:element name="datafield" type="xs:string"/>
+    <xs:element name="stringValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="stringValue" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="stringValue" type="xs:string"/>
+    <xs:element name="integerValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="integerValue" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="integerValue" type="xs:integer"/>
+    <xs:element name="booleanValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="booleanValue" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="booleanValue" type="xs:boolean"/>
+    <xs:element name="mapValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="mapValue" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="mapValue">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="text"/>
+                <xs:choice>
+                    <xs:element ref="stringValues"/>
+                    <xs:element ref="integerValues"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text" type="xs:string"/>
+    <xs:element name="longValues">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="longValue" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="longValue" type="xs:long"/>
+    <xs:element name="allowedNets">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="allowedNet" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="allowedNet" type="xs:string"/>
+</xs:schema>

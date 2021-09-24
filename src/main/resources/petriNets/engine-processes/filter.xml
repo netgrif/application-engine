@@ -123,10 +123,6 @@
         <id>filter_case_id</id>
         <title></title>
     </data>
-    <data type="text">
-        <id>filter_icon</id>
-        <title name="filter_icon">Filter icon</title>
-    </data>
     <data type="button">
         <id>and_me</id>
         <placeholder name="and">AND</placeholder>
@@ -142,6 +138,21 @@
     <data type="text">
         <id>trimmed_origin_view_id</id>
         <title name="filter_from_view_id">Filter from view with ID</title>
+    </data>
+    <data type="number">
+        <id>is_imported</id>
+        <title></title>
+        <init>0</init>
+        <action trigger="set">
+            isNotImported: f.is_not_imported;
+
+            change isNotImported value { return 0 }
+        </action>
+    </data>
+    <data type="number">
+        <id>is_not_imported</id>
+        <title></title>
+        <init>1</init>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -163,7 +174,6 @@
         <i18nString name="filter_from_view_id">Filter z obrazovky s ID</i18nString>
         <i18nString name="filter_case_name">Názov prípadu</i18nString>
         <i18nString name="import_filter">Importovať filter</i18nString>
-        <i18nString name="filter_icon">Ikona filtra</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="process_title">Filter</i18nString>
@@ -184,7 +194,6 @@
         <i18nString name="filter_from_view_id">Filter von der Ansicht mit der ID</i18nString>
         <i18nString name="filter_case_name">Fallname</i18nString>
         <i18nString name="import_filter">Importfilter</i18nString>
-        <i18nString name="filter_icon">Filter-Icon</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
@@ -664,6 +673,7 @@
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
+            <title></title>
             <dataRef>
                 <id>new_title</id>
                 <logic>
@@ -672,6 +682,12 @@
                         name: f.new_title;
 
                         change name value { useCase.getTitle() }
+                    </action>
+                    <action trigger="set">
+                        name: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
                     </action>
                 </logic>
                 <layout>
@@ -715,26 +731,6 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>filter_icon</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <action trigger="get">
-                        icon: f.filter_icon;
-
-                        change icon value { useCase.getIcon() }
-                    </action>
-                </logic>
-                <layout>
-                    <x>3</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
                 <id>filter</id>
                 <logic>
                     <behavior>visible</behavior>
@@ -754,12 +750,7 @@
             <id></id>
             <actions phase="post">
                 <action>
-                    icon: f.filter_icon,
-                    name: f.new_title,
-                    i18nName: f.i18n_filter_name;
-
-                    change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
-                    changeCaseProperty "icon" about { icon.value }
+                    name: f.new_title;
                     changeCaseProperty "title" about { name.value }
                     workflowService.save(useCase)
                 </action>
@@ -787,6 +778,14 @@
         <id>p3</id>
         <x>500</x>
         <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>620</x>
+        <y>140</y>
         <label></label>
         <tokens>0</tokens>
         <static>false</static>
@@ -840,6 +839,7 @@
         <sourceId>auto_create</sourceId>
         <destinationId>p2</destinationId>
         <multiplicity>1</multiplicity>
+        <reference>is_not_imported</reference>
     </arc>
     <arc>
         <id>a10</id>
@@ -853,6 +853,28 @@
         <type>read</type>
         <sourceId>p2</sourceId>
         <destinationId>view_as_ancestor</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a12</id>
+        <type>regular</type>
+        <sourceId>import_filter</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a13</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_imported</reference>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>regular</type>
+        <sourceId>p4</sourceId>
+        <destinationId>import_filter</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
