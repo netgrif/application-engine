@@ -26,9 +26,15 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.*;
 import java.util.*;
 
@@ -71,6 +77,9 @@ public class FilterImportExportService implements IFilterImportExportService {
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
+    @Value("${nae.filter.export.file-name:filters.xml}")
+    private String exportedFileName;
+
     @Override
     public void createFilterImport(User author) {
         createFilterCase("IMP_" + author.getFullName(), IMPORT_NET_IDENTIFIER, author.transformToLoggedUser());
@@ -96,9 +105,13 @@ public class FilterImportExportService implements IFilterImportExportService {
     }
 
     @Override
-    public List<String> importFilters() throws IOException {
+    public List<String> importFilters() throws IOException, IllegalFilterFileException {
         FilterImportExportList filterList = loadFromXML();
         List<String> importedFiltersIds = new ArrayList<>();
+
+        if (filterList == null) {
+            throw new FileNotFoundException();
+        }
 
         filterList.getFilters().forEach(filter -> {
             Optional<Case> filterCase = Optional.empty();
@@ -113,7 +126,8 @@ public class FilterImportExportService implements IFilterImportExportService {
                         filter.getFilterMetadataExport().getMapObject(),
                         filter.getFilterName().getTranslations(),
                         filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                        filter.getFilterMetadataExport().getInheritAllowedNets()
+                        filter.getFilterMetadataExport().getInheritAllowedNets(),
+                        true
                 );
             } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
                 filterCase = defaultFiltersRunner.createTaskFilter(
@@ -126,12 +140,16 @@ public class FilterImportExportService implements IFilterImportExportService {
                         filter.getFilterMetadataExport().getMapObject(),
                         filter.getFilterName().getTranslations(),
                         filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                        filter.getFilterMetadataExport().getInheritAllowedNets()
+                        filter.getFilterMetadataExport().getInheritAllowedNets(),
+                        true
                 );
             }
 
             if (filterCase.isPresent()) {
-                Task importFilterTask = taskService.searchOne(QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION).and(QTask.task.caseId.eq(filterCase.get().getStringId())));
+                Task importFilterTask = taskService.searchOne(
+                        QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
+                                .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
+                );
                 importedFiltersIds.add(importFilterTask.getStringId());
             }
         });
@@ -140,24 +158,28 @@ public class FilterImportExportService implements IFilterImportExportService {
     }
 
     @Transactional
-    protected FilterImportExportList loadFromXML() throws IOException {
+    protected FilterImportExportList loadFromXML() throws IOException, IllegalFilterFileException {
         Case exportCase = workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
                         .and(QCase.case$.author.id.eq(userService.getLoggedUser().getId()))
         );
 
         FileFieldValue ffv = (FileFieldValue) exportCase.getDataSet().get(UPLOAD_FILE_FIELD).getValue();
+        if (ffv == null) {
+            throw new FileNotFoundException();
+        }
 
         File f = new File(ffv.getPath());
-        String xml = inputStreamToString(new FileInputStream(f));
+        validateFilterXML(new FileInputStream(f));
+        String importedFilter = inputStreamToString(new FileInputStream(f));
         SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
-        return xmlMapper.readValue(xml, FilterImportExportList.class);
+        return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
     }
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/filter_" + userService.getLoggedUser().getName() + ".xml";
+        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + exportedFileName;
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 
@@ -171,7 +193,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         FileOutputStream fos = new FileOutputStream(f);
         baos.writeTo(fos);
 
-        return new FileFieldValue("filter_" + userService.getLoggedUser().getName() + ".xml", filePath);
+        return new FileFieldValue(exportedFileName, filePath);
     }
 
     private FilterImportExport createExportClass(Case filter) {
@@ -207,6 +229,17 @@ public class FilterImportExportService implements IFilterImportExportService {
         }
         br.close();
         return sb.toString();
+    }
+
+    private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {
+        try {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(FilterImportExportService.class.getResource("/petriNets/filter_export_schema.xsd"));
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(xml));
+        } catch(Exception ex) {
+            throw new IllegalFilterFileException();
+        }
     }
 }
 
