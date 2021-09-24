@@ -8,21 +8,17 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
+import com.netgrif.workflow.history.domain.dataevents.GetDataEventLog;
+import com.netgrif.workflow.history.domain.dataevents.SetDataEventLog;
+import com.netgrif.workflow.history.service.IHistoryService;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.Component;
-import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.DataEvent;
 import com.netgrif.workflow.petrinet.domain.events.DataEventType;
@@ -63,6 +59,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -91,6 +88,9 @@ public class DataService implements IDataService {
     @Autowired
     private IEventService eventService;
 
+    @Autowired
+    private IHistoryService historyService;
+
     @Value("${nae.image.preview.scaling.px:400}")
     private int imageScale;
 
@@ -115,6 +115,7 @@ public class DataService implements IDataService {
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
             //todo dočasné riešenie na testovanie, kým sa implementuje parsovanie stromu event outcomov
             if (outcome.getMessage() == null) {
@@ -148,6 +149,7 @@ public class DataService implements IDataService {
                 }
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST));
         });
 
         workflowService.save(useCase);
@@ -196,14 +198,9 @@ public class DataService implements IDataService {
         values.fields().forEachRemaining(entry -> {
             String fieldId = entry.getKey();
             DataField dataField = useCase.getDataSet().get(fieldId);
-//            if (entry.getKey().startsWith(task.getStringId())) {
-//                fieldId = fieldId.replace(task.getStringId() + "-", "");
-//                dataField = useCase.getDataField(fieldId);
-//            }
             if (dataField != null) {
                 Field field = useCase.getPetriNet().getField(fieldId).get();
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
-                //todo dá sa to zjednodušiť?
                 if (outcome.getMessage() == null) {
                     Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
                     if (field.getEvents().containsKey(DataEventType.SET) &&
@@ -231,23 +228,26 @@ public class DataService implements IDataService {
                     changedField.addAttribute("filterMetadata", filterMetadata);
                 }
                 outcome.addChangedField(fieldId, changedField);
+                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Stream.of(new AbstractMap.SimpleImmutableEntry<>(fieldId, changedField)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
                 outcome.addOutcomes(resolveDataEvents(field,
                         DataEventType.SET, EventPhase.POST, useCase, task));
 
-            } else try {
-                if (entry.getKey().contains("-")) {
-                    TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
-                    Task referencedTask = taskService.findOne(decoded.getTaskId());
-                    outcome.addOutcome(setData(referencedTask, values));
-//                    changedFieldsTree.propagate(taskRefChangedFields);
-                }
-            } catch (Exception e) {
-                log.error("Failed to set taskRef references fields", e);
+                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null));
             }
+//            else try {
+////                todo samo niečo s taskrefom
+//                if (entry.getKey().contains("-")) {
+//                    TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
+//                    Task referencedTask = taskService.findOne(decoded.getTaskId());
+//                    outcome.addOutcome(setData(referencedTask, values));
+////                    changedFieldsTree.propagate(taskRefChangedFields);
+//                }
+//            } catch (Exception e) {
+//                log.error("Failed to set taskRef references fields", e);
+//            }
         });
         updateDataset(useCase);
-        workflowService.save(useCase);
-        publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
+        outcome.setACase(workflowService.save(useCase));
         return outcome;
     }
 

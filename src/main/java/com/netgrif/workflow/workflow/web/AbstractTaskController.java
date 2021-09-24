@@ -11,6 +11,7 @@ import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsExce
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -35,8 +36,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public abstract class AbstractTaskController {
 
@@ -197,10 +197,13 @@ public abstract class AbstractTaskController {
     }
 
     public EventOutcomeWithMessageResource setData(String taskId, ObjectNode dataBody) {
-//        todo zhodiť setdatachangedfieldsoutcome?
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been set sucessfully",
-                LocalisedEventOutcomeFactory.from(dataService.setData(taskId, dataBody)
-                        ,LocaleContextHolder.getLocale()));
+        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+        SetDataEventOutcome mainOutcome = outcomes.get(taskId);
+        outcomes.remove(taskId);
+        mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
     public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
