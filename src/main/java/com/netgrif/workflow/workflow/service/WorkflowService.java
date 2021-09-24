@@ -4,22 +4,17 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
-import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
-import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
+import com.netgrif.workflow.history.domain.caseevents.CreateCaseEventLog;
+import com.netgrif.workflow.history.domain.caseevents.DeleteCaseEventLog;
+import com.netgrif.workflow.history.service.IHistoryService;
 import com.netgrif.workflow.importer.service.FieldFactory;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.events.*;
+import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
@@ -33,8 +28,6 @@ import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IEventService;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
@@ -46,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -107,8 +101,12 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IElasticCaseMappingService caseMappingService;
 
+    @Lazy
     @Autowired
     private IEventService eventService;
+
+    @Autowired
+    private IHistoryService historyService;
 
     private IElasticCaseService elasticCaseService;
 
@@ -266,7 +264,7 @@ public class WorkflowService implements IWorkflowService {
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
-        publisher.publishEvent(new CreateCaseEvent(useCase));
+        historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
         useCase.getPetriNet().initializeArcs(useCase.getDataSet());
@@ -279,6 +277,7 @@ public class WorkflowService implements IWorkflowService {
         useCase = findOne(useCase.getStringId());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         useCase = save(useCase);
+        historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
         outcome.setACase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
@@ -311,14 +310,15 @@ public class WorkflowService implements IWorkflowService {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase);
         outcome.setOutcomes(eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
+        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty()));
-        publisher.publishEvent(new DeleteCaseEvent(useCase));
         addMessageToOutcome(petriNetService.clone(useCase.getPetriNetObjectId()), CaseEventType.DELETE, outcome);
+        historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
         return outcome;
     }
 
@@ -343,8 +343,6 @@ public class WorkflowService implements IWorkflowService {
     public void updateMarking(Case useCase) {
         PetriNet net = useCase.getPetriNet();
         useCase.setActivePlaces(net.getActivePlaces());
-
-        publisher.publishEvent(new UpdateMarkingEvent(useCase));
     }
 
     @Override
