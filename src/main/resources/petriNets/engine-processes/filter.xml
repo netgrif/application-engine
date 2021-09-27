@@ -154,6 +154,23 @@
         <title></title>
         <init>1</init>
     </data>
+    <data type="text">
+        <id>missing_allowed_nets</id>
+        <title name="missing_allowed_nets">Missing processes</title>
+        <desc name="missing_allowed_nets_desc">List of missing processes for current filter</desc>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>missing_nets_translation</id>
+        <title></title>
+        <options>
+            <option key="sk">Zoznam chýbajúcich procesov pre aktuálny filter:</option>
+            <option key="en">List of missing processes for current filter:</option>
+            <option key="de">Liste der fehlenden Prozesse für den aktuellen Filter:</option>
+        </options>
+    </data>
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="process_title">Filter</i18nString>
@@ -174,6 +191,8 @@
         <i18nString name="filter_from_view_id">Filter z obrazovky s ID</i18nString>
         <i18nString name="filter_case_name">Názov prípadu</i18nString>
         <i18nString name="import_filter">Importovať filter</i18nString>
+        <i18nString name="missing_allowed_nets">Chýbajúce procesy</i18nString>
+        <i18nString name="missing_allowed_nets_desc">Zoznam chýbajúcich procesov pre aktuálny filter</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="process_title">Filter</i18nString>
@@ -194,6 +213,8 @@
         <i18nString name="filter_from_view_id">Filter von der Ansicht mit der ID</i18nString>
         <i18nString name="filter_case_name">Fallname</i18nString>
         <i18nString name="import_filter">Importfilter</i18nString>
+        <i18nString name="missing_allowed_nets">Fehlende Prozesse</i18nString>
+        <i18nString name="missing_allowed_nets_desc">Liste der fehlenden Prozesse für den aktuellen Filter</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
@@ -740,6 +761,21 @@
                     <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>missing_allowed_nets</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
                     <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
