@@ -45,6 +45,10 @@ public class DataGroup extends PetriNetObject {
     @Getter @Setter
     private String parentTaskRefId;
 
+    @Transient
+    @Getter @Setter
+    private int nestingLevel;
+
     public DataGroup() {
         this._id = new ObjectId();
         this.data = new LinkedHashSet<>();
