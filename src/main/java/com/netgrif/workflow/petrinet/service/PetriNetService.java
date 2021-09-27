@@ -229,6 +229,15 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    public List<PetriNet> getNewestNetsByIdentifiers(List<String> identifiers) {
+        Page<PetriNet> page = repository.findByIdentifierIn(identifiers, PageRequest.of(0, 200, Sort.Direction.DESC, "version.major", "version.minor", "version.patch"));
+        if (page.getTotalPages() > 1) {
+            log.warn("Multiple pages of PetriNets found! Returning first page.");
+        }
+        return page.getContent();
+    }
+
+    @Override
     public List<PetriNet> getAll() {
         List<PetriNet> nets = repository.findAll();
         nets.forEach(PetriNet::initializeArcs);

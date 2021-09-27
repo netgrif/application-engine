@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
     <id>import_filters</id>
     <initials>FTI</initials>
     <title name="import_filters">Import of filters</title>
@@ -18,6 +18,14 @@
         <title name="upload_file">Upload filter file</title>
         <placeholder name="upload_file_placeholder">Insert file containing filters</placeholder>
         <desc name="upload_file_desc">Insert xml file that contains filters</desc>
+        <action trigger="set">
+            importedFilters: f.imported_filters;
+
+            taskService.findAllById(importedFilters.value).forEach({filterTask ->
+                workflowService.deleteCase(filterTask.caseId)
+            })
+            change importedFilters value { return [] }
+        </action>
     </data>
     <data type="button">
         <id>import_file</id>
@@ -31,6 +39,16 @@
     <data type="taskRef">
         <id>imported_filters</id>
         <title></title>
+        <action trigger="get">
+            importedFilters: f.imported_filters;
+
+            filterImportExportService.changeFilterField(importedFilters.value)
+        </action>
+        <action trigger="set">
+            importedFilters: f.imported_filters;
+
+            filterImportExportService.changeFilterField(importedFilters.value)
+        </action>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -124,7 +142,7 @@
                     importedFilters: f.imported_filters;
 
                     taskService.finishTasks(taskService.findAllById(importedFilters.value), userService.getLoggedUser())
-                    change importedFilters value { null }
+                    change importedFilters value { [] }
                 </action>
             </actions>
         </event>
@@ -137,7 +155,7 @@
                     taskService.findAllById(importedFilters.value).forEach({filterTask ->
                         workflowService.deleteCase(filterTask.caseId)
                     })
-                    change importedFilters value { null }
+                    change importedFilters value { [] }
                 </action>
             </actions>
         </event>

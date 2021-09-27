@@ -9,17 +9,19 @@ import com.google.common.collect.Lists;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.filters.FilterMetadataExport;
-import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
-import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.workflow.startup.DefaultFiltersRunner;
-import com.netgrif.workflow.workflow.domain.*;
-import com.netgrif.workflow.workflow.domain.CustomFilterDeserializer;
 import com.netgrif.workflow.filters.FilterImportExport;
 import com.netgrif.workflow.filters.FilterImportExportList;
+import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.startup.DefaultFiltersRunner;
+import com.netgrif.workflow.startup.ImportHelper;
+import com.netgrif.workflow.workflow.domain.*;
+import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -27,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -58,6 +62,8 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FIELD_FILTER_TYPE = "filter_type";
     private static final String FIELD_FILTER = "filter";
     private static final String FIELD_NAME = "i18n_filter_name";
+    private static final String FIELD_MISSING_ALLOWED_NETS = "missing_allowed_nets";
+    private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
     @Autowired
     IUserService userService;
@@ -73,6 +79,9 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Autowired
     private ITaskService taskService;
+
+    @Autowired
+    private IDataService dataService;
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
@@ -115,6 +124,9 @@ public class FilterImportExportService implements IFilterImportExportService {
 
         filterList.getFilters().forEach(filter -> {
             Optional<Case> filterCase = Optional.empty();
+            if (filter.getAllowedNets() == null) {
+                filter.setAllowedNets(new ArrayList<>());
+            }
             if (filter.getType().equals(FILTER_TYPE_CASE)) {
                 filterCase = defaultFiltersRunner.createCaseFilter(
                         filter.getFilterName().getDefaultValue(),
@@ -122,7 +134,7 @@ public class FilterImportExportService implements IFilterImportExportService {
                         "",
                         filter.getVisibility(),
                         filter.getFilterValue(),
-                        filter.getAllowedNets() != null ? filter.getAllowedNets() : new ArrayList<>(),
+                        filter.getAllowedNets(),
                         filter.getFilterMetadataExport().getMapObject(),
                         filter.getFilterName().getTranslations(),
                         filter.getFilterMetadataExport().getDefaultSearchCategories(),
@@ -136,7 +148,7 @@ public class FilterImportExportService implements IFilterImportExportService {
                         "",
                         filter.getVisibility(),
                         filter.getFilterValue(),
-                        filter.getAllowedNets() != null ? filter.getAllowedNets() : new ArrayList<>(),
+                        filter.getAllowedNets(),
                         filter.getFilterMetadataExport().getMapObject(),
                         filter.getFilterName().getTranslations(),
                         filter.getFilterMetadataExport().getDefaultSearchCategories(),
@@ -146,15 +158,62 @@ public class FilterImportExportService implements IFilterImportExportService {
             }
 
             if (filterCase.isPresent()) {
-                Task importFilterTask = taskService.searchOne(
+                Task importedFilterTask = taskService.searchOne(
                         QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
                                 .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
                 );
-                importedFiltersIds.add(importFilterTask.getStringId());
+                importedFiltersIds.add(importedFilterTask.getStringId());
+
+                filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
+                filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
+                workflowService.save(filterCase.get());
             }
         });
-
         return importedFiltersIds;
+    }
+
+    @Override
+    public void changeFilterField(List<String> filterFields) {
+        filterFields.forEach(f -> {
+            Task importedFilterTask = taskService.findOne(f);
+            Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
+            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FIELD_FILTER);
+            List<String> allowedNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
+            List<PetriNet> nets = petriNetService.getNewestNetsByIdentifiers(allowedNets);
+            if (nets.size() < allowedNets.size()) {
+                List<String> missingNetsIdentifiers = nets.stream().map(PetriNet::getIdentifier).collect(Collectors.toList());
+                allowedNets.removeAll(missingNetsIdentifiers);
+                StringBuilder missingNetsString = new StringBuilder(
+                        ((EnumerationMapField) filterNet.getDataSet().get(FIELD_MISSING_NETS_TRANSLATION)).getOptions().get(
+                                LocaleContextHolder.getLocale().getLanguage()
+                        ).getDefaultValue()
+                );
+                missingNetsString.append("<ul style=\"color: red\">");
+                allowedNets.forEach(net -> missingNetsString.append("<li>").append(net).append("</li>"));
+                missingNetsString.append("</ul>");
+                Map<String, Map<String, String>> taskData = new HashMap<>();
+                Map<String, String> missingNets = new HashMap<>();
+                missingNets.put("type", "text");
+                missingNets.put("value", missingNetsString.toString());
+                taskData.put(FIELD_MISSING_ALLOWED_NETS, missingNets);
+                this.dataService.setData(importedFilterTask, ImportHelper.populateDataset(taskData));
+                filterCase = workflowService.findOne(filterCase.getStringId());
+                changeVisibilityByAllowedNets(true, filterCase);
+            } else {
+                changeVisibilityByAllowedNets(false, filterCase);
+            }
+            workflowService.save(filterCase);
+        });
+    }
+
+    private void changeVisibilityByAllowedNets(boolean allowedNetsMissing, Case filterCase) {
+        if (allowedNetsMissing) {
+            filterCase.getDataSet().get(FIELD_MISSING_ALLOWED_NETS).makeVisible(IMPORT_FILTER_TRANSITION);
+            filterCase.getDataSet().get(FIELD_FILTER).makeHidden(IMPORT_FILTER_TRANSITION);
+        } else {
+            filterCase.getDataSet().get(FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
+            filterCase.getDataSet().get(FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
+        }
     }
 
     @Transactional

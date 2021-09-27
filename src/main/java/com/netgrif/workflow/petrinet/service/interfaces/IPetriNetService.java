@@ -88,4 +88,6 @@ public interface IPetriNetService {
     void deletePetriNet(String id, LoggedUser loggedUser);
 
     void runActions(List<Action> actions, PetriNet petriNet);
+
+    List<PetriNet> getNewestNetsByIdentifiers(List<String> identifiers);
 }
