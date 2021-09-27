@@ -255,7 +255,7 @@ class InsuranceTest {
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
-                .with(authentication(this.auth)))
+                .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
                 .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))

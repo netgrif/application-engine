@@ -1,21 +1,24 @@
 package com.netgrif.workflow.configuration.quartz;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
-import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
+@Slf4j
 @Configuration
 public class QuartzConfiguration {
 
@@ -30,6 +33,17 @@ public class QuartzConfiguration {
     public Properties quartzProperties() throws IOException {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         propertiesFactoryBean.setLocation(new ClassPathResource("quartz.properties"));
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        List<Resource> resourceList = new ArrayList<>();
+        try {
+            Resource[] resourcesClass = resolver.getResources("classpath*:/quartz.properties");
+            Resource[] resources = resolver.getResources("file:/*/quartz.properties");
+            Collections.addAll(resourceList, resourcesClass);
+            Collections.addAll(resourceList, resources);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        propertiesFactoryBean.setLocations(resourceList.toArray(new Resource[]{}));
         propertiesFactoryBean.afterPropertiesSet();
         return propertiesFactoryBean.getObject();
     }

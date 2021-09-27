@@ -1,9 +1,9 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.MockService;
-import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
@@ -230,8 +230,14 @@ public class VariableArcsTest {
     }
 
     private void assertCancelTasks(String arcType, List<TaskReference> tasks) throws TransitionNotExecutableException {
+        List<TaskReference> tasksAfterPlaceRefReset = null;
         for (TaskReference taskRef : tasks) {
-            Task task = taskService.findOne(taskRef.getStringId());
+            Task task;
+            if (tasksAfterPlaceRefReset != null) {
+                task = taskService.findOne(tasksAfterPlaceRefReset.stream().filter(taskReference -> taskReference.getTitle().equals(taskRef.getTitle())).findFirst().orElseThrow(() -> new IllegalStateException("Cannot find task reference")).getStringId());
+            } else {
+                task = taskService.findOne(taskRef.getStringId());
+            }
             int dataRefMultiplicityBeforeChange = 0;
             int tokensBeforeAssign = 0;
             if (!arcType.equals("inhib")) {
@@ -279,6 +285,7 @@ public class VariableArcsTest {
                 Task removeTokensTask = taskService.searchOne(qTask.transitionId.eq("remove_tokens").and(qTask.caseId.eq(cancelCase.getStringId())));
                 taskService.assignTask(testUser.transformToLoggedUser(), removeTokensTask.getStringId());
                 taskService.finishTask(removeTokensTask, testUser);
+                tasksAfterPlaceRefReset = taskService.findAllByCase(cancelCase.getStringId(), LocaleContextHolder.getLocale());
             }
         }
     }

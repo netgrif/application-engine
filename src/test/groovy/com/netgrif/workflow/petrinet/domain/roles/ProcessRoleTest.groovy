@@ -86,7 +86,7 @@ class ProcessRoleTest {
         netId = net.get().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = userProcessRoleRepository.findAllByNetId(netId)
+        def processRoles = userProcessRoleRepository.findAllById([netId])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }] as ProcessRole[])
