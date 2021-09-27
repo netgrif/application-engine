@@ -96,6 +96,11 @@
 		<id>filter_preview</id>
 		<title></title>
 	</data>
+	<data type="taskRef">
+		<id>imported_menu_ids</id>
+		<title></title>
+	</data>
+	imported_menu_ids
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
 		<title name="select_menu_item_filter">Select filter</title>
@@ -203,29 +208,49 @@
 			menuItemsTaskRef: f.filter_tasks,
 			referencedFiltersList: f.referenced_filters,
 			groupId: f.group_id,
+			newEntries: f.imported_menu_ids,
 			importResults: f.import_results;
 
 			change importResults value {return ""}
 
 			def cases = findCases({ it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			def newMenuItemIds = menuImportExport.importMenu(cases, import_file.value, useCase.stringId)
-			def previousTaskRefValue = menuItemsTaskRef.value
-			def previousCaseRefValue = referencedFiltersList.value
-			log.info("DEBUG: referencedTasks after Import" + menuItemsTaskRef.value)
-			log.info("DEBUG: referencedTasks after Import" + referencedFiltersList.value)
+			change newEntries value { menuImportExport.importMenu(cases, import_file.value, useCase.stringId) }
+			log.info("DEBUG: newEntries: " + newEntries.value)
+		</action>
+		<action trigger="set">
+			import_file: f.import_menu_file,
+			menuItemsTaskRef: f.filter_tasks,
+			referencedFiltersList: f.referenced_filters,
+			groupId: f.group_id,
+			newEntries: f.imported_menu_ids,
+			importResults: f.import_results;
 
-			newMenuItemIds.forEach { itemId -&gt;
+			filterTaskIds = []
+			filterCaseIds = []
+
+			newEntries.value.forEach { itemId -&gt;
+				log.info("DEBUG: foreach ok")
 				def idSplit = itemId.split(',')
-				previousTaskRefValue = previousTaskRefValue + idSplit[0]
-				previousCaseRefValue = previousCaseRefValue + idSplit[1]
+
+				def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
+				setData(initTask, [
+				"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]]
+				])
+				finishTask(initTask)
+
+				def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
+
+				filterTaskIds.add(viewTask.getStringId())
+				filterCaseIds.add(idSplit[1])
+				//TODO vracat case ID novych PFI v split 0 a setData na ich filterCase field podla split 1
+				//TODO skontrolovat finish init tasku
 				log.info("DEBUG: split add ok")
 			}
 
-			log.info("DEBUG: referencedTasks after Import" + previousTaskRefValue.value)
-			log.info("DEBUG: referencedTasks after Import" + previousCaseRefValue.value)
+			change menuItemsTaskRef value {return filterTaskIds}
+			change referencedFiltersList value {return filterCaseIds}
+			log.info("DEBUG: new items add ok")
 
-			change menuItemsTaskRef value {return previousTaskRefValue.value}
-			change referencedFiltersList value {return previousCaseRefValue.value}
 			<!--
             change menuItemsTaskRef value {return menuItemsTaskRef.value + idSplit[0]}
             change referencedFiltersList value {return referencedFiltersList.value + idSplit[1]}
