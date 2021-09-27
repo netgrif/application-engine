@@ -2,6 +2,7 @@ package com.netgrif.workflow.auth
 
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 
@@ -65,10 +66,13 @@ class AuthenticationControllerTest {
     private AuthorityRepository authorityRepository
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private TestHelper testHelper
+
+    @Autowired
+    private SuperCreator superCreator
 
     private GreenMail smtpServer
 
@@ -77,6 +81,7 @@ class AuthenticationControllerTest {
 
     @BeforeEach
     void before() {
+        testHelper.truncateDbs()
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
@@ -84,16 +89,14 @@ class AuthenticationControllerTest {
         assert net.isPresent()
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
-        processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+//        processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
 //        processRoles = importHelper.getProcessRoles(net.get())
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        controller.invite(new NewUserRequest(email: EMAIL, groups: null, processRoles: processRoles.values().collect {
-            it.stringId
-        }), null)
+        controller.invite(new NewUserRequest(email: EMAIL, groups: [], processRoles: []), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)
@@ -104,13 +107,8 @@ class AuthenticationControllerTest {
         controller.signup(new RegistrationRequest(token: token, name: NAME, surname: SURNAME, password: PASSWORD))
 
         User user = userRepository.findByEmail(EMAIL)
-//        Member member = memberRepository.findByEmail(EMAIL)
-//        Group userGroup = groupRepository.findAll().first()
-
         assert user
-//        assert !member.groups.empty
-//        assert member.groups.first().name == GROUP_NAME
-//        assert userGroup
+
     }
 
     @AfterEach
