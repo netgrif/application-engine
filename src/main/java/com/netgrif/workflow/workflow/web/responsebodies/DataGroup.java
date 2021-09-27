@@ -20,10 +20,12 @@ public class DataGroup {
 
     private String parentTaskRefId;
 
+    private int nestingLevel;
+
     private DataGroup() {
     }
 
-    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId, String parentTaskRefId) {
+    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId, String parentTaskRefId, int nestingLevel) {
         this();
         this.fields = fields;
         this.title = title;
@@ -32,5 +34,6 @@ public class DataGroup {
         this.layout = layout;
         this.parentTaskId = parentTaskId;
         this.parentTaskRefId = parentTaskRefId;
+        this.nestingLevel = nestingLevel;
     }
 }
