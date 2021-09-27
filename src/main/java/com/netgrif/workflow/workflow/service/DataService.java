@@ -281,6 +281,7 @@ public class DataService implements IDataService {
                     if (level != 0) {
                         dataGroup.setParentTaskId(taskId);
                         dataGroup.setParentTaskRefId(parentTaskRefId);
+                        dataGroup.setNestingLevel(level);
                         resource.setParentTaskId(taskId);
                     }
                     resources.add(resource);
