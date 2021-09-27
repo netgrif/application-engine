@@ -17,4 +17,6 @@ public interface IFilterImportExportService {
     void createFilterImport(User author);
 
     void createFilterExport(User author);
+
+    void changeFilterField(List<String> filterFields);
 }
