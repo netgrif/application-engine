@@ -362,6 +362,7 @@
 					icon: f.icon_name;
 
 					def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+					log.info("filterCase datafield value was set PFI with id: " + useCase.stringId)
 
 					change entryDefaultName value {return filterCase.title}
 

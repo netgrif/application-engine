@@ -61,8 +61,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         return net.getRoles().values().stream()
                 .filter(role -> (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
                 && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))
-                .map(o -> o.getImportId() + ":" + netImportId + "," + o.getName())
-                .collect(Collectors.toMap(o -> o.split(",")[0], v -> new I18nString(v.split(",")[1])));
+                .collect(Collectors.toMap(o -> o.getImportId() + ":" + netImportId,  v -> new I18nString(v.getName())));
     }
 
     @Override
