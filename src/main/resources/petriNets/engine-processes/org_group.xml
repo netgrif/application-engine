@@ -209,14 +209,28 @@
 
 			def cases = findCases({ it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
 			def newMenuItemIds = menuImportExport.importMenu(cases, import_file.value, useCase.stringId)
+			def previousTaskRefValue = menuItemsTaskRef.value
+			def previousCaseRefValue = referencedFiltersList.value
+			log.info("DEBUG: referencedTasks after Import" + menuItemsTaskRef.value)
+			log.info("DEBUG: referencedTasks after Import" + referencedFiltersList.value)
 
 			newMenuItemIds.forEach { itemId -&gt;
 				def idSplit = itemId.split(',')
-				change menuItemsTaskRef value {return menuItemsTaskRef.value + idSplit[0]}
-				change referencedFiltersList value {return referencedFiltersList.value + idSplit[1]}
+				previousTaskRefValue = previousTaskRefValue + idSplit[0]
+				previousCaseRefValue = previousCaseRefValue + idSplit[1]
+				log.info("DEBUG: split add ok")
 			}
-			<!--TODO opytat sa na to pridavanie kuba-->
-			<!--change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}-->
+
+			log.info("DEBUG: referencedTasks after Import" + previousTaskRefValue.value)
+			log.info("DEBUG: referencedTasks after Import" + previousCaseRefValue.value)
+
+			change menuItemsTaskRef value {return previousTaskRefValue.value}
+			change referencedFiltersList value {return previousCaseRefValue.value}
+			<!--
+            change menuItemsTaskRef value {return menuItemsTaskRef.value + idSplit[0]}
+            change referencedFiltersList value {return referencedFiltersList.value + idSplit[1]}
+        }
+        change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}-->
 		</action>
 		<component>
 			<name>raised</name>
