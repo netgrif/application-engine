@@ -16,5 +16,5 @@ public interface IMenuImportExport {
     void createMenuExport(User author);
     FileFieldValue exportMenu(List<Case> menuItemCaseIds, String menuIdentifier, String groupId, FileField fileField) throws IOException;
     List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String groupCaseId) throws IOException;
-    String createMenuItemCase(MenuEntry item,  String menuIdentifier, String resultMessage, String groupCaseId);
+    String createMenuItemCase(MenuEntry item,  String menuIdentifier, String groupCaseId);
 }
