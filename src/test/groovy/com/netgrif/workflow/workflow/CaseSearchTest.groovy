@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.service.CaseSearchService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -71,7 +73,7 @@ class CaseSearchTest {
 
         PetriNet net = getNet()
 
-        Case case1 = importHelper.createCase("Case1-Milan", net)
+        Case case1 = importHelper.createCase("Case1", net)
         Case case2 = importHelper.createCase("Case2", net)
         Case case3 = importHelper.createCase("Case3", net)
 
@@ -158,13 +160,13 @@ class CaseSearchTest {
     void performSearch(String input, String expect = "", Boolean includeInput = true) {
         String request = buildRequestBody(input)
         mvc.perform(post("/api/workflow/case/search_mongo")
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .with(httpBasic("super@netgrif.com", userPassword))
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json;charset=UTF-8"))
+                .andExpect(content().contentType("application/hal+json"))
                 .andExpect(content().string(containsString("_links")))
                 .andExpect(content().string(containsString("cases")))
                 .andExpect(content().string(containsString(expect)))

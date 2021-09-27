@@ -63,9 +63,7 @@
                     <!-- @formatter:off -->
                     field: f.paged;
 
-                    def cases = findCases({it.title.startsWith("Case ")}, new
-                    org.springframework.data.domain.PageRequest(1, 4));
-
+                    def cases = findCases({ it.title.startsWith("Case ")}, org.springframework.data.domain.PageRequest.of(1, 4));
                     change field value { return cases.size(); }
                     <!-- @formatter:on -->
                 </action>
