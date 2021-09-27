@@ -86,7 +86,8 @@ class TaskAuthorizationServiceTest {
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                ["Role"] as ProcessRole[])
+//                [processRoles.get("role")] as ProcessRole[])
+                [] as ProcessRole[])
 
         userId = user._id
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")

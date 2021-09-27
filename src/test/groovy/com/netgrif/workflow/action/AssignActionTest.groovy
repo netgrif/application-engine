@@ -115,7 +115,6 @@ class AssignActionTest {
         this.secondaryNet = secondaryNet.get()
     }
 
-
     private void cleanDatabases() {
         template.db.drop()
         userRepository.deleteAll()
@@ -138,7 +137,7 @@ class AssignActionTest {
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
-                .with(SecurityMockMvcRequestPostProcessors.authentication(this.authentication)))
+                .with(SecurityMockMvcRequestPostProcessors.authentication(authentication)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
 
