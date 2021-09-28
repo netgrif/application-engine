@@ -60,10 +60,9 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
 
         return net.getRoles().values().stream()
                 .filter(role -> (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
-                && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getImportId() + ":" + netImportId, new I18nString(role.getName())))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-  }
+                        && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))
+                .collect(Collectors.toMap(o -> o.getImportId() + ":" + netImportId,  v -> new I18nString(v.getName())));
+    }
 
     @Override
     public Map<String, I18nString> removeSelectedRoles(MultichoiceMapField addedRoles) {
