@@ -12,7 +12,7 @@ public abstract class LocalisedCaseEventOutcome extends LocalisedPetriNetEventOu
     private Case aCase;
 
     protected LocalisedCaseEventOutcome(CaseEventOutcome outcome, Locale locale) {
-        super(outcome, locale, new PetriNetReference(outcome.getACase().getPetriNet(), locale));
+        super(outcome, locale);
         this.aCase = outcome.getACase();
     }
 
