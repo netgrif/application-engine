@@ -3,15 +3,12 @@ package com.netgrif.workflow.ldap.domain;
 
 import lombok.Data;
 import org.springframework.ldap.odm.annotations.Entry;
+import org.springframework.ldap.odm.annotations.Id;
 
 import javax.naming.Name;
-import javax.persistence.Id;
 import java.util.List;
 
 
-@Entry(
-        objectClasses = {"inetOrgPerson", "person"}
-)
 @Data
 public class LdapUserRef {
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
     <id>filter</id>
     <initials>FTR</initials>
     <title name="process_title">Filter</title>
@@ -49,6 +49,67 @@
     <data type="text" immediate="true">
         <id>origin_view_id</id>
         <title name="origin_view_id">Origin ViewId</title>
+        <event type="set">
+            <id>set</id>
+            <actions phase="post">
+                <action>
+                    origin_view_id: f.origin_view_id,
+                    ancestor_task_ref: f.taskref_and_parent,
+                    trimmed_origin_view_id: f.trimmed_origin_view_id,
+                    and_view: f.and_view,
+                    t1: t.view_filter,
+                    t2: t.view_as_ancestor;
+
+                    // the same regex is used in frontend filter extaction service. Please keep them in sync
+                    def match = origin_view_id.value =~ "^.*?([a-f\\d]{24})(?:-\\d+)?\$"
+                    def parentHasFilterRef = match.matches()
+
+                    if (!parentHasFilterRef &amp;&amp; origin_view_id.value == "") {
+                        make and_view, forbidden on t1 when {true}
+                        make and_view, forbidden on t2 when {true}
+                        make trimmed_origin_view_id, forbidden on t1 when {true}
+                        make trimmed_origin_view_id, forbidden on t2 when {true}
+
+                        change ancestor_task_ref value {[]}
+                        return
+                    } else if (parentHasFilterRef) {
+                        make and_view, forbidden on t1 when {true}
+                        make and_view, forbidden on t2 when {true}
+                        make trimmed_origin_view_id, forbidden on t1 when {true}
+                        make trimmed_origin_view_id, forbidden on t2 when {true}
+
+                        def ancestor_menu_item = findTask({ it._id.eq(new org.bson.types.ObjectId(match.group(1))) })
+
+                        def menu_data = getData(ancestor_menu_item)
+
+                        def ancestor_filter = findTask({ it._id.eq(menu_data.get("filter_preview").value[0]) })
+
+                        def ancestor_view_filter = findTask({it.caseId.eq(ancestor_filter.caseId).and(it.task.transitionId.eq("view_as_ancestor"))})
+
+                        change ancestor_task_ref value {[ancestor_view_filter.stringId]}
+                        return
+                    }
+
+                    // the same regex is used in frontend filter extaction service. Please keep them in sync
+                    match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
+                    match.matches()
+
+                    def trimmed_id;
+
+                    if (match.start(1) == -1) {
+                        trimmed_id = origin_view_id.value
+                    } else {
+                        trimmed_id = origin_view_id.value.substring(0, match.start(1))
+                    }
+
+                    change trimmed_origin_view_id value {trimmed_id}
+                    make and_view, visible on t1 when {true}
+                    make and_view, visible on t2 when {true}
+                    make trimmed_origin_view_id, visible on t1 when {true}
+                    make trimmed_origin_view_id, visible on t2 when {true}
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text">
         <id>new_title</id>
@@ -61,6 +122,22 @@
     <data type="text">
         <id>filter_case_id</id>
         <title></title>
+    </data>
+    <data type="button">
+        <id>and_me</id>
+        <placeholder name="and">AND</placeholder>
+    </data>
+    <data type="button">
+        <id>and_view</id>
+        <placeholder name="and">AND</placeholder>
+    </data>
+    <data type="taskRef">
+        <id>taskref_and_parent</id>
+        <title></title>
+    </data>
+    <data type="text">
+        <id>trimmed_origin_view_id</id>
+        <title name="filter_from_view_id">Filter from view with ID</title>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -78,6 +155,8 @@
         <i18nString name="create_new_filter">Vytvoriť nový filter</i18nString>
         <i18nString name="details">Podrobnosti</i18nString>
         <i18nString name="save">Uložiť</i18nString>
+        <i18nString name="and">A SÚČASNE</i18nString>
+        <i18nString name="filter_from_view_id">Filter z obrazovky s ID</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="process_title">Filter</i18nString>
@@ -94,6 +173,8 @@
         <i18nString name="create_new_filter">Neuer Filter erstellen</i18nString>
         <i18nString name="details">Details</i18nString>
         <i18nString name="save">Speichern</i18nString>
+        <i18nString name="and">UND</i18nString>
+        <i18nString name="filter_from_view_id">Filter von der Ansicht mit der ID</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
@@ -404,6 +485,162 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>taskref_and_parent</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>and_view</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>trimmed_origin_view_id</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>view_as_ancestor</id>
+        <x>860</x>
+        <y>200</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label></label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>and_me</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>taskref_and_parent</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>and_view</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>trimmed_origin_view_id</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
     </transition>
     <!-- PLACES -->
@@ -486,6 +723,13 @@
         <type>read</type>
         <sourceId>p2</sourceId>
         <destinationId>view_filter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a11</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>view_as_ancestor</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
