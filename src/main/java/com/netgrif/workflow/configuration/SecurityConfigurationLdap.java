@@ -103,6 +103,9 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
 
+    @Value("${nae.security.anonymous-exceptions}")
+    private String[] anonymousExceptions;
+
     @Value("${spring.ldap.urls}")
     private String ldapUrl;
 
@@ -226,6 +229,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                 authority,
                 this.serverPatterns,
+                this.anonymousExceptions,
                 this.jwtService,
                 this.userService
         );
@@ -245,6 +249,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
 
         @Override
         public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> authorities) {
+            dirContextOperations.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
             User user = ldapUserService.findByDn(dirContextOperations.getDn());
             if (user == null) {
                 LdapUserRef ldapUserOptional = ldapUserRefService.findById(dirContextOperations.getDn());
