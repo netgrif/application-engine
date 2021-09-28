@@ -231,7 +231,9 @@ public class MenuImportExport implements IMenuImportExport {
         //TODO check filtra podla dohodnuteho Identifikatora s Jozom -> (.dataSet.get(FILTER_IMPORT_ID).value.eq(item.getFilterImportId()))
 
         //Check whether required filter is present in engine. If not, skip this menu entry
-        Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.author.id.eq(userService.getSystem().getId())));
+//        Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.author.id.eq(userService.getSystem().getId())));
+        Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(item.getEntry_name())));
+
         if (filterCase == null) {
             resultMessage = resultMessage.concat("Missing filter with ID: \"" + item.getFilterId() + "\"! Menu entry was skipped.\n");
             return "";
@@ -267,7 +269,7 @@ public class MenuImportExport implements IMenuImportExport {
             //Creating new Case of preference_filter_item net and setting its data...
             Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
                     , item.getEntry_name() + " menu item", "", userService.getLoggedUser().transformToLoggedUser());
-            //TODO title should be empty
+            //TODO title should be empty and author should be engine
 
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
@@ -291,7 +293,7 @@ public class MenuImportExport implements IMenuImportExport {
                 menuItemCase.getDataSet().get(BANNED_ROLES).setOptions(bannedRoles);
                 workflowService.save(menuItemCase);
 
-                //TODO use_icon
+                //TODO use_icon nastavit
                 //TODO title a icon sa nastavi podla filterCaseRef na SET akcii
 //                menuItemCase.getDataSet().get(ENTRY_TITLE).setValue(item.getEntry_name() + " menu item");
 //                menuItemCase.getDataSet().get(ICON_IDENTIFIER).setValue(item.getIconIdentifier());
@@ -303,7 +305,7 @@ public class MenuImportExport implements IMenuImportExport {
 //                data.put("value", filterCase.getStringId());
 //
 //                data.put("allowedNets", "filter");
-//                filterCaseRefData.put("filter_case", data);
+//                filterCaseRefData.put("filter_case", data)
 //                dataService.setData(task, ImportHelper.populateDataset(filterCaseRefData));
 
 //                taskService.finishTask(task, userService.getLoggedUser());
