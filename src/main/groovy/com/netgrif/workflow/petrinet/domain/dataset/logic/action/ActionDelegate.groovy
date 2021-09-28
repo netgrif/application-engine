@@ -144,9 +144,6 @@ class ActionDelegate {
         this.actionsRunner = actionsRunner
         this.initFieldsMap(action.fieldIds)
         this.initTransitionsMap(action.transitionIds)
-//        changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
-//                task.isPresent() ? task.get().stringId : "task",
-//                task.isPresent() ? task.get().transitionId : "trans")
         this.outcomes = new ArrayList<>()
     }
 
