@@ -11,6 +11,29 @@
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
+	<!-- FUNCTIONS -->
+	<function scope="process" name="updateFilterAutocompleteOptions">
+	{
+		com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+		com.netgrif.workflow.petrinet.domain.dataset.TaskField previewTaskRef,
+		com.netgrif.workflow.petrinet.domain.dataset.CaseField referencedFiltersList
+		->
+			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+				change previewTaskRef value {
+					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+				}
+			} else {
+				change filterAutocomplete options {
+					return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+							.findAll({filterCase -&gt; !referencedFiltersList.value.contains(filterCase.stringId)})
+							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+				}
+				change previewTaskRef value {
+					return []
+				}
+			}
+	}
+	</function>
 	<!-- DATA -->
 	<data type="text">
 		<id>group_id</id>
@@ -112,20 +135,14 @@
 			previewTaskRef: f.filter_preview,
 			referencedFiltersList: f.referenced_filters;
 
-			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
-				change previewTaskRef value {
-					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
-				}
-			} else {
-				change filterAutocomplete options {
-					return findFilters(filterAutocomplete.value)
-						.findAll({filterCase -&gt; !referencedFiltersList.value.contains(filterCase.stringId)})
-						.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
-				}
-				change previewTaskRef value {
-					return []
-				}
-			}
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
+		</action>
+		<action trigger="get">
+			filterAutocomplete: f.this,
+			previewTaskRef: f.filter_preview,
+			referencedFiltersList: f.referenced_filters;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
 		</action>
 	</data>
 	<data type="button">
