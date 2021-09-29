@@ -143,7 +143,7 @@ public class MenuImportExport implements IMenuImportExport {
             //Change remove_option button value to trigger its SET action
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            //TODO
+
 //            caseToRemove.getDataSet().get("remove_option").setValue("removed");
 //            workflowService.save(caseToRemove);
             Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
@@ -172,8 +172,17 @@ public class MenuImportExport implements IMenuImportExport {
 //                            } else resultMessage = resultMessage.concat(split[0]);
 //                        }));
         //TODO check resultMessage
-        groupCase.getDataSet().get("import_results").setValue(resultMessage);
-        workflowService.save(groupCase);
+        QTask qTask = new QTask("task");
+        Task task = taskService.searchOne(qTask.transitionId.eq("navigationMenuConfig").and(qTask.caseId.eq(parentId)));
+
+        Map<String, Map<String, String>> groupData = new HashMap<>();
+        Map <String, String> groupResultMessage = new HashMap<>();
+        groupResultMessage.put("type", "text");
+        groupResultMessage.put("value", resultMessage);
+        groupData.put("import_results", groupResultMessage);
+        dataService.setData(task, ImportHelper.populateDataset(groupData));
+
+//        groupCase.getDataSet().get("import_results").setValue(resultMessage);
 
         return filterTaskIds;
     }
@@ -190,7 +199,7 @@ public class MenuImportExport implements IMenuImportExport {
     protected FileFieldValue createXML(MenuList menuList, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-            ffv.setName("menu_" + userService.getLoggedUser().getName() + ".xml");
+            ffv.setName("menu_" + userService.getSystem().getName() + ".xml");
             ffv.setPath(ffv.getPath(parentId, fileField.getImportId()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();
@@ -267,9 +276,12 @@ public class MenuImportExport implements IMenuImportExport {
             });
         }
             //Creating new Case of preference_filter_item net and setting its data...
+//            Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
+//                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getSystem().transformToLoggedUser());
+
             Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
-                    , item.getEntry_name() + " menu item", "", userService.getLoggedUser().transformToLoggedUser());
-            //TODO title should be empty and author should be engine
+                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getLoggedUser().transformToLoggedUser());
+            //TODO title should be empty
 
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
@@ -284,7 +296,6 @@ public class MenuImportExport implements IMenuImportExport {
             //Setting data on "init" task
             try {
                 taskService.assignTask(task, userService.getLoggedUser());
-//                    dataService.setData(task, ImportHelper.populateDataset(menuItemData))
 
 //                menuItemCase.getDataSet().get("filter_case").setValue(Arrays.asList(filterCase.getStringId()));
                 menuItemCase.getDataSet().get("menu_identifier").setValue(menuIdentifier);
@@ -317,7 +328,7 @@ public class MenuImportExport implements IMenuImportExport {
 //            task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(menuItemCase.getStringId())));
 
 //            return task.getStringId() + "," + filterCase.getStringId();
-            return task.getCaseId() + "," + filterCase.getStringId();
+            return task.getCaseId() + "," + filterCase.getStringId() + "," + item.getUseIcon().toString();
         }
 
 //        public Map<String, String> createFilterMapEntry (String Id,boolean setParentId){
