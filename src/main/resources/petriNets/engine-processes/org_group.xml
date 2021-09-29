@@ -32,7 +32,9 @@
 					return []
 				}
 			}
-	}
+
+		log.info("DEBUG: vola sa funkcia, hodnoty filterCaseRefu su taketo: " + referencedFiltersList.value)
+		}
 	</function>
 	<!-- DATA -->
 	<data type="text">
@@ -123,7 +125,6 @@
 		<id>imported_menu_ids</id>
 		<title></title>
 	</data>
-	imported_menu_ids
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
 		<title name="select_menu_item_filter">Select filter</title>
@@ -226,14 +227,78 @@
 			referencedFiltersList: f.referenced_filters,
 			groupId: f.group_id,
 			newEntries: f.imported_menu_ids,
+			newIdsActionSetter: f.new_entries_setter,
 			importResults: f.import_results;
 
 			change importResults value {return ""}
 
-			def cases = findCases({ it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change newEntries value { menuImportExport.importMenu(cases, import_file.value, useCase.stringId) }
-			log.info("DEBUG: newEntries: " + newEntries.value)
+		def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet["parentId"].value == useCase.stringId }
+		change newEntries value { menuImportExport.importMenu(cases, import_file.value, useCase.stringId) }
+		def actualUseCase = workflowService.findOne(useCase.stringId)
+
+		actualUseCase.dataSet.entrySet().forEach{ e ->
+			useCase.dataSet[e.key].value = e.value.value
+			if(e.key == ("imported_menu_ids")) {
+				useCase.dataSet[e.key].value = newEntries.value
+			}
+		}
+
+		log.info("DEBUG: newEntries: " + newEntries.value)
+		log.info("DEBUG: oldEntries " + menuItemsTaskRef.value)
+
+		change newIdsActionSetter value { "whoa new value" }
 		</action>
+		<!--		<action trigger="set">
+
+                    import_file: f.import_menu_file,
+                    menuItemsTaskRef: f.filter_tasks,
+                    referencedFiltersList: f.referenced_filters,
+                    groupId: f.group_id,
+                    newEntries: f.imported_menu_ids,
+                    importResults: f.import_results;
+
+                    filterTaskIds = []
+                    filterCaseIds = []
+
+                    def actualUseCase = workflowService.findOne(useCase.stringId)
+                    def entries = actualUseCase.dataSet.get("imported_menu_ids").value
+
+                    entries.forEach { itemId -&gt;
+                        log.info("DEBUG: foreach ok")
+                        def idSplit = itemId.split(',')
+
+                        def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
+                        setData(initTask, [
+                        "filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
+                        "use_icon": ["type":"boolean", "value": idSplit[2]]
+                        ])
+                        finishTask(initTask)
+
+                        def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
+
+                        filterTaskIds.add(viewTask.getStringId())
+                        filterCaseIds.add(idSplit[1])
+                        log.info("DEBUG: new IDs add ok")
+                    }
+                    log.info("DEBUG: menu items after removal: " + menuItemsTaskRef.value)
+                    log.info("DEBUG: new taskRef task ids: " + filterTaskIds.value)
+                    log.info("DEBUG: new filterCaseref case ids: " + filterCaseIds.value)
+
+                    change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
+                    change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
+                    log.info("DEBUG: menu items after add: " + menuItemsTaskRef.value)
+                    log.info("DEBUG: added task ids: " + filterTaskIds.value)
+                    log.info("DEBUG: added case ids: " + filterCaseIds.value)
+
+                    log.info("DEBUG: new items add ok")
+		</action>-->
+		<component>
+			<name>raised</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>new_entries_setter</id>
+		<title></title>
 		<action trigger="set">
 			import_file: f.import_menu_file,
 			menuItemsTaskRef: f.filter_tasks,
@@ -244,39 +309,62 @@
 
 			filterTaskIds = []
 			filterCaseIds = []
-
-			newEntries.value.forEach { itemId -&gt;
-				log.info("DEBUG: foreach ok")
-				def idSplit = itemId.split(',')
-
-				def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
-				setData(initTask, [
-				"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]]
-				])
-				finishTask(initTask)
-
-				def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
-
-				filterTaskIds.add(viewTask.getStringId())
-				filterCaseIds.add(idSplit[1])
-				//TODO vracat case ID novych PFI v split 0 a setData na ich filterCase field podla split 1
-				//TODO skontrolovat finish init tasku
-				log.info("DEBUG: split add ok")
-			}
-
-			change menuItemsTaskRef value {return filterTaskIds}
-			change referencedFiltersList value {return filterCaseIds}
-			log.info("DEBUG: new items add ok")
-
 			<!--
-            change menuItemsTaskRef value {return menuItemsTaskRef.value + idSplit[0]}
-            change referencedFiltersList value {return referencedFiltersList.value + idSplit[1]}
-        }
-        change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}-->
+			def actualCase1 = workflowService.findOne(useCase.stringId)
+			def actualCase2 =  findCase({it._id.eq(new org.bson.types.ObjectId(useCase.stringId))});
+			def newEntriesFromActualCase1 = actualCase1.dataSet["imported_menu_ids"].value
+			def newEntriesFromActualCase2 = actualCase2.dataSet.get("imported_menu_ids").value
+			log.info("DEBUG: getactualCases ok")
+
+			log.info(newEntriesFromActualCase1)
+			log.info(newEntriesFromActualCase2)
+
+			def entries = getThisGroupMenuImportIds()
+-->
+
+<!--			def actualUseCase = workflowService.findOne(useCase.stringId)
+			def entries = actualUseCase.dataSet.get("imported_menu_ids").value
+-->
+			newEntries.value.forEach { itemId -&gt;
+			log.info("DEBUG: foreach ok")
+			def idSplit = itemId.split(',')
+
+			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
+			setData(initTask, [
+			"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
+			"use_icon": ["type":"boolean", "value": idSplit[2]]
+			])
+			finishTask(initTask)
+
+			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
+
+			filterTaskIds.add(viewTask.getStringId())
+			filterCaseIds.add(idSplit[1])
+			log.info("DEBUG: new IDs add ok")
+			}
+			log.info("DEBUG: menu items after removal: " + menuItemsTaskRef.value)
+			log.info("DEBUG: new taskRef task ids: " + filterTaskIds.value)
+			log.info("DEBUG: new filterCaseref case ids: " + filterCaseIds.value)
+
+			change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
+			change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
+			log.info("DEBUG: menu items after add: " + menuItemsTaskRef.value)
+			log.info("DEBUG: added task ids: " + filterTaskIds.value)
+			log.info("DEBUG: added case ids: " + filterCaseIds.value)
+			workflowService.save(useCase)
+			<!--		if(menuItemsTaskRef.value) {
+                        change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
+                    } else {
+                        change menuItemsTaskRef value {return filterTaskIds}
+                    }
+
+                    if(referencedFiltersList.value) {
+                        change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
+                    } else {
+                        change referencedFiltersList value {return filterCaseIds}
+                    } -->
+			log.info("DEBUG: new items add ok")
 		</action>
-		<component>
-			<name>raised</name>
-		</component>
 	</data>
 	<data type="caseRef">
 		<id>referenced_filters</id>
