@@ -1,22 +1,22 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class ProcessRolesUsersListResponse {
-    List<User> users;
+    List<IUser> users;
 
     public ProcessRolesUsersListResponse() {
         users = new LinkedList<>();
     }
 
-    public List<User> getUsers() {
+    public List<IUser> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(List<IUser> users) {
         this.users = users;
     }
 }

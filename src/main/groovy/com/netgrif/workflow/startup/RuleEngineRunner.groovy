@@ -46,8 +46,8 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
     void generateTemplate() {
         def engine = new SimpleTemplateEngine()
         def binding = [
-                imports : sessionInitializer.imports().collect { "$it" }.join(""),
-                globals : sessionInitializer.globals().collect { "${it.toString()}" }.join(""),
+                imports: sessionInitializer.imports().collect { "$it" }.join(""),
+                globals: sessionInitializer.globals().collect { "${it.toString()}" }.join(""),
         ]
 
         String template = engine.createTemplate(new ClassPathResource(templateResource).inputStream.getText()).make(binding)

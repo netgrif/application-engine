@@ -19,15 +19,15 @@ echo "database: "
 read mongo_db
 mongodump --db ${mongo_db} -o ${dir_name}
 
-echo "Neo4j export"
-echo "database: [graph.db]"
-read neo4j_db
-if [[ ! ${neo4j_db} || ${neo4j_db} = *[^0-9]* ]]; then
-    neo4j_db=graph.db
-fi
+#echo "Neo4j export"
+#echo "database: [graph.db]"
+#read neo4j_db
+#if [[ ! ${neo4j_db} || ${neo4j_db} = *[^0-9]* ]]; then
+#    neo4j_db=graph.db
+#fi
 
-neo4j stop
-neo4j-admin dump --database=${neo4j_db} --to=${dir_name}/neo4j.dump
-neo4j start
+#neo4j stop
+#neo4j-admin dump --database=${neo4j_db} --to=${dir_name}/neo4j.dump
+#neo4j start
 
 zip -r dump-`date "+%F_%_H%_M"`.zip ${dir_name}

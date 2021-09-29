@@ -3,20 +3,21 @@ package com.netgrif.workflow.ipc
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class CaseApiTest {
@@ -39,26 +40,22 @@ class CaseApiTest {
     @Autowired
     private SuperCreator superCreator
 
-    private boolean initialised = false
     private Optional<PetriNet> testNet
 
     private def stream = { String name ->
         return CaseApiTest.getClassLoader().getResourceAsStream(name)
     }
 
-    @Before
+    @BeforeEach
     void setup() {
-        if (!initialised) {
-            testHelper.truncateDbs()
-            initialised = true
-        }
+        testHelper.truncateDbs()
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"
 
     @Test
     void testCreate() {
-        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), "major", superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 
@@ -73,7 +70,9 @@ class CaseApiTest {
 
     @Test
     void testSearch() {
-        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
+        testHelper.truncateDbs()
+
+        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 
@@ -87,7 +86,7 @@ class CaseApiTest {
 
         cases = caseRepository.findAll()
         assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
-        assert cases.findAll { it.title != "Case 1" }.every { it.dataSet["field"].value == 0 }
+        assert cases.findAll { it.title != "Case 1"  && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
         assert cases.find {it.title == "Case 0"}.dataSet["count"].value == 5
         assert cases.find {it.title == "Case 0"}.dataSet["paged"].value == 1
     }

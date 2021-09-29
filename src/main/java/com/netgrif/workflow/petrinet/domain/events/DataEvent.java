@@ -19,7 +19,7 @@ public class DataEvent {
 
     private Map<EventPhase, List<Action>> actions;
 
-    public DataEvent(){
+    public DataEvent() {
         initActions();
     }
 
@@ -33,19 +33,19 @@ public class DataEvent {
         this.trigger = Action.ActionTrigger.fromString(type);
     }
 
-    public EventPhase getDefaultPhase(){
+    public EventPhase getDefaultPhase() {
         try {
             if (trigger.equals(Action.ActionTrigger.GET))
                 return EventPhase.PRE;
             else if (trigger.equals(Action.ActionTrigger.SET))
                 return EventPhase.POST;
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             log.error("Trigger for event [" + this.id + "] is not set", e);
         }
         return null;
     }
 
-    private void initActions(){
+    private void initActions() {
         this.actions = new HashMap<>();
         this.actions.put(EventPhase.PRE, new ArrayList<>());
         this.actions.put(EventPhase.POST, new ArrayList<>());

@@ -1,22 +1,22 @@
 package com.netgrif.workflow.petrinet.domain
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.SuperCreator
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class ImporterTest {
@@ -30,8 +30,6 @@ class ImporterTest {
     @Autowired
     private ProcessRoleRepository processRoleRepository
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-    @Autowired
     private TestHelper testHelper
 
     @Value("classpath:net_import_1.xml")
@@ -39,7 +37,7 @@ class ImporterTest {
     @Value("classpath:net_import_2.xml")
     private Resource secondVersionResource
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
@@ -48,11 +46,10 @@ class ImporterTest {
     void importTest() {
         def netOptional = petriNetService.importPetriNet(
                 firstVersionResource.inputStream,
-                "major",
+                VersionType.MAJOR,
                 superCreator.loggedSuper
         )
         assert processRoleRepository.count() == 3
-        assert userProcessRoleRepository.count() == 3
         assert netOptional.isPresent()
         def net = netOptional.get()
 
@@ -134,11 +131,10 @@ class ImporterTest {
 
         def netOptional2 = petriNetService.importPetriNet(
                 secondVersionResource.inputStream,
-                "major",
+                VersionType.MAJOR,
                 superCreator.loggedSuper
         )
         assert processRoleRepository.count() == 4
-        assert userProcessRoleRepository.count() == 4
         assert netOptional2.isPresent()
         def net2 = netOptional2.get()
 

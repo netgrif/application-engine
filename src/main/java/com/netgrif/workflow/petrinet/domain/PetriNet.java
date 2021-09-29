@@ -2,7 +2,9 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
-import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
@@ -114,6 +116,10 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, Map<String, Boolean>> userRefs;
 
+    @Getter
+    @Setter
+    private List<Function> functions;
+
     @Transient
     private boolean initialized;
 
@@ -142,6 +148,7 @@ public class PetriNet extends PetriNetObject {
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
         userRefs = new HashMap<>();
+        functions = new LinkedList<>();
     }
 
     public void addPlace(Place place) {
@@ -164,7 +171,11 @@ public class PetriNet extends PetriNetObject {
         }
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
+    }
+
+    public void addFunction(Function function) { functions.add(function); }
 
     public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
@@ -238,17 +249,23 @@ public class PetriNet extends PetriNetObject {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
     }
 
-    public void initializeVarArcs(Map<String, DataField> dataSet) {
+    public void initializeArcs(Map<String, DataField> dataSet) {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
-                .filter(arc -> arc instanceof VariableArc)
+                .filter(arc -> arc.getReference() !=null)
                 .forEach(arc -> {
-                    VariableArc varc = (VariableArc) arc;
-                    String fieldId = varc.getFieldId();
-                    DataField field = dataSet.get(fieldId);
-                    varc.setField(field);
+                        String referenceId = arc.getReference().getReference();
+                        arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
                 });
+    }
+
+    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet){
+        if (type == Type.PLACE) {
+            return places.get(referenceId);
+        } else {
+            return dataSet.get(referenceId);
+        }
     }
 
     public Map<String, Integer> getActivePlaces() {
@@ -309,6 +326,10 @@ public class PetriNet extends PetriNetObject {
             return "";
         }
         return title.getTranslation(locale);
+    }
+
+    public List<Function> getFunctions(FunctionScope scope) {
+        return functions.stream().filter(function -> function.getScope().equals(scope)).collect(Collectors.toList());
     }
 
     public List<Action> getPreCreateActions() {
@@ -405,6 +426,7 @@ public class PetriNet extends PetriNetObject {
         clone.setPermissions(this.permissions);
         clone.setUserRefs(this.userRefs);
         this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
+        this.getFunctions().forEach(clone::addFunction);
         return clone;
     }
 }

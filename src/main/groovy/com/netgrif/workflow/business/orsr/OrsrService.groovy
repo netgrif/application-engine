@@ -48,12 +48,13 @@ class OrsrService implements IOrsrService {
             Document doc = Jsoup.connect("${ORSR_URL_BASE}${companyUrl}").get()
             Elements tables = doc.select("table[cellspacing=3]")
 
-        info.name = tables?.get(0)?.select("span[class=ra]")?.get(0)?.text()
-        info.created = tables?.get(3)?.select("span[class=ra]")?.get(0)?.text()
-        parseStreet(info, tables)
-        parseStreetNumber(info, tables)
-        parseCity(info, tables)
-        parsePostalCode(info, tables)} catch (HttpStatusException e) {
+            info.name = tables?.get(0)?.select("span[class=ra]")?.get(0)?.text()
+            info.created = tables?.get(3)?.select("span[class=ra]")?.get(0)?.text()
+            parseStreet(info, tables)
+            parseStreetNumber(info, tables)
+            parseCity(info, tables)
+            parsePostalCode(info, tables)
+        } catch (HttpStatusException e) {
             log.error("HTTP error fetching URL $ORSR_URL_BASE$companyUrl", e)
         }
 
