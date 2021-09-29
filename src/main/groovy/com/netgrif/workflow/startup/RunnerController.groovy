@@ -24,7 +24,8 @@ class RunnerController {
             DemoRunner,
             QuartzSchedulerRunner,
             PdfRunner,
-            FinisherRunner
+            FinisherRunnerSuperCreator,
+            FinisherRunner,
     ]
 
     protected List getOrderList() {
