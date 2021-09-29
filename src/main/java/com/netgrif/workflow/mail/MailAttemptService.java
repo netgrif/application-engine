@@ -1,15 +1,15 @@
 package com.netgrif.workflow.mail;
-import java.util.concurrent.ExecutionException;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.netgrif.workflow.configuration.properties.SecurityLimitsProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -21,14 +21,14 @@ public class MailAttemptService implements IMailAttemptService {
 
     @Autowired
     public MailAttemptService(SecurityLimitsProperties securityLimitsProperties) {
-          super();
-          this.securityLimitsProperties = securityLimitsProperties;
-          attemptsCache = CacheBuilder.newBuilder().
+        super();
+        this.securityLimitsProperties = securityLimitsProperties;
+        attemptsCache = CacheBuilder.newBuilder().
                 expireAfterWrite(securityLimitsProperties.getEmailBlockDuration(), securityLimitsProperties.getEmailBlockTimeType()).build(new CacheLoader<String, Integer>() {
-                public Integer load(String key) {
-                    return 0;
-                }
-          });
+            public Integer load(String key) {
+                return 0;
+            }
+        });
     }
 
     public void mailAttempt(String key) {
@@ -36,7 +36,7 @@ public class MailAttemptService implements IMailAttemptService {
         try {
             attempts = attemptsCache.get(key);
         } catch (ExecutionException e) {
-            log.error("Error reading mail attempts cache for key " + key , e);
+            log.error("Error reading mail attempts cache for key " + key, e);
             attempts = 0;
         }
         attempts++;
@@ -47,7 +47,7 @@ public class MailAttemptService implements IMailAttemptService {
         try {
             return attemptsCache.get(key) >= securityLimitsProperties.getEmailSendsAttempts();
         } catch (ExecutionException e) {
-            log.error("Error reading mail attempts cache for key " + key , e);
+            log.error("Error reading mail attempts cache for key " + key, e);
             return false;
         }
     }

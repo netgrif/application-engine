@@ -1,23 +1,25 @@
 package com.netgrif.workflow.workflow
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.petrinet.domain.DataGroup
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class DataServiceTest {
@@ -38,18 +40,24 @@ class DataServiceTest {
     @Autowired
     private IDataService dataService
 
-    @Before
+    @Autowired
+    private TestHelper testHelper
+
+
+    @BeforeEach
     void beforeAll() {
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), "major", superCreator.getLoggedSuper())
+        testHelper.truncateDbs()
+
+
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), "major", superCreator.getLoggedSuper())
+        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
         this.net = net.get()
     }
 
     private PetriNet net
 
-    // NAE-970
     @Test
     void testTaskrefedFileFieldAction() {
         def aCase = importHelper.createCase("Case", this.net)
@@ -61,7 +69,7 @@ class DataServiceTest {
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
 
         List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH)
-        assert datagroups.stream().filter({it -> it.fields.size() > 0}).count() == 2
+        assert datagroups.stream().filter({it -> it.fields.size() > 0}).count() == 3
         LocalisedField fileField = findField(datagroups, FILE_FIELD_TITLE)
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
@@ -75,9 +83,9 @@ class DataServiceTest {
     }
 
     LocalisedField findField(List<DataGroup> datagroups, String fieldTitle) {
-        def fieldDataGroup = datagroups.find {it -> it.fields.find( {field -> (field.name == fieldTitle) }) != null}
+        def fieldDataGroup = datagroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
         assert fieldDataGroup != null
-        LocalisedField field = fieldDataGroup.fields.find( { field -> (field.name == fieldTitle) }) as LocalisedField
+        LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
     }

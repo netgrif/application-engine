@@ -1,27 +1,27 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.startup.GroupRunner
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
-import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
 import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class FieldTest {
@@ -40,7 +40,7 @@ class FieldTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner systemUserRunner

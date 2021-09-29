@@ -33,20 +33,20 @@ class NewInitTest {
     @Test
     void newInitTest() throws IOException, MissingIconKeyException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/nae_1276_Init_value_as_choice.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId,"New init test", "", superCreator.getLoggedSuper())
-        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Bob"}
-        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Alice"}
-        assert (initTestCase.dataSet["old_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Bob"}
-        assert (initTestCase.dataSet["old_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Alice"}
-        assert (initTestCase.dataSet["new_init_multichoice_map"].value as List<String>).stream().any {it == "al"}
-        assert (initTestCase.dataSet["new_init_multichoice_map"].value as List<String>).stream().any {it == "ca"}
-        assert (initTestCase.dataSet["old_init_multichoice_map"].value as List<String>).stream().any {it == "al"}
-        assert (initTestCase.dataSet["old_init_multichoice_map"].value as List<String>).stream().any {it == "ca"}
+        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId, "New init test", "", superCreator.getLoggedSuper())
+        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { it.defaultValue == "Bob" }
+        assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any { it.defaultValue == "Alice" }
+        assert (initTestCase.dataSet["old_init_multichoice"].value as List<I18nString>).stream().any { it.defaultValue == "Bob" }
+        assert (initTestCase.dataSet["old_init_multichoice"].value as List<I18nString>).stream().any { it.defaultValue == "Alice" }
+        assert (initTestCase.dataSet["new_init_multichoice_map"].value as List<String>).stream().any { it == "al" }
+        assert (initTestCase.dataSet["new_init_multichoice_map"].value as List<String>).stream().any { it == "ca" }
+        assert (initTestCase.dataSet["old_init_multichoice_map"].value as List<String>).stream().any { it == "al" }
+        assert (initTestCase.dataSet["old_init_multichoice_map"].value as List<String>).stream().any { it == "ca" }
         assert !(initTestCase.dataSet["new_init_taskref"].value as List).empty
         assert !(initTestCase.dataSet["old_init_taskref"].value as List).empty
-        assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any {it.getName() == "test-file.txt"}
-        assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any {it.getName() == "test-file-list.txt"}
-        assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any {it.getName() == "test-file.txt"}
-        assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any {it.getName() == "test-file-list.txt"}
+        assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file.txt" }
+        assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file-list.txt" }
+        assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file.txt" }
+        assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file-list.txt" }
     }
 }

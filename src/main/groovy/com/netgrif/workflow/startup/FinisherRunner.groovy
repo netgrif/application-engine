@@ -15,6 +15,7 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
+        superCreator.setAllToSuperUser()
         log.info("+----------------------------+")
         log.info("| Netgrif Application Engine |")
         log.info("+----------------------------+")

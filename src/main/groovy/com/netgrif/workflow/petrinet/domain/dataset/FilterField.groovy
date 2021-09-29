@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FilterField extends FieldWithAllowedNets<String>  {
+class FilterField extends FieldWithAllowedNets<String> {
 
     /**
      * Serialized information necessary for the restoration of the advanced search frontend GUI.

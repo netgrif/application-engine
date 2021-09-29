@@ -24,7 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.*;
+import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.errorMessage;
+import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.successMessage;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -77,7 +78,7 @@ public class AdminController {
             String userIp = details.getRemoteAddress();
             log.warn("Connecting IP " + userIp);
             if (!whitelist.contains(userIp)) {
-                log.error("User "+auth.getName()+ " invalid IP Address " + userIp);
+                log.error("User " + auth.getName() + " invalid IP Address " + userIp);
                 return errorMessage("Invalid IP Address");
             }
             if (code != null) {

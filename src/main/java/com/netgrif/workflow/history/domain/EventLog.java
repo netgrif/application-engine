@@ -18,7 +18,8 @@ public abstract class EventLog {
     @Getter
     protected LocalDateTime created;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected String message;
 
     public EventLog() {

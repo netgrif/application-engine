@@ -1,59 +1,51 @@
 package com.netgrif.workflow.configuration.quartz;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
-import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
-import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
+@Slf4j
 @Configuration
 public class QuartzConfiguration {
-
-    @Value("${spring.datasource.url}")
-    private String defaultJdbcUrl;
-
-    @Value("${spring.datasource.username}")
-    private String defaultJdbcUser;
-
-    @Value("${spring.datasource.password}")
-    private String defaultJdbcPass;
-
-    @Value("${quartz.jdbc-url:#{null}}")
-    private String jdbcUrl;
-
-    @Value("${quartz.jdbc-user:#{null}}")
-    private String jdbcUser;
-
-    @Value("${quartz.jdbc-password:#{null}}")
-    private String jdbcPass;
-
-    @Value("${quartz.default-properties.file:quartz.properties}")
-    private String defaultQuartzPropsPath;
 
     @Autowired
     private ApplicationContext applicationContext;
 
     @Autowired
-    private QuartzProperties quartzProperties;
+    private AutowiringSpringBeanJobFactory jobFactory;
 
-    @QuartzDataSource
-    public DataSource quartzDataSource() {
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url(jdbcUrl == null ? defaultJdbcUrl : jdbcUrl);
-        dataSourceBuilder.username(jdbcUser == null ? defaultJdbcUser : jdbcUser);
-        dataSourceBuilder.password(jdbcPass == null ? defaultJdbcPass : jdbcPass);
-        return dataSourceBuilder.build();
+
+    @Bean
+    public Properties quartzProperties() throws IOException {
+        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
+        propertiesFactoryBean.setLocation(new ClassPathResource("quartz.properties"));
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        List<Resource> resourceList = new ArrayList<>();
+        try {
+            Resource[] resourcesClass = resolver.getResources("classpath*:/quartz.properties");
+            Resource[] resources = resolver.getResources("file:/*/quartz.properties");
+            Collections.addAll(resourceList, resourcesClass);
+            Collections.addAll(resourceList, resources);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        propertiesFactoryBean.setLocations(resourceList.toArray(new Resource[]{}));
+        propertiesFactoryBean.afterPropertiesSet();
+        return propertiesFactoryBean.getObject();
     }
 
     @Bean
@@ -66,14 +58,11 @@ public class QuartzConfiguration {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setApplicationContext(applicationContext);
         schedulerFactory.setAutoStartup(false);
-
-        Properties properties = PropertiesLoaderUtils.loadProperties(new ClassPathResource(defaultQuartzPropsPath));
-        properties.putAll(quartzProperties.getProperties());
-        schedulerFactory.setQuartzProperties(properties);
-
-        schedulerFactory.setJobFactory(new SpringBeanJobFactory());
-        schedulerFactory.setDataSource(quartzDataSource());
-
+        schedulerFactory.setQuartzProperties(quartzProperties());
+        jobFactory.setApplicationContext(applicationContext);
+        schedulerFactory.setJobFactory(jobFactory);
+        schedulerFactory.setOverwriteExistingJobs(true);
+        schedulerFactory.setSchedulerName("netgrif_quartz");
         return schedulerFactory;
     }
 

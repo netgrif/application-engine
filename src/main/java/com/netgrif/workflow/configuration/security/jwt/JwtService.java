@@ -31,7 +31,7 @@ public class JwtService implements IJwtService {
     private IProcessRoleService roleService;
 
     @PostConstruct
-    private void resolveSecret(){
+    private void resolveSecret() {
         try {
             PrivateKeyReader reader = new PrivateKeyReader(properties.getAlgorithm());
             secret = Base64.getEncoder().encodeToString(reader.get(properties.getPrivateKey().getFile().getPath()).getEncoded());
@@ -54,20 +54,20 @@ public class JwtService implements IJwtService {
 
     @Override
     public LoggedUser getLoggedUser(String token, Authority anonymousRole) {
-        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>)getAllClaimsFromToken(token).get("user");
+        LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("user");
         LoggedUser user = new LoggedUser(
-                Long.parseLong(userMap.get("id").toString()),
+                userMap.get("id").toString(),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
                 Collections.singleton(anonymousRole)
         );
         user.setFullName(userMap.get("fullName").toString());
-        user.setAnonymous((boolean)userMap.get("anonymous"));
+        user.setAnonymous((boolean) userMap.get("anonymous"));
         user.setProcessRoles(Collections.singleton(roleService.defaultRole().getStringId()));
         return user;
     }
 
-    private Date getExpirationDateFromToken(String token)  throws ExpiredJwtException {
+    private Date getExpirationDateFromToken(String token) throws ExpiredJwtException {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
