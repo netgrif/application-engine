@@ -3,14 +3,12 @@ package com.netgrif.workflow.configuration;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.configuration.security.SessionUtilsProperties;
 import com.netgrif.workflow.ldap.filters.LoginAttemptsFilter;
-import com.netgrif.workflow.configuration.security.SessionUtilsProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-//import com.netgrif.workflow.ldap.filters.LoginAttemptsFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
