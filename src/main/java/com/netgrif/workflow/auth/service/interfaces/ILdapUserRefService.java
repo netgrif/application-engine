@@ -19,7 +19,6 @@ public interface ILdapUserRefService {
 
     LdapUserRef findUserByDn(String dn);
 
-
     LdapUserRef findUserByCn(String cn);
 
 }
