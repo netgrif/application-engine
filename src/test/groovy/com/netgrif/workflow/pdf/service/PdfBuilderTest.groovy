@@ -1,13 +1,13 @@
 package com.netgrif.workflow.pdf.service
 
 import org.apache.pdfbox.pdmodel.PDDocument
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class PdfBuilderTest {
@@ -16,8 +16,8 @@ class PdfBuilderTest {
     void loadMultiple() {
         PDDocument document = PdfBuilder.builder()
                 .load("src/test/resources/pdf/draft.pdf",
-                "src/test/resources/pdf/offer.pdf",
-                "src/test/resources/pdf/test.pdf")
+                        "src/test/resources/pdf/offer.pdf",
+                        "src/test/resources/pdf/test.pdf")
                 .build()
 
         assert document.numberOfPages > 10

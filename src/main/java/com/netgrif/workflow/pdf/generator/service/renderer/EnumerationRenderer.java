@@ -10,7 +10,7 @@ import java.io.IOException;
 public class EnumerationRenderer extends SelectionFieldRenderer<EnumerationField> {
 
     public void setFieldParams(PdfEnumerationField field) {
-        helperField = new PdfEnumerationField(field.getFieldId(),field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
+        helperField = new PdfEnumerationField(field.getFieldId(), field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
                 resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
     }
 

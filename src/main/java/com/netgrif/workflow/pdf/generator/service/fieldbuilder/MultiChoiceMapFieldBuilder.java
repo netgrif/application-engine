@@ -17,7 +17,7 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedMultichoiceMapField field, int lastX, int lastY){
+    public PdfField buildField(DataGroup dataGroup, LocalisedMultichoiceMapField field, int lastX, int lastY) {
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;

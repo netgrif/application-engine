@@ -1,26 +1,19 @@
 package com.netgrif.workflow.workflow.service;
 
-import com.netgrif.workflow.auth.domain.AnonymousUser;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
-import com.netgrif.workflow.workflow.domain.TaskPair;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.arcs.Arc;
-import com.netgrif.workflow.petrinet.domain.arcs.ArcOrderComparator;
-import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
+import com.netgrif.workflow.petrinet.domain.arcs.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.utils.DateUtils;
@@ -35,6 +28,7 @@ import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +100,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+    public void assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
         for (Task task : tasks) {
             assignTask(task, user);
         }
@@ -119,7 +113,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        User user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.resolveById(loggedUser.getId(), true);
         return assignTask(taskOptional.get(), user);
     }
 
@@ -131,7 +125,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException {
+    public EventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(task.getStringId(), task.getTransitionId(), useCase.getStringId(), transition.getAssignMessage());
@@ -150,7 +144,7 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    protected void assignTaskToUser(User user, Task task, String useCaseId) throws TransitionNotExecutableException {
+    protected void assignTaskToUser(IUser user, Task task, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
         useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -158,7 +152,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCaseId + "]: Assigning task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
         startExecution(transition, useCase);
-        task.setUserId(user.getId());
+        task.setUserId(user.getStringId());
         task.setStartDate(LocalDateTime.now());
 
         useCase = workflowService.save(useCase);
@@ -168,7 +162,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+    public void finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
         for (Task task : tasks) {
             finishTask(task, user);
         }
@@ -187,7 +181,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         Task task = taskOptional.get();
-        User user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.resolveById(loggedUser.getId(), true);
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
@@ -202,7 +196,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException {
+    public EventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(task.getStringId(), task.getTransitionId(), useCase.getStringId(), transition.getFinishMessage());
@@ -234,7 +228,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void cancelTasks(List<Task> tasks, User user) {
+    public void cancelTasks(List<Task> tasks, IUser user) {
         for (Task task : tasks) {
             cancelTask(task, user);
         }
@@ -247,13 +241,13 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        User user = userService.findById(loggedUser.getId(), true);
+        IUser user = userService.resolveById(loggedUser.getId(), true);
         return cancelTask(taskOptional.get(), user);
     }
 
     @Override
     @Transactional
-    public EventOutcome cancelTask(Task task, User user) {
+    public EventOutcome cancelTask(Task task, IUser user) {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(task.getStringId(), task.getTransitionId(), useCase.getStringId(), transition.getCancelMessage());
@@ -300,11 +294,8 @@ public class TaskService implements ITaskService {
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> {
-                    if (arc instanceof ResetArc) {
-                        ((ResetArc) arc).setRemovedTokens(useCase.getResetArcTokens().get(arc.getStringId()));
-                        useCase.getResetArcTokens().remove(arc.getStringId());
-                    }
-                    arc.rollbackExecution();
+                    arc.rollbackExecution(useCase.getConsumedTokens().get(arc.getStringId()));
+                    useCase.getConsumedTokens().remove(arc.getStringId());
                 });
         workflowService.updateMarking(useCase);
 
@@ -318,9 +309,9 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome delegateTask(LoggedUser loggedUser, Long delegatedId, String taskId) throws TransitionNotExecutableException {
-        User delegatedUser = userService.findById(delegatedId, true);
-        User delegateUser = userService.findById(loggedUser.getId(), true);
+    public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
+        IUser delegatedUser = userService.resolveById(delegatedId, true);
+        IUser delegateUser = userService.resolveById(loggedUser.getId(), true);
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
@@ -349,9 +340,9 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    protected void delegate(User delegated, Task task, Case useCase) throws TransitionNotExecutableException {
+    protected void delegate(IUser delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
-            task.setUserId(delegated.getId());
+            task.setUserId(delegated.getStringId());
             save(task);
         } else {
             assignTaskToUser(delegated, task, useCase.getStringId());
@@ -369,9 +360,9 @@ public class TaskService implements ITaskService {
         Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
         if (!taskOptional.isPresent())
             return;
-        Long assigneeId = taskOptional.get().getUserId();
+        String assigneeId = taskOptional.get().getUserId();
         if (assigneeId != null)
-            outcome.setAssignee(userService.findById(assigneeId, true));
+            outcome.setAssignee(userService.resolveById(assigneeId, true));
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
         outcome.setTaskId(task.getStringId());
@@ -407,7 +398,7 @@ public class TaskService implements ITaskService {
                 deleteUnassignedNotExecutableTasks(tasks, transition, useCase);
             }
         });
-        Long sysemId = userService.getSystem().getId();
+        String sysemId = userService.getSystem().getStringId();
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
         if (tasks.stream().anyMatch(task -> Objects.equals(task.getUserId(), sysemId) && task.getStartDate() != null)) {
             return;
@@ -450,9 +441,8 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[" + useCaseId + "]: Finish execution of task [" + transition.getTitle() + "] in case [" + useCase.getTitle() + "]");
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
-        useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
-                .filter(arc -> arc instanceof ResetArc)
-                .forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
+        Supplier<Stream<Arc>> arcStreamSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream();
+        arcStreamSupplier.get().filter(arc -> useCase.getConsumedTokens().containsKey(arc.getStringId())).forEach(arc -> useCase.getConsumedTokens().remove(arc.getStringId()));
         workflowService.save(useCase);
     }
 
@@ -471,7 +461,10 @@ public class TaskService implements ITaskService {
 
         filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
             if (arc instanceof ResetArc) {
-                useCase.getResetArcTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+                useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
+            }
+            if(arc.getReference() != null && arc.getSource() instanceof Place){
+                useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
             }
             arc.execute();
         });
@@ -570,7 +563,7 @@ public class TaskService implements ITaskService {
     @Override
     public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
-        if(searchPredicate != null) {
+        if (searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
             page = loadUsers(page);
             page = dataService.setImmediateFields(page);
@@ -637,8 +630,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> findByUser(Pageable pageable, User user) {
-        return loadUsers(taskRepository.findByUserId(pageable, user.getId()));
+    public Page<Task> findByUser(Pageable pageable, IUser user) {
+        return loadUsers(taskRepository.findByUserId(pageable, user.getStringId()));
     }
 
     @Override
@@ -660,7 +653,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, new PageRequest(0, 1));
+        Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
         if (tasks.getTotalElements() > 0)
             return tasks.getContent().get(0);
         return null;
@@ -694,8 +687,8 @@ public class TaskService implements ITaskService {
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 task.addUsers(new HashSet<>(userIds), permission);
@@ -704,10 +697,10 @@ public class TaskService implements ITaskService {
         return taskRepository.save(task);
     }
 
-    private List<Long> getExistingUsers(List<Long> userIds) {
+    private List<String> getExistingUsers(List<String> userIds) {
         if (userIds == null)
             return null;
-        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
@@ -736,7 +729,7 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                task.setUserId(userService.getSystem().getId());
+                task.setUserId(userService.getSystem().getStringId());
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
@@ -745,7 +738,7 @@ public class TaskService implements ITaskService {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
-        transition.getNegativeViewRoles().forEach((roleId) -> task.addNegativeViewRole(roleId));
+        transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
 
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
@@ -768,13 +761,13 @@ public class TaskService implements ITaskService {
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
-        Map<Long, User> users = new HashMap<>();
+        Map<String, IUser> users = new HashMap<>();
         tasks.forEach(task -> {
             if (task.getUserId() != null) {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
-                    task.setUser(userService.findById(task.getUserId(), true));
+                    task.setUser(userService.resolveById(task.getUserId(), true));
                     users.put(task.getUserId(), task.getUser());
                 }
             }
@@ -802,8 +795,13 @@ public class TaskService implements ITaskService {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
     }
 
+    @Override
+    public void deleteTasksByPetriNetId(String petriNetId) {
+        taskRepository.deleteAllByProcessId(petriNetId);
+    }
+
     private void setUser(Task task) {
         if (task.getUserId() != null)
-            task.setUser(userService.findById(task.getUserId(), true));
+            task.setUser(userService.resolveById(task.getUserId(), true));
     }
 }

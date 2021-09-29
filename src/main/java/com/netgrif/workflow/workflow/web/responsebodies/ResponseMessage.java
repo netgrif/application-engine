@@ -7,27 +7,27 @@ public class ResponseMessage {
     private String error;
     private String data;
 
-    public static ResponseMessage createSuccessMessage(String msg){
+    public static ResponseMessage createSuccessMessage(String msg) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setSuccess(msg);
         return resMsg;
     }
 
-    public static ResponseMessage createSuccessMessageWithData(String msg, String data){
+    public static ResponseMessage createSuccessMessageWithData(String msg, String data) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setSuccess(msg);
         resMsg.setData(data);
         return resMsg;
     }
 
-    public static ResponseMessage createErrorMessage(String msg){
+    public static ResponseMessage createErrorMessage(String msg) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setError(msg);
         return resMsg;
     }
 
 
-    public static ResponseMessage createErrorMessageWithData(String msg, String data){
+    public static ResponseMessage createErrorMessageWithData(String msg, String data) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setError(msg);
         resMsg.setData(data);

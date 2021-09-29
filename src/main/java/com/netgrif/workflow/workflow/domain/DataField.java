@@ -4,8 +4,8 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.importer.model.Validations;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation;
 import com.querydsl.core.annotations.PropertyType;
@@ -15,7 +15,7 @@ import lombok.Setter;
 
 import java.util.*;
 
-public class DataField {
+public class DataField implements Referencable {
 
     @Getter
     private Map<String, Set<FieldBehavior>> behavior;
@@ -107,9 +107,9 @@ public class DataField {
             this.behavior.put(transition, new HashSet<>(behavior));
     }
 
-    public ObjectNode applyOnlyVisibleBehavior(){
+    public ObjectNode applyOnlyVisibleBehavior() {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put(FieldBehavior.VISIBLE.toString(),true);
+        node.put(FieldBehavior.VISIBLE.toString(), true);
         return node;
     }
 
@@ -135,7 +135,7 @@ public class DataField {
         return !behavior.containsKey(transitionId);
     }
 
-    public boolean isDisplayable(){
+    public boolean isDisplayable() {
         return behavior.values().stream().parallel()
                 .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
     }
@@ -195,5 +195,15 @@ public class DataField {
         if (value == null)
             return "null";
         return value.toString();
+    }
+
+    @Override
+    public int getMultiplicity() {
+        double parsedValue = Double.parseDouble(String.valueOf(value));
+        if(parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)){
+            return (int) Double.parseDouble(String.valueOf(value));
+        } else {
+            throw new IllegalArgumentException("Variable arc must be an non negative integer");
+        }
     }
 }

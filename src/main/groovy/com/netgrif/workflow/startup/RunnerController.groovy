@@ -8,22 +8,22 @@ class RunnerController {
     private List order = [
             ElasticsearchRunner,
             MongoDbRunner,
-            Neo4jRunner,
             StorageRunner,
             RuleEngineRunner,
             DefaultRoleRunner,
-            DefaultGroupRunner,
             AuthorityRunner,
             SystemUserRunner,
+            FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,
+            DefaultFiltersRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
-            DummyUserRunner,
             DemoRunner,
             QuartzSchedulerRunner,
+            PdfRunner,
             FinisherRunner
     ]
 

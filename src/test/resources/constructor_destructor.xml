@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>constructor_destructor</id>
-    <title>Constructor and Destructor</title>
     <initials>CAD</initials>
+    <title>Constructor and Destructor</title>
+    <icon>business</icon>
+    <defaultRole>false</defaultRole>
+
     <!-- ROLES -->
     <role>
         <id>process_role</id>
         <title>Process role</title>
     </role>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+
     <roleRef>
         <id>process_role</id>
         <caseLogic>
@@ -15,12 +25,13 @@
             <delete>false</delete>
         </caseLogic>
     </roleRef>
+
     <processEvents>
         <event type="upload">
             <id>upload</id>
             <actions phase="post">
                 <action>
-                    createCase("construtor_destructor", "Construct")
+                    createCase("constructor_destructor", "Construct")
                 </action>
             </actions>
         </event>
@@ -40,15 +51,10 @@
             <id>pdf</id>
             <actions phase="post">
                 <action>
-                    createCase("construtor_destructor", "Destruct")
+                    createCase("constructor_destructor", "Destruct")
                 </action>
             </actions>
         </event>
     </caseEvents>
-    <data type="text">
-        <id>text</id>
-        <title>Text</title>
-        <init>text</init>
-    </data>
 
 </document>

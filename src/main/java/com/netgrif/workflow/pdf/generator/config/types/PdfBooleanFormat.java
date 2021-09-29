@@ -1,8 +1,6 @@
 package com.netgrif.workflow.pdf.generator.config.types;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -8,7 +8,8 @@ import java.util.Map;
 
 public class IllegalArgumentWithChangedFieldsException extends IllegalArgumentException {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, ChangedField> changedFields;
 
     public IllegalArgumentWithChangedFieldsException(String var1, Map<String, ChangedField> changedFields) {

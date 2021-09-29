@@ -4,7 +4,10 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceField;
 import lombok.Data;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 @Data
 public class LocalisedMultichoiceField extends LocalisedChoiceField {

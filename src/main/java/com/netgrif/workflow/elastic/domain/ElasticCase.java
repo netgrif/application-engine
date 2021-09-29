@@ -11,8 +11,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -24,7 +26,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticCaseIndex}", type = "case")
+@Document(indexName = "#{@elasticCaseIndex}")
 public class ElasticCase {
 
     @Id
@@ -50,11 +52,12 @@ public class ElasticCase {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ssZZZ")
     private LocalDateTime creationDate;
 
     private Long creationDateSortable;
 
-    private Long author;
+    private String author;
 
     private String authorName;
 
@@ -72,11 +75,18 @@ public class ElasticCase {
     private Set<String> enabledRoles;
 
     @Field(type = Keyword)
+    private Set<String> viewRoles;
+
+    @Field(type = Keyword)
+    private Set<String> userRefs;
+
+    @Field(type = Keyword)
     private Set<String> negativeViewRoles;
 
-    private Set<Long> users;
+    private Set<String> users;
 
-    private Set<Long> negativeViewUsers;
+    @Field(type = Keyword)
+    private Set<String> negativeViewUsers;
 
     /**
      * Data that is stored in the elasticsearch database.
@@ -102,6 +112,8 @@ public class ElasticCase {
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = new HashSet<>(useCase.getViewRoles());
+        userRefs = new HashSet<>(useCase.getUserRefs().keySet());
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
         users = new HashSet<>(useCase.getUsers().keySet());
         negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
@@ -116,6 +128,8 @@ public class ElasticCase {
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
+        viewRoles = useCase.getViewRoles();
+        userRefs = useCase.getUserRefs();
         negativeViewRoles = useCase.getNegativeViewRoles();
         users = useCase.getUsers();
         negativeViewUsers = useCase.getNegativeViewUsers();
