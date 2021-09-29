@@ -1,15 +1,14 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
 
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.workflow.petrinet.web.PetriNetController;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProcessRolesResource extends Resource<ProcessRolesAndPermissions> {
+public class ProcessRolesResource extends EntityModel<ProcessRolesAndPermissions> {
 
     public ProcessRolesResource(ProcessRolesAndPermissions content, String netId) {
         super(content, new ArrayList<>());
@@ -23,7 +22,7 @@ public class ProcessRolesResource extends Resource<ProcessRolesAndPermissions> {
     }
 
     private void buildLinks(String netId) {
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PetriNetController.class)
                 .getRoles(netId, null)).withSelfRel());
     }
 }

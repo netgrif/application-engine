@@ -16,7 +16,7 @@ public class EnumerationMapFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationMapField field, int lastX, int lastY){
+    public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationMapField field, int lastX, int lastY) {
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;

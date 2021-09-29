@@ -2,9 +2,11 @@ package com.netgrif.workflow.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -25,9 +27,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,6 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
 public class ElasticTaskService implements IElasticTaskService {
@@ -47,14 +48,14 @@ public class ElasticTaskService implements IElasticTaskService {
 
     private ElasticTaskRepository repository;
     private ITaskService taskService;
-    private ElasticsearchTemplate template;
+    private ElasticsearchRestTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchTemplate template) {
+    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchRestTemplate template) {
         this.repository = repository;
         this.template = template;
     }
@@ -92,6 +93,14 @@ public class ElasticTaskService implements IElasticTaskService {
         });
     }
 
+    @Override
+    public void removeByPetriNetId(String petriNetId) {
+        executor.execute(() -> {
+            repository.deleteAllByProcessId(petriNetId);
+            log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
+        });
+    }
+
     @Async
     @Override
     public void index(ElasticTask task) {
@@ -123,7 +132,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -140,7 +149,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
@@ -148,7 +157,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    private SearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    private NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -181,14 +190,14 @@ public class ElasticTaskService implements IElasticTaskService {
 
         BoolQueryBuilder query = boolQuery();
 
-        buildUsersRoleQuery(request, query, user);
+        buildPermissionQuery(request, query, user);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
-        buildStringQuery(request, query);
+        buildStringQuery(request, query, user);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         if (resultAlwaysEmpty)
@@ -209,7 +218,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request.users != null && !request.users.isEmpty()) {
-            Set<Long> users = new HashSet<>(request.users);
+            Set<String> users = new HashSet<>(request.users);
             users.add(user.getId());
             request.users = new ArrayList<>(users);
         } else {
@@ -217,14 +226,19 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
+    protected void buildPermissionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         BoolQueryBuilder userRoleQuery = boolQuery();
-        buildRoleQuery(request, userRoleQuery);
-        buildNegativeViewRoleQuery(userRoleQuery, user);
-        buildUsersQuery(request, userRoleQuery);
-        buildNegativeViewUsersQuery(userRoleQuery, user);
+        buildUsersAndRolesQuery(request, userRoleQuery);
+        negativeUsersAndRolesQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
+    }
+
+    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeQuery = boolQuery();
+        buildNegativeViewRoleQuery(negativeQuery, user);
+        buildNegativeViewUsersQuery(negativeQuery, user);
+        query.should(negativeQuery);
     }
 
     private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
@@ -242,44 +256,38 @@ public class ElasticTaskService implements IElasticTaskService {
         query.mustNot(negativeRoleQuery);
     }
 
-    /**
-     * Tasks with role "5cb07b6ff05be15f0b972c31"
-     * {
-     * "role": "5cb07b6ff05be15f0b972c31"
-     * }
-     * <p>
-     * Tasks with role "5cb07b6ff05be15f0b972c31" OR "5cb07b6ff05be15f0b972c36"
-     * {
-     * "role": [
-     * "5cb07b6ff05be15f0b972c31",
-     * "5cb07b6ff05be15f0b972c36"
-     * ]
-     * }
-     */
-    private void buildRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.role == null || request.role.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder roleQuery = boolQuery();
-        for (String roleId : request.role) {
-            roleQuery.should(termQuery("roles", roleId));
-        }
-
-        query.should(roleQuery);
-    }
-
-    private void buildUsersQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildUsersAndRolesQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.users == null || request.users.isEmpty()) {
             return;
         }
 
+        BoolQueryBuilder existingUsersQuery = boolQuery();
         BoolQueryBuilder roleQuery = boolQuery();
-        for (Long userId : request.users) {
-            roleQuery.should(termQuery("users", userId));
+        BoolQueryBuilder usersRoleQuery = boolQuery();
+        BoolQueryBuilder usersExist = boolQuery();
+        BoolQueryBuilder notExists = boolQuery();
+
+        notExists.mustNot(existsQuery("userRefs"));
+        notExists.mustNot(existsQuery("roles"));
+
+        for (String userId : request.users) {
+            existingUsersQuery.should(termQuery("users", userId));
         }
 
-        query.should(roleQuery);
+        usersExist.must(existsQuery("userRefs"));
+        usersExist.must(existingUsersQuery);
+
+        usersRoleQuery.should(usersExist);
+        usersRoleQuery.should(notExists);
+
+        if (request.role != null && !request.role.isEmpty()) {
+            for (String roleId : request.role) {
+                roleQuery.should(termQuery("roles", roleId));
+            }
+            usersRoleQuery.should(roleQuery);
+        }
+
+        query.must(usersRoleQuery);
     }
 
 
@@ -383,7 +391,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder userQuery = boolQuery();
-        for (Long user : request.user) {
+        for (String user : request.user) {
             userQuery.should(termQuery("userId", user));
         }
 
@@ -459,12 +467,14 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
 
-        query.must(queryStringQuery(request.query));
+        String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
+
+        query.must(queryStringQuery(populatedQuery));
     }
 
     /**

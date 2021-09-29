@@ -2,33 +2,32 @@ package com.netgrif.workflow.petrinet.domain.roles
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.domain.UserState
 
+import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.hateoas.MediaTypes
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.http.MediaType.TEXT_PLAIN
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -36,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class ProcessRoleTest {
@@ -69,37 +68,36 @@ class ProcessRoleTest {
     private IPetriNetService petriNetService;
 
     @Autowired
+    private ProcessRoleRepository userProcessRoleRepository
+
+    @Autowired
     private SuperCreator superCreator;
 
-    @Before
+    @BeforeEach
     void before() {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rolref_view.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
 
         netId = net.get().getStringId()
 
-        def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["View": "View", "Perform": "Perform"], net.get())
+        def processRoles = userProcessRoleRepository.findAllById([netId])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("View")] as UserProcessRole[])
+                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("Perform")] as UserProcessRole[])
+                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("View"), processRoles.get("Perform")] as UserProcessRole[])
+                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }, processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
     }
 
     private String caseId
@@ -128,9 +126,9 @@ class ProcessRoleTest {
                 color: "color"
         ])
         def result = mvc.perform(post(CASE_CREATE_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -143,13 +141,15 @@ class ProcessRoleTest {
 
     def searchTasks(String title, int expected) {
         def content = JsonOutput.toJson([
-                case: caseId
+                case: [
+                        id: caseId
+                ]
         ])
         def result = mvc.perform(post(TASK_SEARCH_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())

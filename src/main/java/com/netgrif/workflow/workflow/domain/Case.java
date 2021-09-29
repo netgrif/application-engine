@@ -99,12 +99,9 @@ public class Case {
     @Indexed
     private Author author;
 
-    /**
-     * TODO: reset = variable
-     */
     @Getter
     @Setter
-    private Map<String, Integer> resetArcTokens;
+    private Map<String, Integer> consumedTokens;
 
     @Getter
     @Setter
@@ -124,24 +121,26 @@ public class Case {
     @Setter
     private List<String> negativeViewRoles;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
-    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
-    private List<Long> negativeViewUsers;
+    private List<String> negativeViewUsers;
 
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
-        resetArcTokens = new HashMap<>();
+        consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
@@ -180,7 +179,9 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
+    public void addNegativeViewRoles(List<String> roleIds) {
+        negativeViewRoles.addAll(roleIds);
+    }
 
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
@@ -257,7 +258,7 @@ public class Case {
         return petriNetObjectId.toString();
     }
 
-    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 users.get(userId).putAll(permissions);
@@ -265,5 +266,15 @@ public class Case {
                 users.put(userId, permissions);
             }
         });
+    }
+
+    public Set<String> getViewRoles() {
+        Set<String> roles = new HashSet<>();
+        this.permissions.forEach((role, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                roles.add(role);
+            }
+        });
+        return roles;
     }
 }

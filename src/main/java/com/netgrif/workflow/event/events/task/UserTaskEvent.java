@@ -1,6 +1,6 @@
 package com.netgrif.workflow.event.events.task;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Getter;
@@ -8,9 +8,9 @@ import lombok.Getter;
 public abstract class UserTaskEvent extends TaskEvent {
 
     @Getter
-    protected final User user;
+    protected final IUser user;
 
-    public UserTaskEvent(User user, Task task, Case useCase) {
+    public UserTaskEvent(IUser user, Task task, Case useCase) {
         super(task, useCase);
         this.user = user;
     }

@@ -1,30 +1,43 @@
 package com.netgrif.workflow.insurance.mvc
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.UserState
-
+import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
+
 import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+
+//import com.netgrif.workflow.orgstructure.domain.Group
+
 import org.hamcrest.CoreMatchers
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.hateoas.MediaTypes
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -40,7 +53,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -54,9 +67,9 @@ class InsuranceTest {
 
     private static final String CASE_CREATE_URL = "/api/workflow/case"
     private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
-    private static final def TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" }
-    private static final def TASK_FINISH_URL = { id -> "/api/task/finish/$id" }
-    private static final def TASK_DATA_URL = { id -> "/api/task/$id/data" }
+    private static final Closure<String> TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" as String }
+    private static final Closure<String> TASK_FINISH_URL = { id -> "/api/task/finish/$id" as String }
+    private static final Closure<String> TASK_DATA_URL = { String id -> "/api/task/$id/data" as String }
 
     private static final String TASK_COVER_TYPE = "Nehnuteľnosť a domácnosť"
     private static final String TASK_BASIC_INFO = "Základné informácie"
@@ -101,25 +114,37 @@ class InsuranceTest {
     @Autowired
     private SuperCreator superCreator
 
-    @Before
+    @Autowired
+    private IProcessRoleService processRoleService
+
+    @Autowired
+    private IUserService userService
+
+    @Autowired
+    private TestHelper testHelper
+
+
+    @BeforeEach
     void before() {
+        testHelper.truncateDbs()
+
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
 
         netId = net.get().getStringId()
 
-        def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+//        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("agent"), processRoles.get("company")] as UserProcessRole[])
+                [auths.get("user"), auths.get("admin")] as Authority[],
+                [] as ProcessRole[])
+        List<ProcessRole> roles = processRoleService.findAll(netId)
+        processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll {it.importId in ["1", "2"]}.collect{it.stringId} as Set,userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
@@ -226,11 +251,11 @@ class InsuranceTest {
                 color: "color"
         ])
         def result = mvc.perform(post(CASE_CREATE_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
-                .with(authentication(this.auth)))
+                .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
                 .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))
@@ -241,13 +266,15 @@ class InsuranceTest {
 
     def searchTasks(String title, int expected) {
         def content = JsonOutput.toJson([
-                case: caseId
+                case: [
+                        id: caseId
+                ]
         ])
         def result = mvc.perform(post(TASK_SEARCH_URL)
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -260,7 +287,7 @@ class InsuranceTest {
 
     def assignTask() {
         mvc.perform(get(TASK_ASSIGN_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
@@ -272,7 +299,7 @@ class InsuranceTest {
 
     def finishTask() {
         mvc.perform(get(TASK_FINISH_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
@@ -283,7 +310,7 @@ class InsuranceTest {
 
     def getData() {
         mvc.perform(get(TASK_DATA_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
@@ -294,10 +321,10 @@ class InsuranceTest {
     def setData(Map data) {
         def content = JsonOutput.toJson(data)
         def result = mvc.perform(post(TASK_DATA_URL(taskId))
-                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -746,12 +773,12 @@ class InsuranceTest {
     def setDataOffer() {
         def data = [
                 (mapper[109001]): [
-                        value:"2018-02-21",
-                        type :FIELD_DATE
+                        value: "2018-02-21",
+                        type : FIELD_DATE
                 ],
                 (mapper[109006]): [
-                        value:"prevodom",
-                        type :FIELD_ENUM
+                        value: "prevodom",
+                        type : FIELD_ENUM
                 ]
         ]
         setData(data)

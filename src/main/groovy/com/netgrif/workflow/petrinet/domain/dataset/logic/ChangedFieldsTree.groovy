@@ -39,7 +39,7 @@ class ChangedFieldsTree extends CaseChangedFields {
         } else {
             changedFields.get(fieldId).merge(changedField)
         }
-        findInPropagated(fieldId).ifPresent() {it.merge(changedField) }
+        findInPropagated(fieldId).ifPresent() { it.merge(changedField) }
     }
 
     void addBehavior(String fieldId, Map<String, Set<FieldBehavior>> behavior) {

@@ -50,7 +50,7 @@ public class DataFieldLogic {
             this.component = getComponent();
     }
 
-    public void addDataEvents(Collection<DataEvent> events){
+    public void addDataEvents(Collection<DataEvent> events) {
         this.events.addAll(events);
     }
 
@@ -76,7 +76,7 @@ public class DataFieldLogic {
         return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
     }
 
-    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, EventPhase phase){
+    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, EventPhase phase) {
         List<Action> actionList = new ArrayList<>();
         events.stream().filter(event -> event.getTrigger().equals(trigger))
                 .flatMap(event -> event.getActions().entrySet().stream()

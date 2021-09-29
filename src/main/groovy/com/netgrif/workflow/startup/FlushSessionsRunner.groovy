@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
-import org.springframework.session.data.redis.RedisOperationsSessionRepository
+import org.springframework.session.data.redis.RedisIndexedSessionRepository
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,7 +18,7 @@ class FlushSessionsRunner extends AbstractOrderedCommandLineRunner {
     private JedisConnectionFactory connectionFactory
 
     @Autowired
-    private RedisOperationsSessionRepository repository
+    private RedisIndexedSessionRepository repository
 
 
     @Override

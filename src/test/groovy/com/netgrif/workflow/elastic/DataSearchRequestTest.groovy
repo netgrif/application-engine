@@ -131,7 +131,7 @@ class DataSearchRequestTest {
 
         Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
         assert actionTrigger != null
-        dataService.setData(actionTrigger, ImportHelper.populateDataset(["testActionTrigger": ["value":"random value", "type": "text"]]))
+        dataService.setData(actionTrigger, ImportHelper.populateDataset(["testActionTrigger": ["value": "random value", "type": "text"]]))
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.get())
