@@ -771,7 +771,6 @@ public class Importer {
     private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId){
         com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent();
         events.forEach(event -> {
-//            todo nájsť niečo lepšie, fromString je static
             dataEvent.setType(event.getType().value().equalsIgnoreCase(DataEventType.GET.value) ? DataEventType.GET : DataEventType.SET);
             if(dataEvent.getId() == null) {
                 dataEvent.setId(event.getId());

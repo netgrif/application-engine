@@ -43,6 +43,10 @@ public class DataGroup extends PetriNetObject {
 
     @Transient
     @Getter @Setter
+    private String parentCaseId;
+
+    @Transient
+    @Getter @Setter
     private String parentTaskRefId;
 
     @Transient
