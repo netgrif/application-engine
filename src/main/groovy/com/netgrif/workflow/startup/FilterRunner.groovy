@@ -34,9 +34,25 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
+        createFilterNet()
+        createPreferenceFilterItemNet()
+        createImportFiltersNet()
+        createExportFiltersNet()
+    }
+
+    Optional<PetriNet> createFilterNet() {
         importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
+    }
+
+    Optional<PetriNet> createPreferenceFilterItemNet() {
         importProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
+    }
+
+    Optional<PetriNet> createImportFiltersNet() {
         importProcess("Petri net for importing filters", IMPORT_NET_IDENTIFIER, IMPORT_FILTER_FILE_NAME)
+    }
+
+    Optional<PetriNet> createExportFiltersNet() {
         importProcess("Petri net for exporting filters", EXPORT_NET_IDENTIFIER, EXPORT_FILTER_FILE_NAME)
     }
 
