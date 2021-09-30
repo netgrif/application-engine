@@ -44,11 +44,6 @@
 
             filterImportExportService.changeFilterField(importedFilters.value)
         </action>
-        <action trigger="set">
-            importedFilters: f.imported_filters;
-
-            filterImportExportService.changeFilterField(importedFilters.value)
-        </action>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">

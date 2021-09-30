@@ -91,12 +91,12 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(User author) {
-        createFilterCase("IMP_" + author.getFullName(), IMPORT_NET_IDENTIFIER, author.transformToLoggedUser());
+        createFilterCase("Import filters " + author.getFullName(), IMPORT_NET_IDENTIFIER, author.transformToLoggedUser());
     }
 
     @Override
     public void createFilterExport(User author) {
-        createFilterCase("EXP_" + author.getFullName(), EXPORT_NET_IDENTIFIER, author.transformToLoggedUser());
+        createFilterCase("Export filters " + author.getFullName(), EXPORT_NET_IDENTIFIER, author.transformToLoggedUser());
     }
 
     private void createFilterCase(String title, String netIdentifier, LoggedUser loggedUser) {
@@ -115,6 +115,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public List<String> importFilters() throws IOException, IllegalFilterFileException {
+        log.info("Importing filters");
         FilterImportExportList filterList = loadFromXML();
         List<String> importedFiltersIds = new ArrayList<>();
 
@@ -169,6 +170,7 @@ public class FilterImportExportService implements IFilterImportExportService {
                 workflowService.save(filterCase.get());
             }
         });
+        changeFilterField(importedFiltersIds);
         return importedFiltersIds;
     }
 
@@ -207,13 +209,8 @@ public class FilterImportExportService implements IFilterImportExportService {
     }
 
     private void changeVisibilityByAllowedNets(boolean allowedNetsMissing, Case filterCase) {
-        if (allowedNetsMissing) {
-            filterCase.getDataSet().get(FIELD_MISSING_ALLOWED_NETS).makeVisible(IMPORT_FILTER_TRANSITION);
-            filterCase.getDataSet().get(FIELD_FILTER).makeHidden(IMPORT_FILTER_TRANSITION);
-        } else {
-            filterCase.getDataSet().get(FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
-            filterCase.getDataSet().get(FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
-        }
+        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_MISSING_ALLOWED_NETS : FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
+        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_FILTER : FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
     }
 
     @Transactional
@@ -296,7 +293,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             Schema schema = factory.newSchema(FilterImportExportService.class.getResource("/petriNets/filter_export_schema.xsd"));
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(xml));
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw new IllegalFilterFileException();
         }
     }
