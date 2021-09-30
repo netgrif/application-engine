@@ -150,7 +150,7 @@ public class TaskService implements ITaskService {
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.PRE);
         useCase = assignTaskToUser(user, task, useCase.getStringId());
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getId()));
-        outcome.addOutcomes(eventService.runActions(transition.getPreAssignActions(), useCase, task, transition));
+        outcome.addOutcomes(eventService.runActions(transition.getPostAssignActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.POST, user.getId()));
 

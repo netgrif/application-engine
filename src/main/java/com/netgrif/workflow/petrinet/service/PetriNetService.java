@@ -176,7 +176,6 @@ public class PetriNetService implements IPetriNetService {
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
-//        todo vybrainiť vykonávanie akcií na zmenených fieldoch bez kontextu
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
         save(net);
