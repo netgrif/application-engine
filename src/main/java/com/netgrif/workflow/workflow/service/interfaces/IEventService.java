@@ -25,8 +25,4 @@ public interface IEventService {
     List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger);
 
     void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger);
-
-    ChangedFieldContainer mergeFieldsFromOutcomes(List<EventOutcome> outcomes, ChangedFieldContainer container, Task referencingTask);
-
-    ChangedFieldContainer parseChangesFromOutcomes(List<EventOutcome> outcomes, ChangedFieldContainer container, Task referencedTask);
 }

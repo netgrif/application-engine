@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -200,8 +201,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+    public EventOutcomeWithMessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -221,8 +221,6 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
         return super.deleteFile(taskId, fieldId);
     }
 
@@ -235,10 +233,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
+    public EventOutcomeWithMessageResource saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) throws IOException {
         return super.saveFiles(taskId, fieldId, multipartFiles);
     }
 
