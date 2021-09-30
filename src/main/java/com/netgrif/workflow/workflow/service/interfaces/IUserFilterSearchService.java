@@ -6,6 +6,4 @@ import java.util.List;
 
 public interface IUserFilterSearchService {
     List<Case> autocompleteFindFilters(String userInput);
-
-    List<Case> findAllUserFilters();
 }
