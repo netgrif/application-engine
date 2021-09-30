@@ -117,7 +117,6 @@ public class DataService implements IDataService {
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
-            //todo dočasné riešenie na testovanie, kým sa implementuje parsovanie stromu event outcomov
             if (outcome.getMessage() == null) {
                 if (field.getEvents().containsKey(DataEventType.GET) &&
                         ((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
@@ -190,7 +189,6 @@ public class DataService implements IDataService {
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        ChangedFieldsTree changedFieldsTree = ChangedFieldsTree.createNew(task.getCaseId(), task);
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
@@ -234,17 +232,6 @@ public class DataService implements IDataService {
 
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null));
             }
-//            else try {
-////                todo samo niečo s taskrefom
-//                if (entry.getKey().contains("-")) {
-//                    TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
-//                    Task referencedTask = taskService.findOne(decoded.getTaskId());
-//                    outcome.addOutcome(setData(referencedTask, values));
-////                    changedFieldsTree.propagate(taskRefChangedFields);
-//                }
-//            } catch (Exception e) {
-//                log.error("Failed to set taskRef references fields", e);
-//            }
         });
         updateDataset(useCase);
         outcome.setACase(workflowService.save(useCase));
@@ -279,6 +266,8 @@ public class DataService implements IDataService {
                 if (dataFieldMap.containsKey(dataFieldId)) {
                     Field resource = dataFieldMap.get(dataFieldId);
                     if (level != 0) {
+                        dataGroup.setParentCaseId(useCase.getStringId());
+                        resource.setParentCaseId(useCase.getStringId());
                         dataGroup.setParentTaskId(taskId);
                         resource.setParentTaskId(taskId);
                     }
@@ -340,20 +329,9 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {
-        TaskRefFieldWrapper wrapper;
-        try {
-            wrapper = decodeTaskRefFieldId(taskId, fieldId);
-        } catch (IllegalArgumentException e) {
-            if (forPreview) {
-                return null;
-            } else {
-                throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
-            }
-        }
-        Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getFieldId();
+        Task task = taskService.findOne(taskId);
 
-        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), task, parsedFieldId, forPreview);
+        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), task, fieldId, forPreview);
 
         if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
@@ -363,11 +341,8 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) {
-        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
-        Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getFieldId();
-
-        return getFileByCaseAndName(task.getCaseId(), parsedFieldId, name);
+        Task task = taskService.findOne(taskId);
+        return getFileByCaseAndName(task.getCaseId(), fieldId, name);
     }
 
     @Override
@@ -509,113 +484,48 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
-        try {
-            Task task = taskService.findOne(taskId);
-            ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
-            FileField field = pair.getRight();
-            Case useCase = pair.getLeft();
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException {
+        Task task = taskService.findOne(taskId);
+        ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
+        FileField field = pair.getRight();
+        Case useCase = pair.getLeft();
 
-            ChangedFieldByFileFieldContainer container = new ChangedFieldByFileFieldContainer(false);
-
-            if (field.isRemote()) {
-                upload(useCase, field, multipartFile);
-            } else {
-                if (!saveLocalFile(useCase, field, multipartFile))
-                    return container;
-            }
-
-            return getChangedFieldByFileFieldContainer(fieldId, task, useCase, container);
-        } catch (IOException e) {
-            log.error("Saving file failed: ", e);
-            return new ChangedFieldByFileFieldContainer(false);
+        if (field.isRemote()) {
+            upload(useCase, field, multipartFile);
+        } else {
+            saveLocalFile(useCase, field, multipartFile);
         }
+        SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
+        outcome.setOutcomes(getChangedFieldByFileFieldContainer(fieldId, task, useCase));
+        return outcome;
     }
 
     @Override
-    public ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
-        try {
-            Task task = taskService.findOne(taskId);
-            ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
-            FileListField field = pair.getRight();
-            Case useCase = pair.getLeft();
+    public SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) throws IOException {
+        Task task = taskService.findOne(taskId);
+        ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
+        FileListField field = pair.getRight();
+        Case useCase = pair.getLeft();
 
-            ChangedFieldByFileFieldContainer container = new ChangedFieldByFileFieldContainer(false);
-
-            if (field.isRemote()) {
-                upload(useCase, field, multipartFiles);
-            } else {
-                if (!saveLocalFiles(useCase, field, multipartFiles))
-                    return container;
-            }
-
-            return getChangedFieldByFileFieldContainer(fieldId, task, useCase, container);
-        } catch (IOException e) {
-            log.error("Saving files failed: ", e);
-            return new ChangedFieldByFileFieldContainer(false);
+        if (field.isRemote()) {
+            upload(useCase, field, multipartFiles);
+        } else {
+            saveLocalFiles(useCase, field, multipartFiles);
         }
+
+        SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
+        outcome.setOutcomes(getChangedFieldByFileFieldContainer(fieldId, task, useCase));
+        return outcome;
     }
 
-    private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase,
-                                                                                 ChangedFieldByFileFieldContainer container) {
-        TaskRefFieldWrapper decodedTaskRef = null;
-        Task task = referencingTask;
-        try {
-            decodedTaskRef = decodeTaskRefFieldId(fieldId);
-            fieldId = decodedTaskRef.getFieldId();
-            task = taskService.findOne(decodedTaskRef.getTaskId());
-        } catch (IllegalArgumentException e) {
-            log.debug("fieldId is not referenced through taskRef", e);
-        }
+    private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {
         List<EventOutcome> outcomes = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.PRE, useCase, task);
+                EventPhase.PRE, useCase, referencingTask);
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.POST, useCase, task));
-//        changedFieldsPre.mergeChangedFields(changedFieldsPost);
-
-        container.setIsSave(true);
+                EventPhase.POST, useCase, referencingTask));
         updateDataset(useCase);
         workflowService.save(useCase);
-        return resolveChangedFieldsByFileTree(outcomes, container, referencingTask, task);
-    }
-
-    private ChangedFieldByFileFieldContainer resolveChangedFieldsByFileTree(List<EventOutcome> outcomes,
-                                                                            ChangedFieldByFileFieldContainer container,
-                                                                            Task referencingTask, Task referencedTask) {
-        if (referencingTask.getStringId().equals(referencedTask.getStringId())) {
-            eventService.mergeFieldsFromOutcomes(outcomes, container, referencingTask);
-//            changedFields.flatten(container);
-        } else {
-//            todo prejsť outcomy, vytiahnúť a mergnut fieldy
-            eventService.parseChangesFromOutcomes(outcomes, container, referencingTask);
-//            CaseChangedFields changedFields = new CaseChangedFields(referencingTask.getCaseId());
-//            ChangedFieldsTree parent = ChangedFieldsTree.createNew(referencingTask.getCaseId(), referencingTask);
-//            parent.setPropagatedChanges(changedFields.getPropagatedChanges());
-//            parent.addPropagated(referencedTask.getCaseId(), changedFields.getChangedFields());
-//            parent.flatten(container);
-        }
-        return container;
-    }
-
-    private TaskRefFieldWrapper decodeTaskRefFieldId(String taskId, String fieldId) {
-        try {
-            TaskRefFieldWrapper decoded = decodeTaskRefFieldId(fieldId);
-            Task task = taskService.findOne(decoded.getTaskId());
-            decoded.setTask(task);
-            return decoded;
-        } catch (IllegalArgumentException e) {
-            Task task = taskService.findOne(taskId);
-            return new TaskRefFieldWrapper(task, task.getStringId(), fieldId);
-        }
-    }
-
-    private TaskRefFieldWrapper decodeTaskRefFieldId(String fieldId) throws IllegalArgumentException {
-        String[] split = fieldId.split("-", 2);
-        if (split[0].length() == MONGO_ID_LENGTH && split.length == 2) {
-            return new TaskRefFieldWrapper(null, split[0], split[1]);
-        }
-
-        throw new IllegalArgumentException("fieldId is not referenced through taskRef");
+        return outcomes;
     }
 
     private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) throws IOException {
@@ -702,12 +612,9 @@ public class DataService implements IDataService {
     }
 
     private ImmutablePair<Case, FileField> getCaseAndFileField(String taskId, String fieldId) {
-        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
-        Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getFieldId();
-
+        Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
-        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
         field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
 
         return new ImmutablePair<>(useCase, field);
@@ -737,12 +644,9 @@ public class DataService implements IDataService {
     }
 
     private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
-        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
-        Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getFieldId();
-
+        Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
-        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
+        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
         field.setValue((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue());
         return new ImmutablePair<>(useCase, field);
     }
@@ -933,13 +837,5 @@ public class DataService implements IDataService {
                 throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
             }
         });
-    }
-
-    @Data
-    @AllArgsConstructor
-    private class TaskRefFieldWrapper {
-        private Task task;
-        private String taskId;
-        private String fieldId;
     }
 }
