@@ -5,7 +5,6 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
@@ -36,6 +35,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 public abstract class AbstractTaskController {
@@ -206,8 +206,9 @@ public abstract class AbstractTaskController {
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
-    public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
-        return dataService.saveFile(taskId, fieldId, multipartFile);
+    public EventOutcomeWithMessageResource saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException {
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(dataService.saveFile(taskId, fieldId, multipartFile), LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
@@ -232,8 +233,9 @@ public abstract class AbstractTaskController {
         return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 
-    public ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
-        return dataService.saveFiles(taskId, fieldId, multipartFiles);
+    public EventOutcomeWithMessageResource saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) throws IOException {
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(dataService.saveFiles(taskId, fieldId, multipartFiles), LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getNamedFile(String taskId, String fieldId, String name) throws FileNotFoundException {
