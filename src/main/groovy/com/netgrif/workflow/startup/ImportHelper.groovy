@@ -12,13 +12,12 @@ import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
@@ -221,12 +220,12 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    SetDataEventOutcome setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-        dataService.setData(taskId, dataSet).getData()
+        dataService.setData(taskId, dataSet)
     }
 
-    ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
+    SetDataEventOutcome setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 
