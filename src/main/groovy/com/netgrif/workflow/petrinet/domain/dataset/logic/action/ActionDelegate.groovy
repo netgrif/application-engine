@@ -1,6 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.Author
 import com.netgrif.workflow.auth.domain.User
@@ -9,7 +8,6 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
-import com.netgrif.workflow.workflow.service.interfaces.IUserFilterSearchService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -26,7 +24,6 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
@@ -44,10 +41,7 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTas
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
-import com.netgrif.workflow.workflow.service.interfaces.IDataService
-import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.service.interfaces.*
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
@@ -61,6 +55,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -738,13 +733,7 @@ class ActionDelegate {
 
     SetDataEventOutcome setDataWithPropagation(String taskId, Map dataSet) {
         Task task = taskService.findOne(taskId)
-        Case caze = workflowService.findOne(task.caseId)
         SetDataEventOutcome outcome = setData(task, dataSet)
-        caze = workflowService.findOne(caze.stringId)
-        outcome.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
-
-//        this.changedFieldsTree.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
-//        this.changedFieldsTree.propagate(container)
         return outcome
     }
 

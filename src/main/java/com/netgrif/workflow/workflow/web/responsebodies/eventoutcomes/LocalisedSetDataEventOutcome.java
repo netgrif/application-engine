@@ -8,11 +8,11 @@ import java.util.Locale;
 
 public class LocalisedSetDataEventOutcome extends LocalisedTaskEventOutcome {
 
-    private ChangedFieldContainer changedFields;
+    private ChangedFieldContainer changedFields = new ChangedFieldContainer();
 
     public LocalisedSetDataEventOutcome(SetDataEventOutcome outcome, Locale locale) {
         super(outcome, locale);
-        this.changedFields = outcome.mergeChangedAndPropagated();
+        this.changedFields.putAll(outcome.getChangedFields());
     }
 
     public ChangedFieldContainer getChangedFields() {
