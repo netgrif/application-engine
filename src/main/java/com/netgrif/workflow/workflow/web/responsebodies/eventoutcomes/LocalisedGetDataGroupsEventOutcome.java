@@ -15,7 +15,7 @@ public class LocalisedGetDataGroupsEventOutcome extends LocalisedTaskEventOutcom
     public LocalisedGetDataGroupsEventOutcome(GetDataGroupsEventOutcome outcome, Locale locale) {
         super(outcome, locale);
         this.data = outcome.getData().stream()
-                .map(dg -> new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout(), dg.getParentTaskId()))
+                .map(dg -> new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout(), dg.getParentTaskId(), dg.getParentCaseId()))
                 .collect(Collectors.toList());
     }
 

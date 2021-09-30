@@ -18,10 +18,12 @@ public class DataGroup {
 
     private String parentTaskId;
 
+    private String parentCaseId;
+
     private DataGroup() {
     }
 
-    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId) {
+    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId, String parentCaseId) {
         this();
         this.fields = fields;
         this.title = title;
@@ -29,5 +31,6 @@ public class DataGroup {
         this.stretch = stretch;
         this.layout = layout;
         this.parentTaskId = parentTaskId;
+        this.parentCaseId = parentCaseId;
     }
 }
