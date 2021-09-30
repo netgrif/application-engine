@@ -13,14 +13,14 @@ import java.util.List;
 @Data
 public class SetDataChangedFieldsEventOutcome extends TaskEventOutcome {
 
-    private ChangedFieldContainer data;
+    private ChangedFieldContainer data = new ChangedFieldContainer();
 
     public SetDataChangedFieldsEventOutcome() {
     }
 
     public SetDataChangedFieldsEventOutcome(SetDataEventOutcome outcome) {
         super(outcome.getMessage(), outcome.getOutcomes(), outcome.getACase(), outcome.getTask());
-        this.data = outcome.mergeChangedAndPropagated();
+        this.data.putAll(outcome.getChangedFields());
     }
 
     public SetDataChangedFieldsEventOutcome(I18nString message, List<EventOutcome> outcomes, ChangedFieldContainer data, Case aCase, Task task) {
