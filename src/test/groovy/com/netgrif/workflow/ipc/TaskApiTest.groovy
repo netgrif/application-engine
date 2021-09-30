@@ -111,7 +111,7 @@ class TaskApiTest {
 
         List<EventLog> log = eventLogRepository.findAll()
 
-//        todo samo fix
+//        todo fix testov po merge s 6.0.0
 //        assert log.findAll {
 //            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")
 //        }.size() == 2

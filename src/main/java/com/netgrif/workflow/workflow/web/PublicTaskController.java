@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -133,7 +134,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
+    public EventOutcomeWithMessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -168,9 +169,9 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
-        return dataService.saveFiles(taskId, fieldId, multipartFiles);
+    public EventOutcomeWithMessageResource saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) throws IOException {
+        return super.saveFiles(taskId, fieldId, multipartFiles);
     }
 
     @Override
