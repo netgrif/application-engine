@@ -1,3 +1,16 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10910/tab/release-report-done"></a>
+## 5.6.3 (27.09.2021)
+### Bug fixes
+* [NAE-1467](https://netgrif.atlassian.net/browse/NAE-1467) - Fix table creation for user
+* [NAE-1453](https://netgrif.atlassian.net/browse/NAE-1453) - Example app sign-up broken
+* [NAE-1465](https://netgrif.atlassian.net/browse/NAE-1465) - Display saved filter options with empty input
+
+### Improvements
+* [NAE-1454](https://netgrif.atlassian.net/browse/NAE-1454) - Dynamic filter chaining
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10909/tab/release-report-all-issues"></a>
 ## 5.6.2 (03.09.2021)
 ### Bug fixes
