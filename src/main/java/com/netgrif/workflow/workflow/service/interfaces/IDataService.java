@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -47,9 +48,9 @@ public interface IDataService {
 
     InputStream download(String url) throws IOException;
 
-    ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile);
+    SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException;
 
-    ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile);
+    SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile) throws IOException;
 
     boolean deleteFile(String taskId, String fieldId);
 
