@@ -957,7 +957,7 @@ class ActionDelegate {
     }
 
     List<Case> findAllFilters() {
-        return filterSearchService.findAllUserFilters()
+        return filterSearchService.autocompleteFindFilters("")
     }
 
     FileFieldValue exportFilters(Set<String> filtersToExport) {
