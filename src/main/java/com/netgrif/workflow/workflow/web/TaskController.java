@@ -255,7 +255,6 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.deleteNamedFile(taskId, fieldId, name);
     }
 
