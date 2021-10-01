@@ -13,12 +13,12 @@ public abstract class LocalisedTaskEventOutcome extends LocalisedCaseEventOutcom
 
     protected LocalisedTaskEventOutcome(TaskEventOutcome outcome, Locale locale) {
         super(outcome, locale);
-        this.task = new Task(outcome.getTask(), locale);
+        this.task = outcome.getTask() == null ? null : new Task(outcome.getTask(), locale);
     }
 
     protected LocalisedTaskEventOutcome(String message, List<LocalisedEventOutcome> outcomes, Locale locale, Case aCase, com.netgrif.workflow.workflow.domain.Task task) {
         super(message, outcomes, locale, aCase);
-        this.task = new Task(task, locale);
+        this.task = task == null ? null : new Task(task, locale);
     }
 
     public Task getTask() {
