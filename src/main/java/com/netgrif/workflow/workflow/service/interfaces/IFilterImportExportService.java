@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+
+/**
+ * Interface which provides methods for filter import and export.
+ */
+
 public interface IFilterImportExportService {
 
     FileFieldValue exportFilters(Set<String> filtersToExport) throws IOException;

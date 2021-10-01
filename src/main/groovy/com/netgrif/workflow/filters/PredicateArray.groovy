@@ -4,6 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 
+/**
+ * This class wraps and holds list of predicates.
+ * In the xml structure class is represented by <predicateMetadataItem> tag.
+ * Same as the FilterMetadataExport class, this one needs to be converted into
+ * map object while importing filter too.
+ */
+
 class PredicateArray {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "predicate")
