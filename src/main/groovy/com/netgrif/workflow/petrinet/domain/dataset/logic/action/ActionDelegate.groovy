@@ -8,6 +8,8 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
+import com.netgrif.workflow.workflow.service.interfaces.IConfigurableMenuService
+import com.netgrif.workflow.workflow.service.interfaces.IUserFilterSearchService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -122,6 +124,9 @@ class ActionDelegate {
     @Autowired
     IUserFilterSearchService filterSearchService
 
+    @Autowired
+    IConfigurableMenuService configurableMenuService
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -228,11 +233,6 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-//                    if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-//                        putIntoChangedFields(field, new ChangedField(field.stringId))
-//                    }
-//                    changedFieldsTree.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
-//                    addAttributeToChangedField(field, "type", field.type.name)
                     ChangedField changedField = new ChangedField(field.stringId)
                     changedField.addAttribute("type", field.type.name)
                     changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
@@ -257,10 +257,6 @@ class ActionDelegate {
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
-//        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-//            putIntoChangedFields(field, new ChangedField(field.stringId))
-//        }
-//        addAttributeToChangedField(field, "choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
     }
 
     def saveChangedAllowedNets(CaseField field) {
@@ -270,10 +266,6 @@ class ActionDelegate {
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
-//        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-//            putIntoChangedFields(field, new ChangedField(field.stringId))
-//        }
-//        addAttributeToChangedField(field, "allowedNets", field.allowedNets)
     }
 
     def saveChangedOptions(MapOptionsField field) {
@@ -283,17 +275,10 @@ class ActionDelegate {
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
-//        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-//            putIntoChangedFields(field, new ChangedField(field.stringId))
-//        }
-//        addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
     }
 
     def saveChangedValidation(Field field) {
         useCase.dataSet.get(field.stringId).validations = field.validations
-//        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-//            putIntoChangedFields(field, new ChangedField(field.stringId))
-//        }
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
             it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
@@ -303,12 +288,7 @@ class ActionDelegate {
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
-//        addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
     }
-
-//    void addAttributeToChangedField(Field field, String attribute, Object value) {
-//        changedFieldsTree.addAttribute(field.stringId, attribute, value)
-//    }
 
     def close = { Transition[] transitions ->
         def service = ApplicationContextProvider.getBean("taskService")
@@ -993,4 +973,5 @@ class ActionDelegate {
     List<Case> findFilters(String userInput) {
         return filterSearchService.autocompleteFindFilters(userInput)
     }
+
 }
