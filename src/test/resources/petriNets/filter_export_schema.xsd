@@ -12,7 +12,6 @@
     <xs:element name="filter">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="title"/>
                 <xs:element ref="filterName" minOccurs="0"/>
                 <xs:element ref="filterValue" minOccurs="0"/>
                 <xs:element ref="visibility"/>
@@ -23,7 +22,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="title" type="xs:string"/>
     <xs:element name="filterName">
         <xs:complexType>
             <xs:sequence>
