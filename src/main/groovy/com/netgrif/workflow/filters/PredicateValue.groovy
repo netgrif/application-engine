@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 
+/**
+ * Class holds values of some search predicates (mainly searching for author).
+ * Values can be integer of author id or other search predicate as a text (<<me>>).
+ */
+
 class PredicateValue {
 
     String text
