@@ -2,6 +2,13 @@ package com.netgrif.workflow.filters
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
+/**
+ * Class represents configuration part on predicate.
+ * Class holds operator, which provides operation for value comparison.
+ * When creating filter for datafield value, datafield attribute is also used,
+ * to represent which datafield from which process is used in comparison.
+ */
+
 class Configuration {
     String operator
     String datafield

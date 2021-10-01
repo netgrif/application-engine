@@ -42,6 +42,10 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service that provides methods for creation of filter export/import cases for users.
+ * Also provides methods to export and import filters.
+ */
 
 @Service
 public class FilterImportExportService implements IFilterImportExportService {
@@ -104,6 +108,14 @@ public class FilterImportExportService implements IFilterImportExportService {
         workflowService.createCase(filterImportNet.getStringId(), title, "", loggedUser);
     }
 
+    /**
+     * Method which performs export of selected filters into xml file.
+     * Method finds all cases by provided ids, transform them into FilterImportExportList object
+     * and serialize them into xml file on path: storage/filterExport/<userId>/filters.xml
+     * @param filtersToExport - set of ids of filter cases, which should be exported
+     * @return FileFieldValue - file field value with path to xml file of exported filters
+     * @throws IOException - if file which contains exported filters cannot be created
+     */
     @Override
     public FileFieldValue exportFilters(Set<String> filtersToExport) throws IOException {
         log.info("Exporting selected filters");
@@ -113,6 +125,15 @@ public class FilterImportExportService implements IFilterImportExportService {
         return createXML(filterList);
     }
 
+    /**
+     * Method which performs import of filters from uploaded xml file.
+     * Method firstly loads xml file from file field and validates it against xml schema for filters
+     * export located on path: filter_export_schema.xml
+     * If the file is correct, method creates filter cases and
+     * @return List<String> - list of task ids of imported filter cases in - import_filter transition
+     * @throws IOException - if imported file is not found
+     * @throws IllegalFilterFileException - if uploaded xml is not in correct xml format and invalidate against schema
+     */
     @Override
     public List<String> importFilters() throws IOException, IllegalFilterFileException {
         log.info("Importing filters");
@@ -174,6 +195,11 @@ public class FilterImportExportService implements IFilterImportExportService {
         return importedFiltersIds;
     }
 
+    /**
+     * Method which provides reloading of imported filters fields, so if allowed nets are missing,
+     * htmlTextArea is shown with list of missing allowed nets, otherwise filter preview is shown.
+     * @param filterFields - list of task ids of filters which value should be reloaded
+     */
     @Override
     public void changeFilterField(List<String> filterFields) {
         filterFields.forEach(f -> {
@@ -235,7 +261,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + exportedFileName;
+        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getId() + "/" + exportedFileName;
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 
@@ -254,7 +280,6 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     private FilterImportExport createExportClass(Case filter) {
         FilterImportExport exportFilter = new FilterImportExport();
-        exportFilter.setTitle(filter.getTitle());
         exportFilter.setIcon(filter.getIcon());
         filter.getImmediateData().forEach(immediateData -> {
             switch (immediateData.getImportId()) {
