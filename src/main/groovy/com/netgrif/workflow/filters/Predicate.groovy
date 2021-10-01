@@ -4,6 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 
+/**
+ * Predicate class represents one search predicate (search term).
+ * In the xml document, this class is represented with <predicate> tag.
+ * Depending on search category and configuration, there could be 5 different
+ * types of values.
+ * Same as the PredicateArray class, this one needs to be converted into map object
+ * when importing filter.
+ */
+
 class Predicate {
     String category
     Configuration configuration
