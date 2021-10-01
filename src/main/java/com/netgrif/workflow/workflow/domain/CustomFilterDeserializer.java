@@ -10,6 +10,10 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Class that helps with deserialization of exported filter xml file in process of importing filters.
+ */
+
 @SuppressWarnings({ "deprecation", "serial" })
 public class CustomFilterDeserializer extends UntypedObjectDeserializer {
 
