@@ -127,7 +127,6 @@ public class MenuImportExport implements IMenuImportExport {
     public List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String parentId) throws IOException {
         resultMessage = "Import results:\n";
         List<String> filterTaskIds = new ArrayList<>();
-        Case groupCase = workflowService.findOne(parentId);
 
 //            Case groupCase = workflowService.findOne(parentId);
 //            filterTaskIds.add((String) groupCase.getDataField("filter_tasks").getValue());
@@ -162,7 +161,9 @@ public class MenuImportExport implements IMenuImportExport {
         menuList.getMenuList()
                 .forEach(menu -> menu.getMenuItems()
                         .forEach(menuItem -> {
-                            filterTaskIds.add(createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId));
+                            resultMessage = resultMessage.concat("\nMenu \"" + menu.getMenuIdentifier() + "\":\n");
+                            String result = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId);
+                            if (!result.equals("")) filterTaskIds.add(result);
                         }));
 //                            String result = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId);
 //                            String[] split = result.split(";");
@@ -171,7 +172,6 @@ public class MenuImportExport implements IMenuImportExport {
 //                                resultMessage = resultMessage.concat(split[1]);
 //                            } else resultMessage = resultMessage.concat(split[0]);
 //                        }));
-        //TODO check resultMessage
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("navigationMenuConfig").and(qTask.caseId.eq(parentId)));
 
@@ -199,7 +199,7 @@ public class MenuImportExport implements IMenuImportExport {
     protected FileFieldValue createXML(MenuList menuList, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-            ffv.setName("menu_" + userService.getSystem().getName() + ".xml");
+            ffv.setName("menu_" + menuList.getMenuList().get(0).getMenuIdentifier()+ ".xml");
             ffv.setPath(ffv.getPath(parentId, fileField.getImportId()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();
@@ -237,11 +237,13 @@ public class MenuImportExport implements IMenuImportExport {
         AtomicBoolean netCheck = new AtomicBoolean(true);
         resultMessage = resultMessage.concat("\nMenu entry \"" + item.getEntry_name() + "\": ");
 
-        //TODO check filtra podla dohodnuteho Identifikatora s Jozom -> (.dataSet.get(FILTER_IMPORT_ID).value.eq(item.getFilterImportId()))
+
 
         //Check whether required filter is present in engine. If not, skip this menu entry
-//        Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.author.id.eq(userService.getSystem().getId())));
+        //TODO check filtra podla dohodnuteho Identifikatora s Jozom -> (.dataSet.get(FILTER_IMPORT_ID).value.eq(item.getFilterImportId()))
+        //TODO momentalne hlada podla title polozky
         Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(item.getEntry_name())));
+//        Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.author.id.eq(userService.getSystem().getId())));
 
         if (filterCase == null) {
             resultMessage = resultMessage.concat("Missing filter with ID: \"" + item.getFilterId() + "\"! Menu entry was skipped.\n");
@@ -276,12 +278,12 @@ public class MenuImportExport implements IMenuImportExport {
             });
         }
             //Creating new Case of preference_filter_item net and setting its data...
-//            Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
-//                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getSystem().transformToLoggedUser());
-
             Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
-                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getLoggedUser().transformToLoggedUser());
-            //TODO title should be empty
+                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getSystem().transformToLoggedUser());
+
+//            Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
+//                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getLoggedUser().transformToLoggedUser());
+//            //TODO title should be empty
 
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
@@ -324,7 +326,7 @@ public class MenuImportExport implements IMenuImportExport {
                 e.printStackTrace();
             }
 
-            if(netCheck.get()) resultMessage = resultMessage.concat("OK");
+            if(netCheck.get()) resultMessage = resultMessage.concat("OK\n");
 //            task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(menuItemCase.getStringId())));
 
 //            return task.getStringId() + "," + filterCase.getStringId();
