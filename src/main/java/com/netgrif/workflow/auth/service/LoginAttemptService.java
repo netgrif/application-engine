@@ -32,6 +32,7 @@ public class LoginAttemptService implements ILoginAttemptService {
         });
     }
 
+
     public void loginSucceeded(String key) {
         attemptsCache.invalidate(key);
     }
