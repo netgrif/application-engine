@@ -121,10 +121,11 @@
 				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
 				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue]
 			])
-
+			log.info("mazem sa" + useCase.stringId)
 			async.run {
 				workflowService.deleteCase(useCase.stringId)
 			}
+			log.info("zmazana" + useCase.stringId)
 		</action>
 	</data>
 	<data type="taskRef">
