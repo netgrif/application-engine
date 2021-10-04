@@ -4,6 +4,9 @@ import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
@@ -19,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,13 +53,28 @@ public class UserService extends AbstractUserService {
     @Autowired
     private GroupConfigurationProperties groupProperties;
 
+    @Autowired
+    private IAfterRegistrationAuthService authenticationService;
+
+    @Override
+    public User saveNewAndAuthenticate(User user) {
+        return saveNew(user, true);
+    }
+
     @Override
     public IUser saveNew(IUser user) {
+        return saveNew(user, false);
+    }
+
+    private IUser saveNew(IUser user, boolean login) {
         registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
+        if (login)
+            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
+
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
 
@@ -63,6 +82,8 @@ public class UserService extends AbstractUserService {
             groupService.addUserToDefaultGroup(user);
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
+        if (login)
+            authenticationService.logoutAfterRegistrationFinished();
         return savedUser;
     }
 
