@@ -48,7 +48,7 @@ public class RegistrationServiceTest {
     public void testRegisterUser() throws InvalidUserTokenException {
         NewUserRequest request = new NewUserRequest();
         request.email = "test@test.com";
-        User user = service.createNewUser(request);
+        User user = (User) service.createNewUser(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());
@@ -60,7 +60,7 @@ public class RegistrationServiceTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(securityContext);
-        User registered = service.registerUser(registrationRequest);
+        User registered = (User) service.registerUser(registrationRequest);
 
         assert registered != null;
     }
