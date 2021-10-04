@@ -24,6 +24,7 @@ public class NaeLdapProperties {
 
     @Value("${spring.ldap.base:#{\"\"}}")
     private String base;
+
     private String superUsername;
 
     private String userFilter;
