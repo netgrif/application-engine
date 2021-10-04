@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
+@Service
 public class RegistrationService implements IRegistrationService {
 
     @Autowired
@@ -160,7 +161,8 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        return (RegisteredUser) userService.saveNew(user);
+        return (RegisteredUser) userService.saveNewAndAuthenticate(user);
+//        return userService.saveNewAndAuthenticate(user);
     }
 
     @Override

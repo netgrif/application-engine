@@ -390,7 +390,7 @@ public class Importer {
             reference.setReference(importArc.getReference());
             arc.setReference(reference);
         }
-//        needed to do it here because of backwards compatibility of variable arcs
+//      It has to be here for backwards compatibility of variable arcs
         if (arc.getReference() != null){
             arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }

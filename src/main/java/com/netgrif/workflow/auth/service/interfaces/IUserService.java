@@ -18,6 +18,8 @@ public interface IUserService {
 
     IUser save(IUser user);
 
+    UUser saveNewAndAuthenticate(IUser user);
+
     IUser saveNew(IUser user);
 
     AnonymousUser saveNewAnonymous(AnonymousUser user);

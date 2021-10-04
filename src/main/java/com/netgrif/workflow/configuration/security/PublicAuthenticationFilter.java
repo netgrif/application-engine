@@ -32,17 +32,19 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final static String JWT_HEADER_NAME = "X-Jwt-Token";
     private final static String BEARER = "Bearer ";
     private final String[] anonymousAccessUrls;
+    private final String[] exceptions;
 
     private final IJwtService jwtService;
     private final IUserService userService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                      Authority anonymousRole, String[] urls, IJwtService jwtService,
+                                      Authority anonymousRole, String[] urls, String[] exceptions, IJwtService jwtService,
                                       IUserService userService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousRole = anonymousRole;
         this.anonymousAccessUrls = urls;
+        this.exceptions = exceptions;
         this.jwtService = jwtService;
         this.userService = userService;
     }
@@ -126,6 +128,11 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private boolean isPublicApi(String path) {
         for (String url : this.anonymousAccessUrls) {
             if (path.matches(url.replace("*", ".*?"))) {
+                for(String ex : this.exceptions) {
+                    if (path.matches(ex.replace("*", ".*?"))) {
+                        return false;
+                    }
+                }
                 return true;
             }
         }
