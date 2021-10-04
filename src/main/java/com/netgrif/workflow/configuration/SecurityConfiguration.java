@@ -1,6 +1,8 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
@@ -12,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,6 +70,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
 
+    @Value("${nae.security.anonymous-exceptions}")
+    private String[] anonymousExceptions;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -83,6 +87,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
+        config.addAllowedOrigin("*"); // TODO: vymazat?
         config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
@@ -120,6 +125,11 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
+    }
+
+    @Bean
+    protected IAfterRegistrationAuthService authenticationService() throws Exception {
+        return new AfterRegistrationAuthService(authenticationManager());
     }
 
     @Override
@@ -162,6 +172,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                 authority,
                 this.serverPatterns,
+                this.anonymousExceptions,
                 this.jwtService,
                 this.userService
         );
