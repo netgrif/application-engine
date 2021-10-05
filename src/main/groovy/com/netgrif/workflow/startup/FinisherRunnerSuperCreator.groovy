@@ -22,7 +22,4 @@ class FinisherRunnerSuperCreator extends AbstractOrderedCommandLineRunner {
         log.info("Super Creator update")
     }
 
-
-
-
 }
