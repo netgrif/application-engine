@@ -2,7 +2,6 @@ package com.netgrif.workflow.auth
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -11,10 +10,10 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import groovy.json.JsonOutput
 
 //import com.netgrif.workflow.orgstructure.domain.Group
 
-import groovy.json.JsonOutput
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

@@ -9,10 +9,10 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.FilterRepository
 import groovy.json.JsonOutput
+import org.junit.jupiter.api.BeforeEach
 
 //import com.netgrif.workflow.orgstructure.domain.Group
 
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

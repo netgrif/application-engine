@@ -2,7 +2,6 @@ package com.netgrif.workflow.petrinet.domain.roles
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.VersionType
