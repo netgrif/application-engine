@@ -3,7 +3,6 @@ package com.netgrif.workflow.ipc
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.history.domain.EventLog
-import com.netgrif.workflow.history.domain.QEventLog
 import com.netgrif.workflow.history.domain.UserTaskEventLog
 import com.netgrif.workflow.history.domain.repository.EventLogRepository
 import com.netgrif.workflow.importer.service.Importer

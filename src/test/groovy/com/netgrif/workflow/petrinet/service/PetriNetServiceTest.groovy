@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.service
 
 import com.netgrif.workflow.TestHelper
-
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
@@ -19,6 +18,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.bson.types.ObjectId
-
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])

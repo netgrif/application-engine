@@ -7,9 +7,9 @@ import com.netgrif.workflow.mail.EmailType;
 import com.netgrif.workflow.mail.domain.MailDraft;
 import com.netgrif.workflow.mail.interfaces.IMailService;
 import freemarker.template.TemplateException;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,10 +29,9 @@ import java.util.Collections;
 public class MailSenderServiceTest {
 
     static final String FROM = "noreply@netgrif.com";
-    static final String RECIPIENT = "valdyreinn@gmail.com";
+    static final String RECIPIENT = "machac@netgrif.com";
     static final String TOKEN = "čšňť";
 
-    @Qualifier("mailService")
     @Autowired
     private IMailService service;
 
