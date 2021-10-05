@@ -5,7 +5,6 @@ import com.icegreen.greenmail.util.ServerSetup
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.web.AuthenticationController
@@ -19,9 +18,6 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import org.jsoup.Jsoup
-
-
-
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

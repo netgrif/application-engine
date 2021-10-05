@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain
 
 import com.netgrif.workflow.TestHelper
-
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.arcs.Arc
 import com.netgrif.workflow.petrinet.domain.arcs.InhibitorArc
