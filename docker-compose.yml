@@ -1,6 +1,28 @@
 version: "3.3"
 
 services:
+#  xxx:
+#    image: docker-private.nexus.netgrif.com/netgrif-backend:6.0.0-rc2
+#    ports:
+#    - 8080:8080
+#    environment:
+#      - NAE_DATABASE=test
+#      - NAE_MONGO_HOST=docker-mongo
+#      - NAE_ELASTIC_CLUSTER=elasticsearch
+#      - NAE_ELASTIC_HOST=docker-elastic
+#      - NAE_REDIS_HOST=docker-redis
+#      - NAE_STORAGE_PATH=storage
+#      - NAE_PASSWORD=aaaa123456
+#      - NAE_MAIL_FROM=noreply@netgrif.com
+#      - NAE_MAIL_REDIRECT_URL=ss
+#      - NAE_MAIL_HOST=smtp.websupport.sk
+#      - NAE_MAIL_USER=noreply@netgrif.com
+#      - NAE_MAIL_PASSWORD=Superstar38
+#      - NAE_MAIL_PORT=25
+#      - NAE_MAIL_REQUIED_AUTH=false
+#      - NAE_MAIL_STARTTLS=false
+#      - NAE_MAIL_PROTOCOL=smtp
+
   docker-mongo:
     image: mongo:4.4
     ports:
