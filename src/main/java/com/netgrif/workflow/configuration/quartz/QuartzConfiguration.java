@@ -3,6 +3,7 @@ package com.netgrif.workflow.configuration.quartz;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,11 @@ public class QuartzConfiguration {
     @Autowired
     private AutowiringSpringBeanJobFactory jobFactory;
 
+    @Value("${spring.data.mongodb.host}")
+    private String addresses;
+
+    @Value("${nae.quartz.dbName:nae}")
+    private String db;
 
     @Bean
     public Properties quartzProperties() throws IOException {
@@ -36,8 +42,10 @@ public class QuartzConfiguration {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         List<Resource> resourceList = new ArrayList<>();
         try {
+            Resource[] resourcesClassApp = resolver.getResources("classpath*:/application.properties");
             Resource[] resourcesClass = resolver.getResources("classpath*:/quartz.properties");
             Resource[] resources = resolver.getResources("file:/*/quartz.properties");
+            Collections.addAll(resourceList, resourcesClassApp);
             Collections.addAll(resourceList, resourcesClass);
             Collections.addAll(resourceList, resources);
         } catch (Exception e) {
@@ -53,12 +61,22 @@ public class QuartzConfiguration {
         return schedulerFactoryBean().getScheduler();
     }
 
+
+    //TODO: JOZIKE
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://"+addresses+":27017/");
+        properties.setProperty("org.quartz.jobStore.dbName", db);
+        properties.setProperty("org.quartz.jobStore.class", "com.novemberain.quartz.mongodb.MongoDBJobStore");
+        properties.setProperty("org.quartz.threadPool.threadCount", "1");
+        properties.setProperty("org.quartz.scheduler.instanceName", "netgrif_onloadcode");
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setApplicationContext(applicationContext);
         schedulerFactory.setAutoStartup(false);
+        schedulerFactory.setApplicationContextSchedulerContextKey("applicationContext");
         schedulerFactory.setQuartzProperties(quartzProperties());
+        schedulerFactory.setQuartzProperties(properties);
         jobFactory.setApplicationContext(applicationContext);
         schedulerFactory.setJobFactory(jobFactory);
         schedulerFactory.setOverwriteExistingJobs(true);
