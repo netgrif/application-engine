@@ -15,9 +15,9 @@ class PredicateValue {
     @JacksonXmlElementWrapper(localName = "stringValues")
     @JacksonXmlProperty(localName = "stringValue")
     List<String> stringValues
-    @JacksonXmlElementWrapper(localName = "integerValues")
-    @JacksonXmlProperty(localName = "integerValue")
-    List<Integer> integerValues
+    @JacksonXmlElementWrapper(localName = "doubleValues")
+    @JacksonXmlProperty(localName = "doubleValue")
+    List<Double> doubleValues
 
     PredicateValue(Map<String, Object> value) {
         value.forEach({ k, v ->
@@ -32,10 +32,10 @@ class PredicateValue {
                         for (def val : v) {
                             stringValues.add((String) val)
                         }
-                    } else if (v.get(0) instanceof Integer) {
-                        integerValues = new ArrayList<>()
+                    } else if (v.get(0) instanceof Integer || v.get(0) instanceof Double || v.get(0) instanceof Float) {
+                        doubleValues = new ArrayList<>()
                         for (def val : v) {
-                            integerValues.add((Integer) val)
+                            doubleValues.add((Double) val)
                         }
                     }
                     break
@@ -45,10 +45,10 @@ class PredicateValue {
                         stringValues.add(val as String)
                     }
                     break
-                case "integerValues":
-                    integerValues = new ArrayList<>()
+                case "doubleValues":
+                    doubleValues = new ArrayList<>()
                     for (def val : v) {
-                        integerValues.add(val as Integer)
+                        doubleValues.add(val as Double)
                     }
                     break
             }
@@ -59,8 +59,8 @@ class PredicateValue {
     Map<String, Object> getMapObject() {
         Map<String, Object> mapObject = new HashMap<>()
         mapObject.put("text", text)
-        if (integerValues != null) {
-            mapObject.put("value", integerValues)
+        if (doubleValues != null) {
+            mapObject.put("value", doubleValues)
         } else if (stringValues != null) {
             mapObject.put("value", stringValues)
         }

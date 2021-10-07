@@ -89,5 +89,5 @@ public interface IPetriNetService {
 
     void runActions(List<Action> actions, PetriNet petriNet);
 
-    List<PetriNet> getNewestNetsByIdentifiers(List<String> identifiers);
+    List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
 }

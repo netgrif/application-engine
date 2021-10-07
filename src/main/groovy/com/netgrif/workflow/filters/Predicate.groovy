@@ -19,9 +19,9 @@ class Predicate {
     @JacksonXmlElementWrapper(localName = "stringValues")
     @JacksonXmlProperty(localName = "stringValue")
     List<String> stringValues
-    @JacksonXmlElementWrapper(localName = "integerValues")
-    @JacksonXmlProperty(localName = "integerValue")
-    List<Integer> integerValues
+    @JacksonXmlElementWrapper(localName = "doubleValues")
+    @JacksonXmlProperty(localName = "doubleValue")
+    List<Double> doubleValues
     @JacksonXmlElementWrapper(localName = "booleanValues")
     @JacksonXmlProperty(localName = "booleanValue")
     List<Boolean> booleanValues
@@ -53,10 +53,10 @@ class Predicate {
                         for (def val : v) {
                             booleanValues.add((Boolean) val)
                         }
-                    } else if (v.get(0) instanceof Integer) {
-                        integerValues = new ArrayList<>()
+                    } else if (v.get(0) instanceof Integer || v.get(0) instanceof Double || v.get(0) instanceof Float) {
+                        doubleValues = new ArrayList<>()
                         for (def val : v) {
-                            integerValues.add((Integer) val)
+                            doubleValues.add((Double) val)
                         }
                     } else if (v.get(0) instanceof Long) {
                         longValues = new ArrayList<>()
@@ -76,10 +76,10 @@ class Predicate {
                         stringValues.add(val as String)
                     }
                     break
-                case "integerValues":
-                    integerValues = new ArrayList<>()
+                case "doubleValues":
+                    doubleValues = new ArrayList<>()
                     for (def val : v) {
-                        integerValues.add(val as Integer)
+                        doubleValues.add(val as Double)
                     }
                     break
                 case "longValues":
@@ -118,8 +118,8 @@ class Predicate {
         } else {
             if (stringValues != null) {
                 mapObject.put("values", stringValues)
-            } else if (integerValues != null) {
-                mapObject.put("values", integerValues)
+            } else if (doubleValues != null) {
+                mapObject.put("values", doubleValues)
             } else if (booleanValues != null) {
                 mapObject.put("values", booleanValues)
             } else if (longValues != null) {
