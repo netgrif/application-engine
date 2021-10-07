@@ -103,7 +103,7 @@
                 <xs:element ref="configuration"/>
                 <xs:choice>
                     <xs:element ref="stringValues"/>
-                    <xs:element ref="integerValues"/>
+                    <xs:element ref="doubleValues"/>
                     <xs:element ref="booleanValues"/>
                     <xs:element ref="mapValues"/>
                     <xs:element ref="longValues"/>
@@ -130,14 +130,14 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="stringValue" type="xs:string"/>
-    <xs:element name="integerValues">
+    <xs:element name="doubleValues">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="integerValue" maxOccurs="unbounded"/>
+                <xs:element ref="doubleValue" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="integerValue" type="xs:integer"/>
+    <xs:element name="doubleValue" type="xs:double"/>
     <xs:element name="booleanValues">
         <xs:complexType>
             <xs:sequence>
@@ -159,7 +159,7 @@
                 <xs:element ref="text"/>
                 <xs:choice>
                     <xs:element ref="stringValues"/>
-                    <xs:element ref="integerValues"/>
+                    <xs:element ref="doubleValues"/>
                 </xs:choice>
             </xs:sequence>
         </xs:complexType>

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.configuration.properties.FilterProperties;
 import com.netgrif.workflow.filters.FilterImportExport;
 import com.netgrif.workflow.filters.FilterImportExportList;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -28,7 +28,6 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Service that provides methods for creation of filter export/import cases for users.
@@ -54,6 +52,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     private static final String EXPORT_NET_IDENTIFIER = "export_filters";
     private static final String IMPORT_NET_IDENTIFIER = "import_filters";
+    private static final String FILTER_NET_IDENTIFIER = "filter";
 
     private static final String UPLOAD_FILE_FIELD = "upload_file";
 
@@ -90,22 +89,17 @@ public class FilterImportExportService implements IFilterImportExportService {
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
-    @Value("${nae.filter.export.file-name:filters.xml}")
-    private String exportedFileName;
+    @Autowired
+    private FilterProperties filterProperties;
 
     @Override
     public void createFilterImport(User author) {
-        createFilterCase("Import filters " + author.getFullName(), IMPORT_NET_IDENTIFIER, author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER,"Import filters " + author.getFullName(), "", author.transformToLoggedUser());
     }
 
     @Override
     public void createFilterExport(User author) {
-        createFilterCase("Export filters " + author.getFullName(), EXPORT_NET_IDENTIFIER, author.transformToLoggedUser());
-    }
-
-    private void createFilterCase(String title, String netIdentifier, LoggedUser loggedUser) {
-        PetriNet filterImportNet = petriNetService.getNewestVersionByIdentifier(netIdentifier);
-        workflowService.createCase(filterImportNet.getStringId(), title, "", loggedUser);
+        workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.transformToLoggedUser());
     }
 
     /**
@@ -117,7 +111,7 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @throws IOException - if file which contains exported filters cannot be created
      */
     @Override
-    public FileFieldValue exportFilters(Set<String> filtersToExport) throws IOException {
+    public FileFieldValue exportFilters(Collection<String> filtersToExport) throws IOException {
         log.info("Exporting selected filters");
         List<Case> selectedFilterCases = this.workflowService.findAllById(Lists.newArrayList(filtersToExport));
         FilterImportExportList filterList = new FilterImportExportList();
@@ -179,17 +173,18 @@ public class FilterImportExportService implements IFilterImportExportService {
                 );
             }
 
-            if (filterCase.isPresent()) {
-                Task importedFilterTask = taskService.searchOne(
-                        QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
-                                .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
-                );
-                importedFiltersIds.add(importedFilterTask.getStringId());
-
-                filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
-                filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
-                workflowService.save(filterCase.get());
+            if (!filterCase.isPresent()) {
+                return;
             }
+            Task importedFilterTask = taskService.searchOne(
+                    QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
+                            .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
+            );
+            importedFiltersIds.add(importedFilterTask.getStringId());
+
+            filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
+            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
+            workflowService.save(filterCase.get());
         });
         changeFilterField(importedFiltersIds);
         return importedFiltersIds;
@@ -205,24 +200,23 @@ public class FilterImportExportService implements IFilterImportExportService {
         filterFields.forEach(f -> {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FIELD_FILTER);
-            List<String> allowedNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
-            List<PetriNet> nets = petriNetService.getNewestNetsByIdentifiers(allowedNets);
-            if (nets.size() < allowedNets.size()) {
-                List<String> missingNetsIdentifiers = nets.stream().map(PetriNet::getIdentifier).collect(Collectors.toList());
-                allowedNets.removeAll(missingNetsIdentifiers);
-                StringBuilder missingNetsString = new StringBuilder(
+            PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
+            List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
+            List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
+            if (currentNets.size() < requiredNets.size()) {
+                requiredNets.removeAll(currentNets);
+                StringBuilder htmlTextAreaValue = new StringBuilder(
                         ((EnumerationMapField) filterNet.getDataSet().get(FIELD_MISSING_NETS_TRANSLATION)).getOptions().get(
                                 LocaleContextHolder.getLocale().getLanguage()
                         ).getDefaultValue()
                 );
-                missingNetsString.append("<ul style=\"color: red\">");
-                allowedNets.forEach(net -> missingNetsString.append("<li>").append(net).append("</li>"));
-                missingNetsString.append("</ul>");
+                htmlTextAreaValue.append("<ul style=\"color: red\">");
+                requiredNets.forEach(net -> htmlTextAreaValue.append("<li>").append(net).append("</li>"));
+                htmlTextAreaValue.append("</ul>");
                 Map<String, Map<String, String>> taskData = new HashMap<>();
                 Map<String, String> missingNets = new HashMap<>();
                 missingNets.put("type", "text");
-                missingNets.put("value", missingNetsString.toString());
+                missingNets.put("value", htmlTextAreaValue.toString());
                 taskData.put(FIELD_MISSING_ALLOWED_NETS, missingNets);
                 this.dataService.setData(importedFilterTask, ImportHelper.populateDataset(taskData));
                 filterCase = workflowService.findOne(filterCase.getStringId());
@@ -261,7 +255,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getId() + "/" + exportedFileName;
+        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getId() + "/" + filterProperties.getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 
@@ -275,7 +269,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         FileOutputStream fos = new FileOutputStream(f);
         baos.writeTo(fos);
 
-        return new FileFieldValue(exportedFileName, filePath);
+        return new FileFieldValue(filterProperties.getFileName(), filePath);
     }
 
     private FilterImportExport createExportClass(Case filter) {
@@ -319,7 +313,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(xml));
         } catch (Exception ex) {
-            throw new IllegalFilterFileException();
+            throw new IllegalFilterFileException(ex);
         }
     }
 }

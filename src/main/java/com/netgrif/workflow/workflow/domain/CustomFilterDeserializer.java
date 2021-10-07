@@ -4,7 +4,10 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -14,23 +17,23 @@ import java.util.*;
  * Class that helps with deserialization of exported filter xml file in process of importing filters.
  */
 
-@SuppressWarnings({ "deprecation", "serial" })
 public class CustomFilterDeserializer extends UntypedObjectDeserializer {
 
-    private static final CustomFilterDeserializer INSTANCE = new CustomFilterDeserializer();
+    private static final CustomFilterDeserializer INSTANCE = new CustomFilterDeserializer(null, null);
 
-    private CustomFilterDeserializer() {}
+    private CustomFilterDeserializer(JavaType listType, JavaType mapType) {
+        super(listType, mapType);
+    }
 
     public static CustomFilterDeserializer getInstance() {
         return INSTANCE;
     }
 
     public static String[] listValues = {"filter", "allowedNet", "searchCategory", "predicateMetadataItem", "predicate",
-            "stringValue", "integerValue", "booleanValue", "mapValue", "longValue"
+            "stringValue", "doubleValue", "booleanValue", "mapValue", "longValue"
     };
 
     @Override
-    @SuppressWarnings({ "unchecked"})
     protected Object mapObject(JsonParser parser, DeserializationContext context) throws IOException {
 
         @Nullable String firstKey;
@@ -41,7 +44,9 @@ public class CustomFilterDeserializer extends UntypedObjectDeserializer {
             firstKey = parser.getCurrentName();
         } else {
             if (token != JsonToken.END_OBJECT) {
-                throw context.mappingException(handledType(), parser.getCurrentToken());
+                throw JsonMappingException.from(parser,
+                        String.format("Cannot deserialize instance of %s out of %s token",
+                                ClassUtil.nameOf(handledType()), token));
             }
             return Collections.emptyMap();
         }
