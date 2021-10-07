@@ -7,7 +7,8 @@ import com.netgrif.workflow.oauth.domain.RemoteUserResource
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService
 import com.netgrif.workflow.utils.FullPageRequest
-import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +38,7 @@ class RemoteUserResourceTest {
     @Autowired
     private IRemoteGroupResourceService remoteGroupResourceService
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
@@ -76,15 +77,17 @@ class RemoteUserResourceTest {
         assert count == page.totalElements
     }
 
-//    @Test(expected = IllegalArgumentException.class)
-//    void testGroupExceptionMembers() {
-//        remoteGroupResourceService.members("INVALID_ID")
-//    }
-//
-//    @Test(expected = IllegalArgumentException.class)
-//    void testGroupExceptionGroupsOfUser() {
-//        remoteGroupResourceService.groupsOfUser("INVALID_ID")
-//    }
+    @Test
+    @Disabled("expected = IllegalArgumentException.class")
+    void testGroupExceptionMembers() {
+        remoteGroupResourceService.members("INVALID_ID")
+    }
+
+    @Test
+    @Disabled("expected = IllegalArgumentException.class")
+    void testGroupExceptionGroupsOfUser() {
+        remoteGroupResourceService.groupsOfUser("INVALID_ID")
+    }
 
     @Test
     void testFindInvalidUser() {

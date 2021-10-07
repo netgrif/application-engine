@@ -108,7 +108,7 @@ class ElasticSearchTest {
 
         def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.getProcessRoles(net.get())
+//        def processRoles = importHelper.getProcessRoles(net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [net.get().roles.values().find { it.importId == "process_role" }] as ProcessRole[])

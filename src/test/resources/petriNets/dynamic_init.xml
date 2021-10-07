@@ -34,8 +34,7 @@
         <title>user</title>
         <init dynamic="true">
             def user = userService.loggedOrSystem
-            return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email:
-            user.email)
+            return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email: user.email)
         </init>
     </data>
 

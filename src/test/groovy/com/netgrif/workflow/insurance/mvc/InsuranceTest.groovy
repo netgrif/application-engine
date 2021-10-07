@@ -20,6 +20,7 @@ import org.hamcrest.CoreMatchers
 //import com.netgrif.workflow.orgstructure.domain.Group
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,6 +37,8 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+
+import java.nio.charset.StandardCharsets
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -149,6 +152,7 @@ class InsuranceTest {
     private Map mapper
 
     @Test
+    @DisplayName("Insurance Test")
     void test() {
         createCase()
         coverType()
@@ -245,7 +249,7 @@ class InsuranceTest {
         def result = mvc.perform(post(CASE_CREATE_URL)
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .with(csrf().asHeader())
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -266,7 +270,7 @@ class InsuranceTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -778,6 +782,6 @@ class InsuranceTest {
 
     @SuppressWarnings("GrMethodMayBeStatic")
     private def parseResult(MvcResult result) {
-        return (new JsonSlurper()).parseText(result.response.contentAsString)
+        return (new JsonSlurper()).parseText(result.response.getContentAsString(StandardCharsets.UTF_8))
     }
 }

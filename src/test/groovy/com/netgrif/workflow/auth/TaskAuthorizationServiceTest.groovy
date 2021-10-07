@@ -69,7 +69,7 @@ class TaskAuthorizationServiceTest {
     private SuperCreator superCreator
 
     @BeforeEach
-    void beforeAll() {
+    void before() {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
 

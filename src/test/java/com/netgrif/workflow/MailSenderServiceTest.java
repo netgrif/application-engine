@@ -29,7 +29,7 @@ import java.util.Collections;
 public class MailSenderServiceTest {
 
     static final String FROM = "noreply@netgrif.com";
-    static final String RECIPIENT = "machac@netgrif.com";
+    static final String RECIPIENT = "userTest@netgrif.com";
     static final String TOKEN = "čšňť";
 
     @Autowired

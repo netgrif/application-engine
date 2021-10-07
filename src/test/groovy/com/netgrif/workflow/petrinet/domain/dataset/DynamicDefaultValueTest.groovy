@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,8 +41,12 @@ class DynamicDefaultValueTest {
 
     @Test
     void testInitValues() {
+        Case useCase
         Optional<PetriNet> optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        Case useCase = importHelper.createCase("test", optNet.get())
+        if(optNet.isPresent()){
+            PetriNet net = optNet.get()
+            useCase = importHelper.createCase("test", net)
+        }
 
         assert useCase.dataSet["text"].value == superCreator.superUser.name
         assert useCase.dataSet["number"].value as Integer == superCreator.superUser.name.length()
