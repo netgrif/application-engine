@@ -7,6 +7,7 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.PetriNetIdentifierResult;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -229,12 +230,14 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> getNewestNetsByIdentifiers(List<String> identifiers) {
-        Page<PetriNet> page = repository.findByIdentifierIn(identifiers, PageRequest.of(0, 200, Sort.Direction.DESC, "version.major", "version.minor", "version.patch"));
-        if (page.getTotalPages() > 1) {
-            log.warn("Multiple pages of PetriNets found! Returning first page.");
-        }
-        return page.getContent();
+    public List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers) {
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("identifier").in(identifiers)),
+                Aggregation.group("identifier"),
+                Aggregation.project("identifier").and("identifier").previousOperation()
+        );
+        AggregationResults<PetriNetIdentifierResult> groupResults = mongoTemplate.aggregate(agg, PetriNet.class, PetriNetIdentifierResult.class);
+        return groupResults.getMappedResults().stream().map(PetriNetIdentifierResult::getIdentifier).collect(Collectors.toList());
     }
 
     @Override
