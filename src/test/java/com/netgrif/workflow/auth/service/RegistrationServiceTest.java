@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.service;
 
 
+import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
@@ -32,11 +33,14 @@ public class RegistrationServiceTest {
     @Autowired
     UserRepository repository;
 
+    @Autowired
+    private TestHelper testHelper;
 
     @BeforeEach
-    public void setUp() {
-        repository.deleteAll();
+    void before() {
+        testHelper.truncateDbs();
     }
+
 
     @AfterEach
     public void cleanUp() {
@@ -44,10 +48,11 @@ public class RegistrationServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "myUser", roles = { "myAuthority" })
+//    @WithMockUser(username = "myUser", roles = { "myAuthority" })
     public void testRegisterUser() throws InvalidUserTokenException {
         NewUserRequest request = new NewUserRequest();
         request.email = "test@test.com";
+
         RegisteredUser user =  service.createNewUser(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();

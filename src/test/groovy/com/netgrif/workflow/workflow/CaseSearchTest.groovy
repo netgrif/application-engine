@@ -73,7 +73,7 @@ class CaseSearchTest {
 
         PetriNet net = getNet()
 
-        Case case1 = importHelper.createCase("Case1", net)
+        Case case1 = importHelper.createCase("Case1-Test", net)
         Case case2 = importHelper.createCase("Case2", net)
         Case case3 = importHelper.createCase("Case3", net)
 
@@ -102,7 +102,7 @@ class CaseSearchTest {
                 ],
                 "3": [
                         "type" : "text",
-                        "value": "Milan"
+                        "value": "Test"
                 ],
                 "4": [
                         "type" : "date",
@@ -143,7 +143,7 @@ class CaseSearchTest {
 
     @Test
     void searchByMoreValues() {
-        performSearch("Milan", "Case1")
+        performSearch("Test", "Case1")
     }
 
     @Test

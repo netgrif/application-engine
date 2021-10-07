@@ -88,7 +88,7 @@ class TaskAuthorizationServiceTest {
 //                [processRoles.get("role")] as ProcessRole[])
                 [] as ProcessRole[])
 
-        userId = user._id
+        userId = user.getStringId()
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
@@ -106,7 +106,7 @@ class TaskAuthorizationServiceTest {
 
     private PetriNet net
 
-    private Long userId
+    private String userId
 
     private Authentication userWithRoleAuth
     private Authentication userWithoutRoleAuth

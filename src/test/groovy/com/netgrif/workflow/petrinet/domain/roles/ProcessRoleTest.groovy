@@ -88,15 +88,16 @@ class ProcessRoleTest {
         def processRoles = userProcessRoleRepository.findAllById([netId])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }] as ProcessRole[])
+                [processRoles.find { it.getStringId() == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+                [processRoles.find { it.getStringId() == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId }, processRoles.find { it.roleId == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
+                [processRoles.find { it.getStringId() == net.get().roles.values().find { it.name.defaultValue == "View" }.stringId },
+                 processRoles.find { it.getStringId() == net.get().roles.values().find { it.name.defaultValue == "Perform" }.stringId }] as ProcessRole[])
     }
 
     private String caseId
