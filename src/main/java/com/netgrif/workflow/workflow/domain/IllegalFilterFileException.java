@@ -1,12 +1,12 @@
 package com.netgrif.workflow.workflow.domain;
 
 /**
- * Exception class that throws error after incorrect filter xml file import.
+ * Exception class that throws error after incorrect filter xml file import.\
  */
 
 public class IllegalFilterFileException extends Exception {
 
-    public IllegalFilterFileException() {
-        super("Incorrect format of imported filters file!");
+    public IllegalFilterFileException(Exception e) {
+        super("Incorrect format of imported filters file!", e);
     }
 }

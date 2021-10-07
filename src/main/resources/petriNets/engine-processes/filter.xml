@@ -788,7 +788,6 @@
                 <action>
                     name: f.new_title;
                     changeCaseProperty "title" about { name.value }
-                    workflowService.save(useCase)
                 </action>
             </actions>
         </event>

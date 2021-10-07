@@ -47,9 +47,9 @@
     </data>
     <data type="file">
         <id>export_file</id>
-        <title name="export_file">Exported filter</title>
-        <placeholder name="export_file_placeholder">Exported filter file</placeholder>
-        <desc name="export_file_desc">Download exported filter file in xml format</desc>
+        <title name="export_file">Exported filters</title>
+        <placeholder name="export_file_placeholder">File with exported filters</placeholder>
+        <desc name="export_file_desc">Download file with exported filters in xml format</desc>
     </data>
     <!-- I18NS -->
     <i18n locale="sk">
@@ -59,9 +59,9 @@
         <i18nString name="exportable_filters_desc">Vyberte jeden alebo viac filtrov na export</i18nString>
         <i18nString name="export_btn_placeholder">Exportovať filtre</i18nString>
         <i18nString name="export_btn_desc">Export vybraných filtrov do súboru xml</i18nString>
-        <i18nString name="export_file">Exportovaný filter</i18nString>
-        <i18nString name="export_file_placeholder">Exportovaný súbor filtra</i18nString>
-        <i18nString name="export_file_desc">Stiahnutie exportovaného súboru filtra vo formáte xml</i18nString>
+        <i18nString name="export_file">Exportované filtre</i18nString>
+        <i18nString name="export_file_placeholder">Súbor s exportovanými filtrami</i18nString>
+        <i18nString name="export_file_desc">Stiahnutie súboru s exportovanými filtrami vo formáte xml</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="export_filters">Exportieren von Filtern</i18nString>
@@ -70,9 +70,9 @@
         <i18nString name="exportable_filters_desc">Wählen Sie einen oder mehrere Filter für den Export</i18nString>
         <i18nString name="export_btn_placeholder">Filter exportieren</i18nString>
         <i18nString name="export_btn_desc">Ausgewählte Filter in xml-Datei exportieren</i18nString>
-        <i18nString name="export_file">Exportierter Filter</i18nString>
-        <i18nString name="export_file_placeholder">Exportierte Filterdatei</i18nString>
-        <i18nString name="export_file_desc">Herunterladen der exportierten Filterdatei im xml-Format</i18nString>
+        <i18nString name="export_file">Exportierte Filter</i18nString>
+        <i18nString name="export_file_placeholder">Datei mit exportierten Filtern</i18nString>
+        <i18nString name="export_file_desc">Datei mit exportierten Filtern im xml-Format herunterladen</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>

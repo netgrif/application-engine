@@ -21,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.io.ClassPathResource
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -187,17 +188,17 @@ class FilterImportExportTest {
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-            Schema schema = factory.newSchema(FilterImportExportTest.class.getResource("/petriNets/filter_export_schema.xsd"))
+            Schema schema = factory.newSchema(new ClassPathResource("/petriNets/filter_export_schema.xsd").URL)
             Validator validator = schema.newValidator()
             validator.validate(new StreamSource(xml))
         } catch (Exception ex) {
-            throw new IllegalFilterFileException()
+            throw new IllegalFilterFileException(ex)
         }
     }
 
     void createTestFilter() {
         defaultFiltersRunner.createCaseFilter("Test filter", "filter_alt", "", FILTER_VISIBILITY_PUBLIC,
-                "((((dataSet.number.numberValue:5) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.number.numberValue:[10 TO 100]) AND " +
+                "((((dataSet.number.numberValue:5) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.number.numberValue:[10 TO 100.548]) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.text.fulltextValue:*asdad*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
                         "OR ((dataSet.enumeration.fulltextValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.enumeration_map.fulltextValue:*asdasd*) " +
                         "AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.multichoice.fulltextValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
@@ -227,7 +228,7 @@ class FilterImportExportTest {
                                          "operator": "in_range",
                                          "datafield": "number#Number"
                                  ],
-                                 "values": [10, 100]
+                                 "values": [10, 100.548]
                          ], [
                                  "category": "case_dataset",
                                  "configuration": [
@@ -416,8 +417,8 @@ class FilterImportExportTest {
                 ],
                  "searchCategories": ["case_dataset", "case_title", "case_creation_date", "case_creation_date_time", "case_process", "case_task", "case_author", "case_visual_id", "case_string_id"]],
                 [
-                        (GERMAN_ISO_3166_CODE): "Dig",
-                        (SLOVAK_ISO_3166_CODE): "Dilino"
+                        (GERMAN_ISO_3166_CODE): "Testfilter",
+                        (SLOVAK_ISO_3166_CODE): "Testovaci filter"
                 ]
         )
     }
