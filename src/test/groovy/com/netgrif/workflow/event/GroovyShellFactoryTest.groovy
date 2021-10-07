@@ -118,7 +118,7 @@ class GroovyShellFactoryTest {
         roleService.assignRolesToUser(
                 user.getStringId(),
                 new HashSet<String>(roles.collect({it.getStringId()})),
-                new LoggedUser(-1, "a", "", [])
+                new LoggedUser("", "a", "", [])
         )
         user = userService.findByEmail(userService.getSystem().getEmail(), false)
         assert user.processRoles.size() == processRoleCount + 1
