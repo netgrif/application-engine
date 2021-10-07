@@ -111,7 +111,7 @@ class RemoveActionTest {
     @Test
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        authentication = new UsernamePasswordAuthenticationToken("super@netgrif.com", "NAEnetgrif15Awesome")
+        authentication = new UsernamePasswordAuthenticationToken("super@netgrif.com", )
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
@@ -132,9 +132,9 @@ class RemoveActionTest {
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
         String managerRoleId = processRoleRepository.findByName_DefaultValue("manager").stringId
-        //TODO: JOZIKE it.stringId
-        assert roles.find { it.roleId == adminRoleId }
-        assert roles.find { it.roleId == managerRoleId }
+
+        assert roles.find { it.getStringId() == adminRoleId }
+        assert roles.find { it.getStringId() == managerRoleId }
 
         //On frontend user had two roles admin and manage, and admin was removed, so now to the backend
         //only manager role came, and as part of admin action, this one should get removed inside action
@@ -143,16 +143,16 @@ class RemoveActionTest {
         mvc.perform(post(ROLE_API.replace("{}", userId))
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
                 .with(authentication(this.authentication)))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
         updatedUser = userRepository.findByEmail(USER_EMAIL)
-        roles = updatedUser.getUserProcessRoles()
+        roles = updatedUser.getProcessRoles()
 
-        Assert.assertNull(roles.find { it.roleId == adminRoleId })
-        Assert.assertNull(roles.find { it.roleId == managerRoleId })
+        Assert.assertNull(roles.find { it.stringId == adminRoleId })
+        Assert.assert(roles.find { it.stringId == managerRoleId })
     }
 }

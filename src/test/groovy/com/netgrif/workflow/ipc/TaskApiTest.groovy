@@ -195,13 +195,11 @@ class TaskApiTest {
         leasing1 = leasing1Opt.get()
         leasing2 = leasing2Opt.get()
 
-//@formatter:off
         assert limits.dataSet["limit"].value as Double == 950_000 as Double
         assert leasing1.dataSet["2"].value as Double == 950_000 as Double
         assert leasing1.dataSet["1"].value as Double == 30_000 as Double
         assert leasing2.dataSet["2"].value as Double == 950_000 as Double
         assert leasing2.dataSet["1"].value as Double == 20_000 as Double
-//@formatter:on
     }
 
     public static final String TASK_BULK_NET_FILE = "ipc_bulk.xml"
@@ -224,7 +222,7 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
         helper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
 
-        assert taskRepository.findAll(QTask.task.userId.eq(userService.system._id)).size() == 2
+        assert taskRepository.findAll(QTask.task.userId.eq(userService.system.getStringId())).size() == 2
     }
 
     public static final String TASK_GETTER_NET_FILE = "ipc_data.xml"

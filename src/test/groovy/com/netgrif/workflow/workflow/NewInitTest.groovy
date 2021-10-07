@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.VersionType
@@ -9,6 +10,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,6 +24,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class NewInitTest {
 
     @Autowired
+    private TestHelper testHelper
+
+    @Autowired
     private IPetriNetService petriNetService
 
     @Autowired
@@ -29,6 +34,11 @@ class NewInitTest {
 
     @Autowired
     private SuperCreator superCreator
+
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs()
+    }
 
     @Test
     void newInitTest() throws IOException, MissingIconKeyException, MissingPetriNetMetaDataException {

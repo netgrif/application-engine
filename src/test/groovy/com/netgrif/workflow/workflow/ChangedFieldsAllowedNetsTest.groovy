@@ -37,7 +37,7 @@ class ChangedFieldsAllowedNetsTest {
     void beforeAll() {
         def netOptional = importHelper.createNet("changed_fields_allowed_nets.xml")
         assert netOptional.isPresent()
-        this.net = netOptional.get()
+        net = netOptional.get()
     }
 
     // NAE-1374

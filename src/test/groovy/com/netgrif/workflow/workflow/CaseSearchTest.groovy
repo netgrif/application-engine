@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -158,14 +159,14 @@ class CaseSearchTest {
 
     void performSearch(String input, String expect = "", Boolean includeInput = true) {
         String request = buildRequestBody(input)
-        mvc.perform(post("/api/workflow/case/search_mongo")
+        mvc.perform(post("/api/workflow/case/search2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .with(httpBasic("super@netgrif.com", userPassword))
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
                 .andExpect(content().string(containsString("_links")))
                 .andExpect(content().string(containsString("cases")))
                 .andExpect(content().string(containsString(expect)))
