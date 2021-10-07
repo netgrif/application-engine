@@ -125,7 +125,7 @@ public class MenuImportExport implements IMenuImportExport {
 
     @Override
     public List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String parentId) throws IOException {
-        resultMessage = "Import results:\n";
+        resultMessage = "";
         List<String> filterTaskIds = new ArrayList<>();
 
 //            Case groupCase = workflowService.findOne(parentId);
@@ -134,7 +134,7 @@ public class MenuImportExport implements IMenuImportExport {
         MenuList menuList = loadFromXML(ffv);
         List<String> menuItemIdsToReplace = menuItemCases.stream().filter(caze -> menuList.getMenuList().stream()
                         .anyMatch(menu -> Objects.equals(menu.getMenuIdentifier(), caze.getDataSet().get("menu_identifier").getValue())))
-                .map(Case::getStringId).collect(Collectors.toList());
+                        .map(Case::getStringId).collect(Collectors.toList());
 
         if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
             Case caseToRemove = workflowService.findOne(id);
@@ -159,12 +159,13 @@ public class MenuImportExport implements IMenuImportExport {
         });
 
         menuList.getMenuList()
-                .forEach(menu -> menu.getMenuItems()
-                        .forEach(menuItem -> {
-                            resultMessage = resultMessage.concat("\nMenu \"" + menu.getMenuIdentifier() + "\":\n");
-                            String result = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId);
-                            if (!result.equals("")) filterTaskIds.add(result);
-                        }));
+                .forEach(menu -> {
+                    resultMessage = resultMessage.concat("\nIMPORTING MENU \"" + menu.getMenuIdentifier() + "\":\n");
+                    menu.getMenuItems().forEach(menuItem -> {
+                                String result = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId);
+                                if (!result.equals("")) filterTaskIds.add(result);
+                            });
+                });
 //                            String result = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId);
 //                            String[] split = result.split(";");
 //                            if (split.length == 2) {
@@ -272,6 +273,8 @@ public class MenuImportExport implements IMenuImportExport {
                             } else {
                                 bannedRoles.put(roleImportId + ":" + netImportId, new I18nString(role.get().getName() + "(" + net.getTitle() + ")"));
                             }
+                        } else {
+                            resultMessage = resultMessage.concat("\nRole with import ID \"" + roleImportId + "\" " + "is not present in currently uploaded net \"" + netImportId + "\"\n");
                         }
                     }
                 }
