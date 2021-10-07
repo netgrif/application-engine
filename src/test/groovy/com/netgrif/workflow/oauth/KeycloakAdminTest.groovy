@@ -13,9 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles(["test"])
 @SpringBootTest
+@ActiveProfiles(["test"])
+@ExtendWith(SpringExtension.class)
 class KeycloakAdminTest {
 
     @Value('${security.oauth2.client.realm}')
@@ -25,7 +25,7 @@ class KeycloakAdminTest {
     protected Keycloak keycloak
 
     @Test
-    @Disabled
+    @Disabled("")
     void test() {
         RealmResource realmResource = keycloak.realm(realm)
         UsersResource usersResource = realmResource.users()
