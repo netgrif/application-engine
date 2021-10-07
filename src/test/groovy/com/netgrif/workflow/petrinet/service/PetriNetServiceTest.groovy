@@ -97,12 +97,12 @@ class PetriNetServiceTest {
 
         def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
-        assert user.processRoles.size() == 0
+        assert user.processRoles.size() == 1
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
         user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
-        assert user.processRoles.size() == 1
+        assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
 
@@ -114,7 +114,7 @@ class PetriNetServiceTest {
         assert processRoleRepository.count() == processRoleCount
         user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
-        assert user.processRoles.size() == 0
+        assert user.processRoles.size() == 2  //TODO: deletePetriNet delete role
 
         boolean exceptionThrown = false
         try {

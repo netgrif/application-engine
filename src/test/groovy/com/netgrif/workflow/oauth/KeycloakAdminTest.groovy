@@ -1,5 +1,6 @@
 package com.netgrif.workflow.oauth
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.keycloak.admin.client.Keycloak
@@ -24,6 +25,7 @@ class KeycloakAdminTest {
     protected Keycloak keycloak
 
     @Test
+    @Disabled
     void test() {
         RealmResource realmResource = keycloak.realm(realm)
         UsersResource usersResource = realmResource.users()

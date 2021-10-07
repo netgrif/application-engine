@@ -22,6 +22,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -94,6 +95,25 @@ class OAuthUserServiceTest {
     private LoggedUser fakeLogged
 
     private Authentication auth
+
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs()
+        mvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build()
+
+        fakeLogged = new OAuthLoggedUser("4", new ObjectId().toString(), "super@netgrif.com", superCreator.superUser.authorities)
+        fakeLogged.processRoles = superCreator.superUser.processRoles.collect { it.stringId } as Set
+        fakeLogged.setFullName("Fake User")
+        auth = new UsernamePasswordAuthenticationToken(fakeLogged, "n/a", fakeLogged.authorities)
+
+        IUser fake = userService.resolveById("4", true)
+        fake.processRoles = superCreator.superUser.processRoles
+        fake.authorities = superCreator.superUser.authorities
+        userService.save(fake)
+    }
 
     @TestConfiguration
     static class TestConfig {
@@ -208,24 +228,6 @@ class OAuthUserServiceTest {
         }
     }
 
-    @BeforeEach
-    void before() {
-        testHelper.truncateDbs()
-        mvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build()
-
-        fakeLogged = new OAuthLoggedUser("4", new ObjectId().toString(), "super@netgrif.com", superCreator.superUser.authorities)
-        fakeLogged.processRoles = superCreator.superUser.processRoles.collect { it.stringId } as Set
-        fakeLogged.setFullName("Fake User")
-        auth = new UsernamePasswordAuthenticationToken(fakeLogged, "n/a", fakeLogged.authorities)
-
-        IUser fake = userService.resolveById("4", true)
-        fake.processRoles = superCreator.superUser.processRoles
-        fake.authorities = superCreator.superUser.authorities
-        userService.save(fake)
-    }
 
     @Test
     void testSuperUserFindByUsername() {
@@ -320,10 +322,11 @@ class OAuthUserServiceTest {
         assert user.processRoles.collect { it.stringId }.sort() == user2.processRoles.collect { it.stringId }.sort()
     }
 
-//    @Test(expected = IllegalArgumentException.class)
-//    void testResolveByIdThrow() {
-//        userService.resolveById("FAKE_ID", false)
-//    }
+    @Test
+    @Disabled("expected = IllegalArgumentException.class")
+    void testResolveByIdThrow() {
+        userService.resolveById("FAKE_ID", false)
+    }
 
     @Test
     void testResolveById() {
