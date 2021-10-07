@@ -182,6 +182,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             );
             importedFiltersIds.add(importedFilterTask.getStringId());
 
+            // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/
             filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
