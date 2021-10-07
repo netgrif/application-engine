@@ -12,6 +12,7 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,6 +63,7 @@ class AssignRemoveTest {
     }
 
     @Test
+    @Disabled("Create functions or update test")
     public void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
         Optional<PetriNet> netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), "major", superCreator.getLoggedSuper());
 

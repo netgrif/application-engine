@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.service;
 
 
+import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
@@ -47,7 +48,7 @@ public class RegistrationServiceTest {
     public void testRegisterUser() throws InvalidUserTokenException {
         NewUserRequest request = new NewUserRequest();
         request.email = "test@test.com";
-        User user = (User) service.createNewUser(request);
+        RegisteredUser user =  service.createNewUser(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());

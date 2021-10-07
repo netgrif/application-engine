@@ -9,7 +9,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
-import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,7 +58,7 @@ class FieldTest {
     def limitsNetOptional
     PetriNet net
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
