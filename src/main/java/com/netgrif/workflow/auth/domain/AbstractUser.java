@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractUser implements IUser {
@@ -46,7 +47,8 @@ public abstract class AbstractUser implements IUser {
     }
 
     public void removeProcessRole(ProcessRole role) {
-        processRoles.remove(role);
+        Optional<ProcessRole> processRoleOptional = processRoles.stream().filter(r -> r.getStringId().equals(role.getStringId())).findFirst();
+        processRoleOptional.ifPresent(processRole -> processRoles.remove(processRole));
     }
 
     public void addGroup(String groupId) {
