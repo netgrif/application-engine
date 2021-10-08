@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +64,8 @@ public interface IUserService {
     Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
     IUser removeRole(IUser user, String roleStringId);
+
+    void removeRoleOfDeletedPetriNet(PetriNet net);
 
     void deleteUser(IUser user);
 
