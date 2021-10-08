@@ -52,7 +52,7 @@ class DynamicDefaultValueTest {
         assert useCase.dataSet["number"].value as Integer == superCreator.superUser.name.length()
         assert useCase.dataSet["date"].value != null
         assert useCase.dataSet["dateTime"].value != null
-        assert (useCase.dataSet["user"].value as User) != null
+        assert (useCase.dataSet["user"].value as UserFieldValue) != null
         assert (useCase.dataSet["multichoice"].value as List) == ["ABC", "DEF"]
         assert (useCase.dataSet["multichoice_map"].value as List) == ["ABC", "DEF"]
     }
