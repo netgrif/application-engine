@@ -79,7 +79,7 @@ class RemoveActionTest {
 
     private MockMvc mvc
     private PetriNet petriNet
-    private Authentication authentication
+    private Authentication auth
 
     @BeforeEach
     void before() {
@@ -111,7 +111,7 @@ class RemoveActionTest {
     @Test
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        authentication = new UsernamePasswordAuthenticationToken("super@netgrif.com", )
+        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com", )
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
@@ -124,7 +124,7 @@ class RemoveActionTest {
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .with(csrf().asHeader())
-                .with(authentication(this.authentication)))
+                .with(authentication(this.auth)))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
@@ -145,7 +145,7 @@ class RemoveActionTest {
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
-                .with(authentication(this.authentication)))
+                .with(authentication(this.auth)))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Selected roles assigned to user")))
 
