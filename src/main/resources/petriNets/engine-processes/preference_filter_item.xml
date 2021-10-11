@@ -177,7 +177,7 @@
 	<data type="button">
 		<id>add_allowed_roles</id>
 		<title></title>
-		<placeholder name="permitRoles">Allow view for roles</placeholder>
+		<placeholder name="allow_roles">Allow view for roles</placeholder>
 		<action trigger="set">
 			allowedRoles: f.allowed_roles,
 			processesAvailable: f.processes_available,
@@ -193,7 +193,7 @@
 	<data type="button">
 		<id>remove_allowed_roles</id>
 		<title></title>
-		<placeholder name="removePermissions">Remove from allowed roles</placeholder>
+		<placeholder name="remove_from_allowed_roles">Remove from allowed roles</placeholder>
 		<action trigger="set">
 			allowedRoles: f.allowed_roles,
 			processesAvailable: f.processes_available,
@@ -210,7 +210,7 @@
 	<data type="button">
 		<id>add_banned_roles</id>
 		<title></title>
-		<placeholder name="banRoles">Ban view for roles</placeholder>
+		<placeholder name="ban_roles">Ban view for roles</placeholder>
 		<action trigger="set">
 			bannedRoles: f.banned_roles,
 			processesAvailable: f.processes_available,
@@ -226,7 +226,7 @@
 	<data type="button">
 		<id>remove_banned_roles</id>
 		<title></title>
-		<placeholder name="removeBannedRoles">Remove from banned roles</placeholder>
+		<placeholder name="remove_from_banned_roles">Remove from banned roles</placeholder>
 		<action trigger="set">
 			bannedRoles: f.banned_roles,
 			processesAvailable: f.processes_available,
@@ -300,10 +300,10 @@
 		<i18nString name="icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
 		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
-		<i18nString name="add_allowed_roles">Pridaj k povoleným roliam</i18nString>
-		<i18nString name="remove_allowed_roles">Odstráň z povolených rolí</i18nString>
-		<i18nString name="add_banned_roles">Pridaj k zakázaným roliam</i18nString>
-		<i18nString name="remove_banned_roles">Odstráň zo zakázaných rolí</i18nString>
+		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
+		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
+		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
+		<i18nString name="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
 		<i18nString name="processes_available">Vaše procesy</i18nString>
 		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
 		<i18nString name="roles_available">Dostupné roly</i18nString>
@@ -321,10 +321,10 @@
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="icon_identifier">Ikone ID</i18nString>
 		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
-		<i18nString name="add_allowed_roles">Zu zulässigen Rollen hinzufügen</i18nString>
-		<i18nString name="remove_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
-		<i18nString name="add_banned_roles">Zu verbotenen Rollen hinzufügen</i18nString>
-		<i18nString name="remove_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
+		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
+		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
 		<i18nString name="processes_available">Ihre Prozesse</i18nString>
 		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
 		<i18nString name="roles_available">Verfügbare Rollen</i18nString>
