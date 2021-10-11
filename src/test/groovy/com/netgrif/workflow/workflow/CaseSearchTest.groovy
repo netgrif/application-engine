@@ -41,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = WorkflowManagementSystemApplication.class
 )
+@Disabled("searchByMoreValues")
 @AutoConfigureMockMvc
 class CaseSearchTest {
 
