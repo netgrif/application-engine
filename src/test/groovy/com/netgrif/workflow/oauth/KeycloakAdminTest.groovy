@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
+@Disabled("UnsatisfiedDependency Error creating bean with name")
 class KeycloakAdminTest {
 
     @Value('${security.oauth2.client.realm}')
@@ -25,7 +26,6 @@ class KeycloakAdminTest {
     protected Keycloak keycloak
 
     @Test
-    @Disabled("")
     void test() {
         RealmResource realmResource = keycloak.realm(realm)
         UsersResource usersResource = realmResource.users()
