@@ -19,7 +19,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.service.ProcessRoleService;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
@@ -68,6 +70,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private IProcessRoleService processRoleService;
 
     @Autowired
     private ITaskService taskService;
@@ -227,6 +232,24 @@ public class WorkflowService implements IWorkflowService {
         return createCase(netId, (u) -> title, color, user);
     }
 
+    @Override
+    public Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        if (net == null) {
+            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
+        }
+        return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user);
+    }
+
+    @Override
+    public Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        if (net == null) {
+            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
+        }
+        return this.createCase(net.getStringId(), title, color, user);
+    }
+
     public Case createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet, petriNet.getActivePlaces());
@@ -248,6 +271,8 @@ public class WorkflowService implements IWorkflowService {
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
         useCase.setUserRefs(petriNet.getUserRefs());
+        useCase.decideEnabledRoles(petriNet);
+        setDefaultRoleIfEnabled(petriNet, useCase);
 
         useCase.setTitle(makeTitle.apply(useCase));
         runActions(petriNet.getPreCreateActions(), petriNet);
@@ -394,6 +419,12 @@ public class WorkflowService implements IWorkflowService {
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
+    }
+
+    private void setDefaultRoleIfEnabled(PetriNet net, Case useCase) {
+        if (useCase.getViewUserRefs().isEmpty() && useCase.getViewRoles().isEmpty() && net.isDefaultRoleEnabled()) {
+            useCase.addAllRolesToViewRoles(processRoleService.defaultRole().getStringId());
+        }
     }
 
     private void resolveTaskRefs(Case useCase) {
