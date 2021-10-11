@@ -1,10 +1,10 @@
 package com.netgrif.workflow.petrinet.domain.layout;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public abstract class Layout {
 
     private Integer rows;
@@ -13,8 +13,5 @@ public abstract class Layout {
     public Layout(Integer rows, Integer cols) {
         this.rows = rows == null || rows == 0 ? null : rows;
         this.cols = cols == null || cols == 0 ? null : cols;
-    }
-
-    public Layout() {
     }
 }
