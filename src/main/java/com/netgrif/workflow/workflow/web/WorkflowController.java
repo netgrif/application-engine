@@ -17,7 +17,6 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
-import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.LocalisedGetDataEventOutcome;
 import com.querydsl.core.types.Predicate;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
