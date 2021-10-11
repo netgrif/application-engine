@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -198,7 +197,7 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EventOutcomeWithMessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
@@ -230,7 +229,7 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EventOutcomeWithMessageResource saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
