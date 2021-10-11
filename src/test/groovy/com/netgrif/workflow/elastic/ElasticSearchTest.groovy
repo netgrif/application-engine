@@ -106,7 +106,7 @@ class ElasticSearchTest {
         netId = net.get().getStringId()
         netId2 = net2.get().getStringId()
 
-        def org = importHelper.createGroup("Test")
+//        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.getProcessRoles(net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
@@ -135,7 +135,7 @@ class ElasticSearchTest {
                                         "id": superCreator.superUser.stringId
                                 ]
                         ]),
-                        "size": 10
+                        "size": 11
                 ],
                 "searchByAuthorName"        : [
                         "json": JsonOutput.toJson([
@@ -143,7 +143,7 @@ class ElasticSearchTest {
                                         "name": superCreator.superUser.fullName
                                 ]
                         ]),
-                        "size": 10
+                        "size": 11
                 ],
                 "searchByAuthorEmail"       : [
                         "json": JsonOutput.toJson([
@@ -151,7 +151,7 @@ class ElasticSearchTest {
                                         "email": superCreator.superUser.email
                                 ]
                         ]),
-                        "size": 10
+                        "size": 11
                 ],
                 "searchByEnumeration"       : [
                         "json": JsonOutput.toJson([

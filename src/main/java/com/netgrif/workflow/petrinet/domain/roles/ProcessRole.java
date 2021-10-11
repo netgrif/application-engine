@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@Document
 @Getter
+@Document
 public class ProcessRole extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
