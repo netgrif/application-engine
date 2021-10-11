@@ -214,6 +214,15 @@ public class Case {
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
         dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
         dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
+        populateDataSetBehavior();
+    }
+
+    private void populateDataSetBehavior() {
+        petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
+            transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
+                getDataSet().get(dataKey).addBehavior(transitionKey, dataValue.getBehavior());
+            });
+        });
     }
 
     private String generateVisualId() {
