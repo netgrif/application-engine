@@ -144,16 +144,16 @@ public class TaskService implements ITaskService {
     public AssignTaskEventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-        AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task);
-
-        outcome.setOutcomes(eventService.runActions(transition.getPreAssignActions(), useCase, task, transition));
+        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.PRE);
         useCase = assignTaskToUser(user, task, useCase.getStringId());
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getId()));
-        outcome.addOutcomes(eventService.runActions(transition.getPostAssignActions(), useCase, task, transition));
+        outcomes.addAll((eventService.runActions(transition.getPostAssignActions(), useCase, task, transition)));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.POST, user.getId()));
 
+        AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task);
+        outcome.setOutcomes(outcomes);
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
 
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -171,6 +171,7 @@ public class TaskService implements ITaskService {
         startExecution(transition, useCase);
         task.setUserId(user.getId());
         task.setStartDate(LocalDateTime.now());
+        task.setUser(user);
 
         useCase = workflowService.save(useCase);
         save(task);
@@ -219,12 +220,12 @@ public class TaskService implements ITaskService {
     public FinishTaskEventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-        FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task);
+
 
         log.info("[" + useCase.getStringId() + "]: Finishing task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
         validateData(transition, useCase);
-        outcome.setOutcomes(eventService.runActions(transition.getPreFinishActions(), useCase, task, transition));
+        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.PRE);
 
         finishExecution(transition, useCase.getStringId());
@@ -236,9 +237,11 @@ public class TaskService implements ITaskService {
         save(task);
         reloadTasks(useCase);
         historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getId()));
-        outcome.addOutcomes(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
+        outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
+        FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task);
+        outcome.setOutcomes(outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
         historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.POST, user.getId()));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
@@ -272,19 +275,20 @@ public class TaskService implements ITaskService {
     public CancelTaskEventOutcome cancelTask(Task task, User user) {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-        CancelTaskEventOutcome outcome = new CancelTaskEventOutcome(useCase, task);
 
         log.info("[" + useCase.getStringId() + "]: Canceling task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
-        outcome.setOutcomes(eventService.runActions(transition.getPreCancelActions(), useCase, task, transition));
+        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.PRE);
         task = returnTokens(task, useCase.getStringId());
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
         historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getId()));
-        outcome.addOutcomes(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition));
+        outcomes.addAll(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
+        CancelTaskEventOutcome outcome = new CancelTaskEventOutcome(useCase, task);
+        outcome.setOutcomes(outcomes);
         addMessageToOutcome(transition, EventType.CANCEL, outcome);
 
         historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.POST, user.getId()));
@@ -342,20 +346,22 @@ public class TaskService implements ITaskService {
 
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-        DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task);
+
 
         log.info("[" + useCase.getStringId() + "]: Delegating task [" + task.getTitle() + "] to user [" + delegatedUser.getEmail() + "]");
 
-        outcome.setOutcomes(eventService.runActions(transition.getPreDelegateActions(), useCase, task, transition));
+        List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
         delegate(delegatedUser, task, useCase);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser.getId(), delegatedUser.getId()));
-        outcome.addOutcomes(eventService.runActions(transition.getPostDelegateActions(), useCase, task, transition));
+        outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.POST);
 
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
 
+        DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task);
+        outcome.setOutcomes(outcomes);
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser.getId(), delegatedUser.getId()));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
@@ -366,6 +372,7 @@ public class TaskService implements ITaskService {
     protected void delegate(User delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
             task.setUserId(delegated.getId());
+            task.setUser(delegated);
             save(task);
         } else {
             assignTaskToUser(delegated, task, useCase.getStringId());
