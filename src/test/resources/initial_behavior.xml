@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>initial_behavior</id>
+    <title>Initial behavior</title>
+    <initials>IBH</initials>
+    <defaultRole>true</defaultRole>
+    <!-- DATA -->
+    <data type="number" immediate="true">
+        <id>number</id>
+        <title>Number</title>
+        <init>10000</init>
+    </data>
+
+    <data type="text" immediate="true">
+        <id>text</id>
+        <title>Text</title>
+        <init>Lorem ipsum</init>
+    </data>
+
+    <data type="enumeration" immediate="true">
+        <id>enumeration</id>
+        <title>Enumeration</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+    </data>
+
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map</id>
+        <title>Enumeration Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <init>bo</init>
+    </data>
+
+    <data type="multichoice" immediate="true">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <inits>
+            <init>Alice</init>
+            <init>Bob</init>
+        </inits>
+    </data>
+
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map</id>
+        <title>Multichoice Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <inits>
+            <init>al</init>
+            <init>ca</init>
+        </inits>
+    </data>
+
+    <data type="boolean" immediate="true">
+        <id>boolean</id>
+        <title>Boolean</title>
+        <placeholder>True</placeholder>
+    </data>
+
+    <data type="date" immediate="true">
+        <id>date</id>
+        <title>Date</title>
+        <init>01.01.2019</init>
+    </data>
+
+    <data type="file" immediate="true">
+        <id>file</id>
+        <title>File</title>
+    </data>
+
+    <data type="fileList" immediate="true">
+        <id>fileList</id>
+        <title>File List</title>
+    </data>
+
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>User</title>
+    </data>
+
+    <data type="dateTime" immediate="true">
+        <id>datetime</id>
+        <title>Datetime</title>
+        <init>01.01.2019 20:00</init>
+    </data>
+
+    <data type="button" immediate="true">
+        <id>button</id>
+        <title>Button</title>
+        <placeholder>Push</placeholder>
+        <component>
+            <name>fab</name>
+        </component>
+    </data>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - editable</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
+                <logic>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>boolean</id>
+                <logic>
+                    <behavior>optional</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>date</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>datetime</id>
+                <logic>
+                    <behavior>immediate</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <behavior>optional</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>user</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>button</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
