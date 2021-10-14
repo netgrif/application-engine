@@ -33,11 +33,11 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         importFilterProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
     }
 
-    ImportPetriNetEventOutcome importFilterProcess(String message, String netIdentifier, String netFileName) {
+    Optional<PetriNet> importFilterProcess(String message, String netIdentifier, String netFileName) {
         PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
-            return new ImportPetriNetEventOutcome()
+            return new Optional<>(filter)
         }
 
         ImportPetriNetEventOutcome filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
@@ -46,6 +46,6 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
             log.error("Import of ${message} failed!")
         }
 
-        return filterNet
+        return new Optional<>(filterNet.getNet())
     }
 }

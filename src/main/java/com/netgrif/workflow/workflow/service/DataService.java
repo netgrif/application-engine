@@ -117,11 +117,13 @@ public class DataService implements IDataService {
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
             if (outcome.getMessage() == null) {
-                if (field.getEvents().containsKey(DataEventType.GET) &&
-                        ((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
+                Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+                if (field.getEvents().containsKey(DataEventType.GET)
+                        && ((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
                     outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage());
-                } else if (useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().containsKey(DataEventType.GET) &&
-                        useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.GET).getMessage() != null) {
+                } else if (dataSet.containsKey(fieldId)
+                        && dataSet.get(fieldId).getEvents().containsKey(DataEventType.GET)
+                        && dataSet.get(fieldId).getEvents().get(DataEventType.GET).getMessage() != null) {
                     outcome.setMessage(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.GET).getMessage());
                 }
             }
@@ -228,7 +230,7 @@ public class DataService implements IDataService {
                     changedField.addAttribute("filterMetadata", filterMetadata);
                 }
                 outcome.addChangedField(fieldId, changedField);
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Stream.of(new AbstractMap.SimpleImmutableEntry<>(fieldId, changedField)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
+                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField)));
                 outcome.addOutcomes(resolveDataEvents(field,
                         DataEventType.SET, EventPhase.POST, useCase, task));
 
@@ -236,7 +238,7 @@ public class DataService implements IDataService {
             }
         });
         updateDataset(useCase);
-        outcome.setACase(workflowService.save(useCase));
+        outcome.setCase(workflowService.save(useCase));
         return outcome;
     }
 
@@ -363,12 +365,8 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        if (field.getEvents() != null && !field.getEvents().isEmpty() && field.getEvents().containsKey(DataEventType.GET)) {
-            DataEvent event = field.getEvents().get(DataEventType.GET);
-            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
-            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
-        }
-        if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
+        runGetActionsFromFileField(field.getEvents(), useCase);
+        if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
         workflowService.save(useCase);
@@ -391,11 +389,7 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
-        if (field.getEvents() != null && !field.getEvents().isEmpty() && field.getEvents().containsKey(DataEventType.GET)) {
-            DataEvent event = field.getEvents().get(DataEventType.GET);
-            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
-            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
-        }
+        runGetActionsFromFileField(field.getEvents(), useCase);
         if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
@@ -412,6 +406,14 @@ public class DataService implements IDataService {
         } catch (IOException e) {
             log.error("Getting file failed: ", e);
             return null;
+        }
+    }
+
+    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase){
+        if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
+            DataEvent event = events.get(DataEventType.GET);
+            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
+            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
         }
     }
 
@@ -497,9 +499,7 @@ public class DataService implements IDataService {
         } else {
             saveLocalFile(useCase, field, multipartFile);
         }
-        SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        outcome.setOutcomes(getChangedFieldByFileFieldContainer(fieldId, task, useCase));
-        return outcome;
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
     @Override
@@ -514,10 +514,7 @@ public class DataService implements IDataService {
         } else {
             saveLocalFiles(useCase, field, multipartFiles);
         }
-
-        SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        outcome.setOutcomes(getChangedFieldByFileFieldContainer(fieldId, task, useCase));
-        return outcome;
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {

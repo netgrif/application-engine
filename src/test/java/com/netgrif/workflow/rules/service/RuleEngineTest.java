@@ -199,12 +199,12 @@ public class RuleEngineTest {
         ruleRepository.save(rule4);
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
-        assert caseOutcome.getACase().getTitle().equals(NEW_CASE_TITLE);
+        assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
-        Task task = findTask(caseOutcome.getACase(), TRANS_1);
+        Task task = findTask(caseOutcome.getCase(), TRANS_1);
         taskService.assignTask(task, superCreator.getLoggedSuper().transformToUser());
         taskService.finishTask(task, superCreator.getLoggedSuper().transformToUser());
-        Case newCase = workflowService.findOne(caseOutcome.getACase().getStringId());
+        Case newCase = workflowService.findOne(caseOutcome.getCase().getStringId());
         assert newCase.getTitle().equals(NEW_CASE_TITLE);
         assert !newCase.getColor().equals(NEW_CASE_TITLE_2);
 
@@ -366,7 +366,7 @@ public class RuleEngineTest {
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
-        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getACase();
+        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getCase();
     }
 
     private Task findTask(Case caze, String trans) {
