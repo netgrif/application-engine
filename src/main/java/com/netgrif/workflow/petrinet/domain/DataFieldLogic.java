@@ -45,7 +45,7 @@ public class DataFieldLogic {
         this.events = events;
         this.layout = layout;
         if (component != null)
-            this.component = getComponent();
+            this.component = component;
     }
 
     public ObjectNode applyBehavior(ObjectNode jsonNode) {

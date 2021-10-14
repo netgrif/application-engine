@@ -27,7 +27,6 @@ import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -96,8 +95,8 @@ public class NextGroupService implements INextGroupService {
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getACase());
-        Task initTask = getGroupInitTask(outcome.getACase());
+        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getCase());
+        Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
@@ -106,7 +105,7 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        return outcome.getACase();
+        return outcome.getCase();
     }
 
     @Override
