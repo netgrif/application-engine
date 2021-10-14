@@ -69,7 +69,7 @@ class AssignRemoveTest {
         def roleCount = userService.system.userProcessRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getACase()
+        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
         assert userService.system.userProcessRoles.size() == roleCount + 4
 
         // delete

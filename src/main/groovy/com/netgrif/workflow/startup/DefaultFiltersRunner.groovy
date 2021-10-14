@@ -190,7 +190,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             return Optional.of(existingFilter.getContent()[0])
         }
 
-        Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, systemUser.transformToLoggedUser()).getACase()
+        Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, systemUser.transformToLoggedUser()).getCase()
         filterCase.setIcon(icon)
         filterCase = this.workflowService.save(filterCase)
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
