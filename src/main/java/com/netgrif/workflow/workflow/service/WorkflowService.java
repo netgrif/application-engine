@@ -35,6 +35,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEval
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import org.apache.commons.collections.map.HashedMap;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,10 +245,13 @@ public class WorkflowService implements IWorkflowService {
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
                 .map(role -> {
+                    Map<String, Boolean> permissionMap = new HashMap<>();
                     if (role.getValue().containsKey("delete"))
-                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete")));
-                    else
-                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("view", role.getValue().get("view")));
+                        permissionMap.put("delete", role.getValue().get("delete"));
+                    if (role.getValue().containsKey("view")) {
+                        permissionMap.put("view", role.getValue().get("view"));
+                    }
+                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
