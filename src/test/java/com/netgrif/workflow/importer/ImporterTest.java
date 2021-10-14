@@ -73,7 +73,7 @@ public class ImporterTest {
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
 
-        assert caseOutcome.getACase() != null;
+        assert caseOutcome.getCase() != null;
     }
 
     @Test
@@ -95,7 +95,6 @@ public class ImporterTest {
         assertExternalMappingImport(outcome.getNet());
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void assertExternalMappingImport(PetriNet imported) {
         assert imported != null;
 

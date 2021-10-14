@@ -16,6 +16,10 @@ public class CreateCaseEventOutcome extends CaseEventOutcome {
         super(aCase);
     }
 
+    public CreateCaseEventOutcome(Case aCase, List<EventOutcome> outcomes) {
+        super(aCase, outcomes);
+    }
+
     public CreateCaseEventOutcome(I18nString message, Case aCase) {
         super(message, aCase);
     }

@@ -2,9 +2,10 @@ package com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes;
 
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import lombok.Data;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 
-@Data
+import java.util.List;
+
 public class FinishTaskEventOutcome extends TaskEventOutcome{
 
     public FinishTaskEventOutcome() {
@@ -13,5 +14,10 @@ public class FinishTaskEventOutcome extends TaskEventOutcome{
 
     public FinishTaskEventOutcome(Case useCase, Task task) {
         super(useCase, task);
+    }
+
+    public FinishTaskEventOutcome(Case useCase, Task task, List<EventOutcome> outcomes) {
+        this(useCase, task);
+        this.setOutcomes(outcomes);
     }
 }

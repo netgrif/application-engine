@@ -6,11 +6,9 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
-import lombok.Data;
 
 import java.util.List;
 
-@Data
 public class GetDataGroupsEventOutcome extends TaskEventOutcome {
 
     private List<DataGroup> data;
