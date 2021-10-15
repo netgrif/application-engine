@@ -87,7 +87,6 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOrigin("*"); // TODO: vymazat?
         config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
