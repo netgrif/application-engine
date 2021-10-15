@@ -16,7 +16,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "entry_name",
-        "filterId",
         "iconIdentifier",
         "menuItemRoleList",
 })
@@ -24,8 +23,6 @@ public class MenuEntry {
 
     @XmlElement(required = true)
     protected String entry_name;
-    @XmlElement
-    protected String filterId;
     @XmlElement
     protected String iconIdentifier;
     @JacksonXmlElementWrapper(useWrapping = false)

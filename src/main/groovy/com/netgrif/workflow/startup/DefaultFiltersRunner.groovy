@@ -50,8 +50,8 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private IDataService dataService
 
     @Override
-    void run(String... args) throws Exception {
-        createCaseFilter("All cases", "assignment", "", FILTER_VISIBILITY_PUBLIC, "", [], [
+    void run(String... args) throws Exception { //TODO doplnit menuId 'defaultMenu'
+        createCaseFilter("All cases", "assignment","", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
         ], [
@@ -194,7 +194,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         filterCase = this.workflowService.save(filterCase)
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
         this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem())
-        this.dataService.setData(newFilterTask, ImportHelper.populateDataset([
+        this.dataService.setData(newFilterTask, ImportHelper.populateDataset([ //TODO checknut ci sa ulozi menuidentifier
             (FILTER_TYPE_FIELD_ID): [
                 "type": "enumeration_map",
                 "value": filterType
