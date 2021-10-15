@@ -875,6 +875,10 @@ public class Importer {
 
     @Transactional
     protected void createRole(Role importRole) {
+        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        }
+
         ProcessRole role = new ProcessRole();
         Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
 
@@ -952,7 +956,7 @@ public class Importer {
 
     private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         // FALSE if defaultRole not allowed in net
-        if (document.isDefaultRole() != null && !document.isDefaultRole()) {
+        if (!net.isDefaultRoleEnabled()) {
             return false;
         }
         // FALSE if role or trigger mapping
@@ -1003,6 +1007,10 @@ public class Importer {
     }
 
     public ProcessRole getRole(String id) {
+        if (id.equals(ProcessRole.DEFAULT_ROLE) && net.isDefaultRoleEnabled()) {
+            return defaultRole;
+        }
+
         ProcessRole role = roles.get(id);
         if (role == null) {
             throw new IllegalArgumentException("Role " + id + " not found");
