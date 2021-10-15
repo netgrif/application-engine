@@ -123,6 +123,10 @@
         <id>filter_case_id</id>
         <title></title>
     </data>
+    <data type="text">
+        <id>menu_identifier</id>
+        <title></title>
+    </data>
     <data type="button">
         <id>and_me</id>
         <placeholder name="and">AND</placeholder>
