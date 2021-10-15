@@ -18,15 +18,15 @@ import java.util.List;
         "menuList",
 })
 
-@XmlRootElement(name = "menuList")
+@XmlRootElement(name = "menus")
 public class MenuList {
 
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "menu")
-    protected List<Menu> menuList;
+    protected List<Menu> menuList; //TODO premenovat na menus
 
     public MenuList () {
         this.menuList = new ArrayList<>();
-        this.menuList.add(new Menu());
+//        this.menuList.add(new Menu());//TODO netreba pridavat
     }
 }
