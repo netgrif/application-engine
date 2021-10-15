@@ -13,7 +13,7 @@
 	<!-- DATA -->
 	<data type="text" >
 		<id>menu_identifier</id>
-		<title name="menu_identifier">Identifier of menu of which is this menu item part of.</title>
+		<title name="menu_identifier">Identifier of menu which is this menu item part of.</title>
 		<init>default</init>
 	</data>
 	<data type="enumeration" immediate="true">
