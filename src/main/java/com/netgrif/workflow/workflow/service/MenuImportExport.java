@@ -211,14 +211,14 @@ public class MenuImportExport implements IMenuImportExport {
             importResultMessage = importResultMessage.concat("\nIMPORTING MENU \"" + menu.getMenuIdentifier() + "\":\n");
             menu.getMenuItems().forEach(menuItem -> {
                 String filterTaskId = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId, importedFilterIds.get(cnt.getAndIncrement()));
-                if (!filterTaskId.equals("")) filterTaskIds.add(filterTaskId); //TODO vytvori sa len 5 MenuItem Caseov!
+                if (!filterTaskId.equals("")) filterTaskIds.add(filterTaskId);
             });
 
 //        for (Menu menu : menuAndFilters.getMenuList().getMenuList()) {
 //            importResultMessage = importResultMessage.concat("\nIMPORTING MENU \"" + menu.getMenuIdentifier() + "\":\n");
 //            menu.getMenuItems().forEach(menuItem -> {
 //                String filterTaskId = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId, importedFilterIds.get(cnt.getAndIncrement()));
-//                if (!filterTaskId.equals("")) filterTaskIds.add(filterTaskId); //TODO vytvori sa len 5 MenuItem Caseov!
+//                if (!filterTaskId.equals("")) filterTaskIds.add(filterTaskId);
 //            });
 
             QTask qTask = new QTask("task");
@@ -292,8 +292,11 @@ public class MenuImportExport implements IMenuImportExport {
         Task importedFilterTask = taskService.findOne(filterTaskId);
         Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
         try {
+//            workflowService.save(filterCase);
             taskService.assignTask(importedFilterTask.getStringId());
             taskService.finishTask(importedFilterTask.getStringId());
+            workflowService.save(filterCase);
+
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
         }
