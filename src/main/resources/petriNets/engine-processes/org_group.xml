@@ -189,7 +189,7 @@
 	<data type="text">
 		<id>export_menu_name</id>
 		<title name="exported_menu_id">Exported menu identifier</title>
-		<desc name="exported_menu_id_desc">Create unique name for current menu configuration.</desc>
+		<desc name="exported_menu_id_desc">Name menu configuration for selected entries.</desc>
 	</data>
 	<data type="multichoice_map">
 		<id>available_export_entries</id>
@@ -347,7 +347,7 @@
 
 			filterTaskIds = []
 			filterCaseIds = []
-			<!--
+			<!-- TODO skusit nenastavovat availableEntries
 			def actualCase1 = workflowService.findOne(useCase.stringId)
 			def actualCase2 =  findCase({it._id.eq(new org.bson.types.ObjectId(useCase.stringId))});
 			def newEntriesFromActualCase1 = actualCase1.dataSet["imported_menu_ids"].value
