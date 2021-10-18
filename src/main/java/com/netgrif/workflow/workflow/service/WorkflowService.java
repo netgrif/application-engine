@@ -235,24 +235,11 @@ public class WorkflowService implements IWorkflowService {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
-        useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
-        useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
-        useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
-                .map(role -> {
-                    if (role.getValue().containsKey("delete"))
-                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete")));
-                    else
-                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("view", role.getValue().get("view")));
-                })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        );
-        useCase.setUserRefs(petriNet.getUserRefs());
-
         useCase.setTitle(makeTitle.apply(useCase));
+
         runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
