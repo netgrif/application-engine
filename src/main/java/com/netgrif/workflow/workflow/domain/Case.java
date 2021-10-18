@@ -154,11 +154,11 @@ public class Case {
         negativeViewUsers = new ArrayList<>();
     }
 
-    public Case(PetriNet petriNet, Map<String, Integer> activePlaces) {
+    public Case(PetriNet petriNet) {
         this();
         this.petriNetObjectId = petriNet.getObjectId();
         this.petriNet = petriNet;
-        this.activePlaces = activePlaces;
+        this.activePlaces = petriNet.getActivePlaces();
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
