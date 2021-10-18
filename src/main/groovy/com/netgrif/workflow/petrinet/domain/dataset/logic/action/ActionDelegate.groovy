@@ -125,6 +125,9 @@ class ActionDelegate {
     @Autowired
     IConfigurableMenuService configurableMenuService
 
+    @Autowired
+    IFilterImportExportService filterImportExportService
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -542,10 +545,7 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
-        if (net == null)
-            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale)
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
@@ -970,4 +970,18 @@ class ActionDelegate {
         return filterSearchService.autocompleteFindFilters(userInput)
     }
 
+    List<Case> findAllFilters() {
+        return filterSearchService.autocompleteFindFilters("")
+    }
+
+    FileFieldValue exportFilters(Collection<String> filtersToExport) {
+        if (filtersToExport.isEmpty()) {
+            return null
+        }
+        return filterImportExportService.exportFilters(filtersToExport)
+    }
+
+    List<String> importFilters() {
+        return filterImportExportService.importFilters()
+    }
 }
