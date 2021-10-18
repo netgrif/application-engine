@@ -19,8 +19,8 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCas
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import com.querydsl.core.BooleanBuilder;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
@@ -73,7 +73,7 @@ public class NextGroupService implements INextGroupService {
     private final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
-    public Case createDefaultSystemGroup(User author){
+    public CreateCaseEventOutcome createDefaultSystemGroup(User author){
         if(findDefaultGroup() != null) {
             log.info("Default system group has already been created.");
             return null;
@@ -82,12 +82,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Case createGroup(User author){
+    public CreateCaseEventOutcome createGroup(User author){
         return createGroup(author.getFullName(), author);
     }
 
     @Override
-    public Case createGroup(String title, User author){
+    public CreateCaseEventOutcome createGroup(String title, User author){
         Case userDefaultGroup = findUserDefaultGroup(author);
         if(userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)){
             return null;
@@ -105,7 +105,7 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        return outcome.getCase();
+        return outcome;
     }
 
     @Override
