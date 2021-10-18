@@ -5,15 +5,16 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
 public class SetDataEventOutcome extends TaskEventOutcome {
 
-    @Getter
     private Map<String, ChangedField> changedFields = new HashMap<>();
 
     public SetDataEventOutcome(Case aCase, Task task) {
