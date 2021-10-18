@@ -23,6 +23,7 @@ import com.netgrif.workflow.petrinet.domain.events.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.domain.EventNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
@@ -488,7 +489,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException {
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile){
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
@@ -503,7 +504,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) throws IOException {
+    public SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
         FileListField field = pair.getRight();
@@ -527,7 +528,7 @@ public class DataService implements IDataService {
         return outcomes;
     }
 
-    private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) throws IOException {
+    private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
         for (MultipartFile oneFile : multipartFiles) {
             if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
                 Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
@@ -540,13 +541,18 @@ public class DataService implements IDataService {
             field.addValue(oneFile.getOriginalFilename(), field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
             File file = new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
 
-            writeFile(oneFile, file);
+            try {
+                writeFile(oneFile, file);
+            } catch (IOException e){
+                log.error(e.getMessage());
+                throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
+            }
         }
         useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
         return true;
     }
 
-    private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
+    private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) {
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
             new File(field.getFilePath(useCase.getStringId())).delete();
             useCase.getDataSet().get(field.getStringId()).setValue(null);
@@ -555,7 +561,12 @@ public class DataService implements IDataService {
         field.setValue(multipartFile.getOriginalFilename());
         field.getValue().setPath(field.getFilePath(useCase.getStringId()));
         File file = new File(field.getFilePath(useCase.getStringId()));
-        writeFile(multipartFile, file);
+        try {
+            writeFile(multipartFile, file);
+        } catch (IOException e){
+            log.error(e.getMessage());
+            throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
+        }
 
         useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
         return true;
