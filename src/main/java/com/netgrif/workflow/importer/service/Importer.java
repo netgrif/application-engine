@@ -189,6 +189,7 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
+        addDefaultPermissions();
         document.getUsersRef().forEach(this::resolveUsersRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
@@ -448,7 +449,7 @@ public class Importer {
                 addDataGroup(transition, dataGroup);
             }
         }
-        if (isDefaultRoleAllowedFor(importTransition, document)) {
+        if (!isDefaultRoleReferenced(transition) && isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
         if (importTransition.getEvent() != null) {
@@ -553,6 +554,19 @@ public class Importer {
         logic.setDelegate(true);
         logic.setPerform(true);
         transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addDefaultPermissions() {
+        if (!net.isDefaultRoleEnabled() || net.getPermissions().containsKey(defaultRole.getStringId())) {
+            return;
+        }
+
+        CaseLogic logic = new CaseLogic();
+        logic.setCreate(true);
+        logic.setDelete(true);
+        logic.setView(true);
+        net.addPermission(defaultRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -980,6 +994,10 @@ public class Importer {
             throw new IllegalArgumentException();
         }
         return net.get();
+    }
+
+    private boolean isDefaultRoleReferenced(Transition transition) {
+        return transition.getRoles().containsKey(defaultRole.getStringId());
     }
 
     private AssignPolicy toAssignPolicy(AssignPolicyType type) {
