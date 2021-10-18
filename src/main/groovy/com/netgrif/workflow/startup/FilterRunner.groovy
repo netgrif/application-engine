@@ -40,12 +40,12 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
             return new Optional<>(filter)
         }
 
-        ImportPetriNetEventOutcome filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+        Optional<PetriNet> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
 
-        if (filterNet.getNet() == null) {
+        if (!filterNet.isPresent()) {
             log.error("Import of ${message} failed!")
         }
 
-        return new Optional<>(filterNet.getNet())
+        return filterNet
     }
 }
