@@ -146,7 +146,7 @@ public class Case {
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
-        viewRoles = filterViewRoles();
+        viewRoles = new HashSet<>();
         permissions = new HashMap<>();
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
@@ -156,13 +156,28 @@ public class Case {
 
     public Case(PetriNet petriNet) {
         this();
-        this.petriNetObjectId = petriNet.getObjectId();
+        petriNetObjectId = petriNet.getObjectId();
+        processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;
-        this.activePlaces = petriNet.getActivePlaces();
-        this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
+        activePlaces = petriNet.getActivePlaces();
+        immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
-        this.enabledRoles = petriNet.getRoles().keySet();
-        this.negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
+        enabledRoles = petriNet.getRoles().keySet();
+        negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
+        icon = petriNet.getIcon();
+        userRefs = petriNet.getUserRefs();
+
+        permissions = petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    if (role.getValue().containsKey("delete"))
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete")));
+                    else
+                        return new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("view", role.getValue().get("view")));
+                })
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
+        viewRoles = filterViewRoles();
     }
 
     public String getStringId() {
