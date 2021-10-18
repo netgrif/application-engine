@@ -200,7 +200,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
+    public EventOutcomeWithMessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
