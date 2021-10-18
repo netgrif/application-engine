@@ -5,10 +5,12 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CaseEventOutcome;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.List;
 
+@Data
 public abstract class TaskEventOutcome extends CaseEventOutcome {
 
     @Getter
