@@ -9,6 +9,7 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.PetriNetIdentifierResult;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -247,6 +248,17 @@ public class PetriNetService implements IPetriNetService {
         if (nets.isEmpty())
             return null;
         return nets.get(0);
+    }
+
+    @Override
+    public List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers) {
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("identifier").in(identifiers)),
+                Aggregation.group("identifier"),
+                Aggregation.project("identifier").and("identifier").previousOperation()
+        );
+        AggregationResults<PetriNetIdentifierResult> groupResults = mongoTemplate.aggregate(agg, PetriNet.class, PetriNetIdentifierResult.class);
+        return groupResults.getMappedResults().stream().map(PetriNetIdentifierResult::getIdentifier).collect(Collectors.toList());
     }
 
     @Override
