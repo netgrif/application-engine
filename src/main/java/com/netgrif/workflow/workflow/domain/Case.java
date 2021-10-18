@@ -146,18 +146,12 @@ public class Case {
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
-        viewRoles = new HashSet<>();
+        viewRoles = filterViewRoles();
         permissions = new HashMap<>();
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
         userRefs = new HashMap<>();
         negativeViewUsers = new ArrayList<>();
-    }
-
-    public Case(String title) {
-        this();
-        this.title = title;
-        visualId = generateVisualId();
     }
 
     public Case(PetriNet petriNet, Map<String, Integer> activePlaces) {
@@ -168,6 +162,7 @@ public class Case {
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
+        this.negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
     }
 
     public String getStringId() {
@@ -181,8 +176,6 @@ public class Case {
     public boolean hasFieldBehavior(String field, String transition) {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
-
-    public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
 
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
         List<Field<?>> dynamicInitFields = new LinkedList<>();
@@ -267,15 +260,6 @@ public class Case {
                 users.put(userId, permissions);
             }
         });
-    }
-
-    public void decideEnabledRoles(PetriNet net) {
-        this.viewRoles = filterViewRoles();
-    }
-
-    public void addAllRolesToViewRoles(String defaultRoleId) {
-        this.viewRoles.addAll(enabledRoles);
-        this.viewRoles.add(defaultRoleId);
     }
 
     public Set<String> getViewUserRefs() {
