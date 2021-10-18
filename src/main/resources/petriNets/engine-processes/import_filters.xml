@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+    <id>import_filters</id>
+    <initials>FTI</initials>
+    <title name="import_filters">Import of filters</title>
+    <icon>file_upload</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <caseName name="import_filters">Import of filters</caseName>
+    <!-- CASE EVENTS -->
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="file">
+        <id>upload_file</id>
+        <title name="upload_file">Upload filter file</title>
+        <placeholder name="upload_file_placeholder">Insert file containing filters</placeholder>
+        <desc name="upload_file_desc">Insert xml file that contains filters</desc>
+        <action trigger="set">
+            importedFilters: f.imported_filters;
+
+            taskService.findAllById(importedFilters.value).forEach({filterTask ->
+                workflowService.deleteCase(filterTask.caseId)
+            })
+            change importedFilters value { return [] }
+        </action>
+    </data>
+    <data type="button">
+        <id>import_file</id>
+        <title></title>
+        <placeholder name="import_file_placeholder">Import filters</placeholder>
+        <desc name="import_file_desc">Import filters from uploaded xml file</desc>
+        <component>
+            <name>raised</name>
+        </component>
+    </data>
+    <data type="taskRef">
+        <id>imported_filters</id>
+        <title></title>
+        <action trigger="get">
+            importedFilters: f.imported_filters;
+
+            filterImportExportService.changeFilterField(importedFilters.value)
+        </action>
+    </data>
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="import_filters">Import filtrov</i18nString>
+        <i18nString name="upload_file">Nahratie súboru s filtrami</i18nString>
+        <i18nString name="upload_file_placeholder">Vložete súbor obsahujúci filtre</i18nString>
+        <i18nString name="upload_file_desc">Vložte xml súbor, ktorý obsahuje filtre</i18nString>
+        <i18nString name="import_file_placeholder">Importovať filtre</i18nString>
+        <i18nString name="import_file_desc">Importovať filtre z nahraného xml súboru</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="import_filters">Import von Filtern</i18nString>
+        <i18nString name="upload_file">Filterdatei hochladen</i18nString>
+        <i18nString name="upload_file_placeholder">Datei mit Filtern einfügen</i18nString>
+        <i18nString name="upload_file_desc">Xml-Datei einfügen, die Filter enthält</i18nString>
+        <i18nString name="import_file_placeholder">Filter importieren</i18nString>
+        <i18nString name="import_file_desc">Filter aus hochgeladener xml-Datei importieren</i18nString>
+    </i18n>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>importFilter</id>
+        <x>200</x>
+        <y>100</y>
+        <label name="import_file_placeholder">Import filters</label>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>upload_file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>import_file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        importedFiltersRef: f.imported_filters;
+
+                        change importedFiltersRef value { importFilters() }
+                    </action>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>imported_filters</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id></id>
+            <actions phase="pre">
+                <action>
+                    importedFilters: f.imported_filters;
+
+                    taskService.finishTasks(taskService.findAllById(importedFilters.value), userService.getLoggedUser())
+                    change importedFilters value { [] }
+                </action>
+            </actions>
+        </event>
+        <event type="cancel">
+            <id></id>
+            <actions phase="pre">
+                <action>
+                    importedFilters: f.imported_filters;
+
+                    taskService.findAllById(importedFilters.value).forEach({filterTask ->
+                        workflowService.deleteCase(filterTask.caseId)
+                    })
+                    change importedFilters value { [] }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>p1</id>
+        <x>100</x>
+        <y>100</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>importFilter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>importFilter</sourceId>
+        <destinationId>p1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
