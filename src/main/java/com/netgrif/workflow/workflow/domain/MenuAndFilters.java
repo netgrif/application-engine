@@ -20,7 +20,7 @@ import java.util.List;
         "filterList"
 })
 
-@JacksonXmlRootElement(localName = "menuWithFilters")
+@JacksonXmlRootElement(localName = "menusWithFilters")
 public class MenuAndFilters {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "menus")
