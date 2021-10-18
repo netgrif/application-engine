@@ -233,7 +233,7 @@ public class WorkflowService implements IWorkflowService {
 
     public Case createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        Case useCase = new Case(petriNet, petriNet.getActivePlaces());
+        Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
