@@ -41,10 +41,15 @@ public class EventService implements IEventService {
     }
 
     @Override
+    public List<EventOutcome> runActions(List<Action> actions) {
+        return runActions(actions, null, Optional.empty());
+    }
+
+    @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
@@ -62,7 +67,7 @@ public class EventService implements IEventService {
     public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
