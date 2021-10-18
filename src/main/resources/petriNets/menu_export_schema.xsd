@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.1.0">
+<!--           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--           xsi:schemaLocation="http://FilterTypesNamespace/FilterTypes ">-->
+    <xs:include schemaLocation="filter_export_schema.xsd"/>
+
+    <!--            <xs:include namespace="http://FilterTypesNamespace/FilterTypes" schemaLocation="filter_export_schema.xsd"/>-->
+    <!-- ===== MENU ===== -->
+    <xs:element name="menusWithFilters">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="menus"/>
+                <xs:element ref="filters"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="menus">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="menu" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="menu">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="menuEntry" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="menuEntry">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="entryName" type="xs:string"/>
+                <xs:element ref="entryRole" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="useIcon" type="xs:boolean" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="entryRole">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="roleImportId" type="xs:string"/>
+                <xs:element name="netImportId" type="xs:string"/>
+                <xs:element name="authorizationType" type="authorizationType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="authorizationType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ALLOWED"/>
+            <xs:enumeration value="BANNED"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

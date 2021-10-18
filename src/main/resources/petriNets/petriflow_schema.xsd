@@ -860,33 +860,32 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <xs:element name="menuItem">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="entry_name" type="xs:string" />
-                <xs:element name="filterId" type="xs:string" />
-                <xs:element name="iconIdentifier" minOccurs="0" type="xs:string" />
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="menuItemRole" />
-            </xs:sequence>
-            <xs:attribute name="useIcon" type="xs:boolean" use="required" />
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="menuItemRole">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="roleImportId" type="xs:string" />
-                <xs:element name="netImportId" type="xs:string" />
-            </xs:sequence>
-            <xs:attribute name="authorizationType" type="authorizationType" use="required" />
-        </xs:complexType>
-    </xs:element>
-    <xs:simpleType name="authorizationType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="allowed"/>
-            <xs:enumeration value="banned"/>
-        </xs:restriction>
-    </xs:simpleType>
+<!--    <xs:element name="menuItem">-->
+<!--        <xs:complexType>-->
+<!--            <xs:sequence>-->
+<!--                <xs:element name="entry_name" type="xs:string" />-->
+<!--                <xs:element name="filterId" type="xs:string" />-->
+<!--                <xs:element name="iconIdentifier" minOccurs="0" type="xs:string" />-->
+<!--                <xs:element minOccurs="0" maxOccurs="unbounded" ref="menuItemRole" />-->
+<!--            </xs:sequence>-->
+<!--            <xs:attribute name="useIcon" type="xs:boolean" use="required" />-->
+<!--        </xs:complexType>-->
+<!--    </xs:element>-->
+<!--    <xs:element name="menuItemRole">-->
+<!--        <xs:complexType>-->
+<!--            <xs:sequence>-->
+<!--                <xs:element name="roleImportId" type="xs:string" />-->
+<!--                <xs:element name="netImportId" type="xs:string" />-->
+<!--            </xs:sequence>-->
+<!--            <xs:attribute name="authorizationType" type="authorizationType" use="required" />-->
+<!--        </xs:complexType>-->
+<!--    </xs:element>-->
+<!--    <xs:simpleType name="authorizationType">-->
+<!--        <xs:restriction base="xs:string">-->
+<!--            <xs:enumeration value="allowed"/>-->
+<!--            <xs:enumeration value="banned"/>-->
+<!--        </xs:restriction>-->
+<!--    </xs:simpleType>-->
     <xs:element name="length" type="xs:int"/>
     <!-- ISO 4217 currency code -->
     <xs:element name="code" type="xs:string" default="EUR"/>
