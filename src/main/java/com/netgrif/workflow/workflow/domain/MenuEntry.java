@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.netgrif.workflow.importer.model.MenuItemRole;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,20 +13,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-        "entry_name",
-        "iconIdentifier",
-        "menuItemRoleList",
+@XmlType(name = "menuEntry", propOrder = {
+        "entryName",
+        "menuEntryRoleList",
 })
 public class MenuEntry {
 
     @XmlElement(required = true)
-    protected String entry_name;
-    @XmlElement
-    protected String iconIdentifier;
+    protected String entryName;
+//    @XmlElement
+//    protected String iconIdentifier;
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "entryRole")
-    protected List<MenuItemRole> menuItemRoleList;
+    protected List<MenuEntryRole> menuEntryRoleList;
     @JacksonXmlProperty(isAttribute = true)
     protected Boolean useIcon;
 }
