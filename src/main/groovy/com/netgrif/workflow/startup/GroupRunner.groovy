@@ -1,14 +1,12 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
+import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
