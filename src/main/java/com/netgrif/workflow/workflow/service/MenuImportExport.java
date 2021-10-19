@@ -5,11 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.netgrif.workflow.AsyncRunner;
-import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.filters.FilterImportExportList;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
@@ -23,11 +19,9 @@ import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.*;
 import com.netgrif.workflow.workflow.service.interfaces.*;
-import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,11 +43,9 @@ public class MenuImportExport implements IMenuImportExport {
 
     private static final String MENU_ITEM_NAME = "entry_name";
     private static final String USE_ICON = "use_icon";
-    private static final String ICON_IDENTIFIER = "icon_name";
     private static final String ALLOWED_ROLES = "allowed_roles";
     private static final String BANNED_ROLES = "banned_roles";
-    private static final String ENTRY_TITLE = "entry_default_name";
-    private String importResultMessage = "";
+    private static String importResultMessage = "";
 
     @Autowired
     IUserService userService;
@@ -76,13 +68,19 @@ public class MenuImportExport implements IMenuImportExport {
     @Autowired
     private IFilterImportExportService filterImportExportService;
 
-    @Autowired
-    private FileStorageConfiguration fileStorageConfiguration;
-
-
+    /**
+     * Method which performs export of selected menu entries with their filters into xml file.
+     * Method finds all cases by provided ids, transform them into FilterImportExportList object
+     * and serialize them into xml file on path: storage/filterExport/<userId>/filters.xml
+     * @param menusForExport - EnumerationMapField with Ids (delimited by ",") of menu entries as keys
+     * and identifier of menu they belong to as value
+     * @param groupId case Id of active group
+     * @return FileFieldValue - file field value of active group file field used to store exported file
+     * @throws IOException - if file which contains exported menus cannot be created
+     */
     @Override
     public FileFieldValue exportMenu(EnumerationMapField menusForExport, String groupId, FileField fileField) throws IOException {
-        log.info("Exporting menu"); //TODO pridat XML class s menuList a FilterList polozkami
+        log.info("Exporting menu");
         MenuAndFilters menuAndFilters = new MenuAndFilters();
 
         for (Map.Entry<String, I18nString> option : menusForExport.getOptions().entrySet()) {
@@ -108,38 +106,23 @@ public class MenuImportExport implements IMenuImportExport {
         }
         return createXML(menuAndFilters, groupId, fileField);
     }
-//            menuItemCases.forEach(menuItem -> {
-//                String filterId = menuItem.getDataSet().get("filter_case").getValue().toString();
-//                menu.getMenuEntries().add(createMenuItemExportClass(menuItem));
-////            menuList.getMenuList().get(0).getMenuEntries().add(createMenuItemExportClass(menuItem));
-//                filterCaseIds.add(filterId.substring(1, filterId.length() - 1));
-//            });
-//            filterCaseIds.forEach(filterId -> {
-//                Case filterCase = workflowService.findOne(filterId);
-//                menuAndFilters.getFilterList().getFilters().add(filterImportExportService.createExportClass(filterCase, menuIdentifier));
-//            });
 
-//            menuAndFilters.getMenuList().getMenuList().add(menu);
-//        }
-
-
-
-//        List<String> filterCaseIds = new ArrayList<>();
-//        menu.setMenuEntries(new ArrayList<>());
-////        menuList.getMenuList().get(0).setMenuIdentifier(menuIdentifier);
-////        menuList.getMenuList().get(0).setMenuEntries(new ArrayList<>());
-//        menuItemCases.forEach(menuItem -> {
-//            String filterId = menuItem.getDataSet().get("filter_case").getValue().toString();
-//            menu.getMenuEntries().add(createMenuItemExportClass(menuItem));
-////            menuList.getMenuList().get(0).getMenuEntries().add(createMenuItemExportClass(menuItem));
-//            filterCaseIds.add(filterId.substring(1, filterId.length() - 1));
-//        });
-//        filterCaseIds.forEach(filterId -> {
-//            Case filterCase = workflowService.findOne(filterId);
-//            menuAndFilters.getFilterList().getFilters().add(filterImportExportService.createExportClass(filterCase, menuIdentifier));
-//        });
-
-
+    /**
+     * Method which performs import of menus from uploaded xml file.
+     * Method firstly loads xml file from file field and validates it against xml schema for menusWithFilters
+     * located on path: menu_export_schema.xml.
+     * Then it calls import of filters provided in uploaded xml file.
+     * Method then deletes any Preference filter item cases of active group case with same menu identifier
+     * as any of the menus imported.
+     * If the file is correct, method creates new instance of Preference filter item cases for each menu entry.
+     * @param menuItemCases - list of Preference filter item cases in active group
+     * @param ffv - file field from active group case containing uploaded xml file.
+     * @param parentId - id of active group case
+     * @return List<String> - list of values delimited by "," containing
+     * preferenceItem case Id, filter case Id, boolean value determining if Icon should be displayed
+     * @throws IOException - if imported file is not found
+     * @throws IllegalMenuFileException - if uploaded xml is not in correct xml format and invalidate against schema
+     */
     @Override
     public List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String parentId) throws IOException, IllegalMenuFileException {
         importResultMessage = "";
@@ -178,13 +161,6 @@ public class MenuImportExport implements IMenuImportExport {
                 if (!filterTaskId.equals("")) filterTaskIds.add(filterTaskId);
             });
 
-//        for (Menu menu : menuAndFilters.getMenuList().getMenuList()) {
-//            importResultMessage = importResultMessage.concat("\nIMPORTING MENU \"" + menu.getMenuIdentifier() + "\":\n");
-//            menu.getMenuEntries().forEach(menuItem -> {
-//                String filterTaskId = createMenuItemCase(menuItem, menu.getMenuIdentifier(), parentId, importedFilterIds.get(cnt.getAndIncrement()));
-//                if (!filterTaskId.equals("")) filterTaskIds.add(filterTaskId);
-//            });
-
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("navigationMenuConfig").and(qTask.caseId.eq(parentId)));
 
@@ -194,9 +170,7 @@ public class MenuImportExport implements IMenuImportExport {
             groupImportResultMessage.put("value", importResultMessage);
             groupData.put("import_results", groupImportResultMessage);
             dataService.setData(task, ImportHelper.populateDataset(groupData));
-//        }
         });
-
         return filterTaskIds;
     }
 
@@ -214,7 +188,6 @@ public class MenuImportExport implements IMenuImportExport {
     protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-
             ffv.setName("menu_" + userService.getLoggedUser().getFullName() + ".xml");
             ffv.setPath(ffv.getPath(parentId, fileField.getImportId()));
             File f = new File(ffv.getPath());
@@ -227,47 +200,26 @@ public class MenuImportExport implements IMenuImportExport {
 
             FileOutputStream fos = new FileOutputStream(f);
             baos.writeTo(fos);
-
         } catch (Exception e) {
             log.error("Failed to export menu!", e);
         }
-
         return ffv;
     }
-//            String filePath = ffv.getPath() + userService.getLoggedUser().getName() + ".xml";
-//            File f = new File(filePath);
-//            f.getParentFile().mkdirs();
-//            XmlMapper xmlMapper = new XmlMapper();
-//            xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//            xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            xmlMapper.writeValue(baos, menuList);
-//
-//            FileOutputStream fos = new FileOutputStream(f);
-//            baos.writeTo(fos);
-
-//            return new FileFieldValue("menu_" + userService.getLoggedUser().getName() + ".xml", filePath);
-
 
     @Override
     public String createMenuItemCase(MenuEntry item, String menuIdentifier, String parentId, String filterTaskId) {
         AtomicBoolean netCheck = new AtomicBoolean(true);
         importResultMessage = importResultMessage.concat("\nMenu entry \"" + item.getEntryName() + "\": ");
 
-
         Task importedFilterTask = taskService.findOne(filterTaskId);
         Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
         try {
-//            workflowService.save(filterCase);
             taskService.assignTask(importedFilterTask.getStringId());
             taskService.finishTask(importedFilterTask.getStringId());
             workflowService.save(filterCase);
-
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
         }
-//        Case filterCase = workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(item.getEntry_name())));
-
         if (filterCase == null) {
             importResultMessage = importResultMessage.concat("Filter not found! Menu entry was skipped.\n");
             return "";
@@ -302,154 +254,103 @@ public class MenuImportExport implements IMenuImportExport {
                 }
             });
         }
-            //Creating new Case of preference_filter_item net and setting its data...
-            Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
-                    , item.getEntryName() + "_" + menuIdentifier, "", userService.getSystem().transformToLoggedUser());
+        //Creating new Case of preference_filter_item net and setting its data...
+        Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
+                , item.getEntryName() + "_" + menuIdentifier, "", userService.getSystem().transformToLoggedUser());
 
-//            Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
-//                    , item.getEntry_name() + "_" + menuIdentifier, "", userService.getLoggedUser().transformToLoggedUser());
-//            //TODO title should be empty
+        QTask qTask = new QTask("task");
+        Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
+        try {
+            taskService.assignTask(task, userService.getLoggedUser());
+            menuItemCase.getDataSet().get("menu_identifier").setValue(menuIdentifier);
+            menuItemCase.getDataSet().get("parentId").setValue(parentId);
+            menuItemCase.getDataSet().get(ALLOWED_ROLES).setOptions(allowedRoles);
+            menuItemCase.getDataSet().get(BANNED_ROLES).setOptions(bannedRoles);
+            workflowService.save(menuItemCase);
+        } catch (TransitionNotExecutableException e) {
+            e.printStackTrace();
+        }
+        if(netCheck.get()) importResultMessage = importResultMessage.concat("OK\n");
 
-            QTask qTask = new QTask("task");
-            Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
-//            menuItemCase.getDataSet().get("filter_case").setValue(Arrays.asList(filterCase.getStringId()));
-//            menuItemCase.getDataSet().get("parentId").setValue(parentId);
-//            workflowService.save(menuItemCase);
+        return task.getCaseId() + "," + filterCase.getStringId() + "," + item.getUseIcon().toString();
+    }
 
-//            Map<String, Map<String, String>> menuItemData = new HashMap<>();
-//            menuItemData.put("filter_case", createFilterMapEntry(filterCase.getStringId(), false));
-//            menuItemData.put("parentId", createFilterMapEntry(parentId, true));
+    private MenuEntry createMenuEntryExportClass (Case menuItemCase)
+    {
+        Map<String, I18nString> allowedRoles = menuItemCase.getDataSet().get(ALLOWED_ROLES).getOptions();
+        Map<String, I18nString> bannedRoles = menuItemCase.getDataSet().get(BANNED_ROLES).getOptions();
 
-            //Setting data on "init" task
-            try {
-                taskService.assignTask(task, userService.getLoggedUser());
+        List<MenuEntryRole> menuEntryRoleList = new ArrayList<>();
 
-//                menuItemCase.getDataSet().get("filter_case").setValue(Arrays.asList(filterCase.getStringId()));
-                menuItemCase.getDataSet().get("menu_identifier").setValue(menuIdentifier);
-                menuItemCase.getDataSet().get("parentId").setValue(parentId);
-                menuItemCase.getDataSet().get(ALLOWED_ROLES).setOptions(allowedRoles);
-                menuItemCase.getDataSet().get(BANNED_ROLES).setOptions(bannedRoles);
-                workflowService.save(menuItemCase);
-
-                //TODO use_icon nastavit
-                //TODO title a icon sa nastavi podla filterCaseRef na SET akcii
-//                menuItemCase.getDataSet().get(ENTRY_TITLE).setValue(item.getEntry_name() + " menu item");
-//                menuItemCase.getDataSet().get(ICON_IDENTIFIER).setValue(item.getIconIdentifier());
-
-//                Map<String, Map<String, String>> filterCaseRefData = new HashMap<>();
-//                Map <String, String> data = new HashMap<>();
-//                data.put("type", "caseRef");
-////                data.put("value", "[" + filterCase.getStringId() + "]");
-//                data.put("value", filterCase.getStringId());
-//
-//                data.put("allowedNets", "filter");
-//                filterCaseRefData.put("filter_case", data)
-//                dataService.setData(task, ImportHelper.populateDataset(filterCaseRefData));
-
-//                taskService.finishTask(task, userService.getLoggedUser());
-            } catch (TransitionNotExecutableException e) {
-                e.printStackTrace();
-            }
-
-            if(netCheck.get()) importResultMessage = importResultMessage.concat("OK\n");
-//            task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(menuItemCase.getStringId())));
-
-//            return task.getStringId() + "," + filterCase.getStringId();
-            return task.getCaseId() + "," + filterCase.getStringId() + "," + item.getUseIcon().toString();
+        if (allowedRoles != null && !allowedRoles.isEmpty()) {
+            menuEntryRoleList.addAll(allowedRoles.keySet().stream().map(roleNet -> {
+                MenuEntryRole newMenuEntryRole = new MenuEntryRole();
+                newMenuEntryRole.setRoleImportId(roleNet.split(":")[0]);
+                newMenuEntryRole.setNetImportId(roleNet.split(":")[1]);
+                newMenuEntryRole.setAuthorizationType(AuthorizationType.ALLOWED);
+                return newMenuEntryRole;
+            }).collect(Collectors.toList()));
         }
 
-//        public Map<String, String> createFilterMapEntry (String Id,boolean setParentId){
-//            Map<String, String> entry = new HashMap<>();
-//
-//            if (setParentId) {
-//                entry.put("type", "caseRef");
-//                entry.put("value", "");
-//                entry.put("allowedNets", "filter");
-//            } else {
-//                entry.put("type", "text");
-//                entry.put("value", Id);
-//            }
-//            return entry;
-//        }
-
-        private MenuEntry createMenuEntryExportClass (Case menuItemCase)
-        {
-            Map<String, I18nString> allowedRoles = menuItemCase.getDataSet().get(ALLOWED_ROLES).getOptions();
-            Map<String, I18nString> bannedRoles = menuItemCase.getDataSet().get(BANNED_ROLES).getOptions();
-
-            List<MenuEntryRole> menuEntryRoleList = new ArrayList<>();
-
-            if (allowedRoles != null && !allowedRoles.isEmpty()) {
-                menuEntryRoleList.addAll(allowedRoles.keySet().stream().map(roleNet -> {
-                    MenuEntryRole newMenuEntryRole = new MenuEntryRole();
-                    newMenuEntryRole.setRoleImportId(roleNet.split(":")[0]);
-                    newMenuEntryRole.setNetImportId(roleNet.split(":")[1]);
-                    newMenuEntryRole.setAuthorizationType(AuthorizationType.ALLOWED);
-                    return newMenuEntryRole;
-                }).collect(Collectors.toList()));
-            }
-
-            if (bannedRoles != null && !bannedRoles.isEmpty()) {
-                menuEntryRoleList.addAll(bannedRoles.keySet().stream().map(roleNet -> {
-                    MenuEntryRole newMenuEntryRole = new MenuEntryRole();
-                    newMenuEntryRole.setRoleImportId(roleNet.split(":")[0]);
-                    newMenuEntryRole.setNetImportId(roleNet.split(":")[1]);
-                    newMenuEntryRole.setAuthorizationType(AuthorizationType.BANNED);
-                    return newMenuEntryRole;
-                }).collect(Collectors.toList()));
-            }
-
-            MenuEntry exportMenuItem = new MenuEntry();
-            exportMenuItem.setEntryName(menuItemCase.getDataSet().get(MENU_ITEM_NAME).toString());
-            exportMenuItem.setUseIcon((Boolean) menuItemCase.getDataSet().get(USE_ICON).getValue());
-//            exportMenuItem.setIconIdentifier(menuItemCase.getDataSet().get(ICON_IDENTIFIER).toString());
-            if (!menuEntryRoleList.isEmpty()) exportMenuItem.setMenuEntryRoleList(menuEntryRoleList);
-
-            return exportMenuItem;
+        if (bannedRoles != null && !bannedRoles.isEmpty()) {
+            menuEntryRoleList.addAll(bannedRoles.keySet().stream().map(roleNet -> {
+                MenuEntryRole newMenuEntryRole = new MenuEntryRole();
+                newMenuEntryRole.setRoleImportId(roleNet.split(":")[0]);
+                newMenuEntryRole.setNetImportId(roleNet.split(":")[1]);
+                newMenuEntryRole.setAuthorizationType(AuthorizationType.BANNED);
+                return newMenuEntryRole;
+            }).collect(Collectors.toList()));
         }
 
-        @Override
-        public Map<String, I18nString>  createMenuExportChoices(MultichoiceMapField availableEntries, List<Case> menuItemCases) {
-            Map <String, I18nString> availableItems; //TODO skontrolovat ci to nebude menit povodne options, premenovat na creatAvailableEntriesChoices
-            availableItems = menuItemCases.stream()
-                    .collect(Collectors.toMap(Case::getStringId, v -> new I18nString((String)v.getDataSet().get("entry_default_name").getValue())));
+        MenuEntry exportMenuItem = new MenuEntry();
+        exportMenuItem.setEntryName(menuItemCase.getDataSet().get(MENU_ITEM_NAME).toString());
+        exportMenuItem.setUseIcon((Boolean) menuItemCase.getDataSet().get(USE_ICON).getValue());
+        if (!menuEntryRoleList.isEmpty()) exportMenuItem.setMenuEntryRoleList(menuEntryRoleList);
 
-            return availableItems;
-        }
+        return exportMenuItem;
+    }
 
-        @Override
-        public Map<String, I18nString>  addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuIdentifier) {
-            Map <String, I18nString> updatedOptions = new LinkedHashMap<>(menusForExport.getOptions());
-            String menuCaseIds = "";
-            if (availableEntries.getOptions().size() != 0) {
-                for (String id: availableEntries.getValue()) {
-                    menuCaseIds = menuCaseIds.concat(id + ",");
+    @Override
+    public Map<String, I18nString>  createAvailableEntriesChoices(List<Case> menuItemCases) {
+        Map <String, I18nString> availableItems;
+        availableItems = menuItemCases.stream()
+                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString((String)v.getDataSet().get("entry_default_name").getValue())));
 
-                updatedOptions.put(menuCaseIds, new I18nString(menuIdentifier));
-                }
+        return availableItems;
+    }
+
+    @Override
+    public Map<String, I18nString>  addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuIdentifier) {
+        Map <String, I18nString> updatedOptions = new LinkedHashMap<>(menusForExport.getOptions());
+        String menuCaseIds = "";
+        if (availableEntries.getOptions().size() != 0) {
+            for (String id: availableEntries.getValue()) {
+                menuCaseIds = menuCaseIds.concat(id + ",");
             }
-            return updatedOptions;
+            updatedOptions.put(menuCaseIds, new I18nString(menuIdentifier));
         }
+        return updatedOptions;
+    }
 
-        private String inputStreamToString (InputStream is) throws IOException {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-            return sb.toString();
+    private String inputStreamToString (InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        String line;
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
         }
+        br.close();
+        return sb.toString();
+    }
 
-        private static void validateFilterXML(InputStream xml) throws IllegalMenuFileException {
-            try {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Schema schema = factory.newSchema(FilterImportExportService.class.getResource("/petriNets/menu_export_schema.xsd"));
-                Validator validator = schema.newValidator();
-                validator.validate(new StreamSource(xml));
-            } catch (Exception ex) {
-                throw new IllegalMenuFileException(ex);
-            }
+    private static void validateFilterXML(InputStream xml) throws IllegalMenuFileException {
+        try {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(FilterImportExportService.class.getResource("/petriNets/menu_export_schema.xsd"));
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(xml));
+        } catch (Exception ex) {
+            throw new IllegalMenuFileException(ex);
         }
+    }
 }
