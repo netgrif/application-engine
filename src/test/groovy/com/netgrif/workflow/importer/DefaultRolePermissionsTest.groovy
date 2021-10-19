@@ -95,12 +95,15 @@ class DefaultRolePermissionsTest {
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
         NetCaseTask instances = importAndCreate(model)
 
-        def processPerms = processPermissions.collectEntries { it -> [it.key, it.value.collectEntries {ti -> [ti.key.toString(), ti.value]}]}
+        Map<String, Map<String, Boolean>> processPerms = processPermissions.collectEntries { it -> [it.key, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>;
         def taskPerms = taskPermissions.collectEntries { it -> [it.key, it.value.collectEntries {ti -> [ti.key.toString(), ti.value]}]}
 
 
         assert instances.net.isDefaultRoleEnabled() == defaultRoleEnabled
         assert instances.net.getPermissions() == processPerms
+
+        processPerms = processPerms.findAll {it -> it.value.containsKey("view") || it.value.containsKey("delete")}
+        processPerms.forEach({ k , v  -> v.remove("create")})
 
         assert instances.aCase.getPermissions() == processPerms
 
