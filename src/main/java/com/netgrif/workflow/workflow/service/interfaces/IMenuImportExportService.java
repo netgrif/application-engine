@@ -18,7 +18,7 @@ import java.util.Map;
  * Interface which provides methods for menu import and export.
  */
 
-public interface IMenuImportExport {
+public interface IMenuImportExportService {
 
     Map<String, I18nString>  createAvailableEntriesChoices(List<Case> menuItemCases);
     Map<String, I18nString>  addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuidentifier);
