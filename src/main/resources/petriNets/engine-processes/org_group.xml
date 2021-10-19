@@ -175,7 +175,7 @@
 			change filterAutocomplete value {return ""}
 
 			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 		</action>
 	</data>
 	<data type="file">
@@ -192,7 +192,7 @@
 			availableEntries: f.available_export_entries;
 
 			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 		</action>
 	</data>
 	<data type="button">
@@ -254,7 +254,7 @@
 			menuIdentifier: f.export_menu_name,
 			menusForExport: f.menus_for_export;
 
-			change menusForExport options { return menuImportExport.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value) }
+			change menusForExport options { return menuImportExportService.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value) }
 
 			change selectedEntries value {[]}
 		</action>
@@ -281,7 +281,7 @@
 			menusForExport: f.menus_for_export,
 			groupId: f.group_id;
 
-			change export_file value { menuImportExport.exportMenu(menusForExport, groupId.value, export_file) }
+			change export_file value { menuImportExportService.exportMenu(menusForExport, groupId.value, export_file) }
 			change menusForExport options {[:]}
 		</action>
 		<component>
@@ -311,7 +311,7 @@
 			change importResults value {return ""}
 
 			def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change newEntries value { return menuImportExport.importMenu(cases, import_file.value, useCase.stringId) }
+			change newEntries value { return menuImportExportService.importMenu(cases, import_file.value, useCase.stringId) }
 			def actualUseCase = workflowService.findOne(useCase.stringId)
 
 			actualUseCase.dataSet.entrySet().forEach{ e ->
@@ -362,7 +362,7 @@
 			workflowService.save(useCase)
 
 			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 		</action>
 	</data>
 	<data type="caseRef">
@@ -520,7 +520,7 @@
 
 					def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
 
-					change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
+					change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 				</action>
 			</actions>
 		</event>
