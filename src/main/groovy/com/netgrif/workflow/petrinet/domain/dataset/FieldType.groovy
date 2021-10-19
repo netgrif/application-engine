@@ -21,7 +21,8 @@ enum FieldType {
     DATETIME("dateTime"),
     BUTTON("button"),
     TASK_REF("taskRef"),
-    FILTER("filter")
+    FILTER("filter"),
+    I18N("i18n")
 
     String name
 
