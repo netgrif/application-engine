@@ -37,9 +37,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class MenuImportExport implements IMenuImportExport {
+public class MenuImportExportService implements IMenuImportExportService {
 
-    private static final Logger log = LoggerFactory.getLogger(MenuImportExport.class);
+    private static final Logger log = LoggerFactory.getLogger(MenuImportExportService.class);
 
     private static final String MENU_ITEM_NAME = "entry_name";
     private static final String USE_ICON = "use_icon";
