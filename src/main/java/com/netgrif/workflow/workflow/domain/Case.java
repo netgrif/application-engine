@@ -137,7 +137,7 @@ public class Case {
     @Setter
     private List<Long> negativeViewUsers;
 
-    public Case() {
+    protected Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
