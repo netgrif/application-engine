@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
@@ -48,7 +49,7 @@ class DefaultRolePermissionsTest {
     private ITaskService taskService
 
     @Autowired
-    private ProcessRoleRepository roleRepository;
+    private IProcessRoleService processRoleService
 
     @Autowired
     private RoleFactory roleFactory
@@ -68,7 +69,7 @@ class DefaultRolePermissionsTest {
     @Before
     public void before() {
         testHelper.truncateDbs()
-        DEFAULT_ROLE_ID = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE).stringId
+        DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
     }
 
     @Test
@@ -96,18 +97,25 @@ class DefaultRolePermissionsTest {
         NetCaseTask instances = importAndCreate(model)
 
         Map<String, Map<String, Boolean>> processPerms = processPermissions.collectEntries { it -> [it.key, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>;
-        def taskPerms = taskPermissions.collectEntries { it -> [it.key, it.value.collectEntries {ti -> [ti.key.toString(), ti.value]}]}
+        Map<String, Map<String, Boolean>> taskPerms = taskPermissions.collectEntries { it -> [it.key, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>;
 
+        def negativeProcessView = processPerms.findAll {it -> it.value.containsKey("view") && !it.value.get("view") }.collect {it -> it.key}
+        def negativeTaskView = taskPerms.findAll {it -> it.value.containsKey("view") && !it.value.get("view") }.collect {it -> it.key}
 
         assert instances.net.isDefaultRoleEnabled() == defaultRoleEnabled
         assert instances.net.getPermissions() == processPerms
+        assert instances.net.negativeViewRoles == negativeProcessView
+        assert instances.net.getTransition(TRANSITION_ID).roles == taskPerms
+        assert instances.net.getTransition(TRANSITION_ID).negativeViewRoles == negativeTaskView
 
         processPerms = processPerms.findAll {it -> it.value.containsKey("view") || it.value.containsKey("delete")}
         processPerms.forEach({ k , v  -> v.remove("create")})
 
         assert instances.aCase.getPermissions() == processPerms
+        assert instances.aCase.negativeViewRoles == negativeProcessView
 
         assert instances.task.getRoles() == taskPerms
+        assert instances.task.negativeViewRoles == negativeTaskView
     }
 
     private NetCaseTask importAndCreate(Resource model) {
