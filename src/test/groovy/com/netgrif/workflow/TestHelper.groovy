@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
@@ -36,6 +37,8 @@ class TestHelper {
     private GroupRunner groupRunner
     @Autowired
     private IFieldActionsCacheService actionsCacheService
+    @Autowired
+    private IProcessRoleService processRoleService
 
     void truncateDbs() {
         template.db.drop()
@@ -46,6 +49,10 @@ class TestHelper {
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
+
+        // flush role cache
+        processRoleService.metaClass.setAttribute(processRoleService, "defaultRole", null)
+
         roleRunner.run()
         systemUserRunner.run()
         groupRunner.run()
