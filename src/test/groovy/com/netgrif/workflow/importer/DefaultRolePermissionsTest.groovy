@@ -27,7 +27,6 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
-@CompileStatic
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -61,9 +60,12 @@ class DefaultRolePermissionsTest {
     @Value("classpath:role_permissions_default_role_defined.xml")
     private Resource definedDefaultRoleNet
 
+    @Value("classpath:role_permissions_default_role_shadowed.xml")
+    private Resource shadowedDefaultRoleNet
+
 
     private static final String TRANSITION_ID = 't1'
-
+    private static final String NET_ROLE_ID = 'netRole'
     private String DEFAULT_ROLE_ID
 
     @Before
@@ -93,11 +95,25 @@ class DefaultRolePermissionsTest {
         ] as Map<String, Map<RolePermission, Boolean>>, true)
     }
 
+    @Test
+    void shadowDefaultRole() {
+        testPermissions(shadowedDefaultRoleNet, [
+                (NET_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (NET_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true)
+    }
+
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
         NetCaseTask instances = importAndCreate(model)
+        String netRoleId = instances.net.getRoles().keySet().find({ it -> it != DEFAULT_ROLE_ID })
 
-        Map<String, Map<String, Boolean>> processPerms = processPermissions.collectEntries { it -> [it.key, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>;
-        Map<String, Map<String, Boolean>> taskPerms = taskPermissions.collectEntries { it -> [it.key, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>;
+        Map<String, Map<String, Boolean>> processPerms = transformPermissionMap(processPermissions, netRoleId);
+        Map<String, Map<String, Boolean>> taskPerms = transformPermissionMap(taskPermissions, netRoleId);
 
         def negativeProcessView = processPerms.findAll {it -> it.value.containsKey("view") && !it.value.get("view") }.collect {it -> it.key}
         def negativeTaskView = taskPerms.findAll {it -> it.value.containsKey("view") && !it.value.get("view") }.collect {it -> it.key}
@@ -135,6 +151,10 @@ class DefaultRolePermissionsTest {
         assert task != null
 
         return new NetCaseTask(optNet.get(), aCase, task)
+    }
+
+    private Map<String, Map<String, Boolean>> transformPermissionMap(Map<String, Map<Object, Boolean>> input, String netRoleId) {
+        return input.collectEntries { it -> [it.key == DEFAULT_ROLE_ID ? DEFAULT_ROLE_ID : netRoleId, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>
     }
 
     private class NetCaseTask {

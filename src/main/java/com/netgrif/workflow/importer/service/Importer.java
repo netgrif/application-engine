@@ -189,7 +189,9 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        addDefaultPermissions();
+        if(!isDefaultRoleReferencedOnNet() && isDefaultRoleAllowedForNet()) {
+            addDefaultPermissions();
+        }
         document.getUsersRef().forEach(this::resolveUsersRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
@@ -988,6 +990,16 @@ public class Importer {
                 )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
+    private boolean isDefaultRoleAllowedForNet() {
+        // FALSE if defaultRole not allowed in net
+        if (!net.isDefaultRoleEnabled()) {
+            return false;
+        }
+        // TRUE if no positive role associations
+        return net.getPermissions().isEmpty()
+                || net.getPermissions().values().stream().noneMatch(perms -> perms.containsValue(true));
+    }
+
     PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
         if (!net.isPresent()) {
@@ -998,6 +1010,10 @@ public class Importer {
 
     private boolean isDefaultRoleReferenced(Transition transition) {
         return transition.getRoles().containsKey(defaultRole.getStringId());
+    }
+
+    private boolean isDefaultRoleReferencedOnNet() {
+        return net.getPermissions().containsKey(defaultRole.getStringId());
     }
 
     private AssignPolicy toAssignPolicy(AssignPolicyType type) {
