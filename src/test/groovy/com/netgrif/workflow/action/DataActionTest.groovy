@@ -7,6 +7,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import groovy.transform.CompileStatic
@@ -40,14 +41,14 @@ class DataActionTest {
         testHelper.truncateDbs()
 
         def mainNet = importHelper.createNet("data_actions_test.xml")
-        assert mainNet.isPresent()
-        def $case = importHelper.createCase("Case 1", mainNet.get())
+        assert mainNet.getNet() != null
+        def $case = importHelper.createCase("Case 1", mainNet.getNet())
         Task task = taskService.findOne($case.tasks.first().task)
 
-        List<Field> dataGet = dataService.getData($case.tasks.first().task)
+        List<Field> dataGet = dataService.getData($case.tasks.first().task).getData()
         dataGet.first().value == ";get-pre;get-post"
 
-        ChangedFieldsTree dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
+        SetDataEventOutcome dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
                 "text_field": [
                         "value": "",
                         "type" : "text"

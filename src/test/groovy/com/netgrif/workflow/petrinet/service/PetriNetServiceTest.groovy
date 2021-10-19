@@ -17,6 +17,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
@@ -91,10 +92,10 @@ class PetriNetServiceTest {
         int caseCount = workflowService.getAll(new FullPageRequest()).size()
         long taskCount = taskRepository.count()
 
-        Optional<PetriNet> testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
-        assert testNetOptional.isPresent()
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
+        assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
-        PetriNet testNet = testNetOptional.get()
+        PetriNet testNet = testNetOptional.getNet()
         importHelper.createCase("Case 1", testNet)
 
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1

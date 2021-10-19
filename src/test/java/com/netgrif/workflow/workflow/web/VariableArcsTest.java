@@ -22,6 +22,8 @@ import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
@@ -39,6 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -95,6 +98,7 @@ public class VariableArcsTest {
 
     @Before
     public void before() throws Exception {
+        testHelper.truncateDbs();
         userRunner.run("");
         repository.deleteAll();
         if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
@@ -105,10 +109,10 @@ public class VariableArcsTest {
             }
         }
         testHelper.truncateDbs();
-        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
-        assert optionalNet.isPresent();
-        PetriNet net = optionalNet.get();
+        assert outcome.getNet() != null;
+        PetriNet net = outcome.getNet();
         this.loaded = service.getPetriNet(net.getStringId());
         User user = new User();
         user.setName("Test");
@@ -130,9 +134,9 @@ public class VariableArcsTest {
 
         List<Arc> arcs = this.loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;
-        Case useCase = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
 
-        assert useCase.getPetriNet().getArcs()
+        assert caseOutcome.getACase().getPetriNet().getArcs()
                 .values()
                 .stream()
                 .flatMap(List::stream)

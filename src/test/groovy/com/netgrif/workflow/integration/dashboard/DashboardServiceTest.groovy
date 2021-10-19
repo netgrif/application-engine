@@ -27,7 +27,7 @@ class DashboardServiceTest {
 
     @Test
     void dashboardIntegerTest() {
-        PetriNet net1 = helper.createNet("all_data.xml", "major").get()
+        PetriNet net1 = helper.createNet("all_data.xml", "major").getNet()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)
@@ -38,7 +38,7 @@ class DashboardServiceTest {
 
     @Test
     void dashboardStringTest() {
-        PetriNet net1 = helper.createNet("all_data.xml", "major").get()
+        PetriNet net1 = helper.createNet("all_data.xml", "major").getNet()
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)

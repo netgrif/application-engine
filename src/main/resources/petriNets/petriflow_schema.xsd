@@ -99,6 +99,8 @@
                             <xs:element ref="rows" minOccurs="0"/>
                             <xs:element ref="offset" minOccurs="0"/>
                             <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
+                            <xs:element ref="hideEmptyRows" minOccurs="0"/>
+                            <xs:element ref="compactDirection" minOccurs="0"/>
                         </xs:sequence>
                         <xs:attribute name="type" type="layoutType"/>
                     </xs:complexType>
@@ -384,6 +386,10 @@
                 <xs:element ref="init"/>
             </xs:choice>
         </xs:complexType>
+        <xs:unique name="optionUniqueKey">
+            <xs:selector xpath="./option"/>
+            <xs:field xpath="@key"/>
+        </xs:unique>
     </xs:element>
     <xs:element name="inits">
         <xs:complexType>
@@ -586,6 +592,21 @@
             <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="hideEmptyRows">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="all"/>
+            <xs:enumeration value="compacted"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="hideEmptyRows" type="hideEmptyRows"/>
+    <xs:simpleType name="compactDirection">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="up"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="compactDirection" type="compactDirection"/>
     <xs:element name="dataGroup">
         <xs:complexType>
             <xs:sequence>
@@ -596,6 +617,8 @@
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
+                <xs:element ref="hideEmptyRows" minOccurs="0"/>
+                <xs:element ref="compactDirection" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
@@ -697,7 +720,6 @@
                 <xs:extension base="baseEvent">
                     <xs:sequence>
                         <xs:element ref="title" minOccurs="0"/>
-                        <xs:element ref="message" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attribute name="type" use="required" type="eventType"/>
                 </xs:extension>
@@ -708,6 +730,7 @@
         <xs:sequence>
             <xs:element ref="id"/>
             <xs:element ref="actions" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="message" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="dataEvent">

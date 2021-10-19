@@ -16,15 +16,27 @@ public class DataGroup {
 
     private Boolean stretch;
 
+    private String parentTaskId;
+
+    private String parentCaseId;
+
+    private String parentTaskRefId;
+
+    private int nestingLevel;
+
     private DataGroup() {
     }
 
-    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout) {
+    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId, String parentCaseId, String parentTaskRefId, int nestingLevel) {
         this();
         this.fields = fields;
         this.title = title;
         this.alignment = alignment;
         this.stretch = stretch;
         this.layout = layout;
+        this.parentTaskId = parentTaskId;
+        this.parentCaseId = parentCaseId;
+        this.parentTaskRefId = parentTaskRefId;
+        this.nestingLevel = nestingLevel;
     }
 }

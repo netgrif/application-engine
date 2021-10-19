@@ -33,7 +33,7 @@ class NewInitTest {
     @Test
     void newInitTest() throws IOException, MissingIconKeyException, MissingPetriNetMetaDataException {
         petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/nae_1276_Init_value_as_choice.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId,"New init test", "", superCreator.getLoggedSuper())
+        Case initTestCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("new_init_test").stringId,"New init test", "", superCreator.getLoggedSuper()).getACase()
         assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Bob"}
         assert (initTestCase.dataSet["new_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Alice"}
         assert (initTestCase.dataSet["old_init_multichoice"].value as List<I18nString>).stream().any {it.defaultValue == "Bob"}

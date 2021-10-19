@@ -60,9 +60,9 @@ class WorkflowAuthorizationServiceTest {
     @Before
     void before() {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        this.net = net.get()
+        this.net = net.getNet()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
@@ -106,7 +106,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         def response = parseResult(result)
-        String userCaseId1 = response.stringId
+        String userCaseId1 = response.outcome.acase.stringId
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -115,7 +115,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String userCaseId2 = response.stringId
+        String userCaseId2 = response.outcome.acase.stringId
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -124,7 +124,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String otherUserCaseId = response.stringId
+        String otherUserCaseId = response.outcome.acase.stringId
 
         /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
         mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)

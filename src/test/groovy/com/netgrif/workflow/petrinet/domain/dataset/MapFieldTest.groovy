@@ -43,9 +43,9 @@ class MapFieldTest {
     @Test
     void testImport() {
         def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
-        def net = netOptional.get()
+        def net = netOptional.getNet()
         assert net.dataSet.size() == 1
 
         EnumerationMapField field = net.dataSet["enumeration"] as EnumerationMapField
@@ -67,9 +67,9 @@ class MapFieldTest {
     @Test
     void testValue() {
         def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
-        Case aCase = importHelper.createCase("Case", netOptional.get())
+        Case aCase = importHelper.createCase("Case", netOptional.getNet())
 
         assert aCase.dataSet["enumeration"] != null
         assert aCase.dataSet["enumeration"].value == "second"
@@ -107,9 +107,9 @@ class MapFieldTest {
     @Test
     void testImportMultichoice() {
         def netOptional = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
-        def net = netOptional.get()
+        def net = netOptional.getNet()
         assert net.dataSet.size() == 1
 
         MultichoiceMapField field = net.dataSet["multichoice"] as MultichoiceMapField
@@ -131,9 +131,9 @@ class MapFieldTest {
     @Test
     void testValueMultichoice() {
         def netOptional = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
-        assert netOptional.isPresent()
+        assert netOptional.getNet() != null
 
-        Case aCase = importHelper.createCase("Case", netOptional.get())
+        Case aCase = importHelper.createCase("Case", netOptional.getNet())
 
         assert aCase.dataSet["multichoice"] != null
         assert aCase.dataSet["multichoice"].value.size() == 2

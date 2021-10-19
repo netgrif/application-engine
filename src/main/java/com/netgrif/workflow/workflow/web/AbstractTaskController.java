@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
-import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -18,6 +19,7 @@ import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSe
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -33,8 +35,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.*;
 
 public abstract class AbstractTaskController {
 
@@ -85,52 +87,52 @@ public abstract class AbstractTaskController {
         return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
-    public LocalisedEventOutcomeResource assign(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.assignTask(loggedUser, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(),
+                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId),locale));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
+            return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
-    public LocalisedEventOutcomeResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
+    public EventOutcomeWithMessageResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         Long userId = delegatedId != null ? Long.parseLong(delegatedId) : null;
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, userId, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to [" + userId + "]");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + userId + "]",
+                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, userId, taskId),locale));
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
+            return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
-    public LocalisedEventOutcomeResource finish(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource finish(LoggedUser loggedUser, String taskId, Locale locale) {
 
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.finishTask(loggedUser, taskId), locale,
-                    "LocalisedTask " + taskId + " finished");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
+                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId),locale));
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
             } else {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
             }
         }
     }
 
-    public LocalisedEventOutcomeResource cancel(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.cancelTask(loggedUser, taskId), locale,
-                    "LocalisedTask " + taskId + " canceled");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
+                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId),locale));
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
             } else {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
             }
         }
     }
@@ -188,17 +190,25 @@ public abstract class AbstractTaskController {
     }
 
 
-    public DataGroupsResource getData(String taskId, Locale locale) {
-        List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
-        return new DataGroupsResource(dataGroups, locale);
+    public EventOutcomeWithMessageResource getData(String taskId, Locale locale) {
+        GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
+        return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
+                LocalisedEventOutcomeFactory.from(outcome,locale));
     }
 
-    public ChangedFieldContainer setData(String taskId, ObjectNode dataBody) {
-        return dataService.setData(taskId, dataBody).flatten();
+    public EventOutcomeWithMessageResource setData(String taskId, ObjectNode dataBody) {
+        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+        SetDataEventOutcome mainOutcome = outcomes.get(taskId);
+        outcomes.remove(taskId);
+        mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
-    public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
-        return dataService.saveFile(taskId, fieldId, multipartFile);
+    public EventOutcomeWithMessageResource saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException {
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(dataService.saveFile(taskId, fieldId, multipartFile), LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
@@ -223,8 +233,9 @@ public abstract class AbstractTaskController {
         return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 
-    public ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
-        return dataService.saveFiles(taskId, fieldId, multipartFiles);
+    public EventOutcomeWithMessageResource saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) throws IOException {
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(dataService.saveFiles(taskId, fieldId, multipartFiles), LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getNamedFile(String taskId, String fieldId, String name) throws FileNotFoundException {

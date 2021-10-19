@@ -2,7 +2,9 @@ package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
-import com.netgrif.workflow.event.events.model.UserImportModelEvent;
+import com.netgrif.workflow.history.domain.petrinetevents.DeletePetriNetEventLog;
+import com.netgrif.workflow.history.domain.petrinetevents.ImportPetriNetEventLog;
+import com.netgrif.workflow.history.service.IHistoryService;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
@@ -12,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.Version;
@@ -23,6 +26,8 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
+import com.netgrif.workflow.workflow.service.interfaces.IEventService;
 import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -96,6 +101,12 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private IFieldActionsCacheService functionCacheService;
 
+    @Autowired
+    private IEventService eventService;
+
+    @Autowired
+    private IHistoryService historyService;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     protected Importer getImporter() {
@@ -141,15 +152,16 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
     @Override
-    public Optional<PetriNet> importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         Optional<PetriNet> imported = getImporter().importPetriNet(copy(xmlFile));
+        ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         if (!imported.isPresent()) {
-            return imported;
+            return outcome;
         }
         PetriNet net = imported.get();
 
@@ -164,16 +176,25 @@ public class PetriNetService implements IPetriNetService {
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
-        publisher.publishEvent(new UserImportModelEvent(author, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
-        runActions(net.getPreUploadActions(), net);
+        outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
         save(net);
-        runActions(net.getPostUploadActions(), net);
+        historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
+        outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.POST);
         save(net);
         cache.put(net.getObjectId(), net);
+        historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
+        addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
+        outcome.setNet(imported.get());
+        return outcome;
+    }
 
-        return imported;
+    private ImportPetriNetEventOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {
+        if(net.getProcessEvents().containsKey(type)){
+            outcome.setMessage(net.getProcessEvents().get(type).getMessage());
+        }
+        return outcome;
     }
 
     protected void evaluateRules(PetriNet net, EventPhase phase) {
@@ -381,6 +402,7 @@ public class PetriNetService implements IPetriNetService {
         this.cache.remove(petriNet.getObjectId());
         // net functions must by removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);
+        historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {

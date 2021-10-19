@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.workflow.workflow.web.responsebodies.*;
+import com.netgrif.workflow.workflow.web.responsebodies.CountResponse;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedTaskResource;
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -83,10 +86,10 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LocalisedEventOutcomeResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.assign(loggedUser, taskId, locale);
     }
@@ -97,10 +100,10 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
+    public EventOutcomeWithMessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.delegate(loggedUser, taskId, delegatedId, locale);
     }
@@ -111,10 +114,10 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LocalisedEventOutcomeResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.finish(loggedUser, taskId, locale);
     }
@@ -125,10 +128,10 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LocalisedEventOutcomeResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.cancel(loggedUser, taskId, locale);
     }
@@ -171,7 +174,7 @@ public class TaskController extends AbstractTaskController {
     @Override
     @ApiOperation(value = "Get all task data", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
+    public EventOutcomeWithMessageResource getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
     }
 
@@ -181,10 +184,10 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public EventOutcomeWithMessageResource setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         return super.setData(taskId, dataBody);
     }
 
@@ -194,11 +197,10 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+    public EventOutcomeWithMessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -218,8 +220,6 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
         return super.deleteFile(taskId, fieldId);
     }
 
@@ -229,13 +229,11 @@ public class TaskController extends AbstractTaskController {
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
+    public EventOutcomeWithMessageResource saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) throws IOException {
         return super.saveFiles(taskId, fieldId, multipartFiles);
     }
 
@@ -256,7 +254,6 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.deleteNamedFile(taskId, fieldId, name);
     }
 
