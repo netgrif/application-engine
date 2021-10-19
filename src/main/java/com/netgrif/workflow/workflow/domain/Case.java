@@ -178,7 +178,7 @@ public class Case {
                     }
                     return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
                 })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
         viewRoles = filterViewRoles();
     }
