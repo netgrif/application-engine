@@ -1072,10 +1072,6 @@ public class Importer {
         return i18n.get(id);
     }
 
-    private boolean isTransitionRoleAllowed() {
-        return document.isTransitionRole() == null || document.isTransitionRole();
-    }
-
     private static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             int read;
