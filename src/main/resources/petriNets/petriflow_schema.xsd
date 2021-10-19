@@ -261,6 +261,7 @@
             <xs:enumeration value="taskRef"/>
             <xs:enumeration value="caseRef"/>
             <xs:enumeration value="filter"/>
+            <xs:enumeration value="i18n"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="scope">
@@ -629,7 +630,7 @@
     <xs:element name="init">
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="expression"/>
+                <xs:extension base="i18nStringTypeWithExpression"/>
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
