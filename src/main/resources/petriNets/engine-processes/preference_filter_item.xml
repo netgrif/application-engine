@@ -13,7 +13,7 @@
 	<!-- DATA -->
 	<data type="text" >
 		<id>menu_identifier</id>
-		<title name="menu_identifier">Identifier of menu which is this menu item part of.</title>
+		<title name="menu_identifier">Identifier of menu which is this menu entry part of.</title>
 		<init>default</init>
 	</data>
 	<data type="enumeration" immediate="true">
@@ -119,13 +119,11 @@
 
 			setDataWithPropagation(parentTask, [
 				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
-				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue]
+				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue],
 			])
-			log.info("mazem sa" + useCase.stringId)
 			async.run {
 				workflowService.deleteCase(useCase.stringId)
 			}
-			log.info("zmazana" + useCase.stringId)
 		</action>
 	</data>
 	<data type="taskRef">
@@ -363,7 +361,6 @@
 					icon: f.icon_name;
 
 					def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-					log.info("filterCase datafield value was set PFI with id: " + useCase.stringId)
 
 					change entryDefaultName value {return filterCase.title}
 

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           version="1.1.0">
-<!--           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
-<!--           xsi:schemaLocation="http://FilterTypesNamespace/FilterTypes ">-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1.0">
     <xs:include schemaLocation="filter_export_schema.xsd"/>
-
-    <!--            <xs:include namespace="http://FilterTypesNamespace/FilterTypes" schemaLocation="filter_export_schema.xsd"/>-->
     <!-- ===== MENU ===== -->
     <xs:element name="menusWithFilters">
         <xs:complexType>

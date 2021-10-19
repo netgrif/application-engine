@@ -32,8 +32,6 @@
 					return []
 				}
 			}
-<!--TODO NullPointerException kontrola-->
-		log.info("DEBUG: vola sa funkcia, hodnoty filterCaseRefu su taketo: " + referencedFiltersList.value)
 		}
 	</function>
 	<!-- DATA -->
@@ -177,42 +175,87 @@
 			change filterAutocomplete value {return ""}
 
 			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExport.createMenuExportChoices(availableEntries, cases) }
+			change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
 		</action>
 	</data>
 	<data type="file">
 		<id>export_menu_file</id>
-		<title name="export_file">Exported menu</title>
+		<title name="export_file">Exported menu file</title>
 		<placeholder name="export_file_placeholder">Exported menu file</placeholder>
-		<desc name="export_file_desc">Download exported menu file in xml format</desc>
+		<desc name="export_file_desc">Download exported file with menus in xml format.</desc>
+	</data>
+	<data type="button">
+		<id>update_available_entries_btn</id>
+		<title></title>
+		<placeholder name="update_available_entries_btn_placeholder">Update entries</placeholder>
+		<action trigger="set">
+			availableEntries: f.available_export_entries;
+
+			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
+		</action>
+	</data>
+	<data type="button">
+		<id>clear_menu_selection_btn</id>
+		<title></title>
+		<placeholder name="clear_menu_selection_btn_placeholder">Clear menu configurations</placeholder>
+		<action trigger="set">
+			menusForExport: f.menus_for_export;
+
+			change menusForExport options {[:]}
+		</action>
 	</data>
 	<data type="text">
 		<id>export_menu_name</id>
 		<title name="exported_menu_id">Exported menu identifier</title>
-		<desc name="exported_menu_id_desc">Name menu configuration for selected entries.</desc>
+		<desc name="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
+<!--		<action trigger="set">-->
+<!--			menuIdentifier: f.this,-->
+<!--			availableEntries: f.available_export_entries,-->
+<!--			addToExportBtn: f.add_to_export_btn,-->
+<!--			menusForExport: f.menus_for_export,-->
+<!--			trans: t.navigationMenuConfig;-->
+
+<!--			if (menusForExport.getOptions().containsValue(new com.netgrif.workflow.petrinet.domain.I18nString(menuIdentifier.value))) {-->
+<!--				make addToExportBtn, visible on trans when { true }-->
+<!--			}-->
+
+<!--			if (availableEntries.value.isEmpty() || menuIdentifier.value?.trim()) {-->
+<!--				make addToExportBtn, visible on trans when { true }-->
+<!--			} else {-->
+<!--				make addToExportBtn, editable on trans when { true }-->
+<!--			}-->
+<!--		</action>-->
 	</data>
 	<data type="multichoice_map">
 		<id>available_export_entries</id>
 		<title name="available_export_entries">Available entries for export</title>
 		<placeholder name="available_export_entries_placeholder">Export menu</placeholder>
-<!--		<action trigger="get">-->
-<!--		availableEntries: f.available_export_entries;-->
-<!--		def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }-->
+<!--		<action trigger="set">-->
+<!--			menuIdentifier: f.export_menu_name,-->
+<!--			availableEntries: f.this,-->
+<!--			addToExportBtn: f.add_to_export_btn;-->
+<!--			trans: t.navigationMenuConfig;-->
 
-<!--		change availableEntries options { return menuImportExport.createMenuExportChoices(availableEntries, cases) }-->
+<!--			if (availableEntries.value.isEmpty() || menuIdentifier.value.eq("")) {-->
+<!--				make addToExportBtn, visible on trans when {true}-->
+<!--			} else {-->
+<!--				make addToExportBtn, editable on trans when {true}-->
+<!--			}-->
 <!--		</action>-->
 	</data>
 	<data type="button">
 		<id>add_to_export_btn</id>
 		<title></title>
 		<placeholder name="add_to_export_placeholder">Add entries to export</placeholder>
-		<desc name="add_to_export_desc">Prepares menu with chosen name for export.</desc>
 		<action trigger="set">
 			selectedEntries: f.available_export_entries,
+			addToExportBtn: f.this,
 			menuIdentifier: f.export_menu_name,
 			menusForExport: f.menus_for_export;
 
 			change menusForExport options { return menuImportExport.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value) }
+
 			change selectedEntries value {[]}
 		</action>
 		<component>
@@ -232,16 +275,14 @@
 		<id>export_menu_btn</id>
 		<title></title>
 		<placeholder name="export_menu_btn_placeholder">Export menu</placeholder>
-		<desc name="export_menu_btn_desc">Export configured menu into downloadable xml file</desc>
 		<action trigger="set">
 			export_file: f.export_menu_file,
 			menuIdentifier: f.export_menu_name,
 			menusForExport: f.menus_for_export,
 			groupId: f.group_id;
 
-<!--			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change export_file value { menuImportExport.exportMenu(cases, menuIdentifier.value, groupId.value, export_file) }-->
 			change export_file value { menuImportExport.exportMenu(menusForExport, groupId.value, export_file) }
+			change menusForExport options {[:]}
 		</action>
 		<component>
 			<name>raised</name>
@@ -269,66 +310,19 @@
 
 			change importResults value {return ""}
 
-		def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet["parentId"].value == useCase.stringId }
-		change newEntries value { return menuImportExport.importMenu(cases, import_file.value, useCase.stringId) }
-		def actualUseCase = workflowService.findOne(useCase.stringId)
+			def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change newEntries value { return menuImportExport.importMenu(cases, import_file.value, useCase.stringId) }
+			def actualUseCase = workflowService.findOne(useCase.stringId)
 
-		actualUseCase.dataSet.entrySet().forEach{ e ->
-			useCase.dataSet[e.key].value = e.value.value
-			if(e.key == ("imported_menu_ids")) {
-				useCase.dataSet[e.key].value = newEntries.value
+			actualUseCase.dataSet.entrySet().forEach{ e ->
+				useCase.dataSet[e.key].value = e.value.value
+				if(e.key == ("imported_menu_ids")) {
+					useCase.dataSet[e.key].value = newEntries.value
+				}
 			}
-		}
-
-		log.info("DEBUG: newEntries: " + newEntries.value)
-		log.info("DEBUG: oldEntries " + menuItemsTaskRef.value)
 
 		change newIdsActionSetter value { "triggerAction" }
 		</action>
-		<!--		<action trigger="set">
-
-                    import_file: f.import_menu_file,
-                    menuItemsTaskRef: f.filter_tasks,
-                    referencedFiltersList: f.referenced_filters,
-                    groupId: f.group_id,
-                    newEntries: f.imported_menu_ids,
-                    importResults: f.import_results;
-
-                    filterTaskIds = []
-                    filterCaseIds = []
-
-                    def actualUseCase = workflowService.findOne(useCase.stringId)
-                    def entries = actualUseCase.dataSet.get("imported_menu_ids").value
-
-                    entries.forEach { itemId -&gt;
-                        log.info("DEBUG: foreach ok")
-                        def idSplit = itemId.split(',')
-
-                        def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
-                        setData(initTask, [
-                        "filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
-                        "use_icon": ["type":"boolean", "value": idSplit[2]]
-                        ])
-                        finishTask(initTask)
-
-                        def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
-
-                        filterTaskIds.add(viewTask.getStringId())
-                        filterCaseIds.add(idSplit[1])
-                        log.info("DEBUG: new IDs add ok")
-                    }
-                    log.info("DEBUG: menu items after removal: " + menuItemsTaskRef.value)
-                    log.info("DEBUG: new taskRef task ids: " + filterTaskIds.value)
-                    log.info("DEBUG: new filterCaseref case ids: " + filterCaseIds.value)
-
-                    change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
-                    change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
-                    log.info("DEBUG: menu items after add: " + menuItemsTaskRef.value)
-                    log.info("DEBUG: added task ids: " + filterTaskIds.value)
-                    log.info("DEBUG: added case ids: " + filterCaseIds.value)
-
-                    log.info("DEBUG: new items add ok")
-		</action>-->
 		<component>
 			<name>raised</name>
 		</component>
@@ -347,33 +341,10 @@
 
 			filterTaskIds = []
 			filterCaseIds = []
-			<!-- TODO skusit nenastavovat availableEntries
-			def actualCase1 = workflowService.findOne(useCase.stringId)
-			def actualCase2 =  findCase({it._id.eq(new org.bson.types.ObjectId(useCase.stringId))});
-			def newEntriesFromActualCase1 = actualCase1.dataSet["imported_menu_ids"].value
-			def newEntriesFromActualCase2 = actualCase2.dataSet.get("imported_menu_ids").value
-			log.info("DEBUG: getactualCases ok")
 
-			log.info(newEntriesFromActualCase1)
-			log.info(newEntriesFromActualCase2)
-
-			def entries = getThisGroupMenuImportIds()
--->
-
-<!--			def actualUseCase = workflowService.findOne(useCase.stringId)
-			def entries = actualUseCase.dataSet.get("imported_menu_ids").value
--->
 			newEntries.value.forEach { itemId -&gt;
-			log.info("DEBUG: foreach ok")
 			def idSplit = itemId.split(',')
-
-			log.info("DEBUG: searching for init task with these values")
-			log.info("task Id:" + idSplit[0] + ", filterCaseId: " + idSplit[1] + ", useIcon: " + idSplit[2])
-
 			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
-
-			log.info("Init task found, ID is: " + initTask.stringId)
-
 			setData(initTask, [
 			"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
 			"use_icon": ["type":"boolean", "value": idSplit[2]]
@@ -381,41 +352,17 @@
 
 			finishTask(initTask)
 
-			log.info("DEBUG: setData InitTask Ok, task finished")
-
 			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
-			log.info("DEBUG: viewTask string id:")
-			log.info(viewTask.stringId)
-
 			filterTaskIds.add(viewTask.getStringId())
 			filterCaseIds.add(idSplit[1])
-			log.info("DEBUG: new IDs add ok")
 			}
-			log.info("DEBUG: menu items after removal: " + menuItemsTaskRef.value)
-			log.info("DEBUG: new taskRef task ids: " + filterTaskIds.value)
-			log.info("DEBUG: new filterCaseref case ids: " + filterCaseIds.value)
 
 			change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
 			change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
-			log.info("DEBUG: menu items after add: " + menuItemsTaskRef.value)
-			log.info("DEBUG: added task ids: " + filterTaskIds.value)
-			log.info("DEBUG: added case ids: " + filterCaseIds.value)
 			workflowService.save(useCase)
-			<!--		if(menuItemsTaskRef.value) {
-                        change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
-                    } else {
-                        change menuItemsTaskRef value {return filterTaskIds}
-                    }
-
-                    if(referencedFiltersList.value) {
-                        change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
-                    } else {
-                        change referencedFiltersList value {return filterCaseIds}
-                    } -->
-			log.info("DEBUG: new items add ok")
 
 			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExport.createMenuExportChoices(availableEntries, cases) }
+			change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
 		</action>
 	</data>
 	<data type="caseRef">
@@ -447,11 +394,37 @@
 		<i18nString name="select_menu_item_filter">Zvoľte filter</i18nString>
 		<i18nString name="add_menu_item">Pridať ako položku menu</i18nString>
 		<i18nString name="menu_configuration">Konfigurácia menu</i18nString>
+		<i18nString name="export_file">Exportovaný súbor s menu</i18nString>
+		<i18nString name="export_file_placeholder">Exportovaný súbor s menu</i18nString>
+		<i18nString name="export_file_desc">Stiahnite exportovaný XML súbor s menu položkami.</i18nString>
+		<i18nString name="exported_menu_id">Identifikátor menu nakonfigurovaného na export</i18nString>
+		<i18nString name="exported_menu_id_desc">Unikátny názov menu pre zvolenú konfiguráciu.</i18nString>
+		<i18nString name="available_export_entries">Dostupné menu položky pre export</i18nString>
+		<i18nString name="available_export_entries_placeholder">Export menu</i18nString>
+		<i18nString name="add_to_export_placeholder">Pridať menu na export</i18nString>
+		<i18nString name="menus_for_export">Menu položky pripravené na export</i18nString>
+		<i18nString name="import_results">Výsledky importu</i18nString>
+		<i18nString name="export_menu_btn_placeholder">Exportovať menu</i18nString>
+		<i18nString name="update_available_entries_btn_placeholder">Aktualizovať dostupné položky</i18nString>
+		<i18nString name="clear_menu_selection_btn_placeholder">Zmazať vytvorené konfigurácie</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="select_menu_item_filter">Filter auswählen</i18nString>
 		<i18nString name="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
 		<i18nString name="menu_configuration">Menükonfiguration</i18nString>
+		<i18nString name="export_file">Exportierte Datei mit Menüs</i18nString>
+		<i18nString name="export_file_placeholder">Datei mit exportiertem Menü</i18nString>
+		<i18nString name="export_file_desc">Exportierte XML-Datei mit Menüs herunterladen.</i18nString>
+		<i18nString name="exported_menu_id">Name des für den Export konfigurierten Menüs</i18nString>
+		<i18nString name="exported_menu_id_desc">Eindeutiger Name des Menüs für die gewählte Konfiguration.</i18nString>
+		<i18nString name="available_export_entries">Verfügbare Menüeinträge für den Export</i18nString>
+		<i18nString name="available_export_entries_placeholder">Exportmenü</i18nString>
+		<i18nString name="add_to_export_placeholder">Menü zum Export hinzufügen</i18nString>
+		<i18nString name="menus_for_export">Me-Einträge bereit für den Export</i18nString>
+		<i18nString name="import_results">Ergebnisse importieren</i18nString>
+		<i18nString name="export_menu_btn_placeholder">Exportmenü</i18nString>
+		<i18nString name="update_available_entries_btn_placeholder">Verfügbare Menüeinträge aktualisieren</i18nString>
+		<i18nString name="clear_menu_selection_btn_placeholder">Menükonfigurationen löschen</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -547,7 +520,7 @@
 
 					def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
 
-					change availableEntries options { return menuImportExport.createMenuExportChoices(availableEntries, cases) }
+					change availableEntries options { return menuImportExport.createAvailableEntriesChoices(cases) }
 				</action>
 			</actions>
 		</event>
@@ -863,7 +836,7 @@
 					<x>0</x>
 					<y>1</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
@@ -885,12 +858,27 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>export_menu_name</id>
+				<id>update_available_entries_btn</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -908,7 +896,22 @@
 					<x>0</x>
 					<y>2</y>
 					<rows>1</rows>
-					<cols>3</cols>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>clear_menu_selection_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
