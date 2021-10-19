@@ -4,9 +4,7 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.RoleFactory
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
@@ -16,7 +14,6 @@ import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.TaskPair
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import groovy.transform.CompileStatic
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +60,18 @@ class DefaultRolePermissionsTest {
     @Value("classpath:role_permissions_default_role_shadowed.xml")
     private Resource shadowedDefaultRoleNet
 
+    @Value("classpath:role_permissions_default_role_custom.xml")
+    private Resource customDefaultRoleNet
+
+    @Value("classpath:role_permissions_default_role_negative.xml")
+    private Resource negativeDefaultRoleNet
+
+    @Value("classpath:role_permissions_default_role_combined.xml")
+    private Resource combinedDefaultRoleNet
+
+    @Value("classpath:role_permissions_default_role_missing.xml")
+    private Resource missingDefaultRoleNet
+
 
     private static final String TRANSITION_ID = 't1'
     private static final String NET_ROLE_ID = 'netRole'
@@ -100,12 +109,72 @@ class DefaultRolePermissionsTest {
         testPermissions(shadowedDefaultRoleNet, [
                 (NET_ROLE_ID): [
                         (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
                 ]
         ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
                 (NET_ROLE_ID): [
                         (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
                 ]
         ] as Map<String, Map<RolePermission, Boolean>>, true)
+    }
+
+    @Test
+    void customDefaultRole() {
+        testPermissions(customDefaultRoleNet, [
+                (DEFAULT_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (DEFAULT_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true)
+    }
+
+    @Test
+    void negativeDefaultRole() {
+        testPermissions(negativeDefaultRoleNet, [
+                (DEFAULT_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : false,
+                        (ProcessRolePermission.DELETE)  : false,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (DEFAULT_ROLE_ID): [
+                        (RolePermission.VIEW) : false,
+                        (RolePermission.DELEGATE) : false,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true)
+    }
+
+    @Test
+    void combinedDefaultRole() {
+        testPermissions(combinedDefaultRoleNet, [
+                (DEFAULT_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ],
+                (NET_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : false,
+                        (ProcessRolePermission.DELETE)  : false,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (DEFAULT_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ],
+                (NET_ROLE_ID): [
+                        (RolePermission.VIEW) : false,
+                        (RolePermission.DELEGATE) : false,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true)
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    void missingDefaultRole() {
+        importAndCreate(missingDefaultRoleNet)
     }
 
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
