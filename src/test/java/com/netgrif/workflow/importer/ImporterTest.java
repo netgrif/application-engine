@@ -8,7 +8,8 @@ import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataExc
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.utils.FullPageRequest;
-import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -68,19 +68,19 @@ public class ImporterTest {
 
     @Test
     public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
-        assert net.isPresent();
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
+        assert outcome.getNet() != null;
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
 
-        assert useCase != null;
+        assert caseOutcome.getACase() != null;
     }
 
     @Test
     public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
 
-        assert net.isPresent();
+        assert outcome.getNet() != null;
     }
 
     @Test
@@ -90,27 +90,26 @@ public class ImporterTest {
 
     @Test
     public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
 
-        assertExternalMappingImport(net);
+        assertExternalMappingImport(outcome.getNet());
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void assertExternalMappingImport(Optional<PetriNet> imported) {
-        assert imported.isPresent();
+    private void assertExternalMappingImport(PetriNet imported) {
+        assert imported != null;
 
-        PetriNet net = imported.get();
         String[] noDataTransitions = {"2", "3", "4", "36", "49"};
 
-        assert net.getPlaces().size() == 11;
-        assert net.getTransitions().size() == 11;
-        assert net.getArcs().values().stream()
+        assert imported.getPlaces().size() == 11;
+        assert imported.getTransitions().size() == 11;
+        assert imported.getArcs().values().stream()
                 .flatMap(List::stream)
                 .collect(Collectors.toList()).size() == 34;
-        assert net.getDataSet().size() == 14;
-        assert net.getRoles().size() == 2;
+        assert imported.getDataSet().size() == 14;
+        assert imported.getRoles().size() == 2;
 
-        net.getTransitions().values().forEach(transition -> {
+        imported.getTransitions().values().forEach(transition -> {
             assert !transition.getRoles().isEmpty();
             if (Arrays.stream(noDataTransitions).anyMatch(x -> x.equals(transition.getImportId()))) {
                 assert transition.getDataSet().isEmpty();

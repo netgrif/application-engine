@@ -1,9 +1,11 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
+
 import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
+import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

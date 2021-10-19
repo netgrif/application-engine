@@ -3,6 +3,7 @@ package com.netgrif.workflow.startup
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -28,20 +29,20 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        importProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
-        importProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
+        importFilterProcess("Petri net for filters", FILTER_PETRI_NET_IDENTIFIER, FILTER_FILE_NAME)
+        importFilterProcess("Petri net for filter preferences", PREFERRED_FILTER_ITEM_NET_IDENTIFIER, PREFERRED_FILTER_ITEM_FILE_NAME)
     }
 
-    Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
+    ImportPetriNetEventOutcome importFilterProcess(String message, String netIdentifier, String netFileName) {
         PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
-            return new Optional<>(filter)
+            return new ImportPetriNetEventOutcome()
         }
 
-        Optional<PetriNet> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+        ImportPetriNetEventOutcome filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
 
-        if (!filterNet.isPresent()) {
+        if (filterNet.getNet() == null) {
             log.error("Import of ${message} failed!")
         }
 

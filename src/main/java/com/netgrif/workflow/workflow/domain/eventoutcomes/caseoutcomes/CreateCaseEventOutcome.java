@@ -1,0 +1,26 @@
+package com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes;
+
+import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
+
+import java.util.List;
+
+public class CreateCaseEventOutcome extends CaseEventOutcome {
+
+    public CreateCaseEventOutcome() {
+        super();
+    }
+
+    public CreateCaseEventOutcome(Case aCase) {
+        super(aCase);
+    }
+
+    public CreateCaseEventOutcome(I18nString message, Case aCase) {
+        super(message, aCase);
+    }
+
+    public CreateCaseEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase) {
+        super(message, outcomes, aCase);
+    }
+}

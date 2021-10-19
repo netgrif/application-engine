@@ -51,8 +51,8 @@ class WorkflowServiceTest {
     @Test
     void testFindOneImmediateData() {
         def testNet = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
-        assert testNet.isPresent()
-        Case aCase = importHelper.createCase("Case 1", testNet.get())
+        assert testNet.getNet() != null
+        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
         assert aCase.getImmediateData().size() == 5
 
@@ -79,14 +79,14 @@ class WorkflowServiceTest {
     @Test
     void createCaseWithLocale() {
         def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), "major", superCreator.getLoggedSuper())
-        assert testNet.isPresent()
+        assert testNet.getNet() != null
 
-        def net = testNet.get()
-        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk'))
+        def net = testNet.getNet()
+        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getACase()
 
         assert aCase.title.equals("Slovenský preklad")
 
-        Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en'))
+        Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getACase()
 
         assert enCase.title.equals("English translation")
     }

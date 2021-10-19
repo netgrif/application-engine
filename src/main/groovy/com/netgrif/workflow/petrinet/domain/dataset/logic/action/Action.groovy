@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.petrinet.domain.events.DataEventType
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
@@ -17,17 +18,17 @@ class Action {
 
     private String definition
 
-    private ActionTrigger trigger
+    private DataEventType trigger
 
     Action(Map<String, String> fieldIds, Map<String, String> transitionIds, String definition, String trigger) {
-        this(fieldIds, transitionIds, definition, ActionTrigger.fromString(trigger))
+        this(fieldIds, transitionIds, definition, DataEventType.fromString(trigger))
     }
 
     Action(String definition, String trigger) {
-        this(new HashMap<>(), new HashMap<>(), definition, trigger)
+        this(new HashMap<String, String>(), new HashMap<String, String>(), definition, trigger)
     }
 
-    Action(Map<String, String> fieldIds, Map<String, String> transitionIds, String definition, ActionTrigger trigger) {
+    Action(Map<String, String> fieldIds, Map<String, String> transitionIds, String definition, DataEventType trigger) {
         this.definition = definition
         this.trigger = trigger
         this.fieldIds = fieldIds
@@ -38,7 +39,7 @@ class Action {
     }
 
     Action(String trigger) {
-        this.trigger = ActionTrigger.fromString(trigger)
+        this.trigger = DataEventType.fromString(trigger)
     }
 
     ObjectId getId() {
@@ -53,15 +54,15 @@ class Action {
         this.definition = definition
     }
 
-    Boolean isTriggeredBy(ActionTrigger trigger) {
+    Boolean isTriggeredBy(DataEventType trigger) {
         return this.trigger == trigger
     }
 
-    ActionTrigger getTrigger() {
+    DataEventType getTrigger() {
         return trigger;
     }
 
-    void setTrigger(ActionTrigger trigger) {
+    void setTrigger(DataEventType trigger) {
         this.trigger = trigger;
     }
 
