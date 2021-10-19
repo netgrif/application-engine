@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
-	<id>permissions_test_3</id>
-	<initials>PT3</initials>
-	<title>Permissions test 3</title>
+	<id>permissions_test_6</id>
+	<initials>PT6</initials>
+	<title>Permissions test 6</title>
 	<defaultRole>true</defaultRole>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
@@ -12,10 +12,17 @@
 	</role>
 	<!-- PROCESS ROLE REFS -->
 	<roleRef>
-		<id>netRole</id>
+		<id>default</id>
 		<caseLogic>
 			<view>true</view>
 			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>netRole</id>
+		<caseLogic>
+			<view>false</view>
+			<delete>false</delete>
 		</caseLogic>
 	</roleRef>
 	<!-- PROCESS USER REFS -->
@@ -31,10 +38,17 @@
 		</layout>
 		<label></label>
 		<roleRef>
-			<id>netRole</id>
+			<id>default</id>
 			<logic>
 				<view>true</view>
 				<delegate>true</delegate>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>netRole</id>
+			<logic>
+				<view>false</view>
+				<delegate>false</delegate>
 			</logic>
 		</roleRef>
 	</transition>
