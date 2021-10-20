@@ -23,7 +23,7 @@ public class MenuEntryRole {
     protected String roleImportId;
     @XmlElement(required = true)
     protected String netImportId;
-    @XmlAttribute(name = "authorizationType", required = true)
+    @JacksonXmlProperty(localName = "type", isAttribute = true)
     protected AuthorizationType authorizationType;
 
 }

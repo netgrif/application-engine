@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 public enum AuthorizationType {
 
     @XmlEnumValue("allowed")
-    ALLOWED("ALLOWED"),
+    allowed("allowed"),
     @XmlEnumValue("banned")
-    BANNED("BANNED");
+    banned("banned");
     private final String value;
 
     AuthorizationType(String v) {

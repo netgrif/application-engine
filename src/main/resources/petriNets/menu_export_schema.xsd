@@ -40,14 +40,14 @@
             <xs:sequence>
                 <xs:element name="roleImportId" type="xs:string"/>
                 <xs:element name="netImportId" type="xs:string"/>
-                <xs:element name="authorizationType" type="authorizationType"/>
             </xs:sequence>
+                <xs:attribute name="type" type="authorizationType"/>
         </xs:complexType>
     </xs:element>
     <xs:simpleType name="authorizationType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="ALLOWED"/>
-            <xs:enumeration value="BANNED"/>
+            <xs:enumeration value="allowed"/>
+            <xs:enumeration value="banned"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>
