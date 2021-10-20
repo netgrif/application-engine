@@ -404,7 +404,20 @@
 					<behavior>editable</behavior>
 					<action trigger="set">
 						entryName: f.entry_name,
+						filterTask: f.filter_preview,
+						filterCaseRef: f.filter_case,
 						entryDefaultName: f.entry_default_name;
+
+						<!--def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseId.value))});
+						def filterTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
+						-->
+						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseRef.value[0]))})
+						filterCase.setTitle(entryDefaultName.value)
+						workflowService.save(filterCase)
+						def filterTask = findTask({ it._id.eq(filterTask.value[0])})
+						setData(filterTask, [
+						"new_title": ["type":"text", "value": entryDefaultName.value]
+						])
 
 						change entryName value {return new com.netgrif.workflow.petrinet.domain.I18nString(entryDefaultName.value)}
 					</action>
@@ -626,6 +639,14 @@
 				<id>icon_name</id>
 				<logic>
 					<behavior>editable</behavior>
+					<action trigger="set">
+						iconIdentifier: f.icon_name,
+						filterCaseId: f.filter_case;
+
+						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseId.value[0]))})
+						filterCase.setIcon(iconIdentifier.value)
+						workflowService.save(filterCase)
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
