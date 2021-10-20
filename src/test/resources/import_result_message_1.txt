@@ -1,0 +1,12 @@
+
+IMPORTING MENU "defaultMenu":
+
+Menu entry "My cases": OK
+
+Menu entry "All cases": OK
+
+IMPORTING MENU "newMenu":
+
+Menu entry "All tasks": OK
+
+Menu entry "My tasks": OK
