@@ -1,4 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document [
+		<!ELEMENT document (id|version|initials|title|icon|defaultRole|transitionRole|function|data|i18n|transition|place|arc)*>
+		<!ATTLIST document
+				xmlns:xsi CDATA #REQUIRED
+				xsi:noNamespaceSchemaLocation CDATA #REQUIRED>
+		<!ELEMENT id (#PCDATA)>
+		<!ELEMENT version (#PCDATA)>
+		<!ELEMENT initials (#PCDATA)>
+		<!ELEMENT title (#PCDATA)>
+		<!ATTLIST title
+				name CDATA #IMPLIED>
+		<!ELEMENT icon (#PCDATA)>
+		<!ELEMENT defaultRole (#PCDATA)>
+		<!ELEMENT transitionRole (#PCDATA)>
+		<!ELEMENT function (#PCDATA)>
+		<!ATTLIST function
+				scope CDATA #REQUIRED
+				name CDATA #REQUIRED>
+		<!ELEMENT data (id|title|placeholder|desc|action|view|options|init|valid|component|values|allowedNets)*>
+		<!ATTLIST data
+				type CDATA #REQUIRED>
+		<!ELEMENT placeholder (#PCDATA)>
+		<!ATTLIST placeholder
+				name CDATA #IMPLIED>
+		<!ELEMENT desc (#PCDATA)>
+		<!ATTLIST desc
+				name CDATA #IMPLIED>
+		<!ELEMENT action (#PCDATA)>
+		<!ATTLIST action
+				trigger CDATA #IMPLIED>
+		<!ELEMENT view (list)*>
+		<!ELEMENT list (#PCDATA)>
+		<!ELEMENT options (option)*>
+		<!ELEMENT option (#PCDATA)>
+		<!ATTLIST option
+				key CDATA #REQUIRED
+				name CDATA #REQUIRED>
+		<!ELEMENT init (#PCDATA)>
+		<!ELEMENT valid (#PCDATA)>
+		<!ELEMENT component (name)*>
+		<!ELEMENT name (#PCDATA)>
+		<!ELEMENT values (#PCDATA)>
+		<!ELEMENT allowedNets (allowedNet)*>
+		<!ELEMENT allowedNet (#PCDATA)>
+		<!ELEMENT i18n (i18nString)*>
+		<!ATTLIST i18n
+				locale CDATA #REQUIRED>
+		<!ELEMENT i18nString (#PCDATA)>
+		<!ATTLIST i18nString
+				name CDATA #REQUIRED>
+		<!ELEMENT transition (id|x|y|layout|label|assignPolicy|dataGroup|event)*>
+		<!ELEMENT x (#PCDATA)>
+		<!ELEMENT y (#PCDATA)>
+		<!ELEMENT layout (offset|x|y|rows|cols|template|appearance)*>
+		<!ELEMENT offset (#PCDATA)>
+		<!ELEMENT label (#PCDATA)>
+		<!ATTLIST label
+				name CDATA #IMPLIED>
+		<!ELEMENT assignPolicy (#PCDATA)>
+		<!ELEMENT dataGroup (id|layout|dataRef)*>
+		<!ELEMENT dataRef (id|logic|layout)*>
+		<!ELEMENT logic (behavior)*>
+		<!ELEMENT behavior (#PCDATA)>
+		<!ELEMENT rows (#PCDATA)>
+		<!ELEMENT cols (#PCDATA)>
+		<!ELEMENT template (#PCDATA)>
+		<!ELEMENT appearance (#PCDATA)>
+		<!ELEMENT event (id|actions)*>
+		<!ATTLIST event
+				type CDATA #REQUIRED>
+		<!ELEMENT actions (action)*>
+		<!ATTLIST actions
+				phase CDATA #REQUIRED>
+		<!ELEMENT place (id|x|y|label|tokens|static)*>
+		<!ELEMENT tokens (#PCDATA)>
+		<!ELEMENT static (#PCDATA)>
+		<!ELEMENT arc (id|type|sourceId|destinationId|multiplicity)*>
+		<!ELEMENT type (#PCDATA)>
+		<!ELEMENT sourceId (#PCDATA)>
+		<!ELEMENT destinationId (#PCDATA)>
+		<!ELEMENT multiplicity (#PCDATA)>
+		]>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
 	<id>org_group</id>
 	<version>1.0.0</version>
@@ -181,8 +263,8 @@
 	<data type="file">
 		<id>export_menu_file</id>
 		<title name="export_file">Exported menu file</title>
-		<placeholder name="export_file_placeholder">Exported menu file</placeholder>
-		<desc name="export_file_desc">Download exported file with menus in xml format.</desc>
+		<placeholder name="export_file_placeholder">Your XML file with menus</placeholder>
+		<desc name="export_file_desc">Download exported file with menus in XML format.</desc>
 	</data>
 	<data type="button">
 		<id>update_available_entries_btn</id>
@@ -209,40 +291,11 @@
 		<id>export_menu_name</id>
 		<title name="exported_menu_id">Exported menu identifier</title>
 		<desc name="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
-<!--		<action trigger="set">-->
-<!--			menuIdentifier: f.this,-->
-<!--			availableEntries: f.available_export_entries,-->
-<!--			addToExportBtn: f.add_to_export_btn,-->
-<!--			menusForExport: f.menus_for_export,-->
-<!--			trans: t.navigationMenuConfig;-->
-
-<!--			if (menusForExport.getOptions().containsValue(new com.netgrif.workflow.petrinet.domain.I18nString(menuIdentifier.value))) {-->
-<!--				make addToExportBtn, visible on trans when { true }-->
-<!--			}-->
-
-<!--			if (availableEntries.value.isEmpty() || menuIdentifier.value?.trim()) {-->
-<!--				make addToExportBtn, visible on trans when { true }-->
-<!--			} else {-->
-<!--				make addToExportBtn, editable on trans when { true }-->
-<!--			}-->
-<!--		</action>-->
 	</data>
 	<data type="multichoice_map">
 		<id>available_export_entries</id>
 		<title name="available_export_entries">Available entries for export</title>
 		<placeholder name="available_export_entries_placeholder">Export menu</placeholder>
-<!--		<action trigger="set">-->
-<!--			menuIdentifier: f.export_menu_name,-->
-<!--			availableEntries: f.this,-->
-<!--			addToExportBtn: f.add_to_export_btn;-->
-<!--			trans: t.navigationMenuConfig;-->
-
-<!--			if (availableEntries.value.isEmpty() || menuIdentifier.value.eq("")) {-->
-<!--				make addToExportBtn, visible on trans when {true}-->
-<!--			} else {-->
-<!--				make addToExportBtn, editable on trans when {true}-->
-<!--			}-->
-<!--		</action>-->
 	</data>
 	<data type="button">
 		<id>add_to_export_btn</id>
@@ -298,7 +351,7 @@
 		<id>import_menu_btn</id>
 		<title></title>
 		<placeholder name="import_menu_btn_placeholder">Import menu</placeholder>
-		<desc name="import_menu_btn_desc">Import menu from provided xml file</desc>
+		<desc name="import_menu_btn_desc">Import menu from provided XML file</desc>
 		<action trigger="set">
 			import_file: f.import_menu_file,
 			menuItemsTaskRef: f.filter_tasks,
@@ -395,8 +448,8 @@
 		<i18nString name="add_menu_item">Pridať ako položku menu</i18nString>
 		<i18nString name="menu_configuration">Konfigurácia menu</i18nString>
 		<i18nString name="export_file">Exportovaný súbor s menu</i18nString>
-		<i18nString name="export_file_placeholder">Exportovaný súbor s menu</i18nString>
 		<i18nString name="export_file_desc">Stiahnite exportovaný XML súbor s menu položkami.</i18nString>
+		<i18nString name="export_file_placeholder">Váš XML súbor s vybranou menu konfiguráciou.</i18nString>
 		<i18nString name="exported_menu_id">Identifikátor menu nakonfigurovaného na export</i18nString>
 		<i18nString name="exported_menu_id_desc">Unikátny názov menu pre zvolenú konfiguráciu.</i18nString>
 		<i18nString name="available_export_entries">Dostupné menu položky pre export</i18nString>
@@ -413,16 +466,16 @@
 		<i18nString name="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
 		<i18nString name="menu_configuration">Menükonfiguration</i18nString>
 		<i18nString name="export_file">Exportierte Datei mit Menüs</i18nString>
-		<i18nString name="export_file_placeholder">Datei mit exportiertem Menü</i18nString>
 		<i18nString name="export_file_desc">Exportierte XML-Datei mit Menüs herunterladen.</i18nString>
+		<i18nString name="export_file_placeholder">Ihre XML-Datei mit Menüs</i18nString>
 		<i18nString name="exported_menu_id">Name des für den Export konfigurierten Menüs</i18nString>
 		<i18nString name="exported_menu_id_desc">Eindeutiger Name des Menüs für die gewählte Konfiguration.</i18nString>
 		<i18nString name="available_export_entries">Verfügbare Menüeinträge für den Export</i18nString>
-		<i18nString name="available_export_entries_placeholder">Exportmenü</i18nString>
+		<i18nString name="available_export_entries_placeholder">Menü exportieren</i18nString>
 		<i18nString name="add_to_export_placeholder">Menü zum Export hinzufügen</i18nString>
 		<i18nString name="menus_for_export">Me-Einträge bereit für den Export</i18nString>
-		<i18nString name="import_results">Ergebnisse importieren</i18nString>
-		<i18nString name="export_menu_btn_placeholder">Exportmenü</i18nString>
+		<i18nString name="import_results">Import Ergebnisse</i18nString>
+		<i18nString name="export_menu_btn_placeholder">Menü exportieren</i18nString>
 		<i18nString name="update_available_entries_btn_placeholder">Verfügbare Menüeinträge aktualisieren</i18nString>
 		<i18nString name="clear_menu_selection_btn_placeholder">Menükonfigurationen löschen</i18nString>
 	</i18n>

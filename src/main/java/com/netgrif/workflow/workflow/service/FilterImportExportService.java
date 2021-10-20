@@ -20,6 +20,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.startup.ImportHelper;
+import com.netgrif.workflow.utils.InputStreamToString;
 import com.netgrif.workflow.workflow.domain.*;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
@@ -28,7 +29,9 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -268,7 +271,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
-        String importedFilter = inputStreamToString(new FileInputStream(f));
+        String importedFilter = InputStreamToString.inputStreamToString(new FileInputStream(f));
         SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
         return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
@@ -314,17 +317,6 @@ public class FilterImportExportService implements IFilterImportExportService {
             }
         });
         return exportFilter;
-    }
-
-    private String inputStreamToString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-        br.close();
-        return sb.toString();
     }
 
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {
