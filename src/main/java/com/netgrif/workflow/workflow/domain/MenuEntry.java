@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.netgrif.workflow.petrinet.domain.I18nString;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,8 +20,6 @@ public class MenuEntry {
 
     @XmlElement(required = true)
     protected String entryName;
-//    @XmlElement
-//    protected String iconIdentifier;
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "entryRole")
     protected List<MenuEntryRole> menuEntryRoleList;
