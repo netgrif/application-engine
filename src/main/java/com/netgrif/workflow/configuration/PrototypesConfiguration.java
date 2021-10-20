@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Scope;
 public class PrototypesConfiguration {
 
     @Bean("importer")
-    @Primary
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public Importer importer() {
         return new Importer();

@@ -85,24 +85,19 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="transition">
-        <xs:complexType>
+    <xs:element name="transition" type="transition">
+        <xs:unique name="dataGroupUniqueId">
+            <xs:selector xpath="./dataGroup"/>
+            <xs:field xpath="id"/>
+        </xs:unique>
+    </xs:element>
+        <xs:complexType name="transition">
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="x"/>
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
-                <xs:element name="layout" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element ref="cols" minOccurs="0"/>
-                            <xs:element ref="rows" minOccurs="0"/>
-                            <xs:element ref="offset" minOccurs="0"/>
-                            <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
-                        </xs:sequence>
-                        <xs:attribute name="type" type="layoutType"/>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element name="layout" minOccurs="0" type="layout-transition"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
@@ -118,11 +113,15 @@
                 <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
-        <xs:unique name="dataGroupUniqueId">
-            <xs:selector xpath="./dataGroup"/>
-            <xs:field xpath="id"/>
-        </xs:unique>
-    </xs:element>
+        <xs:complexType name="layout-transition">
+            <xs:sequence>
+                <xs:element ref="cols" minOccurs="0"/>
+                <xs:element ref="rows" minOccurs="0"/>
+                <xs:element ref="offset" minOccurs="0"/>
+                <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="type" type="layoutType"/>
+        </xs:complexType>
     <xs:element name="place">
         <xs:complexType>
             <xs:sequence>
