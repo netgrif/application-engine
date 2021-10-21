@@ -306,9 +306,9 @@
 		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
 		<i18nString name="roles_available">Dostupné roly</i18nString>
 		<i18nString name="allowed_roles">Povolené roly</i18nString>
-		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam videť.</i18nString>
+		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam vidieť.</i18nString>
 		<i18nString name="banned_roles">Zakázané roly</i18nString>
-		<i18nString name="banned_roles_desc">Zoznam rolí ktorým bude upravovaný menu záznam skrytý.</i18nString>
+		<i18nString name="banned_roles_desc">Zoznam rolí pre ktoré bude upravovaný menu záznam skrytý.</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -408,9 +408,6 @@
 						filterCaseRef: f.filter_case,
 						entryDefaultName: f.entry_default_name;
 
-						<!--def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseId.value))});
-						def filterTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
-						-->
 						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseRef.value[0]))})
 						filterCase.setTitle(entryDefaultName.value)
 						workflowService.save(filterCase)
