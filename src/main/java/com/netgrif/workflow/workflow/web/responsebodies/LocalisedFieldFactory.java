@@ -99,6 +99,8 @@ public class LocalisedFieldFactory {
     }
 
     public static LocalisedField fromI18n(I18nField field, Locale locale) {
-        return new LocalisedI18nField(field, locale);
+        return field.getComponent() != null && field.getComponent().getName() != null && field.getComponent().getName().equals("divider") ?
+                new LocalisedI18nStringField(field, locale) :
+                new LocalisedI18nField(field, locale);
     }
 }
