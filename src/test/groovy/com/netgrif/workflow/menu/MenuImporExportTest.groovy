@@ -41,9 +41,8 @@ class MenuImporExportTest {
     public static final String DUMMY_USER_PASSWORD = "password"
     public static final String DUMMY_USER_GROUP_TITLE = "Dummy User"
 
-    private static final String MORTGAGE_NET_FILE = "mortgage_net.xml"
+    private static final String TEST_NET = "mortgage_net.xml"
     private static final String TEST_XML_FILE_PATH = "src/test/resources/menu_file_test.xml"
-    private static final String TEST_RESULTS_FILE_PATH = "src/test/resources/import_result_message_1.txt"
 
     private static final String GROUP_NAV_TASK = "navigationMenuConfig"
     private static final String IMPORT_FILE_FIELD = "import_menu_file"
@@ -56,6 +55,18 @@ class MenuImporExportTest {
     private static final String IMPORTED_IDS_FIELD = "imported_menu_ids"
     private static final String MENU_NAME_FIELD = "menu_identifier"
 
+    private static final String EXPECTED_RESULTS = "\n" +
+            "IMPORTING MENU \"defaultMenu\":\n" +
+            "\n" +
+            "Menu entry \"My cases\": OK\n" +
+            "\n" +
+            "Menu entry \"All cases\": OK\n" +
+            "\n" +
+            "IMPORTING MENU \"defaultMenu\":\n" +
+            "\n" +
+            "Menu entry \"All tasks\": OK\n" +
+            "\n" +
+            "Menu entry \"My tasks\": OK\n"
 
     @Autowired
     IMenuImportExportService menuImportExportService
@@ -114,8 +125,8 @@ class MenuImporExportTest {
         userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
-        def mortgageNet = importHelper.createNet(MORTGAGE_NET_FILE)
-        assert mortgageNet.isPresent()
+        def testNet = importHelper.createNet(TEST_NET)
+        assert testNet.isPresent()
 
         Optional<Case> caseOptional = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE));
         assert caseOptional.isPresent()
@@ -139,8 +150,7 @@ class MenuImporExportTest {
         groupCase = caseOpt.get()
 
         String importResults = groupCase.getDataField(IMPORT_RESULTS_FIELD).getValue().toString()
-        File testImportResults = new File(TEST_RESULTS_FILE_PATH);
-        assert importResults <=> testImportResults.text
+        assert importResults <=> EXPECTED_RESULTS
 
         ArrayList<String> imported_ids_list = groupCase.getDataSet().get(IMPORTED_IDS_FIELD).getValue() as ArrayList<String>
         assert imported_ids_list.size() == 4
