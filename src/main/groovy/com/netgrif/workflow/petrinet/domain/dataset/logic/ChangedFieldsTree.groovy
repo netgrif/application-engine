@@ -2,13 +2,27 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic
 
 import com.netgrif.workflow.workflow.domain.Task
 import com.querydsl.core.annotations.QueryExclude
+import lombok.Getter
+import lombok.Setter
 
 @QueryExclude
 class ChangedFieldsTree extends CaseChangedFields {
 
+    @Getter
+    @Setter
     private String taskId
+
+    @Getter
+    @Setter
     private String transitionId
+
+    @Getter
+    @Setter
     private Map<String, CaseChangedFields> propagatedChanges = new HashMap<>()
+
+    ChangedFieldsTree() {
+        super()
+    }
 
     ChangedFieldsTree(String caseId, String taskId, String transitionId) {
         super(caseId)
