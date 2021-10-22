@@ -11,6 +11,11 @@
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
+	<data type="text" >
+		<id>menu_identifier</id>
+		<title name="menu_identifier">Identifier of menu which is this menu entry part of.</title>
+		<init>default</init>
+	</data>
 	<data type="enumeration" immediate="true">
 		<id>entry_name</id>
 		<title></title>
@@ -114,9 +119,8 @@
 
 			setDataWithPropagation(parentTask, [
 				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
-				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue]
+				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue],
 			])
-
 			async.run {
 				workflowService.deleteCase(useCase.stringId)
 			}
@@ -234,8 +238,7 @@
 			change processesAvailable value {null}
 		</action>
 	</data>
-
-	<data type="enumeration_map">
+	<data type="enumeration_map" immediate="true">
 		<id>processes_available</id>
 		<title name="available_processes">Your processes</title>
 		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
@@ -303,9 +306,9 @@
 		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
 		<i18nString name="roles_available">Dostupné roly</i18nString>
 		<i18nString name="allowed_roles">Povolené roly</i18nString>
-		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam videť.</i18nString>
+		<i18nString name="allowed_roles_desc">Zoznam rolí ktoré budú upravovaný menu záznam vidieť.</i18nString>
 		<i18nString name="banned_roles">Zakázané roly</i18nString>
-		<i18nString name="banned_roles_desc">Zoznam rolí ktorým bude upravovaný menu záznam skrytý.</i18nString>
+		<i18nString name="banned_roles_desc">Zoznam rolí pre ktoré bude upravovaný menu záznam skrytý.</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -401,7 +404,17 @@
 					<behavior>editable</behavior>
 					<action trigger="set">
 						entryName: f.entry_name,
+						filterTask: f.filter_preview,
+						filterCaseRef: f.filter_case,
 						entryDefaultName: f.entry_default_name;
+
+						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseRef.value[0]))})
+						filterCase.setTitle(entryDefaultName.value)
+						workflowService.save(filterCase)
+						def filterTask = findTask({ it._id.eq(filterTask.value[0])})
+						setData(filterTask, [
+						"new_title": ["type":"text", "value": entryDefaultName.value]
+						])
 
 						change entryName value {return new com.netgrif.workflow.petrinet.domain.I18nString(entryDefaultName.value)}
 					</action>
@@ -623,6 +636,14 @@
 				<id>icon_name</id>
 				<logic>
 					<behavior>editable</behavior>
+					<action trigger="set">
+						iconIdentifier: f.icon_name,
+						filterCaseId: f.filter_case;
+
+						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseId.value[0]))})
+						filterCase.setIcon(iconIdentifier.value)
+						workflowService.save(filterCase)
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
