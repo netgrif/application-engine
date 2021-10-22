@@ -4,14 +4,13 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
     <!-- ===== DOCUMENT ELEMENTS ===== -->
-    <xs:element name="transaction">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="id"/>
-                <xs:element ref="title"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="transaction" type="transaction"/>
+    <xs:complexType name="transaction">
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="title"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:element name="data">
         <xs:complexType>
             <xs:sequence>

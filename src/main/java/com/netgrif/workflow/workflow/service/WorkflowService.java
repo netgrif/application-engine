@@ -61,45 +61,45 @@ public class WorkflowService implements IWorkflowService {
     private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Autowired
-    private CaseRepository repository;
+    protected CaseRepository repository;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
 
     @Autowired
-    private ITaskService taskService;
+    protected ITaskService taskService;
 
     @Autowired
-    private CaseSearchService searchService;
+    protected CaseSearchService searchService;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private EncryptionService encryptionService;
+    protected EncryptionService encryptionService;
 
     @Autowired
-    private FieldFactory fieldFactory;
+    protected FieldFactory fieldFactory;
 
     @Autowired
-    private IRuleEngine ruleEngine;
+    protected IRuleEngine ruleEngine;
 
     @Autowired
-    private FieldActionsRunner actionsRunner;
+    protected FieldActionsRunner actionsRunner;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
     @Autowired
-    private IElasticCaseMappingService caseMappingService;
+    protected IElasticCaseMappingService caseMappingService;
 
-    private IElasticCaseService elasticCaseService;
+    protected IElasticCaseService elasticCaseService;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -396,7 +396,7 @@ public class WorkflowService implements IWorkflowService {
         return fields;
     }
 
-    private void resolveTaskRefs(Case useCase) {
+    protected void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
@@ -436,7 +436,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setImmediateData(immediateData);
     }
 
-    private Page<Case> setImmediateDataFields(Page<Case> cases) {
+    protected Page<Case> setImmediateDataFields(Page<Case> cases) {
         cases.getContent().forEach(this::setImmediateDataFields);
         return cases;
     }

@@ -105,6 +105,9 @@ class ChangedField {
         String taskId
         String transition
 
+        TaskPair() {
+        }
+
         TaskPair(String taskId, String transition) {
             this.taskId = taskId
             this.transition = transition
