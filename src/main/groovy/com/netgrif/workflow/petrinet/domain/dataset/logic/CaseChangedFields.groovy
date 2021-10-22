@@ -5,6 +5,9 @@ class CaseChangedFields {
     protected String caseId
     protected Map<String, ChangedField> changedFields = new HashMap<>()
 
+    CaseChangedFields() {
+    }
+
     CaseChangedFields(String caseId) {
         this.caseId = caseId
     }

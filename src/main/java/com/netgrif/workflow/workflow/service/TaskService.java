@@ -58,37 +58,37 @@ public class TaskService implements ITaskService {
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private TaskRepository taskRepository;
+    protected TaskRepository taskRepository;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
 
     @Autowired
-    private TaskSearchService searchService;
+    protected TaskSearchService searchService;
 
     @Autowired
     @Qualifier("taskScheduler")
-    private TaskScheduler scheduler;
+    protected TaskScheduler scheduler;
 
     @Autowired
-    private IWorkflowService workflowService;
+    protected IWorkflowService workflowService;
 
     @Autowired
-    private IDataService dataService;
+    protected IDataService dataService;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    protected IProcessRoleService processRoleService;
 
     @Autowired
-    private IElasticTaskMappingService taskMappingService;
+    protected IElasticTaskMappingService taskMappingService;
 
-    private IElasticTaskService elasticTaskService;
+    protected IElasticTaskService elasticTaskService;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
