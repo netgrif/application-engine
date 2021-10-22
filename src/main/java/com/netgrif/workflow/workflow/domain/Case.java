@@ -220,7 +220,7 @@ public class Case {
     private void populateDataSetBehavior() {
         petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
             transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
-                getDataSet().get(dataKey).addBehavior(transitionKey, dataValue.getBehavior());
+                getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
             });
         });
     }
