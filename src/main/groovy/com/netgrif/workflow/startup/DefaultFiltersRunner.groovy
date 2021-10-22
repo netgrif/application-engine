@@ -2,10 +2,9 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -13,7 +12,6 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Slf4j
@@ -29,6 +27,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private static final String FILTER_I18N_TITLE_FIELD_ID = "i18n_filter_name"
     private static final String GERMAN_ISO_3166_CODE = "de"
     private static final String SLOVAK_ISO_3166_CODE = "sk"
+    private static final String IS_IMPORTED = "is_imported"
 
     private static final String FILTER_TYPE_CASE = "Case"
     private static final String FILTER_TYPE_TASK = "Task"
@@ -45,14 +44,14 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private IUserService userService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Override
     void run(String... args) throws Exception {
-        createCaseFilter("All cases", "assignment", "", FILTER_VISIBILITY_PUBLIC, "", [], [
+        createCaseFilter("All cases", "assignment","", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
         ], [
@@ -97,7 +96,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
      * @param inheritBaseAllowedNets whether the base allowed nets should be merged with the allowed nets specified in the filter field
      * @return an empty Optional if the filter process does not exist. An existing filter process instance if a filter process instance with the same name already exists. A new filter process instance if not.
      */
-    public Optional<Case> createCaseFilter(
+    Optional<Case> createCaseFilter(
             String title,
             String icon,
             String filterOriginViewId,
@@ -107,9 +106,10 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             Map<String, Object> filterMetadata,
             Map<String, String> titleTranslations,
             boolean withDefaultCategories = true,
-            boolean inheritBaseAllowedNets = true
+            boolean inheritBaseAllowedNets = true,
+            boolean isImported = false
     ) {
-        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories, inheritBaseAllowedNets)
+        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories, inheritBaseAllowedNets, isImported)
     }
 
     /**
@@ -126,7 +126,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
      * @param inheritBaseAllowedNets whether the base allowed nets should be merged with the allowed nets specified in the filter field
      * @return an empty Optional if the filter process does not exist. An existing filter process instance if a filter process instance with the same name already exists. A new filter process instance if not.
      */
-    public Optional<Case> createTaskFilter(
+    Optional<Case> createTaskFilter(
             String title,
             String icon,
             String filterOriginViewId,
@@ -136,9 +136,10 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             Map<String, Object> filterMetadata,
             Map<String, String> titleTranslations,
             boolean withDefaultCategories = true,
-            boolean inheritBaseAllowedNets = true
+            boolean inheritBaseAllowedNets = true,
+            boolean isImported = false
     ) {
-        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories, inheritBaseAllowedNets)
+        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories, inheritBaseAllowedNets, isImported)
     }
 
     private Optional<Case> createFilter(
@@ -152,7 +153,8 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             Map<String, Object> filterMetadata,
             Map<String, String> titleTranslations,
             boolean withDefaultCategories,
-            boolean inheritBaseAllowedNets
+            boolean inheritBaseAllowedNets,
+            boolean isImported = false
     ) {
         return createFilter(
                 title,
@@ -163,7 +165,8 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                 filterQuery,
                 allowedNets,
                 filterMetadata << ["filterType": filterType, "defaultSearchCategories": withDefaultCategories, "inheritAllowedNets": inheritBaseAllowedNets],
-                titleTranslations
+                titleTranslations,
+                isImported
         )
     }
 
@@ -176,7 +179,8 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
-            Map<String, String> titleTranslations
+            Map<String, String> titleTranslations,
+            boolean isImported = false
     ) {
         PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
@@ -184,11 +188,6 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         }
 
         def systemUser = this.userService.getLoggedOrSystem()
-
-        def existingFilter = this.workflowService.search(QCase.case$.processIdentifier.eq("filter") & QCase.case$.author.id.eq(systemUser.getId()) & QCase.case$.title.eq(title), PageRequest.of(0, 1))
-        if (existingFilter.totalElements == 1) {
-            return Optional.of(existingFilter.getContent()[0])
-        }
 
         Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, systemUser.transformToLoggedUser())
         filterCase.setIcon(icon)
@@ -215,6 +214,14 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                     "filterMetadata": filterMetadata
             ]
         ]))
+        if (isImported) {
+            this.dataService.setData(newFilterTask, ImportHelper.populateDataset([
+                    (IS_IMPORTED): [
+                            "type": "number",
+                            "value": 1
+                    ]
+            ]))
+        }
 
         I18nString translatedTitle = new I18nString(title)
         titleTranslations.forEach({locale, translation -> translatedTitle.addTranslation(locale, translation)})
