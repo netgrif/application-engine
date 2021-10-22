@@ -235,7 +235,8 @@ public class MenuImportExportService implements IMenuImportExportService {
                                 bannedRoles.put(roleImportId + ":" + netImportId, new I18nString(role.get().getName() + "(" + net.getTitle() + ")"));
                             }
                         } else {
-                            resultMessage.append("\n- Role with import ID \"").append(roleImportId).append("\" ").append("is not present in currently uploaded net \"").append(netImportId).append("\"\n");
+                            resultMessage.append("\n- Role with import ID \"").append(roleImportId).append("\" ").append("does not exist in the latest present version of net \"").append(netImportId).append("\"\n");
+                            netCheck.set(false);
                         }
                     }
                 }
