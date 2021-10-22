@@ -209,6 +209,17 @@
 		<id>export_menu_name</id>
 		<title name="exported_menu_id">Exported menu identifier</title>
 		<desc name="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
+		<action trigger="set">
+			addToExportBtn: f.add_to_export_btn,
+			exportMenuName: f.this,
+			trans: t.navigationMenuConfig;
+
+			if (exportMenuName.value == "") {
+				make addToExportBtn, visible on trans when {true}
+			} else {
+				make addToExportBtn, editable on trans when {true}
+			}
+		</action>
 	</data>
 	<data type="multichoice_map">
 		<id>available_export_entries</id>
@@ -816,7 +827,7 @@
 			<dataRef>
 				<id>add_to_export_btn</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>3</x>
