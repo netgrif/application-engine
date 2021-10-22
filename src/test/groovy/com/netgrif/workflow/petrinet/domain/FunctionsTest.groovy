@@ -21,6 +21,8 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
@@ -118,52 +120,55 @@ class FunctionsTest {
     }
 
     @Test
-    @Disabled("expected = NullPointerException.class TODO:")
     void testNamespaceFunctionException() {
-        def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
-        if (nets) {
-            nets.each {
-                petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(NullPointerException.class, () -> {
+            def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
+            if (nets) {
+                nets.each {
+                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                }
             }
-        }
 
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+            assert functionTestNet.isPresent()
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+            Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+        })
     }
 
     @Test
-    @Disabled("expected = NullPointerException.class")
     void testNewNetVersionMissingMethodException() {
-        def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
-        if (nets) {
-            nets.each {
-                petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(NullPointerException.class, () -> {
+            def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
+            if (nets) {
+                nets.each {
+                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                }
             }
-        }
 
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+            assert functionTestNet.isPresent()
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+            Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
 
-        functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+            functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+            assert functionTestNet.isPresent()
 
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+        })
     }
 
     @Test
-    @Disabled("expected = MissingMethodException.class")
     void testProcessFunctionException() {
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+        assertThrows(MissingMethodException.class, () -> {
+            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+            assert functionTestNet.isPresent()
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number3": ["value": "20", "type": "number"]]))
+            Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number3": ["value": "20", "type": "number"]]))
+        })
     }
 
     @Test
@@ -190,9 +195,10 @@ class FunctionsTest {
     }
 
     @Test
-    @Disabled("expected = IllegalArgumentException.class")
     void testNamespaceMethodOverloadingFail() {
-        petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        })
     }
 
     @Test
@@ -201,9 +207,10 @@ class FunctionsTest {
     }
 
     @Test
-    @Disabled("expected = IllegalArgumentException.class")
     void testProcessMethodOverloadingFail() {
-        petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        })
     }
 
     @Test
