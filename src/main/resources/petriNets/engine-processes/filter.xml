@@ -123,6 +123,10 @@
         <id>filter_case_id</id>
         <title></title>
     </data>
+    <data type="text">
+        <id>menu_identifier</id>
+        <title></title>
+    </data>
     <data type="button">
         <id>and_me</id>
         <placeholder name="and">AND</placeholder>
@@ -554,6 +558,27 @@
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        name: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
+                    </action>
+                </logic>
+<!--                <layout>-->
+<!--                    <x>0</x>-->
+<!--                    <y>0</y>-->
+<!--                    <rows>1</rows>-->
+<!--                    <cols>1</cols>-->
+<!--                    <offset>0</offset>-->
+<!--                    <template>material</template>-->
+<!--                    <appearance>outline</appearance>-->
+<!--                </layout>-->
             </dataRef>
         </dataGroup>
         <dataGroup>
