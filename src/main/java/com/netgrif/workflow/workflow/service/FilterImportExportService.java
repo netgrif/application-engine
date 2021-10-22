@@ -20,6 +20,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.startup.ImportHelper;
+import com.netgrif.workflow.utils.InputStreamToString;
 import com.netgrif.workflow.workflow.domain.*;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
@@ -28,7 +29,9 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,15 +126,35 @@ public class FilterImportExportService implements IFilterImportExportService {
      * Method which performs import of filters from uploaded xml file.
      * Method firstly loads xml file from file field and validates it against xml schema for filters
      * export located on path: filter_export_schema.xml
-     * If the file is correct, method creates filter cases and
+     * If the file is correct, method calls performImport method which
+     * creates filter cases
      * @return List<String> - list of task ids of imported filter cases in - import_filter transition
      * @throws IOException - if imported file is not found
      * @throws IllegalFilterFileException - if uploaded xml is not in correct xml format and invalidate against schema
      */
     @Override
     public List<String> importFilters() throws IOException, IllegalFilterFileException {
+
         log.info("Importing filters");
         FilterImportExportList filterList = loadFromXML();
+        return performImport(filterList);
+
+    }
+
+    /**
+     * Method which performs import of filters from already created filter import class instances
+     * passed in as parameter.
+     * @param filterList - instance of class FilterImportExportList
+     * @return List<String> - list of task ids of imported filter cases in - import_filter transition
+     * @throws IOException - if imported file is not found
+     */
+    @Override
+    public List<String> importFilters (FilterImportExportList filterList) throws IOException {
+        log.info("Importing filters from imported menu");
+        return performImport(filterList);
+    }
+
+    private List<String> performImport (FilterImportExportList filterList) throws IOException {
         List<String> importedFiltersIds = new ArrayList<>();
 
         if (filterList == null) {
@@ -248,7 +271,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
-        String importedFilter = inputStreamToString(new FileInputStream(f));
+        String importedFilter = InputStreamToString.inputStreamToString(new FileInputStream(f));
         SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
         return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
@@ -273,7 +296,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         return new FileFieldValue(filterProperties.getFileName(), filePath);
     }
 
-    private FilterImportExport createExportClass(Case filter) {
+    public FilterImportExport createExportClass(Case filter) {
         FilterImportExport exportFilter = new FilterImportExport();
         exportFilter.setIcon(filter.getIcon());
         filter.getImmediateData().forEach(immediateData -> {
@@ -294,17 +317,6 @@ public class FilterImportExportService implements IFilterImportExportService {
             }
         });
         return exportFilter;
-    }
-
-    private String inputStreamToString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-        br.close();
-        return sb.toString();
     }
 
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {

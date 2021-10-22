@@ -121,6 +121,9 @@ class ActionDelegate {
     IConfigurableMenuService configurableMenuService
 
     @Autowired
+    IMenuImportExportService menuImportExportService
+
+    @Autowired
     IFilterImportExportService filterImportExportService
 
     /**
