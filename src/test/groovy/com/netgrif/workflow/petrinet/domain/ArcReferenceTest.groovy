@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @SuppressWarnings("GroovyAssignabilityCheck")
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -45,8 +47,9 @@ class ArcReferenceTest {
     }
 
     @Test
-    @Disabled("expected = IllegalArgumentException.class TODO:")
     void testInvalidReference() {
-        importer.importPetriNet(stream(NET_INVALID_FILE)).get()
+        assertThrows(IllegalArgumentException.class, () -> {
+            importer.importPetriNet(stream(NET_INVALID_FILE)).get()
+        });
     }
 }
