@@ -4,8 +4,9 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
+import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.FinisherRunner
 import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
@@ -26,7 +27,7 @@ class TestHelper {
     @Autowired
     private ProcessRoleRepository roleRepository
     @Autowired
-    private IProcessRoleService roleService
+    private ProcessRoleService roleService
     @Autowired
     private SystemUserRunner systemUserRunner
     @Autowired
