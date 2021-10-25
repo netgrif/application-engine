@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class TaskSearchRequest {
     public List<String> title;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<Long> user;
+    public List<String> user;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<PetriNet> process;
@@ -39,6 +38,6 @@ public class TaskSearchRequest {
     public List<String> group;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<Long> users;
+    public List<String> users;
 
 }

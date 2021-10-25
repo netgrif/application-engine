@@ -3,18 +3,17 @@ package com.netgrif.workflow.startup
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.auth.domain.*
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.service.IGroupService
-import com.netgrif.workflow.orgstructure.service.IMemberService
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
@@ -58,9 +57,6 @@ class ImportHelper {
     private CaseRepository caseRepository
 
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-
-    @Autowired
     private IAuthorityService authorityService
 
     @Autowired
@@ -75,14 +71,8 @@ class ImportHelper {
     @Autowired
     private IFilterService filterService
 
-    @Autowired
+    @Autowired(required = false)
     private SuperCreator superCreator
-
-    @Autowired
-    private IGroupService groupService
-
-    @Autowired
-    private IMemberService memberService
 
     @Autowired
     private IDataService dataService
@@ -90,23 +80,11 @@ class ImportHelper {
     @Autowired
     private IWorkflowService workflowService
 
+    @Autowired
+    private INextGroupService groupService;
+
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, Group> createGroups(Map<String, String> groups) {
-        HashMap<String, Group> groupsMap = new HashMap<>()
-        groups.each { groupEntry ->
-            groupsMap.put(groupEntry.key, createGroup(groupEntry.value))
-        }
-
-        log.info("Created ${groupsMap.size()} groups")
-        return groupsMap
-    }
-
-    Group createGroup(String name) {
-        log.info("Creating Group $name")
-        return groupService.save(new Group(name))
-    }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {
@@ -140,16 +118,16 @@ class ImportHelper {
         }
         return Optional.of(petriNet)
     }
-
-    UserProcessRole createUserProcessRole(PetriNet net, String name) {
-        UserProcessRole role = userProcessRoleRepository.save(new UserProcessRole(roleId:
+/*
+    ProcessRole createUserProcessRole(PetriNet net, String name) {
+        ProcessRole role = userProcessRoleRepository.save(new ProcessRole(roleId:
                 net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
         log.info("Created user process role $name")
         return role
     }
 
-    Map<String, UserProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
-        HashMap<String, UserProcessRole> userRoles = new HashMap<>()
+    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
+        HashMap<String, ProcessRole> userRoles = new HashMap<>()
         roles.each { it ->
             userRoles.put(it.key, createUserProcessRole(net, it.value))
         }
@@ -158,19 +136,18 @@ class ImportHelper {
         return userRoles
     }
 
-    Map<String, UserProcessRole> getProcessRoles(PetriNet net) {
-        List<UserProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
-        Map<String, UserProcessRole> map = [:]
+    Map<String, ProcessRole> getProcessRoles(PetriNet net) {
+        List<ProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
+        Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
         }
         return map
     }
-
-    User createUser(User user, Authority[] authorities, Group[] orgs, UserProcessRole[] roles) {
+*/
+    IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
-        user.groups = orgs as Set
         user.state = UserState.ACTIVE
         user = userService.saveNew(user)
         log.info("User $user.name $user.surname created")
@@ -218,7 +195,7 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String, String>> data) {
         ObjectNode dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }
@@ -231,7 +208,7 @@ class ImportHelper {
         return dataService.getData(getTaskId(taskTitle, caseId))
     }
 
-    void updateSuperUser(){
+    void updateSuperUser() {
         superCreator.setAllToSuperUser();
     }
 

@@ -35,7 +35,7 @@ public class ForwardConfiguration {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public String handle404Error(){
+    public String handle404Error() {
         log.info("No requested mapping found. Forwarding to index");
         return "forward:/";
     }

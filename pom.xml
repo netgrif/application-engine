@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>5.6.3</version>
+    <version>6.0.0</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -14,17 +14,21 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.9.RELEASE</version>
+        <version>2.4.9</version>
         <relativePath/>
     </parent>
 
     <properties>
+        <elasticsearch.version>7.6.2</elasticsearch.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
+        <junit-jupiter.version>5.8.1</junit-jupiter.version>
+        <java.version>11</java.version>
+        <groovy.version>3.0.4</groovy.version>
         <jasypt.version>1.9.2</jasypt.version>
-        <querydsl.version>4.2.1</querydsl.version>
-        <drools.version>7.36.1.Final</drools.version>
+        <querydsl.version>4.3.1</querydsl.version>
+        <drools.version>7.55.0.Final</drools.version>
+<!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>netgrif_nae-backend</sonar.projectKey>
@@ -36,7 +40,6 @@
     </properties>
 
     <dependencies>
-
         <!-- Batch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -124,32 +127,50 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
-        <!-- SQL -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.3</version>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Neo4j -->
+        <!-- Test -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-ogm-http-driver</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Groovy -->
+        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.15</version>
+            <version>2.5.14</version>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy.modules.http-builder</groupId>
@@ -191,6 +212,18 @@
             <version>1.10.3</version>
         </dependency>
 
+        <!--SWAGGER -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <!-- QueryDSL -->
         <dependency>
             <groupId>com.querydsl</groupId>
@@ -203,11 +236,7 @@
             <artifactId>querydsl-mongodb</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-jpa</artifactId>
-            <version>${querydsl.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-core</artifactId>
@@ -216,14 +245,13 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
-            <version>2.1.3.RELEASE</version>
         </dependency>
 
         <!-- QR code -->
         <dependency>
             <groupId>com.github.kenglxn.qrgen</groupId>
             <artifactId>javase</artifactId>
-            <version>2.5.0</version>
+            <version>2.6.0</version>
         </dependency>
 
         <!-- ElasticSearch -->
@@ -231,10 +259,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <scope>runtime</scope>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.17.3</version>
         </dependency>
 
         <!-- Drools -->
@@ -257,6 +292,57 @@
             <groupId>org.drools</groupId>
             <artifactId>drools-canonical-model</artifactId>
             <version>${drools.version}</version>
+        </dependency>
+
+        <!-- keycloak admin -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>12.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>3.9.1.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+            <version>3.9.1.Final</version>
+        </dependency>
+
+        <!-- QRGen -->
+        <dependency>
+            <groupId>net.glxn.qrgen</groupId>
+            <artifactId>core</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <!-- Oauth -->
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>2.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            <version>2.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>2.3.5.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <!-- LDAP -->
@@ -283,6 +369,11 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>2.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.novemberain</groupId>
+            <artifactId>quartz-mongodb</artifactId>
+            <version>2.2.0-rc2</version>
         </dependency>
 
         <!-- Dev tools -->
@@ -312,6 +403,7 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session</artifactId>
             <version>2.0.0.M2</version>
+<!--                        <version>1.3.5.RELEASE</version>-->
         </dependency>
 
         <dependency>
@@ -320,31 +412,18 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- For Coniguration Properties -->
+        <!-- For Configuration Properties -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.16.Final</version>
         </dependency>
-
         <!--DOCS-->
-        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.8.0</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
-<!--        <dependency>-->
-<!--            <groupId>io.springfox</groupId>-->
-<!--            <artifactId>springfox-swagger-ui</artifactId>-->
-<!--            <version>2.8.0</version>-->
-<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-bean-validators</artifactId>
-            <version>2.8.0</version>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
@@ -359,7 +438,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+                <!--<filtering>true</filtering>-->
             </resource>
         </resources>
         <plugins>
@@ -376,9 +455,22 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.6.1</version>
+                <version>1.12.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -410,7 +502,6 @@
                         <configuration>
                             <outputDirectory>target/generated-sources/java</outputDirectory>
                             <processors>
-                                <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                                 <processor>
                                     org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
                                 </processor>
@@ -434,25 +525,25 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <doclint>none</doclint>
-                </configuration>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <id>attach-javadocs</id>-->
+            <!--                        <goals>-->
+            <!--                            <goal>jar</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <doclint>none</doclint>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.5.0</version>
                 <executions>
                     <execution>
                         <id>xjc_pos</id>
@@ -511,6 +602,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.3.2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>5.8.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
             </plugin>
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>

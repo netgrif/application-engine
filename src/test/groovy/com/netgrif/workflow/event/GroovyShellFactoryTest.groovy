@@ -4,20 +4,18 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
@@ -25,7 +23,7 @@ import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -35,7 +33,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class GroovyShellFactoryTest {
@@ -66,7 +64,7 @@ class GroovyShellFactoryTest {
     private PetriNet net
 
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
 
@@ -85,8 +83,7 @@ class GroovyShellFactoryTest {
         def auths = importHelper.createAuthorities(["systemAdmin": Authority.systemAdmin])
         importHelper.createUser(new User(name: "Admin", surname: "User", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("systemAdmin")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         def adminAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
@@ -119,9 +116,9 @@ class GroovyShellFactoryTest {
         def roles = roleService.findAll(net.getStringId())
         assert roles.size() == 1
         roleService.assignRolesToUser(
-                user.getId(),
+                user.getStringId(),
                 new HashSet<String>(roles.collect({it.getStringId()})),
-                new LoggedUser(-1, "a", "", [])
+                new LoggedUser("", "a", "", [])
         )
         user = userService.findByEmail(userService.getSystem().getEmail(), false)
         assert user.processRoles.size() == processRoleCount + 1

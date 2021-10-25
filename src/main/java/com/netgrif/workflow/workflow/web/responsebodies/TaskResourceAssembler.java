@@ -1,11 +1,11 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.workflow.domain.Task;
-import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
 
 import java.util.Locale;
 
-public class TaskResourceAssembler implements ResourceAssembler<Task, LocalisedTaskResource> {
+public class TaskResourceAssembler implements RepresentationModelAssembler<Task, LocalisedTaskResource> {
 
     private Locale locale;
 
@@ -14,7 +14,7 @@ public class TaskResourceAssembler implements ResourceAssembler<Task, LocalisedT
     }
 
     @Override
-    public LocalisedTaskResource toResource(com.netgrif.workflow.workflow.domain.Task task) {
+    public LocalisedTaskResource toModel(com.netgrif.workflow.workflow.domain.Task task) {
         return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 }

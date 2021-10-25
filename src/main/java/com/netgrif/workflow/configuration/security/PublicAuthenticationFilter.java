@@ -60,7 +60,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void authenticate(HttpServletRequest request, String jwtToken){
+    private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 UserProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousRole),
@@ -99,7 +99,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         LoggedUser loggedUser = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
-            User user = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
+            IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"), false);
             if (user != null)
                 loggedUser = user.transformToLoggedUser();
         }
@@ -111,7 +111,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private LoggedUser createAnonymousUser(HttpServletRequest request) {
         String hash = new ObjectId().toString();
 
-        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
+        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findAnonymousByEmail(hash + "@nae.com", false);
 
         if (anonymousUser == null) {
             anonymousUser = new AnonymousUser(hash + "@anonymous.nae",

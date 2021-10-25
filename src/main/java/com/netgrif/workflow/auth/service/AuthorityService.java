@@ -50,10 +50,10 @@ public class AuthorityService implements IAuthorityService {
         return repository.findAllByNameStartsWith(Authority.ROLE);
     }
 
-    public Authority getOne(Long id){
+    public Authority getOne(String id) {
         Optional<Authority> authority = repository.findById(id);
         if (!authority.isPresent())
-            throw new IllegalArgumentException("Could not find authority with id ["+id+"]");
+            throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
         return authority.get();
     }
 }

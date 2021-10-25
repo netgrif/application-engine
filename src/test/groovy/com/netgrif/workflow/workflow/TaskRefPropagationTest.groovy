@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow
 
 import com.netgrif.workflow.petrinet.domain.DataGroup
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -12,15 +13,15 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class TaskRefPropagationTest {
@@ -46,10 +47,10 @@ class TaskRefPropagationTest {
     PetriNet netParent
     PetriNet netChild
 
-    @Before
+    @BeforeEach
     void beforeAll() {
-        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), "major", superCreator.getLoggedSuper())
-        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), "major", superCreator.getLoggedSuper())
+        def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert parent.isPresent()
         assert child.isPresent()
@@ -161,7 +162,7 @@ class TaskRefPropagationTest {
         container = changed.flatten()
 
         parent = workflowService.findOne(parent.stringId)
-        assert parent.dataSet[PARENT_FIELD_MULTICHOICE_ID].choices.collect {it as String }.sort() == choices
+        assert parent.dataSet[PARENT_FIELD_MULTICHOICE_ID].choices.collect { it as String }.sort() == choices
         assert parent.dataSet[PARENT_FIELD_MULTICHOICE_SETTER_ID].value == setterValue
 
         assert (container.changedFields[parentMultichoice.stringId].get("choices") as List).collect { it as String }.sort() == choices
@@ -180,9 +181,9 @@ class TaskRefPropagationTest {
     }
 
     LocalisedField findField(List<DataGroup> dataGroups, String fieldTitle) {
-        def fieldDataGroup = dataGroups.find {it -> it.fields.find( {field -> (field.name == fieldTitle) }) != null}
+        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
         assert fieldDataGroup != null
-        LocalisedField field = fieldDataGroup.fields.find( { field -> (field.name == fieldTitle) }) as LocalisedField
+        LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
     }

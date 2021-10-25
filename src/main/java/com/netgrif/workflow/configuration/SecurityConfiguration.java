@@ -43,7 +43,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnExpression("!${server.security.static.enabled} && !${nae.ldap.enabled}")
+@ConditionalOnExpression("!${nae.oauth.enabled} && !${server.security.static.enabled} && !${nae.ldap.enabled}")
 public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -87,7 +87,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOrigin("*");
+        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -121,7 +121,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
@@ -167,13 +167,13 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
-                    authenticationManager(),
-                    new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                    authority,
-                    this.serverPatterns,
-                    this.anonymousExceptions,
-                    this.jwtService,
-                    this.userService
-                );
+                authenticationManager(),
+                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                authority,
+                this.serverPatterns,
+                this.anonymousExceptions,
+                this.jwtService,
+                this.userService
+        );
     }
 }

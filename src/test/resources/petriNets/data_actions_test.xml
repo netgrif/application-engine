@@ -19,7 +19,7 @@
                     <!-- @formatter:off -->
                     field: f.control_field;
                     change field value {
-                        field.value + ";get-pre"
+                    field.value + ";get-pre"
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -29,7 +29,7 @@
                     <!-- @formatter:off -->
                     field: f.control_field;
                     change field value {
-                        field.value + ";get-post"
+                    field.value + ";get-post"
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -42,7 +42,7 @@
                     <!-- @formatter:off -->
                     field: f.control_field;
                     change field value {
-                        field.value + ";set-pre"
+                    field.value + ";set-pre"
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -52,7 +52,7 @@
                     <!-- @formatter:off -->
                     field: f.control_field;
                     change field value {
-                        field.value + ";set-post"
+                    field.value + ";set-post"
                     }
                     <!-- @formatter:on -->
                 </action>

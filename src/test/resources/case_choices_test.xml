@@ -21,9 +21,9 @@
             enume: f.enum,
             check: f.this;
             change enume choices {
-                if (check.value)
-                    return ["Choice 1","Choice 2","Choice 3"]
-                return ["Choice A","Choice B","Choice C"]
+            if (check.value)
+            return ["Choice 1","Choice 2","Choice 3"]
+            return ["Choice A","Choice B","Choice C"]
             }
             <!-- @formatter:on -->
         </action>
