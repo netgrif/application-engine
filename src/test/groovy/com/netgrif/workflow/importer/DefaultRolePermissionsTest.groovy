@@ -172,9 +172,14 @@ class DefaultRolePermissionsTest {
         ] as Map<String, Map<RolePermission, Boolean>>, true)
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test()
     void missingDefaultRole() {
-        importAndCreate(missingDefaultRoleNet)
+        testPermissions(missingDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (DEFAULT_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, false)
     }
 
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
