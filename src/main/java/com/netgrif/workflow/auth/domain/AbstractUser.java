@@ -47,8 +47,7 @@ public abstract class AbstractUser implements IUser {
     }
 
     public void removeProcessRole(ProcessRole role) {
-        Optional<ProcessRole> processRoleOptional = processRoles.stream().filter(r -> r.getStringId().equals(role.getStringId())).findFirst();
-        processRoleOptional.ifPresent(processRole -> processRoles.remove(processRole));
+        processRoles.remove(role);
     }
 
     public void addGroup(String groupId) {
