@@ -18,6 +18,8 @@ import org.springframework.data.domain.Page
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @AutoConfigureMockMvc
@@ -78,15 +80,17 @@ class RemoteUserResourceTest {
     }
 
     @Test
-    @Disabled("expected = IllegalArgumentException.class")
     void testGroupExceptionMembers() {
-        remoteGroupResourceService.members("INVALID_ID")
+        assertThrows(IllegalArgumentException.class, () -> {
+            remoteGroupResourceService.members("INVALID_ID")
+        })
     }
 
     @Test
-    @Disabled("expected = IllegalArgumentException.class")
     void testGroupExceptionGroupsOfUser() {
-        remoteGroupResourceService.groupsOfUser("INVALID_ID")
+        assertThrows(IllegalArgumentException.class, () -> {
+            remoteGroupResourceService.groupsOfUser("INVALID_ID")
+        })
     }
 
     @Test
