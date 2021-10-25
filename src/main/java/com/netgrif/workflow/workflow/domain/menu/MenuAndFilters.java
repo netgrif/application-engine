@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain;
+package com.netgrif.workflow.workflow.domain.menu;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -10,7 +10,6 @@ import lombok.Data;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
