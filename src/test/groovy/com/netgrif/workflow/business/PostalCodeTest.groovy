@@ -1,15 +1,15 @@
 package com.netgrif.workflow.business
 
 import com.netgrif.workflow.startup.PostalCodeImporter
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 @SuppressWarnings("GrMethodMayBeStatic")
@@ -23,7 +23,7 @@ class PostalCodeTest {
     @Autowired
     private PostalCodeImporter importer
 
-    @Before
+    @BeforeEach
     void before() {
         if (setup)
             return
@@ -45,7 +45,7 @@ class PostalCodeTest {
 
     @Test
     void multipleMatchTest() {
-        def psc = "900 42"
+        def psc = "851 10"
 
         List<PostalCode> cities = service.findAllByCode(psc)
 
@@ -61,6 +61,6 @@ class PostalCodeTest {
     private assertMultipleMatch(List<PostalCode> cities) {
         assert cities != null
         assert cities.size() > 1
-        assert cities.find { it.city == "Alžbetin Dvor" }
+        assert cities.find { it.city == "Bratislava - Čunovo" }
     }
 }

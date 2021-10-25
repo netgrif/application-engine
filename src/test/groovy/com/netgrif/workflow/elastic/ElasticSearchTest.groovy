@@ -4,33 +4,32 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -42,7 +41,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -62,9 +61,6 @@ class ElasticSearchTest {
     private static final String SEARCH_URL = "/api/workflow/case/search"
 
     @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
     private WebApplicationContext wac
 
     @Autowired
@@ -77,7 +73,10 @@ class ElasticSearchTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private ElasticsearchTemplate template
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private ElasticsearchRestTemplate template
 
     @Autowired
     private SuperCreator superCreator
@@ -90,7 +89,7 @@ class ElasticSearchTest {
     private String netId, netId2
     private Map testCases
 
-    @Before
+    @BeforeEach
     void before() {
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
@@ -107,13 +106,12 @@ class ElasticSearchTest {
         netId = net.get().getStringId()
         netId2 = net2.get().getStringId()
 
-        def org = importHelper.createGroup("Test")
+//        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = importHelper.getProcessRoles(net.get())
+//        def processRoles = importHelper.getProcessRoles(net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [org] as Group[],
-                [processRoles.get("process_role")] as UserProcessRole[])
+                [net.get().roles.values().find { it.importId == "process_role" }] as ProcessRole[])
 
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net.get() : net2.get())
@@ -134,10 +132,10 @@ class ElasticSearchTest {
                 "searchByAuthorId"          : [
                         "json": JsonOutput.toJson([
                                 "author": [
-                                        "id": superCreator.superUser.id
+                                        "id": superCreator.superUser.stringId
                                 ]
                         ]),
-                        "size": 10
+                        "size": 11
                 ],
                 "searchByAuthorName"        : [
                         "json": JsonOutput.toJson([
@@ -145,7 +143,7 @@ class ElasticSearchTest {
                                         "name": superCreator.superUser.fullName
                                 ]
                         ]),
-                        "size": 10
+                        "size": 11
                 ],
                 "searchByAuthorEmail"       : [
                         "json": JsonOutput.toJson([
@@ -153,7 +151,7 @@ class ElasticSearchTest {
                                         "email": superCreator.superUser.email
                                 ]
                         ]),
-                        "size": 10
+                        "size": 11
                 ],
                 "searchByEnumeration"       : [
                         "json": JsonOutput.toJson([

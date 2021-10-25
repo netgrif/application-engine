@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
+
 import com.netgrif.workflow.event.IGroovyShellFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.context.RoleContext

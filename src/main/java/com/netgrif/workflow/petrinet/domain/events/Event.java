@@ -1,4 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.events;
+
 import lombok.Data;
 
 @Data

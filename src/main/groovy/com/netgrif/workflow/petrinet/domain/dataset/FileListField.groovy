@@ -37,7 +37,7 @@ class FileListField extends Field<FileListFieldValue> {
         this.setDefaultValue(FileListFieldValue.fromString(defaultValue))
     }
 
-    void setDefaultValue(List<String> defaultValues){
+    void setDefaultValue(List<String> defaultValues) {
         this.setDefaultValue(FileListFieldValue.fromList(defaultValues))
     }
 
@@ -60,7 +60,7 @@ class FileListField extends Field<FileListFieldValue> {
      */
     String getFilePath(String caseId, String name) {
         if (this.remote) {
-            FileFieldValue first = this.getValue().getNamesPaths().find({ namePath -> namePath.name == name})
+            FileFieldValue first = this.getValue().getNamesPaths().find({ namePath -> namePath.name == name })
             return first != null ? first.path : null
         }
         return FileListFieldValue.getPath(caseId, getStringId(), name)
