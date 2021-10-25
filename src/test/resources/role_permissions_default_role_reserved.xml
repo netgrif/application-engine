@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>permissions_test_8</id>
+	<initials>PT8</initials>
+	<title>Permissions test 8</title>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<role>
+		<id>default</id>
+		<title>Net role</title>
+	</role>
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>608</x>
+		<y>296</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>

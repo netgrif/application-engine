@@ -72,6 +72,9 @@ class DefaultRolePermissionsTest {
     @Value("classpath:role_permissions_default_role_missing.xml")
     private Resource missingDefaultRoleNet
 
+    @Value("classpath:role_permissions_default_role_reserved.xml")
+    private Resource reservedDefaultRoleNet
+
 
     private static final String TRANSITION_ID = 't1'
     private static final String NET_ROLE_ID = 'netRole'
@@ -180,6 +183,11 @@ class DefaultRolePermissionsTest {
                         (RolePermission.DELEGATE) : true,
                 ]
         ] as Map<String, Map<RolePermission, Boolean>>, false)
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    void reservedDefaultRole() {
+        importAndCreate(reservedDefaultRoleNet)
     }
 
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
