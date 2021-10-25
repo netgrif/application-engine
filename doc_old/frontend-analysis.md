@@ -1,4 +1,4 @@
-# Classes
+ Classes
 
 # Cases
 Class representing case (instance) of process
