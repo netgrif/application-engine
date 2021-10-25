@@ -175,7 +175,9 @@ public class PetriNet extends PetriNetObject {
         }
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
+    }
 
     public void addFunction(Function function) { functions.add(function); }
 

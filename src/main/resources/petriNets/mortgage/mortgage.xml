@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>mortgage</id>
     <initials>MOR</initials>
     <title>Mortgage</title>
@@ -29,20 +29,21 @@
         <placeholder>Pridaj</placeholder>
         <action trigger="set">
             task_personal_information: f.personal_information;
-            def personal = createCase("personal_information", "${useCase.title} - Personal information" as String, "color-fg-amber-500")
+            def personal = createCase("personal_information", "${useCase.title} - Personal information" as String,
+            "color-fg-amber-500")
             def list = (task_personal_information.value as List)
             list.addAll([personal.tasks.first().task])
             change task_personal_information value { list }
         </action>
     </data>
-	<data type="taskRef">
-		<id>personal_information</id>
-		<title>personal_information</title>
-	</data>
     <data type="taskRef">
-		<id>address_and_mortgage</id>
-		<title>address_and_mortgage</title>
-	</data>
+        <id>personal_information</id>
+        <title>personal_information</title>
+    </data>
+    <data type="taskRef">
+        <id>address_and_mortgage</id>
+        <title>address_and_mortgage</title>
+    </data>
     <data type="taskRef">
         <id>financial_data</id>
         <title>financial_data</title>
@@ -96,22 +97,22 @@
         <values>Kooperativa</values>
         <init>Union</init>
     </data>
-	<i18n locale="sk">
-		<i18nString name="first_name">Meno</i18nString>
-		<i18nString name="fn_placeholder">Vaše meno</i18nString>
-		<i18nString name="fn_desc">Napíšte krstné meno</i18nString>
-		<i18nString name="surname">Priezvisko</i18nString>
+    <i18n locale="sk">
+        <i18nString name="first_name">Meno</i18nString>
+        <i18nString name="fn_placeholder">Vaše meno</i18nString>
+        <i18nString name="fn_desc">Napíšte krstné meno</i18nString>
+        <i18nString name="surname">Priezvisko</i18nString>
         <i18nString name="dg_personal_information">Osobné údaje</i18nString>
         <i18nString name="dg_address">Adresa a typ nehnuteľnosti</i18nString>
         <i18nString name="dg_financial_data">Finančné údaje</i18nString>
         <i18nString name="task_apply_for_mortgage">Požiadať o hypotéku / Klient</i18nString>
-	</i18n>
-	<i18n locale="en">
-		<i18nString name="first_name">Name</i18nString>
-		<i18nString name="fn_placeholder">Your name</i18nString>
-		<i18nString name="fn_desc">Enter first name</i18nString>
-		<i18nString name="surname">Surname</i18nString>
-	</i18n>
+    </i18n>
+    <i18n locale="en">
+        <i18nString name="first_name">Name</i18nString>
+        <i18nString name="fn_placeholder">Your name</i18nString>
+        <i18nString name="fn_desc">Enter first name</i18nString>
+        <i18nString name="surname">Surname</i18nString>
+    </i18n>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -176,7 +177,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return "Mortgage Applied";
+                    return "Mortgage Applied";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -203,7 +204,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return "Mortgage Pre-approved";
+                    return "Mortgage Pre-approved";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -213,7 +214,7 @@
     <transition>
         <id>14</id>
         <x>380</x>
-		<y>300</y>
+        <y>300</y>
         <label>Reject / Loan officer</label>
         <priority>2</priority>
         <assignPolicy>auto</assignPolicy>
@@ -230,7 +231,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return "Mortgage Rejected";
+                    return "Mortgage Rejected";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -239,7 +240,7 @@
     </transition>
     <transition>
         <id>39</id>
-		<x>620</x>
+        <x>620</x>
         <y>140</y>
         <label>Appraisal report / Property appraiser</label>
         <assignPolicy>auto</assignPolicy>
@@ -277,17 +278,17 @@
                     def asked = financial_data["loan_amount"]
                     def approvement = (valued.value >= asked.value);
                     if (approvement) {
-                        change decision value { "Mortgage Accepted" }
-                        async.run {
-                            assignTask("ok")
-                            finishTask("ok")
-                        }
+                    change decision value { "Mortgage Accepted" }
+                    async.run {
+                    assignTask("ok")
+                    finishTask("ok")
+                    }
                     } else {
-                        change decision value { "Mortgage Rejected" }
-                        async.run {
-                            assignTask("ko")
-                            finishTask("ko")
-                        }
+                    change decision value { "Mortgage Rejected" }
+                    async.run {
+                    assignTask("ko")
+                    finishTask("ko")
+                    }
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -368,7 +369,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return decision.value + " and Inscription Confirmed";
+                    return decision.value + " and Inscription Confirmed";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -407,7 +408,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return "Mortgage signed";
+                    return "Mortgage signed";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -441,7 +442,7 @@
                     decision: f.status,
                     insurance: f.insurance;
                     change decision value {
-                        return decision.value + " and Insurance Signed in " + insurance.value;
+                    return decision.value + " and Insurance Signed in " + insurance.value;
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -466,13 +467,13 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-<!--        TODO:-->
-<!--        <dataRef>-->
-<!--            <id></id>-->
-<!--            <logic>-->
-<!--                <behavior>visible</behavior>-->
-<!--            </logic>-->
-<!--        </dataRef>-->
+        <!--        TODO:-->
+        <!--        <dataRef>-->
+        <!--            <id></id>-->
+        <!--            <logic>-->
+        <!--                <behavior>visible</behavior>-->
+        <!--            </logic>-->
+        <!--        </dataRef>-->
         <event type="finish">
             <id>78_finish</id>
             <actions phase="pre">
@@ -480,7 +481,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return decision.value + " and Money sended";
+                    return decision.value + " and Money sended";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -538,8 +539,8 @@
     </transition>
     <transition>
         <id>263</id>
-		<x>940</x>
-		<y>380</y>
+        <x>940</x>
+        <y>380</y>
         <label>Delete / Client</label>
         <dataRef>
             <id>delete_instruction</id>
@@ -548,24 +549,24 @@
             </logic>
         </dataRef>
         <event type="finish">
-			<id>263_finish</id>
+            <id>263_finish</id>
             <actions phase="pre">
                 <action>
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return "Application deleted by client";
+                    return "Application deleted by client";
                     }
                     <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
     </transition>
-	<transition>
-		<id>288</id>
-		<x>140</x>
-		<y>60</y>
-		<label>Constructor / System</label>
+    <transition>
+        <id>288</id>
+        <x>140</x>
+        <y>60</y>
+        <label>Constructor / System</label>
         <trigger type="auto"/>
         <event type="finish">
             <id>288_finish</id>
@@ -576,142 +577,144 @@
                     task_address_and_mortgage: f.address_and_mortgage,
                     task_financial_data: f.financial_data;
 
-                    def personal = createCase("personal_information", "${useCase.title} - Personal information" as String, "color-fg-amber-500")
+                    def personal = createCase("personal_information", "${useCase.title} - Personal information" as
+                    String, "color-fg-amber-500")
                     change task_personal_information value {
-                        [personal.tasks.first().task]
+                    [personal.tasks.first().task]
                     }
 
                     def address = createCase("address", "${useCase.title} - Address" as String, "color-fg-green-500")
                     change task_address_and_mortgage value {
-                        [address.tasks.first().task]
+                    [address.tasks.first().task]
                     }
 
-                    def financial_data = createCase("financial_data", "${useCase.title} - Financial data" as String, "color-fg-red-500")
+                    def financial_data = createCase("financial_data", "${useCase.title} - Financial data" as String,
+                    "color-fg-red-500")
                     change task_financial_data value {
-                        [financial_data.tasks.first().task]
+                    [financial_data.tasks.first().task]
                     }
                     <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
-	</transition>
-	<transition>
-		<id>ko</id>
-		<x>780</x>
-		<y>220</y>
-		<label>Reject / System</label>
-	</transition>
-	<transition>
-		<id>ok</id>
-		<x>780</x>
-		<y>140</y>
-		<label>Approve / System</label>
-	</transition>
-	<!-- PLACES -->
-	<place>
-		<id>2</id>
-		<x>20</x>
-		<y>140</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>11</id>
-		<x>260</x>
-		<y>140</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>16</id>
-		<x>860</x>
-		<y>300</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>20</id>
-		<x>500</x>
-		<y>140</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>41</id>
-		<x>860</x>
-		<y>140</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>67</id>
-		<x>1060</x>
-		<y>60</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>70</id>
-		<x>1060</x>
-		<y>220</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>74</id>
-		<x>1380</x>
-		<y>60</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>75</id>
-		<x>1380</x>
-		<y>220</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>156</id>
-		<x>260</x>
-		<y>380</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>204</id>
-		<x>260</x>
-		<y>60</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>289</id>
-		<x>20</x>
-		<y>60</y>
-		<label>IN</label>
-		<tokens>1</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>316</id>
-		<x>700</x>
-		<y>140</y>
-		<label> </label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
+    </transition>
+    <transition>
+        <id>ko</id>
+        <x>780</x>
+        <y>220</y>
+        <label>Reject / System</label>
+    </transition>
+    <transition>
+        <id>ok</id>
+        <x>780</x>
+        <y>140</y>
+        <label>Approve / System</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>2</id>
+        <x>20</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>11</id>
+        <x>260</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>16</id>
+        <x>860</x>
+        <y>300</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>20</id>
+        <x>500</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>41</id>
+        <x>860</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>67</id>
+        <x>1060</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>70</id>
+        <x>1060</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>74</id>
+        <x>1380</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>75</id>
+        <x>1380</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>156</id>
+        <x>260</x>
+        <y>380</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>204</id>
+        <x>260</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>289</id>
+        <x>20</x>
+        <y>60</y>
+        <label>IN</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>316</id>
+        <x>700</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
     <!-- ARCS -->
     <arc>
         <id>3</id>
@@ -865,55 +868,55 @@
         <type>regular</type>
         <sourceId>16</sourceId>
         <destinationId>263</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>290</id>
-		<type>regular</type>
-		<sourceId>289</sourceId>
-		<destinationId>288</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>291</id>
-		<type>regular</type>
-		<sourceId>288</sourceId>
-		<destinationId>2</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>319</id>
-		<type>regular</type>
-		<sourceId>39</sourceId>
-		<destinationId>316</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>320</id>
-		<type>regular</type>
-		<sourceId>316</sourceId>
-		<destinationId>ok</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>321</id>
-		<type>regular</type>
-		<sourceId>ok</sourceId>
-		<destinationId>41</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>322</id>
-		<type>regular</type>
-		<sourceId>316</sourceId>
-		<destinationId>ko</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>323</id>
-		<type>regular</type>
-		<sourceId>ko</sourceId>
-		<destinationId>16</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>290</id>
+        <type>regular</type>
+        <sourceId>289</sourceId>
+        <destinationId>288</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>291</id>
+        <type>regular</type>
+        <sourceId>288</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>319</id>
+        <type>regular</type>
+        <sourceId>39</sourceId>
+        <destinationId>316</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>320</id>
+        <type>regular</type>
+        <sourceId>316</sourceId>
+        <destinationId>ok</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>321</id>
+        <type>regular</type>
+        <sourceId>ok</sourceId>
+        <destinationId>41</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>322</id>
+        <type>regular</type>
+        <sourceId>316</sourceId>
+        <destinationId>ko</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>323</id>
+        <type>regular</type>
+        <sourceId>ko</sourceId>
+        <destinationId>16</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

@@ -199,7 +199,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -209,10 +209,10 @@ public class WorkflowService implements IWorkflowService {
         return repository.save(useCase);
     }
 
-    private List<Long> getExistingUsers(List<Long> userIds) {
+    private List<String> getExistingUsers(List<String> userIds) {
         if (userIds == null)
             return null;
-        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
     }
 
     @Override
@@ -273,7 +273,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable) {
+    public Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable) {
         String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
@@ -354,17 +354,17 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case searchOne(Predicate predicate) {
-        Page<Case> page = search(predicate, new PageRequest(0, 1));
+        Page<Case> page = search(predicate, PageRequest.of(0, 1));
         if (page.getContent().isEmpty())
             return null;
         return page.getContent().get(0);
     }
 
     @Override
-    public Map<String, I18nString> listToMap(List<Case> cases){
+    public Map<String, I18nString> listToMap(List<Case> cases) {
         Map<String, I18nString> options = new HashMap<>();
         cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
-        return  options;
+        return options;
     }
 
 
@@ -391,7 +391,7 @@ public class WorkflowService implements IWorkflowService {
             useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
-                                (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
+                        (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
                     taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(field.getStringId()).getValue()).add(pair.getTask()));
                 }
@@ -507,7 +507,7 @@ public class WorkflowService implements IWorkflowService {
             if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
             }
-            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
+            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET, true);
         });
         save(case$);
         return changedFields;
@@ -532,9 +532,9 @@ public class WorkflowService implements IWorkflowService {
         });
     }
 
-    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields) {
         LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getEvents() != null){
+        if (field.getEvents() != null) {
             fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
         }
         if (fieldActions.isEmpty()) return;
@@ -542,7 +542,7 @@ public class WorkflowService implements IWorkflowService {
         runEventActions(useCase, fieldActions, changedFields, actionTrigger);
     }
 
-    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
+    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger) {
         actions.forEach(action -> {
             ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty(), useCase.getPetriNet().getFunctions());
             changedFields.mergeChangedFields(currentChangedFields);
@@ -550,7 +550,7 @@ public class WorkflowService implements IWorkflowService {
             if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger, trigger == Action.ActionTrigger.SET);
         });
     }
 

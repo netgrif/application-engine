@@ -3,24 +3,23 @@ package com.netgrif.workflow.orgstructure.groups
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.UserService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class NextGroupServiceTest {
@@ -38,10 +37,10 @@ class NextGroupServiceTest {
     UserService userService
 
     @Autowired
-    TestHelper testHelper
+    private ImportHelper importHelper
 
     @Autowired
-    private ImportHelper importHelper
+    TestHelper testHelper
 
     @Test
     void groupTest() {
@@ -49,15 +48,14 @@ class NextGroupServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
 
         Optional<PetriNet> groupNet = importGroup()
         assert groupNet.isPresent()
+
 
         Case customGroup = createGroup()
         if (customGroup == null) {

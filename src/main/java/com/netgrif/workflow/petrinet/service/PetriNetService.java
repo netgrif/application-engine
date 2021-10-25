@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
@@ -13,6 +13,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -61,9 +62,6 @@ public class PetriNetService implements IPetriNetService {
     private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
 
     @Autowired
-    private IUserProcessRoleService userProcessRoleService;
-
-    @Autowired
     private IProcessRoleService processRoleService;
 
     @Autowired
@@ -95,6 +93,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private IFieldActionsCacheService functionCacheService;
+
+    @Autowired
+    private IUserService userService;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -141,7 +142,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
+    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
@@ -159,7 +160,6 @@ public class PetriNetService implements IPetriNetService {
             net.incrementVersion(releaseType);
         }
         processRoleService.saveAll(net.getRoles().values());
-        userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
         net.setAuthor(author.transformToAuthor());
         functionCacheService.cachePetriNetFunctions(net);
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
@@ -373,6 +373,7 @@ public class PetriNetService implements IPetriNetService {
         PetriNet petriNet = petriNetOptional.get();
         log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
 
+        this.userService.removeRoleOfDeletedPetriNet(petriNet);
         this.workflowService.deleteInstancesOfPetriNet(petriNet);
         this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 

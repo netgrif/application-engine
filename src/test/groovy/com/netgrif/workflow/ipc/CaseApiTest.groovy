@@ -3,20 +3,21 @@ package com.netgrif.workflow.ipc
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class CaseApiTest {
@@ -45,7 +46,7 @@ class CaseApiTest {
         return CaseApiTest.getClassLoader().getResourceAsStream(name)
     }
 
-    @Before
+    @BeforeEach
     void setup() {
         testHelper.truncateDbs()
     }
@@ -54,7 +55,7 @@ class CaseApiTest {
 
     @Test
     void testCreate() {
-        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), "major", superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 
@@ -71,7 +72,7 @@ class CaseApiTest {
     void testSearch() {
         testHelper.truncateDbs()
 
-        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
+        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 

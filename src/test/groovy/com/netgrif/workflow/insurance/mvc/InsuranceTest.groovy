@@ -1,26 +1,28 @@
 package com.netgrif.workflow.insurance.mvc
 
 import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
-import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
-import com.netgrif.workflow.WorkflowManagementSystemApplication
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+
+//import com.netgrif.workflow.orgstructure.domain.Group
+
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -30,14 +32,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.http.MediaType.TEXT_PLAIN
+import java.nio.charset.StandardCharsets
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -46,7 +48,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -117,7 +119,7 @@ class InsuranceTest {
     private TestHelper testHelper
 
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
 
@@ -126,18 +128,16 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.isPresent()
 
         netId = net.get().getStringId()
 
-        def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
-                [org] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
         processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll {it.importId in ["1", "2"]}.collect{it.stringId} as Set,userService.getLoggedOrSystem().transformToLoggedUser())
 
@@ -152,6 +152,7 @@ class InsuranceTest {
     private Map mapper
 
     @Test
+    @DisplayName("Insurance Test")
     void test() {
         createCase()
         coverType()
@@ -248,9 +249,9 @@ class InsuranceTest {
         def result = mvc.perform(post(CASE_CREATE_URL)
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .with(csrf().asHeader())
-                .with(authentication(this.auth)))
+                .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
                 .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))
@@ -269,7 +270,7 @@ class InsuranceTest {
                 .accept(MediaTypes.HAL_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
@@ -768,12 +769,12 @@ class InsuranceTest {
     def setDataOffer() {
         def data = [
                 (mapper[109001]): [
-                        value:"2018-02-21",
-                        type :FIELD_DATE
+                        value: "2018-02-21",
+                        type : FIELD_DATE
                 ],
                 (mapper[109006]): [
-                        value:"prevodom",
-                        type :FIELD_ENUM
+                        value: "prevodom",
+                        type : FIELD_ENUM
                 ]
         ]
         setData(data)
@@ -781,6 +782,6 @@ class InsuranceTest {
 
     @SuppressWarnings("GrMethodMayBeStatic")
     private def parseResult(MvcResult result) {
-        return (new JsonSlurper()).parseText(result.response.contentAsString)
+        return (new JsonSlurper()).parseText(result.response.getContentAsString(StandardCharsets.UTF_8))
     }
 }

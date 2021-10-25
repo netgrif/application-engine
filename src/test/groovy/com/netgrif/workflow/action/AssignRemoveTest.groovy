@@ -1,33 +1,29 @@
 package com.netgrif.workflow.action
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class AssignRemoveTest {
@@ -57,7 +53,7 @@ class AssignRemoveTest {
 
     private Authentication auth
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
         def user = userService.system;
@@ -67,6 +63,7 @@ class AssignRemoveTest {
     }
 
     @Test
+    @Disabled("Create functions or update test")
     public void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
         Optional<PetriNet> netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), "major", superCreator.getLoggedSuper());
 
