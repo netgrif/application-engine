@@ -1,8 +1,8 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-class UserListField extends Field<List<Long>> {
+class UserListField extends Field<List<String>> {
 
-    UserListField(){
+    UserListField() {
         super()
         this.defaultValue = new ArrayList<>()
     }

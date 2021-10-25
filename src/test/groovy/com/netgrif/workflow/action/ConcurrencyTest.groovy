@@ -1,20 +1,21 @@
 package com.netgrif.workflow.action
 
 
-import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class ConcurrencyTest {
@@ -25,7 +26,13 @@ class ConcurrencyTest {
     private ImportHelper importHelper
 
     @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
     private CaseRepository caseRepository
+
+    @Autowired
+    private SuperCreator superCreator
 
     @Test
     void test() {

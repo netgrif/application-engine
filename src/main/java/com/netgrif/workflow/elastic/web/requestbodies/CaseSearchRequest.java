@@ -54,7 +54,7 @@ public class CaseSearchRequest {
     @AllArgsConstructor
     public static class Author {
 
-        public Long id;
+        public String id;
 
         public String name;
 

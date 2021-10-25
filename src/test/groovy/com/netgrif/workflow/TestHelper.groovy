@@ -1,9 +1,9 @@
 package com.netgrif.workflow
 
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.GroupRunner
@@ -24,7 +24,9 @@ class TestHelper {
     @Autowired
     private UserRepository userRepository
     @Autowired
-    private UserProcessRoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
+    @Autowired
+    private IProcessRoleService roleService
     @Autowired
     private SystemUserRunner systemUserRunner
     @Autowired
@@ -38,24 +40,22 @@ class TestHelper {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
-    private IProcessRoleService processRoleService
+    private FinisherRunner finisherRunner
 
     void truncateDbs() {
         template.db.drop()
         userRepository.deleteAll()
         roleRepository.deleteAll()
+        roleService.clearCache()
         elasticTaskRepository.deleteAll()
         elasticCaseRepository.deleteAll()
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
-
-        // flush role cache
-        processRoleService.metaClass.setAttribute(processRoleService, "defaultRole", null)
-
         roleRunner.run()
         systemUserRunner.run()
         groupRunner.run()
         superCreator.run()
+        finisherRunner.run()
     }
 }

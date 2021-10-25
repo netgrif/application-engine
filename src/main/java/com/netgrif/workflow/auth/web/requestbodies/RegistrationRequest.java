@@ -8,5 +8,6 @@ public class RegistrationRequest {
     public String surname;
     public String password;
 
-    public RegistrationRequest() {}
+    public RegistrationRequest() {
+    }
 }

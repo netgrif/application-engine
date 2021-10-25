@@ -1,7 +1,8 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
-import lombok.Data;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference;
+import lombok.Data;
+
 import java.util.List;
 
 @Data

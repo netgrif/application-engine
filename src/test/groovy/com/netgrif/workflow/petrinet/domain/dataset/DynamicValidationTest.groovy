@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.petrinet.domain.DataGroup
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
@@ -9,26 +8,22 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicVali
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
-import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
-
-import java.util.stream.Collectors
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
 @ActiveProfiles(["test"])
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 class DynamicValidationTest {
 
     @Autowired
@@ -52,7 +47,7 @@ class DynamicValidationTest {
     @Autowired
     private IWorkflowService workflowService
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs();
     }

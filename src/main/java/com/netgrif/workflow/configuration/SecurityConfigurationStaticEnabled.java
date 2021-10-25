@@ -25,7 +25,7 @@ import org.springframework.stereotype.Controller;
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 @ConditionalOnProperty(
-        value="server.security.static.enabled",
+        value = "server.security.static.enabled",
         havingValue = "true"
 )
 public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfiguration {
@@ -49,23 +49,23 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
         log.info("Configuration with frontend in static/");
 //        @formatter:off
         http
-            .httpBasic()
+                .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
-            .and()
-            .authorizeRequests()
+                .and()
+                .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .logout()
+                .and()
+                .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .headers()
+                .and()
+                .headers()
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
@@ -89,7 +89,7 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
 
     @Override
     String[] getServerPatterns() {
-        return new String[] {
+        return new String[]{
                 "/index.html", "/", "/login", "/signup/**", "/recover/**", "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
         };
     }

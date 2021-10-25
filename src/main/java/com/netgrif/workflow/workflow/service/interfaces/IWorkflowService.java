@@ -32,7 +32,7 @@ public interface IWorkflowService {
 
     Case createCase(String netId, String title, String color, LoggedUser user);
 
-    Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
+    Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
 
     void deleteCase(String caseId);
 
@@ -54,7 +54,7 @@ public interface IWorkflowService {
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
-//    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
+//    List<Case> getCaseFi  eldChoices(Pageable pageable, String caseId, String fieldId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
 

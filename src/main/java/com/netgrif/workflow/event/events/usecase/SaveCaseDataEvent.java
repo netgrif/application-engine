@@ -30,7 +30,7 @@ public class SaveCaseDataEvent extends CaseEvent {
             try {
                 userData.put(entry.getKey(), entry.getValue().get("value").asText());
             } catch (Exception e) {
-                log.error("Could not parse ["+entry+"]");
+                log.error("Could not parse [" + entry + "]");
             }
         });
     }

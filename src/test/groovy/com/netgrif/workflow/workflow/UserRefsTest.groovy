@@ -3,26 +3,21 @@ package com.netgrif.workflow.workflow
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
-import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import groovy.util.logging.Slf4j
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 @Slf4j
@@ -48,11 +43,11 @@ class UserRefsTest {
 
     List<Case> newCases
 
-    List<Long> userIds
+    List<String> userIds
 
     private String netId
 
-    @Before
+    @BeforeEach
     void before() {
         helper.truncateDbs()
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
@@ -63,7 +58,7 @@ class UserRefsTest {
         userIds = new ArrayList<>()
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net.get() : net.get())
-            long id = userService.findByEmail(userEmails[it % 2], true).id
+            String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
             _case.dataSet["user_list_1"].value = [id]
             newCases.add(workflowService.save(_case))
             userIds.add(id)

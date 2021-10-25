@@ -3,8 +3,8 @@ package com.netgrif.workflow.workflow.web;
 import com.netgrif.workflow.MockService;
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
@@ -25,16 +25,16 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class VariableArcsTest {
 
     public static final Logger log = LoggerFactory.getLogger(VariableArcsTest.class);
@@ -87,13 +87,13 @@ public class VariableArcsTest {
 
     private PetriNet loaded;
 
-    private User testUser;
+    private IUser testUser;
 
     private Case finishCase;
 
     private Case cancelCase;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         userRunner.run("");
         repository.deleteAll();
@@ -118,8 +118,7 @@ public class VariableArcsTest {
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
-                new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
-                new UserProcessRole[]{});
+                new ProcessRole[]{});
 
         finishCase = importHelper.createCase("finish case", loaded);
         cancelCase = importHelper.createCase("assign case", loaded);
@@ -291,16 +290,19 @@ public class VariableArcsTest {
         }
     }
 
-    private void assertOutArcsCancelTasks(List<TaskReference> allTasks) throws TransitionNotExecutableException {
-        List<TaskReference> tasks = allTasks.stream().filter(task -> task.getTitle().startsWith("out_")).collect(Collectors.toList());
-        for (TaskReference taskRef : tasks) {
+    private void assertOutArcsCancelTasks(List<TaskReference> tasks) throws TransitionNotExecutableException {
+        List<TaskReference> filteredTasks = tasks.stream().filter(task -> task.getTitle().equals("var_arc_out") || task.getTitle().equals("place_var_arc_out")).collect(Collectors.toList());
+        for (TaskReference taskRef : filteredTasks) {
             Task task = taskService.findOne(taskRef.getStringId());
-            assert !finishCase.getActivePlaces().containsKey(taskRef.getTitle() + "_res");
             taskService.assignTask(task, testUser);
-            taskService.finishTask(task, testUser);
-            finishCase = workflowService.findOne(task.getCaseId());
-            assert finishCase.getActivePlaces().containsKey(taskRef.getTitle() + "_res") &&
-                    finishCase.getActivePlaces().get(taskRef.getTitle() + "_res") == finishCase.getDataSet().get("regular_var").getValue();
+            cancelCase = workflowService.findOne(task.getCaseId());
+
+            assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_end");
+
+            taskService.cancelTask(task, testUser);
+            cancelCase = workflowService.findOne(task.getCaseId());
+
+            assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_res");
         }
     }
 

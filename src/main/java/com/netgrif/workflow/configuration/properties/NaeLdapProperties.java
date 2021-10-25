@@ -24,13 +24,14 @@ public class NaeLdapProperties {
 
     @Value("${spring.ldap.base:#{\"\"}}")
     private String base;
+
     private String superUsername;
 
     private String userFilter;
 
     private String peopleSearchBase;
 
-    private String[] peopleClass =  {"inetOrgPerson","person"};
+    private String[] peopleClass = {"inetOrgPerson", "person"};
 
     private String groupSearchBase;
 
@@ -57,4 +58,3 @@ public class NaeLdapProperties {
     private String mapUserPassword = "userPassword";
 
 }
-

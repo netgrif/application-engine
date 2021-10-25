@@ -107,9 +107,9 @@ public class DataField implements Referencable {
             this.behavior.put(transition, new HashSet<>(behavior));
     }
 
-    public ObjectNode applyOnlyVisibleBehavior(){
+    public ObjectNode applyOnlyVisibleBehavior() {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put(FieldBehavior.VISIBLE.toString(),true);
+        node.put(FieldBehavior.VISIBLE.toString(), true);
         return node;
     }
 
@@ -135,7 +135,7 @@ public class DataField implements Referencable {
         return !behavior.containsKey(transitionId);
     }
 
-    public boolean isDisplayable(){
+    public boolean isDisplayable() {
         return behavior.values().stream().parallel()
                 .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
     }

@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class CaseField extends FieldWithAllowedNets<List<String>>  {
+class CaseField extends FieldWithAllowedNets<List<String>> {
 
     CaseField() {
         this(new ArrayList<String>())

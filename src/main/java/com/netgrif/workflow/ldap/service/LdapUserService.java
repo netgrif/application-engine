@@ -1,15 +1,19 @@
 package com.netgrif.workflow.ldap.service;
 
 
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.service.UserService;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.ldap.domain.LdapUser;
+import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
 import javax.naming.Name;
+
+
+//TODO: JOZIKE saveNew
 
 @Slf4j
 @ConditionalOnExpression("${nae.ldap.enabled}")
@@ -23,7 +27,7 @@ public class LdapUserService extends UserService {
     }
 
 
-    protected LdapUser getUserFromLdap(User user) {
+    protected LdapUser getUserFromLdap(IUser user) {
         if (user instanceof LdapUser) {
             return (LdapUser) user;
         } else {
@@ -32,11 +36,11 @@ public class LdapUserService extends UserService {
     }
 
 
-    public LdapUser transformToUserFromLdap(User user) {
+    public LdapUser transformToUserFromLdap(IUser user) {
 
         LdapUser userFromLdap = ldapUserRepository.findByEmail(user.getEmail());
-        if (userFromLdap == null && user.getId() != null) {
-            userFromLdap = new LdapUser(user.getId());
+        if (userFromLdap == null && user.getStringId() != null) {
+            userFromLdap = new LdapUser(new ObjectId(user.getStringId()));
         } else if (userFromLdap == null) {
             userFromLdap = new LdapUser();
         }
