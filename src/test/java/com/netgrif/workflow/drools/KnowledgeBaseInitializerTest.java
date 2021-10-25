@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -73,36 +74,35 @@ public class KnowledgeBaseInitializerTest {
     }
 
     @Test
-    @Disabled("expected = RuleValidationException.class  TODO")
-    public void testInitializerRuleValidation_EXPECT_EXCEPTION() throws RuleValidationException {
+    public void testInitializerRuleValidation_EXPECT_EXCEPTION() {
+        assertThrows(RuleValidationException.class, () -> {
+            StoredRule rule3 = StoredRule.builder()
+                    ._id(new ObjectId())
+                    .when("$item: Object()")
+                    .then("log.info(' EXPECTING SYNTAX ERROR")
+                    .identifier("rule3")
+                    .lastUpdate(LocalDateTime.now())
+                    .enabled(true)
+                    .build();
 
-        StoredRule rule3 = StoredRule.builder()
-                ._id(new ObjectId())
-                .when("$item: Object()")
-                .then("log.info(' EXPECTING SYNTAX ERROR")
-                .identifier("rule3")
-                .lastUpdate(LocalDateTime.now())
-                .enabled(true)
-                .build();
-
-        knowledgeBaseInitializer.validate(Collections.singletonList(rule3));
-
+            knowledgeBaseInitializer.validate(Collections.singletonList(rule3));
+        });
     }
 
     @Test
-    @Disabled("expected = RuleValidationException.class TODO:")
     public void testInitializerRuleValidation_EXPECT_EXCEPTION2() throws RuleValidationException {
+        assertThrows(RuleValidationException.class, () -> {
+            StoredRule rule4 = StoredRule.builder()
+                    ._id(new ObjectId())
+                    .when("$item: Object")
+                    .then("log.info('nothing')")
+                    .identifier("rule4")
+                    .lastUpdate(LocalDateTime.now())
+                    .enabled(true)
+                    .build();
 
-        StoredRule rule4 = StoredRule.builder()
-                ._id(new ObjectId())
-                .when("$item: Object")
-                .then("log.info('nothing')")
-                .identifier("rule4")
-                .lastUpdate(LocalDateTime.now())
-                .enabled(true)
-                .build();
-
-        knowledgeBaseInitializer.validate(Collections.singletonList(rule4));
+            knowledgeBaseInitializer.validate(Collections.singletonList(rule4));
+        });
     }
 
 
