@@ -1045,7 +1045,7 @@ public class Importer {
     }
 
     public ProcessRole getRole(String id) {
-        if (id.equals(ProcessRole.DEFAULT_ROLE) && net.isDefaultRoleEnabled()) {
+        if (id.equals(ProcessRole.DEFAULT_ROLE)) {
             return defaultRole;
         }
 
