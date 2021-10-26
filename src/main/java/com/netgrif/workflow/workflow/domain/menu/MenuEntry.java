@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain;
+package com.netgrif.workflow.workflow.domain.menu;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
