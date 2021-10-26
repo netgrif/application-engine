@@ -76,7 +76,10 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser removeRole(IUser user, String roleStringId) {
-        ProcessRole role = processRoleService.findByImportId(roleStringId);
+        return removeRole(user, processRoleService.findByImportId(roleStringId));
+    }
+
+    protected IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
         return save(user);
     }
@@ -85,7 +88,7 @@ public abstract class AbstractUserService implements IUserService {
     public void removeRoleOfDeletedPetriNet(PetriNet net) {
         List<IUser> users = findAllByProcessRoles(net.getRoles().keySet(), false);
         users.forEach(u -> {
-            net.getRoles().forEach((k, role) -> removeRole(u, role.getImportId()));
+            net.getRoles().forEach((k, role) -> removeRole(u, role));
         });
     }
 
