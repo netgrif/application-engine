@@ -18,6 +18,7 @@
     * [Public view](views/public_view.md)
     * [Auto-redirect](views/auto_redirect_view.md)
     * [Tree Case view](views/tree_case_view.md)
+    * [Navigation](views/navigation.md)
 * [Services]()
     * [PDF generator](services/pdf_generator.md)
 * [Integrations]()
