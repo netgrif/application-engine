@@ -29,9 +29,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -272,7 +270,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
         String importedFilter = InputStreamToString.inputStreamToString(new FileInputStream(f));
-        SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
+        SimpleModule module = new SimpleModule().addDeserializer(Object.class, FilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
         return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
     }
