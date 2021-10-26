@@ -23,3 +23,24 @@ sudo docker build -t netgrif/4.3.0 .
 sudo docker image ls
 sudo docker run --publish 8000:8080 netgrif/4.3.0
 ```
+
+## TODO Documentation
+- Complete installation guide
+  - Project structure
+  - How to start
+- Migrations explained
+- Elasticsearch indexing more explained
+- List of all properties to configure backend
+- FAQ section (help section)
+- Backup and restore
+- frontend components
+  - schematics
+  - services
+  - views
+- Mail sending
+- Component tag in processes (asi skôr petriflow)
+- Docker
+- Petriflow functions (do petriflow)
+- LDAP configuration
+- Menu import/export
+- Autocomplete inputs (do petriflow)
