@@ -147,10 +147,8 @@ entries present in current application menu.
 
 </div>
 
-After selecting entries of which new menu configration will consist, user should specify unique menu name in field **
-Exported menu identifier** and then click **Add entries to export** button to add seleced menu configuration to export.
-To update selection after some menu entry title has been changed or a menu entry has been removed, clicking button **
-Update entries** will refresh the selection.
+After selecting entries of which new menu configration will consist, user should specify unique menu name in field **Exported menu identifier** and then click **Add entries to export** button to add seleced menu configuration to export.
+To update selection after some menu entry title has been changed or a menu entry has been removed, clicking button **Update entries** will refresh the selection.
 
 <div style="text-align:center">
 
