@@ -62,7 +62,6 @@ the “process interface“ and must remain unchanged will be highlighted.
 ##### Filter
 
 ```xml
-
 <data type="filter" immediate="true">
   <id>filter</id>
   <title name="filter_field">Filter</title>
@@ -76,7 +75,6 @@ It must be `immediate`, have the ID `filter` and be of type `filter`.
 ##### Filter type
 
 ```xml
-
 <data type="enumeration_map" immediate="true">
   <id>filter_type</id>
   <title name="filter_type">Filter type</title>
@@ -97,7 +95,6 @@ therefore be freely overridden.
 ##### Filter visibility
 
 ```xml
-
 <data type="enumeration_map" immediate="true">
   <id>visibility</id>
   <title name="filter_visibility">Filter visibility</title>
@@ -124,7 +121,6 @@ can therefore be freely overridden.
 ##### Origin ViewId
 
 ```xml
-
 <data type="text" immediate="true">
   <id>origin_view_id</id>
   <title name="origin_view_id">Origin ViewId</title>
@@ -140,7 +136,6 @@ It must be `immediate`, have the ID `origin_view_id` and be of type `text`.
 ##### Filter name
 
 ```xml
-
 <data type="text">
   <id>new_title</id>
   <title name="filter_name">Filter name</title>
@@ -155,7 +150,6 @@ omitted.
 ##### I18n filter name
 
 ```xml
-
 <data type="enumeration" immediate="true">
   <id>i18n_filter_name</id>
   <title></title>
@@ -175,7 +169,6 @@ trough actions.
 ##### Filter case id
 
 ```xml
-
 <data type="text">
   <id>filter_case_id</id>
   <title></title>
@@ -193,7 +186,6 @@ omitted.
 ##### And me
 
 ```xml
-
 <data type="button">
   <id>and_me</id>
   <placeholder name="and">AND</placeholder>
@@ -209,7 +201,6 @@ omitted.
 ##### And view
 
 ```xml
-
 <data type="button">
   <id>and_view</id>
   <placeholder name="and">AND</placeholder>
@@ -228,7 +219,6 @@ omitted.
 ##### Parent filter task ref
 
 ```xml
-
 <data type="taskRef">
   <id>taskref_and_parent</id>
   <title></title>
@@ -248,7 +238,6 @@ omitted.
 ##### Trimmed origin view id
 
 ```xml
-
 <data type="text">
   <id>trimmed_origin_view_id</id>
   <title name="filter_from_view_id">Filter from view with ID</title>
@@ -267,7 +256,6 @@ omitted.
 ##### Is imported
 
 ```xml
-
 <data type="number">
   <id>is_imported</id>
   <title></title>
@@ -283,7 +271,6 @@ It must have the ID `is_imported`, be of type `number` and have the initial valu
 ##### Is not imported
 
 ```xml
-
 <data type="number">
   <id>is_not_imported</id>
   <title></title>
@@ -299,7 +286,6 @@ It must have the ID `is_not_imported`, be of type `number` and have the initial 
 ##### Missing allowed nets
 
 ```xml
-
 <data type="text">
   <id>missing_allowed_nets</id>
   <title name="missing_allowed_nets">Missing processes</title>
@@ -318,7 +304,6 @@ It must have the ID `missing_allowed_nets`, be of type `text` and have the compo
 ##### Missing nets translations
 
 ```xml
-
 <data type="enumeration_map">
   <id>missing_nets_translation</id>
   <title></title>
@@ -335,6 +320,46 @@ message in the textarea is dynamically generated depending on the active locale.
 
 It must have the ID `missing_nets_translation` and be of type `enumeration_map`.
 
+##### My full filter
+
+```xml
+<data type="taskRef">
+  <id>my_full_filter</id>
+  <title></title>
+</data>
+```
+
+This task ref holds a reference to the view_filter transition and is displayed in all tasks that should show the contents of the saved filter.
+
+It is not referenced by anything outside the process, so it can be freely modified, provided all the internal references are compatible. 
+
+#### Functions
+
+##### initializeMyFullFilterTaskRef
+
+```xml
+<function scope="process" name="initializeMyFullFilterTaskRef">
+    {
+        com.netgrif.workflow.petrinet.domain.dataset.TaskField myFullFilter
+    ->
+        change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+    }
+</function>
+```
+
+This utility process-scoped function is used to set the value of the `my_full_filter` task ref data variable.
+
+It is called in a finish-post action of both the `frontend_create` and `auto_create` transitions,
+since their execution makes the searched transition (`view_filter`) executable.
+
+#### Roles
+
+##### System
+
+The system role is used to hide the `view_filter` and `view_as_ancestor` tasks from the user.
+
+The other transitions executed by the system are never searched for by the frontend API and therefore don't need to have this role assigned to them.
+
 #### Transitions
 
 The net consists of seven transitions. **Set filter metadata** and **create new filter** are used when creating filter
@@ -347,7 +372,6 @@ display filter preview.
 ##### Set filter metadata
 
 ```xml
-
 <transition>
   <id>frontend_create</id>
   <label>Set filter metadata</label>
@@ -389,21 +413,25 @@ Custom set data requests can be sent via the frontend filter API. These requests
 want to set additional properties to your newly created filter instances you can do so by adding the necessary data
 variables to this task and then use the frontend API to set their values.
 
+Once it finishes the `view_filter` and `view_as_ancestor` tasks become executable.
+An action is bound to the finish of this transition, that sets the reference of the `my_full_filter` task ref.
+
 ##### Create new filter
 
 ```xml
-
 <transition>
   <id>newFilter</id>
   <assignPolicy>auto</assignPolicy>
   <label name="create_new_filter">Create new filter</label>
   <dataGroup>
     <dataRef>
-      <id>filter</id>
+      <id>my_full_filter</id>
       <logic>
         <behavior>visible</behavior>
       </logic>
     </dataRef>
+  </dataGroup>
+  <dataGroup>
     <dataRef>
       <id>visibility</id>
       <logic>
@@ -434,7 +462,6 @@ It must have the transition ID `newFilter`.
 ##### Automated new filter
 
 ```xml
-
 <transition>
   <id>auto_create</id>
   <label>Automated new filter</label>
@@ -479,10 +506,12 @@ It must contain 4 data fields that are set via a `setData` API call.
 * `origin_view_id`
 * `visibility`
 
+Once it finishes the `view_filter` and `view_as_ancestor` tasks become executable.
+An action is bound to the finish of this transition, that sets the reference of the `my_full_filter` task ref.
+
 ##### Import filter
 
 ```xml
-
 <transition>
   <id>import_filter</id>
   <label name="import_filter">Import filter</label>
@@ -538,7 +567,6 @@ change some fundamental filter properties:
 ##### Details
 
 ```xml
-
 <transition>
   <id>t2</id>
   <label name="details">Details</label>
@@ -574,7 +602,6 @@ omitting this transition.
 ##### View filter
 
 ```xml
-
 <transition>
   <id>view_filter</id>
   <label></label>
@@ -641,7 +668,6 @@ It must contain 1 data field:
 ##### View as ancestor
 
 ```xml
-
 <transition>
   <id>view_as_ancestor</id>
   <label></label>
