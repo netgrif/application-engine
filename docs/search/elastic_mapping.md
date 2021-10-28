@@ -114,14 +114,7 @@ Base class for data field mapping. All indexed data variables have these attribu
 
 |index|type|value|
 |-----|----|-----|
-|`dataSet.<fieldID>.fulltextValue`|Text array|value depends on the field type:<br>**
-
-boolean**: textual representation of the value<br>**date** & **
-dateTime**: date formated as ISO-8601 basic local date format<br>**file** & **
-fileList**: names of the contained files<br>**number**: the value stored as decimal string<br>**
-text**: the value itself<br>**multichoice** & **enumeration**: all translations of the selected options<br>**
-multichoiceMap** & **enumerationMap**: all translated values of the selected key-value pairs<br>**user** & **
-userList**: full name followed by email as a single string for each selected user|
+|`dataSet.<fieldID>.fulltextValue`|Text array|value depends on the field type:<br>**boolean**: textual representation of the value<br>**date** & **dateTime**: date formated as ISO-8601 basic local date format<br>**file** & **fileList**: names of the contained files<br>**number**: the value stored as decimal string<br>**text**: the value itself<br>**multichoice** & **enumeration**: all translations of the selected options<br>**multichoiceMap** & **enumerationMap**: all translated values of the selected key-value pairs<br>**user** & **userList**: full name followed by email as a single string for each selected user|
 
 ### BooleanField - boolean
 
