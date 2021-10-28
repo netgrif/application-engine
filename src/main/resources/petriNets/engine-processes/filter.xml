@@ -530,8 +530,8 @@
     </transition>
     <transition>
         <id>view_filter</id>
-        <x>860</x>
-        <y>260</y>
+        <x>550</x>
+        <y>420</y>
         <layout>
             <offset>0</offset>
         </layout>
@@ -616,15 +616,6 @@
                         change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
                     </action>
                 </logic>
-<!--                <layout>-->
-<!--                    <x>0</x>-->
-<!--                    <y>0</y>-->
-<!--                    <rows>1</rows>-->
-<!--                    <cols>1</cols>-->
-<!--                    <offset>0</offset>-->
-<!--                    <template>material</template>-->
-<!--                    <appearance>outline</appearance>-->
-<!--                </layout>-->
             </dataRef>
         </dataGroup>
         <dataGroup>
@@ -664,8 +655,8 @@
     </transition>
     <transition>
         <id>view_as_ancestor</id>
-        <x>860</x>
-        <y>200</y>
+        <x>451</x>
+        <y>418</y>
         <layout>
             <offset>0</offset>
         </layout>
