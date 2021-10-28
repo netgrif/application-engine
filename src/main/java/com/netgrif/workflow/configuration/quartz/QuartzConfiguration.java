@@ -69,6 +69,8 @@ public class QuartzConfiguration {
         properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://"+addresses+":27017/");
         properties.setProperty("org.quartz.jobStore.dbName", db);
         properties.setProperty("org.quartz.jobStore.class", "com.novemberain.quartz.mongodb.MongoDBJobStore");
+        properties.setProperty("spring.quartz.properties.org.quartz.jobStore.isClustered", "false");
+        properties.setProperty("org.quartz.jobStore.isClustered", "true");
         properties.setProperty("org.quartz.threadPool.threadCount", "1");
         properties.setProperty("org.quartz.scheduler.instanceName", "netgrif_onloadcode");
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();

@@ -75,6 +75,9 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
     @Value("${security.oauth2.resource.jwk.key-set-uri}")
     private String oauthJwkUri;
 
+    @Value("${nae.security.anonymous-exceptions}")
+    private String[] anonymousExceptions;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -177,6 +180,7 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                 authority,
                 this.serverPatterns,
+                this.anonymousExceptions,
                 this.jwtService,
                 this.userService
         );

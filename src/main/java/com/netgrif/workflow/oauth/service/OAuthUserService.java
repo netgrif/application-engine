@@ -72,6 +72,11 @@ public class OAuthUserService extends AbstractUserService implements IOAuthUserS
     }
 
     @Override
+    public IUser saveNewAndAuthenticate(IUser user) {
+        return saveNew(user);
+    }
+
+    @Override
     public IUser saveNew(IUser user) {
         addDefaultRole(user);
         addDefaultAuthorities(user);

@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain
 
 import com.netgrif.workflow.TestHelper
-
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService

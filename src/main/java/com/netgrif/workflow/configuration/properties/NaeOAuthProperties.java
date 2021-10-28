@@ -4,12 +4,12 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "nae.oauth")
 @Data
 @Component
+@ConfigurationProperties(prefix = "nae.oauth")
 public class NaeOAuthProperties {
 
-    public boolean enabled;
+    public boolean enabled = false;
     private boolean keycloak;
     private boolean remoteUserBase;
     private String superUsername;
