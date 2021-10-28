@@ -3,9 +3,7 @@ package com.netgrif.workflow.action
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-
 import com.netgrif.workflow.auth.domain.UserState
-
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -35,11 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])

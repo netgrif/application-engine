@@ -16,17 +16,17 @@ import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleExcept
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.util.Optional;
         locations = "classpath:application-test.properties"
 )
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RuleEvaluationScheduleServiceTest {
 
     @Autowired
@@ -62,7 +62,7 @@ public class RuleEvaluationScheduleServiceTest {
     @Autowired
     private IRuleEvaluationScheduleService ruleEvaluationScheduleService;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
@@ -93,7 +93,7 @@ public class RuleEvaluationScheduleServiceTest {
 
     }
 
-    @After
+    @AfterEach
     public void after() {
         testHelper.truncateDbs();
     }

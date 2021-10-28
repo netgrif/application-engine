@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
@@ -49,13 +50,30 @@ public class UserService extends AbstractUserService {
     @Autowired
     private GroupConfigurationProperties groupProperties;
 
+    @Autowired
+    private IAfterRegistrationAuthService authenticationService;
+
+    @Override
+    public IUser saveNewAndAuthenticate(IUser user) {
+        return saveNew(user, true);
+    }
+
     @Override
     public IUser saveNew(IUser user) {
+        return saveNew(user, false);
+    }
+
+    private IUser saveNew(IUser user, boolean login) {
+        String rawPassword = ((RegisteredUser) user).getPassword();
+
         registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
+        if (login)
+            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
+
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
 
@@ -63,6 +81,8 @@ public class UserService extends AbstractUserService {
             groupService.addUserToDefaultGroup(user);
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
+        if (login)
+            authenticationService.logoutAfterRegistrationFinished();
         return savedUser;
     }
 

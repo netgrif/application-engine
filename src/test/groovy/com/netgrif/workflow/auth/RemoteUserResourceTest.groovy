@@ -7,17 +7,20 @@ import com.netgrif.workflow.oauth.domain.RemoteUserResource
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteGroupResourceService
 import com.netgrif.workflow.oauth.service.interfaces.IRemoteUserResourceService
 import com.netgrif.workflow.utils.FullPageRequest
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.assertThrows
+
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @AutoConfigureMockMvc
 @SpringBootTest(properties = [
@@ -37,7 +40,7 @@ class RemoteUserResourceTest {
     @Autowired
     private IRemoteGroupResourceService remoteGroupResourceService
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
@@ -76,14 +79,18 @@ class RemoteUserResourceTest {
         assert count == page.totalElements
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     void testGroupExceptionMembers() {
-        remoteGroupResourceService.members("INVALID_ID")
+        assertThrows(IllegalArgumentException.class, () -> {
+            remoteGroupResourceService.members("INVALID_ID")
+        })
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     void testGroupExceptionGroupsOfUser() {
-        remoteGroupResourceService.groupsOfUser("INVALID_ID")
+        assertThrows(IllegalArgumentException.class, () -> {
+            remoteGroupResourceService.groupsOfUser("INVALID_ID")
+        })
     }
 
     @Test

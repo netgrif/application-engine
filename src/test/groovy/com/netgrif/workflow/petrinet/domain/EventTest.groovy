@@ -113,7 +113,7 @@ class EventTest {
 
     private void assertCancelOutcome() {
         assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
-        assert (outcome.changedFields.changedFields["chained"].attributes["value"].value as String) == "chained"
+        assert (outcome.changedFields.changedFields["chained"].attributes["value"] as String) == "chained"
     }
 
     private void assertActionsRuned(String fieldIdWithoutPhase, String message) {
