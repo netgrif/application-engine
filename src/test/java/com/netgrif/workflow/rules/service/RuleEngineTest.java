@@ -19,17 +19,17 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ import java.util.stream.IntStream;
         locations = "classpath:application-test.properties"
 )
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RuleEngineTest {
 
     @Autowired
@@ -73,12 +73,12 @@ public class RuleEngineTest {
     @Autowired
     private SuperCreator superCreator;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
 
-    @After
+    @AfterEach
     public void after() {
         ruleRepository.deleteAll();
         factRepository.deleteAll();
@@ -324,7 +324,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    @Ignore
+    @Disabled("TODO:")
     public void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.workflow.petrinet.domain.events.EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
