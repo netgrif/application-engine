@@ -115,6 +115,10 @@ public class Case {
 
     @Getter
     @Setter
+    private Set<String> viewRoles;
+
+    @Getter
+    @Setter
     private Map<String, Map<String, Boolean>> permissions;
 
     @Getter
@@ -142,6 +146,7 @@ public class Case {
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
+        viewRoles = new HashSet<>();
         permissions = new HashMap<>();
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
@@ -264,13 +269,26 @@ public class Case {
         });
     }
 
-    public Set<String> getViewRoles() {
-        Set<String> roles = new HashSet<>();
-        this.permissions.forEach((role, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
-                roles.add(role);
-            }
-        });
-        return roles;
+    public void decideEnabledRoles(PetriNet net) {
+        this.viewRoles = filterViewRoles();
+    }
+
+    public void addAllRolesToViewRoles(String defaultRoleId) {
+        this.viewRoles.addAll(enabledRoles);
+        this.viewRoles.add(defaultRoleId);
+    }
+
+    public Set<String> getViewUserRefs() {
+        return this.userRefs.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("view") && e.getValue().get("view"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> filterViewRoles() {
+        return this.permissions.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("view") && e.getValue().get("view"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 }
