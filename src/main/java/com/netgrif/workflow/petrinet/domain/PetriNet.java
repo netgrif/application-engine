@@ -38,6 +38,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private boolean defaultRoleEnabled;
+
+    @Getter
+    @Setter
     private I18nString defaultCaseName;
 
     @Getter
@@ -392,6 +396,7 @@ public class PetriNet extends PetriNetObject {
         clone.setIdentifier(this.identifier);
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
+        clone.setDefaultRoleEnabled(this.defaultRoleEnabled);
         clone.setDefaultCaseName(this.defaultCaseName);
         clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
         clone.setIcon(this.icon);
