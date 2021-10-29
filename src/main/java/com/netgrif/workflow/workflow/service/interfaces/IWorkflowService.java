@@ -32,6 +32,10 @@ public interface IWorkflowService {
 
     Case createCase(String netId, String title, String color, LoggedUser user);
 
+    Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
+
+    Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
+
     Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
 
     void deleteCase(String caseId);
