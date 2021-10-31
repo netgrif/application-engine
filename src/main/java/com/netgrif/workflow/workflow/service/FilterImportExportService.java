@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.google.common.collect.Lists;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.FilterProperties;
 import com.netgrif.workflow.filters.FilterImportExport;
@@ -94,12 +94,12 @@ public class FilterImportExportService implements IFilterImportExportService {
     private FilterProperties filterProperties;
 
     @Override
-    public void createFilterImport(User author) {
+    public void createFilterImport(IUser author) {
         workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER,"Import filters " + author.getFullName(), "", author.transformToLoggedUser());
     }
 
     @Override
-    public void createFilterExport(User author) {
+    public void createFilterExport(IUser author) {
         workflowService.createCaseByIdentifier(EXPORT_NET_IDENTIFIER, "Export filters " + author.getFullName(), "", author.transformToLoggedUser());
     }
 
@@ -259,7 +259,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     protected FilterImportExportList loadFromXML() throws IOException, IllegalFilterFileException {
         Case exportCase = workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER)
-                        .and(QCase.case$.author.id.eq(userService.getLoggedUser().getId()))
+                        .and(QCase.case$.author.id.eq(userService.getLoggedUser().getStringId()))
         );
 
         FileFieldValue ffv = (FileFieldValue) exportCase.getDataSet().get(UPLOAD_FILE_FIELD).getValue();
@@ -277,7 +277,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getId() + "/" + filterProperties.getFileName();
+        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 
