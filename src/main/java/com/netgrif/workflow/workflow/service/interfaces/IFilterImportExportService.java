@@ -1,6 +1,6 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.filters.FilterImportExport;
 import com.netgrif.workflow.filters.FilterImportExportList;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
@@ -26,9 +26,9 @@ public interface IFilterImportExportService {
 
     FilterImportExport createExportClass(Case filter);
 
-    void createFilterImport(User author);
+    void createFilterImport(IUser author);
 
-    void createFilterExport(User author);
+    void createFilterExport(IUser author);
 
     void changeFilterField(List<String> filterFields);
 }
