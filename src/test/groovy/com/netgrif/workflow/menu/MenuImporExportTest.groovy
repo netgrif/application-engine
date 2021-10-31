@@ -3,13 +3,12 @@ package com.netgrif.workflow.menu
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.UserService
-import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.groups.NextGroupService
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.startup.*
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
@@ -194,7 +193,6 @@ class MenuImporExportTest {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
     }
 }
