@@ -22,6 +22,8 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
 
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
 
+    Page<PetriNet> findByIdentifierIn(List<String> identifier, Pageable pageable);
+
     List<PetriNet> findAllByVersion(Version version);
 
     void deleteBy_id(ObjectId id);
