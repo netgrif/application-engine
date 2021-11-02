@@ -7,7 +7,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.IllegalMenuFileException;
-import com.netgrif.workflow.workflow.domain.MenuEntry;
+import com.netgrif.workflow.workflow.domain.menu.MenuEntry;
 
 import java.io.IOException;
 import java.util.List;
