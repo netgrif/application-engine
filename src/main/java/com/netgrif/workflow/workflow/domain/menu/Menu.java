@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain;
+package com.netgrif.workflow.workflow.domain.menu;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -7,24 +7,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "menus",
+        "menuEntries",
 })
 
-@XmlRootElement(name = "menus")
-public class MenuList {
+@XmlRootElement(name = "menu")
+public class Menu {
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    @JacksonXmlProperty(localName = "menu")
-    protected List<Menu> menus;
+    @JacksonXmlProperty(localName = "menuEntry")
+    protected List<MenuEntry> menuEntries;
 
-    public MenuList () {
-        this.menus = new ArrayList<>();
-    }
+    @JacksonXmlProperty(isAttribute = true, localName = "name")
+    protected String menuIdentifier;
 }
