@@ -17,15 +17,15 @@ import java.util.*;
  * Class that helps with deserialization of exported filter xml file in process of importing filters.
  */
 
-public class CustomFilterDeserializer extends UntypedObjectDeserializer {
+public class FilterDeserializer extends UntypedObjectDeserializer {
 
-    private static final CustomFilterDeserializer INSTANCE = new CustomFilterDeserializer(null, null);
+    private static final FilterDeserializer INSTANCE = new FilterDeserializer(null, null);
 
-    private CustomFilterDeserializer(JavaType listType, JavaType mapType) {
+    private FilterDeserializer(JavaType listType, JavaType mapType) {
         super(listType, mapType);
     }
 
-    public static CustomFilterDeserializer getInstance() {
+    public static FilterDeserializer getInstance() {
         return INSTANCE;
     }
 
