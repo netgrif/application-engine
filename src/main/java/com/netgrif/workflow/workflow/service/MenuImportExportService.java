@@ -19,6 +19,7 @@ import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.utils.InputStreamToString;
 import com.netgrif.workflow.workflow.domain.*;
+import com.netgrif.workflow.workflow.domain.menu.*;
 import com.netgrif.workflow.workflow.service.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,7 +270,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     protected MenuAndFilters loadFromXML(FileFieldValue ffv) throws IOException, IllegalMenuFileException {
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
-        SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
+        SimpleModule module = new SimpleModule().addDeserializer(Object.class, FilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
         String xml = InputStreamToString.inputStreamToString(new FileInputStream(f));
         return xmlMapper.readValue(xml, MenuAndFilters.class);
