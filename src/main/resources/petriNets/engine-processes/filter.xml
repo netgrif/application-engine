@@ -36,6 +36,28 @@
                 change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
         }
     </function>
+    <function scope="process" name="resolveVisibilityIfRoot">
+        {
+            com.netgrif.workflow.petrinet.domain.dataset.TextField originViewId,
+            com.netgrif.workflow.petrinet.domain.dataset.TextField parentFilterId,
+            com.netgrif.workflow.petrinet.domain.dataset.ButtonField and_view,
+            com.netgrif.workflow.petrinet.domain.dataset.TextField trimmed_origin_view_id,
+            com.netgrif.workflow.petrinet.domain.dataset.TaskField ancestor_task_ref,
+            com.netgrif.workflow.petrinet.domain.Transition t1,
+            com.netgrif.workflow.petrinet.domain.Transition t2
+                ->
+                if (parentFilterId.value == "" &amp;&amp; originViewId.value == "") {
+                    make and_view, forbidden on t1 when {true}
+                    make and_view, forbidden on t2 when {true}
+                    make trimmed_origin_view_id, forbidden on t1 when {true}
+                    make trimmed_origin_view_id, forbidden on t2 when {true}
+
+                    change ancestor_task_ref value {[]}
+                    return true;
+                }
+                return false;
+        }
+    </function>
     <!-- DATA -->
     <data type="filter" immediate="true">
         <id>filter</id>
@@ -66,44 +88,18 @@
             <actions phase="post">
                 <action>
                     origin_view_id: f.origin_view_id,
-                    ancestor_task_ref: f.taskref_and_parent,
-                    trimmed_origin_view_id: f.trimmed_origin_view_id,
+                    parent_filter_id: f.parent_filter_id,
                     and_view: f.and_view,
+                    trimmed_origin_view_id: f.trimmed_origin_view_id,
+                    ancestor_task_ref: f.taskref_and_parent,
                     t1: t.view_filter,
                     t2: t.view_as_ancestor;
 
-                    // the same regex is used in frontend filter extaction service. Please keep them in sync
-                    def match = origin_view_id.value =~ "^.*?([a-f\\d]{24})(?:-\\d+)?\$"
-                    def parentHasFilterRef = match.matches()
-
-                    if (!parentHasFilterRef &amp;&amp; origin_view_id.value == "") {
-                        make and_view, forbidden on t1 when {true}
-                        make and_view, forbidden on t2 when {true}
-                        make trimmed_origin_view_id, forbidden on t1 when {true}
-                        make trimmed_origin_view_id, forbidden on t2 when {true}
-
-                        change ancestor_task_ref value {[]}
-                        return
-                    } else if (parentHasFilterRef) {
-                        make and_view, forbidden on t1 when {true}
-                        make and_view, forbidden on t2 when {true}
-                        make trimmed_origin_view_id, forbidden on t1 when {true}
-                        make trimmed_origin_view_id, forbidden on t2 when {true}
-
-                        def ancestor_menu_item = findTask({ it._id.eq(new org.bson.types.ObjectId(match.group(1))) })
-
-                        def menu_data = getData(ancestor_menu_item)
-
-                        def ancestor_filter = findTask({ it._id.eq(menu_data.get("filter_preview").value[0]) })
-
-                        def ancestor_view_filter = findTask({it.caseId.eq(ancestor_filter.caseId).and(it.task.transitionId.eq("view_as_ancestor"))})
-
-                        change ancestor_task_ref value {[ancestor_view_filter.stringId]}
-                        return
+                    if (resolveVisibilityIfRoot(origin_view_id, parent_filter_id, and_view, trimmed_origin_view_id, ancestor_task_ref, t1, t2)) {
+                        return;
                     }
 
-                    // the same regex is used in frontend filter extaction service. Please keep them in sync
-                    match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
+                    def match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
                     match.matches()
 
                     def trimmed_id;
@@ -130,60 +126,26 @@
             <id>set</id>
             <actions phase="post">
                 <action>
-//                    origin_view_id: f.origin_view_id,
-//                    ancestor_task_ref: f.taskref_and_parent,
-//                    trimmed_origin_view_id: f.trimmed_origin_view_id,
-//                    and_view: f.and_view,
-//                    t1: t.view_filter,
-//                    t2: t.view_as_ancestor;
-//
-//                    // the same regex is used in frontend filter extaction service. Please keep them in sync
-//                    def match = origin_view_id.value =~ "^.*?([a-f\\d]{24})(?:-\\d+)?\$"
-//                    def parentHasFilterRef = match.matches()
-//
-//                    if (!parentHasFilterRef &amp;&amp; origin_view_id.value == "") {
-//                        make and_view, forbidden on t1 when {true}
-//                        make and_view, forbidden on t2 when {true}
-//                        make trimmed_origin_view_id, forbidden on t1 when {true}
-//                        make trimmed_origin_view_id, forbidden on t2 when {true}
-//
-//                        change ancestor_task_ref value {[]}
-//                        return
-//                    } else if (parentHasFilterRef) {
-//                        make and_view, forbidden on t1 when {true}
-//                        make and_view, forbidden on t2 when {true}
-//                        make trimmed_origin_view_id, forbidden on t1 when {true}
-//                        make trimmed_origin_view_id, forbidden on t2 when {true}
-//
-//                        def ancestor_menu_item = findTask({ it._id.eq(new org.bson.types.ObjectId(match.group(1))) })
-//
-//                        def menu_data = getData(ancestor_menu_item)
-//
-//                        def ancestor_filter = findTask({ it._id.eq(menu_data.get("filter_preview").value[0]) })
-//
-//                        def ancestor_view_filter = findTask({it.caseId.eq(ancestor_filter.caseId).and(it.task.transitionId.eq("view_as_ancestor"))})
-//
-//                        change ancestor_task_ref value {[ancestor_view_filter.stringId]}
-//                        return
-//                    }
-//
-//                    // the same regex is used in frontend filter extaction service. Please keep them in sync
-//                    match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
-//                    match.matches()
-//
-//                    def trimmed_id;
-//
-//                    if (match.start(1) == -1) {
-//                        trimmed_id = origin_view_id.value
-//                    } else {
-//                        trimmed_id = origin_view_id.value.substring(0, match.start(1))
-//                    }
-//
-//                    change trimmed_origin_view_id value {trimmed_id}
-//                    make and_view, visible on t1 when {true}
-//                    make and_view, visible on t2 when {true}
-//                    make trimmed_origin_view_id, visible on t1 when {true}
-//                    make trimmed_origin_view_id, visible on t2 when {true}
+                    origin_view_id: f.origin_view_id,
+                    parent_filter_id: f.parent_filter_id,
+                    and_view: f.and_view,
+                    trimmed_origin_view_id: f.trimmed_origin_view_id,
+                    ancestor_task_ref: f.taskref_and_parent,
+                    t1: t.view_filter,
+                    t2: t.view_as_ancestor;
+
+                    if (resolveVisibilityIfRoot(origin_view_id, parent_filter_id, and_view, trimmed_origin_view_id, ancestor_task_ref, t1, t2)) {
+                        return;
+                    }
+
+                    make and_view, forbidden on t1 when {true}
+                    make and_view, forbidden on t2 when {true}
+                    make trimmed_origin_view_id, forbidden on t1 when {true}
+                    make trimmed_origin_view_id, forbidden on t2 when {true}
+
+                    def ancestor_view_filter = findTask({it.caseId.eq(parent_filter_id.value).and(it.task.transitionId.eq("view_as_ancestor"))})
+
+                    change ancestor_task_ref value {[ancestor_view_filter.stringId]}
                 </action>
             </actions>
         </event>
