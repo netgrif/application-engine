@@ -36,28 +36,6 @@
                 change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
         }
     </function>
-    <function scope="process" name="resolveVisibilityIfRoot">
-        {
-            com.netgrif.workflow.petrinet.domain.dataset.TextField originViewId,
-            com.netgrif.workflow.petrinet.domain.dataset.TextField parentFilterId,
-            com.netgrif.workflow.petrinet.domain.dataset.ButtonField and_view,
-            com.netgrif.workflow.petrinet.domain.dataset.TextField trimmed_origin_view_id,
-            com.netgrif.workflow.petrinet.domain.dataset.TaskField ancestor_task_ref,
-            com.netgrif.workflow.petrinet.domain.Transition t1,
-            com.netgrif.workflow.petrinet.domain.Transition t2
-                ->
-                if (parentFilterId.value == "" &amp;&amp; originViewId.value == "") {
-                    make and_view, forbidden on t1 when {true}
-                    make and_view, forbidden on t2 when {true}
-                    make trimmed_origin_view_id, forbidden on t1 when {true}
-                    make trimmed_origin_view_id, forbidden on t2 when {true}
-
-                    change ancestor_task_ref value {[]}
-                    return true;
-                }
-                return false;
-        }
-    </function>
     <!-- DATA -->
     <data type="filter" immediate="true">
         <id>filter</id>
@@ -97,6 +75,7 @@
                         return;
                     }
 
+                    // the same regex is used in the frontend FilterExtractionService. Please keep them in sync
                     def match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
                     match.matches()
 
