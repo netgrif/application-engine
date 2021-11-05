@@ -88,14 +88,12 @@
             <actions phase="post">
                 <action>
                     origin_view_id: f.origin_view_id,
-                    parent_filter_id: f.parent_filter_id,
                     and_view: f.and_view,
                     trimmed_origin_view_id: f.trimmed_origin_view_id,
-                    ancestor_task_ref: f.taskref_and_parent,
                     t1: t.view_filter,
                     t2: t.view_as_ancestor;
 
-                    if (resolveVisibilityIfRoot(origin_view_id, parent_filter_id, and_view, trimmed_origin_view_id, ancestor_task_ref, t1, t2)) {
+                    if (origin_view_id.value == "") {
                         return;
                     }
 
@@ -126,22 +124,8 @@
             <id>set</id>
             <actions phase="post">
                 <action>
-                    origin_view_id: f.origin_view_id,
                     parent_filter_id: f.parent_filter_id,
-                    and_view: f.and_view,
-                    trimmed_origin_view_id: f.trimmed_origin_view_id,
-                    ancestor_task_ref: f.taskref_and_parent,
-                    t1: t.view_filter,
-                    t2: t.view_as_ancestor;
-
-                    if (resolveVisibilityIfRoot(origin_view_id, parent_filter_id, and_view, trimmed_origin_view_id, ancestor_task_ref, t1, t2)) {
-                        return;
-                    }
-
-                    make and_view, forbidden on t1 when {true}
-                    make and_view, forbidden on t2 when {true}
-                    make trimmed_origin_view_id, forbidden on t1 when {true}
-                    make trimmed_origin_view_id, forbidden on t2 when {true}
+                    ancestor_task_ref: f.taskref_and_parent;
 
                     def ancestor_view_filter = findTask({it.caseId.eq(parent_filter_id.value).and(it.task.transitionId.eq("view_as_ancestor"))})
 
