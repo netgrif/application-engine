@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
 
-
-//TODO: JOZIKE saveNew
-
 @Slf4j
 @Service
 @Primary
