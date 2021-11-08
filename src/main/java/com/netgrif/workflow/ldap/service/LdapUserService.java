@@ -8,10 +8,14 @@ import com.netgrif.workflow.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
 
 @Slf4j
+@Service
+@Primary
 @ConditionalOnExpression("${nae.ldap.enabled}")
 public class LdapUserService extends UserService {
 
