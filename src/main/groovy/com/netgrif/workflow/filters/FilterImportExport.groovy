@@ -9,9 +9,11 @@ import com.netgrif.workflow.petrinet.domain.I18nString
  * This class holds all information about one filter, so filter can be fully build from this class.
  * This class is represented by <filter> tag in exported xml file.
  */
-
 class FilterImportExport {
     I18nString filterName
+    String caseId
+    String parentCaseId
+    String parentViewId
     String filterValue
     String visibility
     String type
