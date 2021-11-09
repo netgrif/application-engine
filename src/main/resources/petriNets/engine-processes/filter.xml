@@ -600,7 +600,7 @@
             <dataRef>
                 <id>origin_view_id</id>
                 <logic>
-                    <behavior>hidden</behavior>
+                    <behavior>forbidden</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
