@@ -176,64 +176,68 @@ public class FilterImportExportService implements IFilterImportExportService {
         return performImport(filterList);
     }
 
-    private List<String> performImport (FilterImportExportList filterList) throws IOException {
-        List<String> importedFiltersIds = new ArrayList<>();
+    protected List<String> performImport (FilterImportExportList filterList) throws IOException {
+        Map<String, String> oldToNewFilterId = new HashMap<>();
+        List<String> importedFilterTaskIds = new ArrayList<>();
 
         if (filterList == null) {
             throw new FileNotFoundException();
         }
 
         filterList.getFilters().forEach(filter -> {
-            Optional<Case> filterCase = Optional.empty();
             if (filter.getAllowedNets() == null) {
                 filter.setAllowedNets(new ArrayList<>());
             }
-            if (filter.getType().equals(FILTER_TYPE_CASE)) {
-                filterCase = defaultFiltersRunner.createCaseFilter(
-                        filter.getFilterName().getDefaultValue(),
-                        filter.getIcon(),
-                        "",
-                        filter.getVisibility(),
-                        filter.getFilterValue(),
-                        filter.getAllowedNets(),
-                        filter.getFilterMetadataExport().getMapObject(),
-                        filter.getFilterName().getTranslations(),
-                        filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                        filter.getFilterMetadataExport().getInheritAllowedNets(),
-                        true
-                );
-            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
-                filterCase = defaultFiltersRunner.createTaskFilter(
-                        filter.getFilterName().getDefaultValue(),
-                        filter.getIcon(),
-                        "",
-                        filter.getVisibility(),
-                        filter.getFilterValue(),
-                        filter.getAllowedNets(),
-                        filter.getFilterMetadataExport().getMapObject(),
-                        filter.getFilterName().getTranslations(),
-                        filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                        filter.getFilterMetadataExport().getInheritAllowedNets(),
-                        true
-                );
+
+            String parentId = null;
+            boolean viewOrigin = false;
+
+            if (filter.getParentCaseId() != null && !filter.getParentCaseId().equals("")) {
+                parentId = oldToNewFilterId.get(filter.getParentCaseId());
+                if (parentId == null) {
+                    log.error("Imported filter with ID '" + filter.getCaseId() + "' could not find an imported mapping of its parent case with original ID '" + filter.getParentCaseId() + "'");
+                }
+                viewOrigin = false;
+            } else if (filter.getParentViewId() != null && !filter.getParentViewId().equals("")) {
+                parentId = filter.getParentViewId();
+                viewOrigin = true;
             }
+
+            Optional<Case> filterCase = defaultFiltersRunner.createFilter(
+                    filter.getFilterName().getDefaultValue(),
+                    filter.getIcon(),
+                    filter.getType(),
+                    filter.getVisibility(),
+                    filter.getFilterValue(),
+                    filter.getAllowedNets(),
+                    filter.getFilterMetadataExport().getMapObject(),
+                    filter.getFilterName().getTranslations(),
+                    filter.getFilterMetadataExport().getDefaultSearchCategories(),
+                    filter.getFilterMetadataExport().getInheritAllowedNets(),
+                    parentId,
+                    viewOrigin,
+                    true
+            );
 
             if (!filterCase.isPresent()) {
                 return;
             }
+
+            oldToNewFilterId.put(filter.getCaseId(), filterCase.get().getStringId());
+
             Task importedFilterTask = taskService.searchOne(
                     QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
                             .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
             );
-            importedFiltersIds.add(importedFilterTask.getStringId());
+            importedFilterTaskIds.add(importedFilterTask.getStringId());
 
             // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/
             filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        changeFilterField(importedFiltersIds);
-        return importedFiltersIds;
+        changeFilterField(importedFilterTaskIds);
+        return importedFilterTaskIds;
     }
 
     /**
