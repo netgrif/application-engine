@@ -16,6 +16,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
+import com.netgrif.workflow.petrinet.domain.dataset.TextField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
@@ -66,6 +67,8 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FIELD_FILTER_TYPE = "filter_type";
     private static final String FIELD_FILTER = "filter";
     private static final String FIELD_NAME = "i18n_filter_name";
+    private static final String FIELD_PARENT_CASE_ID = "parent_filter_id";
+    private static final String FIELD_PARENT_VIEW_ID = "origin_view_id";
     private static final String FIELD_MISSING_ALLOWED_NETS = "missing_allowed_nets";
     private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
@@ -116,7 +119,28 @@ public class FilterImportExportService implements IFilterImportExportService {
         log.info("Exporting selected filters");
         List<Case> selectedFilterCases = this.workflowService.findAllById(Lists.newArrayList(filtersToExport));
         FilterImportExportList filterList = new FilterImportExportList();
-        selectedFilterCases.forEach(filter -> filterList.getFilters().add(createExportClass(filter)));
+
+        Set<String> exportedFilterIds = new HashSet<>();
+
+        for (Case exportedFilter : selectedFilterCases) {
+            LinkedList<FilterImportExport> chain = new LinkedList<>();
+            Case currentCase = exportedFilter;
+            while (true) {
+                if (exportedFilterIds.contains(currentCase.getStringId())) {
+                    break;
+                }
+                exportedFilterIds.add(currentCase.getStringId());
+                FilterImportExport currentFilter = createExportClass(currentCase);
+                chain.push(currentFilter);
+                if (currentFilter.getParentCaseId() != null) {
+                    currentCase = this.workflowService.findOne(currentFilter.getParentCaseId());
+                } else {
+                    break;
+                }
+            }
+            filterList.getFilters().addAll(chain);
+        }
+
         return createXML(filterList);
     }
 
@@ -296,24 +320,33 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     public FilterImportExport createExportClass(Case filter) {
         FilterImportExport exportFilter = new FilterImportExport();
+        exportFilter.setCaseId(filter.getStringId());
         exportFilter.setIcon(filter.getIcon());
-        filter.getImmediateData().forEach(immediateData -> {
-            switch (immediateData.getImportId()) {
-                case FIELD_FILTER:
-                    exportFilter.setFilterValue(((FilterField) immediateData).getValue());
-                    exportFilter.setAllowedNets(((FilterField) immediateData).getAllowedNets());
-                    exportFilter.setFilterMetadataExport(((FilterField) immediateData).getFilterMetadata());
-                    break;
-                case FIELD_VISIBILITY:
-                    exportFilter.setVisibility(immediateData.getValue().toString());
-                    break;
-                case FIELD_FILTER_TYPE:
-                    exportFilter.setType(immediateData.getValue().toString());
-                    break;
-                case FIELD_NAME:
-                    exportFilter.setFilterName((I18nString) immediateData.getValue());
-            }
-        });
+
+        DataField parentCaseId = filter.getDataField(FIELD_PARENT_CASE_ID);
+        if (parentCaseId.getValue() != null && !parentCaseId.getValue().equals("")) {
+            exportFilter.setParentCaseId((String) parentCaseId.getValue());
+        }
+
+        DataField parentViewId = filter.getDataField(FIELD_PARENT_VIEW_ID);
+        if (parentViewId.getValue() != null && !parentViewId.getValue().equals("")) {
+            exportFilter.setParentViewId((String) parentViewId.getValue());
+        }
+
+        DataField filterField = filter.getDataField(FIELD_FILTER);
+        exportFilter.setFilterValue((String) filterField.getValue());
+        exportFilter.setAllowedNets(filterField.getAllowedNets());
+        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
+
+        DataField visibility = filter.getDataField(FIELD_VISIBILITY);
+        exportFilter.setVisibility(visibility.getValue().toString());
+
+        DataField type = filter.getDataField(FIELD_FILTER_TYPE);
+        exportFilter.setType(type.getValue().toString());
+
+        DataField name = filter.getDataField(FIELD_NAME);
+        exportFilter.setFilterName((I18nString) name.getValue());
+
         return exportFilter;
     }
 
