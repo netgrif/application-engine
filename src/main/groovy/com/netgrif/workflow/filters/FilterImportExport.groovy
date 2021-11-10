@@ -10,10 +10,10 @@ import com.netgrif.workflow.petrinet.domain.I18nString
  * This class is represented by <filter> tag in exported xml file.
  */
 class FilterImportExport {
-    I18nString filterName
     String caseId
     String parentCaseId
     String parentViewId
+    I18nString filterName
     String filterValue
     String visibility
     String type
