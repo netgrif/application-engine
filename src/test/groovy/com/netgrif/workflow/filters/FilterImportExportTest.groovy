@@ -197,7 +197,7 @@ class FilterImportExportTest {
     }
 
     void createTestFilter() {
-        defaultFiltersRunner.createCaseFilter("Test filter", "filter_alt", "", FILTER_VISIBILITY_PUBLIC,
+        defaultFiltersRunner.createCaseFilter("Test filter", "filter_alt", FILTER_VISIBILITY_PUBLIC,
                 "((((dataSet.number.numberValue:5) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.number.numberValue:[10 TO 100.548]) AND " +
                         "(processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.text.fulltextValue:*asdad*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) " +
                         "OR ((dataSet.enumeration.fulltextValue:*asdasd*) AND (processIdentifier:6139e51308215f25b0a498c2_all_data)) OR ((dataSet.enumeration_map.fulltextValue:*asdasd*) " +
