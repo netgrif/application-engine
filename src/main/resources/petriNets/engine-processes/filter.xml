@@ -843,21 +843,6 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>filter</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
                 <id>missing_allowed_nets</id>
                 <logic>
                     <behavior>hidden</behavior>
@@ -867,6 +852,25 @@
                     <y>2</y>
                     <rows>1</rows>
                     <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>my_full_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
                     <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
