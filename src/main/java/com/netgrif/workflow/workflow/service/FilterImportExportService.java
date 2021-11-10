@@ -15,8 +15,6 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
-import com.netgrif.workflow.petrinet.domain.dataset.TextField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
@@ -57,9 +55,6 @@ public class FilterImportExportService implements IFilterImportExportService {
     private static final String FILTER_NET_IDENTIFIER = "filter";
 
     private static final String UPLOAD_FILE_FIELD = "upload_file";
-
-    private static final String FILTER_TYPE_CASE = "Case";
-    private static final String FILTER_TYPE_TASK = "Task";
 
     private static final String IMPORT_FILTER_TRANSITION = "import_filter";
 
@@ -115,8 +110,19 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @throws IOException - if file which contains exported filters cannot be created
      */
     @Override
-    public FileFieldValue exportFilters(Collection<String> filtersToExport) throws IOException {
+    public FileFieldValue exportFiltersToFile(Collection<String> filtersToExport) throws IOException {
         log.info("Exporting selected filters");
+        return createXML(exportFilters(filtersToExport));
+    }
+
+    /**
+     * Method which performs export of selected filters into xml file.
+     * Method finds all cases by provided ids, transform them into FilterImportExportList object
+     * @param filtersToExport - set of ids of filter cases, which should be exported
+     * @return a serializable wrapper of a list of filter objects in serializable form
+     */
+    @Override
+    public FilterImportExportList exportFilters(Collection<String> filtersToExport) {
         List<Case> selectedFilterCases = this.workflowService.findAllById(Lists.newArrayList(filtersToExport));
         FilterImportExportList filterList = new FilterImportExportList();
 
@@ -141,7 +147,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             filterList.getFilters().addAll(chain);
         }
 
-        return createXML(filterList);
+        return filterList;
     }
 
     /**
