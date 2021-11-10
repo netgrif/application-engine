@@ -121,7 +121,7 @@ class FilterImportExportTest {
                 .filter({ filterCase -> filterCase.title in FILTERS_TO_EXPORT })
                 .map({filterCase -> filterCase.stringId})
                 .collect(Collectors.toSet())
-        FileFieldValue exportedFiltersField = this.importExportService.exportFilters(exportFiltersIds)
+        FileFieldValue exportedFiltersField = this.importExportService.exportFiltersToFile(exportFiltersIds)
         File exportedFiltersFile = new File(exportedFiltersField.getPath())
         assert exportedFiltersFile.exists()
 

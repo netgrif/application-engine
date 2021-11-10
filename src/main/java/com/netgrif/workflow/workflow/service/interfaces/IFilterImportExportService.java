@@ -18,7 +18,9 @@ import java.util.List;
 
 public interface IFilterImportExportService {
 
-    FileFieldValue exportFilters(Collection<String> filtersToExport) throws IOException;
+    FileFieldValue exportFiltersToFile(Collection<String> filtersToExport) throws IOException;
+
+    FilterImportExportList exportFilters(Collection<String> filtersToExport);
 
     List<String> importFilters() throws IOException, IllegalFilterFileException;
 
