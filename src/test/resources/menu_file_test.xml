@@ -68,6 +68,7 @@
   </menus>
   <filters>
     <filter>
+      <caseId>618b9afb5f420c67b6d6ce66</caseId>
       <filterName>
         <defaultValue>My cases</defaultValue>
         <translations>
@@ -107,6 +108,7 @@
       </filterMetadata>
     </filter>
     <filter>
+      <caseId>618b9afc5f420c67b6d6d36b</caseId>
       <filterName>
         <defaultValue>All cases</defaultValue>
         <translations>
@@ -124,6 +126,7 @@
       </filterMetadata>
     </filter>
     <filter>
+      <caseId>618b9af95f420c67b6d6c45c</caseId>
       <filterName>
         <defaultValue>All tasks</defaultValue>
         <translations>
@@ -141,6 +144,7 @@
       </filterMetadata>
     </filter>
     <filter>
+      <caseId>618b9afa5f420c67b6d6c961</caseId>
       <filterName>
         <defaultValue>My tasks</defaultValue>
         <translations>
