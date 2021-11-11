@@ -176,6 +176,19 @@ public class MenuImportExportService implements IMenuImportExportService {
             groupData.put("import_results", groupImportResultMessage);
             dataService.setData(task, ImportHelper.populateDataset(groupData));
         });
+
+        importedFilterTaskIds.values().forEach(taskId -> {
+            Task importedFilterTask = taskService.findOne(taskId);
+            Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
+            try {
+                taskService.assignTask(importedFilterTask.getStringId());
+                taskService.finishTask(importedFilterTask.getStringId());
+                workflowService.save(filterCase);
+            } catch (TransitionNotExecutableException e) {
+                log.error("Failed to execute \"import_filter\" task with id: " + taskId, e);
+            }
+        });
+
         return importedEntryAndFilterCaseIds;
     }
 
@@ -197,13 +210,6 @@ public class MenuImportExportService implements IMenuImportExportService {
 
         Task importedFilterTask = taskService.findOne(filterTaskId);
         Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-        try {
-            taskService.assignTask(importedFilterTask.getStringId());
-            taskService.finishTask(importedFilterTask.getStringId());
-            workflowService.save(filterCase);
-        } catch (TransitionNotExecutableException e) {
-            log.error("Failed to execute \"import_filter\" task with id: " + filterTaskId, e);
-        }
         if (filterCase == null) {
             resultMessage.append("Filter not found! Menu entry was skipped.\n");
             return "";
