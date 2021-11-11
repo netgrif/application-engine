@@ -156,14 +156,13 @@ public class MenuImportExportService implements IMenuImportExportService {
         });
 
         //Import filters
-        List<String> importedFilterTaskIds = filterImportExportService.importFilters(menuAndFilters.getFilterList());
+        Map<String, String> importedFilterTaskIds = filterImportExportService.importFilters(menuAndFilters.getFilterList());
 
         //Import each menu individually
-        final AtomicInteger cnt = new AtomicInteger( 0 ) ;
         menuAndFilters.getMenuList().getMenus().forEach(menu -> {
             resultMessage.append("\nIMPORTING MENU \"").append(menu.getMenuIdentifier()).append("\":\n");
             menu.getMenuEntries().forEach(menuItem -> {
-                String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(cnt.getAndIncrement()));
+                String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(menuItem.getFilterCaseId()));
                 if (!entryAndFilterCaseId.equals("")) importedEntryAndFilterCaseIds.add(entryAndFilterCaseId);
             });
 
