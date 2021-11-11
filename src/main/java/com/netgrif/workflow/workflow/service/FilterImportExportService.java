@@ -162,29 +162,27 @@ public class FilterImportExportService implements IFilterImportExportService {
      */
     @Override
     public List<String> importFilters() throws IOException, IllegalFilterFileException {
-
         log.info("Importing filters");
         FilterImportExportList filterList = loadFromXML();
-        return performImport(filterList);
-
+        return new ArrayList<>(performImport(filterList).values());
     }
 
     /**
      * Method which performs import of filters from already created filter import class instances
      * passed in as parameter.
      * @param filterList - instance of class FilterImportExportList
-     * @return List<String> - list of task ids of imported filter cases in - import_filter transition
+     * @return a mapping of original filter case ids to task ids of imported filter cases in - import_filter transition
      * @throws IOException - if imported file is not found
      */
     @Override
-    public List<String> importFilters (FilterImportExportList filterList) throws IOException {
+    public Map<String, String> importFilters (FilterImportExportList filterList) throws IOException {
         log.info("Importing filters from imported menu");
         return performImport(filterList);
     }
 
-    protected List<String> performImport (FilterImportExportList filterList) throws IOException {
+    protected Map<String, String> performImport (FilterImportExportList filterList) throws IOException {
         Map<String, String> oldToNewFilterId = new HashMap<>();
-        List<String> importedFilterTaskIds = new ArrayList<>();
+        Map<String, String> importedFilterTaskIds = new HashMap<>();
 
         if (filterList == null) {
             throw new FileNotFoundException();
@@ -235,14 +233,14 @@ public class FilterImportExportService implements IFilterImportExportService {
                     QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
                             .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
             );
-            importedFilterTaskIds.add(importedFilterTask.getStringId());
+            importedFilterTaskIds.put(filter.getCaseId(), importedFilterTask.getStringId());
 
             // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/
             filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        changeFilterField(importedFilterTaskIds);
+        changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }
 
@@ -252,7 +250,7 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @param filterFields - list of task ids of filters which value should be reloaded
      */
     @Override
-    public void changeFilterField(List<String> filterFields) {
+    public void changeFilterField(Collection<String> filterFields) {
         filterFields.forEach(f -> {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
