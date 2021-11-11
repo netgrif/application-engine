@@ -2,11 +2,19 @@ package com.netgrif.workflow.importer
 
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,13 +37,27 @@ class ImporterTestGroovy {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private IWorkflowService workflowService
+
     public static final String FILE_NAME = "importer_upsert.xml"
     public static final String IDENTIFIER = "importer_upsert"
 
-    private static final String ENUMERATION_FIELD = "enumeration"
     private static final String ENUMERATION_LIKE_MAP_FIELD = "enumeration_like_map"
-    private static final String MULTICHOICE_FIELD = "multichoice"
     private static final String MULTICHOICE_LIKE_MAP_FIELD = "multichoice_like_map"
+    private static final String NUMBER_FIELD = "number"
+    private static final String TEXT_FIELD = "text"
+    private static final String ENUMERATION_FIELD = "enumeration"
+    private static final String ENUMERATION_MAP_FIELD = "enumeration_map"
+    private static final String MULTICHOICE_FIELD = "multichoice"
+    private static final String MULTICHOICE_MAP_FIELD = "multichoice_map"
+    private static final String BOOLEAN_FIELD = "boolean"
+    private static final String DATE_FIELD = "date"
+    private static final String FILE_FIELD = "file"
+    private static final String FILE_LIST_FIELD = "fileList"
+    private static final String USER_FIELD = "user"
+    private static final String DATETIME_FIELD = "datetime"
+    private static final String BUTTON_FIELD = "button"
 
     @Test
     void upsertTest() {
