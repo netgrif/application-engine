@@ -328,7 +328,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         return new FileFieldValue(filterProperties.getFileName(), filePath);
     }
 
-    public FilterImportExport createExportClass(Case filter) {
+    protected FilterImportExport createExportClass(Case filter) {
         FilterImportExport exportFilter = new FilterImportExport();
         exportFilter.setCaseId(filter.getStringId());
         exportFilter.setIcon(filter.getIcon());
