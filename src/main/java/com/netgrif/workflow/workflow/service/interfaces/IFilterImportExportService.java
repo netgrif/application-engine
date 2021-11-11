@@ -26,8 +26,6 @@ public interface IFilterImportExportService {
 
     List<String> importFilters(FilterImportExportList filters) throws IOException;
 
-    FilterImportExport createExportClass(Case filter);
-
     void createFilterImport(User author);
 
     void createFilterExport(User author);
