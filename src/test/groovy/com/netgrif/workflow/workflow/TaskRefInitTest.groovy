@@ -39,11 +39,13 @@ class TaskRefInitTest {
     private TestHelper testHelper
 
     PetriNet net = null
+    PetriNet autoTrigger = null
 
     @Before
     void initNet() {
         testHelper.truncateDbs()
         net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).get()
+        autoTrigger = petriNetService.importPetriNet(new FileInputStream("src/test/resources/autotrigger_taskref.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).get()
         assert net != null
     }
 
@@ -57,5 +59,11 @@ class TaskRefInitTest {
         assert ((List<String>)aCase.dataSet.get("taskRef_1").value).isEmpty()
         assert ((List<String>)aCase.dataSet.get("taskRef_2").value).contains(task1.stringId) & ((List<String>)aCase.dataSet.get("taskRef_2").value).size() == 1
         assert ((List<String>)aCase.dataSet.get("taskRef_3").value).isEmpty()
+    }
+
+    @Test
+    void autoTriggerTaskRef() {
+        Case bCase = helper.createCase("Task ref init with auto trigger", autoTrigger)
+        assert ((List<String>) bCase.dataSet["tema"].value).contains(bCase.tasks.stream().filter({ t -> t.transition == "t1" }).findFirst().get().task) && ((List<String>) bCase.dataSet["tema"].value).size() == 1
     }
 }
