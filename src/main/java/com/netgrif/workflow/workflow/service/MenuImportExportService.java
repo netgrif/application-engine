@@ -98,9 +98,9 @@ public class MenuImportExportService implements IMenuImportExportService {
 
             menuItemCaseIds.forEach(menuItemCaseId -> {
                 Case menuItem = workflowService.findOne(menuItemCaseId);
-                String filterId = menuItem.getDataSet().get("filter_case").getValue().toString();
-                menu.getMenuEntries().add(createMenuEntryExportClass(menuItem));
-                filterCaseIds.add(filterId.substring(1, filterId.length() - 1));
+                String filterId = ((List<String>) menuItem.getDataSet().get("filter_case").getValue()).get(0);
+                menu.getMenuEntries().add(createMenuEntryExportClass(menuItem, filterId));
+                filterCaseIds.add(filterId);
             });
             filterCaseIds.forEach(filterCaseId -> {
                 menuAndFilters.getFilterList().getFilters().addAll(filterImportExportService.exportFilters(Collections.singletonList(filterCaseId)).getFilters());
@@ -297,7 +297,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         return ffv;
     }
 
-    private MenuEntry createMenuEntryExportClass (Case menuItemCase)
+    private MenuEntry createMenuEntryExportClass (Case menuItemCase, String filterCaseId)
     {
         Map<String, I18nString> allowedRoles = menuItemCase.getDataSet().get(ALLOWED_ROLES).getOptions();
         Map<String, I18nString> bannedRoles = menuItemCase.getDataSet().get(BANNED_ROLES).getOptions();
@@ -326,6 +326,7 @@ public class MenuImportExportService implements IMenuImportExportService {
 
         MenuEntry exportMenuItem = new MenuEntry();
         exportMenuItem.setEntryName(menuItemCase.getDataSet().get(MENU_ITEM_NAME).toString());
+        exportMenuItem.setFilterCaseId(filterCaseId);
         exportMenuItem.setUseIcon((Boolean) menuItemCase.getDataSet().get(USE_ICON).getValue());
         if (!menuEntryRoleList.isEmpty()) exportMenuItem.setMenuEntryRoleList(menuEntryRoleList);
 
