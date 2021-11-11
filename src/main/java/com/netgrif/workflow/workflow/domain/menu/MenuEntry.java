@@ -20,6 +20,8 @@ public class MenuEntry {
 
     @XmlElement(required = true)
     protected String entryName;
+    @XmlElement(required = true)
+    protected String filterCaseId;
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "entryRole")
     protected List<MenuEntryRole> menuEntryRoleList;
