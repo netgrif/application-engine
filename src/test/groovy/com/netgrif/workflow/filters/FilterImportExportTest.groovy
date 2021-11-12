@@ -12,6 +12,7 @@ import com.netgrif.workflow.startup.DefaultFiltersRunner
 import com.netgrif.workflow.startup.FilterRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.*
+import com.netgrif.workflow.workflow.domain.filter.FilterImportExportList
 import com.netgrif.workflow.workflow.service.UserFilterSearchService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService
