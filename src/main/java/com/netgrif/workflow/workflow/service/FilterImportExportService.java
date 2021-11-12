@@ -9,8 +9,8 @@ import com.google.common.collect.Lists;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.FilterProperties;
-import com.netgrif.workflow.filters.FilterImportExport;
-import com.netgrif.workflow.filters.FilterImportExportList;
+import com.netgrif.workflow.workflow.domain.filter.FilterImportExport;
+import com.netgrif.workflow.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
@@ -216,8 +216,8 @@ public class FilterImportExportService implements IFilterImportExportService {
                     filter.getAllowedNets(),
                     filter.getFilterMetadataExport().getMapObject(),
                     filter.getFilterName().getTranslations(),
-                    filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                    filter.getFilterMetadataExport().getInheritAllowedNets(),
+                    filter.getFilterMetadataExport().isDefaultSearchCategories(),
+                    filter.getFilterMetadataExport().isInheritAllowedNets(),
                     parentId,
                     viewOrigin,
                     true
