@@ -102,9 +102,7 @@ public class MenuImportExportService implements IMenuImportExportService {
                 menu.getMenuEntries().add(createMenuEntryExportClass(menuItem, filterId));
                 filterCaseIds.add(filterId);
             });
-            filterCaseIds.forEach(filterCaseId -> {
-                menuAndFilters.getFilterList().getFilters().addAll(filterImportExportService.exportFilters(Collections.singletonList(filterCaseId)).getFilters());
-            });
+            menuAndFilters.getFilterList().getFilters().addAll(filterImportExportService.exportFilters(filterCaseIds).getFilters());
 
             menuAndFilters.getMenuList().getMenus().add(menu);
         }
