@@ -184,7 +184,119 @@ class FilterImportExportTest {
         }
     }
 
-    User createDummyUser() {
+    @Test
+    void importExportChainedFilters() {
+        Optional<Case> filter1Opt = defaultFiltersRunner.createCaseFilter(
+                "Link 1",
+                "home",
+                FILTER_VISIBILITY_PUBLIC,
+                "(author:<<me>>)",
+                [],
+                ["predicateMetadata": [
+                    [[
+                        "category": "case_author",
+                        "configuration": [
+                            "operator": "equals"
+                        ],
+                        "values": [[
+                            "text": "search.category.userMe",
+                            "value": ["<<me>>"]
+                        ]]
+                    ]]
+                ], "searchCategories": ["case_author"]],
+                [:]
+        )
+        assert filter1Opt.isPresent()
+        Case filter1 = filter1Opt.get()
+        Optional<Case> filter2Opt = defaultFiltersRunner.createCaseFilter(
+                "Link 2",
+                "home",
+                FILTER_VISIBILITY_PUBLIC,
+                "(author:<<me>>)",
+                [],
+                ["predicateMetadata": [
+                        [[
+                                 "category": "case_author",
+                                 "configuration": [
+                                         "operator": "equals"
+                                 ],
+                                 "values": [[
+                                                    "text": "search.category.userMe",
+                                                    "value": ["<<me>>"]
+                                            ]]
+                         ]]
+                ], "searchCategories": ["case_author"]],
+                [:],
+                true,
+                true,
+                filter1.getStringId()
+        )
+        assert filter2Opt.isPresent()
+        Case filter2 = filter2Opt.get()
+        Optional<Case> filter3Opt = defaultFiltersRunner.createCaseFilter(
+                "Link 3",
+                "home",
+                FILTER_VISIBILITY_PUBLIC,
+                "(author:<<me>>)",
+                [],
+                ["predicateMetadata": [
+                        [[
+                                 "category": "case_author",
+                                 "configuration": [
+                                         "operator": "equals"
+                                 ],
+                                 "values": [[
+                                                    "text": "search.category.userMe",
+                                                    "value": ["<<me>>"]
+                                            ]]
+                         ]]
+                ], "searchCategories": ["case_author"]],
+                [:],
+                true,
+                true,
+                filter1.getStringId()
+        )
+        assert filter3Opt.isPresent()
+        Case filter3 = filter3Opt.get()
+
+        FilterImportExportList exported = importExportService.exportFilters([filter2.getStringId(), filter3.getStringId()])
+        assert exported != null
+        assert exported.filters != null
+        assert exported.filters.size() == 3
+        assert exported.filters.get(0).caseId == filter1.getStringId()
+        assert exported.filters.get(0).parentCaseId == null
+        assert exported.filters.get(0).parentViewId == null
+        assert exported.filters.get(1).caseId == filter2.getStringId()
+        assert exported.filters.get(1).parentCaseId == filter1.getStringId()
+        assert exported.filters.get(1).parentViewId == null
+        assert exported.filters.get(2).caseId == filter3.getStringId()
+        assert exported.filters.get(2).parentCaseId == filter1.getStringId()
+        assert exported.filters.get(2).parentViewId == null
+
+        Map<String, String> imported = importExportService.importFilters(exported)
+        assert imported != null
+        assert imported.size() == 3
+
+        List<Task> importedTasks = taskService.findAllById(new ArrayList<String>(imported.values()))
+        assert importedTasks.size() == 3
+
+        Map<String, String> invertedMap = imported.collectEntries {k, v -> [v, k]}
+        Map<String, String> newToOldCaseId = importedTasks.collectEntries {t -> [t.caseId, invertedMap.get(t.getStringId())]}
+        Map<String, Case> idToOldCase = [filter1, filter2, filter3].collectEntries { c -> [c.stringId, c] }
+
+
+        List<Case> importedCases = workflowService.findAllById(new ArrayList<String>(newToOldCaseId.keySet()))
+        assert  importedCases.size() == 3
+
+        importedCases.forEach({c ->
+            Case oldCase = idToOldCase.get(newToOldCaseId.get(c.getStringId()))
+            assert oldCase != null
+            assert newToOldCaseId.get(c.dataSet.get("origin_view_id").value) == oldCase.dataSet.get("origin_view_id").value
+            assert newToOldCaseId.get(c.dataSet.get("parent_filter_id").value) == oldCase.dataSet.get("parent_filter_id").value
+        })
+    }
+
+    private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
