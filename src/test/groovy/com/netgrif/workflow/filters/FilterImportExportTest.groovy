@@ -17,6 +17,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -90,13 +91,16 @@ class FilterImportExportTest {
     private IDataService dataService
 
     private Authentication userAuth
+    private User dummyUser
+    private Case importCase
+    private Case exportCase
 
-    @Test
-    void createImportExportFiltersNet() {
+    @Before
+    void setup() {
         this.testHelper.truncateDbs()
         this.defaultFiltersRunner.run()
         createTestFilter()
-        User dummyUser = createDummyUser()
+        dummyUser = createDummyUser()
         userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
@@ -105,15 +109,18 @@ class FilterImportExportTest {
         assert importNet.isPresent()
         assert exportNet.isPresent()
 
-        Case importCase = this.workflowService.searchOne(
+        importCase = this.workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(IMPORT_NET_IDENTIFIER).and(QCase.case$.author.email.eq(DUMMY_USER_MAIL))
         )
-        Case exportCase = this.workflowService.searchOne(
+        exportCase = this.workflowService.searchOne(
                 QCase.case$.processIdentifier.eq(EXPORT_NET_IDENTIFIER).and(QCase.case$.author.email.eq(DUMMY_USER_MAIL))
         )
         assert importCase != null
         assert exportCase != null
+    }
 
+    @Test
+    void createImportExportFiltersNet() {
         List<Case> filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         assert filterCases.size() == DEFAULT_FILTERS_SIZE
 
