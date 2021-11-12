@@ -4,6 +4,7 @@
     <menu name="defaultMenu">
       <menuEntry useIcon="true">
         <entryName>My cases</entryName>
+        <filterCaseId>618b9afb5f420c67b6d6ce66</filterCaseId>
         <entryRole type="banned">
           <roleImportId>client</roleImportId>
           <netImportId>mortgage</netImportId>
@@ -23,6 +24,7 @@
       </menuEntry>
       <menuEntry useIcon="true">
         <entryName>All cases</entryName>
+        <filterCaseId>618b9afc5f420c67b6d6d36b</filterCaseId>
         <entryRole type="allowed">
           <roleImportId>client</roleImportId>
           <netImportId>mortgage</netImportId>
@@ -44,6 +46,7 @@
     <menu name="newMenu">
       <menuEntry useIcon="false">
         <entryName>All tasks</entryName>
+        <filterCaseId>618b9af95f420c67b6d6c45c</filterCaseId>
         <entryRole type="allowed">
           <roleImportId>client</roleImportId>
           <netImportId>mortgage</netImportId>
@@ -63,6 +66,7 @@
       </menuEntry>
       <menuEntry useIcon="false">
         <entryName>My tasks</entryName>
+        <filterCaseId>618b9afa5f420c67b6d6c961</filterCaseId>
       </menuEntry>
     </menu>
   </menus>

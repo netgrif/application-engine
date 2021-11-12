@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.filters.FilterImportExportList;
+import com.netgrif.workflow.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.workflow.domain.IllegalFilterFileException;
 
