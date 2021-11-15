@@ -67,8 +67,10 @@ public class FilterMetadataExport {
     public Map<String, Object> getMapObject() {
         Map<String, Object> mapObject = new HashMap<>();
         List<Object> listPredicateMetadata = new ArrayList<>();
-        for (PredicateArray val : predicateMetadata) {
-            listPredicateMetadata.add(val.getMapObject());
+        if (predicateMetadata != null) {
+            for (PredicateArray val : predicateMetadata) {
+                listPredicateMetadata.add(val.getMapObject());
+            }
         }
         mapObject.put("predicateMetadata", listPredicateMetadata);
         mapObject.put("searchCategories", searchCategories != null ? searchCategories : new ArrayList<String>());
