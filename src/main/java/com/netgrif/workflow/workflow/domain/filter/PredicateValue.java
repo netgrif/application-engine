@@ -18,7 +18,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PredicateValue {
+public class PredicateValue extends DoubleValueHolder {
 
     protected String text;
     @JacksonXmlElementWrapper(localName = "stringValues")
@@ -44,12 +44,7 @@ public class PredicateValue {
                     } else if (list.get(0) instanceof Integer || list.get(0) instanceof Double || list.get(0) instanceof Float) {
                         doubleValues = new ArrayList<>();
                         for (Object val : list) {
-                            if (val instanceof Double)
-                                doubleValues.add((Double) val);
-                            if (val instanceof Integer)
-                                doubleValues.add(new Double((Integer) val));
-                            if (val instanceof Float)
-                                doubleValues.add(new Double((Float) val));
+                            doubleValues.add(convertObjectToDouble(val));
                         }
                     }
                     break;
@@ -62,12 +57,8 @@ public class PredicateValue {
                     break;
                 case "doubleValues":
                     doubleValues = new ArrayList<>();
-                    List<?> doubleList = (List<?>) v;
-                    for (Object val : doubleList) {
-                        if (val instanceof Double)
-                            doubleValues.add((Double) val);
-                        if (val instanceof String)
-                            doubleValues.add(Double.parseDouble((String) val));
+                    for (Object val :  (List<?>) v) {
+                        doubleValues.add(convertObjectToDouble(val));
                     }
                     break;
             }

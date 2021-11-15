@@ -22,7 +22,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Predicate {
+public class Predicate extends DoubleValueHolder {
     protected String category;
     protected Configuration configuration;
     @JacksonXmlElementWrapper(localName = "stringValues")
@@ -65,12 +65,7 @@ public class Predicate {
                     } else if (list.get(0) instanceof Integer || list.get(0) instanceof Double || list.get(0) instanceof Float) {
                         doubleValues = new ArrayList<>();
                         for (Object val : list) {
-                            if (val instanceof Double)
-                                doubleValues.add((Double) val);
-                            if (val instanceof Integer)
-                                doubleValues.add(new Double((Integer) val));
-                            if (val instanceof Float)
-                                doubleValues.add(new Double((Float) val));
+                            doubleValues.add(convertObjectToDouble(val));
                         }
                     }  else if (list.get(0) instanceof Long) {
                         longValues = new ArrayList<>();
@@ -91,18 +86,35 @@ public class Predicate {
                     break;
                 case "doubleValues":
                     doubleValues = new ArrayList<>();
-                    List<Double> doubleList = (List<Double>) v;
-                    doubleValues.addAll(doubleList);
+                    for (Object val :  (List<?>) v) {
+                        doubleValues.add(convertObjectToDouble(val));
+                    }
                     break;
                 case "longValues":
                     longValues = new ArrayList<>();
-                    List<Long> longList = (List<Long>) v;
-                    longValues.addAll(longList);
+                    for (Object val :  (List<?>) v) {
+                        if (val instanceof Long) {
+                            longValues.add((Long) val);
+                            continue;
+                        } else if (val instanceof String) {
+                            longValues.add(Long.parseLong((String) val));
+                            continue;
+                        }
+                        throw new IllegalArgumentException("The provided Object (" + val.toString() + ") cannot be converted to Long");
+                    }
                     break;
                 case "booleanValues":
                     booleanValues = new ArrayList<>();
-                    List<Boolean> booleanList = (List<Boolean>) v;
-                    booleanValues.addAll(booleanList);
+                    for (Object val :  (List<?>) v) {
+                        if (val instanceof Boolean) {
+                            booleanValues.add((Boolean) val);
+                            continue;
+                        } else if (val instanceof String) {
+                            booleanValues.add(Boolean.parseBoolean((String) val));
+                            continue;
+                        }
+                        throw new IllegalArgumentException("The provided Object (" + val.toString() + ") cannot be converted to Boolean");
+                    }
                     break;
                 case "mapValues":
                     mapValues = new ArrayList<>();
