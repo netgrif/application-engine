@@ -227,7 +227,7 @@ class ActionDelegate {
      *     make text,visible on transition when { condition.value == true }* </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
      * @param field which behaviour will be changed
-     * @param behavior one of visible, editable, required, optional, hidden, forbidden`
+     * @param behavior one of visible, editable, required, optional, hidden, forbidden
      */
     def make(Field field, Closure behavior) {
         [on: { Transition trans ->
