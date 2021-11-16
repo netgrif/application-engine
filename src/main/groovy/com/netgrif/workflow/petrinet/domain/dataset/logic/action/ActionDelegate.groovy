@@ -980,7 +980,7 @@ class ActionDelegate {
         if (filtersToExport.isEmpty()) {
             return null
         }
-        return filterImportExportService.exportFilters(filtersToExport)
+        return filterImportExportService.exportFiltersToFile(filtersToExport)
     }
 
     List<String> importFilters() {
