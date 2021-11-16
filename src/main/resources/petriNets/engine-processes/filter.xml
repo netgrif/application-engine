@@ -92,7 +92,7 @@
                     make and_view, visible on t2 when {true}
                     make trimmed_origin_view_id, visible on t1 when {true}
                     make trimmed_origin_view_id, visible on t2 when {true}
-                    make origin_view_id, hidden on t1 when {true}
+                    make origin_view_id, forbidden on t1 when {true}
                 </action>
             </actions>
         </event>
