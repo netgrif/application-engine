@@ -127,11 +127,29 @@ can therefore be freely overridden.
 </data>
 ```
 
-The viewId of the view where the filter was created is stored in this data variable. When the field is set an action is
-triggered, that resolves the parent filter (if any) and populates the data variables that are responsible for displaying
-the parent filter with the appropriate values.
+The viewId of the view where the filter was created is stored in this data variable.
+Is only set if the filter originates from a view with an in-app filter.
+
+When the field is set an action is triggered, that resolves the parent filter (if any) and populates the data variables
+that are responsible for displaying the parent filter with the appropriate values.
 
 It must be `immediate`, have the ID `origin_view_id` and be of type `text`.
+
+##### Parent filter Id
+
+```xml
+<data type="text" immediate="true">
+  <id>parent_filter_id</id>
+  <title name="parent_filter_id">parent filter ID</title>
+</data>
+```
+
+The case ID of the parent filter case (if any). Is only set if the filter originates from a different filter case (usually via configurable menu).
+
+When the field is set an action is triggered, that resolves the parent filter (if any) and populates the data variables
+that are responsible for displaying the parent filter with the appropriate values.
+
+It must have the ID `parent_filter_id` and be of type `text`.
 
 ##### Filter name
 
@@ -403,11 +421,12 @@ process instance, when a new filter is created (saved).
 
 It must have the transition ID `frontend_create`.
 
-It must contain 3 data fields that are set via an API request:
+It must contain 4 data fields that are set via an API request:
 
 * `filter`
 * `filter_type`
 * `origin_view_id`
+* `parent_filter_id`
 
 Custom set data requests can be sent via the frontend filter API. These requests target this task. Therefore, if you
 want to set additional properties to your newly created filter instances you can do so by adding the necessary data
@@ -499,11 +518,12 @@ transitions with a single `setData` operation.
 
 It must have the transition ID `auto_create`.
 
-It must contain 4 data fields that are set via a `setData` API call.
+It must contain 5 data fields that are set via a `setData` API call.
 
 * `filter`
 * `filter_type`
 * `origin_view_id`
+* `parent_filter_id`
 * `visibility`
 
 Once it finishes the `view_filter` and `view_as_ancestor` tasks become executable.
@@ -535,17 +555,19 @@ An action is bound to the finish of this transition, that sets the reference of 
       </logic>
     </dataRef>
     <dataRef>
-      <id>filter</id>
-      <logic>
-        <behavior>visible</behavior>
-      </logic>
-    </dataRef>
-    <dataRef>
       <id>missing_allowed_nets</id>
       <logic>
         <behavior>hidden</behavior>
       </logic>
     </dataRef>
+  </dataGroup>
+  <dataGroup>
+    <dataRef>
+      <id>my_full_filter</id>
+      <logic>
+        <behavior>visible</behavior>
+      </logic>
+    </dataRef> 
   </dataGroup>
 </transition>
 ```
@@ -561,7 +583,7 @@ change some fundamental filter properties:
 * `new_title` (editable)
 * `filter_type` (visible)
 * `visibility` (editable)
-* `filter` (visible)
+* `my_full_filter` (visible)
 * `missing_allowed_nets` (hidden) - made visible by the import action if some nets are missing
 
 ##### Details
@@ -621,7 +643,7 @@ omitting this transition.
     <dataRef>
       <id>origin_view_id</id>
       <logic>
-        <behavior>hidden</behavior>
+        <behavior>forbidden</behavior>
       </logic>
     </dataRef>
     <dataRef>
@@ -655,9 +677,13 @@ referenced filter somewhere (such as in the configurable group navigation entrie
 the filter field itself the ancestor filters are displayed here as well. Each of them is prefixed with an AND text to
 indicate that they are combined with the original filter with the **and** operator.
 
-If the root of the filter chain is a filter process (indicate by its `origin_view_id` field being set to an empty
-string) the root filters content will be the last entry displayed. If the root is a frontend filter the last entry will
+If the root of the filter chain is a filter process (indicated by its `parent_filter_id` having a non-empty value)
+the root filters content will be the last entry displayed. If the root is a frontend filter
+(indicated by its `origin_view_id` field being set to a non-empty string) the last entry will
 contain a text indicating the view from which the filter originates. The displayed view ID excludes any tab suffixes.
+
+If the filter does not originate from a view its `origin_view_id` field must have its behavior set to `forbidden`, 
+so that the frontend parsing mechanism won't find false positives during the interpretation of the filter.
 
 It must have the transition ID `view_filter`.
 
@@ -765,12 +791,12 @@ according to your wishes. An overview of these building blocks can be found in t
 ### Filter constants
 
 The
-enum [UserFilterConstants](https://developer.netgrif.com/projects/engine-frontend/5.4.0/nae/docs/miscellaneous/enumerations.html#UserFilterConstants)
+enum [UserFilterConstants](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/miscellaneous/enumerations.html#UserFilterConstants)
 contains identifiers and IDs of all parts of the filter process referenced by the frontend filters API.
 
 ### UserFiltersService
 
-The [UserFiltersService](https://developer.netgrif.com/projects/engine-frontend/5.4.0/nae/docs/injectables/UserFiltersService.html)
+The [UserFiltersService](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/injectables/UserFiltersService.html)
 contains the API for saving, loading and deleting filter process instances.
 
 The search component contains buttons that trigger the save and load methods, so you do not have to use this service
@@ -782,7 +808,7 @@ configuring the filter that filters the filter process instances displayed when 
 
 ### SearchComponent
 
-The [SearchComponent](https://developer.netgrif.com/projects/engine-frontend/5.4.0/nae/docs/classes/AbstractSearchComponent.html)
+The [SearchComponent](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/classes/AbstractSearchComponent.html)
 is a wrapper for the two search mode components (fulltext and advanced)
 these components can be used independently of each other and the search component combines them into one and adds
 various control elements to them.
@@ -798,13 +824,19 @@ filter management.
 
 An injection token is available for the configuration of the search component - `NAE_SEARCH_COMPONENT_CONFIGURATION`. It
 provides
-a [SearchComponentConfiguration](https://developer.netgrif.com/projects/engine-frontend/5.4.0/nae/docs/interfaces/SearchComponentConfiguration.html)
+a [SearchComponentConfiguration](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/interfaces/SearchComponentConfiguration.html)
 object that can be used to hide many elements of the search component (buttons mostly). This way you can remove the save
 and/or load filter buttons and therefore not allow the users to persist filters in some specific views.
 
 ### SearchService
 
-The [SearchService](https://developer.netgrif.com/projects/engine-frontend/5.4.0/nae/docs/injectables/SearchService.html)
+The [SearchService](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/injectables/SearchService.html)
 provides two complementary methods - `createPredicateMetadata` and `loadFromMetadata`. These can be used to populate the
 search service with a predicate stored inside a filter field (`filterMetadata` attribute). If an advanced search
 component is connected to the search service, then it will automatically display the loaded predicate.
+
+### FilterExtractionService
+
+The [FilterExtractionService](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/injectables/FilterExtractionService.html)
+contains the functionality of extracting a frontend [Filter](https://developer.netgrif.com/projects/engine-frontend/latest/nae/docs/classes/Filter.html)
+instance from the data of a configurable navigation entry task.
