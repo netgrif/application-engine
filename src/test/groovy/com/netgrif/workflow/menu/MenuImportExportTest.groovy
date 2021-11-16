@@ -15,13 +15,13 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.menu.MenuAndFilters
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.UserFilterSearchService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IMenuImportExportService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.custommonkey.xmlunit.XMLTestCase
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,7 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class MenuImporExportTest {
+class MenuImportExportTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
     public static final String DUMMY_USER_PASSWORD = "password"
@@ -187,10 +187,13 @@ class MenuImporExportTest {
         File exportedFiltersFile = new File(exportFileField.getPath())
         assert exportedFiltersFile.exists()
 
-        XMLTestCase.assertEquals(exportedFiltersFile.text, testXmlMenu.text)
+        MenuAndFilters original = menuImportExportService.invokeMethod("loadFromXML", [FileFieldValue.fromString(testXmlMenu.getName() + ":" + testXmlMenu.getPath())] as Object[]) as MenuAndFilters
+        MenuAndFilters exported = menuImportExportService.invokeMethod("loadFromXML", [exportFileField] as Object[]) as MenuAndFilters
+
+        assert original == exported
     }
 
-    User createDummyUser() {
+    private User createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],

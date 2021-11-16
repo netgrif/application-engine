@@ -98,14 +98,11 @@ public class MenuImportExportService implements IMenuImportExportService {
 
             menuItemCaseIds.forEach(menuItemCaseId -> {
                 Case menuItem = workflowService.findOne(menuItemCaseId);
-                String filterId = menuItem.getDataSet().get("filter_case").getValue().toString();
-                menu.getMenuEntries().add(createMenuEntryExportClass(menuItem));
-                filterCaseIds.add(filterId.substring(1, filterId.length() - 1));
+                String filterId = ((List<String>) menuItem.getDataSet().get("filter_case").getValue()).get(0);
+                menu.getMenuEntries().add(createMenuEntryExportClass(menuItem, filterId));
+                filterCaseIds.add(filterId);
             });
-            filterCaseIds.forEach(filterCaseId -> {
-                Case filterCase = workflowService.findOne(filterCaseId);
-                menuAndFilters.getFilterList().getFilters().add(filterImportExportService.createExportClass(filterCase));
-            });
+            menuAndFilters.getFilterList().getFilters().addAll(filterImportExportService.exportFilters(filterCaseIds).getFilters());
 
             menuAndFilters.getMenuList().getMenus().add(menu);
         }
@@ -157,14 +154,13 @@ public class MenuImportExportService implements IMenuImportExportService {
         });
 
         //Import filters
-        List<String> importedFilterTaskIds = filterImportExportService.importFilters(menuAndFilters.getFilterList());
+        Map<String, String> importedFilterTaskIds = filterImportExportService.importFilters(menuAndFilters.getFilterList());
 
         //Import each menu individually
-        final AtomicInteger cnt = new AtomicInteger( 0 ) ;
         menuAndFilters.getMenuList().getMenus().forEach(menu -> {
             resultMessage.append("\nIMPORTING MENU \"").append(menu.getMenuIdentifier()).append("\":\n");
             menu.getMenuEntries().forEach(menuItem -> {
-                String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(cnt.getAndIncrement()));
+                String entryAndFilterCaseId = createMenuItemCase(resultMessage, menuItem, menu.getMenuIdentifier(), parentId, importedFilterTaskIds.get(menuItem.getFilterCaseId()));
                 if (!entryAndFilterCaseId.equals("")) importedEntryAndFilterCaseIds.add(entryAndFilterCaseId);
             });
 
@@ -178,6 +174,19 @@ public class MenuImportExportService implements IMenuImportExportService {
             groupData.put("import_results", groupImportResultMessage);
             dataService.setData(task, ImportHelper.populateDataset(groupData));
         });
+
+        importedFilterTaskIds.values().forEach(taskId -> {
+            Task importedFilterTask = taskService.findOne(taskId);
+            Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
+            try {
+                taskService.assignTask(importedFilterTask.getStringId());
+                taskService.finishTask(importedFilterTask.getStringId());
+                workflowService.save(filterCase);
+            } catch (TransitionNotExecutableException e) {
+                log.error("Failed to execute \"import_filter\" task with id: " + taskId, e);
+            }
+        });
+
         return importedEntryAndFilterCaseIds;
     }
 
@@ -199,13 +208,6 @@ public class MenuImportExportService implements IMenuImportExportService {
 
         Task importedFilterTask = taskService.findOne(filterTaskId);
         Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
-        try {
-            taskService.assignTask(importedFilterTask.getStringId());
-            taskService.finishTask(importedFilterTask.getStringId());
-            workflowService.save(filterCase);
-        } catch (TransitionNotExecutableException e) {
-            log.error("Failed to execute \"import_filter\" task with id: " + filterTaskId, e);
-        }
         if (filterCase == null) {
             resultMessage.append("Filter not found! Menu entry was skipped.\n");
             return "";
@@ -298,7 +300,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         return ffv;
     }
 
-    private MenuEntry createMenuEntryExportClass (Case menuItemCase)
+    private MenuEntry createMenuEntryExportClass (Case menuItemCase, String filterCaseId)
     {
         Map<String, I18nString> allowedRoles = menuItemCase.getDataSet().get(ALLOWED_ROLES).getOptions();
         Map<String, I18nString> bannedRoles = menuItemCase.getDataSet().get(BANNED_ROLES).getOptions();
@@ -327,6 +329,7 @@ public class MenuImportExportService implements IMenuImportExportService {
 
         MenuEntry exportMenuItem = new MenuEntry();
         exportMenuItem.setEntryName(menuItemCase.getDataSet().get(MENU_ITEM_NAME).toString());
+        exportMenuItem.setFilterCaseId(filterCaseId);
         exportMenuItem.setUseIcon((Boolean) menuItemCase.getDataSet().get(USE_ICON).getValue());
         if (!menuEntryRoleList.isEmpty()) exportMenuItem.setMenuEntryRoleList(menuEntryRoleList);
 
