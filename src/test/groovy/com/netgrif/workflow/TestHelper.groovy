@@ -5,11 +5,7 @@ import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.ProcessRoleService
-import com.netgrif.workflow.startup.DefaultRoleRunner
-import com.netgrif.workflow.startup.FinisherRunner
-import com.netgrif.workflow.startup.GroupRunner
-import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.startup.SystemUserRunner
+import com.netgrif.workflow.startup.*
 import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -41,6 +37,8 @@ class TestHelper {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
+    private FilterRunner filterRunner
+    @Autowired
     private FinisherRunner finisherRunner
 
     void truncateDbs() {
@@ -56,6 +54,7 @@ class TestHelper {
         roleRunner.run()
         systemUserRunner.run()
         groupRunner.run()
+        filterRunner.run()
         superCreator.run()
         finisherRunner.run()
     }
