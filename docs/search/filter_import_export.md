@@ -126,8 +126,11 @@ When creating new user, case for importing filters and also case for exporting f
 Also, new property was added into `application.properties`, with name `nae.filter.export.file-name`, which defines name
 of xml file that contains exported filters. This property has default string value of **filters.xml**.
 
-For proper work of filters import and export, some necessary changes were made to
-**Filter process**. You can find these changes in **Filter process guide**.
+When filters are exported, all of their ancestors are exported as well. If the exported filters have common ancestors,
+the ancestors are only exported once. The relationships between filters are reconstructed on import based on the
+exported filters case Ids. It is assumed that parents precede their children in the imported file
+(the exported file is generated in this way). If a filter cannot find its parent on import the connection will
+be severed and an error will be logged.
 
 ### Processes
 
