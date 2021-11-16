@@ -293,66 +293,66 @@ already created - a filter with the same name as an existing filter (created by 
 
 ### Menu import/export
 
-Most functionality of importing and exporting menu configurations exists in  ```MenuImportExportService.java``` class.
+Most functionality of importing and exporting menu configurations exists in  `MenuImportExportService.java` class.
 
 #### Preference filter item
 
 Changes to existing datafields:
 
-- ```entry_default_name```: on SET also updates ```new_title``` field of menu entry's filter case to new value.
-- ```icon_name```: on SET updates also icon of entry's filter case.
+- `entry_default_name`: on SET also updates `new_title` field of menu entry's filter case to new value.
+- `icon_name`: on SET updates also icon of entry's filter case.
 
 New datafields:
 
-- ```menu_identifier```: TextField used to identify menu configuration to which this menu entry belongs to. Value for
+- `menu_identifier`: TextField used to identify menu configuration to which this menu entry belongs to. Value for
   group's default entries id _"defaultMenu"_.
 
 #### Group process
 
-By performing calls to  ```MenuImportExport.java ``` class methods, this process covers functionality for import and
+By performing calls to  `MenuImportExport.java ` class methods, this process covers functionality for import and
 export of menu configurations.
 
 ##### Export
 
 New datafields:
 
-- MutlichoiceMapField ```available_export_entries```:
+- MutlichoiceMapField `available_export_entries`:
   Holds all current menu entries used for export selection. It's entries are in following format:
-  **Key**: preference filter item ```caseId```
-  **Value**: ```entry_default_name``` field value
-- TextField ```export_menu_name``` where user will create identifier of selected menu configuration.
-- ButtonField ```update_available_entries_btn ```:
-  Updates ```available_export_entries``` with latest entry names from entries currently present in menu.
-- ButtonField ```add_to_export_btn``` which prepares new menu configuration for export from selected entries and
-  identifier. by adding them to ```menus_for_export```.
+  **Key**: preference filter item `caseId`
+  **Value**: `entry_default_name` field value
+- TextField `export_menu_name` where user will create identifier of selected menu configuration.
+- ButtonField `update_available_entries_btn `:
+  Updates `available_export_entries` with latest entry names from entries currently present in menu.
+- ButtonField `add_to_export_btn` which prepares new menu configuration for export from selected entries and
+  identifier. by adding them to `menus_for_export`.
 
-- EnumerationMapField ```menus_for_export```:
+- EnumerationMapField `menus_for_export`:
   Holds menu configurations prepared for export. Field's entries are in following format:
   **Key**: preference filter item case Ids delimited by "**,**"
-  **Value**: ```export_menu_name``` value
+  **Value**: `export_menu_name` value
 
-- ButtonField ```add_to_export_btn``` calls ```MenuImportExportService.exportMenu``` method, which
-  from ```menus_for_export``` field creates new downloadable XML file holding all menu configurations with their
-  filters. Values of ```menus_for_export``` are then cleared. XML file is also validated against XSD schema.
+- ButtonField `add_to_export_btn` calls `MenuImportExportService.exportMenu` method, which
+  from `menus_for_export` field creates new downloadable XML file holding all menu configurations with their
+  filters. Values of `menus_for_export` are then cleared. XML file is also validated against XSD schema.
 
 ##### Import
 
-After uploading exported XML file holding menu configurations, user may click on ```import_menu_btn``` to
-call ```importMenu``` method from ```MenuImportExportService.java``` class. This method creates new menu entry and
+After uploading exported XML file holding menu configurations, user may click on `import_menu_btn` to
+call `importMenu` method from `MenuImportExportService.java` class. This method creates new menu entry and
 filter cases. It's result (newly imported Preference filter item and filter case Ids) is stored
-in ```imported_menu_ids``` field and import result is shown in the ```import_results``` textArea.
+in `imported_menu_ids` field and import result is shown in the `import_results` textArea.
 
 New datafields:
 
-- TaskRef ```imported_menu_ids``` consisting of String array entries in following format:
-  Menu entry ``` caseId```, it' filter ```caseId```, String boolean value determining if menu entry should display its
-  icon. Values are delimited by "**,**". These values are used later in petriflow action in ```import_menu_btn``` SET
+- TaskRef `imported_menu_ids` consisting of String array entries in following format:
+  Menu entry ` caseId`, it' filter `caseId`, String boolean value determining if menu entry should display its
+  icon. Values are delimited by "**,**". These values are used later in petriflow action in `import_menu_btn` SET
   action.
 
-- Text area field ```import_results```: Shows import results. Result messages can be following:
+- Text area field `import_results`: Shows import results. Result messages can be following:
   -- OK (Entry was succesfully imported with all of its role configurations)
-  -- Role missing from latest version of its net with net ```import_id```
-  -- Net missing for role with role ```import_id```
+  -- Role missing from latest version of its net with net `import_id`
+  -- Net missing for role with role `import_id`
   -- Filter missing (In this case only the entry isn't imported and it is skipped)
 
 ### Frontend
@@ -371,13 +371,13 @@ a `route` for the entry. This route fragment will be used to generate the full p
 
 ```json
 "group-navigation-outlet": {
-"layout": {
-"name": "groupNavigation"
-},
-"navigation": false,
-"routing": {
-"path": "group-nav"
-}
+    "layout": {
+        "name": "groupNavigation"
+    },
+    "navigation": false,
+    "routing": {
+        "path": "group-nav"
+    }
 }
 ```
 
@@ -395,12 +395,8 @@ Routing must then be configured with the following entry:
 ```js
 {
     path: '<dynamic_nav_path>/:filterCaseId',
-        component
-:
-    AbstractGroupNavigationComponentResolverComponent,
-        canActivate
-:
-    [AuthenticationGuardService]
+    component: AbstractGroupNavigationComponentResolverComponent,
+    canActivate: [AuthenticationGuardService]
 }
 ```
 
