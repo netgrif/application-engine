@@ -172,7 +172,11 @@ public final class FieldFactory {
 
     private MultichoiceField buildMultichoiceField(Data data, Importer importer) {
         MultichoiceField field = new MultichoiceField();
-        setFieldChoices(field, data, importer);
+        if (data.getOptions() != null) {
+            setFieldOptions(field, data, importer);
+        } else {
+            setFieldChoices(field, data, importer);
+        }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
                field.setDefaultValues(init);
@@ -183,7 +187,11 @@ public final class FieldFactory {
 
     private EnumerationField buildEnumerationField(Data data, Importer importer) {
         EnumerationField field = new EnumerationField();
-        setFieldChoices(field, data, importer);
+        if (data.getOptions() != null) {
+            setFieldOptions(field, data, importer);
+        } else {
+            setFieldChoices(field, data, importer);
+        }
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
                 field.setDefaultValue(init);
@@ -224,6 +232,18 @@ public final class FieldFactory {
             }
         });
         return field;
+    }
+
+    private void setFieldOptions(ChoiceField<?> field, Data data, Importer importer) {
+        if (data.getOptions() != null && data.getOptions().getInit() != null) {
+            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
+            return;
+        }
+
+        List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
+                    .map(importer::toI18NString)
+                    .collect(Collectors.toList());
+        field.getChoices().addAll(options);
     }
 
     private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
