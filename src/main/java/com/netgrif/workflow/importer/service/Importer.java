@@ -177,6 +177,8 @@ public class Importer {
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new PetriNet();
 
+        documentValidator.checkBeatingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
+        documentValidator.checkDeprecatedAttributes(document);
         document.getI18N().forEach(this::addI18N);
 
         setMetaData();
@@ -197,8 +199,9 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        document.getUsersRef().forEach(this::resolveUsersRef);
-        document.getUserRef().forEach(this::resolveUsersRef);
+        /* The following 1 line is deprecated and should be removed in future versions */
+        document.getUsersRef().forEach(this::resolveUserRef);
+        document.getUserRef().forEach(this::resolveUserRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -235,15 +238,15 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUserRef usersRef) {
-        CaseLogic logic = usersRef.getCaseLogic();
-        String usersId = usersRef.getId();
+    protected void resolveUserRef(CaseUserRef userRef) {
+        CaseLogic logic = userRef.getCaseLogic();
+        String usersId = userRef.getId();
 
         if (logic == null || usersId == null) {
             return;
         }
 
-        net.addUsersPermission(usersId, roleFactory.getProcessPermissions(logic));
+        net.addUserPermission(usersId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -642,14 +645,14 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UserRef usersRef) {
-        Logic logic = usersRef.getLogic();
-        String userRef = usersRef.getId();
+    protected void addUserLogic(Transition transition, UserRef userRef) {
+        Logic logic = userRef.getLogic();
+        String userRefId = userRef.getId();
 
-        if (logic == null || userRef == null) {
+        if (logic == null || userRefId == null) {
             return;
         }
-        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
+        transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
     }
 
     @Transactional
