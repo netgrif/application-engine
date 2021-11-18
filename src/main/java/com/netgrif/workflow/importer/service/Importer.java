@@ -112,6 +112,15 @@ public class Importer {
     @Autowired
     private IFieldActionsCacheService actionsCacheService;
 
+    @Autowired
+    private IDocumentValidator documentValidator;
+
+    @Autowired
+    private ITransitionValidator transitionValidator;
+
+    @Autowired
+    private ILogicValidator logicValidator;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
@@ -189,6 +198,7 @@ public class Importer {
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUsersRef);
+        document.getUserRef().forEach(this::resolveUsersRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -225,7 +235,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUsersRef usersRef) {
+    protected void resolveUsersRef(CaseUserRef usersRef) {
         CaseLogic logic = usersRef.getCaseLogic();
         String usersId = usersRef.getId();
 
@@ -408,6 +418,9 @@ public class Importer {
 
     @Transactional
     protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) throws MissingIconKeyException {
+        transitionValidator.checkBeatingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
+        transitionValidator.checkDeprecatedAttributes(importTransition);
+
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
@@ -427,10 +440,17 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        /* This is deprecated, will be removed in future versions*/
         if (importTransition.getUsersRef() != null) {
             importTransition.getUsersRef().forEach(usersRef ->
                     addUserLogic(transition, usersRef));
         }
+
+        if (importTransition.getUserRef() != null) {
+            importTransition.getUserRef().forEach(userRef ->
+                    addUserLogic(transition, userRef));
+        }
+
         if (importTransition.getDataRef() != null) {
             for (com.netgrif.workflow.importer.model.DataRef dataRef : importTransition.getDataRef()) {
                 addDataWithDefaultGroup(transition, dataRef);
@@ -622,7 +642,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UsersRef usersRef) {
+    protected void addUserLogic(Transition transition, UserRef usersRef) {
         Logic logic = usersRef.getLogic();
         String userRef = usersRef.getId();
 
