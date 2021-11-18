@@ -113,7 +113,8 @@
             <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="transactionRef" minOccurs="0"/>
             <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
-            <xs:element type="usersRef" name="usersRef" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="userRef" name="usersRef" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="userRef" name="userRef" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element ref="assignedUser" minOccurs="0"/>
             <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
@@ -225,7 +226,8 @@
             <xs:element ref="transitionRole" minOccurs="0"/>
             <xs:element ref="caseName" minOccurs="0"/>
             <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
-            <xs:element type="caseUsersRef" name="usersRef" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="caseUserRef" name="userRef" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="caseUserRef" name="usersRef" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element ref="processEvents" minOccurs="0"/>
             <xs:element ref="caseEvents" minOccurs="0"/>
             <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
@@ -461,6 +463,7 @@
     <xs:element name="delegate" type="xs:boolean"/>
     <xs:element name="cancel" type="xs:boolean"/>
     <xs:element name="assigned" type="xs:boolean"/>
+    <xs:element name="assign" type="xs:boolean"/>
     <xs:element name="create" type="xs:boolean"/>
     <xs:element name="delete" type="xs:boolean"/>
     <xs:element name="reassign" type="xs:boolean"/>
@@ -472,6 +475,7 @@
             <xs:element ref="view" minOccurs="0"/>
             <xs:element ref="cancel" minOccurs="0"/>
             <xs:element ref="assigned" minOccurs="0"/>
+            <xs:element ref="assign" minOccurs="0"/>
             <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
@@ -501,7 +505,7 @@
             <xs:element ref="logic"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="usersRef">
+    <xs:complexType name="userRef">
         <xs:sequence>
             <xs:element ref="id"/>
             <xs:element ref="logic"/>
@@ -513,7 +517,7 @@
             <xs:element ref="caseLogic"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="caseUsersRef">
+    <xs:complexType name="caseUserRef">
         <xs:sequence>
             <xs:element ref="id"/>
             <xs:element ref="caseLogic"/>
