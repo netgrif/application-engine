@@ -638,6 +638,8 @@ public class Importer {
             return;
         }
 
+        logicValidator.checkDeprecatedAttributes(logic);
+
         if (logic.isView() != null && !logic.isView()) {
             transition.addNegativeViewRole(roleId);
         }
@@ -652,6 +654,7 @@ public class Importer {
         if (logic == null || userRefId == null) {
             return;
         }
+        logicValidator.checkDeprecatedAttributes(logic);
         transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
     }
 
