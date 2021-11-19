@@ -5,7 +5,7 @@ public enum RolePermission {
     PERFORM("perform"),
     DELEGATE("delegate"),
     CANCEL("cancel"),
-    ASSIGNED("assigned"),
+    ASSIGN("assign"),
     VIEW("view");
 
     private String value;
