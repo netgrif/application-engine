@@ -200,8 +200,9 @@ public class Importer {
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
 
-        /* @Deprecated - The 'document.getUsersRef()' is deprecated and should be removed in future versions */
+        /* @deprecated - The 'document.getUsersRef()' is deprecated and should be removed in future versions */
         document.getUsersRef().forEach(this::resolveUserRef);
+
         document.getUserRef().forEach(this::resolveUserRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
