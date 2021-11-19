@@ -11,7 +11,7 @@ import java.util.Map;
 
 public interface IConfigurableMenuService {
 
-    Map<String, I18nString> getNetsByAuthor(User author, Locale locale);
+    Map<String, I18nString> getNetsByAuthorAsMapOptions(User author, Locale locale);
     Map<String, I18nString> getAvailableRolesFromNet (EnumerationMapField processField,MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles);
     Map<String, I18nString> addSelectedRoles(MultichoiceMapField selected, EnumerationMapField netField, MultichoiceMapField roles);
     Map<String, I18nString> removeSelectedRoles(MultichoiceMapField addedRoles);
