@@ -638,6 +638,7 @@ public class Importer {
             return;
         }
 
+        logicValidator.checkBeatingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
         logicValidator.checkDeprecatedAttributes(logic);
 
         if (logic.isView() != null && !logic.isView()) {
@@ -654,8 +655,10 @@ public class Importer {
         if (logic == null || userRefId == null) {
             return;
         }
+
         logicValidator.checkBeatingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
         logicValidator.checkDeprecatedAttributes(logic);
+
         transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
     }
 
