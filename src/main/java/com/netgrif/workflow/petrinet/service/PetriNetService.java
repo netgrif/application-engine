@@ -1,5 +1,7 @@
 package com.netgrif.workflow.petrinet.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.history.domain.petrinetevents.DeletePetriNetEventLog;
@@ -9,7 +11,6 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.PetriNetIdentifierResult;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -250,6 +251,12 @@ public class PetriNetService implements IPetriNetService {
         return nets.get(0);
     }
 
+    /**
+     * Determines which of the provided Strings are identifiers of {@link PetriNet}s uploaded in the system.
+     *
+     * @param identifiers a list of Strings that represent potential PetriNet identifiers
+     * @return a list containing a subset of the input strings that correspond to identifiers of PetriNets that are present in the system
+     */
     @Override
     public List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers) {
         Aggregation agg = Aggregation.newAggregation(
@@ -257,8 +264,14 @@ public class PetriNetService implements IPetriNetService {
                 Aggregation.group("identifier"),
                 Aggregation.project("identifier").and("identifier").previousOperation()
         );
-        AggregationResults<PetriNetIdentifierResult> groupResults = mongoTemplate.aggregate(agg, PetriNet.class, PetriNetIdentifierResult.class);
-        return groupResults.getMappedResults().stream().map(PetriNetIdentifierResult::getIdentifier).collect(Collectors.toList());
+        AggregationResults<?> groupResults = mongoTemplate.aggregate(
+                agg,
+                PetriNet.class,
+                TypeFactory.defaultInstance().constructType(new TypeReference<Map<String, String>>() {}).getRawClass()
+        );
+
+        List<Map<String, String>> result = (List<Map<String, String>>) groupResults.getMappedResults();
+        return result.stream().flatMap(v -> v.values().stream()).collect(Collectors.toList());
     }
 
     @Override

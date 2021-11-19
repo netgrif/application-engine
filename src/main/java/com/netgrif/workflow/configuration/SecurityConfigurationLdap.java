@@ -2,6 +2,8 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.NaeLdapProperties;
@@ -193,6 +195,10 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         return (ProviderManager) super.authenticationManager();
     }
 
+    @Bean
+    protected IAfterRegistrationAuthService authenticationService() throws Exception {
+        return new AfterRegistrationAuthService(authenticationManager());
+    }
 
     @Override
     boolean isOpenRegistration() {

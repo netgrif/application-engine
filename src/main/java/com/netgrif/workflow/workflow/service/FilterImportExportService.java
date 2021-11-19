@@ -9,17 +9,17 @@ import com.google.common.collect.Lists;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.FilterProperties;
-import com.netgrif.workflow.filters.FilterImportExport;
-import com.netgrif.workflow.filters.FilterImportExportList;
+import com.netgrif.workflow.workflow.domain.filter.FilterImportExport;
+import com.netgrif.workflow.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.workflow.petrinet.domain.dataset.FilterField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.startup.ImportHelper;
+import com.netgrif.workflow.utils.InputStreamToString;
 import com.netgrif.workflow.workflow.domain.*;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
@@ -56,15 +56,14 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     private static final String UPLOAD_FILE_FIELD = "upload_file";
 
-    private static final String FILTER_TYPE_CASE = "Case";
-    private static final String FILTER_TYPE_TASK = "Task";
-
     private static final String IMPORT_FILTER_TRANSITION = "import_filter";
 
     private static final String FIELD_VISIBILITY = "visibility";
     private static final String FIELD_FILTER_TYPE = "filter_type";
     private static final String FIELD_FILTER = "filter";
     private static final String FIELD_NAME = "i18n_filter_name";
+    private static final String FIELD_PARENT_CASE_ID = "parent_filter_id";
+    private static final String FIELD_PARENT_VIEW_ID = "origin_view_id";
     private static final String FIELD_MISSING_ALLOWED_NETS = "missing_allowed_nets";
     private static final String FIELD_MISSING_NETS_TRANSLATION = "missing_nets_translation";
 
@@ -111,19 +110,52 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @throws IOException - if file which contains exported filters cannot be created
      */
     @Override
-    public FileFieldValue exportFilters(Collection<String> filtersToExport) throws IOException {
+    public FileFieldValue exportFiltersToFile(Collection<String> filtersToExport) throws IOException {
         log.info("Exporting selected filters");
+        return createXML(exportFilters(filtersToExport));
+    }
+
+    /**
+     * Method which performs export of selected filters into xml file.
+     * Method finds all cases by provided ids, transform them into FilterImportExportList object
+     * @param filtersToExport - set of ids of filter cases, which should be exported
+     * @return a serializable wrapper of a list of filter objects in serializable form
+     */
+    @Override
+    public FilterImportExportList exportFilters(Collection<String> filtersToExport) {
         List<Case> selectedFilterCases = this.workflowService.findAllById(Lists.newArrayList(filtersToExport));
         FilterImportExportList filterList = new FilterImportExportList();
-        selectedFilterCases.forEach(filter -> filterList.getFilters().add(createExportClass(filter)));
-        return createXML(filterList);
+
+        Set<String> exportedFilterIds = new HashSet<>();
+
+        for (Case exportedFilter : selectedFilterCases) {
+            LinkedList<FilterImportExport> chain = new LinkedList<>();
+            Case currentCase = exportedFilter;
+            while (true) {
+                if (exportedFilterIds.contains(currentCase.getStringId())) {
+                    break;
+                }
+                exportedFilterIds.add(currentCase.getStringId());
+                FilterImportExport currentFilter = createExportClass(currentCase);
+                chain.push(currentFilter);
+                if (currentFilter.getParentCaseId() != null) {
+                    currentCase = this.workflowService.findOne(currentFilter.getParentCaseId());
+                } else {
+                    break;
+                }
+            }
+            filterList.getFilters().addAll(chain);
+        }
+
+        return filterList;
     }
 
     /**
      * Method which performs import of filters from uploaded xml file.
      * Method firstly loads xml file from file field and validates it against xml schema for filters
      * export located on path: filter_export_schema.xml
-     * If the file is correct, method creates filter cases and
+     * If the file is correct, method calls performImport method which
+     * creates filter cases
      * @return List<String> - list of task ids of imported filter cases in - import_filter transition
      * @throws IOException - if imported file is not found
      * @throws IllegalFilterFileException - if uploaded xml is not in correct xml format and invalidate against schema
@@ -132,63 +164,84 @@ public class FilterImportExportService implements IFilterImportExportService {
     public List<String> importFilters() throws IOException, IllegalFilterFileException {
         log.info("Importing filters");
         FilterImportExportList filterList = loadFromXML();
-        List<String> importedFiltersIds = new ArrayList<>();
+        return new ArrayList<>(performImport(filterList).values());
+    }
+
+    /**
+     * Method which performs import of filters from already created filter import class instances
+     * passed in as parameter.
+     * @param filterList - instance of class FilterImportExportList
+     * @return a mapping of original filter case ids to task ids of imported filter cases in - import_filter transition
+     * @throws IOException - if imported file is not found
+     */
+    @Override
+    public Map<String, String> importFilters (FilterImportExportList filterList) throws IOException {
+        log.info("Importing filters from imported menu");
+        return performImport(filterList);
+    }
+
+    protected Map<String, String> performImport (FilterImportExportList filterList) throws IOException {
+        Map<String, String> oldToNewFilterId = new HashMap<>();
+        Map<String, String> importedFilterTaskIds = new HashMap<>();
 
         if (filterList == null) {
             throw new FileNotFoundException();
         }
 
         filterList.getFilters().forEach(filter -> {
-            Optional<Case> filterCase = Optional.empty();
             if (filter.getAllowedNets() == null) {
                 filter.setAllowedNets(new ArrayList<>());
             }
-            if (filter.getType().equals(FILTER_TYPE_CASE)) {
-                filterCase = defaultFiltersRunner.createCaseFilter(
-                        filter.getFilterName().getDefaultValue(),
-                        filter.getIcon(),
-                        "",
-                        filter.getVisibility(),
-                        filter.getFilterValue(),
-                        filter.getAllowedNets(),
-                        filter.getFilterMetadataExport().getMapObject(),
-                        filter.getFilterName().getTranslations(),
-                        filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                        filter.getFilterMetadataExport().getInheritAllowedNets(),
-                        true
-                );
-            } else if (filter.getType().equals(FILTER_TYPE_TASK)) {
-                filterCase = defaultFiltersRunner.createTaskFilter(
-                        filter.getFilterName().getDefaultValue(),
-                        filter.getIcon(),
-                        "",
-                        filter.getVisibility(),
-                        filter.getFilterValue(),
-                        filter.getAllowedNets(),
-                        filter.getFilterMetadataExport().getMapObject(),
-                        filter.getFilterName().getTranslations(),
-                        filter.getFilterMetadataExport().getDefaultSearchCategories(),
-                        filter.getFilterMetadataExport().getInheritAllowedNets(),
-                        true
-                );
+
+            String parentId = null;
+            boolean viewOrigin = false;
+
+            if (filter.getParentCaseId() != null && !filter.getParentCaseId().equals("")) {
+                parentId = oldToNewFilterId.get(filter.getParentCaseId());
+                if (parentId == null) {
+                    log.error("Imported filter with ID '" + filter.getCaseId() + "' could not find an imported mapping of its parent case with original ID '" + filter.getParentCaseId() + "'");
+                }
+                viewOrigin = false;
+            } else if (filter.getParentViewId() != null && !filter.getParentViewId().equals("")) {
+                parentId = filter.getParentViewId();
+                viewOrigin = true;
             }
+
+            Optional<Case> filterCase = defaultFiltersRunner.createFilter(
+                    filter.getFilterName().getDefaultValue(),
+                    filter.getIcon(),
+                    filter.getType(),
+                    filter.getVisibility(),
+                    filter.getFilterValue(),
+                    filter.getAllowedNets(),
+                    filter.getFilterMetadataExport().getMapObject(),
+                    filter.getFilterName().getTranslations(),
+                    filter.getFilterMetadataExport().isDefaultSearchCategories(),
+                    filter.getFilterMetadataExport().isInheritAllowedNets(),
+                    parentId,
+                    viewOrigin,
+                    true
+            );
 
             if (!filterCase.isPresent()) {
                 return;
             }
+
+            oldToNewFilterId.put(filter.getCaseId(), filterCase.get().getStringId());
+
             Task importedFilterTask = taskService.searchOne(
                     QTask.task.transitionId.eq(IMPORT_FILTER_TRANSITION)
                             .and(QTask.task.caseId.eq(filterCase.get().getStringId()))
             );
-            importedFiltersIds.add(importedFilterTask.getStringId());
+            importedFilterTaskIds.put(filter.getCaseId(), importedFilterTask.getStringId());
 
             // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/
             filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
-        changeFilterField(importedFiltersIds);
-        return importedFiltersIds;
+        changeFilterField(importedFilterTaskIds.values());
+        return importedFilterTaskIds;
     }
 
     /**
@@ -197,7 +250,7 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @param filterFields - list of task ids of filters which value should be reloaded
      */
     @Override
-    public void changeFilterField(List<String> filterFields) {
+    public void changeFilterField(Collection<String> filterFields) {
         filterFields.forEach(f -> {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
@@ -248,8 +301,8 @@ public class FilterImportExportService implements IFilterImportExportService {
 
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
-        String importedFilter = inputStreamToString(new FileInputStream(f));
-        SimpleModule module = new SimpleModule().addDeserializer(Object.class, CustomFilterDeserializer.getInstance());
+        String importedFilter = InputStreamToString.inputStreamToString(new FileInputStream(f));
+        SimpleModule module = new SimpleModule().addDeserializer(Object.class, FilterDeserializer.getInstance());
         XmlMapper xmlMapper = (XmlMapper) new XmlMapper().registerModule(module);
         return xmlMapper.readValue(importedFilter, FilterImportExportList.class);
     }
@@ -273,38 +326,36 @@ public class FilterImportExportService implements IFilterImportExportService {
         return new FileFieldValue(filterProperties.getFileName(), filePath);
     }
 
-    private FilterImportExport createExportClass(Case filter) {
+    protected FilterImportExport createExportClass(Case filter) {
         FilterImportExport exportFilter = new FilterImportExport();
+        exportFilter.setCaseId(filter.getStringId());
         exportFilter.setIcon(filter.getIcon());
-        filter.getImmediateData().forEach(immediateData -> {
-            switch (immediateData.getImportId()) {
-                case FIELD_FILTER:
-                    exportFilter.setFilterValue(((FilterField) immediateData).getValue());
-                    exportFilter.setAllowedNets(((FilterField) immediateData).getAllowedNets());
-                    exportFilter.setFilterMetadataExport(((FilterField) immediateData).getFilterMetadata());
-                    break;
-                case FIELD_VISIBILITY:
-                    exportFilter.setVisibility(immediateData.getValue().toString());
-                    break;
-                case FIELD_FILTER_TYPE:
-                    exportFilter.setType(immediateData.getValue().toString());
-                    break;
-                case FIELD_NAME:
-                    exportFilter.setFilterName((I18nString) immediateData.getValue());
-            }
-        });
-        return exportFilter;
-    }
 
-    private String inputStreamToString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
+        DataField parentCaseId = filter.getDataField(FIELD_PARENT_CASE_ID);
+        if (parentCaseId.getValue() != null && !parentCaseId.getValue().equals("")) {
+            exportFilter.setParentCaseId((String) parentCaseId.getValue());
         }
-        br.close();
-        return sb.toString();
+
+        DataField parentViewId = filter.getDataField(FIELD_PARENT_VIEW_ID);
+        if (parentViewId.getValue() != null && !parentViewId.getValue().equals("")) {
+            exportFilter.setParentViewId((String) parentViewId.getValue());
+        }
+
+        DataField filterField = filter.getDataField(FIELD_FILTER);
+        exportFilter.setFilterValue((String) filterField.getValue());
+        exportFilter.setAllowedNets(filterField.getAllowedNets());
+        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
+
+        DataField visibility = filter.getDataField(FIELD_VISIBILITY);
+        exportFilter.setVisibility(visibility.getValue().toString());
+
+        DataField type = filter.getDataField(FIELD_FILTER_TYPE);
+        exportFilter.setType(type.getValue().toString());
+
+        DataField name = filter.getDataField(FIELD_NAME);
+        exportFilter.setFilterName((I18nString) name.getValue());
+
+        return exportFilter;
     }
 
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {
