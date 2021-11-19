@@ -199,7 +199,7 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        /* TODO: The following 1 line is deprecated and should be removed in future versions */
+        /* @Deprecated - The 'document.getUsersRef()' is deprecated and should be removed in future versions */
         document.getUsersRef().forEach(this::resolveUserRef);
         document.getUserRef().forEach(this::resolveUserRef);
         resolveProcessEvents(document.getProcessEvents());
@@ -443,7 +443,7 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
-        /* TODO: This 'if' is deprecated, will be removed in future releases*/
+        /* @Deprecated - This 'importTransition.getUsersRef()' is deprecated, will be removed in future releases*/
         if (importTransition.getUsersRef() != null) {
             importTransition.getUsersRef().forEach(usersRef ->
                     addUserLogic(transition, usersRef));
