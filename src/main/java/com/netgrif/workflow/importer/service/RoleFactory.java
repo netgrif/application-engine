@@ -27,7 +27,7 @@ public class RoleFactory {
         addPerform(permissions, roleLogic);
         addDelegate(permissions, roleLogic);
         addCancel(permissions, roleLogic);
-        addAssigned(permissions, roleLogic);
+        addAssign(permissions, roleLogic);
         addView(permissions, roleLogic);
 
         return permissions;
@@ -58,9 +58,10 @@ public class RoleFactory {
             permissions.put(RolePermission.CANCEL.toString(), roleLogic.isCancel());
     }
 
-    private void addAssigned(Map<String, Boolean> permissions, Logic roleLogic) {
-        if (roleLogic.isAssigned() != null)
-            permissions.put(RolePermission.ASSIGNED.toString(), roleLogic.isAssigned());
+    private void addAssign(Map<String, Boolean> permissions, Logic roleLogic) {
+        /* TODO: roleLogic.isAssigned() is deprecated and can be removed in future releases. */
+        if (roleLogic.isAssigned() != null || roleLogic.isAssign() != null)
+            permissions.put(RolePermission.ASSIGN.toString(), roleLogic.isAssigned());
     }
 
     private void addCreate(Map<String, Boolean> permissions, CaseLogic roleLogic) {
