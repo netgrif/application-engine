@@ -40,8 +40,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileInputStream;
 import java.util.List;
-import java.util.Optional;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -136,7 +134,7 @@ public class VariableArcsTest {
         assert arcs.size() > 0;
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(this.loaded.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
 
-        assert caseOutcome.getACase().getPetriNet().getArcs()
+        assert caseOutcome.getCase().getPetriNet().getArcs()
                 .values()
                 .stream()
                 .flatMap(List::stream)

@@ -51,7 +51,7 @@ public interface ITaskService {
 	Task searchOne(com.querydsl.core.types.Predicate predicate);
 
     @Transactional(rollbackFor = Exception.class)
-    FinishTaskEventOutcome finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
+    List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
 
     @Transactional
     FinishTaskEventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException;
@@ -61,7 +61,7 @@ public interface ITaskService {
     FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     @Transactional
-    AssignTaskEventOutcome assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
+    List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
 
     @Transactional
     AssignTaskEventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException;
@@ -71,7 +71,7 @@ public interface ITaskService {
     AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
     @Transactional(rollbackFor = Exception.class)
-    CancelTaskEventOutcome cancelTasks(List<Task> tasks, User user);
+    List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, User user);
 
     @Transactional
     CancelTaskEventOutcome cancelTask(Task task, User user);

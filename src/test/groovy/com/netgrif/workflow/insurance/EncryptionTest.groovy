@@ -80,7 +80,7 @@ class EncryptionTest {
     private String createCase() {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper())
         assert net.getNet() != null
-        def useCase = workflowService.createCase(net.getNet().stringId, "Encryption test", "color", mockLoggedUser()).getACase()
+        def useCase = workflowService.createCase(net.getNet().stringId, "Encryption test", "color", mockLoggedUser()).getCase()
         def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME}
         useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
         return workflowService.save(useCase).stringId

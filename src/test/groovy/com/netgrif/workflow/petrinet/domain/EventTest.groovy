@@ -124,8 +124,7 @@ class EventTest {
         assert instance.dataSet["${fieldIdWithoutPhase}_pre" as String].value as String == "${fieldIdWithoutPhase}_pre"
         assert instance.dataSet["${fieldIdWithoutPhase}_post" as String].value as String == "${fieldIdWithoutPhase}_post"
 
-//        todo message not implemented yet
-//        assert outcome.message.defaultValue == message
+        assert outcome.message.defaultValue == message
         assert outcome.data.flatten().changedFields["${fieldIdWithoutPhase}_pre" as String]
         assert outcome.data.flatten().changedFields["${fieldIdWithoutPhase}_post" as String]
     }

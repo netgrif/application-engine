@@ -13,7 +13,7 @@ public abstract class LocalisedCaseEventOutcome extends LocalisedPetriNetEventOu
 
     protected LocalisedCaseEventOutcome(CaseEventOutcome outcome, Locale locale) {
         super(outcome, locale);
-        this.aCase = outcome.getACase();
+        this.aCase = outcome.getCase();
     }
 
     protected LocalisedCaseEventOutcome(String message, List<LocalisedEventOutcome> outcomes, Locale locale, Case aCase) {

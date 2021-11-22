@@ -1,16 +1,11 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileListField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -48,9 +43,9 @@ public interface IDataService {
 
     InputStream download(String url) throws IOException;
 
-    SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException;
+    SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
-    SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile) throws IOException;
+    SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile);
 
     boolean deleteFile(String taskId, String fieldId);
 
