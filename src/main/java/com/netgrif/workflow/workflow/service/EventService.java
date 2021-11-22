@@ -41,10 +41,15 @@ public class EventService implements IEventService {
     }
 
     @Override
+    public List<EventOutcome> runActions(List<Action> actions) {
+        return runActions(actions, null, Optional.empty());
+    }
+
+    @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
@@ -62,7 +67,7 @@ public class EventService implements IEventService {
     public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
@@ -94,10 +99,10 @@ public class EventService implements IEventService {
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
         outcome.getChangedFields().forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && trigger == DataEventType.SET) {
-                Field field = outcome.getACase().getField(s);
-                log.info("[" + outcome.getACase().getStringId() + "] " + outcome.getACase().getTitle() + ": Running actions on changed field " + s);
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getACase(), outcome.getTask()));
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getACase(), outcome.getTask()));
+                Field field = outcome.getCase().getField(s);
+                log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
+                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask()));
             }
         });
     }

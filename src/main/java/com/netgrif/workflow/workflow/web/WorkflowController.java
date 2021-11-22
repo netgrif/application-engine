@@ -82,7 +82,7 @@ public class WorkflowController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getACase().getStringId() + " was created succesfully",
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
                     LocalisedEventOutcomeFactory.from(outcome,locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:",e);

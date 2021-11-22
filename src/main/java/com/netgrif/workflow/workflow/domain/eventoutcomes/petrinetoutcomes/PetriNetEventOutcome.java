@@ -3,9 +3,11 @@ package com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public abstract class PetriNetEventOutcome extends EventOutcome {
 
     private PetriNet net;
