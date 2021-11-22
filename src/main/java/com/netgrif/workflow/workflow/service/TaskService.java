@@ -114,12 +114,12 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public AssignTaskEventOutcome assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
-        AssignTaskEventOutcome outcome = new AssignTaskEventOutcome();
+    public List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+        List<AssignTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
-            outcome.addOutcome(assignTask(task, user));
+            outcomes.add(assignTask(task, user));
         }
-        return outcome;
+        return outcomes;
     }
 
     @Override
@@ -152,8 +152,7 @@ public class TaskService implements ITaskService {
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.POST, user.getId()));
 
-        AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task);
-        outcome.setOutcomes(outcomes);
+        AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
 
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -181,12 +180,12 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public FinishTaskEventOutcome finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
-        FinishTaskEventOutcome outcome = new FinishTaskEventOutcome();
+    public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+        List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
-            outcome.addOutcome(finishTask(task, user));
+            outcomes.add(finishTask(task, user));
         }
-        return outcome;
+        return outcomes;
     }
 
     @Override
@@ -240,8 +239,7 @@ public class TaskService implements ITaskService {
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
-        FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task);
-        outcome.setOutcomes(outcomes);
+        FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
         historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.POST, user.getId()));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
@@ -251,12 +249,12 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CancelTaskEventOutcome cancelTasks(List<Task> tasks, User user) {
-        CancelTaskEventOutcome outcome = new CancelTaskEventOutcome();
+    public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, User user) {
+        List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
-            outcome.addOutcome(cancelTask(task, user));
+            outcomes.add(cancelTask(task, user));
         }
-        return outcome;
+        return outcomes;
     }
 
     @Override
@@ -360,8 +358,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
 
-        DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task);
-        outcome.setOutcomes(outcomes);
+        DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser.getId(), delegatedUser.getId()));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
@@ -491,19 +488,21 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    protected void executeTransition(Task task, Case useCase) {
+    protected List<EventOutcome> executeTransition(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: executeTransition [" + task.getTransitionId() + "] in case [" + useCase.getTitle() + "]");
         useCase = workflowService.decrypt(useCase);
+        List<EventOutcome> outcomes = new ArrayList<>();
         try {
             log.info("assignTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
-            assignTask(task.getStringId());
+            outcomes.add(assignTask(task.getStringId()));
             log.info("getData [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
-            dataService.getData(task.getStringId());
+            outcomes.add(dataService.getData(task.getStringId()));
             log.info("finishTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
-            finishTask(task.getStringId());
+            outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
             log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed: ", e);
         }
+        return outcomes;
     }
 
     @Transactional

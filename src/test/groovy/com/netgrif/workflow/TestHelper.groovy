@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.FilterRunner
 import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
@@ -36,6 +37,8 @@ class TestHelper {
     private GroupRunner groupRunner
     @Autowired
     private IFieldActionsCacheService actionsCacheService
+    @Autowired
+    private FilterRunner filterRunner
 
     void truncateDbs() {
         template.db.drop()
@@ -49,6 +52,7 @@ class TestHelper {
         roleRunner.run()
         systemUserRunner.run()
         groupRunner.run()
+        filterRunner.run()
         superCreator.run()
     }
 }
