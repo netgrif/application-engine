@@ -116,7 +116,7 @@ public abstract class AbstractTaskController {
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
             } else {
                 return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
             }
@@ -130,7 +130,7 @@ public abstract class AbstractTaskController {
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
             } else {
                 return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
             }
@@ -206,7 +206,7 @@ public abstract class AbstractTaskController {
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
-    public EventOutcomeWithMessageResource saveFile(String taskId, String fieldId, MultipartFile multipartFile) throws IOException {
+    public EventOutcomeWithMessageResource saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(dataService.saveFile(taskId, fieldId, multipartFile), LocaleContextHolder.getLocale()));
     }
@@ -233,7 +233,7 @@ public abstract class AbstractTaskController {
         return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 
-    public EventOutcomeWithMessageResource saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) throws IOException {
+    public EventOutcomeWithMessageResource saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(dataService.saveFiles(taskId, fieldId, multipartFiles), LocaleContextHolder.getLocale()));
     }

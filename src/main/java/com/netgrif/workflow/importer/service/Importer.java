@@ -354,12 +354,7 @@ public class Importer {
     }
 
     private List<Action> buildActionRefs(List<ActionRefType> actionRefs) {
-        List<Action> refs = new ArrayList<>();
-        for (ActionRefType actionRef : actionRefs) {
-            Action action = actions.get(actionRef.getId());
-            refs.add(action);
-        }
-        return refs;
+        return actionRefs.stream().map(ref -> actions.get(ref.getId())).collect(Collectors.toList());
     }
 
     private Action fromActionRef(ActionRefType actionRef) {

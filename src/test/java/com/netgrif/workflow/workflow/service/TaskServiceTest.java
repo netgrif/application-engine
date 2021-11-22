@@ -106,16 +106,16 @@ public class TaskServiceTest {
         user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
-        assert outcome.getACase().getConsumedTokens().size() == 0;
-        assert outcome.getACase().getActivePlaces().size() == 1;
-        assert outcome.getACase().getActivePlaces().values().contains(5);
+        assert outcome.getCase().getConsumedTokens().size() == 0;
+        assert outcome.getCase().getActivePlaces().size() == 1;
+        assert outcome.getCase().getActivePlaces().values().contains(5);
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
         assert task != null;
 
         service.assignTask(user.transformToLoggedUser(), task.getStringId());
-        Case useCase = caseRepository.findById(outcome.getACase().getStringId()).get();
+        Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
         assert useCase.getConsumedTokens().values().contains(5);

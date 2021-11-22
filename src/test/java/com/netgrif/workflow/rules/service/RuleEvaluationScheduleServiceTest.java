@@ -81,13 +81,13 @@ public class RuleEvaluationScheduleServiceTest {
         ruleRepository.save(rule);
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title", "original color", user);
-        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getACase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
+        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
 
         assert outcome.getJobDetail() != null;
         assert outcome.getTrigger() != null;
 
         Thread.sleep(10000);
-        Case caze = workflowService.findOne(caseOutcome.getACase().getStringId());
+        Case caze = workflowService.findOne(caseOutcome.getCase().getStringId());
         assert caze.getDataSet().get("number_data").getValue().equals(6.0);
 
     }
