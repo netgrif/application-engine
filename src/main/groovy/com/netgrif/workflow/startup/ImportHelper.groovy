@@ -126,19 +126,19 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    ImportPetriNetEventOutcome createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    ImportPetriNetEventOutcome createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, release, author)
+        return new Optional<>(petriNetService.importPetriNet(netStream, release, author).getNet())
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
-            return createNet(filename, release, author).getNet()
+            return createNet(filename, release, author)
         }
         return Optional.of(petriNet)
     }
@@ -180,7 +180,7 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user).getACase()
+        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
     }
 
     Case createCase(String title, PetriNet net) {

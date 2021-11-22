@@ -36,10 +36,10 @@ import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
-import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.*
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
@@ -124,6 +124,12 @@ class ActionDelegate {
 
     @Autowired
     IConfigurableMenuService configurableMenuService
+
+    @Autowired
+    IMenuImportExportService menuImportExportService
+
+    @Autowired
+    IFilterImportExportService filterImportExportService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -243,9 +249,7 @@ class ActionDelegate {
     }
 
     private SetDataEventOutcome createSetDataEventOutcome(){
-        return this.task.isPresent()
-                ? new SetDataEventOutcome(this.useCase, this.task.get())
-                : new SetDataEventOutcome(this.useCase, null)
+        return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
     }
 
     def saveChangedChoices(ChoiceField field) {
@@ -315,15 +319,17 @@ class ActionDelegate {
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
         tasksPage?.content?.each { task ->
-            this.outcomes.add(taskService.assignTask(task.stringId))
-            this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
-            this.outcomes.add(taskService.finishTask(task.stringId))
+            addTaskOutcomes(task, dataSet)
         }
     }
 
     void executeTask(String transitionId, Map dataSet) {
         QTask qTask = new QTask("task")
         Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
+        addTaskOutcomes(task, dataSet)
+    }
+
+    private addTaskOutcomes(Task task, Map dataSet){
         this.outcomes.add(taskService.assignTask(task.stringId))
         this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
         this.outcomes.add(taskService.finishTask(task.stringId))
@@ -380,23 +386,40 @@ class ActionDelegate {
              saveChangedAllowedNets(field)
          },
         options: { cl ->
-            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                    || field instanceof MultichoiceField || field instanceof EnumerationField))
                 return
 
             def options = cl()
             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
                 return
-            if (!(options instanceof Map && options.every {it.getKey() instanceof String}))
+            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
                 return
-            field = (MapOptionsField) field
-            if (options.every {it.getValue() instanceof I18nString}) {
-                field.setOptions(options)
-            } else {
-                Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                options.each {it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String))}
-                field.setOptions(newOptions)
+
+            if (field instanceof MapOptionsField) {
+                field = (MapOptionsField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    field.setOptions(options)
+                } else {
+                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                    field.setOptions(newOptions)
+                }
+                saveChangedOptions(field)
+            } else if (field instanceof ChoiceField) {
+                field = (ChoiceField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    Set<I18nString> choices = new LinkedHashSet<>()
+                    options.forEach({ k, v -> choices.add(v) })
+                    field.setChoices(choices)
+                } else {
+                    Set<I18nString> newChoices = new LinkedHashSet<>();
+                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                    field.setChoices(newChoices)
+                }
+                saveChangedChoices(field)
             }
-            saveChangedOptions(field)
+
         },
          validations: { cl ->
              changeFieldValidations(field, cl)
@@ -542,16 +565,13 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
-        if (net == null)
-            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale).getCase()
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
         this.outcomes.add(outcome)
-        return outcome.getACase()
+        return outcome.getCase()
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
@@ -562,50 +582,42 @@ class ActionDelegate {
     }
 
     Task assignTask(Task task, User user = userService.loggedOrSystem) {
-        AssignTaskEventOutcome outcome = taskService.assignTask(task, user)
-        this.outcomes.add(outcome)
-        return outcome.getTask()
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user))
     }
 
-    Task assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
-        AssignTaskEventOutcome outcome = taskService.assignTasks(tasks, assignee)
-        this.outcomes.add(outcome)
-        return outcome.getTask()
+    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
+        this.outcomes.addAll(taskService.assignTasks(tasks, assignee))
     }
 
     Task cancelTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        CancelTaskEventOutcome outcome = taskService.cancelTask(user.transformToLoggedUser(), taskId)
-        this.outcomes.add(outcome)
-        return outcome.getTask()
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId))
     }
 
     Task cancelTask(Task task, User user = userService.loggedOrSystem) {
-        CancelTaskEventOutcome outcome = taskService.cancelTask(task, userService.loggedOrSystem)
-        this.outcomes.add(outcome)
-        return outcome.getTask()
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, userService.loggedOrSystem))
     }
 
-    Task cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
-        CancelTaskEventOutcome outcome = taskService.cancelTasks(tasks, user)
+    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
+        this.outcomes.addAll(taskService.cancelTasks(tasks, user))
+    }
+
+    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome){
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
 
     void finishTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        FinishTaskEventOutcome outcome = taskService.finishTask(user.transformToLoggedUser(), taskId)
-        this.outcomes.add(outcome)
+        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId))
     }
 
     void finishTask(Task task, User user = userService.loggedOrSystem) {
-        FinishTaskEventOutcome outcome = taskService.finishTask(task, user)
-        this.outcomes.add(outcome)
+        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user))
     }
 
     void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
-        FinishTaskEventOutcome outcome = taskService.finishTasks(tasks, finisher)
-        this.outcomes.add(outcome)
+        this.outcomes.addAll(taskService.finishTasks(tasks, finisher))
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -634,7 +646,7 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    User assignRole(String roleMongoId, User user = userService.loggedUser) { // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
+    User assignRole(String roleMongoId, User user = userService.loggedUser) {
         User actualUser = userService.addRole(user, roleMongoId)
         userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
@@ -681,37 +693,38 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(Task task, Map dataSet) {
-        SetDataEventOutcome outcome = dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
-        this.outcomes.add(outcome)
-        return outcome
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
     }
 
     SetDataEventOutcome setData(Transition transition, Map dataSet) {
-        SetDataEventOutcome outcome = setData(transition.importId, this.useCase, dataSet)
-        this.outcomes.add(outcome)
-        return outcome
+        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
     }
 
     SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        SetDataEventOutcome outcome = dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
-        this.outcomes.add(outcome)
-        return outcome
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
     }
 
+    @Deprecated
     SetDataEventOutcome setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
         return setDataWithPropagation(task, dataSet)
     }
 
+    @Deprecated
     SetDataEventOutcome setDataWithPropagation(Task task, Map dataSet) {
         return setDataWithPropagation(task.stringId, dataSet)
     }
 
+    @Deprecated
     SetDataEventOutcome setDataWithPropagation(String taskId, Map dataSet) {
         Task task = taskService.findOne(taskId)
-        SetDataEventOutcome outcome = setData(task, dataSet)
+        return setData(task, dataSet)
+    }
+
+    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome){
+        this.outcomes.add(outcome)
         return outcome
     }
 
@@ -730,7 +743,7 @@ class ActionDelegate {
 
     Map<String, Field> getData(Task task) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(dataService.getData(task, useCase).getData())
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
     Map<String, Field> getData(Transition transition) {
@@ -742,7 +755,12 @@ class ActionDelegate {
         def task = taskService.searchOne(predicate)
         if (!task)
             return new HashMap<String, Field>()
-        return mapData(dataService.getData(task, useCase).getData())
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+    }
+
+    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome.getData()
     }
 
     protected Map<String, Field> mapData(List<Field> data) {
@@ -972,4 +990,18 @@ class ActionDelegate {
         return filterSearchService.autocompleteFindFilters(userInput)
     }
 
+    List<Case> findAllFilters() {
+        return filterSearchService.autocompleteFindFilters("")
+    }
+
+    FileFieldValue exportFilters(Collection<String> filtersToExport) {
+        if (filtersToExport.isEmpty()) {
+            return null
+        }
+        return filterImportExportService.exportFiltersToFile(filtersToExport)
+    }
+
+    List<String> importFilters() {
+        return filterImportExportService.importFilters()
+    }
 }
