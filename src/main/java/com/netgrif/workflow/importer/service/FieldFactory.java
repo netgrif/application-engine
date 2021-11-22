@@ -100,6 +100,9 @@ public final class FieldFactory {
             case FILTER:
                 field = buildFilterField(data);
                 break;
+            case I_18_N:
+                field = buildI18nField(data, importer);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -172,7 +175,11 @@ public final class FieldFactory {
 
     private MultichoiceField buildMultichoiceField(Data data, Importer importer) {
         MultichoiceField field = new MultichoiceField();
-        setFieldChoices(field, data, importer);
+        if (data.getOptions() != null) {
+            setFieldOptions(field, data, importer);
+        } else {
+            setFieldChoices(field, data, importer);
+        }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
                field.setDefaultValues(init);
@@ -183,7 +190,11 @@ public final class FieldFactory {
 
     private EnumerationField buildEnumerationField(Data data, Importer importer) {
         EnumerationField field = new EnumerationField();
-        setFieldChoices(field, data, importer);
+        if (data.getOptions() != null) {
+            setFieldOptions(field, data, importer);
+        } else {
+            setFieldChoices(field, data, importer);
+        }
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
                 field.setDefaultValue(init);
@@ -224,6 +235,18 @@ public final class FieldFactory {
             }
         });
         return field;
+    }
+
+    private void setFieldOptions(ChoiceField<?> field, Data data, Importer importer) {
+        if (data.getOptions() != null && data.getOptions().getInit() != null) {
+            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
+            return;
+        }
+
+        List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
+                    .map(importer::toI18NString)
+                    .collect(Collectors.toList());
+        field.getChoices().addAll(options);
     }
 
     private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
@@ -348,6 +371,25 @@ public final class FieldFactory {
         } else {
             return new FilterField(new ArrayList<>(nets.getAllowedNet()));
         }
+    }
+
+    private I18nField buildI18nField(Data data, Importer importer) {
+        I18nField i18nField = new I18nField();
+        String initExpression = getInitExpression(data);
+        if (initExpression != null) {
+            i18nField.setInitExpression(new Expression(initExpression));
+        } else {
+            if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
+                i18nField.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
+            } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {
+                i18nField.setDefaultValue(new I18nString(data.getInit().getValue()));
+            } else if (data.getInit() != null && data.getInit().getName() != null && !data.getInit().getName().equals("")) {
+                i18nField.setDefaultValue(importer.toI18NString(data.getInit()));
+            } else {
+                i18nField.setDefaultValue(new I18nString(""));
+            }
+        }
+        return i18nField;
     }
 
     private void setActions(Field field, Data data) {

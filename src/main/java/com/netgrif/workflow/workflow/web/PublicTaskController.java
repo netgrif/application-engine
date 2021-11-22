@@ -134,7 +134,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
+    public EventOutcomeWithMessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -170,7 +170,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EventOutcomeWithMessageResource saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) throws IOException {
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
         return super.saveFiles(taskId, fieldId, multipartFiles);
     }
 
