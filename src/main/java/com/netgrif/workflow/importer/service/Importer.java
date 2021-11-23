@@ -229,7 +229,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUsersRef usersRef) {
+    protected void resolveUsersRef(CaseUserRef usersRef) {
         CaseLogic logic = usersRef.getCaseLogic();
         String usersId = usersRef.getId();
 
@@ -327,9 +327,9 @@ public class Importer {
         }
     }
 
-    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActionRefs(List<ActionRef> actionRefs) {
         LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> refs = new LinkedHashSet<>();
-        for (ActionRefType actionRef : actionRefs) {
+        for (ActionRef actionRef : actionRefs) {
             Action action = actions.get(actionRef.getId());
             com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
             dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(fromActionRef(actionRef));
@@ -338,7 +338,7 @@ public class Importer {
         return refs;
     }
 
-    protected Action fromActionRef(ActionRefType actionRef) {
+    protected Action fromActionRef(ActionRef actionRef) {
         Action placeholder = new Action();
         placeholder.setImportId(actionRef.getId());
         this.actionRefs.put(actionRef.getId(), placeholder);
@@ -637,7 +637,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UsersRef usersRef) {
+    protected void addUserLogic(Transition transition, UserRef usersRef) {
         Logic logic = usersRef.getLogic();
         String userRef = usersRef.getId();
 
@@ -737,7 +737,7 @@ public class Importer {
         return dataEvent;
     }
 
-    protected com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction) {
+    protected com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = parseAction(fieldId, transitionId, importedAction);
         com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = createDataEvent(action);
         dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(action);
@@ -755,20 +755,20 @@ public class Importer {
     }
 
     @Transactional
-    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActions(List<com.netgrif.workflow.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> convertAction(fieldId, transitionId, action))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    protected Action parseAction(String transitionId, ActionType action) {
+    protected Action parseAction(String transitionId, com.netgrif.workflow.importer.model.Action action) {
         if (action.getValue().contains("f.this")) {
             throw new IllegalArgumentException("Event action can not reference field using 'this'");
         }
         return parseAction(null, transitionId, action);
     }
 
-    protected Action parseAction(String fieldId, String transitionId, ActionType importedAction) {
+    protected Action parseAction(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction) {
         if (fieldId != null && importedAction.getTrigger() == null) {
             throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
         }
@@ -782,7 +782,7 @@ public class Importer {
         }
     }
 
-    protected Action createAction(ActionType importedAction) {
+    protected Action createAction(com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         if (importedAction.getId() != null) {
             action.setImportId(importedAction.getId());
@@ -792,7 +792,7 @@ public class Importer {
         return action;
     }
 
-    protected void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
+    protected void parseIds(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction, Action action) {
         String definition = importedAction.getValue();
         action.setDefinition(definition);
 
@@ -1020,28 +1020,28 @@ public class Importer {
         return net.getPermissions().containsKey(defaultRole.getStringId());
     }
 
-    protected AssignPolicy toAssignPolicy(AssignPolicyType type) {
-        if (type == null || type.value() == null) {
+    protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return AssignPolicy.MANUAL;
         }
 
-        return AssignPolicy.valueOf(type.value().toUpperCase());
+        return AssignPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected DataFocusPolicy toDataFocusPolicy(DataFocusPolicyType type) {
-        if (type == null || type.value() == null) {
+    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return DataFocusPolicy.MANUAL;
         }
 
-        return DataFocusPolicy.valueOf(type.value().toUpperCase());
+        return DataFocusPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected FinishPolicy toFinishPolicy(FinishPolicyType type) {
-        if (type == null || type.value() == null) {
+    protected FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return FinishPolicy.MANUAL;
         }
 
-        return FinishPolicy.valueOf(type.value().toUpperCase());
+        return FinishPolicy.valueOf(policy.value().toUpperCase());
     }
 
     public ProcessRole getRole(String id) {
