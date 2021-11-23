@@ -19,7 +19,10 @@ import com.netgrif.workflow.startup.DefaultFiltersRunner;
 import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.utils.InputStreamToString;
 import com.netgrif.workflow.workflow.domain.*;
-import com.netgrif.workflow.workflow.domain.menu.*;
+import com.netgrif.workflow.workflow.domain.menu.Menu;
+import com.netgrif.workflow.workflow.domain.menu.MenuAndFilters;
+import com.netgrif.workflow.workflow.domain.menu.MenuEntry;
+import com.netgrif.workflow.workflow.domain.menu.MenuEntryRole;
 import com.netgrif.workflow.workflow.service.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +38,6 @@ import javax.xml.validation.Validator;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,9 +79,10 @@ public class MenuImportExportService implements IMenuImportExportService {
      * Method which performs export of selected menu entries with their filters into xml file.
      * Method finds all cases by provided ids, transform them into FilterImportExportList object
      * and serialize them into xml file on path: storage/filterExport/<userId>/filters.xml
+     *
      * @param menusForExport - EnumerationMapField with Ids (delimited by ",") of menu entries as keys
-     * and identifier of menu they belong to as value
-     * @param groupId case Id of active group
+     *                       and identifier of menu they belong to as value
+     * @param groupId        case Id of active group
      * @return FileFieldValue - file field value of active group file field used to store exported file
      * @throws IOException - if file which contains exported menus cannot be created
      */
@@ -118,12 +121,13 @@ public class MenuImportExportService implements IMenuImportExportService {
      * as any of the menus imported.
      * If the file is correct, method creates new instance of Preference filter item cases
      * for each menu entry by calling method "createMenuItemCase".
+     *
      * @param menuItemCases - list of Preference filter item cases in active group
-     * @param ffv - file field from active group case containing uploaded xml file.
-     * @param parentId - id of active group case
+     * @param ffv           - file field from active group case containing uploaded xml file.
+     * @param parentId      - id of active group case
      * @return List<String> - list of values delimited by "," containing
      * preferenceItem case Id, filter case Id, boolean value determining if Icon should be displayed
-     * @throws IOException - if imported file is not found
+     * @throws IOException              - if imported file is not found
      * @throws IllegalMenuFileException - if uploaded xml is not in correct xml format and invalidate against schema
      */
     @Override
@@ -131,7 +135,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         StringBuilder resultMessage = new StringBuilder("");
 
         List<String> importedEntryAndFilterCaseIds = new ArrayList<>();
-        MenuAndFilters menuAndFilters= loadFromXML(ffv);
+        MenuAndFilters menuAndFilters = loadFromXML(ffv);
 
         //Firstly, remove existing preference_filter_item cases having the same menu identifier as any menu
         // which is being currently imported.
@@ -142,7 +146,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         //Change remove_option button value to trigger its SET action
         if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
             Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
-            Map <String, String> removeBtnData = new HashMap<>();
+            Map<String, String> removeBtnData = new HashMap<>();
             removeBtnData.put("type", "button");
             removeBtnData.put("value", "removed");
             caseToRemoveData.put("remove_option", removeBtnData);
@@ -194,10 +198,11 @@ public class MenuImportExportService implements IMenuImportExportService {
      * Method which creates new Preference filter item case from imported menuEntry class.
      * Before case creation method prepares allowed and banned roles data for the entry while performing checks
      * for imported filter and role nets in engine.
-     * @param item - imported MenuEntry item
+     *
+     * @param item           - imported MenuEntry item
      * @param menuIdentifier - Identifier of new imported menu.
-     * @param parentId - id of active group case
-     * @param filterTaskId - task id of imported filter belonging to men item case being created
+     * @param parentId       - id of active group case
+     * @param filterTaskId   - task id of imported filter belonging to men item case being created
      * @return String - values delimited by "," containing case Id of newly created Preference filter item case,
      * Id of its filter case, boolean value determining if Preference filter item case should display icon.
      */
@@ -246,8 +251,12 @@ public class MenuImportExportService implements IMenuImportExportService {
             });
         }
         //Creating new Case of preference_filter_item net and setting its data...
-        Case menuItemCase = workflowService.createCase(petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId()
-                , item.getEntryName() + "_" + menuIdentifier, "", userService.getSystem().transformToLoggedUser());
+        Case menuItemCase = workflowService.createCase(
+                petriNetService.getNewestVersionByIdentifier("preference_filter_item").getStringId(),
+                item.getEntryName() + "_" + menuIdentifier,
+                "",
+                userService.getSystem().transformToLoggedUser()
+        ).getCase();
 
         QTask qTask = new QTask("task");
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
@@ -263,7 +272,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             netCheck.set(false);
             resultMessage.append("- Failed to execute \"init\" task");
         }
-        if(netCheck.get()) resultMessage.append("OK\n");
+        if (netCheck.get()) resultMessage.append("OK\n");
 
         return task.getCaseId() + "," + filterCase.getStringId() + "," + item.getUseIcon().toString();
     }
@@ -282,7 +291,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {
-            ffv.setName("menu_" + userService.getLoggedUser().getFullName().replaceAll("\\s+","") + ".xml");
+            ffv.setName("menu_" + userService.getLoggedUser().getFullName().replaceAll("\\s+", "") + ".xml");
             ffv.setPath(ffv.getPath(parentId, fileField.getImportId()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();
@@ -300,8 +309,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         return ffv;
     }
 
-    private MenuEntry createMenuEntryExportClass (Case menuItemCase, String filterCaseId)
-    {
+    private MenuEntry createMenuEntryExportClass(Case menuItemCase, String filterCaseId) {
         Map<String, I18nString> allowedRoles = menuItemCase.getDataSet().get(ALLOWED_ROLES).getOptions();
         Map<String, I18nString> bannedRoles = menuItemCase.getDataSet().get(BANNED_ROLES).getOptions();
 
@@ -337,20 +345,20 @@ public class MenuImportExportService implements IMenuImportExportService {
     }
 
     @Override
-    public Map<String, I18nString>  createAvailableEntriesChoices(List<Case> menuItemCases) {
-        Map <String, I18nString> availableItems;
+    public Map<String, I18nString> createAvailableEntriesChoices(List<Case> menuItemCases) {
+        Map<String, I18nString> availableItems;
         availableItems = menuItemCases.stream()
-                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString((String)v.getDataSet().get(ENTRY_DEFAULT_NAME).getValue())));
+                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString((String) v.getDataSet().get(ENTRY_DEFAULT_NAME).getValue())));
 
         return availableItems;
     }
 
     @Override
-    public Map<String, I18nString>  addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuIdentifier) {
-        Map <String, I18nString> updatedOptions = new LinkedHashMap<>(menusForExport.getOptions());
+    public Map<String, I18nString> addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuIdentifier) {
+        Map<String, I18nString> updatedOptions = new LinkedHashMap<>(menusForExport.getOptions());
         String menuCaseIds = "";
         if (availableEntries.getOptions().size() != 0) {
-            for (String id: availableEntries.getValue()) {
+            for (String id : availableEntries.getValue()) {
                 menuCaseIds = menuCaseIds.concat(id + ",");
             }
             updatedOptions.put(menuCaseIds, new I18nString(menuIdentifier));
