@@ -1,3 +1,26 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10940/tab/release-report-all-issues"></a>
+## 5.7.3 (23.11.2021)
+### Bug Fixes
+None
+
+### Improvements
+None
+
+### Features
+* [NAE-1493](https://netgrif.atlassian.net/browse/NAE-1493) - i18n divider data field
+
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10933/tab/release-report-all-issues"></a>
+## 5.7.2 (23.11.2021)
+### Bug Fixes
+* [NAE-1518](https://netgrif.atlassian.net/browse/NAE-1518) - Export of chained filters
+
+### Improvements
+* [NAE-1439](https://netgrif.atlassian.net/browse/NAE-1439) - Deprecate values
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10913/tab/release-report-all-issues"></a>
 ## 5.7.1 (08.11.2021)
 ### Bug Fixes
