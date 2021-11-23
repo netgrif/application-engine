@@ -6,7 +6,7 @@ import java.util.Locale;
 
 public class LocalisedFieldFactory {
 
-    // todo: remove this monstrosity
+    // todo: remove this monstrosity, see LocalisedEventOutcomeFactory
     public static LocalisedField from(Field field, Locale locale) {
         if (field instanceof EnumerationField) {
             return fromEnumeration((EnumerationField) field, locale);
