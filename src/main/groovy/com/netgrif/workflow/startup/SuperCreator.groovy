@@ -4,8 +4,6 @@ import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
-import com.netgrif.workflow.configuration.properties.NaeOAuthProperties
-import com.netgrif.workflow.oauth.service.interfaces.IOAuthUserService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import org.slf4j.Logger
@@ -33,9 +31,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IProcessRoleService processRoleService
 
-    @Autowired
-    protected NaeOAuthProperties oAuthProperties
-
     @Value('${admin.password}')
     private String superAdminPassword
 
@@ -44,7 +39,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) {
         log.info("Creating Super user")
-        oAuthProperties.enabled && oAuthProperties.remoteUserBase ? createOAuthSuperUser() : createSuperUser()
+        createSuperUser()
     }
 
     private IUser createSuperUser() {
@@ -67,12 +62,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superUser = superUser
         }
 
-        return this.superUser
-    }
-
-    private IUser createOAuthSuperUser() {
-        IUser superUser = ((IOAuthUserService) userService).findByUsername(oAuthProperties.getSuperUsername())
-        this.superUser = userService.saveNew(superUser)
         return this.superUser
     }
 
