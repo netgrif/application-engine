@@ -67,9 +67,9 @@ class PetriNetControllerTest {
         testHelper.truncateDbs()
 
         def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        this.net = net.get()
+        this.net = net.getNet()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
