@@ -4,14 +4,13 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
     <!-- ===== DOCUMENT ELEMENTS ===== -->
-    <xs:element name="transaction">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="id"/>
-                <xs:element ref="title"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="transaction" type="transaction"/>
+    <xs:complexType name="transaction">
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="title"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:element name="data">
         <xs:complexType>
             <xs:sequence>
@@ -85,24 +84,19 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="transition">
-        <xs:complexType>
+    <xs:element name="transition" type="transition">
+        <xs:unique name="dataGroupUniqueId">
+            <xs:selector xpath="./dataGroup"/>
+            <xs:field xpath="id"/>
+        </xs:unique>
+    </xs:element>
+        <xs:complexType name="transition">
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="x"/>
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
-                <xs:element name="layout" minOccurs="0">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element ref="cols" minOccurs="0"/>
-                            <xs:element ref="rows" minOccurs="0"/>
-                            <xs:element ref="offset" minOccurs="0"/>
-                            <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
-                        </xs:sequence>
-                        <xs:attribute name="type" type="layoutType"/>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element name="layout" minOccurs="0" type="layout-transition"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
@@ -118,11 +112,17 @@
                 <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
-        <xs:unique name="dataGroupUniqueId">
-            <xs:selector xpath="./dataGroup"/>
-            <xs:field xpath="id"/>
-        </xs:unique>
-    </xs:element>
+    <xs:complexType name="layout-transition">
+        <xs:sequence>
+            <xs:element ref="cols" minOccurs="0"/>
+            <xs:element ref="rows" minOccurs="0"/>
+            <xs:element ref="offset" minOccurs="0"/>
+            <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
+            <xs:element ref="hideEmptyRows" minOccurs="0"/>
+            <xs:element ref="compactDirection" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="layoutType"/>
+    </xs:complexType>
     <xs:element name="place">
         <xs:complexType>
             <xs:sequence>
@@ -383,6 +383,10 @@
                 <xs:element ref="init"/>
             </xs:choice>
         </xs:complexType>
+        <xs:unique name="optionUniqueKey">
+            <xs:selector xpath="./option"/>
+            <xs:field xpath="@key"/>
+        </xs:unique>
     </xs:element>
     <xs:element name="inits">
         <xs:complexType>
@@ -585,6 +589,21 @@
             <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="hideEmptyRows">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="all"/>
+            <xs:enumeration value="compacted"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="hideEmptyRows" type="hideEmptyRows"/>
+    <xs:simpleType name="compactDirection">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="up"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="compactDirection" type="compactDirection"/>
     <xs:element name="dataGroup">
         <xs:complexType>
             <xs:sequence>
@@ -595,6 +614,8 @@
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
+                <xs:element ref="hideEmptyRows" minOccurs="0"/>
+                <xs:element ref="compactDirection" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
