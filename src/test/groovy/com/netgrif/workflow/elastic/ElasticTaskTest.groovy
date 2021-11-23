@@ -58,9 +58,9 @@ class ElasticTaskTest {
     @Test
     void taskReindexTest() {
         def optional = helper.createNet("all_data.xml", "major")
-        assert optional.isPresent()
+        assert optional.getNet() != null
 
-        def net = optional.get()
+        def net = optional.getNet()
         10.times {
             helper.createCase("Case $it", net)
         }
