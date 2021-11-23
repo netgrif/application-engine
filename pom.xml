@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>5.7.2-SNAPSHOT</version>
+    <version>5.7.2</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -556,6 +556,11 @@
                         <nonFilteredFileExtension>pem</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
             </plugin>
         </plugins>
     </build>
