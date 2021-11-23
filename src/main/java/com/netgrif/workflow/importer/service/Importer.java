@@ -338,9 +338,9 @@ public class Importer {
         }
     }
 
-    private LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
+    private LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActionRefs(List<ActionRef> actionRefs) {
         LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> refs = new LinkedHashSet<>();
-        for (ActionRefType actionRef : actionRefs) {
+        for (ActionRef actionRef : actionRefs) {
             Action action = actions.get(actionRef.getId());
             com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
             dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(fromActionRef(actionRef));
@@ -349,7 +349,7 @@ public class Importer {
         return refs;
     }
 
-    private Action fromActionRef(ActionRefType actionRef) {
+    private Action fromActionRef(ActionRef actionRef) {
         Action placeholder = new Action();
         placeholder.setImportId(actionRef.getId());
         this.actionRefs.put(actionRef.getId(), placeholder);
@@ -754,7 +754,7 @@ public class Importer {
         return dataEvent;
     }
 
-    private com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction) {
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = parseAction(fieldId, transitionId, importedAction);
         com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = createDataEvent(action);
         dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(action);
@@ -772,20 +772,20 @@ public class Importer {
     }
 
     @Transactional
-    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActions(List<com.netgrif.workflow.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> convertAction(fieldId, transitionId, action))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private Action parseAction(String transitionId, ActionType action) {
+    private Action parseAction(String transitionId, com.netgrif.workflow.importer.model.Action action) {
         if (action.getValue().contains("f.this")) {
             throw new IllegalArgumentException("Event action can not reference field using 'this'");
         }
         return parseAction(null, transitionId, action);
     }
 
-    private Action parseAction(String fieldId, String transitionId, ActionType importedAction) {
+    private Action parseAction(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction) {
         if (fieldId != null && importedAction.getTrigger() == null) {
             throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
         }
@@ -799,7 +799,7 @@ public class Importer {
         }
     }
 
-    private Action createAction(ActionType importedAction) {
+    private Action createAction(com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         if (importedAction.getId() != null) {
             action.setImportId(importedAction.getId());
@@ -809,7 +809,7 @@ public class Importer {
         return action;
     }
 
-    private void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
+    private void parseIds(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction, Action action) {
         String definition = importedAction.getValue();
         action.setDefinition(definition);
 
@@ -1015,7 +1015,7 @@ public class Importer {
         return net.get();
     }
 
-    private AssignPolicy toAssignPolicy(AssignPolicyType type) {
+    private AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy type) {
         if (type == null || type.value() == null) {
             return AssignPolicy.MANUAL;
         }
@@ -1023,7 +1023,7 @@ public class Importer {
         return AssignPolicy.valueOf(type.value().toUpperCase());
     }
 
-    private DataFocusPolicy toDataFocusPolicy(DataFocusPolicyType type) {
+    private DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy type) {
         if (type == null || type.value() == null) {
             return DataFocusPolicy.MANUAL;
         }
@@ -1031,7 +1031,7 @@ public class Importer {
         return DataFocusPolicy.valueOf(type.value().toUpperCase());
     }
 
-    private FinishPolicy toFinishPolicy(FinishPolicyType type) {
+    private FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy type) {
         if (type == null || type.value() == null) {
             return FinishPolicy.MANUAL;
         }
