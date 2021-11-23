@@ -92,14 +92,14 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM);
+        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.ASSIGN)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.ASSIGN);
     }
 
     @Override
     public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE);
+        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.DELEGATE, RolePermission.DELEGATE)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.DELEGATE, RolePermission.DELEGATE);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             throw new IllegalTaskStateException("Task with ID '" + taskId + "' cannot be finished, because it is not assigned!");
 
         return loggedUser.isAdmin()
-                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM) || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM))
+                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.FINISH) || userHasUserListPermission(loggedUser, taskId, RolePermission.FINISH))
                 && isAssignee(loggedUser, taskId));
     }
 
@@ -126,8 +126,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
             throw new IllegalTaskStateException("Task with ID '" + taskId + "' cannot be canceled, because it is not assigned!");
 
         return loggedUser.isAdmin()
-                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL))
+                || ((userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.CANCEL)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.CANCEL))
                 && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
     }
 
