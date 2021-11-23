@@ -133,11 +133,13 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+        return (loggedUser.isAdmin() || isAssignee(loggedUser, taskId)) && (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.SET)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.SET));
     }
 
     @Override
     public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+        return (loggedUser.isAdmin() || isAssignee(loggedUser, taskId)) && (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.SET)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.SET));
     }
 }
