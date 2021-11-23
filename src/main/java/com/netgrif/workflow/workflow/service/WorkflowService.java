@@ -19,7 +19,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.service.ProcessRoleService;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
@@ -61,45 +63,48 @@ public class WorkflowService implements IWorkflowService {
     private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Autowired
-    private CaseRepository repository;
+    protected CaseRepository repository;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
 
     @Autowired
-    private IPetriNetService petriNetService;
+    protected IPetriNetService petriNetService;
 
     @Autowired
-    private ITaskService taskService;
+    protected IProcessRoleService processRoleService;
 
     @Autowired
-    private CaseSearchService searchService;
+    protected ITaskService taskService;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected CaseSearchService searchService;
 
     @Autowired
-    private EncryptionService encryptionService;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private FieldFactory fieldFactory;
+    protected EncryptionService encryptionService;
 
     @Autowired
-    private IRuleEngine ruleEngine;
+    protected FieldFactory fieldFactory;
 
     @Autowired
-    private FieldActionsRunner actionsRunner;
+    protected IRuleEngine ruleEngine;
 
     @Autowired
-    private IUserService userService;
+    protected FieldActionsRunner actionsRunner;
 
     @Autowired
-    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    protected IUserService userService;
 
     @Autowired
-    private IElasticCaseMappingService caseMappingService;
+    protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
-    private IElasticCaseService elasticCaseService;
+    @Autowired
+    protected IElasticCaseMappingService caseMappingService;
+
+    protected IElasticCaseService elasticCaseService;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -227,6 +232,24 @@ public class WorkflowService implements IWorkflowService {
         return createCase(netId, (u) -> title, color, user);
     }
 
+    @Override
+    public Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        if (net == null) {
+            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
+        }
+        return this.createCase(net.getStringId(), title != null && !title.equals("") ? title : net.getDefaultCaseName().getTranslation(locale), color, user);
+    }
+
+    @Override
+    public Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier);
+        if (net == null) {
+            throw new IllegalArgumentException("Petri net with identifier [" + identifier + "] does not exist.");
+        }
+        return this.createCase(net.getStringId(), title, color, user);
+    }
+
     public Case createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet, petriNet.getActivePlaces());
@@ -248,6 +271,8 @@ public class WorkflowService implements IWorkflowService {
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
         useCase.setUserRefs(petriNet.getUserRefs());
+        useCase.decideEnabledRoles(petriNet);
+        setDefaultRoleIfEnabled(petriNet, useCase);
 
         useCase.setTitle(makeTitle.apply(useCase));
         runActions(petriNet.getPreCreateActions(), petriNet);
@@ -396,7 +421,13 @@ public class WorkflowService implements IWorkflowService {
         return fields;
     }
 
-    private void resolveTaskRefs(Case useCase) {
+    protected void setDefaultRoleIfEnabled(PetriNet net, Case useCase) {
+        if (useCase.getViewUserRefs().isEmpty() && useCase.getViewRoles().isEmpty() && net.isDefaultRoleEnabled()) {
+            useCase.addAllRolesToViewRoles(processRoleService.defaultRole().getStringId());
+        }
+    }
+
+    protected void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
@@ -436,7 +467,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setImmediateData(immediateData);
     }
 
-    private Page<Case> setImmediateDataFields(Page<Case> cases) {
+    protected Page<Case> setImmediateDataFields(Page<Case> cases) {
         cases.getContent().forEach(this::setImmediateDataFields);
         return cases;
     }

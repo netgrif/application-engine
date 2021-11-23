@@ -71,31 +71,31 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
     }
 
     @Override
-    boolean isOpenRegistration() {
+    protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override
-    boolean isCsrfEnabled() {
+    protected boolean isCsrfEnabled() {
         return csrf;
     }
 
     @Override
-    String[] getStaticPatterns() {
+    protected String[] getStaticPatterns() {
         return new String[]{
                 "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
-    String[] getServerPatterns() {
+    protected String[] getServerPatterns() {
         return new String[]{
                 "/index.html", "/", "/login", "/signup/**", "/recover/**", "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
         };
     }
 
     @Override
-    Environment getEnvironment() {
+    protected Environment getEnvironment() {
         return env;
     }
 }

@@ -68,6 +68,10 @@ public class Authority implements GrantedAuthority {
         return this.name;
     }
 
+    public void setAuthority(String authority) {
+        this.name = authority;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
