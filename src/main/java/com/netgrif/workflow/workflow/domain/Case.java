@@ -110,7 +110,6 @@ public class Case {
 
     @Getter
     @Setter
-    @Deprecated
     @JsonIgnore
     private Set<String> enabledRoles;
 
@@ -165,6 +164,7 @@ public class Case {
         this.activePlaces = activePlaces;
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
+        this.enabledRoles = petriNet.getRoles().keySet();
     }
 
     public String getStringId() {
