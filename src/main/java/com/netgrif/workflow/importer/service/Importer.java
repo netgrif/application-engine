@@ -189,7 +189,8 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        document.getUsersRef().forEach(this::resolveUsersRef);
+        document.getUsersRef().forEach(this::resolveUserRef);
+        document.getUserRef().forEach(this::resolveUserRef);
         if (!isDefaultRoleReferencedOnNet() && isDefaultRoleAllowedForNet()) {
             addDefaultPermissions();
         }
@@ -229,7 +230,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUserRef usersRef) {
+    protected void resolveUserRef(CaseUserRef usersRef) {
         CaseLogic logic = usersRef.getCaseLogic();
         String usersId = usersRef.getId();
 
