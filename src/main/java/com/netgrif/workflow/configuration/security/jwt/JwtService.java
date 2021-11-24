@@ -63,7 +63,6 @@ public class JwtService implements IJwtService {
         );
         user.setFullName(userMap.get("fullName").toString());
         user.setAnonymous((boolean) userMap.get("anonymous"));
-        user.setProcessRoles(Collections.singleton(roleService.defaultRole().getStringId()));
         return user;
     }
 
