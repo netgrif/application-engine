@@ -28,7 +28,7 @@
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.3.1</querydsl.version>
         <drools.version>7.55.0.Final</drools.version>
-<!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+        <!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>netgrif_nae-backend</sonar.projectKey>
@@ -423,17 +423,17 @@
         </dependency>
         <!--DOCS-->
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
-<!--        <dependency>-->
-<!--            <groupId>io.springfox</groupId>-->
-<!--            <artifactId>springfox-swagger2</artifactId>-->
-<!--            <version>2.8.0</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.springfox</groupId>-->
+        <!--            <artifactId>springfox-swagger2</artifactId>-->
+        <!--            <version>2.8.0</version>-->
+        <!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
-<!--        <dependency>-->
-<!--            <groupId>io.springfox</groupId>-->
-<!--            <artifactId>springfox-swagger-ui</artifactId>-->
-<!--            <version>2.8.0</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.springfox</groupId>-->
+        <!--            <artifactId>springfox-swagger-ui</artifactId>-->
+        <!--            <version>2.8.0</version>-->
+        <!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators -->
         <dependency>
             <groupId>io.springfox</groupId>
