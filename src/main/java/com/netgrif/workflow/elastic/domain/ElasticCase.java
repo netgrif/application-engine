@@ -71,7 +71,6 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> taskMongoIds;
 
-    @Deprecated
     @Field(type = Keyword)
     private Set<String> enabledRoles;
 
@@ -112,6 +111,7 @@ public class ElasticCase {
         authorEmail = useCase.getAuthor().getEmail();
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
+        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
         userRefs = new HashSet<>(useCase.getUserRefs().keySet());
         negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
@@ -127,6 +127,7 @@ public class ElasticCase {
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
+        enabledRoles = useCase.getEnabledRoles();
         viewRoles = useCase.getViewRoles();
         userRefs = useCase.getUserRefs();
         negativeViewRoles = useCase.getNegativeViewRoles();
