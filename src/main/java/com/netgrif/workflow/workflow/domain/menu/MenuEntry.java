@@ -4,6 +4,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import javax.xml.bind.annotation.*;
 import java.util.List;
@@ -20,6 +21,9 @@ public class MenuEntry {
 
     @XmlElement(required = true)
     protected String entryName;
+    @EqualsAndHashCode.Exclude
+    @XmlElement(required = true)
+    protected String filterCaseId;
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "entryRole")
     protected List<MenuEntryRole> menuEntryRoleList;
