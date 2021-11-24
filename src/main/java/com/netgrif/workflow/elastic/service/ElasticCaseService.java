@@ -13,6 +13,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import org.apache.lucene.search.BooleanQuery;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -185,7 +186,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildPermissionQuery(query, user);
+        buildViewPermissionQuery(query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -204,11 +205,58 @@ public class ElasticCaseService implements IElasticCaseService {
             return query;
     }
 
-    protected void buildPermissionQuery(BoolQueryBuilder query, LoggedUser user){
-        BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(userRoleQuery, user);
-        negativeUsersAndRolesQuery(userRoleQuery, user);
-        query.filter(userRoleQuery);
+    protected void buildViewPermissionQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder permissionQuery = boolQuery();
+        BoolQueryBuilder positiveRoleSetMinusNegativeRole = boolQuery();
+        BoolQueryBuilder roleSetMinusPositiveUserList = boolQuery();
+
+        /* Build positive view role query */
+        BoolQueryBuilder positiveViewRole = boolQuery();
+        BoolQueryBuilder viewRoleNotExists = boolQuery();
+        BoolQueryBuilder positiveViewRoleQuery = boolQuery();
+        for (String roleId : user.getProcessRoles()) {
+            positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
+        }
+        viewRoleNotExists.mustNot(existsQuery("viewRoles"));
+        positiveViewRole.should(viewRoleNotExists);
+        positiveViewRole.should(positiveViewRoleQuery);
+
+        /* Build negative view role query */
+        BoolQueryBuilder negativeViewRole = boolQuery();
+        BoolQueryBuilder negativeViewRoleQuery = boolQuery();
+        for (String roleId : user.getProcessRoles()) {
+            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId));
+        }
+        negativeViewRole.mustNot(negativeViewRoleQuery);
+
+        /* Positive view role set-minus negative view role */
+        positiveRoleSetMinusNegativeRole.must(positiveViewRole);
+        positiveRoleSetMinusNegativeRole.must(negativeViewRole);
+
+        /* Build positive view userList query */
+        BoolQueryBuilder positiveViewUser = boolQuery();
+        BoolQueryBuilder viewUserRefNotExists = boolQuery();
+        BoolQueryBuilder positiveViewUserQuery = boolQuery();
+        positiveViewUserQuery.must(termQuery("users", user.getId()));
+        viewUserRefNotExists.mustNot(existsQuery("userRefs"));
+        positiveViewUser.should(viewUserRefNotExists);
+        positiveViewUser.should(positiveViewUserQuery);
+
+        /* Role query set-minus positive view userList */
+        roleSetMinusPositiveUserList.should(positiveRoleSetMinusNegativeRole);
+        roleSetMinusPositiveUserList.should(positiveViewUser);
+
+        /* Build negative view userList query */
+        BoolQueryBuilder negativeViewUser = boolQuery();
+        BoolQueryBuilder negativeViewUserQuery = boolQuery();
+        negativeViewUserQuery.should(termQuery("negativeViewUsers", user.getId()));
+        negativeViewUser.mustNot(negativeViewUserQuery);
+
+        /* Role-UserListPositive set-minus negative view userList */
+        permissionQuery.must(roleSetMinusPositiveUserList);
+        permissionQuery.must(negativeViewUser);
+
+        query.filter(permissionQuery);
     }
 
     private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
