@@ -451,24 +451,32 @@
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="roleRef">
-        <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
-            <xs:element type="logic" name="logic"/>
-        </xs:sequence>
+        <xs:complexContent>
+            <xs:extension base="permissionRef"/>
+        </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="userRef">
+        <xs:complexContent>
+            <xs:extension base="permissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="permissionRef">
         <xs:sequence>
             <xs:element type="xs:string" name="id"/>
             <xs:element type="logic" name="logic"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="caseRoleRef">
-        <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
-            <xs:element type="caseLogic" name="caseLogic"/>
-        </xs:sequence>
+        <xs:complexContent>
+            <xs:extension base="casePermissionRef"/>
+        </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="caseUserRef">
+        <xs:complexContent>
+            <xs:extension base="casePermissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="casePermissionRef">
         <xs:sequence>
             <xs:element type="xs:string" name="id"/>
             <xs:element type="caseLogic" name="caseLogic"/>
