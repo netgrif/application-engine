@@ -75,6 +75,12 @@ class DefaultRolePermissionsTest {
     @Value("classpath:role_permissions_default_role_reserved.xml")
     private Resource reservedDefaultRoleNet
 
+    @Value("classpath:role_permissions_default_role_shadowed_userref.xml")
+    private Resource shadowedUserRefDefaultRoleNet
+
+    @Value("classpath:role_permissions_default_role_disabled.xml")
+    private Resource disabledReferencedDefaultRoleNet
+
 
     private static final String TRANSITION_ID = 't1'
     private static final String NET_ROLE_ID = 'netRole'
@@ -188,6 +194,26 @@ class DefaultRolePermissionsTest {
     @Test(expected = IllegalArgumentException.class)
     void reservedDefaultRole() {
         importAndCreate(reservedDefaultRoleNet)
+    }
+
+    @Test()
+    void shadowedByUserRef() {
+        testPermissions(shadowedUserRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true)
+    }
+
+    @Test
+    void disabledReferencedDefaultRole() {
+        testPermissions(disabledReferencedDefaultRoleNet, [
+                (DEFAULT_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (DEFAULT_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, false)
     }
 
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
