@@ -189,10 +189,10 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        if(!isDefaultRoleReferencedOnNet() && isDefaultRoleAllowedForNet()) {
+        document.getUsersRef().forEach(this::resolveUsersRef);
+        if (!isDefaultRoleReferencedOnNet() && isDefaultRoleAllowedForNet()) {
             addDefaultPermissions();
         }
-        document.getUsersRef().forEach(this::resolveUsersRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -386,7 +386,7 @@ public class Importer {
         if (importArc.getReference() == null && arc.getReference() == null) {
             arc.setMultiplicity(importArc.getMultiplicity());
         }
-        if (importArc.getReference() != null){
+        if (importArc.getReference() != null) {
             if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
                 throw new IllegalArgumentException("Place or Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
             }
@@ -395,7 +395,7 @@ public class Importer {
             arc.setReference(reference);
         }
 //      It has to be here for backwards compatibility of variable arcs
-        if (arc.getReference() != null){
+        if (arc.getReference() != null) {
             arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }
 
@@ -974,6 +974,9 @@ public class Importer {
         return string;
     }
 
+    /**
+     * @return TRUE if the default role should be added with default permissions to the specified transition. FALSE otherwise
+     */
     protected boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         // FALSE if defaultRole not allowed in net
         if (!net.isDefaultRoleEnabled()) {
@@ -981,27 +984,38 @@ public class Importer {
         }
         // FALSE if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {
-            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())) {
+            if (Objects.equals(mapping.getTransitionRef(), transition.getId())
+                    && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty())
+                    && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())
+            ) {
                 return false;
             }
         }
-        // TRUE if no roles and no triggers
-        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
-                (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
-                        (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
-                        (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
-                        (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
-        )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+        // TRUE if no positive roles and no triggers and no positive user refs
+        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(this::hasPositivePermission))
+                && (transition.getTrigger() == null || transition.getTrigger().isEmpty())
+                && (transition.getUsersRef() == null || transition.getUsersRef().stream().noneMatch(this::hasPositivePermission))
+                && (transition.getUserRef() == null || transition.getUserRef().stream().noneMatch(this::hasPositivePermission));
     }
 
-    private boolean isDefaultRoleAllowedForNet() {
+    protected boolean hasPositivePermission(PermissionRef permissionRef) {
+        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
+               || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
+               || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
+               || (permissionRef.getLogic().isDelegate() != null && permissionRef.getLogic().isDelegate());
+    }
+
+    /**
+     * @return TRUE if the default role should be added with default case permissions to the net. FALSE otherwise
+     */
+    protected boolean isDefaultRoleAllowedForNet() {
         // FALSE if defaultRole not allowed in net
         if (!net.isDefaultRoleEnabled()) {
             return false;
         }
-        // TRUE if no positive role associations
-        return net.getPermissions().isEmpty()
-                || net.getPermissions().values().stream().noneMatch(perms -> perms.containsValue(true));
+        // TRUE if no positive role associations and no positive user ref associations
+        return net.getPermissions().values().stream().noneMatch(perms -> perms.containsValue(true))
+               && net.getUserRefs().values().stream().noneMatch(perms -> perms.containsValue(true));
     }
 
     PetriNet getNetByImportId(String id) {
