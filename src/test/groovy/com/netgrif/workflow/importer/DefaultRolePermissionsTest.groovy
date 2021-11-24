@@ -81,6 +81,9 @@ class DefaultRolePermissionsTest {
     @Value("classpath:role_permissions_default_role_disabled.xml")
     private Resource disabledReferencedDefaultRoleNet
 
+    @Value("classpath:role_permissions_default_role_shadowed_usersref.xml")
+    private Resource shadowedUsersRefDefaultRoleNet
+
 
     private static final String TRANSITION_ID = 't1'
     private static final String NET_ROLE_ID = 'netRole'
@@ -214,6 +217,11 @@ class DefaultRolePermissionsTest {
                         (RolePermission.DELEGATE) : true,
                 ]
         ] as Map<String, Map<RolePermission, Boolean>>, false)
+    }
+
+    @Test()
+    void shadowedByUsersRef() {
+        testPermissions(shadowedUsersRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true)
     }
 
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
