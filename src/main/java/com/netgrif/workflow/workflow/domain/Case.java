@@ -119,6 +119,10 @@ public class Case {
 
     @Getter
     @Setter
+    private List<String> viewRoles;
+
+    @Getter
+    @Setter
     private List<String> negativeViewRoles;
 
     @Getter
@@ -145,6 +149,7 @@ public class Case {
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
+        viewRoles = new LinkedList<>();
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
         userRefs = new HashMap<>();
@@ -268,14 +273,11 @@ public class Case {
         });
     }
 
-    @JsonIgnore
-    public Set<String> getViewRoles() {
-        Set<String> roles = new HashSet<>();
+    public void resolveViewRoles() {
         this.permissions.forEach((role, perms) -> {
             if (perms.containsKey("view") && perms.get("view")) {
-                roles.add(role);
+                viewRoles.add(role);
             }
         });
-        return roles;
     }
 }

@@ -252,7 +252,7 @@ public class ElasticTaskService implements IElasticTaskService {
         positiveViewUser.should(viewUserRefNotExists);
         positiveViewUser.should(positiveViewUserQuery);
 
-        /* Role query set-minus positive view userList */
+        /* Role query union positive view userList */
         roleSetMinusPositiveUserList.should(positiveRoleSetMinusNegativeRole);
         roleSetMinusPositiveUserList.should(positiveViewUser);
 
