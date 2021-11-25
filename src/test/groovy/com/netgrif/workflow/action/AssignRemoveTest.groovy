@@ -4,10 +4,12 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException
+import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
@@ -61,18 +63,18 @@ class AssignRemoveTest {
         auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
-
+//TODO: jozike
     @Test
     @Disabled("Create functions or update test")
     public void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), Version.Major, superCreator.getLoggedSuper());
 
-        assert netOptional.isPresent();
-        def net = netOptional.get()
+        assert netOptional.getNet() != null;
+        def net = netOptional.getNet()
         def roleCount = userService.system.userProcessRoles.size()
 
         // create
-        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser())
+        Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
         assert userService.system.userProcessRoles.size() == roleCount + 4
 
         // delete
