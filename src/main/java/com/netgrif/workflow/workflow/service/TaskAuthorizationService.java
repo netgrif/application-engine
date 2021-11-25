@@ -98,8 +98,8 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.DELEGATE, RolePermission.DELEGATE)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.DELEGATE, RolePermission.DELEGATE);
+        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.DELEGATE)
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.DELEGATE);
     }
 
     @Override
@@ -133,13 +133,11 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
-        return (loggedUser.isAdmin() || isAssignee(loggedUser, taskId)) && (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.SET)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.SET));
+        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
     }
 
     @Override
     public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
-        return (loggedUser.isAdmin() || isAssignee(loggedUser, taskId)) && (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.SET)
-                || userHasUserListPermission(loggedUser, taskId, RolePermission.SET));
+        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
     }
 }
