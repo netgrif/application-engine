@@ -42,9 +42,9 @@ public interface IHistoryService {
 
     List<CancelTaskEventLog> findAllCancelTaskEventLogsByTaskId(ObjectId taskId);
 
-    List<CancelTaskEventLog> findAllCancelTaskEventLogsByUserId(Long userId);
+    List<CancelTaskEventLog> findAllCancelTaskEventLogsByUserId(String userId);
 
     List<FinishTaskEventLog> findAllFinishTaskEventLogsByTaskId(ObjectId taskId);
 
-    List<FinishTaskEventLog> findAllFinishTaskEventLogsByUserId(Long userId);
+    List<FinishTaskEventLog> findAllFinishTaskEventLogsByUserId(String userId);
 }

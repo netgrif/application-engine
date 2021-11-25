@@ -73,12 +73,10 @@ public class WorkflowController {
     @Autowired
     private IDataService dataService;
 
-    @Autowired
-    private IUserService userService;
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EventOutcomeWithMessageResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
@@ -92,7 +90,7 @@ public class WorkflowController {
     }
 
     @ApiOperation(value = "Get all cases of the system", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.getAll(pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
@@ -188,9 +186,23 @@ public class WorkflowController {
         }
     }
 
+    @Deprecated
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
+    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            return new DataFieldsResource(workflowService.getData(caseId), locale);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Getting all case data of [" + caseId + "] failed:", e);
+            return new DataFieldsResource(new ArrayList<>(), locale);
+        }
+    }
+
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EventOutcomeWithMessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
@@ -208,20 +220,8 @@ public class WorkflowController {
         }
     }
 
-    @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId), locale);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of [" + caseId + "] failed:", e);
-            return new DataFieldsResource(new ArrayList<>(), locale);
-        }
-    }
-
     @ApiOperation(value = "Download case file field value", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/case/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
 
@@ -239,7 +239,7 @@ public class WorkflowController {
     }
 
     @ApiOperation(value = "Download one file from cases file list field value", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/case/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
 
