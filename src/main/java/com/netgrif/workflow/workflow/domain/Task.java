@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -92,7 +93,7 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private List<String> negativeViewRoles = new LinkedList<>();
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
@@ -102,7 +103,22 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+    private List<String> viewRoles = new LinkedList<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> viewUserRefs = new LinkedList<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> viewUsers = new LinkedList<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> negativeViewRoles = new LinkedList<>();
 
     @Getter
     @Setter
@@ -259,14 +275,27 @@ public class Task {
         MESSAGE,
     }
 
-    @JsonIgnore
-    public Set<String> getViewRoles() {
-        Set<String> roles = new HashSet<>();
+    public void resolveViewRoles() {
         this.roles.forEach((role, perms) -> {
             if (perms.containsKey("view") && perms.get("view")) {
-                roles.add(role);
+                viewRoles.add(role);
             }
         });
-        return roles;
+    }
+
+    public void resolveViewUserRefs() {
+        this.userRefs.forEach((userRef, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                viewUserRefs.add(userRef);
+            }
+        });
+    }
+
+    public void resolveViewUsers() {
+        this.users.forEach((role, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                viewUsers.add(role);
+            }
+        });
     }
 }

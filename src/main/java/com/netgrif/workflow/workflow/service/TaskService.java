@@ -694,6 +694,7 @@ public class TaskService implements ITaskService {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });
+        task.resolveViewUsers();
         return taskRepository.save(task);
     }
 
@@ -743,6 +744,8 @@ public class TaskService implements ITaskService {
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
         }
+        task.resolveViewRoles();
+        task.resolveViewUserRefs();
 
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
         if (transaction != null) {

@@ -244,12 +244,12 @@ public class ElasticTaskService implements IElasticTaskService {
 
         /* Build positive view userList query */
         BoolQueryBuilder positiveViewUser = boolQuery();
-        BoolQueryBuilder viewUserRefNotExists = boolQuery();
+        BoolQueryBuilder viewUserRefExists = boolQuery();
         BoolQueryBuilder positiveViewUserQuery = boolQuery();
 
-        positiveViewUserQuery.must(termQuery("users", user.getId()));
-        viewUserRefNotExists.mustNot(existsQuery("userRefs"));
-        positiveViewUser.should(viewUserRefNotExists);
+        positiveViewUserQuery.must(termQuery("viewUsers", user.getId()));
+        viewUserRefExists.mustNot(existsQuery("viewUserRefs"));
+        positiveViewUser.should(viewUserRefExists);
         positiveViewUser.should(positiveViewUserQuery);
 
         /* Role query union positive view userList */
