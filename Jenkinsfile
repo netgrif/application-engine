@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         maven 'localMaven3'
-        jdk 'localJava8'
+        jdk 'localJava11'
     }
     options {
         copyArtifactPermission('*')
