@@ -1,14 +1,20 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
+import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceWithMessage;
 import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
 
-public class EventOutcomeWithMessageResource extends Resource<EventOutcomeWithMessage> {
+public class EventOutcomeWithMessageResource extends CollectionModel<EventOutcomeWithMessage> {
 
     public EventOutcomeWithMessageResource(EventOutcomeWithMessage content) {
-        super(content, new ArrayList<>());
+        super(Collections.singleton(content), new ArrayList<Link>());
     }
 
     public static EventOutcomeWithMessageResource successMessage(String successMsg, LocalisedEventOutcome outcome){
