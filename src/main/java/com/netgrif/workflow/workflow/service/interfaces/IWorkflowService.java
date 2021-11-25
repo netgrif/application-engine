@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service.interfaces;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -50,6 +51,9 @@ public interface IWorkflowService {
     Case searchOne(Predicate predicate);
 
     Map<String, I18nString> listToMap(List<Case> cases);
+
+    @Deprecated
+    List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 

@@ -8,9 +8,9 @@ import lombok.Getter;
 public class AssignTaskEventLog extends TaskEventLog{
 
     @Getter
-    private Long userId;
+    private String userId;
 
-    public AssignTaskEventLog(Task task, Case useCase, EventPhase eventPhase, Long userId) {
+    public AssignTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String userId) {
         super(task, useCase, eventPhase);
         this.userId = userId;
     }
