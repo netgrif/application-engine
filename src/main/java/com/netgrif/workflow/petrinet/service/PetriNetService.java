@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.event.events.model.UserImportModelEvent;
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.history.domain.petrinetevents.DeletePetriNetEventLog;
 import com.netgrif.workflow.history.domain.petrinetevents.ImportPetriNetEventLog;
 import com.netgrif.workflow.history.service.IHistoryService;
