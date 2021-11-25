@@ -213,11 +213,6 @@ pipeline {
                                                 type      : pom.getPackaging()
                                         ], [
                                                 artifactId: pom.getArtifactId(),
-                                                classifier: 'javadoc',
-                                                file      : "target/${pom.getArtifactId()}-${pom.getVersion()}-javadoc.${pom.getPackaging()}",
-                                                type      : pom.getPackaging()
-                                        ], [
-                                                artifactId: pom.getArtifactId(),
                                                 classifier: 'sources',
                                                 file      : "target/${pom.getArtifactId()}-${pom.getVersion()}-sources.${pom.getPackaging()}",
                                                 type      : pom.getPackaging()
