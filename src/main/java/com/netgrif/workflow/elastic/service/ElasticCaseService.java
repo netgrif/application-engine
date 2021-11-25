@@ -259,51 +259,6 @@ public class ElasticCaseService implements IElasticCaseService {
         query.filter(permissionQuery);
     }
 
-    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeQuery = boolQuery();
-        buildNegativeViewRoleQuery(negativeQuery, user);
-        buildNegativeViewUsersQuery(negativeQuery, user);
-        query.should(negativeQuery);
-    }
-
-    private void buildUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder usersRoleQuery = boolQuery();
-        BoolQueryBuilder usersExist = boolQuery();
-        BoolQueryBuilder notExists = boolQuery();
-
-        notExists.mustNot(existsQuery("userRefs"));
-        notExists.mustNot(existsQuery("viewRoles"));
-
-        usersExist.must(existsQuery("userRefs"));
-        usersExist.must(termQuery("users", user.getId()));
-
-        usersRoleQuery.should(usersExist);
-        usersRoleQuery.should(notExists);
-
-        for (String roleId : user.getProcessRoles()) {
-            roleQuery.should(termQuery("viewRoles", roleId));
-        }
-        usersRoleQuery.should(roleQuery);
-
-        query.must(usersRoleQuery);
-    }
-
-    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
-        }
-
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeUsersQuery = boolQuery();
-        negativeUsersQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeUsersQuery);
-    }
-
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;

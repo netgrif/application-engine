@@ -268,6 +268,7 @@ public class Case {
         });
     }
 
+    @JsonIgnore
     public Set<String> getViewRoles() {
         Set<String> roles = new HashSet<>();
         this.permissions.forEach((role, perms) -> {
