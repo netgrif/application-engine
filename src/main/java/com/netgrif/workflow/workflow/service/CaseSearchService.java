@@ -100,6 +100,15 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return QCase.case$.viewRoles.isEmpty().or(QCase.case$.viewRoles.contains(role));
     }
 
+    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUserQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUserQuery(String userId) {
+        return QCase.case$.viewUserRefs.isEmpty().or(QCase.case$.viewUsers.contains(userId));
+    }
+
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
         List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
@@ -116,15 +125,6 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate negativeViewUserQuery(String userId) {
         return QCase.case$.negativeViewUsers.contains(userId);
-    }
-
-    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUserQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
-    }
-
-    public Predicate viewUserQuery(String userId) {
-        return QCase.case$.users.containsKey(userId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
