@@ -186,11 +186,9 @@ public class ElasticTaskService implements IElasticTaskService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         addRolesQueryConstraint(request, user);
-        addUsersQueryConstraint(request, user);
 
         BoolQueryBuilder query = boolQuery();
-
-        buildPermissionQuery(request, query, user);
+        buildViewPermissionQuery(request, query, user);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -216,78 +214,59 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
-        if (request.users != null && !request.users.isEmpty()) {
-            Set<String> users = new HashSet<>(request.users);
-            users.add(user.getId());
-            request.users = new ArrayList<>(users);
-        } else {
-            request.users = Collections.singletonList(user.getId());
-        }
-    }
+    protected void buildViewPermissionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder permissionQuery = boolQuery();
+        BoolQueryBuilder positiveRoleSetMinusNegativeRole = boolQuery();
+        BoolQueryBuilder roleSetMinusPositiveUserList = boolQuery();
 
-    protected void buildPermissionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(request, userRoleQuery);
-        negativeUsersAndRolesQuery(userRoleQuery, user);
-
-        query.filter(userRoleQuery);
-    }
-
-    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeQuery = boolQuery();
-        buildNegativeViewRoleQuery(negativeQuery, user);
-        buildNegativeViewUsersQuery(negativeQuery, user);
-        query.should(negativeQuery);
-    }
-
-    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        /* Build positive view role query */
+        BoolQueryBuilder positiveViewRole = boolQuery();
+        BoolQueryBuilder viewRoleNotExists = boolQuery();
+        BoolQueryBuilder positiveViewRoleQuery = boolQuery();
         for (String roleId : user.getProcessRoles()) {
-            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
+            positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
         }
+        viewRoleNotExists.mustNot(existsQuery("viewRoles"));
+        positiveViewRole.should(viewRoleNotExists);
+        positiveViewRole.should(positiveViewRoleQuery);
 
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildUsersAndRolesQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.users == null || request.users.isEmpty()) {
-            return;
+        /* Build negative view role query */
+        BoolQueryBuilder negativeViewRole = boolQuery();
+        BoolQueryBuilder negativeViewRoleQuery = boolQuery();
+        for (String roleId : request.role) {
+            negativeViewRoleQuery.should(termQuery("negativeViewRoles", roleId));
         }
+        negativeViewRole.mustNot(negativeViewRoleQuery);
 
-        BoolQueryBuilder existingUsersQuery = boolQuery();
-        BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder usersRoleQuery = boolQuery();
-        BoolQueryBuilder usersExist = boolQuery();
-        BoolQueryBuilder notExists = boolQuery();
+        /* Positive view role set-minus negative view role */
+        positiveRoleSetMinusNegativeRole.must(positiveViewRole);
+        positiveRoleSetMinusNegativeRole.must(negativeViewRole);
 
-        notExists.mustNot(existsQuery("userRefs"));
-        notExists.mustNot(existsQuery("roles"));
+        /* Build positive view userList query */
+        BoolQueryBuilder positiveViewUser = boolQuery();
+        BoolQueryBuilder viewUserRefNotExists = boolQuery();
+        BoolQueryBuilder positiveViewUserQuery = boolQuery();
 
-        for (String userId : request.users) {
-            existingUsersQuery.should(termQuery("users", userId));
-        }
+        positiveViewUserQuery.must(termQuery("users", user.getId()));
+        viewUserRefNotExists.mustNot(existsQuery("userRefs"));
+        positiveViewUser.should(viewUserRefNotExists);
+        positiveViewUser.should(positiveViewUserQuery);
 
-        usersExist.must(existsQuery("userRefs"));
-        usersExist.must(existingUsersQuery);
+        /* Role query set-minus positive view userList */
+        roleSetMinusPositiveUserList.should(positiveRoleSetMinusNegativeRole);
+        roleSetMinusPositiveUserList.should(positiveViewUser);
 
-        usersRoleQuery.should(usersExist);
-        usersRoleQuery.should(notExists);
+        /* Build negative view userList query */
+        BoolQueryBuilder negativeViewUser = boolQuery();
+        BoolQueryBuilder negativeViewUserQuery = boolQuery();
+        negativeViewUserQuery.should(termQuery("negativeViewUsers", user.getId()));
+        negativeViewUser.mustNot(negativeViewUserQuery);
 
-        if (request.role != null && !request.role.isEmpty()) {
-            for (String roleId : request.role) {
-                roleQuery.should(termQuery("roles", roleId));
-            }
-            usersRoleQuery.should(roleQuery);
-        }
+        /* Role-UserListPositive set-minus negative view userList */
+        permissionQuery.must(roleSetMinusPositiveUserList);
+        permissionQuery.must(negativeViewUser);
 
-        query.must(usersRoleQuery);
+        query.filter(permissionQuery);
     }
 
 

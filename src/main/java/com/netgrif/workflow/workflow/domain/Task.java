@@ -258,4 +258,15 @@ public class Task {
         TIME,
         MESSAGE,
     }
+
+    @JsonIgnore
+    public Set<String> getViewRoles() {
+        Set<String> roles = new HashSet<>();
+        this.roles.forEach((role, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                roles.add(role);
+            }
+        });
+        return roles;
+    }
 }
