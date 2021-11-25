@@ -129,9 +129,9 @@ class InsuranceTest {
                 .build()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        netId = net.get().getStringId()
+        netId = net.getNet().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
@@ -143,7 +143,7 @@ class InsuranceTest {
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
-        mapper = net.get().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
+        mapper = net.getNet().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
     }
 
     private String caseId
@@ -253,11 +253,11 @@ class InsuranceTest {
                 .with(csrf().asHeader())
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
-                .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))
+                .andExpect(jsonPath('$.outcome.acase.title', CoreMatchers.is(CASE_NAME)))
+                .andExpect(jsonPath('$.outcome.acase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.stringId
+        caseId = response.outcome.acase.stringId
     }
 
     def searchTasks(String title, int expected) {

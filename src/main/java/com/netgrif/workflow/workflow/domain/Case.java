@@ -101,6 +101,7 @@ public class Case {
 
     @Getter
     @Setter
+    @JsonIgnore
     private Map<String, Integer> consumedTokens;
 
     @Getter

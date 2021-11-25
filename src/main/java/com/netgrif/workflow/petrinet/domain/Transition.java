@@ -4,6 +4,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.events.DataEvent;
+import com.netgrif.workflow.petrinet.domain.events.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.Event;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
@@ -102,20 +103,20 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component) {
-        if (dataSet.containsKey(field) && dataSet.get(field) != null) {
-            if (behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if (events != null) dataSet.get(field).getEvents().addAll(events);
-            if (layout != null) dataSet.get(field).setLayout(layout);
-            if (component != null) dataSet.get(field).setComponent(component);
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component){
+        if(dataSet.containsKey(field) && dataSet.get(field) != null){
+            if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
+            if(events != null) dataSet.get(field).setEvents(events);
+            if(layout != null) dataSet.get(field).setLayout(layout);
+            if(component != null) dataSet.get(field).setComponent(component);
         } else {
             dataSet.put(field, new DataFieldLogic(behavior, events, layout, component));
         }
     }
 
-    public void addDataEvents(String field, LinkedHashSet<DataEvent> events) {
-        if (dataSet.containsKey(field)) {
-            dataSet.get(field).addDataEvents(events);
+    public void setDataEvents(String field, Map<DataEventType, DataEvent> events){
+        if(dataSet.containsKey(field)){
+            dataSet.get(field).setEvents(events);
         }
     }
 
