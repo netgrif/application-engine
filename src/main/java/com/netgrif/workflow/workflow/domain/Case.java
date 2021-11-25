@@ -119,11 +119,8 @@ public class Case {
 
     @Getter
     @Setter
-    private List<String> viewRoles;
-
-    @Getter
-    @Setter
-    private List<String> negativeViewRoles;
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
@@ -132,8 +129,21 @@ public class Case {
 
     @Getter
     @Setter
-    @Builder.Default
-    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+    private List<String> viewRoles;
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private List<String> viewUserRefs;
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private List<String> viewUsers;
+
+    @Getter
+    @Setter
+    private List<String> negativeViewRoles;
 
     @Getter
     @Setter
@@ -149,10 +159,12 @@ public class Case {
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
-        viewRoles = new LinkedList<>();
-        negativeViewRoles = new LinkedList<>();
-        users = new HashMap<>();
         userRefs = new HashMap<>();
+        users = new HashMap<>();
+        viewRoles = new LinkedList<>();
+        viewUserRefs = new LinkedList<>();
+        viewUsers = new LinkedList<>();
+        negativeViewRoles = new LinkedList<>();
         negativeViewUsers = new ArrayList<>();
     }
 
@@ -277,6 +289,22 @@ public class Case {
         this.permissions.forEach((role, perms) -> {
             if (perms.containsKey("view") && perms.get("view")) {
                 viewRoles.add(role);
+            }
+        });
+    }
+
+    public void resolveViewUserRefs() {
+        this.userRefs.forEach((userRef, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                viewUserRefs.add(userRef);
+            }
+        });
+    }
+
+    public void resolveViewUsers() {
+        this.users.forEach((user, perms) -> {
+            if (perms.containsKey("view") && perms.get("view")) {
+                viewUsers.add(user);
             }
         });
     }
