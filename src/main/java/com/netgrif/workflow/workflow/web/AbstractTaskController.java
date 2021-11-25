@@ -96,12 +96,10 @@ public abstract class AbstractTaskController {
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
-//todo :JOZIKE    return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + userId + "]",
-//                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, userId, taskId),locale));
     public EventOutcomeWithMessageResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         try {
-            return EventOutcomeWithMessageResource.successMessage(taskService.delegateTask(loggedUser, delegatedId, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
+            return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
+                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId),locale));
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
