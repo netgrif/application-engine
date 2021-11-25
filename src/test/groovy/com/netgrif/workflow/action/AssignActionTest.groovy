@@ -100,13 +100,13 @@ class AssignActionTest {
 
     private void createMainAndSecondaryNet() {
         def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert mainNet.isPresent()
+        assert mainNet.getNet() != null
 
         def secondaryNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleSecondaryNet_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert secondaryNet.isPresent()
+        assert secondaryNet.getNet() != null
 
-        this.mainNet = mainNet.get()
-        this.secondaryNet = secondaryNet.get()
+        this.mainNet = mainNet.getNet()
+        this.secondaryNet = secondaryNet.getNet()
     }
 
     private void cleanDatabases() {

@@ -5,8 +5,12 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -19,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -74,14 +79,15 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
+    public EventOutcomeWithMessageResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return new CaseResource(useCase);
+            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
+                    LocalisedEventOutcomeFactory.from(outcome,locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            log.error("Creating case failed:", e);
-            return null;
+            log.error("Creating case failed:",e);
+            return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
         }
     }
 
@@ -185,18 +191,20 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+    public EventOutcomeWithMessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            if (deleteSubtree) {
-                workflowService.deleteSubtreeRootedAt(caseId);
+            DeleteCaseEventOutcome outcome;
+            if(deleteSubtree) {
+                outcome = workflowService.deleteSubtreeRootedAt(caseId);
             } else {
-                workflowService.deleteCase(caseId);
+                outcome = workflowService.deleteCase(caseId);
             }
-            return MessageResource.successMessage("Case " + caseId + " was deleted");
+            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                    LocalisedEventOutcomeFactory.from(outcome,LocaleContextHolder.getLocale()));
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case [" + caseId + "] failed:", e);
-            return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
 
