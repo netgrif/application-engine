@@ -1,3 +1,19 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10913/tab/release-report-all-issues"></a>
+## 5.7.1 (08.11.2021)
+### Bug Fixes
+* [NAE-1487](https://netgrif.atlassian.net/browse/NAE-1487) - Assign button on assigned task
+* [NAE-1485](https://netgrif.atlassian.net/browse/NAE-1485) - Case datafield behavior is not initially set
+* [NAE-1492](https://netgrif.atlassian.net/browse/NAE-1492) - View permission on case is broken when delete permission is present
+* [NAE-1483](https://netgrif.atlassian.net/browse/NAE-1483) - TaskRef init value setting deletes new value of task field
+* [NAE-1520](https://netgrif.atlassian.net/browse/NAE-1520) - Security Configuration Ldap fix
+
+### Improvements
+* [NAE-1515](https://netgrif.atlassian.net/browse/NAE-1515) - Filter process UX improvements
+* [NAE-1516](https://netgrif.atlassian.net/browse/NAE-1516) - Group process UX improvements
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10901/tab/release-report-all-issues"></a>
 ## 5.7.0 (29.10.2021)
 ### Bug fixes
