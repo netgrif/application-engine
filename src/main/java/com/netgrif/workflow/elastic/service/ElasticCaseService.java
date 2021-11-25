@@ -242,7 +242,7 @@ public class ElasticCaseService implements IElasticCaseService {
         positiveViewUser.should(viewUserRefNotExists);
         positiveViewUser.should(positiveViewUserQuery);
 
-        /* Role query set-minus positive view userList */
+        /* Role query union positive view userList */
         roleSetMinusPositiveUserList.should(positiveRoleSetMinusNegativeRole);
         roleSetMinusPositiveUserList.should(positiveViewUser);
 

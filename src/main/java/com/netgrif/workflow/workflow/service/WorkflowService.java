@@ -246,6 +246,7 @@ public class WorkflowService implements IWorkflowService {
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
+        useCase.resolveViewRoles();
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
         useCase.setUserRefs(petriNet.getUserRefs());
 

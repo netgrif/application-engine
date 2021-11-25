@@ -83,41 +83,47 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-        BooleanBuilder constraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
-
-        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
-        negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
-
-        constraints.andNot(negativeConstraints);
-        builder.and(constraints);
-
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        builder.and(permissionConstraints);
         return builder;
     }
 
-    protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleNegativeQuery).collect(Collectors.toList());
+    protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    public Predicate roleNegativeQuery(String role) {
+    public Predicate viewRoleQuery(String role) {
+        return QCase.case$.viewRoles.isEmpty().or(QCase.case$.viewRoles.contains(role));
+    }
+
+    protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewRoleQuery(String role) {
         return QCase.case$.negativeViewRoles.contains(role);
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewUsersQuery(user.getId());
+        Predicate roleConstraints = negativeViewUserQuery(user.getId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(String userId) {
+    public Predicate negativeViewUserQuery(String userId) {
         return QCase.case$.negativeViewUsers.contains(userId);
     }
 
-    protected Predicate buildViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUsersQuery(user.getId());
+    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUserQuery(user.getId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate viewUsersQuery(String userId) {
+    public Predicate viewUserQuery(String userId) {
         return QCase.case$.users.containsKey(userId);
     }
 
