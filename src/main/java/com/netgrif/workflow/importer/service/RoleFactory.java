@@ -25,6 +25,7 @@ public class RoleFactory {
         Map<String, Boolean> permissions = new HashMap<>();
 
         addPerform(permissions, roleLogic);
+        addFinish(permissions, roleLogic);
         addDelegate(permissions, roleLogic);
         addCancel(permissions, roleLogic);
         addAssign(permissions, roleLogic);
@@ -61,6 +62,11 @@ public class RoleFactory {
     private void addCancel(Map<String, Boolean> permissions, Logic roleLogic) {
         if (roleLogic.isCancel() != null)
             permissions.put(RolePermission.CANCEL.toString(), roleLogic.isCancel());
+    }
+
+    private void addFinish(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isCancel() != null)
+            permissions.put(RolePermission.FINISH.toString(), roleLogic.isCancel());
     }
 
     private void addAssign(Map<String, Boolean> permissions, Logic roleLogic) {
