@@ -10,6 +10,7 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -30,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
@@ -77,7 +79,7 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public EventOutcomeWithMessageResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
@@ -203,7 +205,7 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public EventOutcomeWithMessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+    public EntityModel<EventOutcomeWithMessage>  deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             DeleteCaseEventOutcome outcome;
