@@ -3,22 +3,18 @@ package com.netgrif.workflow.orgstructure.groups.interfaces;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.querydsl.core.types.Predicate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface INextGroupService {
 
-    Case createDefaultSystemGroup(User author);
+    CreateCaseEventOutcome createDefaultSystemGroup(User author);
 
-    Case createGroup(User author);
+    CreateCaseEventOutcome createGroup(User author);
 
-    Case createGroup(String title, User author);
+    CreateCaseEventOutcome createGroup(String title, User author);
 
     Case findGroup(String groupID);
 

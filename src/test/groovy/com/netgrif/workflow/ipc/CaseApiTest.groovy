@@ -2,11 +2,11 @@ package com.netgrif.workflow.ipc
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +39,7 @@ class CaseApiTest {
     @Autowired
     private SuperCreator superCreator
 
-    private Optional<PetriNet> testNet
+    private ImportPetriNetEventOutcome testNet
 
     private def stream = { String name ->
         return CaseApiTest.getClassLoader().getResourceAsStream(name)
@@ -56,13 +56,13 @@ class CaseApiTest {
     void testCreate() {
         testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), "major", superCreator.getLoggedSuper())
 
-        assert testNet.isPresent()
+        assert testNet.getNet() != null
 
-        Case aCase = importHelper.createCase("Case 1", testNet.get())
+        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
         importHelper.assignTaskToSuper("Task", aCase.stringId)
         importHelper.finishTaskAsSuper("Task", aCase.stringId)
 
-        assert caseRepository.findAllByProcessIdentifier(testNet.get().identifier).size() > 1
+        assert caseRepository.findAllByProcessIdentifier(testNet.getNet().identifier).size() > 1
     }
 
     public static final String SEARCH_NET_FILE = "ipc_where.xml"
@@ -73,11 +73,11 @@ class CaseApiTest {
 
         testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
 
-        assert testNet.isPresent()
+        assert testNet.getNet() != null
 
         List<Case> cases = []
         5.times { index ->
-            cases << importHelper.createCase("Case $index" as String, testNet.get())
+            cases << importHelper.createCase("Case $index" as String, testNet.getNet())
         }
 
         importHelper.assignTaskToSuper("Task", cases[0].stringId)
