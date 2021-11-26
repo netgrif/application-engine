@@ -44,8 +44,13 @@ public class RoleFactory {
     }
 
     private void addPerform(Map<String, Boolean> permissions, Logic roleLogic) {
-        if (roleLogic.isPerform() != null)
-            permissions.put(RolePermission.PERFORM.toString(), roleLogic.isPerform());
+        if (roleLogic.isPerform() != null) {
+            permissions.put(RolePermission.ASSIGN.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.CANCEL.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.FINISH.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.VIEW.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.SET.toString(), roleLogic.isPerform());
+        }
     }
 
     private void addDelegate(Map<String, Boolean> permissions, Logic roleLogic) {

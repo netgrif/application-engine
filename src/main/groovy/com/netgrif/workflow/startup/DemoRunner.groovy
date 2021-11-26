@@ -38,6 +38,5 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        helper.createNet("all_data.xml", VersionType.MAJOR)
     }
 }
