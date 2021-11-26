@@ -58,25 +58,25 @@ public class DataService implements IDataService {
     public static final int MONGO_ID_LENGTH = 24;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private ITaskService taskService;
+    protected ITaskService taskService;
 
     @Autowired
-    private IWorkflowService workflowService;
+    protected IWorkflowService workflowService;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private FieldFactory fieldFactory;
+    protected FieldFactory fieldFactory;
 
     @Autowired
-    private FieldActionsRunner actionsRunner;
+    protected FieldActionsRunner actionsRunner;
 
     @Value("${nae.image.preview.scaling.px:400}")
-    private int imageScale;
+    protected int imageScale;
 
     @Override
     public List<Field> getData(String taskId) {
