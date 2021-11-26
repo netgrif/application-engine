@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10920/tab/release-report-all-issues"></a>
+## 5.8.0 (26.11.2021)
+### Bug Fixes
+None
+
+### Improvements
+* [NAE-1469](https://netgrif.atlassian.net/browse/NAE-1469) - Data group layouts refactor
+
+### Features
+* [NAE-1296](https://netgrif.atlassian.net/browse/NAE-1296) - Event Outcome refactor
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10940/tab/release-report-all-issues"></a>
 ## 5.7.3 (23.11.2021)
 ### Bug Fixes
