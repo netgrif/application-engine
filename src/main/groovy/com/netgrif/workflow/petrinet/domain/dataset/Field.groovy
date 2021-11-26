@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.events.DataEvent
@@ -10,6 +11,7 @@ import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout
+import com.netgrif.workflow.petrinet.domain.events.DataEventType
 import com.netgrif.workflow.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
@@ -45,7 +47,7 @@ abstract class Field<T> extends Imported {
     private boolean immediate
 
     @JsonIgnore
-    private LinkedHashSet<DataEvent> events;
+    private Map<DataEventType, DataEvent> events
 
     @JsonIgnore
     private String encryption
@@ -64,9 +66,15 @@ abstract class Field<T> extends Imported {
 
     protected List<Validation> validations
 
+    @Transient
+    protected String parentTaskId
+
+    @Transient
+    protected String parentCaseId
+
     Field() {
         _id = new ObjectId()
-        this.events = new LinkedHashSet<>();
+        this.events = new HashMap<>()
     }
 
     Field(Long importId) {
@@ -156,24 +164,48 @@ abstract class Field<T> extends Imported {
         this.immediate = immediate != null && immediate
     }
 
-    LinkedHashSet<DataEvent> getEvents() {
+    Map<DataEventType, DataEvent> getEvents() {
         return events
     }
 
-    void setEvents(LinkedHashSet<DataEvent> events) {
+    void setEvents(Map<DataEventType, DataEvent> events) {
         this.events = events
     }
 
-    void addEvents(Collection<DataEvent> dataEvents) {
-        dataEvents.each { addEvent(it) }
+    String getParentTaskId() {
+        return parentTaskId
     }
 
-    void addEvent(DataEvent event) {
-        if (this.events == null)
-            this.events = new LinkedHashSet<>()
-        if (event == null) return
+    void setParentTaskId(String parentTaskId) {
+        this.parentTaskId = parentTaskId
+    }
 
-        this.events.add(event)
+    String getParentCaseId() {
+        return parentCaseId
+    }
+
+    void setParentCaseId(String parentCaseId) {
+        this.parentCaseId = parentCaseId
+    }
+
+    void addActions(Collection<Action> dataEvents, DataEventType type) {
+        dataEvents.each { addAction(it, type) }
+    }
+
+    void addAction(Action action, DataEventType type) {
+        if (action == null) return
+        if (this.events == null){
+            this.events = new HashMap<>()
+        }
+        if (!this.events.containsKey(type)){
+            this.events.get(type).addToActionsByDefaultPhase(action)
+        } else {
+            DataEvent event = new DataEvent()
+            event.setId(new ObjectId().toString())
+            event.setType(type)
+            event.addToActionsByDefaultPhase(action);
+            this.events.put(type, event)
+        }
     }
 
     String getEncryption() {

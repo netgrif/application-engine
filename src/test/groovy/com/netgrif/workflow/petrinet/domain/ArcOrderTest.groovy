@@ -39,7 +39,7 @@ class ArcOrderTest {
 
     @Test
     void  testOrder() {
-        def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper()).get()
+        def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
 
         def arcs = net.getArcsOfTransition(NET_TASK)
         def sorted = arcs.sort { a1, a2 -> ArcOrderComparator.getInstance().compare(a1,a2) }
