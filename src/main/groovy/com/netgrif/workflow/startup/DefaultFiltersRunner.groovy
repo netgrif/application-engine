@@ -2,10 +2,9 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -13,7 +12,6 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Slf4j
@@ -24,11 +22,13 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
 
     private static final String FILTER_TYPE_FIELD_ID = "filter_type"
     private static final String FILTER_ORIGIN_VIEW_ID_FIELD_ID = "origin_view_id"
+    private static final String FILTER_PARENT_CASE_ID_FIELD_ID = "parent_filter_id"
     private static final String FILTER_VISIBILITY_FIELD_ID = "visibility"
     private static final String FILTER_FIELD_ID = "filter"
     private static final String FILTER_I18N_TITLE_FIELD_ID = "i18n_filter_name"
     private static final String GERMAN_ISO_3166_CODE = "de"
     private static final String SLOVAK_ISO_3166_CODE = "sk"
+    private static final String IS_IMPORTED = "is_imported"
 
     private static final String FILTER_TYPE_CASE = "Case"
     private static final String FILTER_TYPE_TASK = "Task"
@@ -45,21 +45,21 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     private IUserService userService
 
     @Autowired
-    private ITaskService taskService;
+    private ITaskService taskService
 
     @Autowired
-    private IDataService dataService;
+    private IDataService dataService
 
     @Override
     void run(String... args) throws Exception {
-        createCaseFilter("All cases", "assignment", "", FILTER_VISIBILITY_PUBLIC, "", [], [
+        createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
         ], [
                 (GERMAN_ISO_3166_CODE): "Alle Fälle",
                 (SLOVAK_ISO_3166_CODE): "Všetky prípady"
         ])
-        createCaseFilter("My cases", "assignment_ind", "", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
+        createCaseFilter("My cases", "assignment_ind", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
                 "predicateMetadata": [[["category": "case_author", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
                 "searchCategories": ["case_author"]
         ], [
@@ -67,14 +67,14 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
                 (SLOVAK_ISO_3166_CODE): "Moje prípady"
         ])
 
-        createTaskFilter("All tasks", "library_add_check", "", FILTER_VISIBILITY_PUBLIC, "", [], [
+        createTaskFilter("All tasks", "library_add_check", FILTER_VISIBILITY_PUBLIC, "", [], [
                 "predicateMetadata": [],
                 "searchCategories": []
         ], [
                 (GERMAN_ISO_3166_CODE): "Alle Aufgaben",
                 (SLOVAK_ISO_3166_CODE): "Všetky úlohy"
         ])
-        createTaskFilter("My tasks", "account_box", "", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
+        createTaskFilter("My tasks", "account_box", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
                 "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator":"equals"], "values":[["text":"search.category.userMe", value:["<<me>>"]]]]]],
                 "searchCategories": ["task_assignee"]
         ], [
@@ -87,7 +87,6 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
      * Creates a new case filter filter process instance
      * @param title unique title of the default filter
      * @param icon material icon identifier of the default filter
-     * @param filterOriginViewId viewID of the view the filter originated in
      * @param filterVisibility filter visibility
      * @param filterQuery the elastic query string query used by the filter
      * @param allowedNets list of process identifiers allowed for search categories metadata generation
@@ -95,28 +94,46 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
      * @param titleTranslations a map of locale codes to translated strings for the filter title
      * @param withDefaultCategories whether the default search categories should be merged with the search categories specified in the metadata
      * @param inheritBaseAllowedNets whether the base allowed nets should be merged with the allowed nets specified in the filter field
+     * @param originId the ID of the parent if any
+     * @param viewOrigin true if the parent was a view. false if the parent was another filter
+     * @param isImported whether the filter is being created by importing it from na XML file
      * @return an empty Optional if the filter process does not exist. An existing filter process instance if a filter process instance with the same name already exists. A new filter process instance if not.
      */
-    public Optional<Case> createCaseFilter(
+    Optional<Case> createCaseFilter(
             String title,
             String icon,
-            String filterOriginViewId,
             String filterVisibility,
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
             Map<String, String> titleTranslations,
             boolean withDefaultCategories = true,
-            boolean inheritBaseAllowedNets = true
+            boolean inheritBaseAllowedNets = true,
+            String originId = null,
+            boolean viewOrigin = false,
+            boolean isImported = false
     ) {
-        return createFilter(title, icon, FILTER_TYPE_CASE, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories, inheritBaseAllowedNets)
+        return createFilter(
+                title,
+                icon,
+                FILTER_TYPE_CASE,
+                filterVisibility,
+                filterQuery,
+                allowedNets,
+                filterMetadata,
+                titleTranslations,
+                withDefaultCategories,
+                inheritBaseAllowedNets,
+                originId,
+                viewOrigin,
+                isImported
+        )
     }
 
     /**
      * Creates a new task filter filter process instance
      * @param title unique title of the default filter
      * @param icon material icon identifier of the default filter
-     * @param filterOriginViewId viewID of the view the filter originated in
      * @param filterVisibility filter visibility
      * @param filterQuery the elastic query string query used by the filter
      * @param allowedNets list of process identifiers allowed for search categories metadata generation
@@ -124,59 +141,101 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
      * @param titleTranslations a map of locale codes to translated strings for the filter title
      * @param withDefaultCategories whether the default search categories should be merged with the search categories specified in the metadata
      * @param inheritBaseAllowedNets whether the base allowed nets should be merged with the allowed nets specified in the filter field
+     * @param originId the ID of the parent if any
+     * @param viewOrigin true if the parent was a view. false if the parent was another filter
+     * @param isImported whether the filter is being created by importing it from na XML file
      * @return an empty Optional if the filter process does not exist. An existing filter process instance if a filter process instance with the same name already exists. A new filter process instance if not.
      */
-    public Optional<Case> createTaskFilter(
+    Optional<Case> createTaskFilter(
             String title,
             String icon,
-            String filterOriginViewId,
             String filterVisibility,
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
             Map<String, String> titleTranslations,
             boolean withDefaultCategories = true,
-            boolean inheritBaseAllowedNets = true
+            boolean inheritBaseAllowedNets = true,
+            String originId = null,
+            boolean viewOrigin = false,
+            boolean isImported = false
     ) {
-        return createFilter(title, icon, FILTER_TYPE_TASK, filterOriginViewId, filterVisibility, filterQuery, allowedNets, filterMetadata, titleTranslations, withDefaultCategories, inheritBaseAllowedNets)
+        return createFilter(
+                title,
+                icon,
+                FILTER_TYPE_TASK,
+                filterVisibility,
+                filterQuery,
+                allowedNets,
+                filterMetadata,
+                titleTranslations,
+                withDefaultCategories,
+                inheritBaseAllowedNets,
+                originId,
+                viewOrigin,
+                isImported
+        )
     }
 
-    private Optional<Case> createFilter(
+    /**
+     * Creates a new filter process instance of the provided type
+     * @param title unique title of the default filter
+     * @param icon material icon identifier of the default filter
+     * @param filterType the type of the filter
+     * @param filterVisibility filter visibility
+     * @param filterQuery the elastic query string query used by the filter
+     * @param allowedNets list of process identifiers allowed for search categories metadata generation
+     * @param filterMetadata metadata of the serialised filter as generated by the frontend
+     * @param titleTranslations a map of locale codes to translated strings for the filter title
+     * @param withDefaultCategories whether the default search categories should be merged with the search categories specified in the metadata
+     * @param inheritBaseAllowedNets whether the base allowed nets should be merged with the allowed nets specified in the filter field
+     * @param originId the ID of the parent if any
+     * @param viewOrigin true if the parent was a view. false if the parent was another filter
+     * @param isImported whether the filter is being created by importing it from na XML file
+     * @return an empty Optional if the filter process does not exist. An existing filter process instance if a filter process instance with the same name already exists. A new filter process instance if not.
+     */
+    Optional<Case> createFilter(
             String title,
             String icon,
             String filterType,
-            String filterOriginViewId,
             String filterVisibility,
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
             Map<String, String> titleTranslations,
             boolean withDefaultCategories,
-            boolean inheritBaseAllowedNets
+            boolean inheritBaseAllowedNets,
+            String originId = null,
+            boolean viewOrigin = false,
+            boolean isImported = false
     ) {
-        return createFilter(
+        return createFilterCase(
                 title,
                 icon,
                 filterType,
-                filterOriginViewId,
                 filterVisibility,
                 filterQuery,
                 allowedNets,
                 filterMetadata << ["filterType": filterType, "defaultSearchCategories": withDefaultCategories, "inheritAllowedNets": inheritBaseAllowedNets],
-                titleTranslations
+                titleTranslations,
+                originId,
+                viewOrigin,
+                isImported
         )
     }
 
-    private Optional<Case> createFilter(
+    private Optional<Case> createFilterCase(
             String title,
             String icon,
             String filterType,
-            String filterOriginViewId,
             String filterVisibility,
             String filterQuery,
             List<String> allowedNets,
             Map<String, Object> filterMetadata,
-            Map<String, String> titleTranslations
+            Map<String, String> titleTranslations,
+            String originId,
+            boolean viewOrigin,
+            boolean isImported
     ) {
         PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
         if (filterNet == null) {
@@ -185,36 +244,46 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
 
         def systemUser = this.userService.getLoggedOrSystem()
 
-        def existingFilter = this.workflowService.search(QCase.case$.processIdentifier.eq("filter") & QCase.case$.author.id.eq(systemUser.getId()) & QCase.case$.title.eq(title), PageRequest.of(0, 1))
-        if (existingFilter.totalElements == 1) {
-            return Optional.of(existingFilter.getContent()[0])
-        }
-
         Case filterCase = this.workflowService.createCase(filterNet.getStringId(), title, null, systemUser.transformToLoggedUser())
         filterCase.setIcon(icon)
         filterCase = this.workflowService.save(filterCase)
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
         this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem())
-        this.dataService.setData(newFilterTask, ImportHelper.populateDataset([
-            (FILTER_TYPE_FIELD_ID): [
-                "type": "enumeration_map",
-                "value": filterType
-            ],
-            (FILTER_VISIBILITY_FIELD_ID): [
-                "type": "enumeration_map",
-                "value": filterVisibility
-            ],
-            (FILTER_ORIGIN_VIEW_ID_FIELD_ID): [
+
+        def setDataMap = [
+                (FILTER_TYPE_FIELD_ID): [
+                        "type": "enumeration_map",
+                        "value": filterType
+                ],
+                (FILTER_VISIBILITY_FIELD_ID): [
+                        "type": "enumeration_map",
+                        "value": filterVisibility
+                ],
+                (FILTER_FIELD_ID): [
+                        "type": "filter",
+                        "value": filterQuery,
+                        "allowedNets": allowedNets,
+                        "filterMetadata": filterMetadata
+                ]
+        ]
+
+        if (originId != null) {
+            setDataMap.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, [
                     "type": "text",
-                    "value": filterOriginViewId
-            ],
-            (FILTER_FIELD_ID): [
-                    "type": "filter",
-                    "value": filterQuery,
-                    "allowedNets": allowedNets,
-                    "filterMetadata": filterMetadata
-            ]
-        ]))
+                    "value": originId
+            ])
+        }
+
+
+        this.dataService.setData(newFilterTask, ImportHelper.populateDataset(setDataMap))
+        if (isImported) {
+            this.dataService.setData(newFilterTask, ImportHelper.populateDataset([
+                    (IS_IMPORTED): [
+                            "type": "number",
+                            "value": 1
+                    ]
+            ]))
+        }
 
         I18nString translatedTitle = new I18nString(title)
         titleTranslations.forEach({locale, translation -> translatedTitle.addTranslation(locale, translation)})
