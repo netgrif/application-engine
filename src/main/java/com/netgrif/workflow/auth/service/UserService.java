@@ -11,6 +11,7 @@ import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationPropert
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class UserService extends AbstractUserService {
     private GroupConfigurationProperties groupProperties;
 
     @Autowired
+    private IFilterImportExportService filterImportExportService;
+
+    @Autowired
     private IAfterRegistrationAuthService authenticationService;
 
     @Override
@@ -71,6 +75,8 @@ public class UserService extends AbstractUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
+        filterImportExportService.createFilterImport(user);
+        filterImportExportService.createFilterExport(user);
         if (login)
             authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
 
