@@ -208,6 +208,7 @@ public class WorkflowService implements IWorkflowService {
                 useCase.addUsers(new HashSet<>(userIds), permission);
             }
         });
+        useCase.resolveViewUsers();
         return repository.save(useCase);
     }
 
@@ -275,8 +276,8 @@ public class WorkflowService implements IWorkflowService {
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
         useCase.setUserRefs(petriNet.getUserRefs());
-        useCase.decideEnabledRoles(petriNet);
-        setDefaultRoleIfEnabled(petriNet, useCase);
+        useCase.resolveViewRoles();
+        useCase.resolveViewUserRefs();
 
         useCase.setTitle(makeTitle.apply(useCase));
         runActions(petriNet.getPreCreateActions(), petriNet);
