@@ -64,7 +64,7 @@ public class RoleFactory {
     }
 
     private void addAssign(Map<String, Boolean> permissions, Logic roleLogic) {
-        /* TODO: roleLogic.isAssigned() is deprecated and can be removed in future releases. */
+        /* Part roleLogic.isAssigned() is deprecated and can be removed in future releases. */
         if (roleLogic.isAssigned() != null || roleLogic.isAssign() != null)
             permissions.put(RolePermission.ASSIGN.toString(), roleLogic.isAssigned());
     }
