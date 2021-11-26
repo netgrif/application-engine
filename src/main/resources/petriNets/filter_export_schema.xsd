@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1.0">
+    <!-- ===== FILTERS ===== -->
+    <xs:element name="filters" type="filters"/>
+    <xs:complexType name="filters">
+        <xs:sequence>
+            <xs:element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="filter" type="filter"/>
+    <xs:complexType name="filter">
+        <xs:sequence>
+            <xs:element ref="caseId"/>
+            <xs:choice>
+                <xs:element ref="parentCaseId" minOccurs="0"/>
+                <xs:element ref="parentViewId" minOccurs="0"/>
+            </xs:choice>
+            <xs:element ref="filterName" minOccurs="0"/>
+            <xs:element ref="filterValue" minOccurs="0"/>
+            <xs:element ref="visibility"/>
+            <xs:element ref="type"/>
+            <xs:element ref="icon"/>
+            <xs:element ref="allowedNets" minOccurs="0"/>
+            <xs:element ref="filterMetadata"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="caseId" type="xs:string"/>
+    <xs:element name="parentCaseId" type="xs:string"/>
+    <xs:element name="parentViewId" type="xs:string"/>
+    <xs:element name="filterName" type="filterName"/>
+    <xs:complexType name="filterName">
+        <xs:sequence>
+            <xs:element ref="defaultValue" minOccurs="0"/>
+            <xs:element ref="translations" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="defaultValue" type="xs:string"/>
+    <xs:element name="translations" type="translations"/>
+    <xs:complexType name="translations">
+        <xs:sequence>
+            <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="filterValue" type="xs:string"/>
+    <xs:element name="visibility" type="visibility"/>
+    <xs:simpleType name="visibility">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="public|private"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="type" type="type"/>
+    <xs:simpleType name="type">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="Case|Task"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="icon" type="xs:string"/>
+    <xs:element name="filterMetadata" type="filterMetadata"/>
+    <xs:complexType name="filterMetadata">
+        <xs:sequence>
+            <xs:element ref="filterType"/>
+            <xs:element ref="defaultSearchCategories"/>
+            <xs:element ref="inheritAllowedNets"/>
+            <xs:element ref="searchCategories" minOccurs="0"/>
+            <xs:element ref="predicateMetadata" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="filterType" type="filterType"/>
+    <xs:simpleType name="filterType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="Case|Task"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="defaultSearchCategories" type="xs:boolean"/>
+    <xs:element name="inheritAllowedNets" type="xs:boolean"/>
+    <xs:element name="searchCategories" type="searchCategories"/>
+    <xs:complexType name="searchCategories">
+        <xs:sequence>
+            <xs:element ref="searchCategory" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="searchCategory" type="xs:string"/>
+    <xs:element name="predicateMetadata" type="predicateMetadata"/>
+    <xs:complexType name="predicateMetadata">
+        <xs:sequence>
+            <xs:element ref="predicateMetadataItem" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="predicateMetadataItem" type="predicateMetadataItem"/>
+    <xs:complexType name="predicateMetadataItem">
+        <xs:sequence>
+            <xs:element ref="predicate" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="predicate" type="predicate"/>
+    <xs:complexType name="predicate">
+        <xs:sequence>
+            <xs:element ref="category"/>
+            <xs:element ref="configuration"/>
+            <xs:choice>
+                <xs:element ref="stringValues"/>
+                <xs:element ref="doubleValues"/>
+                <xs:element ref="booleanValues"/>
+                <xs:element ref="mapValues"/>
+                <xs:element ref="longValues"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="category" type="xs:string"/>
+    <xs:element name="configuration" type="configuration"/>
+    <xs:complexType name="configuration">
+        <xs:sequence>
+            <xs:element ref="operator"/>
+            <xs:element ref="datafield" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="operator" type="xs:string"/>
+    <xs:element name="datafield" type="xs:string"/>
+    <xs:element name="stringValues" type="stringValues"/>
+    <xs:complexType name="stringValues">
+        <xs:sequence>
+            <xs:element ref="stringValue" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="stringValue" type="xs:string"/>
+    <xs:element name="doubleValues" type="doubleValues"/>
+    <xs:complexType name="doubleValues">
+        <xs:sequence>
+            <xs:element ref="doubleValue" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="doubleValue" type="xs:double"/>
+    <xs:element name="booleanValues" type="booleanValues"/>
+    <xs:complexType name="booleanValues">
+        <xs:sequence>
+            <xs:element ref="booleanValue" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="booleanValue" type="xs:boolean"/>
+    <xs:element name="mapValues" type="mapValues"/>
+    <xs:complexType name="mapValues">
+        <xs:sequence>
+            <xs:element ref="mapValue" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="mapValue" type="mapValue"/>
+    <xs:complexType name="mapValue">
+        <xs:sequence>
+            <xs:element ref="text"/>
+            <xs:choice>
+                <xs:element ref="stringValues"/>
+                <xs:element ref="doubleValues"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="text" type="xs:string"/>
+    <xs:element name="longValues" type="longValues"/>
+    <xs:complexType name="longValues">
+        <xs:sequence>
+            <xs:element ref="longValue" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="longValue" type="xs:long"/>
+    <xs:element name="allowedNets" type="allowedNets"/>
+    <xs:complexType name="allowedNets">
+        <xs:sequence>
+            <xs:element ref="allowedNet" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="allowedNet" type="xs:string"/>
+</xs:schema>

@@ -30,6 +30,8 @@ public class EventOutcome {
         this.changedFields.mergeChangedFields(changedFieldsTree);
     }
 
+    public EventOutcome () {}
+
     public EventOutcome(String taskId, String transitionId, String caseId) {
         this.taskId = taskId;
         this.caseId = caseId;
