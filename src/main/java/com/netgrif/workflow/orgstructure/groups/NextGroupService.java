@@ -15,18 +15,18 @@ import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import com.querydsl.core.BooleanBuilder;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +73,7 @@ public class NextGroupService implements INextGroupService {
     private final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
-    public Case createDefaultSystemGroup(User author){
+    public CreateCaseEventOutcome createDefaultSystemGroup(User author){
         if(findDefaultGroup() != null) {
             log.info("Default system group has already been created.");
             return null;
@@ -82,21 +82,21 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Case createGroup(User author){
+    public CreateCaseEventOutcome createGroup(User author){
         return createGroup(author.getFullName(), author);
     }
 
     @Override
-    public Case createGroup(String title, User author){
+    public CreateCaseEventOutcome createGroup(String title, User author){
         Case userDefaultGroup = findUserDefaultGroup(author);
         if(userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)){
             return null;
         }
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
+        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, groupCase);
-        Task initTask = getGroupInitTask(groupCase);
+        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getCase());
+        Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
@@ -105,7 +105,7 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        return groupCase;
+        return outcome;
     }
 
     @Override
