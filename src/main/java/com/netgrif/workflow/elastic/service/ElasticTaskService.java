@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
-public class ElasticTaskService implements IElasticTaskService {
+public class ElasticTaskService extends ElasticViewPermissionService implements IElasticTaskService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
@@ -186,11 +186,9 @@ public class ElasticTaskService implements IElasticTaskService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         addRolesQueryConstraint(request, user);
-        addUsersQueryConstraint(request, user);
 
         BoolQueryBuilder query = boolQuery();
-
-        buildPermissionQuery(request, query, user);
+        buildViewPermissionQuery(query, user);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -214,80 +212,6 @@ public class ElasticTaskService implements IElasticTaskService {
         } else {
             request.role = new ArrayList<>(user.getProcessRoles());
         }
-    }
-
-    protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
-        if (request.users != null && !request.users.isEmpty()) {
-            Set<String> users = new HashSet<>(request.users);
-            users.add(user.getId());
-            request.users = new ArrayList<>(users);
-        } else {
-            request.users = Collections.singletonList(user.getId());
-        }
-    }
-
-    protected void buildPermissionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(request, userRoleQuery);
-        negativeUsersAndRolesQuery(userRoleQuery, user);
-
-        query.filter(userRoleQuery);
-    }
-
-    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeQuery = boolQuery();
-        buildNegativeViewRoleQuery(negativeQuery, user);
-        buildNegativeViewUsersQuery(negativeQuery, user);
-        query.should(negativeQuery);
-    }
-
-    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
-        }
-
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildUsersAndRolesQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.users == null || request.users.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder existingUsersQuery = boolQuery();
-        BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder usersRoleQuery = boolQuery();
-        BoolQueryBuilder usersExist = boolQuery();
-        BoolQueryBuilder notExists = boolQuery();
-
-        notExists.mustNot(existsQuery("userRefs"));
-        notExists.mustNot(existsQuery("roles"));
-
-        for (String userId : request.users) {
-            existingUsersQuery.should(termQuery("users", userId));
-        }
-
-        usersExist.must(existsQuery("userRefs"));
-        usersExist.must(existingUsersQuery);
-
-        usersRoleQuery.should(usersExist);
-        usersRoleQuery.should(notExists);
-
-        if (request.role != null && !request.role.isEmpty()) {
-            for (String roleId : request.role) {
-                roleQuery.should(termQuery("roles", roleId));
-            }
-            usersRoleQuery.should(roleQuery);
-        }
-
-        query.must(usersRoleQuery);
     }
 
 
