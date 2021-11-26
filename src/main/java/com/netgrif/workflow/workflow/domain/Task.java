@@ -262,9 +262,9 @@ public class Task {
     public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
-                users.get(userId).putAll(permissions);
+                users.get(userId).putAll(new HashMap<>(permissions));
             } else {
-                users.put(userId, permissions);
+                users.put(userId, new HashMap<>(permissions));
             }
         });
     }
