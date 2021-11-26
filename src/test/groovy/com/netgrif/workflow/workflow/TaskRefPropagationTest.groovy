@@ -51,11 +51,11 @@ class TaskRefPropagationTest {
         def parent = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_parent.xml"), "major", superCreator.getLoggedSuper())
         def child = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskRef_propagation_test_child.xml"), "major", superCreator.getLoggedSuper())
 
-        assert parent.isPresent()
-        assert child.isPresent()
+        assert parent.getNet() != null
+        assert child.getNet() != null
 
-        netParent = parent.get()
-        netChild = child.get()
+        netParent = parent.getNet()
+        netChild = child.getNet()
     }
 
     public static final String PARENT_FIELD_TEXT_ID = "text"
@@ -129,7 +129,7 @@ class TaskRefPropagationTest {
         /* test propagation Parent -> Child -> Parent */
         ChangedFieldsTree changed = dataService.setData(parentTaskId, ImportHelper.populateDataset([
                 (PARENT_FIELD_TEXT_ID): ["value": "VALUE", "type": "text"]
-        ]))
+        ])).getData()
 
         ChangedFieldContainer container = changed.flatten()
         assert container.changedFields[PARENT_FIELD_TEXT_FROM_CHILD_SETTER_ID].get("value") == "VALUE-propagated-down-post-propagated-up"
@@ -157,7 +157,7 @@ class TaskRefPropagationTest {
         String setterValue = choices.join(";")
         changed = dataService.setData(parentTaskId, ImportHelper.populateDataset([
                 (childText5.stringId): ["value": setterValue, "type": "text"],
-        ]))
+        ])).getData()
         container = changed.flatten()
 
         parent = workflowService.findOne(parent.stringId)
@@ -170,7 +170,7 @@ class TaskRefPropagationTest {
         String multiValue = "CHOICE1"
         changed = dataService.setData(parentTaskId, ImportHelper.populateDataset([
                 (childText6.stringId): ["value": multiValue, "type": "text"],
-        ]))
+        ])).getData()
         container = changed.flatten()
 
         parent = workflowService.findOne(parent.stringId)
