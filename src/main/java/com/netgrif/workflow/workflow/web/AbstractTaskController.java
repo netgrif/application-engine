@@ -11,6 +11,7 @@ import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -25,6 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -87,7 +89,7 @@ public abstract class AbstractTaskController {
         return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
-    public EventOutcomeWithMessageResource assign(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(),
                     LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId),locale));
@@ -96,7 +98,7 @@ public abstract class AbstractTaskController {
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
-    public EventOutcomeWithMessageResource delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
                     LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId),locale));
@@ -106,7 +108,7 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EventOutcomeWithMessageResource finish(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId, Locale locale) {
 
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
@@ -121,7 +123,7 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EventOutcomeWithMessageResource cancel(LoggedUser loggedUser, String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
                     LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId),locale));
@@ -188,13 +190,13 @@ public abstract class AbstractTaskController {
     }
 
 
-    public EventOutcomeWithMessageResource getData(String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
         GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
         return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
                 LocalisedEventOutcomeFactory.from(outcome,locale));
     }
 
-    public EventOutcomeWithMessageResource setData(String taskId, ObjectNode dataBody) {
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody) {
         Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
         SetDataEventOutcome mainOutcome = outcomes.get(taskId);
@@ -204,7 +206,7 @@ public abstract class AbstractTaskController {
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
-    public EventOutcomeWithMessageResource saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(dataService.saveFile(taskId, fieldId, multipartFile), LocaleContextHolder.getLocale()));
     }
@@ -231,7 +233,7 @@ public abstract class AbstractTaskController {
         return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 
-    public EventOutcomeWithMessageResource saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
+    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(dataService.saveFiles(taskId, fieldId, multipartFiles), LocaleContextHolder.getLocale()));
     }

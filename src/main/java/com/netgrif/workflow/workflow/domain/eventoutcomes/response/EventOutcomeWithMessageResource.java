@@ -1,31 +1,23 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
-import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceWithMessage;
 import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.EntityModel;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Locale;
 
-public class EventOutcomeWithMessageResource extends CollectionModel<EventOutcomeWithMessage> {
+public class EventOutcomeWithMessageResource {
 
-    public EventOutcomeWithMessageResource(EventOutcomeWithMessage content) {
-        super(Collections.singleton(content), new ArrayList<Link>());
+    private EventOutcomeWithMessageResource(){
     }
 
-    public static EventOutcomeWithMessageResource successMessage(String successMsg, LocalisedEventOutcome outcome){
-        return new EventOutcomeWithMessageResource(EventOutcomeWithMessage.withSuccessMessage(successMsg,outcome));
+    public static EntityModel<EventOutcomeWithMessage> successMessage(String successMsg, LocalisedEventOutcome outcome){
+        return  EntityModel.of(EventOutcomeWithMessage.withSuccessMessage(successMsg,outcome));
     }
 
-    public static EventOutcomeWithMessageResource errorMessage(String errorMsg){
-        return new EventOutcomeWithMessageResource(new EventOutcomeWithMessage(errorMsg));
+    public static EntityModel<EventOutcomeWithMessage> errorMessage(String errorMsg){
+        return EntityModel.of(new EventOutcomeWithMessage(errorMsg));
     }
 
-    public static EventOutcomeWithMessageResource errorMessage(String errorMsg, LocalisedEventOutcome outcome){
-        return new EventOutcomeWithMessageResource(EventOutcomeWithMessage.withErrorMessage(errorMsg, outcome));
+    public static EntityModel<EventOutcomeWithMessage> errorMessage(String errorMsg, LocalisedEventOutcome outcome){
+        return EntityModel.of(EventOutcomeWithMessage.withErrorMessage(errorMsg, outcome));
     }
 }
