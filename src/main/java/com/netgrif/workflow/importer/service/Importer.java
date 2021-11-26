@@ -1029,9 +1029,12 @@ public class Importer {
 
     protected boolean hasPositivePermission(PermissionRef permissionRef) {
         return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
-               || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
-               || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
-               || (permissionRef.getLogic().isDelegate() != null && permissionRef.getLogic().isDelegate());
+                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
+                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
+                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
+                || (permissionRef.getLogic().isAssigned() != null && permissionRef.getLogic().isAssigned())
+                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
+                || (permissionRef.getLogic().isDelegate() != null && permissionRef.getLogic().isDelegate());
     }
 
     /**

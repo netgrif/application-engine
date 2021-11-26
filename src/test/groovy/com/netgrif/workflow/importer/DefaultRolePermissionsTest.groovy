@@ -110,7 +110,11 @@ class DefaultRolePermissionsTest {
                 ]
         ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
                 (DEFAULT_ROLE_ID): [
-                        (RolePermission.PERFORM) : true,
+                        (RolePermission.ASSIGN) : true,
+                        (RolePermission.CANCEL) : true,
+                        (RolePermission.FINISH) : true,
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.SET) : true,
                         (RolePermission.DELEGATE): true
                 ]
         ] as Map<String, Map<RolePermission, Boolean>>, true)
