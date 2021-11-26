@@ -390,25 +390,42 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-         options    : { cl ->
-             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
-                 return
+        options: { cl ->
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                    || field instanceof MultichoiceField || field instanceof EnumerationField))
+                return
 
-             def options = cl()
-             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                 return
-             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
-                 return
-             field = (MapOptionsField) field
-             if (options.every { it.getValue() instanceof I18nString }) {
-                 field.setOptions(options)
-             } else {
-                 Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                 options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
-                 field.setOptions(newOptions)
-             }
-             saveChangedOptions(field)
-         },
+            def options = cl()
+            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                return
+            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                return
+
+            if (field instanceof MapOptionsField) {
+                field = (MapOptionsField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    field.setOptions(options)
+                } else {
+                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                    field.setOptions(newOptions)
+                }
+                saveChangedOptions(field)
+            } else if (field instanceof ChoiceField) {
+                field = (ChoiceField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    Set<I18nString> choices = new LinkedHashSet<>()
+                    options.forEach({ k, v -> choices.add(v) })
+                    field.setChoices(choices)
+                } else {
+                    Set<I18nString> newChoices = new LinkedHashSet<>();
+                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                    field.setChoices(newChoices)
+                }
+                saveChangedChoices(field)
+            }
+
+        },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -922,7 +939,7 @@ class ActionDelegate {
         if (filtersToExport.isEmpty()) {
             return null
         }
-        return filterImportExportService.exportFilters(filtersToExport)
+        return filterImportExportService.exportFiltersToFile(filtersToExport)
     }
 
     List<String> importFilters() {

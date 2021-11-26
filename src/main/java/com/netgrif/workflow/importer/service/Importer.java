@@ -349,7 +349,7 @@ public class Importer {
         return refs;
     }
 
-    private Action fromActionRef(ActionRef actionRef) {
+    protected Action fromActionRef(ActionRef actionRef) {
         Action placeholder = new Action();
         placeholder.setImportId(actionRef.getId());
         this.actionRefs.put(actionRef.getId(), placeholder);
@@ -1013,28 +1013,28 @@ public class Importer {
         return net.get();
     }
 
-    protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy type) {
-        if (type == null || type.value() == null) {
+    protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return AssignPolicy.MANUAL;
         }
 
-        return AssignPolicy.valueOf(type.value().toUpperCase());
+        return AssignPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy type) {
-        if (type == null || type.value() == null) {
+    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return DataFocusPolicy.MANUAL;
         }
 
-        return DataFocusPolicy.valueOf(type.value().toUpperCase());
+        return DataFocusPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy type) {
-        if (type == null || type.value() == null) {
+    protected FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return FinishPolicy.MANUAL;
         }
 
-        return FinishPolicy.valueOf(type.value().toUpperCase());
+        return FinishPolicy.valueOf(policy.value().toUpperCase());
     }
 
     public ProcessRole getRole(String id) {
