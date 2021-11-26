@@ -195,7 +195,8 @@ public class Case {
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
-        viewRoles = filterViewRoles();
+        resolveViewRoles();
+        resolveViewUserRefs();
     }
 
     public String getStringId() {
