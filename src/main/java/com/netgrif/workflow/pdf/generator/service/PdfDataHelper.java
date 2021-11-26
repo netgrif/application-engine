@@ -91,7 +91,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         lastX = Integer.MAX_VALUE;
         lastY = 0;
 
-        this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale());
+        this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale()).getData();
 
         dataGroups.forEach(dataGroup ->{
             refreshGrid(dataGroup);
