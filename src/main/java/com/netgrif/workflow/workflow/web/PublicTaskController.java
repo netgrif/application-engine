@@ -6,6 +6,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
@@ -69,7 +71,7 @@ public class PublicTaskController extends AbstractTaskController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EventOutcomeWithMessageResource assign(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         return super.assign(loggedUser, taskId, locale);
     }
@@ -85,7 +87,7 @@ public class PublicTaskController extends AbstractTaskController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EventOutcomeWithMessageResource finish(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         return super.finish(loggedUser, taskId, locale);
     }
@@ -101,14 +103,14 @@ public class PublicTaskController extends AbstractTaskController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EventOutcomeWithMessageResource cancel(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser  = userService.getAnonymousLogged();
         return super.cancel(loggedUser, taskId, locale);
     }
 
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get all task data")
-    public EventOutcomeWithMessageResource getData(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
     }
 
@@ -123,7 +125,7 @@ public class PublicTaskController extends AbstractTaskController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EventOutcomeWithMessageResource setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         return super.setData(taskId, dataBody);
     }
 
@@ -135,7 +137,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
+    public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -170,7 +172,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                       @RequestParam(value = "files") MultipartFile[] multipartFiles) {
         return super.saveFiles(taskId, fieldId, multipartFiles);
     }
