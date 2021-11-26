@@ -112,6 +112,15 @@ public class Importer {
     @Autowired
     protected IFieldActionsCacheService actionsCacheService;
 
+    @Autowired
+    private IDocumentValidator documentValidator;
+
+    @Autowired
+    private ITransitionValidator transitionValidator;
+
+    @Autowired
+    private ILogicValidator logicValidator;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
@@ -168,6 +177,8 @@ public class Importer {
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new PetriNet();
 
+        documentValidator.checkBeatingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
+        documentValidator.checkDeprecatedAttributes(document);
         document.getI18N().forEach(this::addI18N);
 
         setMetaData();
@@ -188,7 +199,11 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        document.getUsersRef().forEach(this::resolveUsersRef);
+
+        /* @deprecated - The 'document.getUsersRef()' is deprecated and should be removed in future versions */
+        document.getUsersRef().forEach(this::resolveUserRef);
+
+        document.getUserRef().forEach(this::resolveUserRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -225,15 +240,15 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUserRef usersRef) {
-        CaseLogic logic = usersRef.getCaseLogic();
-        String usersId = usersRef.getId();
+    protected void resolveUserRef(CaseUserRef userRef) {
+        CaseLogic logic = userRef.getCaseLogic();
+        String usersId = userRef.getId();
 
         if (logic == null || usersId == null) {
             return;
         }
 
-        net.addUsersPermission(usersId, roleFactory.getProcessPermissions(logic));
+        net.addUserPermission(usersId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -408,6 +423,9 @@ public class Importer {
 
     @Transactional
     protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) throws MissingIconKeyException {
+        transitionValidator.checkBeatingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
+        transitionValidator.checkDeprecatedAttributes(importTransition);
+
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
@@ -427,10 +445,17 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        /* @Deprecated - This 'importTransition.getUsersRef()' is deprecated, will be removed in future releases*/
         if (importTransition.getUsersRef() != null) {
             importTransition.getUsersRef().forEach(usersRef ->
                     addUserLogic(transition, usersRef));
         }
+
+        if (importTransition.getUserRef() != null) {
+            importTransition.getUserRef().forEach(userRef ->
+                    addUserLogic(transition, userRef));
+        }
+
         if (importTransition.getDataRef() != null) {
             for (com.netgrif.workflow.importer.model.DataRef dataRef : importTransition.getDataRef()) {
                 addDataWithDefaultGroup(transition, dataRef);
@@ -613,6 +638,9 @@ public class Importer {
             return;
         }
 
+        logicValidator.checkBeatingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
+        logicValidator.checkDeprecatedAttributes(logic);
+
         if (logic.isView() != null && !logic.isView()) {
             transition.addNegativeViewRole(roleId);
         }
@@ -620,14 +648,18 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UserRef usersRef) {
-        Logic logic = usersRef.getLogic();
-        String userRef = usersRef.getId();
+    protected void addUserLogic(Transition transition, UserRef userRef) {
+        Logic logic = userRef.getLogic();
+        String userRefId = userRef.getId();
 
-        if (logic == null || userRef == null) {
+        if (logic == null || userRefId == null) {
             return;
         }
-        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
+
+        logicValidator.checkBeatingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
+        logicValidator.checkDeprecatedAttributes(logic);
+
+        transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
     }
 
     @Transactional
