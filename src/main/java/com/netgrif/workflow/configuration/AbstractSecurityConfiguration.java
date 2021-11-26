@@ -20,9 +20,9 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     protected ServerAuthProperties serverAuthProperties;
 
     @Autowired
-    private SessionUtilsProperties sessionUtilsProperties;
+    protected SessionUtilsProperties sessionUtilsProperties;
 
-    void setCsrf(HttpSecurity http) throws Exception {
+    protected void setCsrf(HttpSecurity http) throws Exception {
         if (isCsrfEnabled()) {
             http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         } else {
@@ -30,7 +30,7 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
         }
     }
 
-    String[] getPatterns() {
+    protected String[] getPatterns() {
         List<String> patterns = new ArrayList<>(Arrays.asList(getStaticPatterns()));
         patterns.addAll(Arrays.asList(getServerPatterns()));
         patterns.addAll(Arrays.asList(serverAuthProperties.getNoAuthenticationPatterns()));
@@ -43,7 +43,7 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
         return patterns.toArray(new String[0]);
     }
 
-    void configureSession(HttpSecurity http) throws Exception {
+    protected void configureSession(HttpSecurity http) throws Exception {
         if (sessionUtilsProperties.isEnabledLimitSession()) {
             http.sessionManagement()
                     .maximumSessions(sessionUtilsProperties.getMaxSession())
@@ -53,19 +53,19 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     }
 
 
-    void configureFilters(HttpSecurity http) {
+    protected void configureFilters(HttpSecurity http) {
         if (sessionUtilsProperties.isEnabledFilter()) {
             http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
         }
     }
 
-    abstract boolean isOpenRegistration();
+    protected abstract boolean isOpenRegistration();
 
-    abstract boolean isCsrfEnabled();
+    protected abstract boolean isCsrfEnabled();
 
-    abstract String[] getStaticPatterns();
+    protected abstract String[] getStaticPatterns();
 
-    abstract String[] getServerPatterns();
+    protected abstract String[] getServerPatterns();
 
-    abstract Environment getEnvironment();
+    protected abstract Environment getEnvironment();
 }
