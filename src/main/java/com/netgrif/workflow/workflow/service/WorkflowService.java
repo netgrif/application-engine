@@ -426,12 +426,6 @@ public class WorkflowService implements IWorkflowService {
         return fields;
     }
 
-    protected void setDefaultRoleIfEnabled(PetriNet net, Case useCase) {
-        if (useCase.getViewUserRefs().isEmpty() && useCase.getViewRoles().isEmpty() && net.isDefaultRoleEnabled()) {
-            useCase.addAllRolesToViewRoles(processRoleService.defaultRole().getStringId());
-        }
-    }
-
     protected void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataField(field.getStringId()).getValue() != null &&
