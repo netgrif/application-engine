@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -92,7 +94,7 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private List<String> negativeViewRoles = new LinkedList<>();
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
@@ -102,7 +104,22 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+    private List<String> viewRoles = new LinkedList<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> viewUserRefs = new LinkedList<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> viewUsers = new LinkedList<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> negativeViewRoles = new LinkedList<>();
 
     @Getter
     @Setter
@@ -257,5 +274,29 @@ public class Task {
         AUTO,
         TIME,
         MESSAGE,
+    }
+
+    public void resolveViewRoles() {
+        this.roles.forEach((role, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewRoles.add(role);
+            }
+        });
+    }
+
+    public void resolveViewUserRefs() {
+        this.userRefs.forEach((userRef, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewUserRefs.add(userRef);
+            }
+        });
+    }
+
+    public void resolveViewUsers() {
+        this.users.forEach((role, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewUsers.add(role);
+            }
+        });
     }
 }
