@@ -47,10 +47,10 @@ class DataServiceTest {
         testHelper.truncateDbs()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
         net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), "major", superCreator.getLoggedSuper())
-        assert net.isPresent()
-        this.net = net.get()
+        assert net.getNet() != null
+        this.net = net.getNet()
     }
 
     private PetriNet net
