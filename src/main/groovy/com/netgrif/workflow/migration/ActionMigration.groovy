@@ -3,6 +3,7 @@ package com.netgrif.workflow.migration
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
@@ -22,27 +23,27 @@ class ActionMigration {
 
     void migrateActions(String petriNetPath){
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
-        Optional<PetriNet> newPetriNet = petriNetService.importPetriNet(netStream, "major", userService.loggedOrSystem.transformToLoggedUser())
+        ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, "major", userService.loggedOrSystem.transformToLoggedUser())
         List<PetriNet> oldPetriNets
 
-        if(!newPetriNet.isPresent()) {
+        if(newPetriNet.getNet() != null) {
             String message = "Petri net from file [" + petriNetPath + "] was not imported"
             log.error(message)
             throw new IllegalArgumentException(message)
         } else {
-            oldPetriNets = petriNetService.getByIdentifier(newPetriNet.get().importId)
-                    .stream().filter({ net -> (net.version != newPetriNet.get().version)})
+            oldPetriNets = petriNetService.getByIdentifier(newPetriNet.getNet().importId)
+                    .stream().filter({ net -> (net.version != newPetriNet.getNet().version)})
                     .collect(Collectors.toList())
         }
 
         if(oldPetriNets.size() == 0){
-            String message = "Older version of Petri net with ID [" + newPetriNet.get().importId + "] is not present in MongoDB."
+            String message = "Older version of Petri net with ID [" + newPetriNet.getNet().importId + "] is not present in MongoDB."
             log.error(message)
             throw new IllegalArgumentException(message)
         } else {
             oldPetriNets.each {net ->
-                migrateDataSetActions(newPetriNet.get(), net)
-                migrateDataRefActions(newPetriNet.get(), net)
+                migrateDataSetActions(newPetriNet.getNet(), net)
+                migrateDataRefActions(newPetriNet.getNet(), net)
                 petriNetService.save(net)
             }
         }
