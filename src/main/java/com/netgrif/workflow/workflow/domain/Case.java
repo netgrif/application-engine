@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
@@ -296,7 +297,7 @@ public class Case {
 
     public void resolveViewRoles() {
         this.permissions.forEach((role, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewRoles.add(role);
             }
         });
@@ -304,7 +305,7 @@ public class Case {
 
     public void resolveViewUserRefs() {
         this.userRefs.forEach((userRef, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUserRefs.add(userRef);
             }
         });
@@ -312,7 +313,7 @@ public class Case {
 
     public void resolveViewUsers() {
         this.users.forEach((user, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUsers.add(user);
             }
         });
