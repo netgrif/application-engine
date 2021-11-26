@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -277,7 +278,7 @@ public class Task {
 
     public void resolveViewRoles() {
         this.roles.forEach((role, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewRoles.add(role);
             }
         });
@@ -285,7 +286,7 @@ public class Task {
 
     public void resolveViewUserRefs() {
         this.userRefs.forEach((userRef, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUserRefs.add(userRef);
             }
         });
@@ -293,7 +294,7 @@ public class Task {
 
     public void resolveViewUsers() {
         this.users.forEach((role, perms) -> {
-            if (perms.containsKey("view") && perms.get("view")) {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUsers.add(role);
             }
         });
