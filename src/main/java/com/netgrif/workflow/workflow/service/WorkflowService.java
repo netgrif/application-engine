@@ -258,8 +258,6 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        useCase.resolveViewRoles();
-        useCase.resolveViewUserRefs();
 
         runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
