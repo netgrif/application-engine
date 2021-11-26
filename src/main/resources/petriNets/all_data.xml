@@ -180,6 +180,16 @@
         <title>User</title>
     </data>
 
+    <data type="userList">
+        <id>userList1</id>
+        <title>UserList</title>
+    </data>
+
+    <data type="userList">
+        <id>userList2</id>
+        <title>UserList</title>
+    </data>
+
     <data type="dateTime" immediate="true">
         <id>datetime</id>
         <title>Datetime</title>
@@ -200,6 +210,12 @@
         <title>Text datafield z iného transitionu</title>
         <init>Field načítaný pomocou taskrefu</init>
     </data>
+    <usersRef>
+        <id>userList1</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </usersRef>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -207,11 +223,17 @@
         <y>273</y>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
+        <usersRef>
+            <id>userList1</id>
+            <logic>
+                <assigned>true</assigned>
+            </logic>
+        </usersRef>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
             <stretch>false</stretch>
-			<rows>2</rows>
+            <rows>2</rows>
             <dataRef>
                 <id>number</id>
                 <logic>

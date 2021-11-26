@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
-import com.netgrif.workflow.workflow.service.interfaces.IUserFilterSearchService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -34,10 +33,7 @@ import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
-import com.netgrif.workflow.workflow.service.interfaces.IDataService
-import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.service.interfaces.*
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
@@ -118,6 +114,15 @@ class ActionDelegate {
 
     @Autowired
     IUserFilterSearchService filterSearchService
+
+    @Autowired
+    IConfigurableMenuService configurableMenuService
+
+    @Autowired
+    IMenuImportExportService menuImportExportService
+
+    @Autowired
+    IFilterImportExportService filterImportExportService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -385,25 +390,42 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-         options    : { cl ->
-             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
-                 return
+        options: { cl ->
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                    || field instanceof MultichoiceField || field instanceof EnumerationField))
+                return
 
-             def options = cl()
-             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                 return
-             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
-                 return
-             field = (MapOptionsField) field
-             if (options.every { it.getValue() instanceof I18nString }) {
-                 field.setOptions(options)
-             } else {
-                 Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                 options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
-                 field.setOptions(newOptions)
-             }
-             saveChangedOptions(field)
-         },
+            def options = cl()
+            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                return
+            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                return
+
+            if (field instanceof MapOptionsField) {
+                field = (MapOptionsField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    field.setOptions(options)
+                } else {
+                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                    field.setOptions(newOptions)
+                }
+                saveChangedOptions(field)
+            } else if (field instanceof ChoiceField) {
+                field = (ChoiceField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    Set<I18nString> choices = new LinkedHashSet<>()
+                    options.forEach({ k, v -> choices.add(v) })
+                    field.setChoices(choices)
+                } else {
+                    Set<I18nString> newChoices = new LinkedHashSet<>();
+                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                    field.setChoices(newChoices)
+                }
+                saveChangedChoices(field)
+            }
+
+        },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -538,10 +560,7 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
-        if (net == null)
-            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale)
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
@@ -910,5 +929,20 @@ class ActionDelegate {
 
     List<Case> findFilters(String userInput) {
         return filterSearchService.autocompleteFindFilters(userInput)
+    }
+
+    List<Case> findAllFilters() {
+        return filterSearchService.autocompleteFindFilters("")
+    }
+
+    FileFieldValue exportFilters(Collection<String> filtersToExport) {
+        if (filtersToExport.isEmpty()) {
+            return null
+        }
+        return filterImportExportService.exportFiltersToFile(filtersToExport)
+    }
+
+    List<String> importFilters() {
+        return filterImportExportService.importFilters()
     }
 }
