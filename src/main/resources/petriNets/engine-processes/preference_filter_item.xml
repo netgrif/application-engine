@@ -149,9 +149,9 @@
 	<data type="text">
 		<id>icon_preview</id>
 		<title name="icon_preview">Menu icon preview</title>
-		<view>
-			<htmlEditor/>
-		</view>
+		<component>
+			<name>htmltextarea</name>
+		</component>
 		<init></init>
 	</data>
 	<data type="text" immediate="true">
