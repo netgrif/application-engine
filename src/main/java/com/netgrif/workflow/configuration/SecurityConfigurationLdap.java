@@ -4,6 +4,8 @@ package com.netgrif.workflow.configuration;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.ldap.domain.LdapUser;
+import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -192,31 +194,35 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         return (ProviderManager) super.authenticationManager();
     }
 
+    @Bean
+    protected IAfterRegistrationAuthService authenticationService() throws Exception {
+        return new AfterRegistrationAuthService(authenticationManager());
+    }
 
     @Override
-    boolean isOpenRegistration() {
+    protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override
-    boolean isCsrfEnabled() {
+    protected boolean isCsrfEnabled() {
         return properties.isCsrf();
     }
 
     @Override
-    String[] getStaticPatterns() {
+    protected String[] getStaticPatterns() {
         return new String[]{
                 "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
-    String[] getServerPatterns() {
+    protected String[] getServerPatterns() {
         return this.serverPatterns;
     }
 
     @Override
-    Environment getEnvironment() {
+    protected Environment getEnvironment() {
         return env;
     }
 
