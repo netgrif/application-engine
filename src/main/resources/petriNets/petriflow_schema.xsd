@@ -428,6 +428,7 @@
             <xs:element type="xs:boolean" name="delegate" minOccurs="0"/>
             <xs:element type="xs:boolean" name="view" minOccurs="0"/>
             <xs:element type="xs:boolean" name="cancel" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="finish" minOccurs="0"/>
             <xs:choice minOccurs="0">
                 <xs:element type="xs:boolean" name="assigned"/>
                 <xs:element type="xs:boolean" name="assign"/>
