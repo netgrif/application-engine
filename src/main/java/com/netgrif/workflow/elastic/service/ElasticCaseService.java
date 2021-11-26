@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
-public class ElasticCaseService implements IElasticCaseService {
+public class ElasticCaseService extends ElasticViewPermissionService implements IElasticCaseService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
@@ -185,10 +185,11 @@ public class ElasticCaseService implements IElasticCaseService {
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildPermissionQuery(query, user);
+        buildViewPermissionQuery(query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
+        buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query, user);
@@ -201,61 +202,6 @@ public class ElasticCaseService implements IElasticCaseService {
             return null;
         else
             return query;
-    }
-
-    protected void buildPermissionQuery(BoolQueryBuilder query, LoggedUser user){
-        BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(userRoleQuery, user);
-        negativeUsersAndRolesQuery(userRoleQuery, user);
-        query.filter(userRoleQuery);
-    }
-
-    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeQuery = boolQuery();
-        buildNegativeViewRoleQuery(negativeQuery, user);
-        buildNegativeViewUsersQuery(negativeQuery, user);
-        query.should(negativeQuery);
-    }
-
-    private void buildUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder viewRoleQuery = boolQuery();
-        BoolQueryBuilder usersRoleQuery = boolQuery();
-        BoolQueryBuilder usersExist = boolQuery();
-        BoolQueryBuilder notExists = boolQuery();
-
-        notExists.mustNot(existsQuery("viewUserRefs"));
-        notExists.must(existsQuery("viewRoles"));
-
-        usersExist.must(existsQuery("viewUserRefs"));
-        usersExist.must(termQuery("users", user.getId()));
-
-        usersRoleQuery.should(usersExist);
-        usersRoleQuery.should(notExists);
-
-        for (String roleId : user.getProcessRoles()) {
-            viewRoleQuery.should(termQuery("viewRoles", roleId));
-        }
-        roleQuery.must(existsQuery("viewRoles"));
-        roleQuery.must(viewRoleQuery);
-        usersRoleQuery.should(roleQuery);
-
-        query.must(usersRoleQuery);
-    }
-
-    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
-        }
-
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeUsersQuery = boolQuery();
-        negativeUsersQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeUsersQuery);
     }
 
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
@@ -348,6 +294,37 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         query.filter(taskQuery);
+    }
+
+    /**
+     * Cases with active role "5cb07b6ff05be15f0b972c36"
+     * <pre>
+     * {
+     *     "role": "5cb07b6ff05be15f0b972c36"
+     * }
+     * </pre>
+     * <p>
+     * Cases with active role "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
+     * <pre>
+     * {
+     *     "role" [
+     *         "5cb07b6ff05be15f0b972c36",
+     *         "5cb07b6ff05be15f0b972c31"
+     *     ]
+     * }
+     * </pre>
+     */
+    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.role == null || request.role.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder roleQuery = boolQuery();
+        for (String roleId : request.role) {
+            roleQuery.should(termQuery("enabledRoles", roleId));
+        }
+
+        query.filter(roleQuery);
     }
 
     /**
