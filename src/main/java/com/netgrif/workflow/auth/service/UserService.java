@@ -94,7 +94,8 @@ public class UserService extends AbstractUserService {
 
     @Override
     public AnonymousUser saveNewAnonymous(AnonymousUser user) {
-        addDefaultAuthorities(user);
+        addAnonymousRole(user);
+        addAnonymousAuthorities(user);
 
         return userRepository.save(user);
     }
@@ -122,10 +123,22 @@ public class UserService extends AbstractUserService {
         user.addProcessRole(processRoleService.defaultRole());
     }
 
+    public void addAnonymousRole(User user) {
+        user.addProcessRole(processRoleService.anonymousRole());
+    }
+
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
             authorities.add(authorityRepository.findByName(Authority.user));
+            user.setAuthorities(authorities);
+        }
+    }
+
+    public void addAnonymousAuthorities(User user) {
+        if (user.getAuthorities().isEmpty()) {
+            HashSet<Authority> authorities = new HashSet<Authority>();
+            authorities.add(authorityRepository.findByName(Authority.anonymous));
             user.setAuthorities(authorities);
         }
     }

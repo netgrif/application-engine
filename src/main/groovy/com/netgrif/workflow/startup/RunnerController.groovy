@@ -11,6 +11,7 @@ class RunnerController {
             StorageRunner,
             RuleEngineRunner,
             DefaultRoleRunner,
+            AnonymousRoleRunner,
             AuthorityRunner,
             SystemUserRunner,
             FunctionsCacheRunner,

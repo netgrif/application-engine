@@ -65,6 +65,7 @@ public class Importer {
     protected Document document;
     protected PetriNet net;
     protected ProcessRole defaultRole;
+    protected ProcessRole anonymousRole;
     @Getter
     protected Map<String, ProcessRole> roles;
     protected Map<String, Field> fields;
@@ -150,6 +151,7 @@ public class Importer {
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
         this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+        this.anonymousRole = roleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
@@ -184,6 +186,7 @@ public class Importer {
         setMetaData();
         net.setIcon(document.getIcon());
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
+        net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
 
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
@@ -202,9 +205,15 @@ public class Importer {
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUserRef);
         document.getUserRef().forEach(this::resolveUserRef);
+
         if (!isDefaultRoleReferencedOnNet() && isDefaultRoleAllowedForNet()) {
             addDefaultPermissions();
         }
+
+        if (!isAnonymousRoleReferencedOnNet() && isAnonymousRoleAllowedForNet()) {
+            addAnonymousPermissions();
+        }
+
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -584,6 +593,14 @@ public class Importer {
     }
 
     @Transactional
+    protected void addAnonymousRole(Transition transition) {
+        Logic logic = new Logic();
+        logic.setDelegate(true);
+        logic.setPerform(true);
+        transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
     protected void addDefaultPermissions() {
         if (!net.isDefaultRoleEnabled() || net.getPermissions().containsKey(defaultRole.getStringId())) {
             return;
@@ -594,6 +611,19 @@ public class Importer {
         logic.setDelete(true);
         logic.setView(true);
         net.addPermission(defaultRole.getStringId(), roleFactory.getProcessPermissions(logic));
+    }
+
+    @Transactional
+    protected void addAnonymousPermissions() {
+        if (!net.isAnonymousRoleEnabled() || net.getPermissions().containsKey(anonymousRole.getStringId())) {
+            return;
+        }
+
+        CaseLogic logic = new CaseLogic();
+        logic.setCreate(true);
+        logic.setDelete(true);
+        logic.setView(true);
+        net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -927,6 +957,10 @@ public class Importer {
             throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
         }
 
+        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        }
+
         ProcessRole role = new ProcessRole();
         Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
 
@@ -1047,7 +1081,11 @@ public class Importer {
         }
         // TRUE if no positive role associations and no positive user ref associations
         return net.getPermissions().values().stream().noneMatch(perms -> perms.containsValue(true))
-               && net.getUserRefs().values().stream().noneMatch(perms -> perms.containsValue(true));
+                && net.getUserRefs().values().stream().noneMatch(perms -> perms.containsValue(true));
+    }
+
+    protected boolean isAnonymousRoleAllowedForNet() {
+        return net.isAnonymousRoleEnabled();
     }
 
     PetriNet getNetByImportId(String id) {
@@ -1064,6 +1102,14 @@ public class Importer {
 
     protected boolean isDefaultRoleReferencedOnNet() {
         return net.getPermissions().containsKey(defaultRole.getStringId());
+    }
+
+    protected boolean isAnonymousRoleReferenced(Transition transition) {
+        return transition.getRoles().containsKey(anonymousRole.getStringId());
+    }
+
+    protected boolean isAnonymousRoleReferencedOnNet() {
+        return net.getPermissions().containsKey(anonymousRole.getStringId());
     }
 
     protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy policy) {
@@ -1093,6 +1139,10 @@ public class Importer {
     public ProcessRole getRole(String id) {
         if (id.equals(ProcessRole.DEFAULT_ROLE)) {
             return defaultRole;
+        }
+
+        if (id.equals(ProcessRole.ANONYMOUS_ROLE)) {
+            return anonymousRole;
         }
 
         ProcessRole role = roles.get(id);
