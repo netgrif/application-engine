@@ -43,12 +43,13 @@ class ImporterTest {
 
     @Test
     void importTest() {
+        int beforeImportNet = processRoleRepository.count()
         def netOptional = petriNetService.importPetriNet(
                 firstVersionResource.inputStream,
                 VersionType.MAJOR,
                 superCreator.loggedSuper
         )
-        assert processRoleRepository.count() == 3
+        assert processRoleRepository.count() == beforeImportNet+1
         assert netOptional.getNet() != null
         def net = netOptional.getNet()
 
