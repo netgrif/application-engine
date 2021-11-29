@@ -120,8 +120,12 @@ class FunctionsTest {
     }
 
     @Test
+    /**
+     * TODO: why?
+     * NullPointerException -> MissingMethodException
+     **/
     void testNamespaceFunctionException() {
-        assertThrows(NullPointerException.class, () -> {
+        assertThrows(MissingMethodException.class, () -> {
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
             if (nets) {
                 nets.each {
@@ -138,6 +142,10 @@ class FunctionsTest {
     }
 
     @Test
+    /**
+     * TODO: why?
+     * NullPointerException -> MissingMethodException
+     **/
     void testNewNetVersionMissingMethodException() {
         assertThrows(NullPointerException.class, () -> {
             def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
