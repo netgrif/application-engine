@@ -358,8 +358,11 @@ public class PetriNetService implements IPetriNetService {
     public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
 
-        if (!user.isAdmin())
+        if (!user.isAdmin() && !user.isAnonymous())
             query.addCriteria(getProcessRolesCriteria(user));
+
+        if (user.isAnonymous())
+            query.addCriteria(getAnonymousRoleCriteria());
 
         criteria.forEach((key, value) -> {
             Criteria valueCriteria;
@@ -412,6 +415,10 @@ public class PetriNetService implements IPetriNetService {
     private Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
+    }
+
+    private Criteria getAnonymousRoleCriteria() {
+        return Criteria.where("anonymousRoleEnabled").is(true);
     }
 
     @Override
