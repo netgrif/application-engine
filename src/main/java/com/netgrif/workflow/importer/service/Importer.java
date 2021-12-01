@@ -487,6 +487,9 @@ public class Importer {
         if (!isDefaultRoleReferenced(transition) && isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
+        if (!isAnonymousRoleReferenced(transition) && isAnonymousRoleAllowedForNet()) {
+            addAnonymousRole(transition);
+        }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     transition.addEvent(addEvent(transition.getImportId(), event))
@@ -595,7 +598,6 @@ public class Importer {
     @Transactional
     protected void addAnonymousRole(Transition transition) {
         Logic logic = new Logic();
-        logic.setDelegate(true);
         logic.setPerform(true);
         transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
     }
@@ -621,7 +623,6 @@ public class Importer {
 
         CaseLogic logic = new CaseLogic();
         logic.setCreate(true);
-        logic.setDelete(true);
         logic.setView(true);
         net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
