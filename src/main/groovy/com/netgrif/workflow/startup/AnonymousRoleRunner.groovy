@@ -27,7 +27,7 @@ class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
         }
 
         ProcessRole anonymousRole = new ProcessRole(
-                importId: "anonymous",
+                importId: ProcessRole.ANONYMOUS_ROLE,
                 name: new I18nString(ProcessRole.ANONYMOUS_ROLE),
                 description: "Anonymous system process role",
                 events: new LinkedHashMap<EventType, Event>()
