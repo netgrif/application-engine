@@ -6,14 +6,21 @@ the developer can define, who can see and edit the processes, cases and task, wh
 ## Role
 
 Role is an object in the Petriflow model, that is used for managing permissions of users to work with processes, cases
-and tasks. A role can be referenced to process or transition to define permissions for cases and tasks and using NAE
-APIs and controllers a role can be assigned to user.
+and tasks. A role can be referenced on a process or a transition to define permissions for its cases and tasks and for using NAE
+APIs and controllers. A role can be assigned to a user, thus applying the permissions it defines to them.
 
 ### Predefined roles
 
-In NAE, there are two predefined roles: **anonymous** and **default**. Every registered user has automatically assigned
-the **default** role and every anonymous user has assigned the **anonymous** role. In XML, each can be enabled in the
-root document element as follows:
+In NAE, there are two predefined roles: **anonymous** and **default**. Every registered user is automatically a member of
+the **default** role and every anonymous user is a member of the **anonymous** role.
+These roles cannot be removed from or granted to the users of the application by the developer.
+
+These roles can be referenced in the model just like a normal developer-defined role by using their identifiers (`anonymous` and `default` respectively).
+
+#### Applying predefined roles with default permissions
+
+Since the developer may want to apply these roles to "all" transitions a shorthand syntax exists.
+The default and the anonymous role can be applied independently of each other.  
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
@@ -24,13 +31,195 @@ root document element as follows:
 </document>
 ```
 
-From NAE version 6.0.0, it is possible to reference these roles and defined permissions for them. If these roles are
-enabled on process, but never referenced, each permission on these role will have default value **true**.
+The "enabled" role is applied with the default permissions (see the following section) to any transition and to the process
+if no other positive association with another role or a user list is present. The default permissions are also not applied if
+the role that is "enabled" already has a custom association of any sort (positive OR negative).
+
+If the `<defaultRole>` or the `<anonymousRole>` tags are not present in the model the roles are not considered to be "enabled" and 
+are therefore not automatically applied to the transitions and to the process. Beware that the NETGRIF application builder "enables"
+the `<defaultRole>` by default, so that tasks in processes with no roles can be executed by any logged user.
+
+The ability to associate the `anonymous` and the `default` role is **INDEPENDENT** of the values of the `<defaultRole>` and the `<anonymousRole>`
+tags. The predefined roles can be associated with anything even if the value of the tags is set to `false`, since the tags only affect the 
+automatic application of these roles to the process and to its transitions.
+
+##### Examples
+
+Both of the predefined roles behave in the same manner. If both are "enabled" at the same time, then both will be added if the conditions are met.
+The conditions are evaluated independently of each other.
+
+For these examples only the `default` role is used to demonstrate the principles. 
+
+[//]: # (TODO maybe allow the reader to colapsable the examples section)
+
+###### Predefined role will be added
+
+- If there are no roles
+
+```xml
+<document>
+    <roleRef>
+        <id>other</id>
+        <caseLogic>
+            <view>false</view>
+        </caseLogic>
+    </roleRef>
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <roleRef>
+            <id>other</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </roleRef>
+    </transition>
+</document>
+```
+
+```xml
+<document>
+    <userRef>
+        <id>other</id>
+        <caseLogic>
+            <view>false</view>
+        </caseLogic>
+    </userRef>
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <userRef>
+            <id>other</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </userRef>
+    </transition>
+</document>
+```
+
+###### Predefined role will not be added
+
+```xml
+<document>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <view>false</view>
+        </caseLogic>
+    </roleRef>
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </roleRef>
+    </transition>
+</document>
+```
+
+```xml
+<document>
+    <roleRef>
+        <id>default</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <roleRef>
+            <id>default</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+    </transition>
+</document>
+```
+
+```xml
+<document>
+    <roleRef>
+        <id>other</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <roleRef>
+            <id>other</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+    </transition>
+</document>
+```
+
+```xml
+<document>
+    <userRef>
+        <id>other</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </userRef>
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <userRef>
+            <id>other</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </userRef>
+    </transition>
+</document>
+```
+
+#### Default permissions of the predefined roles
+
+##### The default role
+
+On a task the `delegate` and the `perform` permissions are granted.
+
+On a process the `create`, `delete` and `view` permissions are granted.
+
+##### The anonymous role
+
+On a task the `delegate` and the `perform` permissions are granted.
+
+On a process the `create`, `delete` and `view` permissions are granted.
 
 ### Role definition
 
-In the XML model of process, you can define roles as child elements of root element **document**  using **role**
-element. The role is connected to role reference via the role's ID.
+In the XML model of the process, you can define roles as child elements of the root element **document** using the **role**
+element. The role is connected to the role reference via the role's ID.
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
@@ -43,14 +232,16 @@ element. The role is connected to role reference via the role's ID.
 </document>
 ```
 
-In the role definitions, the identifier and name of role can be defined.
+In the role definition, the identifier and the name of the role can be defined.
+
+The `default` and `anonymous` are reserved role identifiers and cannot be used when defining roles.
 
 ### Role reference
 
-Defined roles can be referenced with **roleRef** element, this element then will contain definition of permissions.
-Permissions are explained [here](#Permissions). Roles can be referenced as follows:
+Defined roles can be referenced with **roleRef** element, this element will then contain the definition of permissions.
+Permission documentation can be found [here](#Permissions). Roles can be referenced as follows:
 
-- as child element of document for referencing roles on cases:
+- as a child element of the `document` tag for referencing roles on cases:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
@@ -66,7 +257,7 @@ Permissions are explained [here](#Permissions). Roles can be referenced as follo
 </document>
 ```
 
-- as child element of transition for referencing roles on tasks:
+- as a child element of the `transition` tag for referencing roles on tasks:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
@@ -107,10 +298,10 @@ The value of this data field can be modified and managed using Actions API, as i
 
 ### User reference
 
-Defined user lists can be referenced with **userRef** element, this element will contain definition of permissions.
-Permissions are explained [here](#Permissions). User list can be referenced as follows:
+Defined user lists can be referenced with **userRef** element, this element will contain the definition of permissions.
+Permission documentation can be found [here](#Permissions). User list can be referenced as follows:
 
-- as child element of document for referencing user list on cases:
+- as a child element of the `document` tag for referencing user list on cases:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
@@ -126,7 +317,7 @@ Permissions are explained [here](#Permissions). User list can be referenced as f
 </document>
 ```
 
-- as child element of transition for referencing user list on tasks:
+- as a child element of the `transition` tag for referencing user list on tasks:
 
 ```
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
