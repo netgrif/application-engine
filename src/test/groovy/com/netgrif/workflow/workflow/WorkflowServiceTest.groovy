@@ -52,8 +52,8 @@ class WorkflowServiceTest {
     @Test
     void testFindOneImmediateData() {
         def testNet = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert testNet.isPresent()
-        Case aCase = importHelper.createCase("Case 1", testNet.get())
+        assert testNet.getNet() != null
+        Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
         assert aCase.getImmediateData().size() == 5
 
@@ -65,11 +65,11 @@ class WorkflowServiceTest {
 
     @Test
     void testFirstTransitionAuto() {
-        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), "major", superCreator.getLoggedSuper())
-        assert testNet.isPresent()
+        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+        assert testNet
 
-        def net = testNet.get()
-        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper())
+        def net = testNet
+        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
@@ -80,14 +80,14 @@ class WorkflowServiceTest {
     @Test
     void createCaseWithLocale() {
         def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), "major", superCreator.getLoggedSuper())
-        assert testNet.isPresent()
+        assert testNet.getNet() != null
 
-        def net = testNet.get()
-        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk'))
+        def net = testNet.getNet()
+        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
 
         assert aCase.title.equals("Slovenský preklad")
 
-        Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en'))
+        Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
 
         assert enCase.title.equals("English translation")
     }
