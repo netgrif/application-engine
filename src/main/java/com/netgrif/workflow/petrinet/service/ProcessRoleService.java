@@ -277,5 +277,6 @@ public class ProcessRoleService implements IProcessRoleService {
 
     public void clearCache() {
         this.defaultRole = null;
+        this.anonymousRole = null;
     }
 }
