@@ -42,6 +42,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private boolean anonymousRoleEnabled;
+
+    @Getter
+    @Setter
     private I18nString defaultCaseName;
 
     @Getter
