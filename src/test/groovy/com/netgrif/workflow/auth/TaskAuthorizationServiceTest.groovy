@@ -86,9 +86,9 @@ class TaskAuthorizationServiceTest {
     @BeforeEach
     void before() {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        this.net = net.get()
+        this.net = net.getNet()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)

@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,44 +52,43 @@ class ChangedFieldsAllowedNetsTest {
 
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
 
-        ChangedFieldsTree dataSet = dataService.setData(taskId, ImportHelper.populateDataset(
+        SetDataEventOutcome dataSet = dataService.setData(taskId, ImportHelper.populateDataset(
                 [(TRIGGER_FIELD_ID): [
                         "value": "trigger",
                         "type" : "text"
                 ]]
         ))
 
-        def changeMap = dataSet.getChangedFields()
-        assert changeMap.containsKey(CASE_REF_FIELD_ID)
-        assert changeMap.get(CASE_REF_FIELD_ID).attributes.containsKey(ALLOWED_NETS_KEY)
-        def newAllowedNets = changeMap.get(CASE_REF_FIELD_ID).attributes.get(ALLOWED_NETS_KEY)
+        def changeMap = dataSet.outcomes
+
+        assert dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
+        }
+        assert (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
+        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID).attributes.containsKey(ALLOWED_NETS_KEY)
+
+        def newAllowedNets = (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
+        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID).attributes.get(ALLOWED_NETS_KEY)
         assert newAllowedNets instanceof ArrayList
         assert newAllowedNets.size() == 1
         assert newAllowedNets.get(0) == NET_IDENTIFIER
 
-        def changeContainer = dataSet.flatten()
-        assert changeContainer.getChangedFields().containsKey(CASE_REF_FIELD_ID)
-        assert changeContainer.getChangedFields().get(CASE_REF_FIELD_ID).containsKey(ALLOWED_NETS_KEY)
-        newAllowedNets = changeContainer.getChangedFields().get(CASE_REF_FIELD_ID).get(ALLOWED_NETS_KEY)
-        assert newAllowedNets instanceof ArrayList
-        assert newAllowedNets.size() == 1
-        assert newAllowedNets.get(0) == NET_IDENTIFIER
+        assert  dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
+        }
+        assert (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
+        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID2).attributes.containsKey(ALLOWED_NETS_KEY)
 
-        assert changeMap.containsKey(CASE_REF_FIELD_ID2)
-        assert changeMap.get(CASE_REF_FIELD_ID2).attributes.containsKey(ALLOWED_NETS_KEY)
-        newAllowedNets = changeMap.get(CASE_REF_FIELD_ID2).attributes.get(ALLOWED_NETS_KEY)
+        newAllowedNets = (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
+        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID2).attributes.get(ALLOWED_NETS_KEY)
         assert newAllowedNets instanceof ArrayList
         assert newAllowedNets.size() == 2
         assert newAllowedNets.contains(NET_IDENTIFIER)
         assert newAllowedNets.contains(NET_IDENTIFIER2)
 
-        changeContainer = dataSet.flatten()
-        assert changeContainer.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
-        assert changeContainer.getChangedFields().get(CASE_REF_FIELD_ID2).containsKey(ALLOWED_NETS_KEY)
-        newAllowedNets = changeContainer.getChangedFields().get(CASE_REF_FIELD_ID2).get(ALLOWED_NETS_KEY)
-        assert newAllowedNets instanceof ArrayList
-        assert newAllowedNets.size() == 2
-        assert newAllowedNets.contains(NET_IDENTIFIER)
-        assert newAllowedNets.contains(NET_IDENTIFIER2)
     }
 }
