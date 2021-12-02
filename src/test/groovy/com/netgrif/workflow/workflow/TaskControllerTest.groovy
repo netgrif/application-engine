@@ -129,9 +129,9 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        ImportPetriNetEventOutcome netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR)
-        assert netOptional.getNet() != null
-        net = netOptional.getNet()
+        PetriNet netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR).get()
+        assert netOptional != null
+        net = netOptional
     }
 
     void createCase() {
@@ -154,7 +154,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         List<String> userIds = [] as List
-        userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getId())
+        userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId())
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,

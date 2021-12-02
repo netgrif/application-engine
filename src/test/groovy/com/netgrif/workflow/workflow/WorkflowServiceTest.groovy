@@ -65,11 +65,11 @@ class WorkflowServiceTest {
 
     @Test
     void testFirstTransitionAuto() {
-        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), "major", superCreator.getLoggedSuper())
-        assert testNet.isPresent()
+        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+        assert testNet
 
-        def net = testNet.get()
-        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper())
+        def net = testNet
+        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
