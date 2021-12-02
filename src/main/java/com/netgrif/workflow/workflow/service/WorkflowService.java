@@ -19,7 +19,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
-import com.netgrif.workflow.petrinet.service.ProcessRoleService;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
@@ -35,7 +34,6 @@ import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEval
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
-import org.apache.commons.collections.map.HashedMap;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,32 +252,13 @@ public class WorkflowService implements IWorkflowService {
 
     public Case createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        Case useCase = new Case(petriNet, petriNet.getActivePlaces());
+        Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
-        useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
-        useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
-        useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
-                .map(role -> {
-                    Map<String, Boolean> permissionMap = new HashMap<>();
-                    if (role.getValue().containsKey("delete"))
-                        permissionMap.put("delete", role.getValue().get("delete"));
-                    if (role.getValue().containsKey("view")) {
-                        permissionMap.put("view", role.getValue().get("view"));
-                    }
-                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
-                })
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        );
-        useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
-        useCase.setUserRefs(petriNet.getUserRefs());
-        useCase.resolveViewRoles();
-        useCase.resolveViewUserRefs();
-
         useCase.setTitle(makeTitle.apply(useCase));
+
         runActions(petriNet.getPreCreateActions(), petriNet);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
