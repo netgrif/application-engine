@@ -120,24 +120,24 @@ class TaskRefPropagationTest {
         LocalisedField childText4 = findField(parentData, CHILD_FIELD_TEXT4_TITLE)
         LocalisedField childText5 = findField(parentData, CHILD_FIELD_TEXT5_TITLE)
         LocalisedField childText6 = findField(parentData, CHILD_FIELD_TEXT6_TITLE)
-        assert childText1.stringId ==  CHILD_FIELD_TEXT1_ID
-        assert childText1.parentTaskId ==  childTaskId
+        assert childText1.stringId == CHILD_FIELD_TEXT1_ID
+        assert childText1.parentTaskId == childTaskId
 
-        assert childText2.stringId ==  CHILD_FIELD_TEXT2_ID
-        assert childText2.parentTaskId ==  childTaskId
+        assert childText2.stringId == CHILD_FIELD_TEXT2_ID
+        assert childText2.parentTaskId == childTaskId
 
-        assert childText3.stringId ==  CHILD_FIELD_TEXT3_ID
-        assert childText3.parentTaskId ==  childTaskId
+        assert childText3.stringId == CHILD_FIELD_TEXT3_ID
+        assert childText3.parentTaskId == childTaskId
 
-        assert childText4.stringId ==  CHILD_FIELD_TEXT4_ID
-        assert childText4.parentTaskId ==  childTaskId
+        assert childText4.stringId == CHILD_FIELD_TEXT4_ID
+        assert childText4.parentTaskId == childTaskId
 
-        assert childText5.stringId ==  CHILD_FIELD_TEXT5_ID
-        assert childText5.parentTaskId ==  childTaskId
+        assert childText5.stringId == CHILD_FIELD_TEXT5_ID
+        assert childText5.parentTaskId == childTaskId
 
-        assert childText6.stringId ==  CHILD_FIELD_TEXT6_ID
-        assert childText6.parentTaskId ==  childTaskId
-
+        assert childText6.stringId == CHILD_FIELD_TEXT6_ID
+        assert childText6.parentTaskId == childTaskId
+    }
 //  TODO:   JOZIKE
 //        /* test propagation Parent -> Child -> Parent */
 //        ChangedFieldsTree changed = dataService.setData(parentTaskId, ImportHelper.populateDataset([
@@ -192,12 +192,12 @@ class TaskRefPropagationTest {
 //
 //    }
 //
-//    LocalisedField findField(List<DataGroup> dataGroups, String fieldTitle) {
-//        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
-//        assert fieldDataGroup != null
-//        LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
-//        assert field != null
-//        return field
+    LocalisedField findField(List<DataGroup> dataGroups, String fieldTitle) {
+        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
+        assert fieldDataGroup != null
+        LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
+        assert field != null
+        return field
     }
 
 }
