@@ -3,7 +3,6 @@ package com.netgrif.workflow.startup
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.auth.domain.*
-
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
@@ -12,12 +11,12 @@ import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
@@ -83,7 +82,10 @@ class ImportHelper {
     private IWorkflowService workflowService
 
     @Autowired
-    private INextGroupService groupService;
+    private INextGroupService groupService
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
@@ -120,33 +122,47 @@ class ImportHelper {
         }
         return Optional.of(petriNet)
     }
-/*
-    ProcessRole createUserProcessRole(PetriNet net, String name) {
-        ProcessRole role = userProcessRoleRepository.save(new ProcessRole(roleId:
-                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
-        log.info("Created user process role $name")
+
+//    ProcessRole createUserProcessRole(PetriNet net, String name) {
+//        ProcessRole role = processRoleRepository.save(new ProcessRole(roleId:
+//                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
+//        log.info("Created user process role $name")
+//        return role
+//    }
+//
+//    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
+//        HashMap<String, ProcessRole> userRoles = new HashMap<>()
+//        roles.each { it ->
+//            userRoles.put(it.key, createUserProcessRole(net, it.value))
+//        }
+//
+//        log.info("Created ${userRoles.size()} process roles")
+//        return userRoles
+//    }
+
+
+    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
+        ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
         return role
     }
 
-    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
-        HashMap<String, ProcessRole> userRoles = new HashMap<>()
-        roles.each { it ->
-            userRoles.put(it.key, createUserProcessRole(net, it.value))
+    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
+        HashMap<String, ProcessRole> roles = new HashMap<>()
+        importId.each { it ->
+            roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
         }
-
-        log.info("Created ${userRoles.size()} process roles")
-        return userRoles
+        return roles
     }
 
     Map<String, ProcessRole> getProcessRoles(PetriNet net) {
-        List<ProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
+        List<ProcessRole> roles = processRoleRepository.findAllByNetId(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
         }
         return map
     }
-*/
+
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
@@ -197,7 +213,7 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    SetDataEventOutcome setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    SetDataEventOutcome setTaskData(String taskId, Map<String, Map<String, String>> data) {
         ObjectNode dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }

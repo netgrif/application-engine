@@ -52,6 +52,7 @@ class DataActionTest {
                         "type" : "text"
                 ] as Map
         ))
-        assert dataSet.getChangedFields()["control_field"].attributes["value"] == ";get-pre;get-pre;get-post;get-post;set-pre;set-pre;set-post;set-post"
+        assert (dataSet.outcomes.get(dataSet.outcomes.size() - 1) as SetDataEventOutcome)
+                .getChangedFields()["control_field"].attributes["value"] == ";get-pre;get-pre;get-post;get-post;set-pre;set-pre;set-post;set-post"
     }
 }
