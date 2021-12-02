@@ -6,11 +6,6 @@ import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.ProcessRoleService
 import com.netgrif.workflow.startup.*
-import com.netgrif.workflow.startup.DefaultRoleRunner
-import com.netgrif.workflow.startup.FilterRunner
-import com.netgrif.workflow.startup.GroupRunner
-import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate

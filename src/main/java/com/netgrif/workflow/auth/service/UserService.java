@@ -94,7 +94,6 @@ public class UserService extends AbstractUserService {
 
     @Override
     public AnonymousUser saveNewAnonymous(AnonymousUser user) {
-        addDefaultRole(user);
         addDefaultAuthorities(user);
 
         return userRepository.save(user);

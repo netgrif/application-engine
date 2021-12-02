@@ -150,7 +150,7 @@ public class Case {
     @Setter
     private List<String> negativeViewUsers;
 
-    public Case() {
+    protected Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
@@ -169,20 +169,34 @@ public class Case {
         negativeViewUsers = new ArrayList<>();
     }
 
-    public Case(String title) {
+    public Case(PetriNet petriNet) {
         this();
-        this.title = title;
-        visualId = generateVisualId();
-    }
-
-    public Case(PetriNet petriNet, Map<String, Integer> activePlaces) {
-        this();
-        this.petriNetObjectId = petriNet.getObjectId();
+        petriNetObjectId = petriNet.getObjectId();
+        processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;
-        this.activePlaces = activePlaces;
-        this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
+        activePlaces = petriNet.getActivePlaces();
+        immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
-        this.enabledRoles = petriNet.getRoles().keySet();
+        enabledRoles = petriNet.getRoles().keySet();
+        negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
+        icon = petriNet.getIcon();
+        userRefs = petriNet.getUserRefs();
+
+        permissions = petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    Map<String, Boolean> permissionMap = new HashMap<>();
+                    if (role.getValue().containsKey("delete"))
+                        permissionMap.put("delete", role.getValue().get("delete"));
+                    if (role.getValue().containsKey("view")) {
+                        permissionMap.put("view", role.getValue().get("view"));
+                    }
+                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
+                })
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
+        resolveViewRoles();
+        resolveViewUserRefs();
     }
 
     public String getStringId() {
@@ -195,10 +209,6 @@ public class Case {
 
     public boolean hasFieldBehavior(String field, String transition) {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
-    }
-
-    public void addNegativeViewRoles(List<String> roleIds) {
-        negativeViewRoles.addAll(roleIds);
     }
 
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
