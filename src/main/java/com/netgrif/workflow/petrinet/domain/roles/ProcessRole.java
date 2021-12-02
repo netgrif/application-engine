@@ -24,6 +24,8 @@ public class ProcessRole extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
 
+    public static final String ANONYMOUS_ROLE = "anonymous";
+
     @Id
     @Setter
     private ObjectId _id;

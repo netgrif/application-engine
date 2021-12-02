@@ -1,6 +1,7 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.UserProperties;
 import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
@@ -72,8 +73,6 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Value("${nae.security.anonymous-exceptions}")
     private String[] anonymousExceptions;
-
-    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
@@ -168,7 +167,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                 authenticationManager(),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                new AnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
                 authority,
                 this.serverPatterns,
                 this.anonymousExceptions,
