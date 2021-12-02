@@ -101,27 +101,22 @@ public class Task {
     @Builder.Default
     private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
-    @Getter
     @Setter
     @Builder.Default
     private List<String> viewRoles = new LinkedList<>();
 
-    @Getter
     @Setter
     @Builder.Default
     private List<String> viewUserRefs = new LinkedList<>();
 
-    @Getter
     @Setter
     @Builder.Default
     private List<String> viewUsers = new LinkedList<>();
 
-    @Getter
     @Setter
     @Builder.Default
     private List<String> negativeViewRoles = new LinkedList<>();
 
-    @Getter
     @Setter
     @Builder.Default
     private List<String> negativeViewUsers = new LinkedList<>();
@@ -212,6 +207,41 @@ public class Task {
 
     public String getIcon() {
         return icon;
+    }
+
+    public List<String> getViewRoles() {
+        if (viewRoles == null) {
+            viewRoles = new LinkedList<>();
+        }
+        return viewRoles;
+    }
+
+    public List<String> getViewUserRefs() {
+        if (viewUserRefs == null) {
+            viewUserRefs = new LinkedList<>();
+        }
+        return viewUserRefs;
+    }
+
+    public List<String> getViewUsers() {
+        if (viewUsers == null) {
+            viewUsers = new LinkedList<>();
+        }
+        return viewUsers;
+    }
+
+    public List<String> getNegativeViewRoles() {
+        if (negativeViewRoles == null) {
+            negativeViewRoles = new LinkedList<>();
+        }
+        return negativeViewRoles;
+    }
+
+    public List<String> getNegativeViewUsers() {
+        if (negativeViewUsers == null) {
+            negativeViewUsers = new LinkedList<>();
+        }
+        return negativeViewUsers;
     }
 
     public void addRole(String roleId, Map<String, Boolean> permissions) {
