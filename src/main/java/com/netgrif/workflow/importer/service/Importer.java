@@ -341,7 +341,7 @@ public class Importer {
         if (data.getAction() != null) {
             Map<DataEventType, DataEvent> events = getField(fieldId).getEvents();
 
-            List<ActionType> filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.GET);
+            List<com.netgrif.workflow.importer.model.Action> filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.GET);
             addActionsToEvent(buildActions(filteredActions, fieldId, null), DataEventType.GET, events);
 
             filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.SET);
@@ -349,7 +349,7 @@ public class Importer {
         }
     }
 
-    private List<ActionType> filterActionsByTrigger(List<ActionType> actions, DataEventType trigger){
+    private List<com.netgrif.workflow.importer.model.Action> filterActionsByTrigger(List<com.netgrif.workflow.importer.model.Action> actions, DataEventType trigger){
         return actions.stream()
                 .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.value))
                 .collect(Collectors.toList());
@@ -379,7 +379,7 @@ public class Importer {
         }
     }
 
-    protected List<Action> buildActionRefs(List<ActionRefType> actionRefs) {
+    protected List<Action> buildActionRefs(List<ActionRef> actionRefs) {
         return actionRefs.stream().map(ref -> actions.get(ref.getId())).collect(Collectors.toList());
     }
 
@@ -881,7 +881,7 @@ public class Importer {
     }
 
     @Transactional
-    protected List<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected List<Action> buildActions(List<com.netgrif.workflow.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> parseAction(fieldId, transitionId, action))
                 .collect(Collectors.toList());

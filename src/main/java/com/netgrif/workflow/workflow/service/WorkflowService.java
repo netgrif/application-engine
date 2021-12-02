@@ -433,12 +433,6 @@ public class WorkflowService implements IWorkflowService {
         return fields;
     }
 
-    private void setDefaultRoleIfEnabled(PetriNet net, Case useCase) {
-        if (useCase.getViewUserRefs().isEmpty() && useCase.getViewRoles().isEmpty() && net.isDefaultRoleEnabled()) {
-            useCase.addAllRolesToViewRoles(processRoleService.defaultRole().getStringId());
-        }
-    }
-
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
 
