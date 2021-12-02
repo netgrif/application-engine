@@ -209,6 +209,7 @@
             <xs:element type="i18nStringType" name="title" minOccurs="1"/>
             <xs:element type="xs:string" name="icon" minOccurs="0"/>
             <xs:element type="xs:boolean" name="defaultRole" minOccurs="0" default="true"/>
+            <xs:element type="xs:boolean" name="anonymousRole" minOccurs="0" default="true"/>
             <xs:element type="xs:boolean" name="transitionRole" minOccurs="0" default="true"/>
             <xs:element type="i18nStringTypeWithExpression" name="caseName" minOccurs="0"/>
             <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
