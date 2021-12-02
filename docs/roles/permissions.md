@@ -54,7 +54,19 @@ For these examples only the `default` role is used to demonstrate the principles
 
 ###### Predefined role will be added
 
-- If there are no other role and user list associations
+```xml
+<document>
+    <!-- No process role/user ref -->
+</document>
+```
+
+```xml
+<document>
+    <transition>
+        <!-- No transition role/user ref -->
+    </transition>
+</document>
+```
 
 ```xml
 <document>
@@ -342,7 +354,7 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 Permissions can manage access and execution rights to Case and Task objects. These permissions are assigned to user
 through **roleRef** and **userRef**. There may be the case, when a user can have multiple role assigned and be present
 in multiple user list, and the references of the roles and user lists define the same permission but with other flags (
-e.g. one role reference grants the permission, the other forbids it, one user reference grants the permission, the other
+e.g. one role reference grants the permission, the other forbids it, one user list reference grants the permission, the other
 forbids it). These complex situations are always resolved according to the following rule:
 
 $$((R_{p} \setminus R_{n}) \cup U_{p}) \setminus U_{n}$$
@@ -355,7 +367,7 @@ $$((R_{p} \setminus R_{n}) \cup U_{p}) \setminus U_{n}$$
 - $U_{n}$ - set of user lists that user is part of and define given permission with `false` (forbid the permission)
 
 Explained in words:
-A user list is stronger than a role and a forbidding (negative - `false`) association is stronger than a granting (positive - `true`) association. 
+A user list is stronger than a role and a forbidding/revoking (negative - `false`) association is stronger than a granting (positive - `true`) association. 
 A user must be granted a permission from at least one source in order to be allowed to perform an operation.
 A granting (positive) user list association overrides a forbidding (negative) role association.
 A forbidding (negative) user list association overrides any granting (positive) association.
