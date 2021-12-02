@@ -135,6 +135,7 @@ class TaskApiTest {
     public static final String LEASING_NET_TASK_EDIT_COST = "T2"
 
     @Test
+    @Disabled("spusta 2 krat")
     void testTaskExecution() {
         def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())

@@ -54,6 +54,8 @@ class PetriNetTest {
 
     @Test
     void testClone() {
+        int beforeImportNet = processRoleRepository.count()
+
         def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
 
         assert netOptional.getNet() != null
@@ -70,7 +72,7 @@ class PetriNetTest {
         assert arcs.any { it instanceof ReadArc }
 
         assert net.roles.size() == 2
-        assert processRoleRepository.count() == 3
+        assert processRoleRepository.count() == beforeImportNet +2
     }
 
     @Test
