@@ -43,11 +43,11 @@ class TestHelper {
 
     void truncateDbs() {
         template.db.drop()
+        elasticTaskRepository.deleteAll()
+        elasticCaseRepository.deleteAll()
         userRepository.deleteAll()
         roleRepository.deleteAll()
         roleService.clearCache()
-        elasticTaskRepository.deleteAll()
-        elasticCaseRepository.deleteAll()
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()

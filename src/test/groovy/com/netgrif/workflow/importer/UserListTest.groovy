@@ -10,6 +10,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -54,10 +55,10 @@ class UserListTest {
 
     @Test
     void testUserList() throws MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/user_list.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
-        assert net.isPresent();
-        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"))
+        assert net.getNet() != null;
+        Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
 
         assert caseOpt.isPresent();
         assert caseOpt.get().getDataSet().get("text").getValue() == "Its working...";
