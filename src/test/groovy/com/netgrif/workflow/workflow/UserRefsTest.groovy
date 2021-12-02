@@ -50,9 +50,9 @@ class UserRefsTest {
     @BeforeEach
     void before() {
         helper.truncateDbs()
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser())
-        assert net.isPresent()
-        netId = net.get().getStringId()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        assert net
+        netId = net.getStringId()
         def userEmails = ["super@netgrif.com", "engine@netgrif.com"]
         newCases = new ArrayList<>()
         userIds = new ArrayList<>()

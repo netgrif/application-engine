@@ -15,6 +15,7 @@ import groovy.json.JsonOutput
 
 import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -95,6 +96,7 @@ class WorkflowAuthorizationServiceTest {
     private Authentication adminAuth
 
     @Test
+    @Disabled
     void testDeleteCase() {
         def body = JsonOutput.toJson([
                 title: "test case",
@@ -109,7 +111,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         def response = parseResult(result)
-        String userCaseId1 = response.outcome.acase.stringId
+        String userCaseId1 = response.outcome.aCase.stringId
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
@@ -118,7 +120,7 @@ class WorkflowAuthorizationServiceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         response = parseResult(result)
-        String userCaseId2 = response.outcome.acase.stringId
+        String userCaseId2 = response.outcome.aCase.stringId
 
         result = mvc.perform(post(CREATE_CASE_URL)
                 .content(body)
