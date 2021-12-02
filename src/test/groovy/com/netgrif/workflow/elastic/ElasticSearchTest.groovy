@@ -98,23 +98,23 @@ class ElasticSearchTest {
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
-        assert net2.isPresent()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert net
+        assert net2
 
-        netId = net.get().getStringId()
-        netId2 = net2.get().getStringId()
+        netId = net.getStringId()
+        netId2 = net2.getStringId()
 
 //        def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 //        def processRoles = importHelper.getProcessRoles(net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [net.get().roles.values().find { it.importId == "process_role" }] as ProcessRole[])
+                [net.roles.values().find { it.importId == "process_role" }] as ProcessRole[])
 
         10.times {
-            def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net.get() : net2.get())
+            def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net2)
             _case.dataSet["number"].value = it * 100.0 as Double
             _case.dataSet["enumeration"].value = _case.petriNet.dataSet["enumeration"].choices[it % 3]
             workflowService.save(_case)

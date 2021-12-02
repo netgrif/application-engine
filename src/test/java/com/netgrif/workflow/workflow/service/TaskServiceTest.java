@@ -18,6 +18,7 @@ import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -96,9 +97,9 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), "major", superCreator.getLoggedSuper()).get();
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), "major", superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
-        Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();
         user.setName("name");
         user.setPassword("password");
@@ -107,16 +108,16 @@ public class TaskServiceTest {
         user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
-        assert useCase.getConsumedTokens().size() == 0;
-        assert useCase.getActivePlaces().size() == 1;
-        assert useCase.getActivePlaces().values().contains(5);
+        assert outcome.getCase().getConsumedTokens().size() == 0;
+        assert outcome.getCase().getActivePlaces().size() == 1;
+        assert outcome.getCase().getActivePlaces().values().contains(5);
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
         assert task != null;
 
         service.assignTask(user.transformToLoggedUser(), task.getStringId());
-        useCase = caseRepository.findById(useCase.getStringId()).get();
+        Case useCase = caseRepository.findById(outcome.getCase().getStringId()).get();
 
         assert useCase.getConsumedTokens().size() == 1;
         assert useCase.getConsumedTokens().values().contains(5);

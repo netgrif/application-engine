@@ -4,10 +4,10 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,19 +28,19 @@ public interface IWorkflowService {
 
     Case resolveUserRef(Case useCase);
 
-    Case createCase(String netId, String title, String color, LoggedUser user, Locale locale);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale);
 
-    Case createCase(String netId, String title, String color, LoggedUser user);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user);
 
-    Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
 
-    Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
 
     Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
 
-    void deleteCase(String caseId);
+    DeleteCaseEventOutcome deleteCase(String caseId);
 
-    void deleteSubtreeRootedAt(String caseId);
+    DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
 
     void deleteInstancesOfPetriNet(PetriNet net);
 
@@ -52,6 +52,7 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
+    @Deprecated
     List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
@@ -67,8 +68,4 @@ public interface IWorkflowService {
     Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
-
-    ChangedFieldsTree runActions(List<Action> actions, String useCaseId);
-
-    void runActions(List<Action> actions, PetriNet petriNet);
 }

@@ -5,6 +5,7 @@
 	<initials>ALL</initials>
     <caseName>All data test default case name</caseName>
     <!-- ROLES -->
+    <defaultRole>true</defaultRole>
     <role>
         <id>process_role</id>
         <title>Process role</title>
