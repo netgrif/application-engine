@@ -487,7 +487,7 @@ public class Importer {
         if (!isDefaultRoleReferenced(transition) && isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
-        if (!isAnonymousRoleReferenced(transition) && isAnonymousAllowedFor(importTransition, document)) {
+        if (!isAnonymousRoleReferenced(transition) && isAnonymousRoleAllowedFor(importTransition, document)) {
             addAnonymousRole(transition);
         }
         if (importTransition.getEvent() != null) {
@@ -1062,7 +1062,7 @@ public class Importer {
                 && (transition.getUserRef() == null || transition.getUserRef().stream().noneMatch(this::hasPositivePermission));
     }
 
-    protected boolean isAnonymousAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
+    protected boolean isAnonymousRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         // FALSE if defaultRole not allowed in net
         if (!net.isAnonymousRoleEnabled()) {
             return false;
