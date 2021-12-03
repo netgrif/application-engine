@@ -27,7 +27,9 @@ class TestHelper {
     @Autowired
     private SystemUserRunner systemUserRunner
     @Autowired
-    private DefaultRoleRunner roleRunner
+    private DefaultRoleRunner defaultRoleRunner
+    @Autowired
+    private AnonymousRoleRunner anonymousRoleRunner
     @Autowired
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
@@ -51,7 +53,9 @@ class TestHelper {
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
-        roleRunner.run()
+
+        defaultRoleRunner.run()
+        anonymousRoleRunner.run()
         systemUserRunner.run()
         groupRunner.run()
         filterRunner.run()
