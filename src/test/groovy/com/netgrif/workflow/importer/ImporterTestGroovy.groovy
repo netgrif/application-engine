@@ -72,7 +72,7 @@ class ImporterTestGroovy {
         PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net
-        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper)
+        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
 
         assert testCase.dataSet.get(NUMBER_FIELD).behavior.get("1") == [FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
         assert testCase.dataSet.get(TEXT_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN] as Set<FieldBehavior>
