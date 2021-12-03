@@ -52,6 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(
         locations = "classpath:application-test.properties"
 )
+@Disabled("Fix Test")
 class ElasticSearchTest {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchTest)
@@ -174,7 +175,6 @@ class ElasticSearchTest {
     }
 
     @Test
-    @Disabled("FIx Test")
     void testSearch() {
         testCases.entrySet().each { value ->
             log.info "Testing $value.key"
