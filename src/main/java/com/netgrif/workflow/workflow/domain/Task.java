@@ -307,6 +307,7 @@ public class Task {
     }
 
     public void resolveViewRoles() {
+        this.viewRoles.clear();
         this.roles.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewRoles.add(role);
@@ -315,6 +316,7 @@ public class Task {
     }
 
     public void resolveViewUserRefs() {
+        this.viewUserRefs.clear();
         this.userRefs.forEach((userRef, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUserRefs.add(userRef);
@@ -323,6 +325,7 @@ public class Task {
     }
 
     public void resolveViewUsers() {
+        this.viewUsers.clear();
         this.users.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUsers.add(role);

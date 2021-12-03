@@ -4,6 +4,7 @@
     <id>vpt</id>
     <initials>VPT</initials>
     <title>ViewPermissionTest test</title>
+    <defaultRole>true</defaultRole>
     <roleRef>
         <id>view_pos_role</id>
         <caseLogic>
@@ -18,11 +19,11 @@
     </roleRef>
     <role>
         <id>view_pos_role</id>
-        <name>view role</name>
+        <name>view pos role</name>
     </role>
     <role>
         <id>view_neg_role</id>
-        <name>view role</name>
+        <name>view neg role</name>
     </role>
     <data type="text">
         <id>text</id>
