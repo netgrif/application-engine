@@ -12,6 +12,8 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.TaskPair
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
@@ -50,9 +52,6 @@ class PredefinedRolesPermissionsTest {
     @Autowired
     private RoleFactory roleFactory
 
-
-    @Value("classpath:predefinedPermissions/role_permissions_combined_roles_undefined.xml")
-    private Resource undefinedCombinedRoleNet
 
     @Value("classpath:predefinedPermissions/role_permissions_default_role_defined.xml")
     private Resource definedDefaultRoleNet
@@ -96,6 +95,11 @@ class PredefinedRolesPermissionsTest {
     @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_shadowed_usersref.xml")
     private Resource shadowedUsersRefAnonymousRoleNet
 
+    @Value("classpath:predefinedPermissions/role_permissions_combined_roles_undefined.xml")
+    private Resource undefinedCombinedRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_combined_roles_defined.xml")
+    private Resource definedCombinedRoleNet
+
 
     private static final String TRANSITION_ID = 't1'
     private static final String NET_ROLE_ID = 'netRole'
@@ -107,11 +111,6 @@ class PredefinedRolesPermissionsTest {
         testHelper.truncateDbs()
         DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
         ANONYMOUS_ROLE_ID = processRoleService.anonymousRole().stringId
-    }
-
-    @Test
-    void undefinedCombinedRole() {
-        testPermissions(undefinedCombinedRoleNet, [:], [:], false, false)
     }
 
     //    DEFAULT ROLE =================================
@@ -249,7 +248,6 @@ class PredefinedRolesPermissionsTest {
         testPermissions(definedAnonymousRoleNet, [
                 (ANONYMOUS_ROLE_ID): [
                         (ProcessRolePermission.VIEW)  : true,
-                        (ProcessRolePermission.DELETE): true,
                         (ProcessRolePermission.CREATE): true,
                 ]
         ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
@@ -259,7 +257,6 @@ class PredefinedRolesPermissionsTest {
                         (RolePermission.FINISH) : true,
                         (RolePermission.VIEW) : true,
                         (RolePermission.SET) : true,
-                        (RolePermission.DELEGATE): true
                 ]
         ] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
@@ -372,6 +369,42 @@ class PredefinedRolesPermissionsTest {
         testPermissions(shadowedUsersRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
+    // COMBINED ROLES ======================================
+    @Test
+    void undefinedCombinedRole() {
+        testPermissions(undefinedCombinedRoleNet, [:], [:], false, false)
+    }
+
+    @Test
+    void definedCombinedRole() {
+        testPermissions(definedCombinedRoleNet, [
+                (DEFAULT_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE): true,
+                        (ProcessRolePermission.CREATE): true,
+                ],
+                (ANONYMOUS_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.CREATE): true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (DEFAULT_ROLE_ID): [
+                        (RolePermission.ASSIGN) : true,
+                        (RolePermission.CANCEL) : true,
+                        (RolePermission.FINISH) : true,
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.SET) : true,
+                        (RolePermission.DELEGATE): true
+                ],
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.ASSIGN) : true,
+                        (RolePermission.CANCEL) : true,
+                        (RolePermission.FINISH) : true,
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.SET) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true, true)
+    }
 
 
     private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled, boolean anonymousRoleEnabled) {
@@ -402,11 +435,15 @@ class PredefinedRolesPermissionsTest {
     }
 
     private NetCaseTask importAndCreate(Resource model) {
-        Optional<PetriNet> optNet = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(model.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
 
-        assert optNet.isPresent()
+        assert importOutcome.getNet() != null
 
-        Case aCase = workflowService.createCase(optNet.get().stringId, '', '', superCreator.loggedSuper)
+        PetriNet net = importOutcome.getNet()
+
+        CreateCaseEventOutcome createCaseOutcome = workflowService.createCase(net.stringId, '', '', superCreator.loggedSuper)
+        assert createCaseOutcome.getCase() != null
+        Case aCase = createCaseOutcome.getCase()
 
         assert aCase != null
         assert !aCase.getTasks().isEmpty()
@@ -417,7 +454,7 @@ class PredefinedRolesPermissionsTest {
 
         assert task != null
 
-        return new NetCaseTask(optNet.get(), aCase, task)
+        return new NetCaseTask(net, aCase, task)
     }
 
     private Map<String, Map<String, Boolean>> transformPermissionMap(Map<String, Map<Object, Boolean>> input, String netRoleId) {
