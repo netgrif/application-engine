@@ -9,6 +9,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -49,8 +50,8 @@ class ChangeFieldValueInitTest {
 
     @Test
     void testInitValues() {
-        Optional<PetriNet> optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
-        Case useCase = importHelper.createCase("test", optNet.get())
+        ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+        Case useCase = importHelper.createCase("test", optNet.getNet())
 
         assert useCase.dataSet["text_static"].value == "TEST VALUE"
         assert useCase.dataSet["text_dynamic"].value == "TEST VALUE DYNAMIC"

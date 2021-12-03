@@ -17,6 +17,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -128,9 +129,9 @@ class TaskControllerTest {
     }
 
     void importNet() {
-        Optional<PetriNet> netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR,)
-        assert netOptional.isPresent()
-        net = netOptional.get()
+        PetriNet netOptional = helper.createNet("all_data_refs.xml", VersionType.MAJOR).get()
+        assert netOptional != null
+        net = netOptional
     }
 
     void createCase() {
@@ -153,7 +154,7 @@ class TaskControllerTest {
     void setUserListValue() {
         assert task != null
         List<String> userIds = [] as List
-        userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getId())
+        userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId())
         dataService.setData(task.stringId, ImportHelper.populateDataset([
                 "performable_users": [
                         "value": userIds,
