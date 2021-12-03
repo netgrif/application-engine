@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
-	<id>permissions_test_2</id>
-	<initials>PT2</initials>
-	<title>Permissions test 2</title>
-	<defaultRole>true</defaultRole>
+	<id>permissions_test_combined_1</id>
+	<initials>PTC</initials>
+	<title>Permissions test combined 1</title>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
