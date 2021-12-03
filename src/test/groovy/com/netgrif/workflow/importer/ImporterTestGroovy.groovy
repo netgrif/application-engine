@@ -69,10 +69,10 @@ class ImporterTestGroovy {
 
     @Test
     void initialBehaviorTest() {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())
+        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/initial_behavior.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
-        assert net.isPresent()
-        Case testCase = workflowService.createCase(net.get().stringId, "Test case", "", superCreator.loggedSuper)
+        assert net
+        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper)
 
         assert testCase.dataSet.get(NUMBER_FIELD).behavior.get("1") == [FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
         assert testCase.dataSet.get(TEXT_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN] as Set<FieldBehavior>
@@ -91,13 +91,14 @@ class ImporterTestGroovy {
 
     @Test
     void enumerationMultichoiceOptionsTest() throws IOException, MissingPetriNetMetaDataException {
-        Optional<PetriNet> net = petriNetService.importPetriNet(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper())
+        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/enumeration_multichoice_options.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
-        assert net.isPresent()
-        ChoiceField multichoice = (ChoiceField) net.get().getDataSet().get(MULTICHOICE_FIELD)
-        ChoiceField multichoice_like_map = (ChoiceField) net.get().getDataSet().get(MULTICHOICE_LIKE_MAP_FIELD)
-        ChoiceField enumeration = (ChoiceField) net.get().getDataSet().get(ENUMERATION_FIELD)
-        ChoiceField enumeration_like_map = (ChoiceField) net.get().getDataSet().get(ENUMERATION_LIKE_MAP_FIELD)
+        assert net != null
+
+        ChoiceField multichoice = (ChoiceField) net.getDataSet().get(MULTICHOICE_FIELD)
+        ChoiceField multichoice_like_map = (ChoiceField) net.getDataSet().get(MULTICHOICE_LIKE_MAP_FIELD)
+        ChoiceField enumeration = (ChoiceField) net.getDataSet().get(ENUMERATION_FIELD)
+        ChoiceField enumeration_like_map = (ChoiceField) net.getDataSet().get(ENUMERATION_LIKE_MAP_FIELD)
 
         assert multichoice.getChoices() == multichoice_like_map.getChoices()
         assert enumeration.getChoices() == enumeration_like_map.getChoices()
