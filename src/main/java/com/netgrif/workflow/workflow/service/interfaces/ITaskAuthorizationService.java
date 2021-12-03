@@ -7,13 +7,13 @@ import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
-    boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
-    boolean userHasAtLeastOneRolePermission(IUser user, Task task, RolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(IUser user, Task task, RolePermission... permissions);
 
-    boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+    Boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
-    boolean userHasUserListPermission(IUser user, Task task, RolePermission... permissions);
+    Boolean userHasUserListPermission(IUser user, Task task, RolePermission... permissions);
 
     boolean isAssignee(LoggedUser loggedUser, String taskId);
 

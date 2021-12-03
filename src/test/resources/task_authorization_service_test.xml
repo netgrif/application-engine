@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>wst</id>
+    <initials>WST</initials>
+    <title>WorkflowAuthorizationService test</title>
+    <role>
+        <id>assign_pos_role</id>
+        <name>assign pos role</name>
+    </role>
+    <role>
+        <id>assign_neg_role</id>
+        <name>assign neg role</name>
+    </role>
+    <role>
+        <id>finish_pos_role</id>
+        <name>finish pos role</name>
+    </role>
+    <role>
+        <id>finish_neg_role</id>
+        <name>finish neg role</name>
+    </role>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Transition</label>
+        <roleRef>
+            <id>assign_pos_role</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>assign_neg_role</id>
+            <logic>
+                <assign>false</assign>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>finish_pos_role</id>
+            <logic>
+                <finish>true</finish>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>finish_neg_role</id>
+            <logic>
+                <finish>false</finish>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>file</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>
