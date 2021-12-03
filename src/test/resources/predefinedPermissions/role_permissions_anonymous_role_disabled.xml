@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
-	<id>permissions_test_9</id>
-	<initials>PT9</initials>
-	<title>Permissions test 9</title>
-	<defaultRole>true</defaultRole>
+	<id>permissions_test_anonymous_10</id>
+	<initials>PTA</initials>
+	<title>Permissions test anonymous 10</title>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
-	<userRef>
-		<id>userList</id>
+	<roleRef>
+		<id>anonymous</id>
 		<caseLogic>
 			<view>true</view>
 			<delete>true</delete>
 		</caseLogic>
-	</userRef>
+	</roleRef>
+	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
-	<data type="userList">
-		<id>userList</id>
-		<title></title>
-	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
 	<transition>
@@ -30,13 +25,13 @@
 			<offset>0</offset>
 		</layout>
 		<label></label>
-		<userRef>
-			<id>userList</id>
+		<roleRef>
+			<id>anonymous</id>
 			<logic>
 				<view>true</view>
 				<delegate>true</delegate>
 			</logic>
-		</userRef>
+		</roleRef>
 	</transition>
 	<!-- PLACES -->
 	<!-- ARCS -->

@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class DefaultRolePermissionsTest {
+class PredefinedRolesPermissionsTest {
 
     @Autowired
     private TestHelper testHelper
@@ -51,55 +51,70 @@ class DefaultRolePermissionsTest {
     private RoleFactory roleFactory
 
 
-    @Value("classpath:role_permissions_default_role_undefined.xml")
-    private Resource undefinedDefaultRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_combined_roles_undefined.xml")
+    private Resource undefinedCombinedRoleNet
 
-    @Value("classpath:role_permissions_default_role_defined.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_defined.xml")
     private Resource definedDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_shadowed.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_shadowed.xml")
     private Resource shadowedDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_custom.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_custom.xml")
     private Resource customDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_negative.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_negative.xml")
     private Resource negativeDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_combined.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_combined.xml")
     private Resource combinedDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_missing.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_missing.xml")
     private Resource missingDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_reserved.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_reserved.xml")
     private Resource reservedDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_shadowed_userref.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_shadowed_userref.xml")
     private Resource shadowedUserRefDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_disabled.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_disabled.xml")
     private Resource disabledReferencedDefaultRoleNet
-
-    @Value("classpath:role_permissions_default_role_shadowed_usersref.xml")
+    @Value("classpath:predefinedPermissions/role_permissions_default_role_shadowed_usersref.xml")
     private Resource shadowedUsersRefDefaultRoleNet
+
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_defined.xml")
+    private Resource definedAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_shadowed.xml")
+    private Resource shadowedAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_custom.xml")
+    private Resource customAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_negative.xml")
+    private Resource negativeAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_combined.xml")
+    private Resource combinedAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_missing.xml")
+    private Resource missingAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_reserved.xml")
+    private Resource reservedAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_shadowed_userref.xml")
+    private Resource shadowedUserRefAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_disabled.xml")
+    private Resource disabledReferencedAnonymousRoleNet
+    @Value("classpath:predefinedPermissions/role_permissions_anonymous_role_shadowed_usersref.xml")
+    private Resource shadowedUsersRefAnonymousRoleNet
 
 
     private static final String TRANSITION_ID = 't1'
     private static final String NET_ROLE_ID = 'netRole'
     private String DEFAULT_ROLE_ID
+    private String ANONYMOUS_ROLE_ID
 
     @Before
     public void before() {
         testHelper.truncateDbs()
         DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
+        ANONYMOUS_ROLE_ID = processRoleService.anonymousRole().stringId
     }
 
     @Test
-    void undefinedDefaultRole() {
-        testPermissions(undefinedDefaultRoleNet, [:], [:], false)
+    void undefinedCombinedRole() {
+        testPermissions(undefinedCombinedRoleNet, [:], [:], false, false)
     }
 
+    //    DEFAULT ROLE =================================
     @Test
     void definedDefaultRole() {
         testPermissions(definedDefaultRoleNet, [
@@ -117,7 +132,7 @@ class DefaultRolePermissionsTest {
                         (RolePermission.SET) : true,
                         (RolePermission.DELEGATE): true
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true)
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
     @Test
@@ -132,7 +147,7 @@ class DefaultRolePermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.DELEGATE) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true)
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
     @Test
@@ -147,7 +162,7 @@ class DefaultRolePermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.DELEGATE) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true)
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
     @Test
@@ -162,7 +177,7 @@ class DefaultRolePermissionsTest {
                         (RolePermission.VIEW) : false,
                         (RolePermission.DELEGATE) : false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true)
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
     @Test
@@ -185,7 +200,7 @@ class DefaultRolePermissionsTest {
                         (RolePermission.VIEW) : false,
                         (RolePermission.DELEGATE) : false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true)
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
     @Test()
@@ -195,7 +210,7 @@ class DefaultRolePermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.DELEGATE) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -204,8 +219,8 @@ class DefaultRolePermissionsTest {
     }
 
     @Test()
-    void shadowedByUserRef() {
-        testPermissions(shadowedUserRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true)
+    void defaultShadowedByUserRef() {
+        testPermissions(shadowedUserRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
     @Test
@@ -220,17 +235,148 @@ class DefaultRolePermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.DELEGATE) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
     }
 
     @Test()
-    void shadowedByUsersRef() {
-        testPermissions(shadowedUsersRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true)
+    void defaultShadowedByUsersRef() {
+        testPermissions(shadowedUsersRefDefaultRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
     }
 
-    private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled) {
+    //    ANONYMOUS ROLE =================================
+    @Test
+    void definedAnonymousRole() {
+        testPermissions(definedAnonymousRoleNet, [
+                (ANONYMOUS_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE): true,
+                        (ProcessRolePermission.CREATE): true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.ASSIGN) : true,
+                        (RolePermission.CANCEL) : true,
+                        (RolePermission.FINISH) : true,
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.SET) : true,
+                        (RolePermission.DELEGATE): true
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+    @Test
+    void shadowAnonymousRole() {
+        testPermissions(shadowedAnonymousRoleNet, [
+                (NET_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (NET_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+    @Test
+    void customAnonymousRole() {
+        testPermissions(customAnonymousRoleNet, [
+                (ANONYMOUS_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+    @Test
+    void negativeAnonymousRole() {
+        testPermissions(negativeAnonymousRoleNet, [
+                (ANONYMOUS_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : false,
+                        (ProcessRolePermission.DELETE)  : false,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.VIEW) : false,
+                        (RolePermission.DELEGATE) : false,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+    @Test
+    void combinedAnonymousRole() {
+        testPermissions(combinedAnonymousRoleNet, [
+                (ANONYMOUS_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ],
+                (NET_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : false,
+                        (ProcessRolePermission.DELETE)  : false,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ],
+                (NET_ROLE_ID): [
+                        (RolePermission.VIEW) : false,
+                        (RolePermission.DELEGATE) : false,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+    @Test()
+    void missingAnonymousRole() {
+        testPermissions(missingAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    void reservedAnonymousRole() {
+        importAndCreate(reservedAnonymousRoleNet)
+    }
+
+    @Test()
+    void anonymousShadowedByUserRef() {
+        testPermissions(shadowedUserRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+    @Test
+    void disabledReferencedAnonymousRole() {
+        testPermissions(disabledReferencedAnonymousRoleNet, [
+                (ANONYMOUS_ROLE_ID): [
+                        (ProcessRolePermission.VIEW)  : true,
+                        (ProcessRolePermission.DELETE)  : true,
+                ]
+        ] as Map<String, Map<ProcessRolePermission, Boolean>>, [
+                (ANONYMOUS_ROLE_ID): [
+                        (RolePermission.VIEW) : true,
+                        (RolePermission.DELEGATE) : true,
+                ]
+        ] as Map<String, Map<RolePermission, Boolean>>, false, false)
+    }
+
+    @Test()
+    void anonymousShadowedByUsersRef() {
+        testPermissions(shadowedUsersRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
+    }
+
+
+
+    private void testPermissions(Resource model, Map<String, Map<ProcessRolePermission, Boolean>> processPermissions, Map<String, Map<RolePermission, Boolean>> taskPermissions, boolean defaultRoleEnabled, boolean anonymousRoleEnabled) {
         NetCaseTask instances = importAndCreate(model)
-        String netRoleId = instances.net.getRoles().keySet().find({ it -> it != DEFAULT_ROLE_ID })
+        String netRoleId = instances.net.getRoles().keySet().find({ it -> it != DEFAULT_ROLE_ID && it != ANONYMOUS_ROLE_ID})
 
         Map<String, Map<String, Boolean>> processPerms = transformPermissionMap(processPermissions, netRoleId);
         Map<String, Map<String, Boolean>> taskPerms = transformPermissionMap(taskPermissions, netRoleId);
@@ -239,6 +385,7 @@ class DefaultRolePermissionsTest {
         def negativeTaskView = taskPerms.findAll {it -> it.value.containsKey("view") && !it.value.get("view") }.collect {it -> it.key}
 
         assert instances.net.isDefaultRoleEnabled() == defaultRoleEnabled
+        assert instances.net.isAnonymousRoleEnabled() == anonymousRoleEnabled
         assert instances.net.getPermissions() == processPerms
         assert instances.net.negativeViewRoles == negativeProcessView
         assert instances.net.getTransition(TRANSITION_ID).roles == taskPerms
