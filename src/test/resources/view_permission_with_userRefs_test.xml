@@ -4,6 +4,7 @@
     <id>vpt_userRefs</id>
     <initials>VPT</initials>
     <title>ViewPermissionTest test</title>
+    <defaultRole>true</defaultRole>
     <roleRef>
         <id>view_pos_role</id>
         <caseLogic>
