@@ -86,39 +86,45 @@ class WorkflowAuthorizationServiceTest {
     private Map<String, Authority> auths
     private IUser testUser
 
-    @BeforeEach
+//    @BeforeEach
     void before() {
-//        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-//        assert net.getNet() != null
-//
-//        this.net = net.getNet()
-//
-//        mvc = MockMvcBuilders
-//                .webAppContextSetup(wac)
-//                .apply(springSecurity())
-//                .build()
-//
-//        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-//
-//        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-//                [auths.get("user")] as Authority[],
-////                [] as Group[],
-//                [] as ProcessRole[])
-//
-//        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
-//
-//        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-//                [auths.get("admin")] as Authority[],
-////                [] as Group[],
-//                [] as ProcessRole[])
-//
-//        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert net.getNet() != null
+
+        this.net = net.getNet()
+
+        mvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build()
+
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+
+        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("user")] as Authority[],
+//                [] as Group[],
+                [] as ProcessRole[])
+
+        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+
+        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("admin")] as Authority[],
+//                [] as Group[],
+                [] as ProcessRole[])
+
+        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+    }
+
+    @BeforeEach
+    void init() {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
+
         ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test_with_userRefs.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
+
         auths = importHelper.createAuthorities(["user": Authority.user])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[], [] as ProcessRole[])
@@ -126,53 +132,53 @@ class WorkflowAuthorizationServiceTest {
 
 //    @Test
 //    @Disabled
-//    void testDeleteCase() {
-//        def body = JsonOutput.toJson([
-//                title: "test case",
-//                netId: this.net.stringId,
-//                color: "color"
-//        ])
-//
-//        def result = mvc.perform(post(CREATE_CASE_URL)
-//                .content(body)
-//                .contentType(APPLICATION_JSON)
-//                .with(authentication(this.userAuth)))
-//                .andExpect(status().isOk())
-//                .andReturn()
-//        def response = parseResult(result)
-//        String userCaseId1 = response.outcome.aCase.stringId
-//
-//        result = mvc.perform(post(CREATE_CASE_URL)
-//                .content(body)
-//                .contentType(APPLICATION_JSON)
-//                .with(authentication(this.userAuth)))
-//                .andExpect(status().isOk())
-//                .andReturn()
-//        response = parseResult(result)
-//        String userCaseId2 = response.outcome.aCase.stringId
-//
-//        result = mvc.perform(post(CREATE_CASE_URL)
-//                .content(body)
-//                .contentType(APPLICATION_JSON)
-//                .with(authentication(this.adminAuth)))
-//                .andExpect(status().isOk())
-//                .andReturn()
-//        response = parseResult(result)
-//        String otherUserCaseId = response.outcome.acase.stringId
-//
-//        /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
-//        mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
-//                .with(authentication(this.userAuth)))
-//                .andExpect(status().isForbidden())
-//        */
-//        mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
-//                .with(authentication(this.userAuth)))
-//                .andExpect(status().isOk())
-//
-//        mvc.perform(delete(DELETE_CASE_URL + userCaseId2)
-//                .with(authentication(this.adminAuth)))
-//                .andExpect(status().isOk())
-//    }
+    void testDeleteCase() {
+        def body = JsonOutput.toJson([
+                title: "test case",
+                netId: this.net.stringId,
+                color: "color"
+        ])
+
+        def result = mvc.perform(post(CREATE_CASE_URL)
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.userAuth)))
+                .andExpect(status().isOk())
+                .andReturn()
+        def response = parseResult(result)
+        String userCaseId1 = response.outcome.aCase.stringId
+
+        result = mvc.perform(post(CREATE_CASE_URL)
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.userAuth)))
+                .andExpect(status().isOk())
+                .andReturn()
+        response = parseResult(result)
+        String userCaseId2 = response.outcome.aCase.stringId
+
+        result = mvc.perform(post(CREATE_CASE_URL)
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+                .andReturn()
+        response = parseResult(result)
+        String otherUserCaseId = response.outcome.acase.stringId
+
+        /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
+        mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
+                .with(authentication(this.userAuth)))
+                .andExpect(status().isForbidden())
+        */
+        mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
+                .with(authentication(this.userAuth)))
+                .andExpect(status().isOk())
+
+        mvc.perform(delete(DELETE_CASE_URL + userCaseId2)
+                .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+    }
 
     @Test
     void testCanCallCreate() {

@@ -71,6 +71,7 @@ class QueryDSLViewPermissionTest {
 
     @BeforeEach
     void inti() {
+        testHelper.truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
