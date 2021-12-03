@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEvent
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.TaskService
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,6 +88,7 @@ class EventTest {
 
 
     @Test
+    @Disabled
     void testEventImport() {
         testHelper.truncateDbs()
 
