@@ -112,7 +112,7 @@ class DynamicValidationTest {
 
     ChangedFieldsTree setData(Case useCase, Map<String, Map<String, Object>> values) {
         Task task = task(useCase)
-        return dataService.setData(task, ImportHelper.populateDataset(values)).getData()
+        return dataService.setData(task, ImportHelper.populateDataset(values))
     }
 
     Task task(Case useCase) {
