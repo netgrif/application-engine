@@ -1,14 +1,21 @@
 package com.netgrif.workflow.auth
 
+import com.netgrif.workflow.MockService
 import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.workflow.workflow.service.WorkflowAuthorizationService
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 
 //import com.netgrif.workflow.orgstructure.domain.Group
@@ -61,88 +68,182 @@ class WorkflowAuthorizationServiceTest {
     @Autowired
     private ImportHelper importHelper
 
-    @BeforeEach
-    void before() {
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
+    @Autowired
+    private WorkflowAuthorizationService workflowAuthorizationService
 
-        this.net = net.getNet()
+    @Autowired
+    private IWorkflowService workflowService
 
-        mvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build()
-
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-
-        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
-
-        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
-
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
-
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
-    }
+    @Autowired
+    private IUserService userService
 
     private PetriNet net
+    private PetriNet netWithUserRefs
 
     private Authentication userAuth
     private Authentication adminAuth
+    private Map<String, Authority> auths
+    private IUser testUser
+
+    @BeforeEach
+    void before() {
+//        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        assert net.getNet() != null
+//
+//        this.net = net.getNet()
+//
+//        mvc = MockMvcBuilders
+//                .webAppContextSetup(wac)
+//                .apply(springSecurity())
+//                .build()
+//
+//        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+//
+//        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("user")] as Authority[],
+////                [] as Group[],
+//                [] as ProcessRole[])
+//
+//        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+//
+//        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("admin")] as Authority[],
+////                [] as Group[],
+//                [] as ProcessRole[])
+//
+//        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert net.getNet() != null
+        this.net = net.getNet()
+        ImportPetriNetEventOutcome netWithUserRefs = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test_with_userRefs.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert netWithUserRefs.getNet() != null
+        this.netWithUserRefs = netWithUserRefs.getNet()
+        auths = importHelper.createAuthorities(["user": Authority.user])
+        testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("user")] as Authority[], [] as ProcessRole[])
+    }
+
+//    @Test
+//    @Disabled
+//    void testDeleteCase() {
+//        def body = JsonOutput.toJson([
+//                title: "test case",
+//                netId: this.net.stringId,
+//                color: "color"
+//        ])
+//
+//        def result = mvc.perform(post(CREATE_CASE_URL)
+//                .content(body)
+//                .contentType(APPLICATION_JSON)
+//                .with(authentication(this.userAuth)))
+//                .andExpect(status().isOk())
+//                .andReturn()
+//        def response = parseResult(result)
+//        String userCaseId1 = response.outcome.aCase.stringId
+//
+//        result = mvc.perform(post(CREATE_CASE_URL)
+//                .content(body)
+//                .contentType(APPLICATION_JSON)
+//                .with(authentication(this.userAuth)))
+//                .andExpect(status().isOk())
+//                .andReturn()
+//        response = parseResult(result)
+//        String userCaseId2 = response.outcome.aCase.stringId
+//
+//        result = mvc.perform(post(CREATE_CASE_URL)
+//                .content(body)
+//                .contentType(APPLICATION_JSON)
+//                .with(authentication(this.adminAuth)))
+//                .andExpect(status().isOk())
+//                .andReturn()
+//        response = parseResult(result)
+//        String otherUserCaseId = response.outcome.acase.stringId
+//
+//        /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
+//        mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
+//                .with(authentication(this.userAuth)))
+//                .andExpect(status().isForbidden())
+//        */
+//        mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
+//                .with(authentication(this.userAuth)))
+//                .andExpect(status().isOk())
+//
+//        mvc.perform(delete(DELETE_CASE_URL + userCaseId2)
+//                .with(authentication(this.adminAuth)))
+//                .andExpect(status().isOk())
+//    }
 
     @Test
-    @Disabled
-    void testDeleteCase() {
-        def body = JsonOutput.toJson([
-                title: "test case",
-                netId: this.net.stringId,
-                color: "color"
-        ])
+    void testCanCallCreate() {
+        def positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
+        userService.addRole(testUser, positiveCreateRole.getStringId())
+        assert workflowAuthorizationService.canCallCreate(testUser.transformToLoggedUser(), net.getStringId())
+        userService.removeRole(testUser, positiveCreateRole.getStringId())
+    }
 
-        def result = mvc.perform(post(CREATE_CASE_URL)
-                .content(body)
-                .contentType(APPLICATION_JSON)
-                .with(authentication(this.userAuth)))
-                .andExpect(status().isOk())
-                .andReturn()
-        def response = parseResult(result)
-        String userCaseId1 = response.outcome.aCase.stringId
+    @Test
+    void testCanCallDelete() {
+        ProcessRole positiveDeleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        userService.addRole(testUser, positiveDeleteRole.getStringId())
+        Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
+        userService.removeRole(testUser, positiveDeleteRole.getStringId())
+    }
 
-        result = mvc.perform(post(CREATE_CASE_URL)
-                .content(body)
-                .contentType(APPLICATION_JSON)
-                .with(authentication(this.userAuth)))
-                .andExpect(status().isOk())
-                .andReturn()
-        response = parseResult(result)
-        String userCaseId2 = response.outcome.aCase.stringId
+    @Test
+    void testCanCallCreateFalse() {
+        def positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_neg_role")
+        userService.addRole(testUser, positiveCreateRole.getStringId())
+        assert !workflowAuthorizationService.canCallCreate(testUser.transformToLoggedUser(), net.getStringId())
+        userService.removeRole(testUser, positiveCreateRole.getStringId())
+    }
 
-        result = mvc.perform(post(CREATE_CASE_URL)
-                .content(body)
-                .contentType(APPLICATION_JSON)
-                .with(authentication(this.adminAuth)))
-                .andExpect(status().isOk())
-                .andReturn()
-        response = parseResult(result)
-        String otherUserCaseId = response.outcome.acase.stringId
+    @Test
+    void testCanCallDeleteFalse() {
+        ProcessRole deleteRole = this.net.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
+        userService.addRole(testUser, deleteRole.getStringId())
+        Case case_ = workflowService.createCase(net.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
+        userService.removeRole(testUser, deleteRole.getStringId())
+    }
 
-        /* TODO: momentalne vracia 200 OK, ma User vediet zmazat case ktory vytvoril Admin?
-        mvc.perform(delete(DELETE_CASE_URL + otherUserCaseId)
-                .with(authentication(this.userAuth)))
-                .andExpect(status().isForbidden())
-        */
-        mvc.perform(delete(DELETE_CASE_URL + userCaseId1)
-                .with(authentication(this.userAuth)))
-                .andExpect(status().isOk())
 
-        mvc.perform(delete(DELETE_CASE_URL + userCaseId2)
-                .with(authentication(this.adminAuth)))
-                .andExpect(status().isOk())
+    @Test
+    void testCanCallDeleteRoleFalseUserRefTrue() {
+        ProcessRole posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        ProcessRole negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
+
+        userService.addRole(testUser, posDeleteRole.getStringId())
+        userService.addRole(testUser, negDeleteRole.getStringId())
+
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        case_.dataSet["pos_user_list"].value = [testUser.stringId]
+        workflowService.save(case_)
+
+        assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
+
+        userService.removeRole(testUser, posDeleteRole.getStringId())
+        userService.removeRole(testUser, negDeleteRole.getStringId())
+    }
+
+    @Test
+    void testCanCallDeleteRoleFalseUserRefTrueUserRefFalse() {
+        ProcessRole posDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_pos_role")
+        ProcessRole negDeleteRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "delete_neg_role")
+
+        userService.addRole(testUser, posDeleteRole.getStringId())
+        userService.addRole(testUser, negDeleteRole.getStringId())
+
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
+        case_.dataSet["pos_user_list"].value = [testUser.stringId]
+        case_.dataSet["neg_user_list"].value = [testUser.stringId]
+
+        workflowService.save(case_)
+
+        assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
+
+        userService.removeRole(testUser, posDeleteRole.getStringId())
+        userService.removeRole(testUser, negDeleteRole.getStringId())
     }
 
     @SuppressWarnings("GrMethodMayBeStatic")
