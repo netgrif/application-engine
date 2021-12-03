@@ -13,7 +13,8 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.EventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.TaskService
@@ -82,14 +83,14 @@ class EventTest {
     }
 
     Case instance
-    EventOutcome outcome
+    TaskEventOutcome outcome
 
 
     @Test
     void testEventImport() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).get()
+        PetriNet net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
         outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)
@@ -113,7 +114,7 @@ class EventTest {
 
     private void assertCancelOutcome() {
         assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
-        assert (outcome.changedFields.changedFields["chained"].attributes["value"] as String) == "chained"
+        assert outcome.data.flatten().changedFields["chained"]["value"] == "chained"
     }
 
     private void assertActionsRuned(String fieldIdWithoutPhase, String message) {
@@ -126,7 +127,13 @@ class EventTest {
         assert instance.dataSet["${fieldIdWithoutPhase}_post" as String].value as String == "${fieldIdWithoutPhase}_post"
 
         assert outcome.message.defaultValue == message
-        assert outcome.changedFields.changedFields["${fieldIdWithoutPhase}_pre" as String]
-        assert outcome.changedFields.changedFields["${fieldIdWithoutPhase}_post" as String]
+//        assert outcome.data.flatten().changedFields["${fieldIdWithoutPhase}_pre" as String]
+//        assert outcome.data.flatten().changedFields["${fieldIdWithoutPhase}_post" as String]
+
+//        outcome.getOutcomes().each{ SetDataEventOutcome eventOutcome ->
+//            eventOutcome.getChangedFields().
+//        }
+
+
     }
 }

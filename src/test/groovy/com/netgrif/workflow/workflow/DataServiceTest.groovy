@@ -48,12 +48,11 @@ class DataServiceTest {
     void beforeAll() {
         testHelper.truncateDbs()
 
-
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_referenced.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert net.getNet() != nulldata_service_referenced
         net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
-        this.net = net.get()
+        assert net.getNet() != null
+        this.net = net.getNet()
     }
 
     private PetriNet net
@@ -68,7 +67,7 @@ class DataServiceTest {
 
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
 
-        List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH)
+        List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH).getData()
         assert datagroups.stream().filter({it -> it.fields.size() > 0}).count() == 3
         LocalisedField fileField = findField(datagroups, FILE_FIELD_TITLE)
 
