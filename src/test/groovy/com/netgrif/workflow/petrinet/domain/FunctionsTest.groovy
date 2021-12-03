@@ -142,12 +142,8 @@ class FunctionsTest {
     }
 
     @Test
-    /**
-     * TODO: why?
-     * NullPointerException -> MissingMethodException
-     **/
     void testNewNetVersionMissingMethodException() {
-        assertThrows(MissingMethodException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
             def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
             if (nets) {
                 nets.each {
