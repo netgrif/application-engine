@@ -15,6 +15,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.WorkflowAuthorizationService
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 
@@ -69,7 +70,7 @@ class WorkflowAuthorizationServiceTest {
     private ImportHelper importHelper
 
     @Autowired
-    private WorkflowAuthorizationService workflowAuthorizationService
+    private IWorkflowAuthorizationService workflowAuthorizationService
 
     @Autowired
     private IWorkflowService workflowService
@@ -175,7 +176,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallCreate() {
-        def positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_pos_role")
         userService.addRole(testUser, positiveCreateRole.getStringId())
         assert workflowAuthorizationService.canCallCreate(testUser.transformToLoggedUser(), net.getStringId())
         userService.removeRole(testUser, positiveCreateRole.getStringId())
@@ -192,7 +193,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     void testCanCallCreateFalse() {
-        def positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_neg_role")
+        ProcessRole positiveCreateRole = this.net.getRoles().values().find(v -> v.getImportId() == "create_neg_role")
         userService.addRole(testUser, positiveCreateRole.getStringId())
         assert !workflowAuthorizationService.canCallCreate(testUser.transformToLoggedUser(), net.getStringId())
         userService.removeRole(testUser, positiveCreateRole.getStringId())
