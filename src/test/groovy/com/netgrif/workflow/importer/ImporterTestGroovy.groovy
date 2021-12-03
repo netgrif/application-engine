@@ -11,6 +11,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -57,6 +58,7 @@ class ImporterTestGroovy {
     private static final String BUTTON_FIELD = "button"
 
     @Test
+    @Disabled
     void upsertTest() {
         def net = importHelper.upsertNet(FILE_NAME, IDENTIFIER)
         assert net.present
