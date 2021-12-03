@@ -207,13 +207,7 @@ public class Importer {
         document.getUsersRef().forEach(this::resolveUserRef);
         document.getUserRef().forEach(this::resolveUserRef);
 
-        if (!isDefaultRoleReferencedOnNet() && isDefaultRoleAllowedForNet()) {
-            addDefaultPermissions();
-        }
-
-        if (!isAnonymousRoleReferencedOnNet() && isAnonymousRoleAllowedForNet()) {
-            addAnonymousPermissions();
-        }
+        addPredefinedRolesWithDefaultPermissions();
 
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
@@ -537,12 +531,9 @@ public class Importer {
                 addDataGroup(transition, dataGroup);
             }
         }
-        if (!isDefaultRoleReferenced(transition) && isDefaultRoleAllowedFor(importTransition, document)) {
-            addDefaultRole(transition);
-        }
-        if (!isAnonymousRoleReferenced(transition) && isAnonymousRoleAllowedFor(importTransition, document)) {
-            addAnonymousRole(transition);
-        }
+
+        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
+
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     transition.addEvent(addEvent(transition.getImportId(), event))
@@ -644,6 +635,10 @@ public class Importer {
 
     @Transactional
     protected void addDefaultRole(Transition transition) {
+        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferenced(transition)) {
+            return;
+        }
+
         Logic logic = new Logic();
         logic.setDelegate(true);
         logic.setPerform(true);
@@ -652,6 +647,10 @@ public class Importer {
 
     @Transactional
     protected void addAnonymousRole(Transition transition) {
+        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferenced(transition)) {
+            return;
+        }
+
         Logic logic = new Logic();
         logic.setPerform(true);
         transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
@@ -659,7 +658,7 @@ public class Importer {
 
     @Transactional
     protected void addDefaultPermissions() {
-        if (!net.isDefaultRoleEnabled() || net.getPermissions().containsKey(defaultRole.getStringId())) {
+        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferencedOnNet()) {
             return;
         }
 
@@ -672,7 +671,7 @@ public class Importer {
 
     @Transactional
     protected void addAnonymousPermissions() {
-        if (!net.isAnonymousRoleEnabled() || net.getPermissions().containsKey(anonymousRole.getStringId())) {
+        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferencedOnNet()) {
             return;
         }
 
@@ -1104,42 +1103,26 @@ public class Importer {
         return string;
     }
 
-    /**
-     * @return TRUE if the default role should be added with default permissions to the specified transition. FALSE otherwise
-     */
-    protected boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
-        // FALSE if defaultRole not allowed in net
-        if (!net.isDefaultRoleEnabled()) {
-            return false;
-        }
-        return isRoleOrTriggerMappingPresent(transition, document) && isPositivePermissionPresent(transition, document);
-    }
-
-    protected boolean isAnonymousRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
-        // FALSE if defaultRole not allowed in net
-        if (!net.isAnonymousRoleEnabled()) {
-            return false;
-        }
-        return isRoleOrTriggerMappingPresent(transition, document) && isPositivePermissionPresent(transition, document);
-    }
-
-    protected boolean isRoleOrTriggerMappingPresent(com.netgrif.workflow.importer.model.Transition transition, Document document) {
+    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.workflow.importer.model.Transition importTransition, Transition transition) {
+        // Don't add if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {
-            if (Objects.equals(mapping.getTransitionRef(), transition.getId())
+            if (Objects.equals(mapping.getTransitionRef(), importTransition.getId())
                     && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty())
                     && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())
             ) {
-                return false;
+                return;
             }
         }
-        return true;
-    }
+        // Don't add if positive roles or triggers or positive user refs
+        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
+                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())
+                || (importTransition.getUsersRef() != null && importTransition.getUsersRef().stream().anyMatch(this::hasPositivePermission))
+                || (importTransition.getUserRef() != null && importTransition.getUserRef().stream().anyMatch(this::hasPositivePermission))) {
+            return;
+        }
 
-    protected boolean isPositivePermissionPresent(com.netgrif.workflow.importer.model.Transition transition, Document document) {
-        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(this::hasPositivePermission))
-                && (transition.getTrigger() == null || transition.getTrigger().isEmpty())
-                && (transition.getUsersRef() == null || transition.getUsersRef().stream().noneMatch(this::hasPositivePermission))
-                && (transition.getUserRef() == null || transition.getUserRef().stream().noneMatch(this::hasPositivePermission));
+        addDefaultRole(transition);
+        addAnonymousRole(transition);
     }
 
     protected boolean hasPositivePermission(PermissionRef permissionRef) {
@@ -1152,30 +1135,18 @@ public class Importer {
                 || (permissionRef.getLogic().isDelegate() != null && permissionRef.getLogic().isDelegate());
     }
 
-    /**
-     * @return TRUE if the default role should be added with default case permissions to the net. FALSE otherwise
-     */
-    protected boolean isDefaultRoleAllowedForNet() {
-        // FALSE if defaultRole not allowed in net
-        if (!net.isDefaultRoleEnabled()) {
-            return false;
+    protected void addPredefinedRolesWithDefaultPermissions() {
+        // only if no positive role associations and no positive user ref associations
+        if (net.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))
+                || net.getUserRefs().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+            return;
         }
-        // TRUE if no positive role associations and no positive user ref associations
-        return net.getPermissions().values().stream().noneMatch(perms -> perms.containsValue(true))
-                && net.getUserRefs().values().stream().noneMatch(perms -> perms.containsValue(true));
+
+        addDefaultPermissions();
+        addAnonymousPermissions();
     }
 
-    protected boolean isAnonymousRoleAllowedForNet() {
-        // FALSE if defaultRole not allowed in net
-        if (!net.isAnonymousRoleEnabled()) {
-            return false;
-        }
-        // TRUE if no positive role associations and no positive user ref associations
-        return net.getPermissions().values().stream().noneMatch(perms -> perms.containsValue(true))
-                && net.getUserRefs().values().stream().noneMatch(perms -> perms.containsValue(true));
-    }
-
-    PetriNet getNetByImportId(String id) {
+    protected PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
         if (!net.isPresent()) {
             throw new IllegalArgumentException();
