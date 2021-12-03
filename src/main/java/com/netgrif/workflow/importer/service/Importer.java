@@ -1046,20 +1046,7 @@ public class Importer {
         if (!net.isDefaultRoleEnabled()) {
             return false;
         }
-        // FALSE if role or trigger mapping
-        for (Mapping mapping : document.getMapping()) {
-            if (Objects.equals(mapping.getTransitionRef(), transition.getId())
-                    && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty())
-                    && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())
-            ) {
-                return false;
-            }
-        }
-        // TRUE if no positive roles and no triggers and no positive user refs
-        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(this::hasPositivePermission))
-                && (transition.getTrigger() == null || transition.getTrigger().isEmpty())
-                && (transition.getUsersRef() == null || transition.getUsersRef().stream().noneMatch(this::hasPositivePermission))
-                && (transition.getUserRef() == null || transition.getUserRef().stream().noneMatch(this::hasPositivePermission));
+        return isRoleOrTriggerMappingPresent(transition, document) && isPositivePermissionPresent(transition, document);
     }
 
     protected boolean isAnonymousRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
@@ -1067,7 +1054,10 @@ public class Importer {
         if (!net.isAnonymousRoleEnabled()) {
             return false;
         }
-        // FALSE if role or trigger mapping
+        return isRoleOrTriggerMappingPresent(transition, document) && isPositivePermissionPresent(transition, document);
+    }
+
+    protected boolean isRoleOrTriggerMappingPresent(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         for (Mapping mapping : document.getMapping()) {
             if (Objects.equals(mapping.getTransitionRef(), transition.getId())
                     && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty())
@@ -1076,7 +1066,10 @@ public class Importer {
                 return false;
             }
         }
-        // TRUE if no positive roles and no triggers and no positive user refs
+        return true;
+    }
+
+    protected boolean isPositivePermissionPresent(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(this::hasPositivePermission))
                 && (transition.getTrigger() == null || transition.getTrigger().isEmpty())
                 && (transition.getUsersRef() == null || transition.getUsersRef().stream().noneMatch(this::hasPositivePermission))
