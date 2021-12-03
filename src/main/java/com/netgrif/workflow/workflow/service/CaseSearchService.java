@@ -97,7 +97,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QCase.case$.viewRoles.isEmpty().or(QCase.case$.viewRoles.contains(role));
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
@@ -106,7 +106,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public Predicate viewUserQuery(String userId) {
-        return QCase.case$.viewUserRefs.isEmpty().or(QCase.case$.viewUsers.contains(userId));
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {

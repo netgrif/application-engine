@@ -60,7 +60,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewRoleQuery(String role) {
-        return QTask.task.viewRoles.isEmpty().or(QTask.task.viewRoles.contains(role));
+        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
     }
 
     protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
@@ -69,7 +69,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate viewUsersQuery(String userId) {
-        return QTask.task.viewUserRefs.isEmpty().or(QTask.task.viewUsers.contains(userId));
+        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
     }
 
     protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
