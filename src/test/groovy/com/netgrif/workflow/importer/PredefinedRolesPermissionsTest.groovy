@@ -109,8 +109,12 @@ class PredefinedRolesPermissionsTest {
     @Before
     public void before() {
         testHelper.truncateDbs()
+        assert processRoleService.defaultRole() != null
         DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
+        assert DEFAULT_ROLE_ID != null
+        assert processRoleService.anonymousRole() != null
         ANONYMOUS_ROLE_ID = processRoleService.anonymousRole().stringId
+        assert ANONYMOUS_ROLE_ID != null
     }
 
     //    DEFAULT ROLE =================================
@@ -258,7 +262,7 @@ class PredefinedRolesPermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.SET) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     @Test
@@ -273,7 +277,7 @@ class PredefinedRolesPermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.DELEGATE) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     @Test
@@ -288,7 +292,7 @@ class PredefinedRolesPermissionsTest {
                         (RolePermission.VIEW) : true,
                         (RolePermission.DELEGATE) : true,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     @Test
@@ -303,7 +307,7 @@ class PredefinedRolesPermissionsTest {
                         (RolePermission.VIEW) : false,
                         (RolePermission.DELEGATE) : false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     @Test
@@ -326,7 +330,7 @@ class PredefinedRolesPermissionsTest {
                         (RolePermission.VIEW) : false,
                         (RolePermission.DELEGATE) : false,
                 ]
-        ] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        ] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     @Test()
@@ -346,7 +350,7 @@ class PredefinedRolesPermissionsTest {
 
     @Test()
     void anonymousShadowedByUserRef() {
-        testPermissions(shadowedUserRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        testPermissions(shadowedUserRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     @Test
@@ -366,7 +370,7 @@ class PredefinedRolesPermissionsTest {
 
     @Test()
     void anonymousShadowedByUsersRef() {
-        testPermissions(shadowedUsersRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, true, false)
+        testPermissions(shadowedUsersRefAnonymousRoleNet, [:] as Map<String, Map<ProcessRolePermission, Boolean>>, [:] as Map<String, Map<RolePermission, Boolean>>, false, true)
     }
 
     // COMBINED ROLES ======================================
@@ -458,7 +462,7 @@ class PredefinedRolesPermissionsTest {
     }
 
     private Map<String, Map<String, Boolean>> transformPermissionMap(Map<String, Map<Object, Boolean>> input, String netRoleId) {
-        return input.collectEntries { it -> [it.key == DEFAULT_ROLE_ID ? DEFAULT_ROLE_ID : netRoleId, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>
+        return input.collectEntries { it -> [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key.toString(), ti.value]}]} as Map<String, Map<String, Boolean>>
     }
 
     private class NetCaseTask {
