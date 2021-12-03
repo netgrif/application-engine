@@ -53,13 +53,6 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             }
         }
 
-        if (net.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey(permissions[0].toString()) &&
-                        role.getValue().get(permissions[0].toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).isEmpty()) {
-            return true;
-        }
-
         return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 
