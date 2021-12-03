@@ -37,7 +37,7 @@ class ConcurrencyTest {
     @Test
     void test() {
         def mainNet = importHelper.createNet("action_delegate_concurrency_test.xml")
-        assert mainNet.isPresent()
+        assert mainNet.get() != null
 
         List<Case> cases = []
         10.times {

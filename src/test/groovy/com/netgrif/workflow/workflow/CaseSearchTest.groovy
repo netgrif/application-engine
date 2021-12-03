@@ -124,8 +124,8 @@ class CaseSearchTest {
                 new FileInputStream("src/test/resources/case_search_test.xml"),
                 VersionType.MAJOR,
                 superCreator.getLoggedSuper())
-        assert netOptional.isPresent()
-        return netOptional.get()
+        assert netOptional.getNet() != null
+        return netOptional.getNet()
     }
 
     @Test
