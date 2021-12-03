@@ -746,8 +746,11 @@ public class TaskService implements ITaskService {
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
+        ProcessRole anonymousRole = processRoleService.anonymousRole();
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
-            if (useCase.getEnabledRoles().contains(entry.getKey()) || defaultRole.getStringId().equals(entry.getKey())) {
+            if (useCase.getEnabledRoles().contains(entry.getKey())
+                    || defaultRole.getStringId().equals(entry.getKey())
+                    || anonymousRole.getStringId().equals(entry.getKey())) {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
