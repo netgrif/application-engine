@@ -1,67 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>wst_usersRef</id>
-    <initials>WSU</initials>
-    <title>WorkflowAuthorizationService test</title>
+    <id>vpt_userRefs</id>
+    <initials>VPT</initials>
+    <title>ViewPermissionTest test</title>
     <roleRef>
-        <id>delete_pos_role</id>
+        <id>view_pos_role</id>
         <caseLogic>
-            <delete>true</delete>
+            <view>true</view>
         </caseLogic>
     </roleRef>
     <roleRef>
-        <id>create_pos_role</id>
+        <id>view_neg_role</id>
         <caseLogic>
-            <create>true</create>
-        </caseLogic>
-    </roleRef>
-    <roleRef>
-        <id>delete_neg_role</id>
-        <caseLogic>
-            <delete>false</delete>
-        </caseLogic>
-    </roleRef>
-    <roleRef>
-        <id>create_neg_role</id>
-        <caseLogic>
-            <create>false</create>
+            <view>false</view>
         </caseLogic>
     </roleRef>
     <userRef>
-        <id>neg_user_list</id>
+        <id>view_ul_pos</id>
         <caseLogic>
-            <delete>false</delete>
+            <view>true</view>
         </caseLogic>
     </userRef>
     <userRef>
-        <id>pos_user_list</id>
+        <id>view_ul_neg</id>
         <caseLogic>
-            <delete>true</delete>
+            <view>false</view>
         </caseLogic>
     </userRef>
     <role>
-        <id>delete_pos_role</id>
-        <name>delete role</name>
+        <id>view_pos_role</id>
+        <name>view role</name>
     </role>
     <role>
-        <id>create_pos_role</id>
-        <name>create role</name>
-    </role>
-    <role>
-        <id>delete_neg_role</id>
-        <name>delete role</name>
-    </role>
-    <role>
-        <id>create_neg_role</id>
-        <name>create role</name>
+        <id>view_neg_role</id>
+        <name>view role</name>
     </role>
     <data type="userList">
-        <id>pos_user_list</id>
+        <id>view_ul_pos</id>
         <title/>
     </data>
     <data type="userList">
-        <id>neg_user_list</id>
+        <id>view_ul_neg</id>
         <title/>
     </data>
     <data type="text">
@@ -78,6 +58,30 @@
         <x>1</x>
         <y>1</y>
         <label>Transition</label>
+        <roleRef>
+            <id>view_pos_role</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>view_neg_role</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </roleRef>
+        <userRef>
+            <id>view_ul_pos</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </userRef>
+        <userRef>
+            <id>view_ul_neg</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </userRef>
         <dataRef>
             <id>text</id>
             <logic>
