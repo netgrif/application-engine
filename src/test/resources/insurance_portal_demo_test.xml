@@ -3,7 +3,7 @@
     <id>test</id>
     <initials>TST</initials>
     <title>Test</title>
-    <defaultRole>false</defaultRole>
+    <defaultRole>true</defaultRole>
 
     <!-- ========== GLOBAL ================ -->
     <!--<icon>location_city</icon>-->
