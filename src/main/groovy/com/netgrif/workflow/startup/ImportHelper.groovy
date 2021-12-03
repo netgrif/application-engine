@@ -3,22 +3,23 @@ package com.netgrif.workflow.startup
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.auth.domain.*
-
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
@@ -81,7 +82,10 @@ class ImportHelper {
     private IWorkflowService workflowService
 
     @Autowired
-    private INextGroupService groupService;
+    private INextGroupService groupService
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
@@ -108,7 +112,7 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, release, author)
+        return new Optional<>(petriNetService.importPetriNet(netStream, release, author).getNet())
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
@@ -118,33 +122,47 @@ class ImportHelper {
         }
         return Optional.of(petriNet)
     }
-/*
-    ProcessRole createUserProcessRole(PetriNet net, String name) {
-        ProcessRole role = userProcessRoleRepository.save(new ProcessRole(roleId:
-                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
-        log.info("Created user process role $name")
+
+//    ProcessRole createUserProcessRole(PetriNet net, String name) {
+//        ProcessRole role = processRoleRepository.save(new ProcessRole(roleId:
+//                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
+//        log.info("Created user process role $name")
+//        return role
+//    }
+//
+//    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
+//        HashMap<String, ProcessRole> userRoles = new HashMap<>()
+//        roles.each { it ->
+//            userRoles.put(it.key, createUserProcessRole(net, it.value))
+//        }
+//
+//        log.info("Created ${userRoles.size()} process roles")
+//        return userRoles
+//    }
+
+
+    ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
+        ProcessRole role = net.roles.values().find { it -> it.importId == roleId }
         return role
     }
 
-    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
-        HashMap<String, ProcessRole> userRoles = new HashMap<>()
-        roles.each { it ->
-            userRoles.put(it.key, createUserProcessRole(net, it.value))
+    Map<String, ProcessRole> getProcessRolesByImportId(PetriNet net, Map<String, String> importId) {
+        HashMap<String, ProcessRole> roles = new HashMap<>()
+        importId.each { it ->
+            roles.put(it.getKey(), getProcessRoleByImportId(net, it.getValue()))
         }
-
-        log.info("Created ${userRoles.size()} process roles")
-        return userRoles
+        return roles
     }
 
     Map<String, ProcessRole> getProcessRoles(PetriNet net) {
-        List<ProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
+        List<ProcessRole> roles = processRoleRepository.findAllByNetId(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
         }
         return map
     }
-*/
+
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
@@ -155,7 +173,7 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        return workflowService.createCase(net.getStringId(), title, "", user)
+        return workflowService.createCase(net.getStringId(), title, "", user).getCase()
     }
 
     Case createCase(String title, PetriNet net) {
@@ -166,27 +184,27 @@ class ImportHelper {
         return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
     }
 
-    EventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
+    AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
         return taskService.assignTask(author, getTaskId(taskTitle, caseId))
     }
 
-    EventOutcome assignTaskToSuper(String taskTitle, String caseId) {
+    AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
         return assignTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    EventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
+    FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
         return taskService.finishTask(author, getTaskId(taskTitle, caseId))
     }
 
-    EventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
+    FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
         return finishTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    EventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
+    CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
         return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
     }
 
-    EventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
+    CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
         return cancelTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
@@ -195,17 +213,17 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String, String>> data) {
+    SetDataEventOutcome setTaskData(String taskId, Map<String, Map<String, String>> data) {
         ObjectNode dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }
 
-    ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
+    SetDataEventOutcome setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 
     List<Field> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId))
+        return dataService.getData(getTaskId(taskTitle, caseId)).getData()
     }
 
     void updateSuperUser() {
