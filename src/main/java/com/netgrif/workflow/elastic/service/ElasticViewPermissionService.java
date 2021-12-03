@@ -12,6 +12,12 @@ public abstract class ElasticViewPermissionService {
         BoolQueryBuilder positiveRoleSetMinusNegativeRole = boolQuery();
         BoolQueryBuilder roleSetMinusPositiveUserList = boolQuery();
 
+        BoolQueryBuilder viewPermsExists = boolQuery();
+        BoolQueryBuilder viewPermNotExists = boolQuery();
+        viewPermsExists.should(existsQuery("viewRoles"));
+        viewPermsExists.should(existsQuery("viewUserRefs"));
+        viewPermNotExists.mustNot(viewPermsExists);
+
         /* Build positive view role query */
         BoolQueryBuilder positiveViewRole = boolQuery();
         BoolQueryBuilder viewRoleNotExists = boolQuery();
@@ -19,8 +25,7 @@ public abstract class ElasticViewPermissionService {
         for (String roleId : user.getProcessRoles()) {
             positiveViewRoleQuery.should(termQuery("viewRoles", roleId));
         }
-        viewRoleNotExists.mustNot(existsQuery("viewRoles"));
-        positiveViewRole.should(viewRoleNotExists);
+        positiveViewRole.should(viewPermNotExists);
         positiveViewRole.should(positiveViewRoleQuery);
 
         /* Build negative view role query */
@@ -41,8 +46,7 @@ public abstract class ElasticViewPermissionService {
         BoolQueryBuilder positiveViewUserQuery = boolQuery();
 
         positiveViewUserQuery.must(termQuery("viewUsers", user.getId()));
-        viewUserRefExists.mustNot(existsQuery("viewUserRefs"));
-        positiveViewUser.should(viewUserRefExists);
+        positiveViewUser.should(viewPermNotExists);
         positiveViewUser.should(positiveViewUserQuery);
 
         /* Role query union positive view userList */
