@@ -262,7 +262,7 @@ public class Task {
     public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
-                users.get(userId).putAll(new HashMap<>(permissions));
+                compareExistingUserPermissions(userId, new HashMap<>(permissions));
             } else {
                 users.put(userId, new HashMap<>(permissions));
             }
@@ -326,6 +326,14 @@ public class Task {
         this.users.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
                 viewUsers.add(role);
+            }
+        });
+    }
+
+    private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
+        permissions.forEach((id, perm) -> {
+            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
+                users.get(userId).put(id, perm);
             }
         });
     }
