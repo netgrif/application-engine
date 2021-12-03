@@ -56,7 +56,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             return null;
 
         if (!useCase.getUsers().containsKey(user.getStringId()))
-            return false;
+            return null;
 
         Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
 
