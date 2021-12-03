@@ -11,6 +11,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,6 +59,7 @@ class DataServiceTest {
     private PetriNet net
 
     @Test
+    @Disabled
     void testTaskrefedFileFieldAction() {
         def aCase = importHelper.createCase("Case", this.net)
         assert aCase != null
