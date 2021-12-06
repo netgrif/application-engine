@@ -40,11 +40,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
         BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
+        constraints.or(buildUserRefQueryConstraint(user));
+        builder.and(constraints);
+
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
         permissionConstraints.or(buildViewUserQueryConstraint(user));
         permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
-        builder.and(constraints);
         builder.and(permissionConstraints);
         return builder;
     }
@@ -52,6 +54,11 @@ public class TaskSearchService extends MongoSearchService<Task> {
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
         List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
+        Predicate userRefConstraints = userRefQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
     }
 
     protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
@@ -123,6 +130,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate roleQuery(String role) {
         return QTask.task.roles.containsKey(role);
+    }
+
+    public Predicate userRefQuery(String userId) {
+        return QTask.task.users.containsKey(userId);
     }
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
