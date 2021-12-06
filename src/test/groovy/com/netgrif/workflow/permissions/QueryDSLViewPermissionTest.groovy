@@ -17,11 +17,14 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.CaseSearchService
 import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -145,6 +148,38 @@ class QueryDSLViewPermissionTest {
                 PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale())
 
         assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId && case_.viewUsers.contains(testUser.getStringId())
+        workflowService.deleteCase(case_.getStringId())
+    }
+
+    @Test
+    void testSearchTaskQueryDSLViewWithPosUserRef() {
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
+        case_.dataSet["view_ul_pos"].value = [testUser.stringId]
+        case_ = workflowService.save(case_)
+        sleep(4000)
+
+        TaskSearchRequest request = new TaskSearchRequest()
+        request.process = [new com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        Page<Task> taskPage = taskService.search([request],
+                PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
+
+        assert taskPage.getContent().size() == 1 && taskPage.content[0].caseId == case_.stringId && taskPage.content[0].viewUsers.contains(testUser.getStringId())
+        workflowService.deleteCase(case_.getStringId())
+    }
+
+    @Test
+    void testSearchTaskQueryDSLViewWithUserWithPosRole() {
+        Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
+        ProcessRole posViewRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "view_pos_role")
+        userService.addRole(testUser, posViewRole.getStringId())
+
+        TaskSearchRequest request = new TaskSearchRequest()
+        request.process = [new com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet(netWithUserRefs.getStringId())]
+        Page<Task> taskPage = taskService.search([request],
+                PageRequest.of(0, 20), testUser.transformToLoggedUser(), LocaleContextHolder.getLocale(), false)
+
+        assert taskPage.getContent().size() == 1 && taskPage.getContent()[0].caseId == case_.stringId
+        userService.removeRole(testUser, posViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
 
