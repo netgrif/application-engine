@@ -227,7 +227,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUsersRef usersRef) {
+    protected void resolveUsersRef(CaseUserRef usersRef) {
         CaseLogic logic = usersRef.getCaseLogic();
         String usersId = usersRef.getId();
 
@@ -317,7 +317,7 @@ public class Importer {
         if (data.getAction() != null) {
             Map<DataEventType, DataEvent> events = getField(fieldId).getEvents();
 
-            List<ActionType> filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.GET);
+            List<com.netgrif.workflow.importer.model.Action> filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.GET);
             addActionsToEvent(buildActions(filteredActions, fieldId, null), DataEventType.GET, events);
 
             filteredActions = filterActionsByTrigger(data.getAction(), DataEventType.SET);
@@ -325,7 +325,7 @@ public class Importer {
         }
     }
 
-    private List<ActionType> filterActionsByTrigger(List<ActionType> actions, DataEventType trigger){
+    private List<com.netgrif.workflow.importer.model.Action> filterActionsByTrigger(List<com.netgrif.workflow.importer.model.Action> actions, DataEventType trigger){
         return actions.stream()
                 .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.value))
                 .collect(Collectors.toList());
@@ -355,11 +355,11 @@ public class Importer {
         }
     }
 
-    protected List<Action> buildActionRefs(List<ActionRefType> actionRefs) {
+    protected List<Action> buildActionRefs(List<ActionRef> actionRefs) {
         return actionRefs.stream().map(ref -> actions.get(ref.getId())).collect(Collectors.toList());
     }
 
-    protected Action fromActionRef(ActionRefType actionRef) {
+    protected Action fromActionRef(ActionRef actionRef) {
         Action placeholder = new Action();
         placeholder.setImportId(actionRef.getId());
         this.actionRefs.put(actionRef.getId(), placeholder);
@@ -411,7 +411,7 @@ public class Importer {
         });
     }
 
-    private void addActionsToDataEvent(List<Action> actions, Map<DataEventType, DataEvent> dataEvents, DataEventType type){
+    protected void addActionsToDataEvent(List<Action> actions, Map<DataEventType, DataEvent> dataEvents, DataEventType type){
         if(!dataEvents.containsKey(type) || dataEvents.get(type).getId() == null){
             dataEvents.put(type, createDefaultEvent(actions, DataEventType.SET));
         } else {
@@ -419,7 +419,7 @@ public class Importer {
         }
     }
 
-    private DataEvent createDefaultEvent(List<Action> actions, DataEventType type){
+    protected DataEvent createDefaultEvent(List<Action> actions, DataEventType type){
         DataEvent event = new DataEvent();
         event.setType(type);
         event.setId(new ObjectId().toString());
@@ -436,7 +436,7 @@ public class Importer {
         if (importArc.getReference() == null && arc.getReference() == null) {
             arc.setMultiplicity(importArc.getMultiplicity());
         }
-        if (importArc.getReference() != null){
+        if (importArc.getReference() != null) {
             if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
                 throw new IllegalArgumentException("Place or Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
             }
@@ -445,7 +445,7 @@ public class Importer {
             arc.setReference(reference);
         }
 //      It has to be here for backwards compatibility of variable arcs
-        if (arc.getReference() != null){
+        if (arc.getReference() != null) {
             arc.getReference().setType((places.containsKey(arc.getReference().getReference())) ? Type.PLACE : Type.DATA);
         }
 
@@ -676,7 +676,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UsersRef usersRef) {
+    protected void addUserLogic(Transition transition, UserRef usersRef) {
         Logic logic = usersRef.getLogic();
         String userRef = usersRef.getId();
 
@@ -804,20 +804,20 @@ public class Importer {
     }
 
     @Transactional
-    protected List<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected List<Action> buildActions(List<com.netgrif.workflow.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> parseAction(fieldId, transitionId, action))
                 .collect(Collectors.toList());
     }
 
-    protected Action parseAction(String transitionId, ActionType action) {
+    protected Action parseAction(String transitionId, com.netgrif.workflow.importer.model.Action action) {
         if (action.getValue().contains("f.this")) {
             throw new IllegalArgumentException("Event action can not reference field using 'this'");
         }
         return parseAction(null, transitionId, action);
     }
 
-    protected Action parseAction(String fieldId, String transitionId, ActionType importedAction) {
+    protected Action parseAction(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction) {
         if (fieldId != null && importedAction.getTrigger() == null) {
             throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
         }
@@ -831,7 +831,7 @@ public class Importer {
         }
     }
 
-    protected Action createAction(ActionType importedAction) {
+    protected Action createAction(com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         if (importedAction.getId() != null) {
             action.setImportId(importedAction.getId());
@@ -841,7 +841,7 @@ public class Importer {
         return action;
     }
 
-    protected void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
+    protected void parseIds(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction, Action action) {
         String definition = importedAction.getValue();
         action.setDefinition(definition);
 
@@ -1047,7 +1047,7 @@ public class Importer {
         return net.get();
     }
 
-    protected AssignPolicy toAssignPolicy(AssignPolicyType type) {
+    protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy type) {
         if (type == null || type.value() == null) {
             return AssignPolicy.MANUAL;
         }
@@ -1055,7 +1055,7 @@ public class Importer {
         return AssignPolicy.valueOf(type.value().toUpperCase());
     }
 
-    protected DataFocusPolicy toDataFocusPolicy(DataFocusPolicyType type) {
+    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy type) {
         if (type == null || type.value() == null) {
             return DataFocusPolicy.MANUAL;
         }
@@ -1063,7 +1063,7 @@ public class Importer {
         return DataFocusPolicy.valueOf(type.value().toUpperCase());
     }
 
-    protected FinishPolicy toFinishPolicy(FinishPolicyType type) {
+    protected FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy type) {
         if (type == null || type.value() == null) {
             return FinishPolicy.MANUAL;
         }
