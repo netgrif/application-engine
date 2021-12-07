@@ -41,7 +41,7 @@ public class PublicWorkflowController {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
             CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case created succesfully",
+            return EventOutcomeWithMessageResource.successMessage("Case created successfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) {
             log.error("Creating case failed:" + e.getMessage(), e);
