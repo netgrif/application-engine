@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import javax.naming.Name;
 
 
-//TODO:  JOZIKE
 @Service
 @Slf4j
 @ConditionalOnExpression("${nae.ldap.enabled}")
