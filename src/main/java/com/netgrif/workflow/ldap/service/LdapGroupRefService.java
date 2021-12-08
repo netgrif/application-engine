@@ -5,6 +5,7 @@ import com.netgrif.workflow.ldap.domain.LdapGroupRef;
 import com.netgrif.workflow.ldap.domain.repository.LdapGroupRefRepository;
 import com.netgrif.workflow.ldap.service.interfaces.ILdapGroupRefService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 
 @Service
+@ConditionalOnExpression("${nae.ldap.enabled}")
 public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Autowired
