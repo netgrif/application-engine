@@ -236,7 +236,7 @@ public class TaskService implements ITaskService {
         save(task);
         reloadTasks(useCase);
         useCase = workflowService.findOne(useCase.getStringId());
-        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getId()));
+        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
@@ -283,7 +283,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
         useCase = workflowService.findOne(useCase.getStringId());
-        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getId()));
+        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
         outcomes.addAll(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
