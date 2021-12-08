@@ -24,6 +24,7 @@ class WorkflowServiceTest {
     public static final String NET_FILE = "case_search_test.xml"
     public static final String CASE_LOCALE_NET_FILE = "create_case_locale.xml"
     public static final String FIRST_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto.xml"
+    public static final String SECOND_AUTO_NET_FILE = "petriNets/NAE_1382_first_trans_auto_2.xml"
 
     @Autowired
     private ImportHelper importHelper
@@ -76,6 +77,22 @@ class WorkflowServiceTest {
         assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
         assert  workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
     }
+
+    @Test
+    void testSecondTransitionAuto() {
+        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+
+        Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
+        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+
+        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+
+        assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
+        assert  workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
+    }
+
 
     @Test
     void createCaseWithLocale() {
