@@ -6,10 +6,14 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.workflow.workflow.web.responsebodies.*;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedTaskResource;
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
@@ -27,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,12 +66,12 @@ public class PublicTaskController extends AbstractTaskController {
     @ApiResponses({@ApiResponse(
             code = 200,
             message = "OK",
-            response = LocalisedEventOutcomeResource.class
+            response = EventOutcomeWithMessageResource.class
     ), @ApiResponse(
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public LocalisedEventOutcomeResource assign(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         return super.assign(loggedUser, taskId, locale);
     }
@@ -76,12 +82,12 @@ public class PublicTaskController extends AbstractTaskController {
     @ApiResponses({@ApiResponse(
             code = 200,
             message = "OK",
-            response = LocalisedEventOutcomeResource.class
+            response = EventOutcomeWithMessageResource.class
     ), @ApiResponse(
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public LocalisedEventOutcomeResource finish(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         return super.finish(loggedUser, taskId, locale);
     }
@@ -92,19 +98,19 @@ public class PublicTaskController extends AbstractTaskController {
     @ApiResponses({@ApiResponse(
             code = 200,
             message = "OK",
-            response = LocalisedEventOutcomeResource.class
+            response = EventOutcomeWithMessageResource.class
     ), @ApiResponse(
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public LocalisedEventOutcomeResource cancel(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = userService.getAnonymousLogged();
+    public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
+        LoggedUser loggedUser  = userService.getAnonymousLogged();
         return super.cancel(loggedUser, taskId, locale);
     }
 
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get all task data")
-    public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
     }
 
@@ -114,12 +120,12 @@ public class PublicTaskController extends AbstractTaskController {
     @ApiResponses({@ApiResponse(
             code = 200,
             message = "OK",
-            response = ChangedFieldContainer.class
+            response = EventOutcomeWithMessageResource.class
     ), @ApiResponse(
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public ChangedFieldContainer setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         return super.setData(taskId, dataBody);
     }
 
@@ -131,7 +137,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -166,9 +172,9 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public ChangedFieldByFileFieldContainer saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                       @RequestParam(value = "files") MultipartFile[] multipartFiles) {
-        return dataService.saveFiles(taskId, fieldId, multipartFiles);
+        return super.saveFiles(taskId, fieldId, multipartFiles);
     }
 
     @Override
