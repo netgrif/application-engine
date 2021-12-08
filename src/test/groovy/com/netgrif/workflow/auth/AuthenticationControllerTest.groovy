@@ -83,11 +83,11 @@ class AuthenticationControllerTest {
         smtpServer.start()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
-//        processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
-//        processRoles = importHelper.getProcessRoles(net.get())
+//        group = importHelper.createGroup(GROUP_NAME)
+//        processRoles = importHelper.getProcessRoles(net.getNet())
     }
 
     @Test

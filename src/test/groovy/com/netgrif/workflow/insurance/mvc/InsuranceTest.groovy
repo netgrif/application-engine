@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import java.nio.charset.StandardCharsets
+import java.util.stream.Collectors
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -129,21 +130,21 @@ class InsuranceTest {
                 .build()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.isPresent()
+        assert net.getNet() != null
 
-        netId = net.get().getStringId()
+        netId = net.getNet().getStringId()
 
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-//        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+        def processRoles = importHelper.getProcessRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user"), auths.get("admin")] as Authority[],
-                [] as ProcessRole[])
+                [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
         processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll {it.importId in ["1", "2"]}.collect{it.stringId} as Set,userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
-        mapper = net.get().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
+        mapper = net.getNet().dataSet.collectEntries { [(it.value.importId as int): (it.key)] }
     }
 
     private String caseId
@@ -253,11 +254,11 @@ class InsuranceTest {
                 .with(csrf().asHeader())
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.title', CoreMatchers.is(CASE_NAME)))
-                .andExpect(jsonPath('$.petriNetId', CoreMatchers.is(netId)))
+                .andExpect(jsonPath('$.outcome.aCase.title', CoreMatchers.is(CASE_NAME)))
+//                .andExpect(jsonPath('$.outcome.aCase.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.stringId
+        caseId = response.outcome.aCase.stringId
     }
 
     def searchTasks(String title, int expected) {
@@ -315,12 +316,12 @@ class InsuranceTest {
     }
 
     def setData(Map data) {
-        def content = JsonOutput.toJson(data)
+        def content = JsonOutput.toJson([(taskId): data])
         def result = mvc.perform(post(TASK_DATA_URL(taskId))
-                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())

@@ -623,7 +623,6 @@
             <xs:extension base="baseEvent">
                 <xs:sequence>
                     <xs:element type="i18nStringType" name="title" minOccurs="0"/>
-                    <xs:element type="i18nStringType" name="message" minOccurs="0"/>
                 </xs:sequence>
                 <xs:attribute name="type" use="required" type="eventType"/>
             </xs:extension>
@@ -633,6 +632,7 @@
         <xs:sequence>
             <xs:element type="xs:string" name="id"/>
             <xs:element type="actions" name="actions" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="i18nStringType" name="message" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="dataEvent">

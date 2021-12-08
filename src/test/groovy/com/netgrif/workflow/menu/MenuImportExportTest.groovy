@@ -21,17 +21,19 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IMenuImportExportService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class MenuImportExportTest {
@@ -112,15 +114,20 @@ class MenuImportExportTest {
     @Autowired
     private SuperCreator superCreator
 
+    private User dummyUser;
 
     private Authentication userAuth
+
+    @BeforeEach
+    void beforeTest() {
+        this.testHelper.truncateDbs();
+        this.defaultFiltersRunner.run()
+        this.dummyUser = createDummyUser();
+    }
 
 
     @Test
     void testMenuImportExport() {
-        this.testHelper.truncateDbs();
-        this.defaultFiltersRunner.run()
-        User dummyUser = createDummyUser();
         userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
 
@@ -141,7 +148,7 @@ class MenuImportExportTest {
         dataService.setData(task, ImportHelper.populateDataset([
                 (IMPORT_BUTTON_FIELD): [
                         "value": "1",
-                        "type": "button"
+                        "type" : "button"
                 ]
         ]))
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
@@ -154,7 +161,7 @@ class MenuImportExportTest {
         ArrayList<String> imported_ids_list = groupCase.getDataSet().get(IMPORTED_IDS_FIELD).getValue() as ArrayList<String>
         assert imported_ids_list.size() == 4
 
-        Map <String, I18nString> menusForExportOptions = new LinkedHashMap<>()
+        Map<String, I18nString> menusForExportOptions = new LinkedHashMap<>()
         String[] split1 = imported_ids_list.get(0).split(",")
         String[] split2 = imported_ids_list.get(1).split(",")
         String[] split3 = imported_ids_list.get(2).split(",")
@@ -175,7 +182,7 @@ class MenuImportExportTest {
         dataService.setData(task, ImportHelper.populateDataset([
                 (EXPORT_BUTTON_FIELD): [
                         "value": "1",
-                        "type": "button"
+                        "type" : "button"
                 ]
         ]))
         caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
