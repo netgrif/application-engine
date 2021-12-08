@@ -3,12 +3,11 @@ package com.netgrif.workflow.ldap.service;
 
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.UserState;
-import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.auth.service.interfaces.ILdapUserRefService;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.ldap.LdapConfiguration;
 import com.netgrif.workflow.configuration.properties.NaeLdapProperties;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
+import com.netgrif.workflow.ldap.domain.LdapUser;
 import com.netgrif.workflow.ldap.domain.LdapUserRef;
 import com.netgrif.workflow.ldap.domain.repository.LdapUserRefRepository;
 import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
@@ -50,10 +49,6 @@ public class LdapUserRefService implements ILdapUserRefService {
 
     @Autowired
     private NaeLdapProperties ldapProperties;
-
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private LdapConfiguration ldapUserConfiguration;
