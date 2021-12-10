@@ -19,5 +19,5 @@ public interface ITransitionValidator extends IModelValidator {
      * @param attr2Name  the name of second element
      * @throws BeatingAttributesException is thrown when there are two attributes with different type but same goal
      */
-    void checkBeatingAttributes(Transition transition, Object attr1, Object attr2, String attr1Name, String attr2Name) throws BeatingAttributesException;
+    void checkConflictingAttributes(Transition transition, Object attr1, Object attr2, String attr1Name, String attr2Name) throws BeatingAttributesException;
 }
