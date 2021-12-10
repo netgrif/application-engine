@@ -180,7 +180,7 @@ public class Importer {
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new PetriNet();
 
-        documentValidator.checkBeatingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
+        documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
         documentValidator.checkDeprecatedAttributes(document);
         document.getI18N().forEach(this::addI18N);
 
@@ -480,7 +480,7 @@ public class Importer {
 
     @Transactional
     protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) throws MissingIconKeyException {
-        transitionValidator.checkBeatingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
+        transitionValidator.checkConflictingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
         transitionValidator.checkDeprecatedAttributes(importTransition);
 
         Transition transition = new Transition();
@@ -737,7 +737,7 @@ public class Importer {
             return;
         }
 
-        logicValidator.checkBeatingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
+        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
         logicValidator.checkDeprecatedAttributes(logic);
 
         if (logic.isView() != null && !logic.isView()) {
@@ -755,7 +755,7 @@ public class Importer {
             return;
         }
 
-        logicValidator.checkBeatingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
+        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
         logicValidator.checkDeprecatedAttributes(logic);
 
         transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
