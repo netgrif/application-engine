@@ -18,5 +18,5 @@ public interface IDocumentValidator extends IModelValidator {
      * @param attr2Name the name of second element
      * @throws BeatingAttributesException is thrown when there are two attributes with different type but same goal
      */
-    void checkBeatingAttributes(Document document, Object attr1, Object attr2, String attr1Name, String attr2Name) throws BeatingAttributesException;
+    void checkConflictingAttributes(Document document, Object attr1, Object attr2, String attr1Name, String attr2Name) throws BeatingAttributesException;
 }
