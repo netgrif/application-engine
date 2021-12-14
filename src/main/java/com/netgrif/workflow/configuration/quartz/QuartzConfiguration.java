@@ -29,8 +29,11 @@ public class QuartzConfiguration {
     @Autowired
     private AutowiringSpringBeanJobFactory jobFactory;
 
-    @Value("${spring.data.mongodb.host}")
+    @Value("${spring.data.mongodb.host:null}")
     private String addresses;
+
+    @Value("${spring.data.mongodb.uri:null}")
+    private String uri;
 
     @Value("${nae.quartz.dbName:nae}")
     private String db;
@@ -66,7 +69,10 @@ public class QuartzConfiguration {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://"+addresses+":27017/");
+        if (addresses != null && !addresses.equals("null"))
+            properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://" + addresses + ":27017/");
+        else if (uri != null && !uri.equals("null"))
+            properties.setProperty("org.quartz.jobStore.mongoUri", uri);
         properties.setProperty("org.quartz.jobStore.dbName", db);
         properties.setProperty("org.quartz.jobStore.class", "com.novemberain.quartz.mongodb.MongoDBJobStore");
         properties.setProperty("spring.quartz.properties.org.quartz.jobStore.isClustered", "false");
