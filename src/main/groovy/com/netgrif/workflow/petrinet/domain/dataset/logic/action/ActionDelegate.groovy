@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
-import com.netgrif.workflow.workflow.service.interfaces.IUserFilterSearchService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -21,7 +20,6 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
@@ -33,11 +31,14 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
-import com.netgrif.workflow.workflow.service.interfaces.IDataService
-import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.service.interfaces.*
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
@@ -119,6 +120,15 @@ class ActionDelegate {
     @Autowired
     IUserFilterSearchService filterSearchService
 
+    @Autowired
+    IConfigurableMenuService configurableMenuService
+
+    @Autowired
+    IMenuImportExportService menuImportExportService
+
+    @Autowired
+    IFilterImportExportService filterImportExportService
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -127,7 +137,7 @@ class ActionDelegate {
     def map = [:]
     Action action
     FieldActionsRunner actionsRunner
-    ChangedFieldsTree changedFieldsTree
+    List<EventOutcome> outcomes
 
     def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
         this.action = action
@@ -136,9 +146,7 @@ class ActionDelegate {
         this.actionsRunner = actionsRunner
         this.initFieldsMap(action.fieldIds)
         this.initTransitionsMap(action.transitionIds)
-        changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
-                task.isPresent() ? task.get().stringId : "task",
-                task.isPresent() ? task.get().transitionId : "trans")
+        this.outcomes = new ArrayList<>()
     }
 
     def initFieldsMap(Map<String, String> fieldIds) {
@@ -227,71 +235,59 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-                        putIntoChangedFields(field, new ChangedField(field.stringId))
-                    }
-                    changedFieldsTree.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
-                    addAttributeToChangedField(field, "type", field.type.name)
+                    ChangedField changedField = new ChangedField(field.stringId)
+                    changedField.addAttribute("type", field.type.name)
+                    changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
+                    SetDataEventOutcome outcome = createSetDataEventOutcome()
+                    outcome.addChangedField(field.stringId, changedField)
+                    this.outcomes.add(outcome)
                 }
             }]
         }]
     }
 
-    def saveChangedValue(Field field) {
-        useCase.dataSet.get(field.stringId).value = field.value
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "value", field.value)
-        addAttributeToChangedField(field, "type", field.type.name)
+    private SetDataEventOutcome createSetDataEventOutcome(){
+        return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("choices", field.choices.collect {it.getTranslation(LocaleContextHolder.locale)})
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "allowedNets", field.allowedNets)
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("allowedNets", field.allowedNets)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedValidation(Field field) {
         useCase.dataSet.get(field.stringId).validations = field.validations
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
             it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
         }
-        addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
-    }
-
-    void putIntoChangedFields(Field field, ChangedField changedField) {
-        putIntoChangedFields(field.stringId, changedField)
-    }
-
-    void putIntoChangedFields(String fieldId, ChangedField changedField) {
-        changedFieldsTree.put(fieldId, changedField)
-    }
-
-    void addAttributeToChangedField(Field field, String attribute, Object value) {
-        changedFieldsTree.addAttribute(field.stringId, attribute, value)
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def close = { Transition[] transitions ->
@@ -321,18 +317,20 @@ class ActionDelegate {
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
         tasksPage?.content?.each { task ->
-            taskService.assignTask(task.stringId)
-            dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
-            taskService.finishTask(task.stringId)
+            addTaskOutcomes(task, dataSet)
         }
     }
 
     void executeTask(String transitionId, Map dataSet) {
         QTask qTask = new QTask("task")
         Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
-        taskService.assignTask(task.stringId)
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
-        taskService.finishTask(task.stringId)
+        addTaskOutcomes(task, dataSet)
+    }
+
+    private addTaskOutcomes(Task task, Map dataSet){
+        this.outcomes.add(taskService.assignTask(task.stringId))
+        this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
+        this.outcomes.add(taskService.finishTask(task.stringId))
     }
 
     List<String> searchCases(Closure<Predicate> predicates) {
@@ -385,25 +383,42 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-         options    : { cl ->
-             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
-                 return
+        options: { cl ->
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                    || field instanceof MultichoiceField || field instanceof EnumerationField))
+                return
 
-             def options = cl()
-             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                 return
-             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
-                 return
-             field = (MapOptionsField) field
-             if (options.every { it.getValue() instanceof I18nString }) {
-                 field.setOptions(options)
-             } else {
-                 Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                 options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
-                 field.setOptions(newOptions)
-             }
-             saveChangedOptions(field)
-         },
+            def options = cl()
+            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                return
+            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                return
+
+            if (field instanceof MapOptionsField) {
+                field = (MapOptionsField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    field.setOptions(options)
+                } else {
+                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                    field.setOptions(newOptions)
+                }
+                saveChangedOptions(field)
+            } else if (field instanceof ChoiceField) {
+                field = (ChoiceField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    Set<I18nString> choices = new LinkedHashSet<>()
+                    options.forEach({ k, v -> choices.add(v) })
+                    field.setChoices(choices)
+                } else {
+                    Set<I18nString> newChoices = new LinkedHashSet<>();
+                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                    field.setChoices(newChoices)
+                }
+                saveChangedChoices(field)
+            }
+
+        },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -432,6 +447,16 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("value", value)
+        changedField.addAttribute("type", field.type.name)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
+    }
+
+    def saveChangedValue(Field field) {
+        useCase.dataSet.get(field.stringId).value = field.value
     }
 
     void changeFieldValidations(Field field, def cl) {
@@ -538,55 +563,59 @@ class ActionDelegate {
     }
 
     Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
-        if (net == null)
-            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale).getCase()
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
-        return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+        this.outcomes.add(outcome)
+        return outcome.getCase()
     }
 
     Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        taskService.assignTask(user.transformToLoggedUser(), taskId)
-        return taskService.findOne(taskId)
+        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId)
+        this.outcomes.add(outcome)
+        return outcome.getTask()
     }
 
     Task assignTask(Task task, IUser user = userService.loggedOrSystem) {
-        taskService.assignTask(task, user)
-        return taskService.findOne(task.stringId)
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user))
     }
 
     void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem) {
-        taskService.assignTasks(tasks, assignee)
+        this.outcomes.addAll(taskService.assignTasks(tasks, assignee))
     }
 
-    void cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
+    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        taskService.cancelTask(user.transformToLoggedUser(), taskId)
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId))
     }
 
-    void cancelTask(Task task, IUser user = userService.loggedOrSystem) {
-        taskService.cancelTask(task, userService.loggedOrSystem)
+    Task cancelTask(Task task, IUser user = userService.loggedOrSystem) {
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, userService.loggedOrSystem))
     }
 
     void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem) {
-        taskService.cancelTasks(tasks, user)
+        this.outcomes.addAll(taskService.cancelTasks(tasks, user))
+    }
+
+    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome.getTask()
     }
 
     void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        taskService.finishTask(user.transformToLoggedUser(), taskId)
+        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId))
     }
 
     void finishTask(Task task, IUser user = userService.loggedOrSystem) {
-        taskService.finishTask(task, user)
+        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user))
     }
 
     void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem) {
-        taskService.finishTasks(tasks, finisher)
+        this.outcomes.addAll(taskService.finishTasks(tasks, finisher))
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -662,37 +691,40 @@ class ActionDelegate {
         return removeRole(roleId, net, user)
     }
 
-    def setData(Task task, Map dataSet) {
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+    SetDataEventOutcome setData(Task task, Map dataSet) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
     }
 
-    def setData(Transition transition, Map dataSet) {
-        setData(transition.importId, this.useCase, dataSet)
+    SetDataEventOutcome setData(Transition transition, Map dataSet) {
+        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
     }
 
-    def setData(String transitionId, Case useCase, Map dataSet) {
+    SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
     }
 
-    def setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
+    @Deprecated
+    SetDataEventOutcome setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
         return setDataWithPropagation(task, dataSet)
     }
 
-    def setDataWithPropagation(Task task, Map dataSet) {
+    @Deprecated
+    SetDataEventOutcome setDataWithPropagation(Task task, Map dataSet) {
         return setDataWithPropagation(task.stringId, dataSet)
     }
 
-    def setDataWithPropagation(String taskId, Map dataSet) {
+    @Deprecated
+    SetDataEventOutcome setDataWithPropagation(String taskId, Map dataSet) {
         Task task = taskService.findOne(taskId)
-        Case caze = workflowService.findOne(task.caseId)
-        ChangedFieldsTree container = setData(task, dataSet)
-        caze = workflowService.findOne(caze.stringId)
-        this.changedFieldsTree.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
-        this.changedFieldsTree.propagate(container)
-        return container
+        return setData(task, dataSet)
+    }
+
+    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome
     }
 
     Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
@@ -709,8 +741,8 @@ class ActionDelegate {
     }
 
     Map<String, Field> getData(Task task) {
-        def useCase = workflowService.findOne(task.caseId);
-        return mapData(dataService.getData(task, useCase))
+        def useCase = workflowService.findOne(task.caseId)
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
     Map<String, Field> getData(Transition transition) {
@@ -722,7 +754,12 @@ class ActionDelegate {
         def task = taskService.searchOne(predicate)
         if (!task)
             return new HashMap<String, Field>()
-        return mapData(dataService.getData(task, useCase))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+    }
+
+    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome.getData()
     }
 
     protected Map<String, Field> mapData(List<Field> data) {
@@ -910,5 +947,20 @@ class ActionDelegate {
 
     List<Case> findFilters(String userInput) {
         return filterSearchService.autocompleteFindFilters(userInput)
+    }
+
+    List<Case> findAllFilters() {
+        return filterSearchService.autocompleteFindFilters("")
+    }
+
+    FileFieldValue exportFilters(Collection<String> filtersToExport) {
+        if (filtersToExport.isEmpty()) {
+            return null
+        }
+        return filterImportExportService.exportFiltersToFile(filtersToExport)
+    }
+
+    List<String> importFilters() {
+        return filterImportExportService.importFilters()
     }
 }

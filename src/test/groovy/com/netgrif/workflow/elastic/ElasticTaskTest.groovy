@@ -60,10 +60,9 @@ class ElasticTaskTest {
     @Test
     void taskReindexTest() {
         def optional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert optional.getNet() != null
 
-        assert optional.isPresent()
-
-        def net = optional.get()
+        def net = optional.getNet()
         10.times {
             helper.createCase("Case $it", net)
         }

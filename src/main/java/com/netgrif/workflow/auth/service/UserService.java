@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
@@ -10,6 +11,7 @@ import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationPropert
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +51,35 @@ public class UserService extends AbstractUserService {
     @Autowired
     private GroupConfigurationProperties groupProperties;
 
+    @Autowired
+    private IFilterImportExportService filterImportExportService;
+
+    @Autowired
+    private IAfterRegistrationAuthService authenticationService;
+
+    @Override
+    public IUser saveNewAndAuthenticate(IUser user) {
+        return saveNew(user, true);
+    }
+
     @Override
     public IUser saveNew(IUser user) {
+        return saveNew(user, false);
+    }
+
+    private IUser saveNew(IUser user, boolean login) {
+        String rawPassword = ((RegisteredUser) user).getPassword();
+
         registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save((User) user);
+        filterImportExportService.createFilterImport(user);
+        filterImportExportService.createFilterExport(user);
+        if (login)
+            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
+
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
 
@@ -63,13 +87,15 @@ public class UserService extends AbstractUserService {
             groupService.addUserToDefaultGroup(user);
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
+        if (login)
+            authenticationService.logoutAfterRegistrationFinished();
         return savedUser;
     }
 
     @Override
     public AnonymousUser saveNewAnonymous(AnonymousUser user) {
-        addDefaultRole(user);
-        addDefaultAuthorities(user);
+        addAnonymousRole(user);
+        addAnonymousAuthorities(user);
 
         return userRepository.save(user);
     }
@@ -97,10 +123,22 @@ public class UserService extends AbstractUserService {
         user.addProcessRole(processRoleService.defaultRole());
     }
 
+    public void addAnonymousRole(User user) {
+        user.addProcessRole(processRoleService.anonymousRole());
+    }
+
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
             authorities.add(authorityRepository.findByName(Authority.user));
+            user.setAuthorities(authorities);
+        }
+    }
+
+    public void addAnonymousAuthorities(User user) {
+        if (user.getAuthorities().isEmpty()) {
+            HashSet<Authority> authorities = new HashSet<Authority>();
+            authorities.add(authorityRepository.findByName(Authority.anonymous));
             user.setAuthorities(authorities);
         }
     }

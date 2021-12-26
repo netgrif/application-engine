@@ -1,12 +1,16 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
+import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -19,12 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
@@ -68,25 +74,24 @@ public class WorkflowController {
     @Autowired
     private IDataService dataService;
 
-    @Autowired
-    private IUserService userService;
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
+    @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return new CaseResource(useCase);
+            CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
+                    LocalisedEventOutcomeFactory.from(outcome,locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            log.error("Creating case failed:", e);
-            return null;
+            log.error("Creating case failed:",e);
+            return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
         }
     }
 
     @ApiOperation(value = "Get all cases of the system", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.getAll(pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
@@ -182,26 +187,10 @@ public class WorkflowController {
         }
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
-    @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            if (deleteSubtree) {
-                workflowService.deleteSubtreeRootedAt(caseId);
-            } else {
-                workflowService.deleteCase(caseId);
-            }
-            return MessageResource.successMessage("Case " + caseId + " was deleted");
-        } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
-            return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
-        }
-    }
-
+    @Deprecated
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
@@ -212,8 +201,28 @@ public class WorkflowController {
         }
     }
 
+    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
+    @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<EventOutcomeWithMessage>  deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            DeleteCaseEventOutcome outcome;
+            if(deleteSubtree) {
+                outcome = workflowService.deleteSubtreeRootedAt(caseId);
+            } else {
+                outcome = workflowService.deleteCase(caseId);
+            }
+            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                    LocalisedEventOutcomeFactory.from(outcome,LocaleContextHolder.getLocale()));
+        } catch (UnsupportedEncodingException e) {
+            log.error("Deleting case [" + caseId + "] failed:", e);
+            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+        }
+    }
+
     @ApiOperation(value = "Download case file field value", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/case/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
 
@@ -222,7 +231,7 @@ public class WorkflowController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileFieldInputStream.getFileName() + "\"");
 
         return ResponseEntity
                 .ok()
@@ -231,7 +240,7 @@ public class WorkflowController {
     }
 
     @ApiOperation(value = "Download one file from cases file list field value", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/case/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
 
@@ -240,7 +249,7 @@ public class WorkflowController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileFieldInputStream.getFileName() + "\"");
 
         return ResponseEntity
                 .ok()

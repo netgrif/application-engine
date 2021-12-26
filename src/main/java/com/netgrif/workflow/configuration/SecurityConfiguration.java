@@ -1,6 +1,9 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.UserProperties;
+import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
@@ -12,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,7 +71,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
+    @Value("${nae.security.anonymous-exceptions}")
+    private String[] anonymousExceptions;
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
@@ -122,35 +125,40 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         setCsrf(http);
     }
 
+    @Bean
+    protected IAfterRegistrationAuthService authenticationService() throws Exception {
+        return new AfterRegistrationAuthService(authenticationManager());
+    }
+
     @Override
     protected ProviderManager authenticationManager() throws Exception {
         return (ProviderManager) super.authenticationManager();
     }
 
     @Override
-    boolean isOpenRegistration() {
+    protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override
-    boolean isCsrfEnabled() {
+    protected boolean isCsrfEnabled() {
         return properties.isCsrf();
     }
 
     @Override
-    String[] getStaticPatterns() {
+    protected String[] getStaticPatterns() {
         return new String[]{
                 "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
-    String[] getServerPatterns() {
+    protected String[] getServerPatterns() {
         return this.serverPatterns;
     }
 
     @Override
-    Environment getEnvironment() {
+    protected Environment getEnvironment() {
         return env;
     }
 
@@ -159,9 +167,10 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                 authenticationManager(),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                new AnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
                 authority,
                 this.serverPatterns,
+                this.anonymousExceptions,
                 this.jwtService,
                 this.userService
         );
