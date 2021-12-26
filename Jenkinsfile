@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         maven 'localMaven3'
-        jdk 'localJava8'
+        jdk 'localJava11'
     }
     options {
         copyArtifactPermission('*')
@@ -210,11 +210,6 @@ pipeline {
                                                 artifactId: pom.getArtifactId(),
                                                 classifier: '',
                                                 file      : "target/${pom.getArtifactId()}-${pom.getVersion()}.${pom.getPackaging()}",
-                                                type      : pom.getPackaging()
-                                        ], [
-                                                artifactId: pom.getArtifactId(),
-                                                classifier: 'javadoc',
-                                                file      : "target/${pom.getArtifactId()}-${pom.getVersion()}-javadoc.${pom.getPackaging()}",
                                                 type      : pom.getPackaging()
                                         ], [
                                                 artifactId: pom.getArtifactId(),
