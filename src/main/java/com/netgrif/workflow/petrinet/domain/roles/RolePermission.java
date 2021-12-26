@@ -2,10 +2,11 @@ package com.netgrif.workflow.petrinet.domain.roles;
 
 
 public enum RolePermission {
-    PERFORM("perform"),
     DELEGATE("delegate"),
     CANCEL("cancel"),
-    ASSIGNED("assigned"),
+    ASSIGN("assign"),
+    FINISH("finish"),
+    SET("set"),
     VIEW("view");
 
     private String value;

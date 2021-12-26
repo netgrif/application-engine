@@ -55,6 +55,8 @@ public class ProcessRoleService implements IProcessRoleService {
 
     private ProcessRole defaultRole;
 
+    private ProcessRole anonymousRole;
+
     @Override
     public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
         return processRoleRepository.saveAll(entities);
@@ -233,6 +235,13 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
+    public ProcessRole anonymousRole() {
+        if (anonymousRole == null)
+            anonymousRole = processRoleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
+        return anonymousRole;
+    }
+
+    @Override
     public ProcessRole findByImportId(String importId) {
         return processRoleRepository.findByImportId(importId);
     }
@@ -268,5 +277,6 @@ public class ProcessRoleService implements IProcessRoleService {
 
     public void clearCache() {
         this.defaultRole = null;
+        this.anonymousRole = null;
     }
 }
