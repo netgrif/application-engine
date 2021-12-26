@@ -127,9 +127,6 @@ gen
 .springBeans
 
 ### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
 *.ipr
 
 ### Work folder ###
@@ -137,5 +134,6 @@ _issues/
 storage/
 rules/
 *.log*
+log/
 !/src/main/java/com/netgrif/workflow/rules/
 !/src/main/java/com/netgrif/workflow/rules/domain/StoredRuleRepository.java

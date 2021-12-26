@@ -1,5 +1,5 @@
 FROM openjdk:11-jdk
-MAINTAINER Netgrif <netgrif@netgrif.com>
+MAINTAINER Netgrif <devops@netgrif.com>
 
 RUN mkdir -p /src/main/
 
