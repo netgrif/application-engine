@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -92,19 +94,29 @@ public class Task {
     @Getter
     @Setter
     @Builder.Default
-    private List<String> negativeViewRoles = new LinkedList<>();
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter
     @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> users = new HashMap<>();
 
-    @Getter
     @Setter
     @Builder.Default
-    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+    private List<String> viewRoles = new LinkedList<>();
 
-    @Getter
+    @Setter
+    @Builder.Default
+    private List<String> viewUserRefs = new LinkedList<>();
+
+    @Setter
+    @Builder.Default
+    private List<String> viewUsers = new LinkedList<>();
+
+    @Setter
+    @Builder.Default
+    private List<String> negativeViewRoles = new LinkedList<>();
+
     @Setter
     @Builder.Default
     private List<String> negativeViewUsers = new LinkedList<>();
@@ -197,6 +209,41 @@ public class Task {
         return icon;
     }
 
+    public List<String> getViewRoles() {
+        if (viewRoles == null) {
+            viewRoles = new LinkedList<>();
+        }
+        return viewRoles;
+    }
+
+    public List<String> getViewUserRefs() {
+        if (viewUserRefs == null) {
+            viewUserRefs = new LinkedList<>();
+        }
+        return viewUserRefs;
+    }
+
+    public List<String> getViewUsers() {
+        if (viewUsers == null) {
+            viewUsers = new LinkedList<>();
+        }
+        return viewUsers;
+    }
+
+    public List<String> getNegativeViewRoles() {
+        if (negativeViewRoles == null) {
+            negativeViewRoles = new LinkedList<>();
+        }
+        return negativeViewRoles;
+    }
+
+    public List<String> getNegativeViewUsers() {
+        if (negativeViewUsers == null) {
+            negativeViewUsers = new LinkedList<>();
+        }
+        return negativeViewUsers;
+    }
+
     public void addRole(String roleId, Map<String, Boolean> permissions) {
         if (roles.containsKey(roleId) && roles.get(roleId) != null)
             roles.get(roleId).putAll(permissions);
@@ -215,9 +262,9 @@ public class Task {
     public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
-                users.get(userId).putAll(permissions);
+                compareExistingUserPermissions(userId, new HashMap<>(permissions));
             } else {
-                users.put(userId, permissions);
+                users.put(userId, new HashMap<>(permissions));
             }
         });
     }
@@ -257,5 +304,40 @@ public class Task {
         AUTO,
         TIME,
         MESSAGE,
+    }
+
+    public void resolveViewRoles() {
+        this.viewRoles.clear();
+        this.roles.forEach((role, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewRoles.add(role);
+            }
+        });
+    }
+
+    public void resolveViewUserRefs() {
+        this.viewUserRefs.clear();
+        this.userRefs.forEach((userRef, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewUserRefs.add(userRef);
+            }
+        });
+    }
+
+    public void resolveViewUsers() {
+        this.viewUsers.clear();
+        this.users.forEach((role, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewUsers.add(role);
+            }
+        });
+    }
+
+    private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
+        permissions.forEach((id, perm) -> {
+            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
+                users.get(userId).put(id, perm);
+            }
+        });
     }
 }
