@@ -68,7 +68,7 @@ You can now safely **delete all between two horizontal lines**, so the instructi
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
-- [ ] My changes have been checked with @...
+- [ ] My changes have been checked, personally or remotely, with at least one of the reviewer
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have resolved all conflicts with the target branch of the PR
 - [ ] I have updated and synced my code with the target branch
@@ -78,7 +78,7 @@ You can now safely **delete all between two horizontal lines**, so the instructi
     - [ ] Unit tests
     - [ ] Integration tests
 - [ ] I have checked my contribution with code analysis tools:
-    - [ ] [SonarCloud](https://sonarcloud.io/project/overview?id=netgrif_petriflow.js)
+    - [ ] [SonarCloud](https://sonarcloud.io/project/overview?id=netgrif_application-engine)
     - [ ] [Snyk](https://app.snyk.io/org/netgrif)
 - [ ] I have made corresponding changes to the documentation:
     - [ ] Developer documentation
