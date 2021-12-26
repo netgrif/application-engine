@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>wst_usersRef</id>
+    <initials>WSU</initials>
+    <title>WorkflowAuthorizationService test</title>
+    <roleRef>
+        <id>delete_pos_role</id>
+        <caseLogic>
+            <delete>true</delete>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>create_pos_role</id>
+        <caseLogic>
+            <create>true</create>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>delete_neg_role</id>
+        <caseLogic>
+            <delete>false</delete>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>create_neg_role</id>
+        <caseLogic>
+            <create>false</create>
+        </caseLogic>
+    </roleRef>
+    <userRef>
+        <id>neg_user_list</id>
+        <caseLogic>
+            <delete>false</delete>
+        </caseLogic>
+    </userRef>
+    <userRef>
+        <id>pos_user_list</id>
+        <caseLogic>
+            <delete>true</delete>
+        </caseLogic>
+    </userRef>
+    <role>
+        <id>delete_pos_role</id>
+        <name>delete role</name>
+    </role>
+    <role>
+        <id>create_pos_role</id>
+        <name>create role</name>
+    </role>
+    <role>
+        <id>delete_neg_role</id>
+        <name>delete role</name>
+    </role>
+    <role>
+        <id>create_neg_role</id>
+        <name>create role</name>
+    </role>
+    <data type="userList">
+        <id>pos_user_list</id>
+        <title/>
+    </data>
+    <data type="userList">
+        <id>neg_user_list</id>
+        <title/>
+    </data>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Transition</label>
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>file</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

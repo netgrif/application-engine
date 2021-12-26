@@ -66,6 +66,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (requestQuery.containsKey(FULLTEXT)) {
             builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
         }
+        if (requestQuery.containsKey(ROLE)) {
+            builder.and(role(requestQuery.get(ROLE)));
+        }
         if (requestQuery.containsKey(DATA)) {
             builder.and(data(requestQuery.get(DATA)));
         }
@@ -80,44 +83,48 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-
-        BooleanBuilder constraints = new BooleanBuilder(role(user.getProcessRoles()));
-        constraints.or(buildViewUsersQueryConstraint(user));
-
-        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
-        negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
-
-        constraints.andNot(negativeConstraints);
-        builder.and(constraints);
-
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        builder.and(permissionConstraints);
         return builder;
     }
 
-    protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleNegativeQuery).collect(Collectors.toList());
+    protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    public Predicate roleNegativeQuery(String role) {
+    public Predicate viewRoleQuery(String role) {
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
+    }
+
+    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUserQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUserQuery(String userId) {
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
+    }
+
+    protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewRoleQuery(String role) {
         return QCase.case$.negativeViewRoles.contains(role);
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewUsersQuery(user.getId());
+        Predicate roleConstraints = negativeViewUserQuery(user.getId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(String userId) {
+    public Predicate negativeViewUserQuery(String userId) {
         return QCase.case$.negativeViewUsers.contains(userId);
-    }
-
-    protected Predicate buildViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUsersQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
-    }
-
-    public Predicate viewUsersQuery(String userId) {
-        return QCase.case$.users.containsKey(userId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
@@ -153,8 +160,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return null;
     }
 
-    public Predicate role(Set<String> o) {
-            return QCase.case$.viewRoles.any().in(o);
+    public Predicate role(Object o) {
+        if (o instanceof ArrayList) {
+            return QCase.case$.enabledRoles.any().in((ArrayList<String>) o);
+        }
+        return null;
     }
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {

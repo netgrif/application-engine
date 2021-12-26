@@ -66,6 +66,7 @@ public class Importer {
     protected Document document;
     protected PetriNet net;
     protected ProcessRole defaultRole;
+    protected ProcessRole anonymousRole;
     @Getter
     protected Map<String, ProcessRole> roles;
     protected Map<String, Field> fields;
@@ -113,6 +114,15 @@ public class Importer {
     @Autowired
     protected IFieldActionsCacheService actionsCacheService;
 
+    @Autowired
+    private IDocumentValidator documentValidator;
+
+    @Autowired
+    private ITransitionValidator transitionValidator;
+
+    @Autowired
+    private ILogicValidator logicValidator;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
@@ -142,6 +152,7 @@ public class Importer {
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
         this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+        this.anonymousRole = roleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
@@ -169,11 +180,14 @@ public class Importer {
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException, MissingIconKeyException {
         net = new PetriNet();
 
+        documentValidator.checkConflictingAttributes(document, document.getUsersRef(), document.getUserRef(), "usersRef", "userRef");
+        documentValidator.checkDeprecatedAttributes(document);
         document.getI18N().forEach(this::addI18N);
 
         setMetaData();
         net.setIcon(document.getIcon());
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
+        net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
 
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
@@ -190,7 +204,11 @@ public class Importer {
         evaluateFunctions();
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
-        document.getUsersRef().forEach(this::resolveUsersRef);
+        document.getUsersRef().forEach(this::resolveUserRef);
+        document.getUserRef().forEach(this::resolveUserRef);
+
+        addPredefinedRolesWithDefaultPermissions();
+
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -227,15 +245,15 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveUsersRef(CaseUserRef usersRef) {
-        CaseLogic logic = usersRef.getCaseLogic();
-        String usersId = usersRef.getId();
+    protected void resolveUserRef(CaseUserRef userRef) {
+        CaseLogic logic = userRef.getCaseLogic();
+        String usersId = userRef.getId();
 
         if (logic == null || usersId == null) {
             return;
         }
 
-        net.addUsersPermission(usersId, roleFactory.getProcessPermissions(logic));
+        net.addUserPermission(usersId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -462,6 +480,9 @@ public class Importer {
 
     @Transactional
     protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) throws MissingIconKeyException {
+        transitionValidator.checkConflictingAttributes(importTransition, importTransition.getUsersRef(), importTransition.getUserRef(), "usersRef", "userRef");
+        transitionValidator.checkDeprecatedAttributes(importTransition);
+
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
@@ -481,10 +502,17 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        /* @Deprecated - This 'importTransition.getUsersRef()' is deprecated, will be removed in future releases*/
         if (importTransition.getUsersRef() != null) {
             importTransition.getUsersRef().forEach(usersRef ->
                     addUserLogic(transition, usersRef));
         }
+
+        if (importTransition.getUserRef() != null) {
+            importTransition.getUserRef().forEach(userRef ->
+                    addUserLogic(transition, userRef));
+        }
+
         if (importTransition.getDataRef() != null) {
             for (com.netgrif.workflow.importer.model.DataRef dataRef : importTransition.getDataRef()) {
                 addDataWithDefaultGroup(transition, dataRef);
@@ -503,9 +531,9 @@ public class Importer {
                 addDataGroup(transition, dataGroup);
             }
         }
-        if (isDefaultRoleAllowedFor(importTransition, document)) {
-            addDefaultRole(transition);
-        }
+
+        addPredefinedRolesWithDefaultPermissions(importTransition, transition);
+
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     transition.addEvent(addEvent(transition.getImportId(), event))
@@ -607,10 +635,50 @@ public class Importer {
 
     @Transactional
     protected void addDefaultRole(Transition transition) {
+        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferenced(transition)) {
+            return;
+        }
+
         Logic logic = new Logic();
         logic.setDelegate(true);
         logic.setPerform(true);
         transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addAnonymousRole(Transition transition) {
+        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferenced(transition)) {
+            return;
+        }
+
+        Logic logic = new Logic();
+        logic.setPerform(true);
+        transition.addRole(anonymousRole.getStringId(), roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addDefaultPermissions() {
+        if (!net.isDefaultRoleEnabled() || isDefaultRoleReferencedOnNet()) {
+            return;
+        }
+
+        CaseLogic logic = new CaseLogic();
+        logic.setCreate(true);
+        logic.setDelete(true);
+        logic.setView(true);
+        net.addPermission(defaultRole.getStringId(), roleFactory.getProcessPermissions(logic));
+    }
+
+    @Transactional
+    protected void addAnonymousPermissions() {
+        if (!net.isAnonymousRoleEnabled() || isAnonymousRoleReferencedOnNet()) {
+            return;
+        }
+
+        CaseLogic logic = new CaseLogic();
+        logic.setCreate(true);
+        logic.setView(true);
+        net.addPermission(anonymousRole.getStringId(), roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -669,6 +737,9 @@ public class Importer {
             return;
         }
 
+        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
+        logicValidator.checkDeprecatedAttributes(logic);
+
         if (logic.isView() != null && !logic.isView()) {
             transition.addNegativeViewRole(roleId);
         }
@@ -676,14 +747,18 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UserRef usersRef) {
-        Logic logic = usersRef.getLogic();
-        String userRef = usersRef.getId();
+    protected void addUserLogic(Transition transition, UserRef userRef) {
+        Logic logic = userRef.getLogic();
+        String userRefId = userRef.getId();
 
-        if (logic == null || userRef == null) {
+        if (logic == null || userRefId == null) {
             return;
         }
-        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
+
+        logicValidator.checkConflictingAttributes(logic, logic.isAssigned(), logic.isAssign(), "assigned", "assign");
+        logicValidator.checkDeprecatedAttributes(logic);
+
+        transition.addUserRef(userRefId, roleFactory.getPermissions(logic));
     }
 
     @Transactional
@@ -767,7 +842,8 @@ public class Importer {
 
         return parsedEvents;
     }
-    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId){
+
+    protected com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId){
         com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent();
         events.forEach(event -> {
             dataEvent.setType(event.getType().value().equalsIgnoreCase(DataEventType.GET.value) ? DataEventType.GET : DataEventType.SET);
@@ -943,6 +1019,14 @@ public class Importer {
 
     @Transactional
     protected void createRole(Role importRole) {
+        if (importRole.getId().equals(ProcessRole.DEFAULT_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + ProcessRole.DEFAULT_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        }
+
+        if (importRole.getId().equals(ProcessRole.ANONYMOUS_ROLE)) {
+            throw new IllegalArgumentException("Role ID '" + ProcessRole.ANONYMOUS_ROLE + "' is a reserved identifier, roles with this ID cannot be defined!");
+        }
+
         ProcessRole role = new ProcessRole();
         Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
 
@@ -1019,27 +1103,50 @@ public class Importer {
         return string;
     }
 
-    protected boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
-        // FALSE if defaultRole not allowed in net
-        if (document.isDefaultRole() != null && !document.isDefaultRole()) {
-            return false;
-        }
-        // FALSE if role or trigger mapping
+    protected void addPredefinedRolesWithDefaultPermissions(com.netgrif.workflow.importer.model.Transition importTransition, Transition transition) {
+        // Don't add if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {
-            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())) {
-                return false;
+            if (Objects.equals(mapping.getTransitionRef(), importTransition.getId())
+                    && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty())
+                    && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())
+            ) {
+                return;
             }
         }
-        // TRUE if no roles and no triggers
-        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
-                (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
-                        (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
-                        (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
-                        (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
-        )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+        // Don't add if positive roles or triggers or positive user refs
+        if ((importTransition.getRoleRef() != null && importTransition.getRoleRef().stream().anyMatch(this::hasPositivePermission))
+                || (importTransition.getTrigger() != null && !importTransition.getTrigger().isEmpty())
+                || (importTransition.getUsersRef() != null && importTransition.getUsersRef().stream().anyMatch(this::hasPositivePermission))
+                || (importTransition.getUserRef() != null && importTransition.getUserRef().stream().anyMatch(this::hasPositivePermission))) {
+            return;
+        }
+
+        addDefaultRole(transition);
+        addAnonymousRole(transition);
     }
 
-    PetriNet getNetByImportId(String id) {
+    protected boolean hasPositivePermission(PermissionRef permissionRef) {
+        return (permissionRef.getLogic().isPerform() != null && permissionRef.getLogic().isPerform())
+                || (permissionRef.getLogic().isCancel() != null && permissionRef.getLogic().isCancel())
+                || (permissionRef.getLogic().isView() != null && permissionRef.getLogic().isView())
+                || (permissionRef.getLogic().isAssign() != null && permissionRef.getLogic().isAssign())
+                || (permissionRef.getLogic().isAssigned() != null && permissionRef.getLogic().isAssigned())
+                || (permissionRef.getLogic().isFinish() != null && permissionRef.getLogic().isFinish())
+                || (permissionRef.getLogic().isDelegate() != null && permissionRef.getLogic().isDelegate());
+    }
+
+    protected void addPredefinedRolesWithDefaultPermissions() {
+        // only if no positive role associations and no positive user ref associations
+        if (net.getPermissions().values().stream().anyMatch(perms -> perms.containsValue(true))
+                || net.getUserRefs().values().stream().anyMatch(perms -> perms.containsValue(true))) {
+            return;
+        }
+
+        addDefaultPermissions();
+        addAnonymousPermissions();
+    }
+
+    protected PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
         if (!net.isPresent()) {
             throw new IllegalArgumentException();
@@ -1047,31 +1154,55 @@ public class Importer {
         return net.get();
     }
 
-    protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy type) {
-        if (type == null || type.value() == null) {
+    protected boolean isDefaultRoleReferenced(Transition transition) {
+        return transition.getRoles().containsKey(defaultRole.getStringId());
+    }
+
+    protected boolean isDefaultRoleReferencedOnNet() {
+        return net.getPermissions().containsKey(defaultRole.getStringId());
+    }
+
+    protected boolean isAnonymousRoleReferenced(Transition transition) {
+        return transition.getRoles().containsKey(anonymousRole.getStringId());
+    }
+
+    protected boolean isAnonymousRoleReferencedOnNet() {
+        return net.getPermissions().containsKey(anonymousRole.getStringId());
+    }
+
+    protected AssignPolicy toAssignPolicy(com.netgrif.workflow.importer.model.AssignPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return AssignPolicy.MANUAL;
         }
 
-        return AssignPolicy.valueOf(type.value().toUpperCase());
+        return AssignPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy type) {
-        if (type == null || type.value() == null) {
+    protected DataFocusPolicy toDataFocusPolicy(com.netgrif.workflow.importer.model.DataFocusPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return DataFocusPolicy.MANUAL;
         }
 
-        return DataFocusPolicy.valueOf(type.value().toUpperCase());
+        return DataFocusPolicy.valueOf(policy.value().toUpperCase());
     }
 
-    protected FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy type) {
-        if (type == null || type.value() == null) {
+    protected FinishPolicy toFinishPolicy(com.netgrif.workflow.importer.model.FinishPolicy policy) {
+        if (policy == null || policy.value() == null) {
             return FinishPolicy.MANUAL;
         }
 
-        return FinishPolicy.valueOf(type.value().toUpperCase());
+        return FinishPolicy.valueOf(policy.value().toUpperCase());
     }
 
     public ProcessRole getRole(String id) {
+        if (id.equals(ProcessRole.DEFAULT_ROLE)) {
+            return defaultRole;
+        }
+
+        if (id.equals(ProcessRole.ANONYMOUS_ROLE)) {
+            return anonymousRole;
+        }
+
         ProcessRole role = roles.get(id);
         if (role == null) {
             throw new IllegalArgumentException("Role " + id + " not found");
@@ -1113,10 +1244,6 @@ public class Importer {
 
     public I18nString getI18n(String id) {
         return i18n.get(id);
-    }
-
-    protected boolean isTransitionRoleAllowed() {
-        return document.isTransitionRole() == null || document.isTransitionRole();
     }
 
     protected static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {

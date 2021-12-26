@@ -235,6 +235,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         save(task);
         reloadTasks(useCase);
+        useCase = workflowService.findOne(useCase.getStringId());
         historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
@@ -281,6 +282,7 @@ public class TaskService implements ITaskService {
         task = returnTokens(task, useCase.getStringId());
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
+        useCase = workflowService.findOne(useCase.getStringId());
         historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
         outcomes.addAll(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
@@ -706,6 +708,7 @@ public class TaskService implements ITaskService {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });
+        task.resolveViewUsers();
         return taskRepository.save(task);
     }
 
@@ -745,8 +748,11 @@ public class TaskService implements ITaskService {
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
+        ProcessRole anonymousRole = processRoleService.anonymousRole();
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
-            if (useCase.getEnabledRoles().contains(entry.getKey()) || defaultRole.getStringId().equals(entry.getKey())) {
+            if (useCase.getEnabledRoles().contains(entry.getKey())
+                    || defaultRole.getStringId().equals(entry.getKey())
+                    || anonymousRole.getStringId().equals(entry.getKey())) {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
@@ -755,6 +761,8 @@ public class TaskService implements ITaskService {
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
         }
+        task.resolveViewRoles();
+        task.resolveViewUserRefs();
 
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
         if (transaction != null) {

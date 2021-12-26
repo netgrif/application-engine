@@ -209,6 +209,7 @@
             <xs:element type="i18nStringType" name="title" minOccurs="1"/>
             <xs:element type="xs:string" name="icon" minOccurs="0"/>
             <xs:element type="xs:boolean" name="defaultRole" minOccurs="0" default="true"/>
+            <xs:element type="xs:boolean" name="anonymousRole" minOccurs="0" default="true"/>
             <xs:element type="xs:boolean" name="transitionRole" minOccurs="0" default="true"/>
             <xs:element type="i18nStringTypeWithExpression" name="caseName" minOccurs="0"/>
             <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
@@ -428,6 +429,7 @@
             <xs:element type="xs:boolean" name="delegate" minOccurs="0"/>
             <xs:element type="xs:boolean" name="view" minOccurs="0"/>
             <xs:element type="xs:boolean" name="cancel" minOccurs="0"/>
+            <xs:element type="xs:boolean" name="finish" minOccurs="0"/>
             <xs:choice minOccurs="0">
                 <xs:element type="xs:boolean" name="assigned"/>
                 <xs:element type="xs:boolean" name="assign"/>
@@ -452,24 +454,32 @@
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="roleRef">
-        <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
-            <xs:element type="logic" name="logic"/>
-        </xs:sequence>
+        <xs:complexContent>
+            <xs:extension base="permissionRef"/>
+        </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="userRef">
+        <xs:complexContent>
+            <xs:extension base="permissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="permissionRef">
         <xs:sequence>
             <xs:element type="xs:string" name="id"/>
             <xs:element type="logic" name="logic"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="caseRoleRef">
-        <xs:sequence>
-            <xs:element type="xs:string" name="id"/>
-            <xs:element type="caseLogic" name="caseLogic"/>
-        </xs:sequence>
+        <xs:complexContent>
+            <xs:extension base="casePermissionRef"/>
+        </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="caseUserRef">
+        <xs:complexContent>
+            <xs:extension base="casePermissionRef"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="casePermissionRef">
         <xs:sequence>
             <xs:element type="xs:string" name="id"/>
             <xs:element type="caseLogic" name="caseLogic"/>
