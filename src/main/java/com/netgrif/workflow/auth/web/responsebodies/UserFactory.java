@@ -20,15 +20,14 @@ public class UserFactory implements IUserFactory {
         User result = getUser(user);
 
         String defaultRoleId = processRoleService.defaultRole().getStringId();
-//        Map<String, UserProcessRole> userProcessRoles = user.getUserProcessRoles().stream().collect(Collectors.toMap(UserProcessRole::getRoleId, r -> r));
+        String anonymousRoleId = processRoleService.anonymousRole().getStringId();
         result.setProcessRoles(user.getProcessRoles().stream().map(processRole -> {
             if (processRole.getStringId().equals(defaultRoleId)) {
                 return new ProcessRole(processRole, locale);
             }
-            /*UserProcessRole userProcessRole = userProcessRoles.get(processRole.getStringId());
-            if (userProcessRole == null) {
-                throw new IllegalStateException("User has ProcessRole without UserProcessRole!");
-            }*/
+            if (processRole.getStringId().equals(anonymousRoleId)) {
+                return new ProcessRole(processRole, locale);
+            }
             return processRoleFactory.getProcessRole(processRole, locale);
         }).collect(Collectors.toSet()));
 
