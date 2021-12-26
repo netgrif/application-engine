@@ -26,7 +26,7 @@ services:
   docker-mongo:
     image: mongo:4.4
     ports:
-    - 27017:27017
+    - "27017:27017"
 #      environment:
 #          MONGO_INITDB_ROOT_USERNAME: netgrif_nae
 #          MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
@@ -39,10 +39,10 @@ services:
       - http.host=0.0.0.0
       - transport.host=0.0.0.0
     ports:
-      - 9200:9200
-      - 9300:9300
+      - "9200:9200"
+      - "9300:9300"
 
   docker-redis:
     image: redis:5
     ports:
-      - 6379:6379
+      - "6379:6379"
