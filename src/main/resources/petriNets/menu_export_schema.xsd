@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.1.0">
+    <xs:include schemaLocation="filter_export_schema.xsd"/>
+    <!-- ===== MENU ===== -->
+    <xs:element name="menusWithFilters" type="menusWithFilters"/>
+    <xs:complexType name="menusWithFilters">
+        <xs:sequence>
+            <xs:element ref="menus"/>
+            <xs:element ref="filters"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="menus" type="menus"/>
+    <xs:complexType name="menus">
+        <xs:sequence>
+            <xs:element ref="menu" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="menu" type="menu"/>
+    <xs:complexType name="menu">
+        <xs:sequence>
+            <xs:element ref="menuEntry" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:element name="menuEntry" type="menuEntry"/>
+    <xs:complexType name="menuEntry">
+        <xs:sequence>
+            <xs:element name="entryName" type="xs:string"/>
+            <xs:element name="filterCaseId" type="xs:string"/>
+            <xs:element ref="entryRole" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="useIcon" type="xs:boolean" use="required"/>
+    </xs:complexType>
+    <xs:element name="entryRole" type="entryRole"/>
+    <xs:complexType name="entryRole">
+        <xs:sequence>
+            <xs:element name="roleImportId" type="xs:string"/>
+            <xs:element name="netImportId" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="authorizationType"/>
+    </xs:complexType>
+    <xs:simpleType name="authorizationType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="allowed"/>
+            <xs:enumeration value="banned"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

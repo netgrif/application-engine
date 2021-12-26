@@ -7,6 +7,7 @@ import com.netgrif.workflow.configuration.drools.throwable.RuleValidationExcepti
 import com.netgrif.workflow.rules.domain.StoredRule;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -70,38 +73,37 @@ public class KnowledgeBaseInitializerTest {
         }
     }
 
-    //    @Test(expected = RuleValidationException.class)  //TODO: nefunguje
-//    @Test
-//    public void testInitializerRuleValidation_EXPECT_EXCEPTION() throws RuleValidationException {
-//
-//        StoredRule rule3 = StoredRule.builder()
-//                ._id(new ObjectId())
-//                .when("$item: Object()")
-//                .then("log.info(' EXPECTING SYNTAX ERROR")
-//                .identifier("rule3")
-//                .lastUpdate(LocalDateTime.now())
-//                .enabled(true)
-//                .build();
-//
-//        knowledgeBaseInitializer.validate(Collections.singletonList(rule3));
-//
-//    }
-//
-//    //    @Test(expected = RuleValidationException.class)
-//    @Test
-//    public void testInitializerRuleValidation_EXPECT_EXCEPTION2() throws RuleValidationException {
-//
-//        StoredRule rule4 = StoredRule.builder()
-//                ._id(new ObjectId())
-//                .when("$item: Object")
-//                .then("log.info('nothing')")
-//                .identifier("rule4")
-//                .lastUpdate(LocalDateTime.now())
-//                .enabled(true)
-//                .build();
-//
-//        knowledgeBaseInitializer.validate(Collections.singletonList(rule4));
-//    }
+    @Test
+    public void testInitializerRuleValidation_EXPECT_EXCEPTION() {
+        assertThrows(RuleValidationException.class, () -> {
+            StoredRule rule3 = StoredRule.builder()
+                    ._id(new ObjectId())
+                    .when("$item: Object()")
+                    .then("log.info(' EXPECTING SYNTAX ERROR")
+                    .identifier("rule3")
+                    .lastUpdate(LocalDateTime.now())
+                    .enabled(true)
+                    .build();
+
+            knowledgeBaseInitializer.validate(Collections.singletonList(rule3));
+        });
+    }
+
+    @Test
+    public void testInitializerRuleValidation_EXPECT_EXCEPTION2() throws RuleValidationException {
+        assertThrows(RuleValidationException.class, () -> {
+            StoredRule rule4 = StoredRule.builder()
+                    ._id(new ObjectId())
+                    .when("$item: Object")
+                    .then("log.info('nothing')")
+                    .identifier("rule4")
+                    .lastUpdate(LocalDateTime.now())
+                    .enabled(true)
+                    .build();
+
+            knowledgeBaseInitializer.validate(Collections.singletonList(rule4));
+        });
+    }
 
 
 }
