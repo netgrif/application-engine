@@ -56,7 +56,6 @@ public class User {
     public static User createUser(IUser user) {
         User result = new User(user);
         result.setTelNumber(user.getTelNumber());
-//        result.setGroups(user.getGroups());
         result.setAuthorities(user.getAuthorities());
         result.setNextGroups(user.getNextGroups());
         return result;
