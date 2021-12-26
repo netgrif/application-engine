@@ -5,7 +5,6 @@ import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -16,26 +15,27 @@ import com.netgrif.workflow.rules.domain.facts.*;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 @SpringBootTest(
@@ -46,7 +46,7 @@ import java.util.stream.IntStream;
         locations = "classpath:application-test.properties"
 )
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RuleEngineTest {
 
     @Autowired
@@ -73,12 +73,12 @@ public class RuleEngineTest {
     @Autowired
     private SuperCreator superCreator;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
 
-    @After
+    @AfterEach
     public void after() {
         ruleRepository.deleteAll();
         factRepository.deleteAll();
@@ -100,14 +100,14 @@ public class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
 
-        assert petriNetOptional.isPresent();
-        assert petriNetOptional.get().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
-        assert petriNetOptional.get().getDataSet().containsKey(TEST_FIELD);
-        assert petriNetOptional.get().getDataSet().get(TEST_FIELD) != null;
+        assert outcome.getNet() != null;
+        assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
+        assert outcome.getNet().getDataSet().containsKey(TEST_FIELD);
+        assert outcome.getNet().getDataSet().get(TEST_FIELD) != null;
 
-        List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(petriNetOptional.get().getStringId()), PageRequest.of(0, 100)).getContent();
+        List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(outcome.getNet().getStringId()), PageRequest.of(0, 100)).getContent();
         assert facts.size() == 1 && facts.get(0) instanceof NetImportedFact;
     }
 
@@ -137,13 +137,13 @@ public class RuleEngineTest {
 
         assert refreshableKieBase.shouldRefresh();
 
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert !refreshableKieBase.shouldRefresh();
 
-        assert petriNetOptional.isPresent();
-        assert petriNetOptional.get().getTitle().getDefaultValue().equals(NET_TITLE_POST);
-        assert petriNetOptional.get().getInitials().equals(NEW_INITIALS);
+        assert outcome.getNet() != null;
+        assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_POST);
+        assert outcome.getNet().getInitials().equals(NEW_INITIALS);
 
         ruleRepository.deleteAll();
         factRepository.deleteAll();
@@ -158,8 +158,8 @@ public class RuleEngineTest {
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
-        assert petriNetOptional.isPresent();
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
                 ._id(new ObjectId())
@@ -198,13 +198,13 @@ public class RuleEngineTest {
         ruleRepository.save(rule3);
         ruleRepository.save(rule4);
 
-        Case newCase = workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
-        assert newCase.getTitle().equals(NEW_CASE_TITLE);
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
+        assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
-        Task task = findTask(newCase, TRANS_1);
+        Task task = findTask(caseOutcome.getCase(), TRANS_1);
         taskService.assignTask(task, superCreator.getLoggedSuper().transformToUser());
         taskService.finishTask(task, superCreator.getLoggedSuper().transformToUser());
-        newCase = workflowService.findOne(newCase.getStringId());
+        Case newCase = workflowService.findOne(caseOutcome.getCase().getStringId());
         assert newCase.getTitle().equals(NEW_CASE_TITLE);
         assert !newCase.getColor().equals(NEW_CASE_TITLE_2);
 
@@ -324,7 +324,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    @Ignore
+    @Disabled("TODO:")
     public void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.workflow.petrinet.domain.events.EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
@@ -365,8 +365,8 @@ public class RuleEngineTest {
     }
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
-        return workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getCase();
     }
 
     private Task findTask(Case caze, String trans) {

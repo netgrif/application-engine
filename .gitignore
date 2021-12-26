@@ -18,6 +18,7 @@ target/
 ### Work folder ###
 _issues/
 
-storage
-rules
-*.log*
+storage/
+rules/
+!/src/main/java/com/netgrif/workflow/rules/
+*.log*!/src/main/java/com/netgrif/workflow/rules/domain/StoredRuleRepository.java

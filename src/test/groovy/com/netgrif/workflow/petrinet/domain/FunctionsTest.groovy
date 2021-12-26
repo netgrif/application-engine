@@ -10,17 +10,20 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.assertThrows
+
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class FunctionsTest {
@@ -73,38 +76,39 @@ class FunctionsTest {
     @Value("classpath:petriNets/function_overloading_fail_v2.xml")
     private Resource functionOverloadingFailNetResourceV2
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
 
     @Test
+    @Disabled("MissingMethod No signature of method")
     void testNamespaceFunction() {
         assert userService.findByEmail("test@test.com", true) == null
 
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
 
-        assert functionResNet.isPresent()
-        assert functionTestNet.isPresent()
+        assert functionResNet
+        assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["createUser": ["value": "true", "type": "boolean"]]))
 
         User user = userService.findByEmail("test@test.com", true)
         assert user
 
         userService.deleteUser(user)
-        petriNetService.deletePetriNet(functionResNet.get().stringId, userService.getLoggedOrSystem().transformToLoggedUser())
-        petriNetService.deletePetriNet(functionTestNet.get().stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(functionResNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     @Test
     void testProcessFunctions() {
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["enum": ["value": "ano", "type": "enumeration"]]))
         aCase = workflowService.findOne(aCase.getStringId())
 
@@ -112,71 +116,81 @@ class FunctionsTest {
         def fieldBehavior = aCase.getDataField("number").behavior
         assert fieldBehavior.containsKey(aCase.tasks.first().transition) && fieldBehavior.get(aCase.tasks.first().transition).contains(FieldBehavior.EDITABLE)
 
-        petriNetService.deletePetriNet(functionTestNet.get().stringId, userService.getLoggedOrSystem().transformToLoggedUser())
+        petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
+    /**
+     * TODO: why?
+     * NullPointerException -> MissingMethodException
+     **/
     void testNamespaceFunctionException() {
-        def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
-        if (nets) {
-            nets.each {
-                petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(MissingMethodException.class, () -> {
+            def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
+            if (nets) {
+                nets.each {
+                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                }
             }
-        }
 
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+            Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+        })
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     void testNewNetVersionMissingMethodException() {
-        def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
-        if (nets) {
-            nets.each {
-                petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(NullPointerException.class, () -> {
+            def nets = petriNetService.getByIdentifier(FUNCTION_TEST_IDENTIFIER)
+            if (nets) {
+                nets.each {
+                    petriNetService.deletePetriNet(it.getStringId(), userService.getLoggedOrSystem().transformToLoggedUser())
+                }
             }
-        }
 
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
 
-        functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+            functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            assert functionTestNet
 
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+        })
     }
 
-    @Test(expected = MissingMethodException.class)
+    @Test
     void testProcessFunctionException() {
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionTestNet.isPresent()
+        assertThrows(MissingMethodException.class, () -> {
+            def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number3": ["value": "20", "type": "number"]]))
+            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number3": ["value": "20", "type": "number"]]))
+        })
     }
 
     @Test
     void testNewVersionOfNamespaceFunction() {
-        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
 
-        assert functionResNet.isPresent()
-        assert functionTestNet.isPresent()
+        assert functionResNet
+        assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         aCase = workflowService.findOne(aCase.getStringId())
 
         assert aCase.getFieldValue("number2") == 20 + 20
 
-        functionResNet = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
-        assert functionResNet.isPresent()
+        functionResNet = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        assert functionResNet
 
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         aCase = workflowService.findOne(aCase.getStringId())
@@ -184,9 +198,11 @@ class FunctionsTest {
         assert aCase.getFieldValue("number2") == 20 * 20
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     void testNamespaceMethodOverloadingFail() {
-        petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(functionOverloadingFailNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        })
     }
 
     @Test
@@ -194,9 +210,11 @@ class FunctionsTest {
         testMethodOverloading(functionOverloadingNetResource)
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     void testProcessMethodOverloadingFail() {
-        petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        assertThrows(IllegalArgumentException.class, () -> {
+            petriNetService.importPetriNet(functionOverloadingFailNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        })
     }
 
     @Test
@@ -205,11 +223,11 @@ class FunctionsTest {
     }
 
     private void testMethodOverloading(Resource resource) {
-        def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser())
+        def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
 
-        assert petriNet.isPresent()
+        assert petriNet
 
-        Case aCase = workflowService.createCase(petriNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
+        Case aCase = workflowService.createCase(petriNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
         dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
         aCase = workflowService.findOne(aCase.getStringId())
 

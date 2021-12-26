@@ -38,6 +38,14 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private boolean defaultRoleEnabled;
+
+    @Getter
+    @Setter
+    private boolean anonymousRoleEnabled;
+
+    @Getter
+    @Setter
     private I18nString defaultCaseName;
 
     @Getter
@@ -177,7 +185,7 @@ public class PetriNet extends PetriNetObject {
 
     public void addFunction(Function function) { functions.add(function); }
 
-    public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
+    public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
             this.userRefs.get(usersRefId).putAll(permissions);
         } else {
@@ -394,6 +402,7 @@ public class PetriNet extends PetriNetObject {
         clone.setIdentifier(this.identifier);
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
+        clone.setDefaultRoleEnabled(this.defaultRoleEnabled);
         clone.setDefaultCaseName(this.defaultCaseName);
         clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
         clone.setIcon(this.icon);

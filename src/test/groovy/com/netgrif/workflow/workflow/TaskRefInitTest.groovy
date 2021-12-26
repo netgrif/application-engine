@@ -10,15 +10,15 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class TaskRefInitTest {
@@ -39,11 +39,13 @@ class TaskRefInitTest {
     private TestHelper testHelper
 
     PetriNet net = null
+    PetriNet autoTrigger = null
 
-    @Before
+    @BeforeEach
     void initNet() {
         testHelper.truncateDbs()
-        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).get()
+        net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/taskref_init.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
+        autoTrigger = petriNetService.importPetriNet(new FileInputStream("src/test/resources/autotrigger_taskref.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
         assert net != null
     }
 
@@ -57,5 +59,11 @@ class TaskRefInitTest {
         assert ((List<String>) aCase.dataSet.get("taskRef_1").value).isEmpty()
         assert ((List<String>) aCase.dataSet.get("taskRef_2").value).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").value).size() == 1
         assert ((List<String>) aCase.dataSet.get("taskRef_3").value).isEmpty()
+    }
+
+    @Test
+    void autoTriggerTaskRef() {
+        Case bCase = helper.createCase("Task ref init with auto trigger", autoTrigger)
+        assert ((List<String>) bCase.dataSet["tema"].value).contains(bCase.tasks.stream().filter({ t -> t.transition == "t1" }).findFirst().get().task) && ((List<String>) bCase.dataSet["tema"].value).size() == 1
     }
 }
