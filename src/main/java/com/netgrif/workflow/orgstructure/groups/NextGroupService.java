@@ -15,6 +15,7 @@ import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -73,8 +74,8 @@ public class NextGroupService implements INextGroupService {
     protected final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
-    public Case createDefaultSystemGroup(IUser author) {
-        if (findDefaultGroup() != null) {
+    public CreateCaseEventOutcome createDefaultSystemGroup(IUser author){
+        if(findDefaultGroup() != null) {
             log.info("Default system group has already been created.");
             return null;
         }
@@ -82,25 +83,21 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Case createGroup(IUser author) {
+    public CreateCaseEventOutcome createGroup(IUser author){
         return createGroup(author.getFullName(), author);
     }
 
     @Override
-    public Case createGroup(String title, IUser author) {
+    public CreateCaseEventOutcome createGroup(String title, IUser author){
         Case userDefaultGroup = findUserDefaultGroup(author);
         if (userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)) {
             return null;
         }
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
+        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        Map<String, Map<String, String>> taskData = getInitialGroupData(author, title, groupCase);
-        Task initTask = getGroupInitTask(groupCase);
-        if (initTask == null) {
-            log.error("Initial task of group case is not present!");
-            return null;
-        }
+        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getCase());
+        Task initTask = getGroupInitTask(outcome.getCase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
@@ -109,7 +106,7 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        return groupCase;
+        return outcome;
     }
 
     @Override
@@ -173,7 +170,6 @@ public class NextGroupService implements INextGroupService {
     public void addUserToDefaultGroup(IUser user) {
         addUser(user, findDefaultGroup());
     }
-
 
     @Override
     public void addUser(IUser user, String groupId){

@@ -6,12 +6,10 @@ import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleExcept
 import com.netgrif.workflow.workflow.domain.Case;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
-@Service
 public interface IRuleEvaluationScheduleService {
 
     ScheduleOutcome scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, TriggerBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;

@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.Imported;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.events.Event;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -16,11 +17,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@Document
 @Getter
+@Document
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class ProcessRole extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
+
+    public static final String ANONYMOUS_ROLE = "anonymous";
 
     @Id
     @Setter
@@ -47,6 +51,7 @@ public class ProcessRole extends Imported {
         _id = new ObjectId(id);
     }
 
+    @EqualsAndHashCode.Include
     public String getStringId() {
         return _id.toString();
     }
