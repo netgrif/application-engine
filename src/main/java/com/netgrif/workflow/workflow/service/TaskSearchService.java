@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
+import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
@@ -40,18 +41,14 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
         constraints.or(buildUserRefQueryConstraint(user));
-
-        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
-        negativeConstraints.or(buildNegativeViewUsersConstraint(user));
-
-        constraints.andNot(negativeConstraints);
         builder.and(constraints);
-        return builder;
-    }
 
-    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
-        Predicate userConstraints = usersQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        builder.and(permissionConstraints);
+        return builder;
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
@@ -59,15 +56,47 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    protected Predicate buildNegativeViewUsersConstraint(LoggedUser user) {
+    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
+        Predicate userRefConstraints = userRefQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(userRefConstraints), BooleanBuilder::or);
+    }
+
+    protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate viewRoleQuery(String role) {
+        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewRoles.contains(role));
+    }
+
+    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        Predicate userConstraints = viewUsersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUsersQuery(String userId) {
+        return QTask.task.viewUserRefs.isEmpty().and(QTask.task.viewRoles.isEmpty()).or(QTask.task.viewUsers.contains(userId));
+    }
+
+    protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewRoleQuery(String role) {
+        return QTask.task.negativeViewRoles.contains(role);
+    }
+
+    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
         Predicate userConstraints = negativeViewUsersQuery(user.getId());
         return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
-    protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleNegativeQuery).collect(Collectors.toList());
-        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    public Predicate negativeViewUsersQuery(String userId) {
+        return QTask.task.negativeViewUsers.contains(userId);
     }
+
 
     private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -103,16 +132,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.roles.containsKey(role);
     }
 
-    public Predicate roleNegativeQuery(String role) {
-        return QTask.task.negativeViewRoles.contains(role);
-    }
-
-    public Predicate usersQuery(String userId) {
+    public Predicate userRefQuery(String userId) {
         return QTask.task.users.containsKey(userId);
-    }
-
-    public Predicate negativeViewUsersQuery(String userId) {
-        return QTask.task.negativeViewUsers.contains(userId);
     }
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {

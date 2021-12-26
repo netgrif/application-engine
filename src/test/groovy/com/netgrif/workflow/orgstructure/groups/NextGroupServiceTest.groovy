@@ -80,7 +80,7 @@ class NextGroupServiceTest {
     }
 
     Case createGroup() {
-        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false))
+        return nextGroupService.createGroup("CUSTOM_GROUP_1", userService.findByEmail(DUMMY_USER_MAIL, false)).getCase()
     }
 
     List<Case> findGroup() {

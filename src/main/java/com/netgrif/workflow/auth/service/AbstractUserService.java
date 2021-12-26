@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +76,20 @@ public abstract class AbstractUserService implements IUserService {
 
     @Override
     public IUser removeRole(IUser user, String roleStringId) {
-        ProcessRole role = processRoleService.findByImportId(roleStringId);
+        return removeRole(user, processRoleService.findByImportId(roleStringId));
+    }
+
+    protected IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
         return save(user);
+    }
+
+    @Override
+    public void removeRoleOfDeletedPetriNet(PetriNet net) {
+        List<IUser> users = findAllByProcessRoles(net.getRoles().keySet(), false);
+        users.forEach(u -> {
+            net.getRoles().forEach((k, role) -> removeRole(u, role));
+        });
     }
 
     @Override

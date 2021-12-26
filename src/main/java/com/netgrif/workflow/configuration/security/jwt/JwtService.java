@@ -53,17 +53,17 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public LoggedUser getLoggedUser(String token, Authority anonymousRole) {
+    public LoggedUser getLoggedUser(String token, Authority anonymousAuthority) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("user");
         LoggedUser user = new LoggedUser(
                 userMap.get("id").toString(),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
-                Collections.singleton(anonymousRole)
+                Collections.singleton(anonymousAuthority)
         );
         user.setFullName(userMap.get("fullName").toString());
         user.setAnonymous((boolean) userMap.get("anonymous"));
-        user.setProcessRoles(Collections.singleton(roleService.defaultRole().getStringId()));
+        user.setProcessRoles(Collections.singleton(roleService.anonymousRole().getStringId()));
         return user;
     }
 
