@@ -12,7 +12,7 @@ public interface IWorkflowAuthorizationService {
 
     boolean canCallCreate(LoggedUser user, String netId);
 
-    boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions);
+    Boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions);
 
-    boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions);
+    Boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions);
 }

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>enumeration_multichoice_options</id>
+    <title>Enumeration/multichoice options</title>
+    <initials>EMO</initials>
+    <defaultRole>true</defaultRole>
+    <!-- DATA -->
+    <data type="enumeration" immediate="true">
+        <id>enumeration</id>
+        <title>Enumeration values</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+    </data>
+
+    <data type="enumeration" immediate="true">
+        <id>enumeration_like_map</id>
+        <title>Enumeration options</title>
+        <options>
+            <option key="one">Alice</option>
+            <option key="two">Bob</option>
+            <option key="three">Carol</option>
+        </options>
+        <init>Bob</init>
+    </data>
+
+    <data type="multichoice" immediate="true">
+        <id>multichoice</id>
+        <title>Multichoice values</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Alice,Bob</init>
+    </data>
+
+    <data type="multichoice" immediate="true">
+        <id>multichoice_like_map</id>
+        <title>Multichoice options</title>
+        <options>
+            <option key="one">Alice</option>
+            <option key="two">Bob</option>
+            <option key="three">Carol</option>
+        </options>
+        <init>Alice,Bob</init>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - editable</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_like_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_like_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

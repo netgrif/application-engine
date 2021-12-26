@@ -2,7 +2,6 @@ package com.netgrif.workflow.auth.service.interfaces;
 
 import org.springframework.stereotype.Service;
 
-@Service
 public interface ILoginAttemptService {
 
     void loginSucceeded(String key);
