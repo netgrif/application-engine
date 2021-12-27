@@ -11,21 +11,45 @@
 
 > Next-generation end-to-end low code platform.
 
-Application Engine is a workflow management system fully supporting low-code language Petriflow. // TODO short description
+Application Engine is a workflow management system fully supporting low-code language Petriflow. Application Engine (NAE for short)
+is based on Spring framework with fully complaint Petriflow language interpreter. NAE runs inside the Java Virtual Machine.
+It can be embedded into Java 11 project or used as a standalone process server. On top of the process server, NAE provides
+additional components to make integration to your project/environment seamless.
 
-Full specification of Petriflow low-code language can be found at [Petriflow.com](https://petriflow.com)
+* Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
+* Web Site: [https://engine.netgrif.com](https://engine.netgrif.com)
+* Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started)
+* Issue Tracker:
+* Java docs:
+* Roadmap:
+* License:
+
+## Components
+
+// TODO spísať komponenty v engine a len jednou vetou čo robia + link na dokumentáciu
+This project contains
+complete Petriflow interpreter together with user management, security configuration, data management,
+
+
+## Requirements
+
+// TODO spísať čo všetko je treba pre rozbehania. Databázy (poskytnúť docker compose) + Java 11
 
 ## Installation
 
-// TODO
+### Running as standalone
 
-### Requirements
+// TODO stručný popis ako rozbehať rovno z jarka engine a otestovať si deployment. odkázať sa na podrobnejší popis v docs
 
-// TODO
+### Embedding
 
-## Usage
+// TODO stručný popis ako to zahrnúť v spring projekte cez maven. odkázať sa na podrobnejší popis v docs
 
 For more information please follow instructions in [Get Started](https://engine.netgrif.com/get_started)
+
+## Other projects
+
+// TODO uviesť linku na frontend repo + builder
 
 ## Reporting issues
 
