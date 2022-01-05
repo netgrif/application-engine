@@ -61,9 +61,10 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f
+            "title.keyword", 2f,
+            "authorName.keyword", 1f,
+            "authorEmail.keyword", 1f,
+            "visualId.keyword", 2f
     );
 
     /**
@@ -418,7 +419,7 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         // TODO: improvement? wildcard does not scale good
-        QueryBuilder fullTextQuery = queryStringQuery("\\*" + request.fullText + "\\*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
 
