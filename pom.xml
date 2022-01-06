@@ -451,6 +451,9 @@
       <version>6.0.16.Final</version>
     </dependency>
     <!--DOCS-->
+<!--    TODO Replace with springdoc-->
+<!--    https://springdoc.org/#migrating-from-springfox-->
+<!--    https://www.baeldung.com/spring-rest-openapi-documentation-->
     <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
     <!--        <dependency>-->
     <!--            <groupId>io.springfox</groupId>-->
@@ -577,22 +580,22 @@
           </execution>
         </executions>
       </plugin>
-      <!--            <plugin>-->
-      <!--                <groupId>org.apache.maven.plugins</groupId>-->
-      <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-      <!--                <executions>-->
-      <!--                    <execution>-->
-      <!--                        <id>attach-javadocs</id>-->
-      <!--                        <goals>-->
-      <!--                            <goal>jar</goal>-->
-      <!--                        </goals>-->
-      <!--                    </execution>-->
-      <!--                </executions>-->
-      <!--                <configuration>-->
-      <!--                    <doclint>none</doclint>-->
-      <!--                    <detectJavaApiLink>false</detectJavaApiLink>-->
-      <!--                </configuration>-->
-      <!--            </plugin>-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doclint>none</doclint>
+          <detectJavaApiLink>false</detectJavaApiLink>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
