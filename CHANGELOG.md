@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10947/tab/release-report-all-issues"></a>
+## 5.5.5 (06.01.2022)
+### Bug fixes
+* [NAE-1530](https://netgrif.atlassian.net/browse/NAE-1530) - Cez simple search nie je možné vyhľadávať podľa visual ID
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10946/tab/release-report-all-issues"></a>
 ## 5.5.4 (20.12.2021)
 ### Bug fixes
