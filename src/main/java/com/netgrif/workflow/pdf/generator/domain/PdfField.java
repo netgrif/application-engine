@@ -23,11 +23,11 @@ public abstract class PdfField implements Comparable<PdfField> {
 
     @Getter
     @Setter
-    protected DataGroup dataGroup = null;
+    protected DataGroup dataGroup;
 
     @Getter
     @Setter
-    protected FieldType type = null;
+    protected FieldType type;
 
     @Getter
     @Setter
@@ -35,7 +35,7 @@ public abstract class PdfField implements Comparable<PdfField> {
 
     @Getter
     @Setter
-    protected List<String> values = null;
+    protected List<String> values;
 
     @Getter
     @Setter
@@ -75,15 +75,15 @@ public abstract class PdfField implements Comparable<PdfField> {
 
     @Getter
     @Setter
-    protected boolean changedSize = false;
+    protected boolean changedSize;
 
     @Getter
     @Setter
-    protected boolean changedPosition = false;
+    protected boolean changedPosition;
 
     @Getter
     @Setter
-    protected boolean dgField = false;
+    protected boolean dgField;
 
     @Getter
     @Setter
@@ -93,7 +93,14 @@ public abstract class PdfField implements Comparable<PdfField> {
     @Setter
     protected Renderer renderer;
 
-    public PdfField(PdfResource resource){
+    public PdfField() {
+        changedSize = false;
+        changedPosition = false;
+        dgField = false;
+    }
+
+    public PdfField(PdfResource resource) {
+        this();
         this.resource = resource;
     }
 
