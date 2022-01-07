@@ -170,5 +170,10 @@ PdfGenerator.generatePdf(Case, String, PdfResource) function takes three argumen
 Finally, based on the path or FileFieldValue in the first part of function, you can change a file fields value to the
 final PDF file.
 
+## Supported layouts
+
+PDF generator supports standard legacy layout, grid layout and flow layout. You have nothing to do with layout
+configuration as the PDF generator resolves it automatically.
+
 
 
