@@ -152,7 +152,7 @@ public class PetriNetController {
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
         FileSystemResource fileResource = service.getFile(decodeUrl(netId), decodeUrl(title));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename() + Importer.FILE_EXTENSION);
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileResource.getFilename() + Importer.FILE_EXTENSION + "\"");
         response.setHeader("Content-Length", String.valueOf(fileResource.getFile().length()));
         log.info("Downloading Petri net file: " + fileResource.getFilename() + " [" + netId + "]");
         return fileResource;
