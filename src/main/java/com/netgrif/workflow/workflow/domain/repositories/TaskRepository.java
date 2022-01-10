@@ -38,6 +38,8 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     void deleteAllByCaseId(String caseId);
 
+    void deleteAllByProcessId(String processId);
+
     @Override
     default void customize(QuerydslBindings bindings, QTask qTask) {
         //

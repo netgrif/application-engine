@@ -1254,35 +1254,35 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105007;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="91" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305003;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="92" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.105008;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="93" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305019;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="94" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.105004;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -1437,14 +1437,14 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105010;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="107" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305004;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -1584,14 +1584,14 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105012;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="118" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305005;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -3635,7 +3635,7 @@
             other: f.104003;
             change other value {
                 if (check.value == "0.00 €")
-                    return null;
+                    return init;
                 return other.value;
             }
             <!--@formatter:on-->
@@ -3678,7 +3678,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.308009;
-            change other value { null; }
+            change other value { init; }
         <!--@formatter:on-->
         </action>
         <action id="231" trigger="set">
@@ -5027,7 +5027,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.109065;
-            change other value { return null; }
+            change other value { return init; }
             <!--@formatter:off-->
         </action>
     </data>
@@ -5062,7 +5062,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5113,7 +5113,7 @@
             field: f.109058;
             change field value {
                 if (check.value == "fyzická osoba")
-                    return null;
+                    return init;
                 return field.value;
             }
             <!--@formatter:on-->
@@ -5165,7 +5165,7 @@
             field: f.109012;
             change field value {
                 if (check.value == "fyzická osoba")
-                    return null;
+                    return init;
                 return field.value;
             }
             <!--@formatter:on-->
@@ -5210,7 +5210,7 @@
             change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5254,7 +5254,7 @@
             change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5271,7 +5271,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5288,7 +5288,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5305,7 +5305,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5322,7 +5322,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5339,7 +5339,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5362,7 +5362,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5396,7 +5396,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5440,7 +5440,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5457,7 +5457,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5475,7 +5475,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5493,7 +5493,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5643,7 +5643,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5655,7 +5655,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5667,7 +5667,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5679,7 +5679,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5691,7 +5691,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5703,7 +5703,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5715,7 +5715,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5739,7 +5739,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5751,7 +5751,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5763,7 +5763,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5775,7 +5775,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5787,7 +5787,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5799,7 +5799,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5811,7 +5811,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5823,7 +5823,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5937,7 +5937,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5954,7 +5954,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -5971,7 +5971,7 @@
             change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6032,7 +6032,7 @@
             field: f.109059;
             change field value {
                 if (check.value == "fyzická osoba")
-                    return null;
+                    return init;
                 return field.value;
             }
             <!--@formatter:on-->
@@ -6084,7 +6084,7 @@
             field: f.109026;
             change field value {
                 if (check.value == "fyzická osoba")
-                    return null;
+                    return init;
                 return field.value;
             }
             <!--@formatter:on-->
@@ -6129,7 +6129,7 @@
             change field value {
                 if (check.value == "fyzická osoba")
                     return field.value;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6173,7 +6173,7 @@
             change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6217,7 +6217,7 @@
             change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6425,7 +6425,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6437,7 +6437,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6449,7 +6449,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6461,7 +6461,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6623,7 +6623,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6635,7 +6635,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6647,7 +6647,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6659,7 +6659,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6697,7 +6697,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6714,7 +6714,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6731,7 +6731,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -6748,7 +6748,7 @@
             change f_2 value {
                 if (field.value)
                     return f_1.value as String;
-                return null;
+                return init;
             }
             <!--@formatter:on-->
         </action>
@@ -7362,14 +7362,14 @@
                         <!--@formatter:off-->
                         check: f.105031,
                         other: f.105032;
-                        change other value { null; }
+                        change other value { init; }
                         <!--@formatter:on-->
                     </action>
                     <action id="476" trigger="set">
                         <!--@formatter:off-->
                         check: f.105031,
                         other: f.105032;
-                        change other value { null; }
+                        change other value { init; }
                         <!--@formatter:on-->
                     </action>
                 </logic>
@@ -7459,14 +7459,14 @@
                         <!--@formatter:off-->
             check: f.105033,
             other: f.105034;
-            change other value { null; }
+            change other value { init; }
             <!--@formatter:on-->
                     </action>
                     <action id="484" trigger="set">
                         <!--@formatter:off-->
             check: f.105033,
             other: f.105034;
-            change other value { null; }
+            change other value { init; }
             <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8060,14 +8060,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105015,
                     other: f.105016;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="532" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105015,
                     other: f.305007;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8162,14 +8162,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105017,
                     other: f.105018;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="540" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105017,
                     other: f.305008;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8263,14 +8263,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105019,
                     other: f.105020;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="548" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105019,
                     other: f.305009;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8364,14 +8364,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105021,
                     other: f.105022;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="556" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105021,
                     other: f.305010;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8465,14 +8465,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105023,
                     other: f.105024;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="564" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105023,
                     other: f.305011;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8566,14 +8566,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105025,
                     other: f.105026;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="572" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105025,
                     other: f.305012;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8667,14 +8667,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105027,
                     other: f.105028;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="580" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105027,
                     other: f.305013;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8767,14 +8767,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105029,
                     other: f.105030;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                     <action id="588" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105029,
                     other: f.305014;
-                    change other value { null; }
+                    change other value { init; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8998,12 +8998,12 @@
                     <action id="595" trigger="set">
                         idTrue: f.106004,
                         other: f.106005;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="596" trigger="set">
                         idTrue: f.106004,
                         other: f.306002;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9083,12 +9083,12 @@
                     <action id="603" trigger="set">
                         idTrue: f.106006,
                         other: f.106007;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="604" trigger="set">
                         idTrue: f.106006,
                         other: f.306003;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9168,12 +9168,12 @@
                     <action id="611" trigger="set">
                         idTrue: f.106008,
                         other: f.106009;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="612" trigger="set">
                         idTrue: f.106008,
                         other: f.306004;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9253,12 +9253,12 @@
                     <action id="619" trigger="set">
                         idTrue: f.106010,
                         other: f.106011;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="620" trigger="set">
                         idTrue: f.106010,
                         other: f.306005;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9338,12 +9338,12 @@
                     <action id="627" trigger="set">
                         idTrue: f.106012,
                         other: f.106013;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="628" trigger="set">
                         idTrue: f.106012,
                         other: f.306006;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9423,12 +9423,12 @@
                     <action id="635" trigger="set">
                         idTrue: f.106014,
                         other: f.106015;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="636" trigger="set">
                         idTrue: f.106014,
                         other: f.306007;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9508,12 +9508,12 @@
                     <action id="643" trigger="set">
                         idTrue: f.106016,
                         other: f.106017;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="644" trigger="set">
                         idTrue: f.106016,
                         other: f.306008;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9593,12 +9593,12 @@
                     <action id="651" trigger="set">
                         idTrue: f.106018,
                         other: f.106019;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="652" trigger="set">
                         idTrue: f.106018,
                         other: f.306009;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>
@@ -9678,12 +9678,12 @@
                     <action id="659" trigger="set">
                         idTrue: f.106020,
                         other: f.106021;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                     <action id="660" trigger="set">
                         idTrue: f.106020,
                         other: f.306010;
-                        change other value { null; }
+                        change other value { init; }
                     </action>
                 </logic>
             </dataRef>

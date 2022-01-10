@@ -3,15 +3,18 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -52,18 +55,51 @@ public class UserService implements IUserService {
     @Autowired
     private INextGroupService groupService;
 
+    @Autowired
+    private GroupConfigurationProperties groupProperties;
+
+    @Autowired
+    private IFilterImportExportService filterImportExportService;
+
+    @Autowired
+    private IAfterRegistrationAuthService authenticationService;
+
+    @Override
+    public User saveNewAndAuthenticate(User user) {
+        return saveNew(user, true);
+    }
+
     @Override
     public User saveNew(User user) {
+        return saveNew(user, false);
+    }
+
+    private User saveNew(User user, boolean login) {
+        String rawPassword = user.getPassword();
+
         encodeUserPassword(user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
-        groupService.createGroup(user);
-        groupService.addUserToDefaultGroup(user);
+        filterImportExportService.createFilterImport(user);
+        filterImportExportService.createFilterExport(user);
+
+        if (login)
+            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
+
+        if (groupProperties.isDefaultEnabled())
+            groupService.createGroup(user);
+
+        if (groupProperties.isSystemEnabled())
+            groupService.addUserToDefaultGroup(user);
+
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
+
+        if (login)
+            authenticationService.logoutAfterRegistrationFinished();
         return savedUser;
     }
 

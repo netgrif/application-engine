@@ -1,10 +1,9 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -32,6 +31,10 @@ public interface IWorkflowService {
     Case createCase(String netId, String title, String color, LoggedUser user, Locale locale);
 
     Case createCase(String netId, String title, String color, LoggedUser user);
+
+    Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
+
+    Case createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
 
     Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
 
@@ -67,5 +70,5 @@ public interface IWorkflowService {
 
     ChangedFieldsTree runActions(List<Action> actions, String useCaseId);
 
-    void runActions(List<Action> actions);
+    void runActions(List<Action> actions, PetriNet petriNet);
 }

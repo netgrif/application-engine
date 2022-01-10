@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>function_res</id>
+    <initials>SFR</initials>
+    <title>Test</title>
+    <!-- FUNCTIONS -->
+    <function name="createUser" scope="namespace">
+        {  com.netgrif.workflow.auth.domain.User user ->
+            if (user != null) {
+                userService.encodeUserPassword(user)
+                userService.save(user)
+            }
+        }
+    </function>
+    <function scope="namespace" name="calculate">
+        { def x, def y ->
+            return x + y
+        }
+    </function>
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Test</label>
+        <dataGroup>
+            <id>0</id>
+            <layout>flow</layout>
+            <dataRef>
+                <id>number</id>
+                <logic><behavior>editable</behavior></logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

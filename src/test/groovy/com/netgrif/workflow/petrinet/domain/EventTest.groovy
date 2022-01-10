@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
@@ -72,6 +73,8 @@ class EventTest {
 
     @Autowired
     private IPetriNetService petriNetService;
+    @Autowired
+    private TestHelper testHelper
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -80,14 +83,10 @@ class EventTest {
     Case instance
     EventOutcome outcome
 
+
     @Test
     void testEventImport() {
-        template.db.drop()
-        userRepository.deleteAll()
-        userRunner.run("")
-        roleRepository.deleteAll()
-        roleRunner.run()
-        superCreator.run()
+        testHelper.truncateDbs()
 
         def net = petriNetService.importPetriNet(stream(EVENT_NET_FILE), "major", superCreator.getLoggedSuper()).get()
         instance = helper.createCase(EVENT_NET_CASE, net)
@@ -113,7 +112,7 @@ class EventTest {
 
     private void assertCancelOutcome() {
         assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
-        assert (outcome.changedFields["chained"].attributes["value"].value as String) == "chained"
+        assert (outcome.changedFields.changedFields["chained"].attributes["value"].value as String) == "chained"
     }
 
     private void assertActionsRuned(String fieldIdWithoutPhase, String message) {
@@ -126,7 +125,7 @@ class EventTest {
         assert instance.dataSet["${fieldIdWithoutPhase}_post" as String].value as String == "${fieldIdWithoutPhase}_post"
 
         assert outcome.message.defaultValue == message
-        assert outcome.changedFields["${fieldIdWithoutPhase}_pre" as String]
-        assert outcome.changedFields["${fieldIdWithoutPhase}_post" as String]
+        assert outcome.changedFields.changedFields["${fieldIdWithoutPhase}_pre" as String]
+        assert outcome.changedFields.changedFields["${fieldIdWithoutPhase}_post" as String]
     }
 }
