@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@ConditionalOnProperty(value = "nae.group.default.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
 public interface INextGroupService {
 
     Case createDefaultSystemGroup(User author);

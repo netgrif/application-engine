@@ -33,15 +33,11 @@
     <data type="text">
         <id>text</id>
         <title>Text</title>
-
         <event type="set">
             <id>id</id>
 
             <actions phase="pre">
                 <action>
-                    number: f.number;
-
-                    change number value { 666 as Double }
                 </action>
             </actions>
 

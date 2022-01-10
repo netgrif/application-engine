@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles(["dev"])
+@ActiveProfiles(["test"])
 @SpringBootTest
 class DashboardServiceTest {
 
@@ -26,7 +26,7 @@ class DashboardServiceTest {
     int[] testDataInt = [15, 20, 32, 11, 7, 12]
 
     @Test
-    void dashboardIntegerTest(){
+    void dashboardIntegerTest() {
         PetriNet net1 = helper.createNet("all_data.xml", "major").get()
         Random random = new Random()
         (1..30).each {
@@ -37,7 +37,7 @@ class DashboardServiceTest {
     }
 
     @Test
-    void dashboardStringTest(){
+    void dashboardStringTest() {
         PetriNet net1 = helper.createNet("all_data.xml", "major").get()
         Random random = new Random()
         (1..30).each {

@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.service.CaseSearchService
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -74,7 +75,7 @@ class CaseSearchTest {
 
         PetriNet net = getNet()
 
-        Case case1 = importHelper.createCase("Case1-Prdel", net)
+        Case case1 = importHelper.createCase("Case1-Milan", net)
         Case case2 = importHelper.createCase("Case2", net)
         Case case3 = importHelper.createCase("Case3", net)
 
@@ -103,7 +104,7 @@ class CaseSearchTest {
                 ],
                 "3": [
                         "type" : "text",
-                        "value": "Prdel"
+                        "value": "Milan"
                 ],
                 "4": [
                         "type" : "date",
@@ -144,7 +145,7 @@ class CaseSearchTest {
 
     @Test
     void searchByMoreValues() {
-        performSearch("Prdel","Case1")
+        performSearch("Milan","Case1")
     }
 
     @Test
@@ -159,9 +160,9 @@ class CaseSearchTest {
 
 
     void performSearch(String input, String expect = "", Boolean includeInput = true) {
-        String request = buildRequestBody("net", input)
-        mvc.perform(post("/api/workflow/case/search")
-                .contentType(MediaType.APPLICATION_JSON)
+        String request = buildRequestBody(input)
+        mvc.perform(post("/api/workflow/case/search_mongo")
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(request)
                 .with(httpBasic("super@netgrif.com", userPassword))
                 .with(csrf()))
@@ -175,12 +176,12 @@ class CaseSearchTest {
                 .andReturn()
     }
 
-    String buildRequestBody(String process, String fullText) {
+    String buildRequestBody(String fullText) {
         def map = [
-                "petriNet": [
-                        "identifier": process
+                (CaseSearchService.PETRINET): [
+                        (CaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
                 ],
-                "fullText": fullText
+                (CaseSearchService.FULLTEXT): fullText
         ]
 
         ObjectMapper mapper = new ObjectMapper()

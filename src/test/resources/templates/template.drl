@@ -1,0 +1,39 @@
+template header
+ruleId
+salienceVal
+ruleEnabled
+dateEffective
+dateExpires
+whenCondition
+thenAction
+
+import java.util.HashMap;
+import java.util.ArrayList;
+import org.slf4j.Logger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import com.netgrif.workflow.utils.DateUtils;
+
+import com.netgrif.workflow.workflow.domain.*
+import com.netgrif.workflow.petrinet.domain.*
+import com.netgrif.workflow.rules.domain.facts.*
+
+import org.quartz.*
+
+<%= imports %>
+
+<%= globals %>
+
+template "standard_template"
+
+rule "@{ruleId}" salience @{salienceVal}
+  dialect "mvel"
+  enabled @{ruleEnabled}
+  @{dateEffective}
+  @{dateExpires}
+  when
+    @{whenCondition}
+  then
+    @{thenAction}
+end
+end template

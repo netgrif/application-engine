@@ -1,10 +1,15 @@
 package com.netgrif.workflow.petrinet.service
 
 import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.ipc.TaskApiTest
+import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
@@ -14,6 +19,7 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import org.bson.types.ObjectId
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner
 class PetriNetServiceTest {
 
     public static final String NET_FILE = "process_delete_test.xml"
+    public static final String CUSTOMER_USER_MAIL = "customer@netgrif.com"
 
     @Autowired
     private ImportHelper importHelper
@@ -69,6 +76,11 @@ class PetriNetServiceTest {
     @Before
     void setup() {
         testHelper.truncateDbs()
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
+                [auths.get("user")] as Authority[],
+                [] as Group[],
+                [] as UserProcessRole[])
     }
 
     @Test
@@ -90,14 +102,17 @@ class PetriNetServiceTest {
         assert processRoleRepository.count() == processRoleCount + 2
         assert userProcessRoleRepository.count() == userProcessRoleCount + 2
 
-        def user = userService.findByEmail("user@netgrif.com", false)
+        def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
         assert user.processRoles.size() == 0
 
         userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
-        user = userService.findByEmail("user@netgrif.com", false)
+        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
         assert user.processRoles.size() == 1
+        assert petriNetService.get(new ObjectId(testNet.stringId)) != null
+
+
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
@@ -105,8 +120,17 @@ class PetriNetServiceTest {
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
         assert userProcessRoleRepository.count() == userProcessRoleCount
-        user = userService.findByEmail("user@netgrif.com", false)
+        user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
         assert user != null
         assert user.processRoles.size() == 0
+
+        boolean exceptionThrown = false
+        try {
+            petriNetService.get(new ObjectId(testNet.stringId))
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true
+            assert e.message.contains(testNet.stringId)
+        }
+        assert exceptionThrown
     }
 }

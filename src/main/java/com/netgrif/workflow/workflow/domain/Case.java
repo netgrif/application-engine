@@ -99,12 +99,9 @@ public class Case {
     @Indexed
     private Author author;
 
-    /**
-     * TODO: reset = variable
-     */
     @Getter
     @Setter
-    private Map<String, Integer> resetArcTokens;
+    private Map<String, Integer> consumedTokens;
 
     @Getter
     @Setter
@@ -115,6 +112,10 @@ public class Case {
     @Setter
     @JsonIgnore
     private Set<String> enabledRoles;
+
+    @Getter
+    @Setter
+    private Set<String> viewRoles;
 
     @Getter
     @Setter
@@ -141,10 +142,11 @@ public class Case {
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
-        resetArcTokens = new HashMap<>();
+        consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
+        viewRoles = new HashSet<>();
         permissions = new HashMap<>();
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
@@ -212,6 +214,15 @@ public class Case {
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
         dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
         dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
+        populateDataSetBehavior();
+    }
+
+    private void populateDataSetBehavior() {
+        petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
+            transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
+                getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
+            });
+        });
     }
 
     private String generateVisualId() {
@@ -265,5 +276,28 @@ public class Case {
                 users.put(userId, permissions);
             }
         });
+    }
+
+    public void decideEnabledRoles(PetriNet net) {
+        this.viewRoles = filterViewRoles();
+    }
+
+    public void addAllRolesToViewRoles(String defaultRoleId) {
+        this.viewRoles.addAll(enabledRoles);
+        this.viewRoles.add(defaultRoleId);
+    }
+
+    public Set<String> getViewUserRefs() {
+        return this.userRefs.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("view") && e.getValue().get("view"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> filterViewRoles() {
+        return this.permissions.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("view") && e.getValue().get("view"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 }
