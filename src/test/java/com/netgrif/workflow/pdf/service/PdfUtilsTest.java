@@ -29,7 +29,7 @@ public class PdfUtilsTest {
     @Test
     @Ignore // TODO: 4/6/18 font fix
     public void fillPdfFormPoisteniePremioveByvanie() throws Exception {
-        File input = new File("src/main/resources/pdf/draft.pdf");
+        File input = new File("src/test/resources/pdf/draft.pdf");
         File xml = new File("src/test/resources/pdf/draft.xml");
 
         File out = PdfUtils.fillPdfForm("target/test_out_premiovebyvanie.pdf", new FileInputStream(input), new FileInputStream(xml));

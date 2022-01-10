@@ -18,31 +18,29 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 
-@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
 
     @Autowired
-    private IMemberService memberService;
+    protected IMemberService memberService;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    protected ApplicationEventPublisher publisher;
 
     @Autowired
-    private ILoginAttemptService loginAttemptService;
+    protected ILoginAttemptService loginAttemptService;
 
     @Autowired
-    private HttpServletRequest request;
+    protected HttpServletRequest request;
 
     @Override
     @Transactional(readOnly = true)
@@ -66,7 +64,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(token);
     }
 
-    private LoggedUser getLoggedUser(String email) throws UsernameNotFoundException{
+    protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException{
         User user = userRepository.findByEmail(email);
         if(user == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
@@ -76,14 +74,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return user.transformToLoggedUser();
     }
 
-    private void setGroups(LoggedUser loggedUser) {
+    protected void setGroups(LoggedUser loggedUser) {
         Member member = memberService.findByEmail(loggedUser.getUsername());
         if (member != null) {
             loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
         }
     }
 
-    private String getClientIP() {
+    protected String getClientIP() {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null){
             return request.getRemoteAddr();

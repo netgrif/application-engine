@@ -3,6 +3,7 @@
 	<id>all_data</id>
 	<title>All Data</title>
 	<initials>ALL</initials>
+    <caseName>All data test default case name</caseName>
     <!-- ROLES -->
     <role>
         <id>process_role</id>
