@@ -123,6 +123,29 @@ None
 ### Features
 * [NAE-1407](https://netgrif.atlassian.net/browse/NAE-1407) - Static functions
 
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10947/tab/release-report-all-issues"></a>
+## 5.5.5 (06.01.2022)
+### Bug fixes
+* [NAE-1530](https://netgrif.atlassian.net/browse/NAE-1530) - Cez simple search nie je možné vyhľadávať podľa visual ID
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10946/tab/release-report-all-issues"></a>
+## 5.5.4 (20.12.2021)
+### Bug fixes
+* [NAE-1522](https://netgrif.atlassian.net/browse/NAE-1522) - Neda sa stahovat subory, ktore maju v nazve ciarku
+* [NAE-1536](https://netgrif.atlassian.net/browse/NAE-1536) - Cez simple search nie je možné vyhľadávať hodnoty obsahujúce pomlčku
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
 ## 5.5.2 (19.07.2021)
 ### Bug fixes
