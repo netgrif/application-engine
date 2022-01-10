@@ -39,7 +39,6 @@ class CaseApiTest {
     @Autowired
     private SuperCreator superCreator
 
-    private boolean initialised = false
     private Optional<PetriNet> testNet
 
     private def stream = { String name ->
@@ -48,10 +47,7 @@ class CaseApiTest {
 
     @Before
     void setup() {
-        if (!initialised) {
-            testHelper.truncateDbs()
-            initialised = true
-        }
+        testHelper.truncateDbs()
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"
@@ -73,6 +69,8 @@ class CaseApiTest {
 
     @Test
     void testSearch() {
+        testHelper.truncateDbs()
+
         testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
@@ -87,7 +85,7 @@ class CaseApiTest {
 
         cases = caseRepository.findAll()
         assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
-        assert cases.findAll { it.title != "Case 1" }.every { it.dataSet["field"].value == 0 }
+        assert cases.findAll { it.title != "Case 1"  && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
         assert cases.find {it.title == "Case 0"}.dataSet["count"].value == 5
         assert cases.find {it.title == "Case 0"}.dataSet["paged"].value == 1
     }

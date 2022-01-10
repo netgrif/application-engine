@@ -13,12 +13,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
-@Service
 public interface IUserService {
 
     User findByAuth(Authentication auth);
 
     User save(User user);
+
+    User saveNewAndAuthenticate(User user);
 
     User saveNew(User user);
 

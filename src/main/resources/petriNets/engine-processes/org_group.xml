@@ -9,6 +9,31 @@
 	<transitionRole>false</transitionRole>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- FUNCTIONS -->
+	<function scope="process" name="updateFilterAutocompleteOptions">
+	{
+		com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+		com.netgrif.workflow.petrinet.domain.dataset.TaskField previewTaskRef,
+		com.netgrif.workflow.petrinet.domain.dataset.CaseField referencedFiltersList
+		->
+			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+				change previewTaskRef value {
+					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+				}
+			} else {
+				change filterAutocomplete options {
+					return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+							.findAll({filterCase -&gt; !referencedFiltersList.value.contains(filterCase.stringId)})
+							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+				}
+				change previewTaskRef value {
+					return []
+				}
+			}
+		}
+	</function>
 	<!-- DATA -->
 	<data type="text">
 		<id>group_id</id>
@@ -54,7 +79,6 @@
 		<id>members</id>
 		<title>Members</title>
 		<desc>Members of current organization group</desc>
-		<options/>
 		<view>
 			<list/>
 		</view>
@@ -66,7 +90,7 @@
 			<option key="add" name="user_action_selection_add">Add existing user</option>
 			<option key="invite" name="user_action_selection_invite">Invite new user</option>
 		</options>
-		<init>Add existing user</init>
+		<init>add</init>
 		<action trigger="set">
 			action_selection: f.user_action_selection,
 			user_selection: f.user_selection,
@@ -87,6 +111,252 @@
 		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
 		<valid>email</valid>
 	</data>
+	<data type="taskRef">
+		<id>filter_tasks</id>
+		<title></title>
+	</data>
+	<data type="taskRef">
+		<id>filter_preview</id>
+		<title></title>
+	</data>
+	<data type="taskRef">
+		<id>imported_menu_ids</id>
+		<title></title>
+	</data>
+	<data type="enumeration_map">
+		<id>filter_autocomplete_selection</id>
+		<title name="select_menu_item_filter">Select filter</title>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<action trigger="set">
+			filterAutocomplete: f.this,
+			previewTaskRef: f.filter_preview,
+			referencedFiltersList: f.referenced_filters;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
+		</action>
+		<action trigger="get">
+			filterAutocomplete: f.this,
+			previewTaskRef: f.filter_preview,
+			referencedFiltersList: f.referenced_filters;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
+		</action>
+	</data>
+	<data type="button">
+		<id>add_filter_to_menu</id>
+		<title></title>
+		<placeholder name="add_menu_item">Add to menu</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			filterAutocomplete: f.filter_autocomplete_selection,
+			menuItemsTaskRef: f.filter_tasks,
+			availableEntries: f.available_export_entries,
+			referencedFiltersList: f.referenced_filters;
+
+			if (!filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+				return;
+			}
+
+			def optionCase = createCase("preference_filter_item")
+			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
+			assignTask(initTask)
+			setData(initTask, [
+				"filter_case": ["type":"caseRef", "value": [filterAutocomplete.value], "allowedNets":["filter"]],
+				"parentId": ["type":"text", "value":useCase.stringId]
+			])
+			finishTask(initTask)
+
+			change referencedFiltersList value {return referencedFiltersList.value + filterAutocomplete.value}
+
+			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
+
+			change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
+			change filterAutocomplete value {return ""}
+
+			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+		</action>
+	</data>
+	<data type="file">
+		<id>export_menu_file</id>
+		<title name="export_file">Exported menu file</title>
+		<placeholder name="export_file_placeholder">Your XML file with menus</placeholder>
+		<desc name="export_file_desc">Download exported file with menus in XML format.</desc>
+	</data>
+	<data type="button">
+		<id>update_available_entries_btn</id>
+		<title></title>
+		<placeholder name="update_available_entries_btn_placeholder">Update entries</placeholder>
+		<action trigger="set">
+			availableEntries: f.available_export_entries;
+
+			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+		</action>
+	</data>
+	<data type="button">
+		<id>clear_menu_selection_btn</id>
+		<title></title>
+		<placeholder name="clear_menu_selection_btn_placeholder">Clear menu configurations</placeholder>
+		<action trigger="set">
+			menusForExport: f.menus_for_export;
+
+			change menusForExport options {[:]}
+		</action>
+	</data>
+	<data type="text">
+		<id>export_menu_name</id>
+		<title name="exported_menu_id">Exported menu identifier</title>
+		<desc name="exported_menu_id_desc">Unique name menu configuration for selected entries.</desc>
+		<action trigger="set">
+			addToExportBtn: f.add_to_export_btn,
+			exportMenuName: f.this,
+			trans: t.navigationMenuConfig;
+
+			if (exportMenuName.value == "") {
+				make addToExportBtn, visible on trans when {true}
+			} else {
+				make addToExportBtn, editable on trans when {true}
+			}
+		</action>
+	</data>
+	<data type="multichoice_map">
+		<id>available_export_entries</id>
+		<title name="available_export_entries">Available entries for export</title>
+		<placeholder name="available_export_entries_placeholder">Export menu</placeholder>
+	</data>
+	<data type="button">
+		<id>add_to_export_btn</id>
+		<title></title>
+		<placeholder name="add_to_export_placeholder">Add entries to export</placeholder>
+		<action trigger="set">
+			selectedEntries: f.available_export_entries,
+			addToExportBtn: f.this,
+			menuIdentifier: f.export_menu_name,
+			menusForExport: f.menus_for_export;
+
+			change menusForExport options { return menuImportExportService.addSelectedEntriesToExport(selectedEntries, menusForExport, menuIdentifier.value) }
+
+			change selectedEntries value {[]}
+		</action>
+		<component>
+			<name>raised</name>
+		</component>
+	</data>
+	<data type="enumeration_map">
+		<id>menus_for_export</id>
+		<title name="menus_for_export">Menus to be exported</title>
+	</data>
+	<data type="text">
+		<id>import_results</id>
+		<title name="import_results">Import results</title>
+		<values>area</values>
+	</data>
+	<data type="button">
+		<id>export_menu_btn</id>
+		<title></title>
+		<placeholder name="export_menu_btn_placeholder">Export menu</placeholder>
+		<action trigger="set">
+			export_file: f.export_menu_file,
+			menuIdentifier: f.export_menu_name,
+			menusForExport: f.menus_for_export,
+			groupId: f.group_id;
+
+			change export_file value { menuImportExportService.exportMenu(menusForExport, groupId.value, export_file) }
+			change menusForExport options {[:]}
+		</action>
+		<component>
+			<name>raised</name>
+		</component>
+	</data>
+	<data type="file">
+		<id>import_menu_file</id>
+		<title>Import menu</title>
+		<placeholder name="import_file_placeholder">Menu file to import</placeholder>
+		<desc name="import_file_desc">Upload XML file containing menu here</desc>
+	</data>
+	<data type="button">
+		<id>import_menu_btn</id>
+		<title></title>
+		<placeholder name="import_menu_btn_placeholder">Import menu</placeholder>
+		<desc name="import_menu_btn_desc">Import menu from provided XML file</desc>
+		<action trigger="set">
+			import_file: f.import_menu_file,
+			menuItemsTaskRef: f.filter_tasks,
+			referencedFiltersList: f.referenced_filters,
+			groupId: f.group_id,
+			newEntries: f.imported_menu_ids,
+			newIdsActionSetter: f.new_entries_setter,
+			importResults: f.import_results;
+
+			change importResults value {return ""}
+
+			def cases = findCases({ it.processIdentifier.eq("preference_filter_item") }).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change newEntries value { return menuImportExportService.importMenu(cases, import_file.value, useCase.stringId) }
+			def actualUseCase = workflowService.findOne(useCase.stringId)
+
+			actualUseCase.dataSet.entrySet().forEach{ e ->
+				useCase.dataSet[e.key].value = e.value.value
+				if(e.key == ("imported_menu_ids")) {
+					useCase.dataSet[e.key].value = newEntries.value
+				}
+			}
+
+		change newIdsActionSetter value { "triggerAction" }
+		</action>
+		<component>
+			<name>raised</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>new_entries_setter</id>
+		<title></title>
+		<action trigger="set">
+			import_file: f.import_menu_file,
+			menuItemsTaskRef: f.filter_tasks,
+			referencedFiltersList: f.referenced_filters,
+			groupId: f.group_id,
+			newEntries: f.imported_menu_ids,
+			availableEntries: f.available_export_entries,
+			importResults: f.import_results;
+
+			filterTaskIds = []
+			filterCaseIds = []
+
+			newEntries.value.forEach { itemId -&gt;
+			def idSplit = itemId.split(',')
+			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(idSplit[0]))})
+			setData(initTask, [
+			"filter_case": ["type":"caseRef", "value": [idSplit[1]], "allowedNets":["filter"]],
+			"use_icon": ["type":"boolean", "value": idSplit[2]]
+			])
+
+			finishTask(initTask)
+
+			def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(idSplit[0]))})
+			filterTaskIds.add(viewTask.getStringId())
+			filterCaseIds.add(idSplit[1])
+			}
+
+			change menuItemsTaskRef value {return menuItemsTaskRef.value + filterTaskIds}
+			change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
+			workflowService.save(useCase)
+
+			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+		</action>
+	</data>
+	<data type="caseRef">
+		<id>referenced_filters</id>
+		<title></title>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="author">Autor grupy</i18nString>
@@ -106,202 +376,289 @@
 		<i18nString name="user_action_selection_invite">Pozvať nového používateľa</i18nString>
 		<i18nString name="invite_by_mail">Zadaj e-mail adresu</i18nString>
 		<i18nString name="invite_by_mail_desc">Zadaj e-mail adresu</i18nString>
+		<i18nString name="select_menu_item_filter">Zvoľte filter</i18nString>
+		<i18nString name="add_menu_item">Pridať ako položku menu</i18nString>
+		<i18nString name="menu_configuration">Konfigurácia menu</i18nString>
+		<i18nString name="export_file">Exportovaný súbor s menu</i18nString>
+		<i18nString name="export_file_desc">Stiahnite exportovaný XML súbor s menu položkami.</i18nString>
+		<i18nString name="export_file_placeholder">Váš XML súbor s vybranou menu konfiguráciou.</i18nString>
+		<i18nString name="exported_menu_id">Identifikátor menu nakonfigurovaného na export</i18nString>
+		<i18nString name="exported_menu_id_desc">Unikátny názov menu pre zvolenú konfiguráciu.</i18nString>
+		<i18nString name="available_export_entries">Dostupné menu položky pre export</i18nString>
+		<i18nString name="available_export_entries_placeholder">Export menu</i18nString>
+		<i18nString name="add_to_export_placeholder">Pridať menu na export</i18nString>
+		<i18nString name="menus_for_export">Menu položky pripravené na export</i18nString>
+		<i18nString name="import_results">Výsledky importu</i18nString>
+		<i18nString name="export_menu_btn_placeholder">Exportovať menu</i18nString>
+		<i18nString name="update_available_entries_btn_placeholder">Aktualizovať dostupné položky</i18nString>
+		<i18nString name="clear_menu_selection_btn_placeholder">Zmazať vytvorené konfigurácie</i18nString>
+		<i18nString name="import_export_dg">Import a export položiek menu</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="select_menu_item_filter">Filter auswählen</i18nString>
+		<i18nString name="add_menu_item">Als Menüpunkt hinzufügen</i18nString>
+		<i18nString name="menu_configuration">Menükonfiguration</i18nString>
+		<i18nString name="export_file">Exportierte Datei mit Menüs</i18nString>
+		<i18nString name="export_file_desc">Exportierte XML-Datei mit Menüs herunterladen.</i18nString>
+		<i18nString name="export_file_placeholder">Ihre XML-Datei mit Menüs</i18nString>
+		<i18nString name="exported_menu_id">Name des für den Export konfigurierten Menüs</i18nString>
+		<i18nString name="exported_menu_id_desc">Eindeutiger Name des Menüs für die gewählte Konfiguration.</i18nString>
+		<i18nString name="available_export_entries">Verfügbare Menüeinträge für den Export</i18nString>
+		<i18nString name="available_export_entries_placeholder">Menü exportieren</i18nString>
+		<i18nString name="add_to_export_placeholder">Menü zum Export hinzufügen</i18nString>
+		<i18nString name="menus_for_export">Menüeinträge bereit für den Export</i18nString>
+		<i18nString name="import_results">Import Ergebnisse</i18nString>
+		<i18nString name="export_menu_btn_placeholder">Menü exportieren</i18nString>
+		<i18nString name="update_available_entries_btn_placeholder">Verfügbare Menüeinträge aktualisieren</i18nString>
+		<i18nString name="clear_menu_selection_btn_placeholder">Menükonfigurationen löschen</i18nString>
+		<i18nString name="import_export_dg">Import und Export von Menüeinträge</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>2</id>
-		<x>420</x>
+		<x>220</x>
 		<y>220</y>
-		<label>Initialize group</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
+		<label>Initialize group</label>
 		<assignPolicy>auto</assignPolicy>
-		<dataRef>
-			<id>group_id</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>0</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>author</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>1</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>group_name</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>2</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>group_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>author</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>group_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					filtersTaskRef: f.filter_tasks,
+					availableEntries: f.available_export_entries,
+					referencedFiltersList: f.referenced_filters;
+
+                    defaultFilters = findCases({it.processIdentifier.eq("filter").and(it.author.id.eq(userService.getSystem().id))})
+
+					filterTaskIds = []
+					filterCaseIds = []
+
+					defaultFilters.forEach { filterCase -&gt;
+						def optionCase = createCase("preference_filter_item")
+
+						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
+						assignTask(initTask)
+						setData(initTask, [
+								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
+								"parentId": ["type":"text", "value":useCase.stringId], "menu_identifier": ["type":"text", value:"defaultMenu"]
+						])
+						finishTask(initTask)
+
+						def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
+						filterTaskIds.add(viewTask.stringId)
+						filterCaseIds.add(filterCase.stringId)
+					}
+
+					change filtersTaskRef value {return filterTaskIds}
+					change referencedFiltersList value {return filterCaseIds}
+
+
+					def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
+
+					change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>6</id>
 		<x>740</x>
 		<y>100</y>
-		<label>Group info</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
+		<label>Group info</label>
 		<assignPolicy>auto</assignPolicy>
-		<dataRef>
-			<id>group_id</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>0</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>0</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>author</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>1</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>0</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>group_name</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>2</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>0</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>members</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>3</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>0</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>group_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>author</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>group_name</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>members</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 	</transition>
 	<transition>
 		<id>8</id>
 		<x>500</x>
 		<y>340</y>
-		<label>Add user</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
+		<label>Add user</label>
 		<assignPolicy>auto</assignPolicy>
-		<dataRef>
-			<id>user_action_selection</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>0</y>
-				<rows>2</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>user_selection</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>2</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>invite_by_mail</id>
-			<logic>
-				<behavior>hidden</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>3</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>members</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>4</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>user_action_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>invite_by_mail</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>members</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 		<event type="finish">
 			<id>invite_new_user</id>
 			<actions phase="pre">
@@ -321,81 +678,89 @@
 		<id>25</id>
 		<x>740</x>
 		<y>340</y>
-		<label>Edit group info</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
+		<label>Edit group info</label>
 		<assignPolicy>auto</assignPolicy>
-		<dataRef>
-			<id>group_id</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>0</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>author</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>1</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
-		<dataRef>
-			<id>group_name</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>2</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>group_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>author</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>group_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 	</transition>
 	<transition>
 		<id>28</id>
 		<x>500</x>
 		<y>100</y>
-		<label>Remove user</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
+		<label>Remove user</label>
 		<assignPolicy>auto</assignPolicy>
-		<dataRef>
-			<id>members</id>
-			<logic>
-				<behavior>editable</behavior>
-			</logic>
-			<layout>
-				<x>0</x>
-				<y>0</y>
-				<rows>1</rows>
-				<cols>4</cols>
-				<offset>6</offset>
-				<template>material</template>
-				<appearance>outline</appearance>
-			</layout>
-		</dataRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>members</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>6</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 		<event type="finish">
 			<id>remove_user</id>
 			<actions phase="pre">
@@ -407,10 +772,263 @@
 			</actions>
 		</event>
 	</transition>
+	<transition>
+		<id>navigationMenuConfig</id>
+		<x>380</x>
+		<y>100</y>
+		<layout>
+			<cols>5</cols>
+			<offset>0</offset>
+		</layout>
+		<label name="menu_configuration">Configure menu</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>dg0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_autocomplete_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_filter_to_menu</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg1</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<layout>grid</layout>
+			<title name="import_export_dg">Import &amp; export of menu entries</title>
+			<dataRef>
+				<id>available_export_entries</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>update_available_entries_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_to_export_btn</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>menus_for_export</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>clear_menu_selection_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>export_menu_file</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>import_menu_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>import_menu_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>import_results</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>5</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_tasks</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
 	<!-- PLACES -->
 	<place>
 		<id>1</id>
-		<x>220</x>
+		<x>100</x>
 		<y>220</y>
 		<label>#init</label>
 		<tokens>1</tokens>
@@ -421,6 +1039,14 @@
 		<x>620</x>
 		<y>220</y>
 		<label>Group created</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p1</id>
+		<x>300</x>
+		<y>100</y>
+		<label></label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -486,6 +1112,20 @@
 		<type>regular</type>
 		<sourceId>4</sourceId>
 		<destinationId>28</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>2</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>read</type>
+		<sourceId>p1</sourceId>
+		<destinationId>navigationMenuConfig</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

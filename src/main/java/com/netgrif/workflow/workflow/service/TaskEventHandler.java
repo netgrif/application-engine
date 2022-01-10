@@ -38,7 +38,19 @@ public class TaskEventHandler extends AbstractMongoEventListener<Task> {
             log.warn("Trying to delete null document!");
             return;
         }
+
         ObjectId objectId = document.getObjectId("_id");
-        service.remove(objectId.toString());
+        if (objectId != null) {
+            service.remove(objectId.toString());
+            return;
+        }
+
+        String processId = document.getString("processId");
+        if (processId != null) {
+            service.removeByPetriNetId(processId);
+            return;
+        }
+
+        throw new IllegalStateException("Task has been deleted neither by ID nor by process ID!");
     }
 }

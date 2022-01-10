@@ -1,11 +1,14 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
+import com.netgrif.workflow.configuration.security.SessionUtilsProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import com.netgrif.workflow.ldap.filters.LoginAttemptsFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +18,9 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
 
     @Autowired
     protected ServerAuthProperties serverAuthProperties;
+
+    @Autowired
+    private SessionUtilsProperties sessionUtilsProperties;
 
     void setCsrf(HttpSecurity http) throws Exception {
         if (isCsrfEnabled()) {
@@ -36,6 +42,23 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
         }
         return patterns.toArray(new String[0]);
     }
+
+    void configureSession(HttpSecurity http) throws Exception {
+        if (sessionUtilsProperties.isEnabledLimitSession()) {
+            http.sessionManagement()
+                    .maximumSessions(sessionUtilsProperties.getMaxSession())
+                    .and()
+                    .sessionFixation().newSession();
+        }
+    }
+
+
+    void configureFilters(HttpSecurity http) {
+        if (sessionUtilsProperties.isEnabledFilter()) {
+            http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);
+        }
+    }
+
 
     abstract boolean isOpenRegistration();
 

@@ -11,10 +11,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.util.Matrix;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,9 +167,9 @@ public class PdfDrawer implements IPdfDrawer {
     @Override
     public void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException {
         if (checkBooleanValue(values, text)) {
-            contentStream.drawImage(resource.getBooleanChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
+            drawSvg(resource.getBooleanChecked(), x, y);
         } else {
-            contentStream.drawImage(resource.getBooleanUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
+            drawSvg(resource.getBooleanUnchecked(), x, y);
         }
     }
 
@@ -175,15 +177,15 @@ public class PdfDrawer implements IPdfDrawer {
     public boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException {
         if (values.contains(choice)) {
             if (fieldType == FieldType.MULTICHOICE || fieldType == FieldType.MULTICHOICE_MAP) {
-                contentStream.drawImage(resource.getCheckboxChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
+                drawSvg(resource.getCheckboxChecked(), x, y);
             } else if (fieldType == FieldType.ENUMERATION || fieldType == FieldType.ENUMERATION_MAP) {
-                contentStream.drawImage(resource.getRadioChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
+                drawSvg(resource.getRadioChecked(), x, y);
             }
         } else {
             if (fieldType == FieldType.MULTICHOICE || fieldType == FieldType.MULTICHOICE_MAP) {
-                contentStream.drawImage(resource.getCheckboxUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
+                drawSvg(resource.getCheckboxUnchecked(), x, y);
             } else if (fieldType == FieldType.ENUMERATION || fieldType == FieldType.ENUMERATION_MAP) {
-                contentStream.drawImage(resource.getRadioUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
+                drawSvg(resource.getRadioUnchecked(), x, y);
             }
         }
         return true;
@@ -223,5 +225,13 @@ public class PdfDrawer implements IPdfDrawer {
             return format.getValue().get(1).equals(text);
         }
         return false;
+    }
+
+    private void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
+        contentStream.saveGraphicsState();
+        AffineTransform transform = new AffineTransform(boxSize, 0.0F, 0.0F, boxSize, x, y - resource.getBoxPadding());
+        contentStream.transform(new Matrix(transform));
+        contentStream.drawForm(resourceObject);
+        contentStream.restoreGraphicsState();
     }
 }
