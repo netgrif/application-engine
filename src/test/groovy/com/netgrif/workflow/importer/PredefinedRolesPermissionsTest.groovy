@@ -16,17 +16,19 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCas
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.assertThrows
+
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class PredefinedRolesPermissionsTest {
@@ -106,7 +108,7 @@ class PredefinedRolesPermissionsTest {
     private String DEFAULT_ROLE_ID
     private String ANONYMOUS_ROLE_ID
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs()
         assert processRoleService.defaultRole() != null
@@ -216,9 +218,11 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<RolePermission, Boolean>>, false, false)
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test()
     void reservedDefaultRole() {
-        importAndCreate(reservedDefaultRoleNet)
+        assertThrows(IllegalArgumentException.class, () -> {
+            importAndCreate(reservedDefaultRoleNet)
+        });
     }
 
     @Test()
@@ -343,9 +347,11 @@ class PredefinedRolesPermissionsTest {
         ] as Map<String, Map<RolePermission, Boolean>>, false, false)
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test()
     void reservedAnonymousRole() {
-        importAndCreate(reservedAnonymousRoleNet)
+        assertThrows(IllegalArgumentException.class, () -> {
+            importAndCreate(reservedAnonymousRoleNet)
+        });
     }
 
     @Test()
