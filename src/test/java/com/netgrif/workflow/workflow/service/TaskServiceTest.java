@@ -97,7 +97,7 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), "major", superCreator.getLoggedSuper()).getNet();
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();
         CreateCaseEventOutcome outcome = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();
