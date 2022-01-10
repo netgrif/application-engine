@@ -520,8 +520,8 @@ public class DataService implements IDataService {
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {
-        List<EventOutcome> outcomes = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.PRE, useCase, referencingTask);
+        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
+                EventPhase.PRE, useCase, referencingTask));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
                 EventPhase.POST, useCase, referencingTask));
         updateDataset(useCase);
