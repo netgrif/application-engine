@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
 #  xxx:
-#    image: docker-private.nexus.netgrif.com/netgrif-backend:6.0.0-rc2
+#    image: docker.nexus.netgrif.com/netgrif-backend:6.0.0-rc2
 #    ports:
 #    - 8080:8080
 #    environment:
