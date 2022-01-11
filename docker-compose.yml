@@ -43,6 +43,6 @@ services:
       - "9300:9300"
 
   docker-redis:
-    image: redis:5
+    image: redis:6
     ports:
       - "6379:6379"
