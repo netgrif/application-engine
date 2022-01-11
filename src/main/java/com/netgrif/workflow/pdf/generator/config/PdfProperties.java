@@ -8,6 +8,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
 import java.util.Locale;
 
 @ConfigurationProperties(prefix = "nae.pdf.properties")
@@ -84,6 +85,8 @@ public class PdfProperties {
     protected Locale numberFormat = new Locale("sk", "SK");
 
     protected Locale textLocale = new Locale("sk", "SK");
+
+    protected ZoneId dateZoneId = ZoneId.systemDefault();
 
     protected PdfBooleanFormat booleanFormat = PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK;
 

@@ -3,6 +3,7 @@ package com.netgrif.workflow.utils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -28,10 +29,18 @@ public class DateUtils {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
+    public static ZonedDateTime localDateTimeToZonedDateTime(LocalDateTime localDateTime, ZoneId zoneId) {
+        return ZonedDateTime.from(localDateTime.atZone(zoneId));
+    }
+
     public static Date localDateToDate(LocalDate dateToConvert) {
         return Date.from(dateToConvert.atStartOfDay()
                 .atZone(ZoneId.systemDefault())
                 .toInstant());
+    }
+
+    public static ZonedDateTime localDateToZonedDate(LocalDate dateToConvert, ZoneId zoneId) {
+        return ZonedDateTime.from(dateToConvert.atStartOfDay().atZone(zoneId));
     }
 
     static LocalDate convertToLocalDate(Date dateToConvert) {
