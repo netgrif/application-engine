@@ -49,6 +49,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
+import java.time.ZoneId
 import java.util.stream.Collectors
 
 /**
@@ -842,18 +843,30 @@ class ActionDelegate {
         pdfResource.setTextLocale(locale)
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void sendMail(MailDraft mailDraft){
+    void generatePdfWithZoneId(String transitionId, String fileFieldId, ZoneId dateZoneId = ZoneId.systemDefault()) {
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setDateZoneId(dateZoneId)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    }
+
+    void sendMail(MailDraft mailDraft) {
         mailService.sendMail(mailDraft)
     }
 
     def changeUser(String email) {
-        [email: {cl ->
+        [email  : { cl ->
             changeUser(email, "email", cl)
         },
-         name: {cl ->
+         name   : { cl ->
              changeUser(email, "name", cl)
          },
          surname: {cl ->
