@@ -19,10 +19,10 @@ additional components to make integration to your project/environment seamless.
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
 * Web Site: [https://engine.netgrif.com](https://engine.netgrif.com)
 * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started)
-* Issue Tracker:
-* Java docs:
-* Roadmap:
-* License:
+* Issue Tracker: [Github issues](https://github.com/netgrif/application-engine/issues)
+* Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
+* Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/roadmap)
+* License: [NETGRIF Community License](https://github.com/netgrif/application-engine/blob/master/LICENSE)
 
 ## Components
 
@@ -33,6 +33,15 @@ additional components to make integration to your project/environment seamless.
 ## Requirements
 
 // TODO spísať čo všetko je treba pre rozbehania. Databázy (poskytnúť docker compose) + Java 11
+The Application engine has some requirements for runtime environment. The following table is summary of requirements 
+to run and use the engine:
+
+| Name          | Version | Description                                                     | Recommendation       |
+|---------------|---------|-----------------------------------------------------------------|----------------------|
+| Java          | 11+     | Runtime Virtual Machine                                         | OpenJDK 11           |
+| Redis         | 5+      | Key-value in-memory database used for user sessions and caching | Redis 6.2.6          |
+| MongoDB       | 4.4+    | Main document store database                                    | MongoDB 4.4.11       |
+| Elasticsearch | 7.10+   | Index database used for better application search               | Elasticsearch 7.10.2 |
 
 ## Installation
 
@@ -65,7 +74,7 @@ take a look on [NCLI (Netgrif Command Line Interface)](https://github.com/netgri
 
 ## Reporting issues
 
-If you find a bug, let us know at [Netgrif JIRA](). First, please read our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
+If you find a bug, let us know at [Issue page](https://github.com/netgrif/application-engine/issues). First, please read our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
 
 ## License
 
