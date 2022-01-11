@@ -3,7 +3,6 @@ package com.netgrif.workflow.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
@@ -24,7 +23,7 @@ public class FaviconConfiguration {
     @Bean
     protected ResourceHttpRequestHandler myFaviconRequestHandler() {
         ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-        requestHandler.setLocations(Arrays.<Resource>asList(new ClassPathResource("/")));
+        requestHandler.setLocations(Arrays.asList(new ClassPathResource("/")));
         return requestHandler;
     }
 

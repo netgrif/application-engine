@@ -4,7 +4,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FileField extends FieldWithDefault<FileFieldValue> {
+class FileField extends Field<FileFieldValue> {
 
     private Boolean remote
 
@@ -17,11 +17,6 @@ class FileField extends FieldWithDefault<FileFieldValue> {
         return FieldType.FILE
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     void setValue(FileFieldValue value) {
@@ -78,9 +73,7 @@ class FileField extends FieldWithDefault<FileFieldValue> {
     Field clone() {
         FileField clone = new FileField()
         super.clone(clone)
-
         clone.remote = this.remote
-        clone.defaultValue = this.defaultValue
 
         return clone
     }

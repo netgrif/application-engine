@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+    <id>filter</id>
+    <initials>FTR</initials>
+    <title name="process_title">Filter</title>
+    <icon>filter_alt</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <caseName name="case_name">New filter</caseName>
+    <!-- CASE EVENTS -->
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    caseId: f.filter_case_id;
+
+                    change caseId value {return useCase.stringId};
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- FUNCTIONS -->
+    <function scope="process" name="initializeMyFullFilterTaskRef">
+        {
+            com.netgrif.workflow.petrinet.domain.dataset.TaskField myFullFilter
+                ->
+                change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+        }
+    </function>
+    <!-- DATA -->
+    <data type="filter" immediate="true">
+        <id>filter</id>
+        <title name="filter_field">Filter</title>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>filter_type</id>
+        <title name="filter_type">Filter type</title>
+        <options>
+            <option key="Case" name="filter_type_case">Case filter</option>
+            <option key="Task" name="filter_type_task">Task filter</option>
+        </options>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>visibility</id>
+        <title name="filter_visibility">Filter visibility</title>
+        <options>
+            <option key="public" name="filter_visibility_public">Public</option>
+            <option key="private" name="filter_visibility_private">Private</option>
+        </options>
+        <init>public</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>origin_view_id</id>
+        <title name="origin_view_id">Origin ViewId</title>
+        <event type="set">
+            <id>set</id>
+            <actions phase="post">
+                <action>
+                    origin_view_id: f.origin_view_id,
+                    and_view: f.and_view,
+                    trimmed_origin_view_id: f.trimmed_origin_view_id,
+                    t1: t.view_filter,
+                    t2: t.view_as_ancestor;
+
+                    if (origin_view_id.value == "") {
+                        return;
+                    }
+
+                    // the same regex is used in the frontend FilterExtractionService. Please keep them in sync
+                    def match = origin_view_id.value =~ "^.*?(-\\d+)?\$"
+                    match.matches()
+
+                    def trimmed_id;
+
+                    if (match.start(1) == -1) {
+                        trimmed_id = origin_view_id.value
+                    } else {
+                        trimmed_id = origin_view_id.value.substring(0, match.start(1))
+                    }
+
+                    change trimmed_origin_view_id value {trimmed_id}
+                    make and_view, visible on t1 when {true}
+                    make and_view, visible on t2 when {true}
+                    make trimmed_origin_view_id, visible on t1 when {true}
+                    make trimmed_origin_view_id, visible on t2 when {true}
+                    make origin_view_id, forbidden on t1 when {true}
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text" immediate="true">
+        <id>parent_filter_id</id>
+        <title name="parent_filter_id">parent filter ID</title>
+        <event type="set">
+            <id>set</id>
+            <actions phase="post">
+                <action>
+                    parent_filter_id: f.parent_filter_id,
+                    ancestor_task_ref: f.taskref_and_parent;
+
+                    def ancestor_view_filter = findTask({it.caseId.eq(parent_filter_id.value).and(it.task.transitionId.eq("view_as_ancestor"))})
+
+                    change ancestor_task_ref value {[ancestor_view_filter.stringId]}
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>new_title</id>
+        <title name="filter_name">Filter name</title>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>i18n_filter_name</id>
+        <title></title>
+    </data>
+    <data type="text">
+        <id>filter_case_id</id>
+        <title></title>
+    </data>
+    <data type="text">
+        <id>menu_identifier</id>
+        <title></title>
+    </data>
+    <data type="button">
+        <id>and_me</id>
+        <placeholder name="and">AND</placeholder>
+    </data>
+    <data type="button">
+        <id>and_view</id>
+        <placeholder name="and">AND</placeholder>
+    </data>
+    <data type="taskRef">
+        <id>taskref_and_parent</id>
+        <title></title>
+    </data>
+    <data type="text">
+        <id>trimmed_origin_view_id</id>
+        <title name="filter_from_view_id">Filter from view with ID</title>
+    </data>
+    <data type="number">
+        <id>is_imported</id>
+        <title>imported</title>
+        <init>0</init>
+        <action trigger="set">
+            isNotImported: f.is_not_imported;
+
+            change isNotImported value { return 0 }
+        </action>
+    </data>
+    <data type="number">
+        <id>is_not_imported</id>
+        <title>not imported</title>
+        <init>1</init>
+    </data>
+    <data type="text">
+        <id>missing_allowed_nets</id>
+        <title name="missing_allowed_nets">Missing processes</title>
+        <desc name="missing_allowed_nets_desc">List of missing processes for current filter</desc>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>missing_nets_translation</id>
+        <title></title>
+        <options>
+            <option key="sk">Zoznam chýbajúcich procesov pre aktuálny filter:</option>
+            <option key="en">List of missing processes for current filter:</option>
+            <option key="de">Liste der fehlenden Prozesse für den aktuellen Filter:</option>
+        </options>
+    </data>
+    <data type="taskRef">
+        <id>my_full_filter</id>
+        <title></title>
+    </data>
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="process_title">Filter</i18nString>
+        <i18nString name="case_name">Nový Filter</i18nString>
+        <i18nString name="filter_field">Filter</i18nString>
+        <i18nString name="filter_type">Druh filtra</i18nString>
+        <i18nString name="filter_type_case">Filter prípadov</i18nString>
+        <i18nString name="filter_type_task">Filter úloh</i18nString>
+        <i18nString name="filter_visibility">Viditeľnosť filtra</i18nString>
+        <i18nString name="filter_visibility_public">Verejný</i18nString>
+        <i18nString name="filter_visibility_private">Súkromný</i18nString>
+        <i18nString name="origin_view_id">ViewId pôvodu</i18nString>
+        <i18nString name="filter_name">Názov filtra</i18nString>
+        <i18nString name="create_new_filter">Vytvoriť nový filter</i18nString>
+        <i18nString name="details">Podrobnosti</i18nString>
+        <i18nString name="save">Uložiť</i18nString>
+        <i18nString name="and">A SÚČASNE</i18nString>
+        <i18nString name="filter_from_view_id">Filter z obrazovky s ID</i18nString>
+        <i18nString name="filter_case_name">Názov prípadu</i18nString>
+        <i18nString name="import_filter">Importovať filter</i18nString>
+        <i18nString name="missing_allowed_nets">Chýbajúce procesy</i18nString>
+        <i18nString name="missing_allowed_nets_desc">Zoznam chýbajúcich procesov pre aktuálny filter</i18nString>
+        <i18nString name="parent_filter_id">ID rodičovského filtra</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="process_title">Filter</i18nString>
+        <i18nString name="case_name">Neuer Filter</i18nString>
+        <i18nString name="filter_field">Filter</i18nString>
+        <i18nString name="filter_type">Filtertyp</i18nString>
+        <i18nString name="filter_type_case">Fallfilter</i18nString>
+        <i18nString name="filter_type_task">Aufgabenfilter</i18nString>
+        <i18nString name="filter_visibility">Filter Sichtbarkeit</i18nString>
+        <i18nString name="filter_visibility_public">Öffentlich</i18nString>
+        <i18nString name="filter_visibility_private">Persönlich</i18nString>
+        <i18nString name="origin_view_id">Herkunft ViewId</i18nString>
+        <i18nString name="filter_name">Filtername</i18nString>
+        <i18nString name="create_new_filter">Neuer Filter erstellen</i18nString>
+        <i18nString name="details">Details</i18nString>
+        <i18nString name="save">Speichern</i18nString>
+        <i18nString name="and">UND</i18nString>
+        <i18nString name="filter_from_view_id">Filter von der Ansicht mit der ID</i18nString>
+        <i18nString name="filter_case_name">Fallname</i18nString>
+        <i18nString name="import_filter">Importfilter</i18nString>
+        <i18nString name="missing_allowed_nets">Fehlende Prozesse</i18nString>
+        <i18nString name="missing_allowed_nets_desc">Liste der fehlenden Prozesse für den aktuellen Filter</i18nString>
+        <i18nString name="parent_filter_id">Elternfilter-ID</i18nString>
+    </i18n>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>newFilter</id>
+        <x>620</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <assignPolicy>auto</assignPolicy>
+        <label name="create_new_filter">Create new filter</label>
+        <dataGroup>
+            <id>myFilter</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>my_full_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        userTitle: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(userTitle.value) }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id></id>
+            <title name="save">Save</title>
+            <actions phase="post">
+                <action>
+                    name: f.new_title;
+                    useCase.setTitle(name.value)
+                    workflowService.save(useCase)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>740</x>
+        <y>380</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="details">Details</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>myFilter</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>my_full_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>frontend_create</id>
+        <x>380</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Set filter metadata</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>parent_filter_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    taskRef: f.my_full_filter;
+
+                    initializeMyFullFilterTaskRef(taskRef)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>auto_create</id>
+        <x>500</x>
+        <y>180</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Automated new filter</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>parent_filter_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="post">
+                <action>
+                    taskRef: f.my_full_filter;
+
+                    initializeMyFullFilterTaskRef(taskRef)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>view_filter</id>
+        <x>550</x>
+        <y>420</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label></label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_case_id</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>taskref_and_parent</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        name: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>and_view</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>trimmed_origin_view_id</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>view_as_ancestor</id>
+        <x>451</x>
+        <y>418</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label></label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>and_me</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>taskref_and_parent</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>and_view</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>trimmed_origin_view_id</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>import_filter</id>
+        <x>740</x>
+        <y>180</y>
+        <label name="import_filter">Import filter</label>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <title></title>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="get">
+                        name: f.new_title;
+
+                        change name value { useCase.getTitle() }
+                    </action>
+                    <action trigger="set">
+                        name: f.new_title,
+                        i18nName: f.i18n_filter_name;
+
+                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>filter_type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>missing_allowed_nets</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>my_full_filter</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id></id>
+            <actions phase="post">
+                <action>
+                    name: f.new_title;
+                    changeCaseProperty "title" about { name.value }
+
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>p1</id>
+        <x>260</x>
+        <y>260</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>740</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>540</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>660</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p5</id>
+        <x>500</x>
+        <y>340</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>frontend_create</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>frontend_create</sourceId>
+        <destinationId>p3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>regular</type>
+        <sourceId>p3</sourceId>
+        <destinationId>newFilter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>regular</type>
+        <sourceId>newFilter</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>auto_create</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+        <reference>is_not_imported</reference>
+    </arc>
+    <arc>
+        <id>a12</id>
+        <type>regular</type>
+        <sourceId>import_filter</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a13</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_imported</reference>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>regular</type>
+        <sourceId>p4</sourceId>
+        <destinationId>import_filter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a15</id>
+        <type>regular</type>
+        <sourceId>frontend_create</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a18</id>
+        <type>read</type>
+        <sourceId>p5</sourceId>
+        <destinationId>view_as_ancestor</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a19</id>
+        <type>read</type>
+        <sourceId>p5</sourceId>
+        <destinationId>view_filter</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a20</id>
+        <type>regular</type>
+        <sourceId>auto_create</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

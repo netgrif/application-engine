@@ -4,21 +4,22 @@ import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.workflow.configuration.drools.throwable.RuleValidationException;
-import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
 import org.bson.types.ObjectId;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -28,7 +29,7 @@ import java.util.Collections;
         locations = "classpath:application-test.properties"
 )
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class KnowledgeBaseInitializerTest {
 
     @Autowired
@@ -37,7 +38,7 @@ public class KnowledgeBaseInitializerTest {
     @Autowired
     private IKnowledgeBaseInitializer knowledgeBaseInitializer;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
@@ -72,34 +73,36 @@ public class KnowledgeBaseInitializerTest {
         }
     }
 
-    @Test(expected = RuleValidationException.class)
-    public void testInitializerRuleValidation_EXPECT_EXCEPTION() throws RuleValidationException {
+    @Test
+    public void testInitializerRuleValidation_EXPECT_EXCEPTION() {
+        assertThrows(RuleValidationException.class, () -> {
+            StoredRule rule3 = StoredRule.builder()
+                    ._id(new ObjectId())
+                    .when("$item: Object()")
+                    .then("log.info(' EXPECTING SYNTAX ERROR")
+                    .identifier("rule3")
+                    .lastUpdate(LocalDateTime.now())
+                    .enabled(true)
+                    .build();
 
-        StoredRule rule3 = StoredRule.builder()
-                ._id(new ObjectId())
-                .when("$item: Object()")
-                .then("log.info(' EXPECTING SYNTAX ERROR")
-                .identifier("rule3")
-                .lastUpdate(LocalDateTime.now())
-                .enabled(true)
-                .build();
-
-        knowledgeBaseInitializer.validate(Collections.singletonList(rule3));
-
+            knowledgeBaseInitializer.validate(Collections.singletonList(rule3));
+        });
     }
-    @Test(expected = RuleValidationException.class)
+
+    @Test
     public void testInitializerRuleValidation_EXPECT_EXCEPTION2() throws RuleValidationException {
+        assertThrows(RuleValidationException.class, () -> {
+            StoredRule rule4 = StoredRule.builder()
+                    ._id(new ObjectId())
+                    .when("$item: Object")
+                    .then("log.info('nothing')")
+                    .identifier("rule4")
+                    .lastUpdate(LocalDateTime.now())
+                    .enabled(true)
+                    .build();
 
-        StoredRule rule4 = StoredRule.builder()
-                ._id(new ObjectId())
-                .when("$item: Object")
-                .then("log.info('nothing')")
-                .identifier("rule4")
-                .lastUpdate(LocalDateTime.now())
-                .enabled(true)
-                .build();
-
-        knowledgeBaseInitializer.validate(Collections.singletonList(rule4));
+            knowledgeBaseInitializer.validate(Collections.singletonList(rule4));
+        });
     }
 
 

@@ -2,14 +2,14 @@ package com.netgrif.workflow.auth.web.responsebodies;
 
 
 import com.netgrif.workflow.auth.web.UserController;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class UsersResource extends Resources<UserResource> {
+public class UsersResource extends CollectionModel<UserResource> {
 
     public static final String SELF_REL_SMALL = "small";
     public static final String SELF_REL_PROFILE = "profile";
@@ -25,8 +25,8 @@ public class UsersResource extends Resources<UserResource> {
     }
 
     private void buildLinks(String selfRel) {
-        ControllerLinkBuilder allLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(UserController.class).getAll(false, null,null, null, null));
+        WebMvcLinkBuilder allLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
+                .methodOn(UserController.class).getAll(false, null, null, null, null));
         add(selfRel.equalsIgnoreCase("all") ? allLink.withSelfRel() : allLink.withRel("all"));
     }
 }

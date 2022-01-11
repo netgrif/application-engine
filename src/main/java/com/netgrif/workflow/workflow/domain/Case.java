@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
-import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -21,7 +21,6 @@ import javax.validation.constraints.NotNull;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Document
@@ -101,55 +100,104 @@ public class Case {
     @Indexed
     private Author author;
 
-    /**
-     * TODO: reset = variable
-     */
     @Getter
     @Setter
-    private Map<String, Integer> resetArcTokens;
+    @JsonIgnore
+    private Map<String, Integer> consumedTokens;
 
-    /**
-     * TODO: Indexed?
-     */
     @Getter
     @Setter
     @JsonIgnore
     private Set<TaskPair> tasks;
 
-    /**
-     * TODO: Indexed?
-     */
     @Getter
     @Setter
     @JsonIgnore
     private Set<String> enabledRoles;
 
-    public Case() {
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> permissions;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> users = new HashMap<>();
+
+    @Getter
+    @Setter
+    private List<String> viewRoles;
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private List<String> viewUserRefs;
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private List<String> viewUsers;
+
+    @Getter
+    @Setter
+    private List<String> negativeViewRoles;
+
+    @Getter
+    @Setter
+    private List<String> negativeViewUsers;
+
+    protected Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
-        resetArcTokens = new HashMap<>();
+        consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
+        permissions = new HashMap<>();
+        userRefs = new HashMap<>();
+        users = new HashMap<>();
+        viewRoles = new LinkedList<>();
+        viewUserRefs = new LinkedList<>();
+        viewUsers = new LinkedList<>();
+        negativeViewRoles = new LinkedList<>();
+        negativeViewUsers = new ArrayList<>();
     }
 
-    public Case(String title) {
+    public Case(PetriNet petriNet) {
         this();
-        this.title = title;
-        visualId = generateVisualId();
-    }
-
-    public Case(String title, PetriNet petriNet, Map<String, Integer> activePlaces) {
-        this(title);
-        this.petriNetObjectId = petriNet.getObjectId();
+        petriNetObjectId = petriNet.getObjectId();
+        processIdentifier = petriNet.getIdentifier();
         this.petriNet = petriNet;
-        this.activePlaces = activePlaces;
-        populateDataSet();
-        this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
+        activePlaces = petriNet.getActivePlaces();
+        immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
-        this.enabledRoles = petriNet.getRoles().keySet();
+        enabledRoles = petriNet.getRoles().keySet();
+        negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
+        icon = petriNet.getIcon();
+        userRefs = petriNet.getUserRefs();
+
+        permissions = petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .map(role -> {
+                    Map<String, Boolean> permissionMap = new HashMap<>();
+                    if (role.getValue().containsKey("delete"))
+                        permissionMap.put("delete", role.getValue().get("delete"));
+                    if (role.getValue().containsKey("view")) {
+                        permissionMap.put("view", role.getValue().get("view"));
+                    }
+                    return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
+                })
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
+        resolveViewRoles();
+        resolveViewUserRefs();
     }
 
     public String getStringId() {
@@ -164,20 +212,44 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    private void populateDataSet() {
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        List<Field<?>> dynamicInitFields = new LinkedList<>();
+        List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
+        List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
-            if (field instanceof FieldWithDefault) {
-                this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
-            } else {
+            if (field.isDynamicDefaultValue()) {
+                dynamicInitFields.add(field);
                 this.dataSet.put(key, new DataField());
+            } else {
+                this.dataSet.put(key, new DataField(field.getDefaultValue()));
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
-            if (field instanceof CaseField) {
-                this.dataSet.get(key).setValue(new ArrayList<>());
-                this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
+            if (field instanceof FieldWithAllowedNets) {
+                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
             }
+            if (field instanceof FilterField) {
+                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
+            }
+            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
+                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+            }
+            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
+                dynamicChoicesFields.add((ChoiceField<?>) field);
+            }
+        });
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
+        populateDataSetBehavior();
+    }
+
+    private void populateDataSetBehavior() {
+        petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
+            transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
+                getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
+            });
         });
     }
 
@@ -202,14 +274,10 @@ public class Case {
     }
 
     public boolean removeTask(Task task) {
-//        return this.tasks.remove(new TaskPair(task.getStringId(), task.getTransitionId()));
         return this.removeTasks(Collections.singletonList(task));
     }
 
     public boolean removeTasks(List<Task> tasks) {
-//        List<TaskPair> taskPairsToRemove = tasks.stream().map(task -> new TaskPair(task.getStringId(), task.getTransitionId()))
-//                .collect(Collectors.toList());
-//        return this.tasks.removeAll(taskPairsToRemove);
         int sizeBeforeChange = this.tasks.size();
         Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
         this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());
@@ -226,5 +294,50 @@ public class Case {
 
     public String getPetriNetId() {
         return petriNetObjectId.toString();
+    }
+
+    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
+        userIds.forEach(userId -> {
+            if (users.containsKey(userId) && users.get(userId) != null) {
+                compareExistingUserPermissions(userId, new HashMap<>(permissions));
+            } else {
+                users.put(userId, new HashMap<>(permissions));
+            }
+        });
+    }
+
+    public void resolveViewRoles() {
+        this.viewRoles.clear();
+        this.permissions.forEach((role, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewRoles.add(role);
+            }
+        });
+    }
+
+    public void resolveViewUserRefs() {
+        this.viewUserRefs.clear();
+        this.userRefs.forEach((userRef, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewUserRefs.add(userRef);
+            }
+        });
+    }
+
+    public void resolveViewUsers() {
+        this.viewUsers.clear();
+        this.users.forEach((user, perms) -> {
+            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+                viewUsers.add(user);
+            }
+        });
+    }
+
+    private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
+        permissions.forEach((id, perm) -> {
+            if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
+                users.get(userId).put(id, perm);
+            }
+        });
     }
 }

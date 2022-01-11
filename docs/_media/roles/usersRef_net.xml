@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+    <id>testing_model</id>
+    <initials>TSM</initials>
+    <title>Testing Model</title>
+    <defaultRole>false</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role>
+        <id>tester</id>
+        <title>Testing Role</title>
+    </role>
+    <role>
+        <id>enabledTester</id>
+        <title>Enabled Testing Role</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin Role</title>
+    </role>
+    <roleRef>
+        <id>tester</id>
+        <caseLogic>
+            <view>false</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>enabledTester</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <usersRef>
+        <id>user_list_1</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </usersRef>
+
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="button">
+        <id>assign</id>
+        <title>Assign to user ref</title>
+    </data>
+    <data type="button">
+        <id>remove</id>
+        <title>Remove from user ref</title>
+    </data>
+    <data type="userList">
+        <id>user_list_1</id>
+        <title>User list 1</title>
+    </data>
+    <data type="userList">
+        <id>user_list_2</id>
+        <title>User list 2</title>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <caseEvents>
+        <event type="create">
+            <id>userAddition</id>
+            <actions phase="post">
+                <action>
+                    userList: f.user_list_1;
+                    change userList value { [getDummyUser()] }
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <transition>
+        <id>t1</id>
+        <x>380</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Initialization</label>
+        <roleRef>
+            <id>enabledTester</id>
+            <logic>
+                <perform>true</perform>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <usersRef>
+            <id>user_list_1</id>
+            <logic>
+                <view>false</view>
+            </logic>
+        </usersRef>
+        <dataRef>
+            <id>assign</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <event type="set">
+                <id>assign</id>
+                <actions phase="pre">
+                    <action>
+                        userList: f.user_list_1;
+                        change userList value { [getDummyUser()] }
+                    </action>
+                </actions>
+            </event>
+        </dataRef>
+        <dataRef>
+            <id>remove</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+            <event type="set">
+                <id>remove</id>
+                <actions phase="pre">
+                    <action>
+                        userList: f.user_list_1;
+                        change userList value { [] }
+                    </action>
+                </actions>
+            </event>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>620</x>
+        <y>260</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Finishing</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>p1</id>
+        <x>260</x>
+        <y>260</y>
+        <label>#init</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>500</x>
+        <y>260</y>
+        <label>After initialization state</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>t2</sourceId>
+        <destinationId>p1</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint><x>460</x><y>140</y></breakPoint>
+    </arc>
+</document>

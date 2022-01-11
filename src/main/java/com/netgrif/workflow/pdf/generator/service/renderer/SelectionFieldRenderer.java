@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T>{
+public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T> {
 
 
     public void renderValue(PdfSelectionField field, int lineCounter) throws IOException {

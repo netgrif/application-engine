@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>function_overloading_fail</id>
+    <initials>FOF</initials>
+    <title>Test</title>
+    <!-- FUNCTIONS -->
+    <function scope="namespace" name="overloadingTest">
+        { Double x, Double y ->
+            x * y
+        }
+    </function>
+    <function scope="namespace" name="overloadingTest">
+        { Double x, Double y ->
+            x + y
+        }
+    </function>
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Test</label>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

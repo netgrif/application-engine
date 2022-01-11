@@ -7,9 +7,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Executor {
@@ -21,7 +22,7 @@ public class Executor {
     private Map<String, ExecutorService> executors;
 
     public Executor(@Value("${spring.data.elasticsearch.executors:500}") long maxSize, @Value("${spring.data.elasticsearch.executors.timeout:5}") long timeout) {
-        this.executors = Collections.synchronizedMap(new MaxSizeHashMap(maxSize, timeout));
+        this.executors = Collections.synchronizedMap(new ExecutorMaxSizeHashMap(maxSize, timeout));
         log.info("Executor created, thread capacity: " + maxSize);
     }
 

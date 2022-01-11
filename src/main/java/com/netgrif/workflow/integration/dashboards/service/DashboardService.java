@@ -23,7 +23,7 @@ public class DashboardService implements IDashboardService {
         HttpEntity entity = new HttpEntity<>(searchBody, headers);
         RestTemplate elasticRestTemplate = new RestTemplate();
         ResponseEntity<String> response = elasticRestTemplate.exchange(
-                    elasticSearcHost, HttpMethod.POST, entity, String.class);
+                elasticSearcHost, HttpMethod.POST, entity, String.class);
         responseBody = response.getBody();
         return "{" + responseBody.substring(responseBody.indexOf("\"aggregations"));
     }

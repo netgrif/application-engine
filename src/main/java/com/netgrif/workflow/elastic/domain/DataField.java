@@ -1,27 +1,24 @@
 package com.netgrif.workflow.elastic.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
+import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode
+@AllArgsConstructor
 public class DataField {
 
-    public String value;
+    @Field(type = Text)
+    public String[] fulltextValue;
 
-    @Field(type = Keyword)
-    public String sortable;
-
-    public DataField(String value) {
-        this.value = value;
-        this.sortable = value;
-    }
-
-    public DataField(String value, String sortable) {
-        this.value = value;
-        this.sortable = sortable;
+    DataField(String fulltextValue) {
+        this.fulltextValue = new String[1];
+        this.fulltextValue[0] = fulltextValue;
     }
 }

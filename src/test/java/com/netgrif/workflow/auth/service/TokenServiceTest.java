@@ -4,20 +4,19 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.jws.soap.SOAPBinding;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles({"test"})
 @SpringBootTest
 public class TokenServiceTest {
@@ -30,12 +29,12 @@ public class TokenServiceTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         repository.deleteAll();
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         repository.deleteAll();
     }
@@ -60,7 +59,7 @@ public class TokenServiceTest {
 
     @Test
     public void authorizeToken() throws Exception {
-        User expired = new User("test3@test.com",null,User.UNKNOWN,User.UNKNOWN);
+        User expired = new User("test3@test.com", null, User.UNKNOWN, User.UNKNOWN);
         expired.setToken("token3");
         expired.setExpirationDate(LocalDateTime.now().plusMinutes(10));
         expired.setState(UserState.INVITED);

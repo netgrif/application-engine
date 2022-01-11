@@ -4,7 +4,7 @@ package com.netgrif.workflow.mail;
 import lombok.Getter;
 
 public enum EmailType {
-    REGISTRATION ("registration.html", "Registration invite"),
+    REGISTRATION("registration.html", "Registration invite"),
     PASSWORD_RESET("password-reset.html", "Reset password");
 
     @Getter

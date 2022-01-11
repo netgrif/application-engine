@@ -6,12 +6,12 @@ import java.util.Locale;
 
 public class LocalisedFieldFactory {
 
-    // todo: remove this monstrosity
+    // todo: remove this monstrosity, see LocalisedEventOutcomeFactory
     public static LocalisedField from(Field field, Locale locale) {
         if (field instanceof EnumerationField) {
             return fromEnumeration((EnumerationField) field, locale);
         } else if (field instanceof MultichoiceField) {
-            return fromMultichoice((MultichoiceField)   field, locale);
+            return fromMultichoice((MultichoiceField) field, locale);
             // case, file,
         } else if (field instanceof NumberField) {
             return fromNumber((NumberField) field, locale);
@@ -33,6 +33,10 @@ public class LocalisedFieldFactory {
             return fromCase((CaseField) field, locale);
         } else if (field instanceof FileListField) {
             return fromFileList((FileListField) field, locale);
+        } else if (field instanceof FilterField) {
+            return fromFilter((FilterField) field, locale);
+        } else if (field instanceof I18nField) {
+            return fromI18n((I18nField) field, locale);
         } else {
             return fromGeneral(field, locale);
         }
@@ -88,5 +92,15 @@ public class LocalisedFieldFactory {
 
     public static LocalisedField fromFileList(FileListField field, Locale locale) {
         return new LocalisedFileListField(field, locale);
+    }
+
+    public static LocalisedField fromFilter(FilterField field, Locale locale) {
+        return new LocalisedFilterField(field, locale);
+    }
+
+    public static LocalisedField fromI18n(I18nField field, Locale locale) {
+        return field.getComponent() != null && field.getComponent().getName() != null && field.getComponent().getName().equals("divider") ?
+                new LocalisedI18nStringField(field, locale) :
+                new LocalisedI18nField(field, locale);
     }
 }

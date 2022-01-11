@@ -32,10 +32,15 @@ public class I18nString {
         this.key = key;
     }
 
-    public I18nString(I18nString other){
+    public I18nString(I18nString other) {
         this(other.defaultValue);
         this.key = other.key;
         this.translations.putAll(other.translations);
+    }
+
+    public I18nString(String defaultValue, Map<String, String> translations) {
+        this(defaultValue);
+        this.translations = translations;
     }
 
     public void addTranslation(String locale, String translation) {

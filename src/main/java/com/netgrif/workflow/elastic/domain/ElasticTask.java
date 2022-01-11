@@ -9,10 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -20,7 +23,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticTaskIndex}", type = "task")
+@Document(indexName = "#{@elasticTaskIndex}")
 public class ElasticTask {
 
     @Id
@@ -53,10 +56,11 @@ public class ElasticTask {
 
     private int priority;
 
-    private Long userId;
+    private String userId;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ssZZZ")
     private LocalDateTime startDate;
 
     @Field(type = Keyword)
@@ -64,6 +68,21 @@ public class ElasticTask {
 
     @Field(type = Keyword)
     private Set<String> roles;
+
+    @Field(type = Keyword)
+    private Set<String> viewUserRefs;
+
+    @Field(type = Keyword)
+    private Set<String> viewRoles;
+
+    @Field(type = Keyword)
+    private Set<String> negativeViewRoles;
+
+    @Field(type = Keyword)
+    private Set<String> viewUsers;
+
+    @Field(type = Keyword)
+    private Set<String> negativeViewUsers;
 
     @Field(type = Keyword)
     private String icon;
@@ -91,6 +110,11 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
+        this.viewRoles = new HashSet<>(task.getViewRoles());
+        this.viewUserRefs = new HashSet<>(task.getViewUserRefs());
+        this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
+        this.viewUsers = new HashSet<>(task.getViewUsers());
+        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
     }
 
     public void update(ElasticTask task) {
@@ -102,5 +126,10 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
+        this.viewRoles = task.getViewRoles();
+        this.viewUserRefs = task.getViewUserRefs();
+        this.negativeViewRoles = task.getNegativeViewRoles();
+        this.viewUsers = task.getViewUsers();
+        this.negativeViewUsers = task.getNegativeViewUsers();
     }
 }

@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-class FileListField extends ValidableField<FileListFieldValue> {
+class FileListField extends Field<FileListFieldValue> {
     private Boolean remote
 
     FileListField() {
@@ -12,11 +12,6 @@ class FileListField extends ValidableField<FileListFieldValue> {
         return FieldType.FILELIST
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     void setValue(FileListFieldValue value) {
@@ -42,6 +37,10 @@ class FileListField extends ValidableField<FileListFieldValue> {
         this.setDefaultValue(FileListFieldValue.fromString(defaultValue))
     }
 
+    void setDefaultValue(List<String> defaultValues) {
+        this.setDefaultValue(FileListFieldValue.fromList(defaultValues))
+    }
+
     void addValue(String fileName, String path) {
         if (this.getValue() == null || this.getValue().getNamesPaths() == null) {
             this.setValue(new FileListFieldValue())
@@ -61,7 +60,7 @@ class FileListField extends ValidableField<FileListFieldValue> {
      */
     String getFilePath(String caseId, String name) {
         if (this.remote) {
-            FileFieldValue first = this.getValue().getNamesPaths().find({ namePath -> namePath.name == name})
+            FileFieldValue first = this.getValue().getNamesPaths().find({ namePath -> namePath.name == name })
             return first != null ? first.path : null
         }
         return FileListFieldValue.getPath(caseId, getStringId(), name)
@@ -79,10 +78,7 @@ class FileListField extends ValidableField<FileListFieldValue> {
     Field clone() {
         FileListField clone = new FileListField()
         super.clone(clone)
-
         clone.remote = this.remote
-        clone.validations = this.validations
-        clone.defaultValue = this.defaultValue
 
         return clone
     }

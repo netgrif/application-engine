@@ -17,25 +17,47 @@ import java.util.Set;
 @Document
 public class DataGroup extends PetriNetObject {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @JsonIgnore
     private Set<String> data;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private DataFieldsResource fields;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private DataGroupLayout layout;
 
-    @Getter @Setter(AccessLevel.NONE)
+    @Getter
+    @Setter(AccessLevel.NONE)
     private I18nString title;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String alignment;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean stretch;
+
+    @Transient
+    @Getter @Setter
+    private String parentTaskId;
+
+    @Transient
+    @Getter @Setter
+    private String parentCaseId;
+
+    @Transient
+    @Getter @Setter
+    private String parentTaskRefId;
+
+    @Transient
+    @Getter @Setter
+    private int nestingLevel;
 
     public DataGroup() {
         this._id = new ObjectId();
@@ -48,6 +70,7 @@ public class DataGroup extends PetriNetObject {
 
     /**
      * Sets title default value
+     *
      * @param title default string value
      */
     public void setTitle(I18nString title) {

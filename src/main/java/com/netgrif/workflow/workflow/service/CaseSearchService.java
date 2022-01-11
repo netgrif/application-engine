@@ -1,11 +1,11 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -83,8 +83,48 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        builder.and(permissionConstraints);
         return builder;
+    }
+
+    protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate viewRoleQuery(String role) {
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
+    }
+
+    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUserQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUserQuery(String userId) {
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
+    }
+
+    protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewRoleQuery(String role) {
+        return QCase.case$.negativeViewRoles.contains(role);
+    }
+
+    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = negativeViewUserQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewUserQuery(String userId) {
+        return QCase.case$.negativeViewUsers.contains(userId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
@@ -133,11 +173,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         else if (query.containsKey(AUTHOR_NAME))
             return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
         else if (query.containsKey(AUTHOR_ID)) {
-            Long searchValue = -1L;
-            if (query.get(AUTHOR_ID) instanceof Long)
-                searchValue = (Long) query.get(AUTHOR_ID);
-            else if (query.get(AUTHOR_ID) instanceof Integer)
-                searchValue = ((Integer) query.get(AUTHOR_ID)).longValue();
+            String searchValue = "";
+            if (query.get(AUTHOR_ID) instanceof String)
+                searchValue = (String) query.get(AUTHOR_ID);
             return QCase.case$.author.id.eq(searchValue);
         }
         return null;
@@ -175,14 +213,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
                     switch (type) {
                         case USER:
-                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k),"value");
-                            Path idPath = Expressions.stringPath(valuePath,"id");
-                            Expression<Long> constant = Expressions.constant(Long.valueOf(""+fieldValue));
+                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
+                            Path idPath = Expressions.stringPath(valuePath, "id");
+                            Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
                             predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
                             break;
                     }
                 } catch (IllegalArgumentException e) {
-                    log.error("Unrecognized Field type "+entry.getKey());
+                    log.error("Unrecognized Field type " + entry.getKey());
                 }
             } else {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
@@ -205,12 +243,12 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
 
         List<PetriNet> petriNets;
-        if(processes.isEmpty()) {
+        if (processes.isEmpty()) {
             petriNets = petriNetService.getAll();
         } else {
             petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
         }
-        if(petriNets.isEmpty())
+        if (petriNets.isEmpty())
             return null;
 
         List<BooleanExpression> predicates = new ArrayList<>();
@@ -246,9 +284,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
                         LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if(field.getType() == FieldType.ENUMERATION) {
-                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()),"value");
-                        Path defaultValuePath = Expressions.stringPath(valuePath,"defaultValue");
+                    } else if (field.getType() == FieldType.ENUMERATION) {
+                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
+                        Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");
                         Expression<String> constant = Expressions.constant(searchPhrase);
                         predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
                     }

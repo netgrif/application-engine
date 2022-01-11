@@ -6,4 +6,5 @@ import com.netgrif.workflow.utils.SingleItemAsList;
 import com.netgrif.workflow.utils.SingleItemAsListDeserializer;
 
 @JsonDeserialize(using = SingleItemAsListDeserializer.class, contentAs = ElasticTaskSearchRequest.class)
-public class SingleElasticTaskSearchRequestAsList extends SingleItemAsList<ElasticTaskSearchRequest> {}
+public class SingleElasticTaskSearchRequestAsList extends SingleItemAsList<ElasticTaskSearchRequest> {
+}

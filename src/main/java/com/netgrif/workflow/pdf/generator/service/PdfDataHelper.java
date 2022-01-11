@@ -60,7 +60,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     private int lastX, lastY;
 
     @Override
-    public void setupDataHelper(PdfResource resource){
+    public void setupDataHelper(PdfResource resource) {
         this.resource = resource;
         this.pdfFields = new ArrayList<>();
         this.dataGroups = new ArrayList<>();
@@ -70,6 +70,8 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Override
     public void setTaskId(Case useCase, Transition transition) {
+        if (transition.getLayout() != null && transition.getLayout().getCols() != null)
+            resource.setFormGridCols(transition.getLayout().getCols());
         QTask qTask = new QTask("task");
         this.taskId = taskService.searchOne(qTask.transitionId.eq(transition.getStringId()).and(qTask.caseId.eq(useCase.get_id().toString()))).getStringId();
     }
@@ -89,9 +91,9 @@ public class PdfDataHelper implements IPdfDataHelper {
         lastX = Integer.MAX_VALUE;
         lastY = 0;
 
-        this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale());
+        this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale()).getData();
 
-        dataGroups.forEach(dataGroup ->{
+        dataGroups.forEach(dataGroup -> {
             refreshGrid(dataGroup);
             dataGroup.getFields().getContent().forEach(field -> {
                         generateField(dataGroup, field);
@@ -103,7 +105,6 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generatePdfDataGroup(DataGroup dataGroup, PdfField pdfField) {
-        log.info("Generating PDF field from data group titles.");
         PdfField dgField = null;
         if (dataGroup != null && dataGroup.getTitle() != null) {
             dgField = new DataGroupFieldBuilder(resource).buildField(dataGroup, pdfField);
@@ -140,7 +141,6 @@ public class PdfDataHelper implements IPdfDataHelper {
             switch (field.getType()) {
                 case BUTTON:
                 case TASK_REF:
-                case FILE:
                     break;
                 case ENUMERATION_MAP:
                     pdfField = createEnumMapField(dataGroup, (LocalisedEnumerationMapField) field);
@@ -163,7 +163,7 @@ public class PdfDataHelper implements IPdfDataHelper {
                     pdfFields.add(pdfField);
                     break;
             }
-            if(pdfField != null)
+            if (pdfField != null)
                 generatePdfDataGroup(dataGroup, pdfField);
         }
     }
@@ -203,12 +203,12 @@ public class PdfDataHelper implements IPdfDataHelper {
         return pdfField;
     }
 
-    protected void updateLastCoordinates(int lastX, int lastY){
+    protected void updateLastCoordinates(int lastX, int lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
     }
 
-    protected int updateBottomY(PdfField pdfField){
+    protected int updateBottomY(PdfField pdfField) {
         return FieldBuilder.countBottomPosY(pdfField, pdfField.getResource());
     }
 
@@ -220,7 +220,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         });
     }
 
-    protected void shiftField(PdfField currentField, PdfField fieldBelow){
+    protected void shiftField(PdfField currentField, PdfField fieldBelow) {
         int belowTopY, cFieldBottomY;
         belowTopY = fieldBelow.getTopY();
         cFieldBottomY = currentField.getBottomY();
@@ -248,15 +248,15 @@ public class PdfDataHelper implements IPdfDataHelper {
         return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
     }
 
-    private void refreshGrid(DataGroup dataGroup){
-        if(dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null){
+    private void refreshGrid(DataGroup dataGroup) {
+        if (dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null) {
             Integer cols = dataGroup.getLayout().getCols();
             resource.setFormGridCols(cols == null ? resource.getFormGridCols() : cols);
             resource.updateProperties();
         }
     }
 
-    private boolean isNotHidden(LocalisedField field){
+    private boolean isNotHidden(LocalisedField field) {
         return !field.getBehavior().has("hidden") || !field.getBehavior().get("hidden").asBoolean();
     }
 

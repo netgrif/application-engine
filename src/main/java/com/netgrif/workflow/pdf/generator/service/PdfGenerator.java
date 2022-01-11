@@ -8,13 +8,20 @@ import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.workflow.domain.Case;
+import de.rototor.pdfbox.graphics2d.PdfBoxGraphics2D;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.bridge.*;
+import org.apache.batik.gvt.GraphicsNode;
+import org.apache.batik.util.XMLResourceDescriptor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
 
 import java.io.*;
 import java.util.List;
@@ -35,7 +42,7 @@ public class PdfGenerator implements IPdfGenerator {
     private IPdfDrawer pdfDrawer;
 
     @Override
-    public void setupPdfGenerator(PdfResource pdfResource) throws IOException{
+    public void setupPdfGenerator(PdfResource pdfResource) throws IOException {
         setupPdfGenerator(pdfResource, 1.4f);
     }
 
@@ -52,12 +59,12 @@ public class PdfGenerator implements IPdfGenerator {
         pdfResource.setLabelFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontLabelResource().getFile()), true));
         pdfResource.setValueFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontValueResource().getFile()), true));
 
-        pdfResource.setCheckboxChecked(PDImageXObject.createFromFileByContent(pdfResource.getCheckBoxCheckedResource().getFile(), this.pdf));
-        pdfResource.setCheckboxUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getCheckBoxUnCheckedResource().getFile(), this.pdf));
-        pdfResource.setRadioChecked(PDImageXObject.createFromFileByContent(pdfResource.getRadioCheckedResource().getFile(), this.pdf));
-        pdfResource.setRadioUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getRadioUnCheckedResource().getFile(), this.pdf));
-        pdfResource.setBooleanChecked(PDImageXObject.createFromFileByContent(pdfResource.getBooleanCheckedResource().getFile(), this.pdf));
-        pdfResource.setBooleanUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getBooleanUncheckedResource().getFile(), this.pdf));
+        pdfResource.setCheckboxChecked(getSvg(pdfResource.getCheckBoxCheckedResource()));
+        pdfResource.setCheckboxUnchecked(getSvg(pdfResource.getCheckBoxUnCheckedResource()));
+        pdfResource.setRadioChecked(getSvg(pdfResource.getRadioCheckedResource()));
+        pdfResource.setRadioUnchecked(getSvg(pdfResource.getRadioUnCheckedResource()));
+        pdfResource.setBooleanChecked(getSvg(pdfResource.getBooleanCheckedResource()));
+        pdfResource.setBooleanUnchecked(getSvg(pdfResource.getBooleanUncheckedResource()));
     }
 
     @Override
@@ -66,7 +73,7 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields){
+    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields) {
         generateData(formCase.getPetriNet(), formCase, formCase.getPetriNet().getTransition(transitionId), pdfResource, excludedFields);
         return generatePdf(pdfResource);
     }
@@ -79,7 +86,7 @@ public class PdfGenerator implements IPdfGenerator {
 
     @Override
     public File generatePdf(PdfResource pdfResource) {
-        try{
+        try {
             return transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource);
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
@@ -133,7 +140,7 @@ public class PdfGenerator implements IPdfGenerator {
 
     protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
         File template = new File(((ClassPathResource) pdfResource.getTemplateResource()).getPath());
-        if(template.exists()){
+        if (template.exists()) {
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }
         pdfDrawer.newPage();
@@ -175,5 +182,24 @@ public class PdfGenerator implements IPdfGenerator {
             }
         }
         pdfDrawer.drawPageNumber();
+    }
+
+    private PDFormXObject getSvg(Resource resource) throws IOException {
+        String parser = XMLResourceDescriptor.getXMLParserClassName();
+        SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
+        Document document = f.createDocument(resource.getURI().toString(), resource.getInputStream());
+
+        UserAgent userAgent = new UserAgentAdapter();
+        DocumentLoader loader = new DocumentLoader(userAgent);
+        BridgeContext context = new BridgeContext(userAgent, loader);
+        context.setDynamicState(BridgeContext.STATIC);
+        GVTBuilder builder = new GVTBuilder();
+        final GraphicsNode gvtRoot = builder.build(context, document);
+
+        PdfBoxGraphics2D pdfBoxGraphics2D = new PdfBoxGraphics2D(pdf, 1, 1);
+        pdfBoxGraphics2D.scale(1, 1);
+        gvtRoot.paint(pdfBoxGraphics2D);
+        pdfBoxGraphics2D.dispose();
+        return pdfBoxGraphics2D.getXFormObject();
     }
 }

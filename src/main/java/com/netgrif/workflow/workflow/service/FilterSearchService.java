@@ -15,6 +15,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
+ */
+@Deprecated
 @Service
 public class FilterSearchService extends MongoSearchService<Filter> {
 
@@ -63,11 +67,11 @@ public class FilterSearchService extends MongoSearchService<Filter> {
 
     public Predicate author(Object query) {
         if (query instanceof Long)
-            return authorLong((Long) query);
+            return authorLong((String) query);
         return null;
     }
 
-    private Predicate authorLong(Long query) {
+    private Predicate authorLong(String query) {
         return QFilter.filter.author.id.eq(query);
     }
 

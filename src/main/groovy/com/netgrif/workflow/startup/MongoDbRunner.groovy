@@ -1,8 +1,5 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.petrinet.domain.I18nString
-import com.netgrif.workflow.workflow.domain.Filter
-import com.netgrif.workflow.workflow.domain.repositories.FilterRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,25 +20,26 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.mongodb.database}')
     private String name
 
-    @Value('${spring.data.mongodb.host}')
+    @Value('${spring.data.mongodb.host:null}')
     private String host
 
-    @Value('${spring.data.mongodb.port}')
+    @Value('${spring.data.mongodb.port:null}')
     private String port
+
+    @Value('${spring.data.mongodb.uri:null}')
+    private String uri
 
     @Value('${spring.data.mongodb.drop}')
     private boolean dropDatabase
 
-    @Autowired
-    private FilterRepository repository
-
     @Override
     void run(String... strings) throws Exception {
         if (dropDatabase) {
-            log.info("Dropping Mongo database ${host}:${port}/${name}")
+            if (host != null && port != null)
+                log.info("Dropping Mongo database ${host}:${port}/${name}")
+            else if (uri != null)
+                log.info("Droppiung Mongo database ${uri}")
             mongoTemplate.getDb().drop()
         }
-
-        repository.save(new Filter(title: new I18nString("title"), description: new I18nString("desc")))
     }
 }

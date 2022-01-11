@@ -12,12 +12,14 @@ public class ReadArc extends PTArc {
 
     /**
      * Returns true if source place has fewer tokens then arc weight.
+     *
      * @return true if <br>
-     *     <center><b><i>m(p) &ge; w</i></b><br></center>
-     *     false otherwise.
+     * <center><b><i>m(p) &ge; w</i></b><br></center>
+     * false otherwise.
      */
     @Override
     public boolean isExecutable() {
+        if(this.reference != null) multiplicity = this.reference.getMultiplicity();
         return ((Place) source).getTokens() >= multiplicity;
     }
 
@@ -32,7 +34,7 @@ public class ReadArc extends PTArc {
      * Does nothing. The token situation on <i>p</i> is not changed by the firing of <i>t</i>, i.e. <i>m'(p)</i> = <i>m(p)</i>.
      */
     @Override
-    public void rollbackExecution() {
+    public void rollbackExecution(Integer tokensConsumed) {
     }
 
     @SuppressWarnings("Duplicates")
@@ -44,6 +46,7 @@ public class ReadArc extends PTArc {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
+        clone.setReference(this.reference);
         return clone;
     }
 }

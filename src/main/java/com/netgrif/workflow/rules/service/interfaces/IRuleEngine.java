@@ -7,9 +7,7 @@ import com.netgrif.workflow.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import org.springframework.stereotype.Service;
 
-@Service
 public interface IRuleEngine {
 
     void evaluateRules(Case useCase, CaseCreatedFact caseCreatedFact);

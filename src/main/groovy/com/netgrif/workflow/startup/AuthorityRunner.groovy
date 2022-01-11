@@ -16,5 +16,6 @@ class AuthorityRunner extends AbstractOrderedCommandLineRunner {
         service.getOrCreate(Authority.user)
         service.getOrCreate(Authority.admin)
         service.getOrCreate(Authority.systemAdmin)
+        service.getOrCreate(Authority.anonymous)
     }
 }

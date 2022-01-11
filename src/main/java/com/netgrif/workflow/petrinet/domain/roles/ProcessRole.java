@@ -1,10 +1,11 @@
 package com.netgrif.workflow.petrinet.domain.roles;
 
-import com.netgrif.workflow.petrinet.domain.Event;
-import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.Imported;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.events.Event;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -16,11 +17,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@Document
 @Getter
+@Document
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class ProcessRole extends Imported {
 
     public static final String DEFAULT_ROLE = "default";
+
+    public static final String ANONYMOUS_ROLE = "anonymous";
 
     @Id
     @Setter
@@ -28,16 +32,26 @@ public class ProcessRole extends Imported {
 
     private I18nString name;
 
+    @Getter
+    @Setter
+    private String netId;
+
     @Setter
     private String description;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<EventType, Event> events;
 
     public ProcessRole() {
         _id = new ObjectId();
     }
 
+    public ProcessRole(String id) {
+        _id = new ObjectId(id);
+    }
+
+    @EqualsAndHashCode.Include
     public String getStringId() {
         return _id.toString();
     }
@@ -50,7 +64,7 @@ public class ProcessRole extends Imported {
         this._id = _id;
     }
 
-    public void set_id(String id){
+    public void set_id(String id) {
         this._id = new ObjectId(id);
     }
 
@@ -89,13 +103,13 @@ public class ProcessRole extends Imported {
     }
 
     private List<Action> getPreActions(EventType type) {
-        if (events.containsKey(type))
+        if (events != null && events.containsKey(type))
             return events.get(type).getPreActions();
         return new LinkedList<>();
     }
 
     private List<Action> getPostActions(EventType type) {
-        if (events.containsKey(type))
+        if (events != null && events.containsKey(type))
             return events.get(type).getPostActions();
         return new LinkedList<>();
     }

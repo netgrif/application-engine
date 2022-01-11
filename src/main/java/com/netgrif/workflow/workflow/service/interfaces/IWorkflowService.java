@@ -1,13 +1,14 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.querydsl.core.types.Predicate;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -25,13 +26,21 @@ public interface IWorkflowService {
 
     Page<Case> getAll(Pageable pageable);
 
-    Case createCase(String netId, String title, String color, LoggedUser user);
+    Case resolveUserRef(Case useCase);
 
-    Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale);
 
-    void deleteCase(String caseId);
+    CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user);
 
-    void deleteSubtreeRootedAt(String caseId);
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user);
+
+    CreateCaseEventOutcome createCaseByIdentifier(String identifier, String title, String color, LoggedUser user, Locale locale);
+
+    Page<Case> findAllByAuthor(String authorId, String petriNet, Pageable pageable);
+
+    DeleteCaseEventOutcome deleteCase(String caseId);
+
+    DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
 
     void deleteInstancesOfPetriNet(PetriNet net);
 
@@ -43,6 +52,7 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
+    @Deprecated
     List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);

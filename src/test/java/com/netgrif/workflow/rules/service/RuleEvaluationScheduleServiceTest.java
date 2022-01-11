@@ -3,7 +3,9 @@ package com.netgrif.workflow.rules.service;
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.RuleRepository;
@@ -13,23 +15,24 @@ import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleServ
 import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -39,7 +42,7 @@ import java.util.Optional;
         locations = "classpath:application-test.properties"
 )
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RuleEvaluationScheduleServiceTest {
 
     @Autowired
@@ -60,15 +63,15 @@ public class RuleEvaluationScheduleServiceTest {
     @Autowired
     private IRuleEvaluationScheduleService ruleEvaluationScheduleService;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
 
     @Test
-    public void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException {
+    public void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", user);
+        ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
 
         StoredRule rule = StoredRule.builder()
                 .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
@@ -79,19 +82,19 @@ public class RuleEvaluationScheduleServiceTest {
                 .build();
         ruleRepository.save(rule);
 
-        Case caze = workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", user);
-        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caze, "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(importOutcome.getNet().getStringId(), "Original title", "original color", user);
+        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caseOutcome.getCase(), "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
 
         assert outcome.getJobDetail() != null;
         assert outcome.getTrigger() != null;
 
         Thread.sleep(10000);
-        caze = workflowService.findOne(caze.getStringId());
+        Case caze = workflowService.findOne(caseOutcome.getCase().getStringId());
         assert caze.getDataSet().get("number_data").getValue().equals(6.0);
 
     }
 
-    @After
+    @AfterEach
     public void after() {
         testHelper.truncateDbs();
     }

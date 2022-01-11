@@ -30,7 +30,7 @@
             <!-- @formatter:off -->
             caseref: f.caseref;
             def net = petriNetService.getNewestVersionByIdentifier("change_value");
-            def newCase = workflowService.createCase(net.stringId, "", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            def newCase = workflowService.createCase(net.stringId, "", "", userService.getLoggedOrSystem().transformToLoggedUser()).getACase()
             def newValue = new ArrayList(caseref.value)
             newValue.add(newCase)
             change caseref value {return newValue}
@@ -44,7 +44,7 @@
             <!-- @formatter:off -->
             caseref: f.caseref;
             def net = petriNetService.getNewestVersionByIdentifier("test");
-            def newCase = workflowService.createCase(net.stringId, "", "", userService.getLoggedOrSystem().transformToLoggedUser())
+            def newCase = workflowService.createCase(net.stringId, "", "", userService.getLoggedOrSystem().transformToLoggedUser()).getACase()
             def newValue = new ArrayList(caseref.value)
             newValue.add(newCase)
             try {

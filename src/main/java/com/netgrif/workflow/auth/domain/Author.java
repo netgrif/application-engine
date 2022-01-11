@@ -1,20 +1,30 @@
 package com.netgrif.workflow.auth.domain;
 
 import lombok.Data;
+import org.bson.types.ObjectId;
 
 @Data
 public class Author {
 
-    private Long id;
+    private String id;
     private String email;
     private String fullName;
 
-    public Author(){}
+    public Author() {
+    }
 
-    public Author(Long id, String email, String fullName) {
+    public Author(String id, String email, String fullName) {
         this.id = id;
         this.email = email;
         this.fullName = fullName;
+    }
+
+    public static Author createAnonymizedAuthor() {
+        Author author = new Author();
+        author.setId("");
+        author.setEmail("***");
+        author.setFullName("***");
+        return author;
     }
 
     @Override

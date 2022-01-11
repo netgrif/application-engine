@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>test</id>
     <initials>TST</initials>
     <title>Test</title>
@@ -40,10 +41,10 @@
                     def usecase = findCase({ it.title.eq("Case 1") })
                     def data = getData("2", usecase)
                     change text value {
-                        data["data_text"].value
+                    data["data_text"].value
                     }
                     change number value {
-                        data["data_number"].value
+                    data["data_number"].value
                     }
                     <!-- @formatter:on  -->
                 </action>

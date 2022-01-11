@@ -1,11 +1,9 @@
 package com.netgrif.workflow.elastic.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -13,24 +11,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
-@SuppressWarnings("OptionalIsPresent")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticCaseIndex}", type = "case")
+@Document(indexName = "#{@elasticCaseIndex}")
 public class ElasticCase {
 
     @Id
@@ -44,7 +40,6 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String stringId;
 
-    @Field(type = Keyword)
     private String visualId;
 
     @Field(type = Keyword)
@@ -55,20 +50,17 @@ public class ElasticCase {
 
     private String title;
 
-    @Field(type = Keyword)
-    private String titleSortable;
-
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ssZZZ")
     private LocalDateTime creationDate;
 
     private Long creationDateSortable;
 
-    private Long author;
+    private String author;
 
     private String authorName;
 
-    @Field(type = Keyword)
     private String authorEmail;
 
     private Map<String, DataField> dataSet;
@@ -82,6 +74,29 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> enabledRoles;
 
+    @Field(type = Keyword)
+    private Set<String> viewRoles;
+
+    @Field(type = Keyword)
+    private Set<String> viewUserRefs;
+
+    @Field(type = Keyword)
+    private Set<String> negativeViewRoles;
+
+    private Set<String> viewUsers;
+
+    @Field(type = Keyword)
+    private Set<String> negativeViewUsers;
+
+    /**
+     * Data that is stored in the elasticsearch database.
+     *
+     * Note that the dataSet attribute is NOT set when the object is created and must be set later.
+     *
+     * The {@link com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService IElasticCaseMappingService} can be used to create
+     * instances of this class from Case objects, that have the dataset populated.
+     * @param useCase the data object that should be turned into elasticsearch data object
+     */
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
@@ -89,7 +104,6 @@ public class ElasticCase {
         processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
-        titleSortable = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
@@ -98,66 +112,28 @@ public class ElasticCase {
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        viewRoles = new HashSet<>(useCase.getViewRoles());
+        viewUserRefs = new HashSet<>(useCase.getViewUserRefs());
+        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
+        viewUsers = new HashSet<>(useCase.getViewUsers());
+        negativeViewUsers = new HashSet<>(useCase.getNegativeViewUsers());
 
         dataSet = new HashMap<>();
-        for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parseValue = parseValue(useCase.getDataField(id));
-            if (parseValue.isPresent()) {
-                dataSet.put(id, parseValue.get());
-            }
-        }
     }
 
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
-        titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
-        dataSet = useCase.getDataSet();
-    }
+        viewRoles = useCase.getViewRoles();
+        viewUserRefs = useCase.getViewUserRefs();
+        negativeViewRoles = useCase.getNegativeViewRoles();
+        viewUsers = useCase.getViewUsers();
+        negativeViewUsers = useCase.getNegativeViewUsers();
 
-    private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
-        // Set<I18nString>
-        if (dataField.getValue() instanceof User) {
-            User user = (User) dataField.getValue();
-            if (user == null)
-                return Optional.of(new DataField(""," "));
-            StringBuilder fullname = new StringBuilder("");
-            if (user.getSurname() != null) {
-                fullname.append(user.getSurname());
-                fullname.append(" ");
-            }
-            if (user.getName() != null) {
-                fullname.append(user.getName());
-            }
-            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
-        } else if (dataField.getValue() instanceof LocalDate) {
-            LocalDate date = (LocalDate) dataField.getValue();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
-        } else if (dataField.getValue() instanceof LocalDateTime) {
-            LocalDateTime date = (LocalDateTime) dataField.getValue();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
-        } else if (dataField.getValue() instanceof Date) {
-            LocalDateTime date = ((Date)dataField.getValue()).toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
-        } else {
-            if (dataField.getValue() == null)
-                return Optional.empty();
-            String string = dataField.getValue().toString();
-            if (string == null)
-                return Optional.empty();
-            return Optional.of(new DataField(string));
-        }
+        dataSet = useCase.getDataSet();
     }
 }

@@ -31,17 +31,11 @@ class EnumerationField extends ChoiceField<I18nString> {
     }
 
     void setValue(String value) {
-        def i18n = choices.find {it.contains(value)}
+        def i18n = choices.find { it.contains(value) }
         //TODO: case save choices
         if (i18n == null)
             i18n = new I18nString(value)
         super.setValue(i18n)
-    }
-
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
     }
 
     void setDefaultValue(String defaultValue) {
@@ -61,10 +55,8 @@ class EnumerationField extends ChoiceField<I18nString> {
     Field clone() {
         EnumerationField clone = new EnumerationField()
         super.clone(clone)
-
         clone.choices = this.choices
-        clone.defaultValue = this.defaultValue
-
+        clone.choicesExpression = this.choicesExpression
         return clone
     }
 }

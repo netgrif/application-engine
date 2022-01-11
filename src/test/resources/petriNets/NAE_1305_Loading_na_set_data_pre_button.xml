@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>NAE_1305_Loading_na_set_data_pre_button</id>
+    <initials>ALL</initials>
+    <title>NAE_1305_Loading_na_set_data_pre_button</title>
+    <caseName>Test default case name</caseName>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role>
+        <id>process_role</id>
+        <title>Process role</title>
+    </role>
+    <data type="button">
+        <id>button</id>
+        <title>Button</title>
+        <placeholder>home</placeholder>
+        <component>
+            <name>fab</name>
+        </component>
+    </data>
+    <data type="button">
+        <id>button2</id>
+        <title>Button</title>
+        <placeholder>Button s dlhým placeholderom</placeholder>
+        <component>
+            <name>stroked</name>
+        </component>
+    </data>
+    <data type="button">
+        <id>button3</id>
+        <title>Button</title>
+        <placeholder>home</placeholder>
+        <component>
+            <name>minifab</name>
+        </component>
+    </data>
+    <data type="button">
+        <id>button4</id>
+        <title>Button</title>
+        <placeholder>Button s dlhým placeholderom</placeholder>
+        <component>
+            <name>raised</name>
+        </component>
+    </data>
+    <data type="button">
+        <id>button5</id>
+        <title>Button</title>
+        <placeholder>Button s dlhým placeholderom</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+    </data>
+    <data type="button">
+        <id>button6</id>
+        <title>Button</title>
+        <placeholder>home</placeholder>
+        <component>
+            <name>icon</name>
+        </component>
+    </data>
+    <transition>
+        <id>1</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - editable</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>button</id>
+            <title>Button fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>button</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        Thread.sleep(1000)
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        Thread.sleep(1000)
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        Thread.sleep(1000)
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button4</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        Thread.sleep(1000)
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button5</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        Thread.sleep(1000)
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button6</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        Thread.sleep(1000)
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

@@ -1,21 +1,23 @@
 package com.netgrif.workflow.petrinet.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.version.Version;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -23,9 +25,9 @@ import java.util.*;
 public interface IPetriNetService {
 
     @Deprecated
-    Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
-    Optional<PetriNet> importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
+    ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
     Optional<PetriNet> save(PetriNet petriNet);
 
@@ -85,4 +87,8 @@ public interface IPetriNetService {
     PetriNet clone(ObjectId petriNetId);
 
     void deletePetriNet(String id, LoggedUser loggedUser);
+
+    void runActions(List<Action> actions, PetriNet petriNet);
+
+    List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
 }

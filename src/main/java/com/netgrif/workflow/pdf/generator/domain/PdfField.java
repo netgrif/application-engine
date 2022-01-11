@@ -93,7 +93,7 @@ public abstract class PdfField implements Comparable<PdfField> {
     @Setter
     protected Renderer renderer;
 
-    public PdfField(PdfResource resource){
+    public PdfField(PdfResource resource) {
         this.resource = resource;
     }
 

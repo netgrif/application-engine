@@ -1,18 +1,18 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.AsyncRunner
-import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.Author
+import com.netgrif.workflow.auth.domain.IUser
+import com.netgrif.workflow.auth.service.UserDetailsServiceImpl
+import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
-import com.netgrif.workflow.mail.domain.SimpleMailDraft
-import com.netgrif.workflow.mail.domain.TypedMailDraft
+import com.netgrif.workflow.mail.domain.MailDraft
+import com.netgrif.workflow.mail.interfaces.IMailAttemptService
 import com.netgrif.workflow.mail.interfaces.IMailService
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
-import com.netgrif.workflow.orgstructure.service.GroupService
-import com.netgrif.workflow.orgstructure.service.MemberService
 import com.netgrif.workflow.pdf.generator.config.PdfResource
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
@@ -20,20 +20,30 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.rules.domain.RuleRepository
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
+import com.netgrif.workflow.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
-import com.netgrif.workflow.workflow.service.interfaces.IDataService
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.service.interfaces.*
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import org.bson.types.ObjectId
+import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,6 +53,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -77,12 +88,6 @@ class ActionDelegate {
     AsyncRunner async
 
     @Autowired
-    GroupService groupService
-
-    @Autowired
-    MemberService memberService
-
-    @Autowired
     IPdfGenerator pdfGenerator
 
     @Autowired
@@ -90,6 +95,39 @@ class ActionDelegate {
 
     @Autowired
     INextGroupService nextGroupService
+
+    @Autowired
+    IRegistrationService registrationService
+
+    @Autowired
+    IMailAttemptService mailAttemptService
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService
+
+    @Autowired
+    IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
+
+    @Autowired
+    IInitValueExpressionEvaluator initValueExpressionEvaluator
+
+    @Autowired
+    RuleRepository ruleRepository
+
+    @Autowired
+    Scheduler scheduler
+
+    @Autowired
+    IUserFilterSearchService filterSearchService
+
+    @Autowired
+    IConfigurableMenuService configurableMenuService
+
+    @Autowired
+    IMenuImportExportService menuImportExportService
+
+    @Autowired
+    IFilterImportExportService filterImportExportService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -99,22 +137,28 @@ class ActionDelegate {
     def map = [:]
     Action action
     FieldActionsRunner actionsRunner
-    ChangedFieldsTree changedFieldsTree
+    List<EventOutcome> outcomes
 
     def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
         this.action = action
         this.useCase = useCase
         this.task = task
         this.actionsRunner = actionsRunner
-        action.fieldIds.each { name, id ->
-            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
+        this.initFieldsMap(action.fieldIds)
+        this.initTransitionsMap(action.transitionIds)
+        this.outcomes = new ArrayList<>()
+    }
+
+    def initFieldsMap(Map<String, String> fieldIds) {
+        fieldIds.each { name, id ->
+            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id, null))
         }
-        action.transitionIds.each { name, id ->
+    }
+
+    def initTransitionsMap(Map<String, String> transitionIds) {
+        transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
-        changedFieldsTree = ChangedFieldsTree.createNew(useCase.stringId,
-                task.isPresent() ? task.get().stringId : "task",
-                task.isPresent() ? task.get().transitionId : "trans")
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -155,6 +199,23 @@ class ActionDelegate {
 
     def unchanged = { return UNCHANGED_VALUE }
 
+    def initValueOfField = { Field field ->
+        if (!field.hasDefault()) {
+            return null
+        } else if (field.isDynamicDefaultValue()) {
+            return initValueExpressionEvaluator.evaluate(useCase, field)
+        }
+        return field.defaultValue
+    }
+
+    def getInit() {
+        return initValueOfField
+    }
+
+    def init(Field field) {
+        return initValueOfField(field)
+    }
+
     /**
      * Changes behavior of a given field on given transition if certain condition is being met.
      * <br>
@@ -174,59 +235,59 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-                        putIntoChangedFields(field, new ChangedField(field.stringId))
-                    }
-                    changedFieldsTree.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
-                    addAttributeToChangedField(field, "type", field.type.name)
+                    ChangedField changedField = new ChangedField(field.stringId)
+                    changedField.addAttribute("type", field.type.name)
+                    changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
+                    SetDataEventOutcome outcome = createSetDataEventOutcome()
+                    outcome.addChangedField(field.stringId, changedField)
+                    this.outcomes.add(outcome)
                 }
             }]
         }]
     }
 
-    def saveChangedValue(Field field) {
-        useCase.dataSet.get(field.stringId).value = field.value
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "value", field.value)
-        addAttributeToChangedField(field, "type", field.type.name)
+    private SetDataEventOutcome createSetDataEventOutcome(){
+        return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("choices", field.choices.collect {it.getTranslation(LocaleContextHolder.locale)})
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
-        }
-        addAttributeToChangedField(field, "allowedNets", field.allowedNets)
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("allowedNets", field.allowedNets)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
-            putIntoChangedFields(field, new ChangedField(field.stringId))
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
+    }
+
+    def saveChangedValidation(Field field) {
+        useCase.dataSet.get(field.stringId).validations = field.validations
+        List<Validation> compiled = field.validations.collect { it.clone() }
+        compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
+            it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
         }
-        addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
-    }
-
-    void putIntoChangedFields(Field field, ChangedField changedField) {
-        putIntoChangedFields(field.stringId, changedField)
-    }
-
-    void putIntoChangedFields(String fieldId, ChangedField changedField) {
-        changedFieldsTree.put(fieldId, changedField)
-    }
-
-    void addAttributeToChangedField(Field field, String attribute, Object value) {
-        changedFieldsTree.addAttribute(field.stringId, attribute, value)
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def close = { Transition[] transitions ->
@@ -256,18 +317,20 @@ class ActionDelegate {
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
         tasksPage?.content?.each { task ->
-            taskService.assignTask(task.stringId)
-            dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
-            taskService.finishTask(task.stringId)
+            addTaskOutcomes(task, dataSet)
         }
     }
 
     void executeTask(String transitionId, Map dataSet) {
         QTask qTask = new QTask("task")
         Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
-        taskService.assignTask(task.stringId)
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
-        taskService.finishTask(task.stringId)
+        addTaskOutcomes(task, dataSet)
+    }
+
+    private addTaskOutcomes(Task task, Map dataSet){
+        this.outcomes.add(taskService.assignTask(task.stringId))
+        this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
+        this.outcomes.add(taskService.finishTask(task.stringId))
     }
 
     List<String> searchCases(Closure<Predicate> predicates) {
@@ -303,7 +366,7 @@ class ActionDelegate {
              saveChangedChoices(field)
          },
          allowedNets: { cl ->
-             if (!(field instanceof CaseField))
+             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
                  return
 
              def allowedNets = cl()
@@ -321,40 +384,60 @@ class ActionDelegate {
              saveChangedAllowedNets(field)
          },
         options: { cl ->
-            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                    || field instanceof MultichoiceField || field instanceof EnumerationField))
                 return
 
             def options = cl()
             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
                 return
-            if (!(options instanceof Map && options.every {it.getKey() instanceof String}))
+            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
                 return
-            field = (MapOptionsField) field
-            if (options.every {it.getValue() instanceof I18nString}) {
-                field.setOptions(options)
-            } else {
-                Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                options.each {it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String))}
-                field.setOptions(newOptions)
+
+            if (field instanceof MapOptionsField) {
+                field = (MapOptionsField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    field.setOptions(options)
+                } else {
+                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                    field.setOptions(newOptions)
+                }
+                saveChangedOptions(field)
+            } else if (field instanceof ChoiceField) {
+                field = (ChoiceField) field
+                if (options.every { it.getValue() instanceof I18nString }) {
+                    Set<I18nString> choices = new LinkedHashSet<>()
+                    options.forEach({ k, v -> choices.add(v) })
+                    field.setChoices(choices)
+                } else {
+                    Set<I18nString> newChoices = new LinkedHashSet<>();
+                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                    field.setChoices(newChoices)
+                }
+                saveChangedChoices(field)
             }
-            saveChangedOptions(field)
-        }]
+
+        },
+         validations: { cl ->
+             changeFieldValidations(field, cl)
+         }
+        ]
     }
 
     void changeFieldValue(Field field, def cl) {
         def value = cl()
-        if (value instanceof Closure && value() == UNCHANGED_VALUE) {
-            return
-        }
-        if (value == null) {
-            if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
-                field.clearValue()
-                saveChangedValue(field)
-            } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
-                field.clearValue()
-                saveChangedValue(field)
+        if (value instanceof Closure) {
+            if (value == initValueOfField) {
+                value = initValueOfField(field)
+
+            } else if (value() == UNCHANGED_VALUE) {
+                return
             }
-            return
+        }
+        if (value == null && useCase.dataSet.get(field.stringId).value != null) {
+            field.clearValue()
+            saveChangedValue(field)
         }
         if (value != null) {
             if (field instanceof CaseField) {
@@ -364,6 +447,38 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("value", value)
+        changedField.addAttribute("type", field.type.name)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
+    }
+
+    def saveChangedValue(Field field) {
+        useCase.dataSet.get(field.stringId).value = field.value
+    }
+
+    void changeFieldValidations(Field field, def cl) {
+        def valid = cl()
+        if (valid == UNCHANGED_VALUE)
+            return
+        List<Validation> newValidations = []
+        if (valid != null) {
+            if (valid instanceof String) {
+                newValidations = [new Validation(valid as String)]
+            } else if (valid instanceof Validation) {
+                newValidations = [valid]
+            } else if (valid instanceof Collection) {
+                if (valid.every { it instanceof Validation }) {
+                    newValidations = valid
+                } else {
+                    newValidations = valid.collect { new Validation(it as String) }
+                }
+            }
+        }
+        field.validations = newValidations
+        saveChangedValidation(field)
     }
 
     def always = { return ALWAYS_GENERATE }
@@ -447,56 +562,60 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem) {
-        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
-        if (net == null)
-            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.defaultValue, color, author)
+    Case createCase(String identifier, String title = null, String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
+        return workflowService.createCaseByIdentifier(identifier, title, color, author.transformToLoggedUser(), locale).getCase()
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.loggedOrSystem) {
-        return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", IUser author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
+        CreateCaseEventOutcome outcome = workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+        this.outcomes.add(outcome)
+        return outcome.getCase()
     }
 
-    Task assignTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+    Task assignTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        taskService.assignTask(user.transformToLoggedUser(), taskId)
-        return taskService.findOne(taskId)
+        AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId)
+        this.outcomes.add(outcome)
+        return outcome.getTask()
     }
 
-    Task assignTask(Task task, User user = userService.loggedOrSystem) {
-        taskService.assignTask(task, user)
-        return taskService.findOne(task.stringId)
+    Task assignTask(Task task, IUser user = userService.loggedOrSystem) {
+        return addTaskOutcomeAndReturnTask(taskService.assignTask(task, user))
     }
 
-    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
-        taskService.assignTasks(tasks, assignee)
+    void assignTasks(List<Task> tasks, IUser assignee = userService.loggedOrSystem) {
+        this.outcomes.addAll(taskService.assignTasks(tasks, assignee))
     }
 
-    void cancelTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+    Task cancelTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        taskService.cancelTask(user.transformToLoggedUser(), taskId)
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(user.transformToLoggedUser(), taskId))
     }
 
-    void cancelTask(Task task, User user = userService.loggedOrSystem) {
-        taskService.cancelTask(task, userService.loggedOrSystem)
+    Task cancelTask(Task task, IUser user = userService.loggedOrSystem) {
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, userService.loggedOrSystem))
     }
 
-    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
-        taskService.cancelTasks(tasks, user)
+    void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem) {
+        this.outcomes.addAll(taskService.cancelTasks(tasks, user))
     }
 
-    void finishTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome.getTask()
+    }
+
+    void finishTask(String transitionId, Case aCase = useCase, IUser user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId, aCase)
-        taskService.finishTask(user.transformToLoggedUser(), taskId)
+        addTaskOutcomeAndReturnTask(taskService.finishTask(user.transformToLoggedUser(), taskId))
     }
 
-    void finishTask(Task task, User user = userService.loggedOrSystem) {
-        taskService.finishTask(task, user)
+    void finishTask(Task task, IUser user = userService.loggedOrSystem) {
+        addTaskOutcomeAndReturnTask(taskService.finishTask(task, user))
     }
 
-    void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
-        taskService.finishTasks(tasks, finisher)
+    void finishTasks(List<Task> tasks, IUser finisher = userService.loggedOrSystem) {
+        this.outcomes.addAll(taskService.finishTasks(tasks, finisher))
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -525,48 +644,94 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    User assignRole(String roleImportId, User user = userService.loggedUser) {
-        return userService.addRole(user, roleImportId)
+    IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
+        // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
+        IUser actualUser = userService.addRole(user, roleMongoId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
     }
 
-    def setData(Task task, Map dataSet) {
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+    IUser assignRole(String roleId, String netId, IUser user = userService.loggedUser) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+        nets.forEach({ net -> user = assignRole(roleId, net, user) })
+        return user
     }
 
-    def setData(Transition transition, Map dataSet) {
-        setData(transition.importId, this.useCase, dataSet)
+    IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
+        IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
     }
 
-    def setData(String transitionId, Case useCase, Map dataSet) {
+    IUser assignRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
+        PetriNet net = petriNetService.getPetriNet(netId, version)
+        return assignRole(roleId, net, user)
+    }
+
+    IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
+        IUser actualUser = userService.removeRole(user, roleMongoId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
+    }
+
+    IUser removeRole(String roleId, String netId, IUser user = userService.loggedUser) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+        nets.forEach({ net -> user = removeRole(roleId, net, user) })
+        return user
+    }
+
+    IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
+        IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
+    }
+
+    IUser removeRole(String roleId, String netId, Version version, IUser user = userService.loggedUser) {
+        PetriNet net = petriNetService.getPetriNet(netId, version)
+        return removeRole(roleId, net, user)
+    }
+
+    SetDataEventOutcome setData(Task task, Map dataSet) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
+    }
+
+    SetDataEventOutcome setData(Transition transition, Map dataSet) {
+        return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
+    }
+
+    SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
     }
 
-    def setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
+    @Deprecated
+    SetDataEventOutcome setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
         return setDataWithPropagation(task, dataSet)
     }
 
-    def setDataWithPropagation(Task task, Map dataSet) {
+    @Deprecated
+    SetDataEventOutcome setDataWithPropagation(Task task, Map dataSet) {
         return setDataWithPropagation(task.stringId, dataSet)
     }
 
-    def setDataWithPropagation(String taskId, Map dataSet) {
+    @Deprecated
+    SetDataEventOutcome setDataWithPropagation(String taskId, Map dataSet) {
         Task task = taskService.findOne(taskId)
-        Case caze = workflowService.findOne(task.caseId)
-        ChangedFieldsTree container = setData(task, dataSet)
-        caze = workflowService.findOne(caze.stringId)
-        this.changedFieldsTree.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
-        this.changedFieldsTree.propagate(container)
-        return container
+        return setData(task, dataSet)
+    }
+
+    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome
     }
 
     Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)
             changedField.wasChangedOn(task)
-            fieldAttributes.value.each {attribute ->
+            fieldAttributes.value.each { attribute ->
                 changedField.addAttribute(attribute.key, attribute.value)
             }
             return changedField
@@ -576,8 +741,8 @@ class ActionDelegate {
     }
 
     Map<String, Field> getData(Task task) {
-        def useCase = workflowService.findOne(task.caseId);
-        return mapData(dataService.getData(task, useCase))
+        def useCase = workflowService.findOne(task.caseId)
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
     Map<String, Field> getData(Transition transition) {
@@ -589,7 +754,12 @@ class ActionDelegate {
         def task = taskService.searchOne(predicate)
         if (!task)
             return new HashMap<String, Field>()
-        return mapData(dataService.getData(task, useCase))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+    }
+
+    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome){
+        this.outcomes.add(outcome)
+        return outcome.getData()
     }
 
     protected Map<String, Field> mapData(List<Field> data) {
@@ -598,76 +768,36 @@ class ActionDelegate {
         }
     }
 
-    Set<Group> findOrganisation(User user = loggedUser()) {
-        return memberService.findByEmail(user.email)?.groups
-    }
-
-    Group createOrganisation(String name, Group parent = null, Set<User> users = [] as Set) {
-        Group org = new Group(name)
-        if (parent)
-            org.setParentGroup(parent)
-        users.collect { user ->
-            org.addMember(findMember(user))
-        }
-        return groupService.save(org)
-    }
-
-    def deleteOrganisation(Group organisation) {
-        groupService.delete(organisation)
-    }
-
-    Group saveOrganisation(Group organisation) {
-        return groupService.save(organisation)
-    }
-
-    Group removeMember(Group organisation, User user) {
-        organisation.members.removeAll { it.email == user.email }
-        return groupService.save(organisation)
-    }
-
-    Group addMember(Group organisation, User user) {
-        def member = findMember(user)
-        organisation.members.add(member)
-        return groupService.save(organisation)
-    }
-
-    Member findMember(User user) {
-        def member = memberService.findByEmail(user.email)
-        if (member == null)
-            return memberService.save(Member.from(user))
-        return member
-    }
-
-    User loggedUser() {
+    IUser loggedUser() {
         return userService.loggedUser
     }
 
-    void generatePDF(String transitionId, String fileFieldId){
+    void generatePDF(String transitionId, String fileFieldId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields){
+    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
+    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -677,26 +807,160 @@ class ActionDelegate {
         pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale){
+    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
-    void sendMail(TypedMailDraft mailDraft){
+    void sendMail(MailDraft mailDraft) {
         mailService.sendMail(mailDraft)
     }
 
-    void sendMail(SimpleMailDraft mailDraft){
-        mailService.sendMail(mailDraft)
+    def changeUserByEmail(String email) {
+        [email  : { cl ->
+            changeUserByEmail(email, "email", cl)
+        },
+         name   : { cl ->
+             changeUserByEmail(email, "name", cl)
+         },
+         surname: { cl ->
+             changeUserByEmail(email, "surname", cl)
+         },
+         tel    : { cl ->
+             changeUserByEmail(email, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(String id) {
+        [email  : { cl ->
+            changeUser(id, "email", cl)
+        },
+         name   : { cl ->
+             changeUser(id, "name", cl)
+         },
+         surname: { cl ->
+             changeUser(id, "surname", cl)
+         },
+         tel    : { cl ->
+             changeUser(id, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(IUser user) {
+        [email  : { cl ->
+            changeUser(user, "email", cl)
+        },
+         name   : { cl ->
+             changeUser(user, "name", cl)
+         },
+         surname: { cl ->
+             changeUser(user, "surname", cl)
+         },
+         tel    : { cl ->
+             changeUser(user, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUserByEmail(String email, String attribute, def cl) {
+        IUser user = userService.findByEmail(email, false)
+        changeUser(user, attribute, cl)
+    }
+
+    def changeUser(String id, String attribute, def cl) {
+        IUser user = userService.findById(id, false)
+        changeUser(user, attribute, cl)
+    }
+
+    def changeUser(IUser user, String attribute, def cl) {
+        if (user == null) {
+            log.error("Cannot find user.")
+            return
+        }
+
+        if (user.hasProperty(attribute) == null) {
+            log.error("User object does not have property [" + attribute + "]")
+            return
+        }
+
+        user[attribute] = cl() as String
+        userService.save(user)
+    }
+
+    MessageResource inviteUser(String email) {
+        NewUserRequest newUserRequest = new NewUserRequest()
+        newUserRequest.email = email
+        newUserRequest.groups = new HashSet<>()
+        newUserRequest.processRoles = new HashSet<>()
+        return inviteUser(newUserRequest)
+    }
+
+    MessageResource inviteUser(NewUserRequest newUserRequest) {
+        IUser user = registrationService.createNewUser(newUserRequest);
+        if (user == null)
+            return MessageResource.successMessage("Done");
+        mailService.sendRegistrationEmail(user);
+
+        mailAttemptService.mailAttempt(newUserRequest.email);
+        return MessageResource.successMessage("Done");
+    }
+
+    void deleteUser(String email) {
+        IUser user = userService.findByEmail(email, false)
+        if (user == null)
+            log.error("Cannot find user with email [" + email + "]")
+        deleteUser(user)
+    }
+
+    void deleteUser(IUser user) {
+        List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
+        if (tasks != null && tasks.size() > 0)
+            taskService.cancelTasks(tasks, user)
+
+        QCase qCase = new QCase("case")
+        List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
+        if (cases != null)
+            cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
+
+        userService.deleteUser(user)
+    }
+
+    Validation validation(String rule, I18nString message) {
+        return new Validation(rule, message)
+    }
+
+    DynamicValidation dynamicValidation(String rule, I18nString message) {
+        return new DynamicValidation(rule, message)
+    }
+
+    List<Case> findFilters(String userInput) {
+        return filterSearchService.autocompleteFindFilters(userInput)
+    }
+
+    List<Case> findAllFilters() {
+        return filterSearchService.autocompleteFindFilters("")
+    }
+
+    FileFieldValue exportFilters(Collection<String> filtersToExport) {
+        if (filtersToExport.isEmpty()) {
+            return null
+        }
+        return filterImportExportService.exportFiltersToFile(filtersToExport)
+    }
+
+    List<String> importFilters() {
+        return filterImportExportService.importFilters()
     }
 }

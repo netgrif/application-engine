@@ -1,5 +1,7 @@
 package com.netgrif.workflow.configuration;
 
+import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -25,7 +28,7 @@ import org.springframework.stereotype.Controller;
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 @ConditionalOnProperty(
-        value="server.security.static.enabled",
+        value = "server.security.static.enabled",
         havingValue = "true"
 )
 public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfiguration {
@@ -49,55 +52,63 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
         log.info("Configuration with frontend in static/");
 //        @formatter:off
         http
-            .httpBasic()
-            .and()
-            .authorizeRequests()
+                .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .logout()
+                .and()
+                .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-            .and()
-            .headers()
+                .and()
+                .headers()
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
 
     @Override
-    boolean isOpenRegistration() {
+    protected ProviderManager authenticationManager() throws Exception {
+        return (ProviderManager) super.authenticationManager();
+    }
+
+    @Bean
+    protected IAfterRegistrationAuthService authenticationService() throws Exception {
+        return new AfterRegistrationAuthService(authenticationManager());
+    }
+
+    @Override
+    protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override
-    boolean isCsrfEnabled() {
+    protected boolean isCsrfEnabled() {
         return csrf;
     }
 
     @Override
-    String[] getStaticPatterns() {
+    protected String[] getStaticPatterns() {
         return new String[]{
                 "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
-    String[] getServerPatterns() {
-        return new String[] {
+    protected String[] getServerPatterns() {
+        return new String[]{
                 "/index.html", "/", "/login", "/signup/**", "/recover/**", "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
         };
     }
 
     @Override
-    Environment getEnvironment() {
+    protected Environment getEnvironment() {
         return env;
     }
 }
