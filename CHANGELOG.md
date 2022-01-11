@@ -1,4 +1,16 @@
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10943/tab/release-report-all-issues"></a>
+## 5.7.5 (11.01.2022)
+### Bug Fixes
+* [NAE-1542](https://netgrif.atlassian.net/browse/NAE-1533) - PDF generátor generovanie hodnoty dátumov
+* [NAE-1543](https://netgrif.atlassian.net/browse/NAE-1533) - Prisposobenie generovania PDF pre nove layouty ktore si vieme definovat na konkretnu datagrupu
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10943/tab/release-report-all-issues"></a>
 ## 5.7.4 (21.12.2021)
 ### Bug Fixes
 * [NAE-1533](https://netgrif.atlassian.net/browse/NAE-1533) - Mongo case search exceeds maximum query nesting level
