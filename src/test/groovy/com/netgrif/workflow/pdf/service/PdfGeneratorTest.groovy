@@ -67,7 +67,7 @@ class PdfGeneratorTest {
     }
 
     @BeforeEach
-    void beforeTest(){
+    void beforeTest() {
         testHelper.truncateDbs()
     }
 
@@ -156,42 +156,39 @@ class PdfGeneratorTest {
         pdfGenerator.addCustomField(pdf, pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
-//TODO: dorobit
 
     @Test
-    public void testFlowLayout() {
+    void testFlowLayout() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[4]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
-        Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
-        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[4]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[4] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
     }
 
     @Test
-    public void testDataGroup() {
+    void testDataGroup() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[5]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
-        Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
-        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[5]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[5] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
     }
 
     @Test
-    public void testTaskRef() {
+    void testTaskRef() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[6]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
-        Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
-        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)))
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[6]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[6] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
     }
-
-
 
 
     private Map<String, DataGroup> getDataGroupMap(List<DataGroup> dataGroupList) {
