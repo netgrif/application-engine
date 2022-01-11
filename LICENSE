@@ -15,8 +15,9 @@
     NOT USE THE SOFTWARE. IF YOU ARE RECEIVING THE SOFTWARE ON BEHALF OF
     A LEGAL ENTITY, YOU REPRESENT AND WARRANT THAT YOU HAVE THE ACTUAL
     AUTHORITY TO AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT ON
-    BEHALF OF SUCH ENTITY. THIS IS NOT A PURCHASE AGREEMENT BUT A LICENCE
-    AGREEMENT WITH YOU (as defined below).
+    BEHALF OF SUCH ENTITY.
+    THIS IS NOT A PURCHASE AGREEMENT BUT A LICENCE AGREEMENT WITH YOU
+    (as defined below).
 
     1.  Definitions.
 
@@ -40,6 +41,9 @@
         purposes of this License, Derivative Works shall not include works
         that remain separable from, or merely link (or bind by name) to
         the interfaces of, the Software and Derivative Works thereof.
+
+        “Business” means goods and/or services provided or to be provided
+        at standard commercial terms between You and the Partner.
 
         “Partner” means any third-party person to whom You provide or by
         any means intent to provide any goods and/or services or who
@@ -75,17 +79,17 @@
         (b) You must cause any modified files to carry prominent notices
             stating that You changed the files;
 
-        (c) You must not provide the Commercial Workflow Service; and
+        (c) You must not use Software and/or Derivative Works as a cloud-based
+            platform enabling any Partner to create Subsequent Works;
 
-        (d) You must not use Software and/or Derivative Works as a cloud-based
-            platform and/or software provided as a
-            service enabling any Partner to use (or access via its APIs)
-            the Software, Derivative Works or create and use
-            Subsequent Works for any commercial purpose or for any purpose
-            forming a base for (or for execution of rights and obligations
-            under) any contractual relationship between Partner and its
-            current or potential customers, suppliers or any other business
-            partners (that are not Your Partners).
+        (d) You must not use Software and/or Derivative Works as a “software
+            provided as a service” enabling any Partner to use (or access via
+            its APIs) the Software and/or, Derivative Works for other purposes
+            than
+            (i) as an integral part of the Business (in relationship between
+                You and the Partner);
+            (ii) as an integral part of the Business (in relationship between
+                 Your Partners).
 
         You may add Your own notices to Your modifications and may provide
         additional or different license terms and conditions for use,
