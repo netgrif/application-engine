@@ -52,47 +52,37 @@ public class CaseSearchService extends MongoSearchService<Case> {
     private IPetriNetService petriNetService;
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
-        List<Predicate> andPredicates = new ArrayList<>();
+        BooleanBuilder builder = new BooleanBuilder();
 
         if (requestQuery.containsKey(PETRINET)) {
-            andPredicates.add(petriNet(requestQuery.get(PETRINET), user, locale));
+            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
-            andPredicates.add(author(requestQuery.get(AUTHOR)));
+            builder.and(author(requestQuery.get(AUTHOR)));
         }
         if (requestQuery.containsKey(TRANSITION)) {
-            andPredicates.add(transition(requestQuery.get(TRANSITION)));
+            builder.and(transition(requestQuery.get(TRANSITION)));
         }
         if (requestQuery.containsKey(FULLTEXT)) {
-            andPredicates.add(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
+            builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
         }
         if (requestQuery.containsKey(ROLE)) {
-            andPredicates.add(role(requestQuery.get(ROLE)));
+            builder.and(role(requestQuery.get(ROLE)));
         }
         if (requestQuery.containsKey(DATA)) {
-            andPredicates.add(data(requestQuery.get(DATA)));
+            builder.and(data(requestQuery.get(DATA)));
         }
         if (requestQuery.containsKey(CASE_ID)) {
-            andPredicates.add(caseId(requestQuery.get(CASE_ID)));
+            builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
             Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
             if (groupPredicate != null) {
-                andPredicates.add(groupPredicate);
+                builder.and(groupPredicate);
             } else {
                 return null;
             }
         }
-        BooleanBuilder constraints = new BooleanBuilder(role(user.getProcessRoles()));
-        constraints.or(buildViewUsersQueryConstraint(user));
-
-        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
-        negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
-
-        constraints.andNot(negativeConstraints);
-        andPredicates.add(constraints);
-
-        return constructPredicateTree(andPredicates, BooleanBuilder::and);
         BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
         permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
         permissionConstraints.or(buildViewUserQueryConstraint(user));
@@ -140,8 +130,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
         List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (query instanceof ArrayList) {
-            List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
-            return constructPredicateTree(expressions, BooleanBuilder::or);
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
         } else if (query instanceof HashMap) {
             return petriNetObject((HashMap<String, String>) query, allowedNets);
         }
@@ -156,8 +148,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate author(Object query) {
         if (query instanceof ArrayList) {
-            List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
-            return constructPredicateTree(expressions, BooleanBuilder::or);
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
         } else if (query instanceof HashMap) {
             return authorObject((HashMap<String, Object>) query);
         }
@@ -187,8 +181,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate transition(Object query) {
         if (query instanceof ArrayList) {
-            List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
-            return constructPredicateTree(expressions, BooleanBuilder::or);
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
         } else if (query instanceof String) {
             return transitionString((String) query);
         }
@@ -205,7 +201,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
         Map dataQueries = (Map) data;
 
-        List<Predicate> predicates = new ArrayList<>();
+        List<BooleanExpression> predicates = new ArrayList<>();
         (dataQueries).forEach((k, v) -> {
             if (v instanceof Map) {
                 Map.Entry<String, Object> entry = (Map.Entry<String, Object>) ((Map) v).entrySet().iterator().next();
@@ -228,7 +224,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
             }
         });
-        return constructPredicateTree(predicates, BooleanBuilder::or);
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::and);
+        return builder;
     }
 
     public Predicate fullText(Object petriNetQuery, String searchPhrase) {
@@ -251,7 +249,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (petriNets.isEmpty())
             return null;
 
-        List<Predicate> predicates = new ArrayList<>();
+        List<BooleanExpression> predicates = new ArrayList<>();
         predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
@@ -297,7 +295,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
             });
         });
 
-        return constructPredicateTree(predicates, BooleanBuilder::or);
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::or);
+        return builder;
     }
 
     private String parseProcessIdentifier(HashMap<String, String> petriNet) {
@@ -308,8 +308,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate caseId(Object query) {
         if (query instanceof ArrayList) {
-            List<Predicate> expressions = (List<Predicate>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> caseIdString((String) q)).collect(Collectors.toList());
-            return constructPredicateTree(expressions, BooleanBuilder::or);
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> caseIdString((String) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
         } else if (query instanceof String) {
             return caseIdString((String) query);
         }
@@ -327,7 +329,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (groupProcesses.size() == 0)
             return null;
 
-        List<Predicate> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
-        return constructPredicateTree(processQueries, BooleanBuilder::or);
+        List<BooleanExpression> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
+        BooleanBuilder builder = new BooleanBuilder();
+        processQueries.forEach(builder::or);
+        return builder;
     }
 }
