@@ -66,9 +66,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f
+            "title.keyword", 2f,
+            "authorName.keyword", 1f,
+            "authorEmail.keyword", 1f,
+            "visualId.keyword", 2f
     );
 
     /**
