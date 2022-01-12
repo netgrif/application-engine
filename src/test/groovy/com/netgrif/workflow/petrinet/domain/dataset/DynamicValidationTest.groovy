@@ -1,9 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -72,7 +70,7 @@ class DynamicValidationTest {
         assert (data["date"]).validations[0].compiledRule == ("between past,today-P${useCase.dataSet["max"].value as Integer}D" as String)
 
         SetDataEventOutcome changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": true],
-                                                      "text_valid_switch"  : ["type": "boolean", "value": true]])
+                                                        "text_valid_switch"  : ["type": "boolean", "value": true]])
         assert (changes.changedFields["number"].attributes["validations"] as List)[0]["validationRule"] == "odd"
         assert (changes.changedFields["text"].attributes["validations"] as List)[0]["validationRule"] == "email"
 

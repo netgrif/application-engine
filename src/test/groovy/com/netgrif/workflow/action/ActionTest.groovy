@@ -1,7 +1,6 @@
 package com.netgrif.workflow.action
 
 
-
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner
 import com.netgrif.workflow.workflow.domain.Case

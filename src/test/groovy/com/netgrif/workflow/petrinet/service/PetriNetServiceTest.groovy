@@ -86,7 +86,7 @@ class PetriNetServiceTest {
         int caseCount = workflowService.getAll(new FullPageRequest()).size()
         long taskCount = taskRepository.count()
 
-        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE),  VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
@@ -105,7 +105,6 @@ class PetriNetServiceTest {
         assert user != null
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
-
 
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())

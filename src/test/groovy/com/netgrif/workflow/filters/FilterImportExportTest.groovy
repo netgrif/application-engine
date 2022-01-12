@@ -28,7 +28,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.context.junit4.SpringRunner
 
 import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
@@ -127,7 +126,7 @@ class FilterImportExportTest {
 
         Set<String> exportFiltersIds = filterCases.stream()
                 .filter({ filterCase -> filterCase.title in FILTERS_TO_EXPORT })
-                .map({filterCase -> filterCase.stringId})
+                .map({ filterCase -> filterCase.stringId })
                 .collect(Collectors.toSet())
         FileFieldValue exportedFiltersField = this.importExportService.exportFiltersToFile(exportFiltersIds)
         File exportedFiltersFile = new File(exportedFiltersField.getPath())
@@ -139,15 +138,15 @@ class FilterImportExportTest {
         assert importedTasksIds.size() == FILTERS_TO_EXPORT.size()
 
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
-        importedTasksIds.forEach({taskId ->
+        importedTasksIds.forEach({ taskId ->
             Task filterTask = this.taskService.findOne(taskId)
             this.dataService.setData(filterTask, ImportHelper.populateDataset([
                     (VISIBILITY_FIELD): [
-                            "type": "enumeration_map",
+                            "type" : "enumeration_map",
                             "value": FILTER_VISIBILITY_PRIVATE
                     ],
-                    (NEW_TITLE_FIELD): [
-                            "type": "text",
+                    (NEW_TITLE_FIELD) : [
+                            "type" : "text",
                             "value": this.workflowService.findOne(filterTask.caseId).title + " new"
                     ]
             ]))
@@ -155,14 +154,14 @@ class FilterImportExportTest {
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
         this.dataService.setData(importTask, ImportHelper.populateDataset([
                 (IMPORTED_FILTERS_FIELD): [
-                        "type": "taskRef",
+                        "type" : "taskRef",
                         "value": importedTasksIds
                 ]
         ]))
         this.taskService.finishTask(importTask, dummyUser)
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
-        List<String> filterCasesNames = filterCases.stream().map({filterCase -> filterCase.title}).collect(Collectors.toList())
+        List<String> filterCasesNames = filterCases.stream().map({ filterCase -> filterCase.title }).collect(Collectors.toList())
         assert filterCases.size() == DEFAULT_FILTERS_SIZE + FILTERS_TO_EXPORT.size()
 
         for (String filterName : FILTERS_TO_EXPORT_NEW) {
@@ -193,17 +192,17 @@ class FilterImportExportTest {
                 FILTER_VISIBILITY_PUBLIC,
                 "(author:<<me>>)",
                 [],
-                ["predicateMetadata": [
-                    [[
-                        "category": "case_author",
-                        "configuration": [
-                            "operator": "equals"
-                        ],
-                        "values": [[
-                            "text": "search.category.userMe",
-                            "value": ["<<me>>"]
-                        ]]
-                    ]]
+                ["predicateMetadata" : [
+                        [[
+                                 "category"     : "case_author",
+                                 "configuration": [
+                                         "operator": "equals"
+                                 ],
+                                 "values"       : [[
+                                                           "text" : "search.category.userMe",
+                                                           "value": ["<<me>>"]
+                                                   ]]
+                         ]]
                 ], "searchCategories": ["case_author"]],
                 [:]
         )
@@ -215,16 +214,16 @@ class FilterImportExportTest {
                 FILTER_VISIBILITY_PUBLIC,
                 "(author:<<me>>)",
                 [],
-                ["predicateMetadata": [
+                ["predicateMetadata" : [
                         [[
-                                 "category": "case_author",
+                                 "category"     : "case_author",
                                  "configuration": [
                                          "operator": "equals"
                                  ],
-                                 "values": [[
-                                                    "text": "search.category.userMe",
-                                                    "value": ["<<me>>"]
-                                            ]]
+                                 "values"       : [[
+                                                           "text" : "search.category.userMe",
+                                                           "value": ["<<me>>"]
+                                                   ]]
                          ]]
                 ], "searchCategories": ["case_author"]],
                 [:],
@@ -240,16 +239,16 @@ class FilterImportExportTest {
                 FILTER_VISIBILITY_PUBLIC,
                 "(author:<<me>>)",
                 [],
-                ["predicateMetadata": [
+                ["predicateMetadata" : [
                         [[
-                                 "category": "case_author",
+                                 "category"     : "case_author",
                                  "configuration": [
                                          "operator": "equals"
                                  ],
-                                 "values": [[
-                                                    "text": "search.category.userMe",
-                                                    "value": ["<<me>>"]
-                                            ]]
+                                 "values"       : [[
+                                                           "text" : "search.category.userMe",
+                                                           "value": ["<<me>>"]
+                                                   ]]
                          ]]
                 ], "searchCategories": ["case_author"]],
                 [:],
@@ -281,15 +280,15 @@ class FilterImportExportTest {
         List<Task> importedTasks = taskService.findAllById(new ArrayList<String>(imported.values()))
         assert importedTasks.size() == 3
 
-        Map<String, String> invertedMap = imported.collectEntries {k, v -> [v, k]}
-        Map<String, String> newToOldCaseId = importedTasks.collectEntries {t -> [t.caseId, invertedMap.get(t.getStringId())]}
+        Map<String, String> invertedMap = imported.collectEntries { k, v -> [v, k] }
+        Map<String, String> newToOldCaseId = importedTasks.collectEntries { t -> [t.caseId, invertedMap.get(t.getStringId())] }
         Map<String, Case> idToOldCase = [filter1, filter2, filter3].collectEntries { c -> [c.stringId, c] }
 
 
         List<Case> importedCases = workflowService.findAllById(new ArrayList<String>(newToOldCaseId.keySet()))
-        assert  importedCases.size() == 3
+        assert importedCases.size() == 3
 
-        importedCases.forEach({c ->
+        importedCases.forEach({ c ->
             Case oldCase = idToOldCase.get(newToOldCaseId.get(c.getStringId()))
             assert oldCase != null
             assert newToOldCaseId.get(c.dataSet.get("origin_view_id").value) == oldCase.dataSet.get("origin_view_id").value
@@ -335,206 +334,206 @@ class FilterImportExportTest {
                         "((author:<<me>>) OR (!(author:7))) AND (visualId:*asdad*) AND (stringId:*asdasd*))", ["all_data", "test_net"],
                 ["predicateMetadata": [
                         [[
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals",
+                                         "operator" : "equals",
                                          "datafield": "number#Number"
                                  ],
-                                 "values": [5]
+                                 "values"       : [5]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "in_range",
+                                         "operator" : "in_range",
                                          "datafield": "number#Number"
                                  ],
-                                 "values": [10, 100.548]
+                                 "values"       : [10, 100.548]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "substring",
+                                         "operator" : "substring",
                                          "datafield": "text#Text"
                                  ],
-                                 "values": ["asdad"]
+                                 "values"       : ["asdad"]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "substring",
+                                         "operator" : "substring",
                                          "datafield": "enumeration#Enumeration"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "substring",
+                                         "operator" : "substring",
                                          "datafield": "enumeration_map#Enumeration Map"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "substring",
+                                         "operator" : "substring",
                                          "datafield": "multichoice#Multichoice"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals",
+                                         "operator" : "equals",
                                          "datafield": "boolean#Boolean"
                                  ],
-                                 "values": [true]
+                                 "values"       : [true]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals",
+                                         "operator" : "equals",
                                          "datafield": "boolean#Boolean"
                                  ],
-                                 "values": [false]
+                                 "values"       : [false]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals_date",
+                                         "operator" : "equals_date",
                                          "datafield": "date#Date"
                                  ],
-                                 "values": [1631138400000]
+                                 "values"       : [1631138400000]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "in_range_date",
+                                         "operator" : "in_range_date",
                                          "datafield": "date#Date"
                                  ],
-                                 "values": [1631138400000, 1631224800000]
+                                 "values"       : [1631138400000, 1631224800000]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "substring",
+                                         "operator" : "substring",
                                          "datafield": "file#File"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "substring",
+                                         "operator" : "substring",
                                          "datafield": "fileList#File List"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals",
+                                         "operator" : "equals",
                                          "datafield": "user#User"
                                  ],
-                                 "values": [[
-                                                    "text": "search.category.userMe",
-                                                    "value": ["<<me>>"]
-                                            ]]
+                                 "values"       : [[
+                                                           "text" : "search.category.userMe",
+                                                           "value": ["<<me>>"]
+                                                   ]]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals",
+                                         "operator" : "equals",
                                          "datafield": "user#User"
                                  ],
-                                 "values": [[
-                                                    "text": "Admin Netgrif",
-                                                    "value": [7]
-                                            ]]
+                                 "values"       : [[
+                                                           "text" : "Admin Netgrif",
+                                                           "value": [7]
+                                                   ]]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "equals_date_time",
+                                         "operator" : "equals_date_time",
                                          "datafield": "dateTime#Datetime"
                                  ],
-                                 "values": [1631184356623]
+                                 "values"       : [1631184356623]
                          ], [
-                                 "category": "case_dataset",
+                                 "category"     : "case_dataset",
                                  "configuration": [
-                                         "operator": "in_range_date_time",
+                                         "operator" : "in_range_date_time",
                                          "datafield": "dateTime#Datetime"
                                  ],
-                                 "values": [1631184364266, 1631270767000]
+                                 "values"       : [1631184364266, 1631270767000]
                          ]],
                         [[
-                                 "category": "case_title",
+                                 "category"     : "case_title",
                                  "configuration": [
                                          "operator": "substring"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ]],
                         [[
-                                 "category": "case_creation_date",
+                                 "category"     : "case_creation_date",
                                  "configuration": [
                                          "operator": "equals_date"
                                  ],
-                                 "values": [1631138400000]
+                                 "values"       : [1631138400000]
                          ], [
-                                 "category": "case_creation_date",
+                                 "category"     : "case_creation_date",
                                  "configuration": [
                                          "operator": "in_range_date"
                                  ],
-                                 "values": [1631138400000, 1631224800000]
+                                 "values"       : [1631138400000, 1631224800000]
                          ]],
                         [[
-                                 "category": "case_creation_date_time",
+                                 "category"     : "case_creation_date_time",
                                  "configuration": [
                                          "operator": "equals_date_time"
                                  ],
-                                 "values": [1631184402526]
+                                 "values"       : [1631184402526]
                          ], [
-                                 "category": "case_creation_date_time",
+                                 "category"     : "case_creation_date_time",
                                  "configuration": [
                                          "operator": "in_range_date_time"
                                  ],
-                                 "values": [1631184408995, 1631270810000]
+                                 "values"       : [1631184408995, 1631270810000]
                          ]],
                         [[
-                                 "category": "case_process",
+                                 "category"     : "case_process",
                                  "configuration": [
                                          "operator": "equals"
                                  ],
-                                 "values": ["All Data"]
+                                 "values"       : ["All Data"]
                          ]],
                         [[
-                                 "category": "case_task",
+                                 "category"     : "case_task",
                                  "configuration": [
                                          "operator": "equals"
                                  ],
-                                 "values": ["Task - editable"]
+                                 "values"       : ["Task - editable"]
                          ]],
                         [[
-                                 "category": "case_author",
+                                 "category"     : "case_author",
                                  "configuration": [
                                          "operator": "equals"
                                  ],
-                                 "values": [[
-                                                    "text": "search.category.userMe",
-                                                    "value": ["<<me>>"]
-                                            ]]
+                                 "values"       : [[
+                                                           "text" : "search.category.userMe",
+                                                           "value": ["<<me>>"]
+                                                   ]]
                          ], [
-                                 "category": "case_author",
+                                 "category"     : "case_author",
                                  "configuration": [
                                          "operator": "not_equals"
                                  ],
-                                 "values": [[
-                                                    "text": "Admin Netgrif",
-                                                    "value": [7]
-                                            ]]
+                                 "values"       : [[
+                                                           "text" : "Admin Netgrif",
+                                                           "value": [7]
+                                                   ]]
                          ]],
                         [[
-                                 "category": "case_visual_id",
+                                 "category"     : "case_visual_id",
                                  "configuration": [
                                          "operator": "substring"
                                  ],
-                                 "values": ["asdad"]
+                                 "values"       : ["asdad"]
                          ]],
                         [[
-                                 "category": "case_string_id",
+                                 "category"     : "case_string_id",
                                  "configuration": [
                                          "operator": "substring"
                                  ],
-                                 "values": ["asdasd"]
+                                 "values"       : ["asdasd"]
                          ]]
                 ],
-                 "searchCategories": ["case_dataset", "case_title", "case_creation_date", "case_creation_date_time", "case_process", "case_task", "case_author", "case_visual_id", "case_string_id"]],
+                 "searchCategories" : ["case_dataset", "case_title", "case_creation_date", "case_creation_date_time", "case_process", "case_task", "case_author", "case_visual_id", "case_string_id"]],
                 [
                         (GERMAN_ISO_3166_CODE): "Testfilter",
                         (SLOVAK_ISO_3166_CODE): "Testovaci filter"

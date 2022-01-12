@@ -113,7 +113,7 @@ class RemoveActionTest {
     @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com", )
+        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com",)
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 

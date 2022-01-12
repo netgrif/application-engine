@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow
 
 import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -61,28 +60,28 @@ class ChangedFieldsAllowedNetsTest {
 
         def changeMap = dataSet.outcomes
 
-        assert dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+        assert dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
             eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
         }
-        assert (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+        assert (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
             eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
         } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID).attributes.containsKey(ALLOWED_NETS_KEY)
 
-        def newAllowedNets = (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+        def newAllowedNets = (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
             eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
         } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID).attributes.get(ALLOWED_NETS_KEY)
         assert newAllowedNets instanceof ArrayList
         assert newAllowedNets.size() == 1
         assert newAllowedNets.get(0) == NET_IDENTIFIER
 
-        assert  dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+        assert dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
             eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
         }
-        assert (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+        assert (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
             eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
         } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID2).attributes.containsKey(ALLOWED_NETS_KEY)
 
-        newAllowedNets = (dataSet.outcomes.find {SetDataEventOutcome eventOutcome ->
+        newAllowedNets = (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
             eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
         } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID2).attributes.get(ALLOWED_NETS_KEY)
         assert newAllowedNets instanceof ArrayList
