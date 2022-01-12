@@ -2,7 +2,6 @@ package com.netgrif.workflow.ipc
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -87,8 +86,8 @@ class CaseApiTest {
 
         cases = caseRepository.findAll()
         assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
-        assert cases.findAll { it.title != "Case 1"  && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
-        assert cases.find {it.title == "Case 0"}.dataSet["count"].value == 5
-        assert cases.find {it.title == "Case 0"}.dataSet["paged"].value == 1
+        assert cases.findAll { it.title != "Case 1" && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
+        assert cases.find { it.title == "Case 0" }.dataSet["count"].value == 5
+        assert cases.find { it.title == "Case 0" }.dataSet["paged"].value == 1
     }
 }
