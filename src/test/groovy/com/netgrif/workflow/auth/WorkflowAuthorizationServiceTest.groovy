@@ -1,6 +1,6 @@
 package com.netgrif.workflow.auth
 
-import com.netgrif.workflow.MockService
+
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.domain.User
@@ -14,16 +14,14 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.workflow.workflow.service.WorkflowAuthorizationService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 
 //import com.netgrif.workflow.orgstructure.domain.Group
 
-import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

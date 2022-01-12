@@ -10,7 +10,6 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.DataGroup
-import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService

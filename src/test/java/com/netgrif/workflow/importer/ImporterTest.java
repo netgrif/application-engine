@@ -31,21 +31,6 @@ import java.util.stream.Collectors;
 @ExtendWith(SpringExtension.class)
 public class ImporterTest {
 
-    @Autowired
-    private TestHelper testHelper;
-
-    @Autowired
-    private PetriNetRepository repository;
-
-    @Autowired
-    private IWorkflowService workflowService;
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private SuperCreator superCreator;
-
     private static final String NET_ID = "prikladFM_test.xml";
     private static final String NET_TITLE = "Test";
     private static final String NET_INITIALS = "TST";
@@ -54,6 +39,16 @@ public class ImporterTest {
     private static final Integer NET_ARCS = 21;
     private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
+    @Autowired
+    private TestHelper testHelper;
+    @Autowired
+    private PetriNetRepository repository;
+    @Autowired
+    private IWorkflowService workflowService;
+    @Autowired
+    private IPetriNetService petriNetService;
+    @Autowired
+    private SuperCreator superCreator;
 
     @BeforeEach
     public void before() {

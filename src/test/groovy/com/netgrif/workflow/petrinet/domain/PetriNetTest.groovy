@@ -72,7 +72,7 @@ class PetriNetTest {
         assert arcs.any { it instanceof ReadArc }
 
         assert net.roles.size() == 2
-        assert processRoleRepository.count() == beforeImportNet +2
+        assert processRoleRepository.count() == beforeImportNet + 2
     }
 
     @Test
@@ -87,7 +87,7 @@ class PetriNetTest {
         assert netOptional3.getNet() != null
 
         def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
-        assert nets.findAll {it.identifier in [netOptional.getNet().identifier, netOptional3.getNet().identifier]}.size() == 2
+        assert nets.findAll { it.identifier in [netOptional.getNet().identifier, netOptional3.getNet().identifier] }.size() == 2
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"
     }
