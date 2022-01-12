@@ -70,7 +70,7 @@ class DataServiceTest {
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
 
         List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH).getData()
-        assert datagroups.stream().filter({it -> it.fields.size() > 0}).count() == 3
+        assert datagroups.stream().filter({ it -> it.fields.size() > 0 }).count() == 3
         LocalisedField fileField = findField(datagroups, FILE_FIELD_TITLE)
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())

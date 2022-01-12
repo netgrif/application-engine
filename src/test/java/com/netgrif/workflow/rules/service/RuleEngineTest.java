@@ -49,27 +49,23 @@ import java.util.stream.IntStream;
 @ExtendWith(SpringExtension.class)
 public class RuleEngineTest {
 
+    public static final String TEXT_VALUE = "new text value";
+    public static final Double NUM_VALUE = 99.0;
+    public static final String TRANS_1 = "2";
     @Autowired
     private TestHelper testHelper;
-
     @Autowired
     private RuleRepository ruleRepository;
-
     @Autowired
     private RefreshableKieBase refreshableKieBase;
-
     @Autowired
     private IWorkflowService workflowService;
-
     @Autowired
     private ITaskService taskService;
-
     @Autowired
     private IPetriNetService petriNetService;
-
     @Autowired
     private FactRepository factRepository;
-
     @Autowired
     private SuperCreator superCreator;
 
@@ -219,11 +215,6 @@ public class RuleEngineTest {
 
         assert newCase.getTitle().equals(NEW_CASE_TITLE_2);
     }
-
-
-    public static final String TEXT_VALUE = "new text value";
-    public static final Double NUM_VALUE = 99.0;
-    public static final String TRANS_1 = "2";
 
     @Test
     public void testAssign() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
@@ -382,12 +373,12 @@ public class RuleEngineTest {
             this.number = number;
         }
 
-        public Integer increment() {
-            return ++number;
-        }
-
         public static TestFact instance(String caseId, Integer number) {
             return new TestFact(caseId, number);
+        }
+
+        public Integer increment() {
+            return ++number;
         }
     }
 

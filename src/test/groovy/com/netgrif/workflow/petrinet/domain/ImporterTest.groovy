@@ -50,7 +50,7 @@ class ImporterTest {
                 superCreator.loggedSuper
         )
         assert netOptional.getNet() != null
-        assert processRoleRepository.count() == beforeImportNet+2
+        assert processRoleRepository.count() == beforeImportNet + 2
         int statusImportRole = processRoleRepository.count()
         def net = netOptional.getNet()
 
@@ -136,7 +136,7 @@ class ImporterTest {
                 superCreator.loggedSuper
         )
 
-        assert processRoleRepository.count() == statusImportRole+1
+        assert processRoleRepository.count() == statusImportRole + 1
         assert netOptional2.getNet() != null
         def net2 = netOptional2.getNet()
 
