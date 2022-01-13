@@ -427,6 +427,9 @@ class ActionDelegate {
 
     void changeFieldValue(Field field, def cl) {
         def value = cl()
+        if (field instanceof FileField && task.isPresent()) {
+            dataService.deleteFile(task.get().stringId, field.stringId)
+        }
         if (value instanceof Closure) {
             if (value == initValueOfField) {
                 value = initValueOfField(field)
@@ -436,6 +439,11 @@ class ActionDelegate {
             }
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
+            if (field instanceof FileListField && task.isPresent()) {
+                field.value.namesPaths.forEach(namePath -> {
+                    dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
+                })
+            }
             field.clearValue()
             saveChangedValue(field)
         }
