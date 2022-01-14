@@ -18,7 +18,7 @@ public class ViewFactory {
         } else if (data.getView().getHtmlEditor() != null) {
             return new HtmlEditorView();
         } else if (data.getView().getArea() != null) {
-            return new View("area");
+            return new View("textarea");
         } else if (data.getView().getAutocomplete() != null) {
             return new View("autocomplete");
         } else if (data.getView().getTree() != null) {

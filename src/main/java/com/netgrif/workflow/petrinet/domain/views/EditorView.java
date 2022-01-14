@@ -6,6 +6,6 @@ import lombok.Data;
 public class EditorView extends View {
 
     public EditorView() {
-        super("editor");
+        super("richtextarea");
     }
 }

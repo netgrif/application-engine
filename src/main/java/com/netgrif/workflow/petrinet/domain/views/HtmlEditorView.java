@@ -6,7 +6,7 @@ import lombok.Data;
 public class HtmlEditorView extends View {
 
     public HtmlEditorView() {
-        super("htmlEditor");
+        super("htmltextarea");
     }
 
 }

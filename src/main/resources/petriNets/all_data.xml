@@ -10,6 +10,24 @@
         <id>process_role</id>
         <title>Process role</title>
     </role>
+    <roleRef>
+        <id>process_role</id>
+        <caseLogic>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <caseEvents>
+        <event type="create">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    userList1: f.userList1;
+
+                    change userList1 value {[userService.findByEmail("super@netgrif.com", false).stringId]}
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
     <!-- DATA -->
     <!-- NUMBER -->
     <data type="number" immediate="true">
@@ -137,6 +155,29 @@
             <property key="arrowStepper">true</property>
         </component>
     </data>
+    <data type="enumeration">
+        <id>enumeration_icon</id>
+        <title>Enumeration icon</title>
+        <values>Krádež</values>
+        <values>Poškodenie Zariadenia</values>
+        <values>Rozbitie skla</values>
+        <values>Vandalizmus</values>
+        <values>Živelná škoda</values>
+        <component>
+            <name>icon</name>
+            <properties>
+                <property key="arrow">true</property>
+                <property key="divider">true</property>
+                <option_icons>
+                    <icon key="Krádež">home</icon>
+                    <icon key="Poškodenie Zariadenia">nature</icon>
+                    <icon key="Rozbitie skla">home</icon>
+                    <icon key="Vandalizmus">nature</icon>
+                    <icon key="Živelná škoda">home</icon>
+                </option_icons>
+            </properties>
+        </component>
+    </data>
 
     <data type="enumeration_map" immediate="true">
         <id>enumeration_map</id>
@@ -199,6 +240,29 @@
         <component>
             <name>stepper</name>
             <property key="arrowStepper">true</property>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_map_icon</id>
+        <title>Enumeration map icon</title>
+        <options>
+            <option key="1">Krádež</option>
+            <option key="2">Poškodenie Zariadenia</option>
+            <option key="3">Rozbitie skla</option>
+            <option key="4">Vandalizmus</option>
+            <option key="5">Živelná škoda</option>
+        </options>
+        <component>
+            <name>icon</name>
+            <properties>
+                <option_icons>
+                    <icon key="1">home</icon>
+                    <icon key="2">nature</icon>
+                    <icon key="3">home</icon>
+                    <icon key="4">nature</icon>
+                    <icon key="5">home</icon>
+                </option_icons>
+            </properties>
         </component>
     </data>
 
@@ -291,6 +355,13 @@
             <!-- @formatter:on -->
         </action>
     </data>
+    <data type="file" immediate="true">
+        <id>file_preview</id>
+        <title>File preview</title>
+        <component>
+            <name>preview</name>
+        </component>
+    </data>
 
     <!-- FILELIST -->
     <data type="fileList" immediate="true">
@@ -321,7 +392,7 @@
     </data>
 
     <!-- BUTTONS -->
-    <data type="button"  immediate="true">>
+    <data type="button"  immediate="true">
         <id>button</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
@@ -397,12 +468,47 @@
         <title>Text datafield z iného transitionu</title>
         <init>Field načítaný pomocou taskrefu</init>
     </data>
+
+    <data type="i18n" immediate="true">
+        <id>i18n</id>
+        <title>i18n field</title>
+        <init name="i18n_field_translation">This is DEFAULT translation of i18n</init>
+        <component>
+            <name>text</name>
+            <properties>
+                <property key="plainText">true</property>
+                <property key="fontSize">14</property>
+            </properties>
+        </component>
+    </data>
+    <data type="i18n" immediate="true">
+        <id>i18n_divider</id>
+        <title>Nema title</title>
+        <placeholder>Nema placeholder</placeholder>
+        <init name="i18n_field_translation">This is DEFAULT translation of i18n</init>
+        <component>
+            <name>divider</name>
+            <properties>
+                <property key="fontSize">12</property>
+                <property key="dividerColor">red</property>
+            </properties>
+        </component>
+    </data>
     <usersRef>
         <id>userList1</id>
         <caseLogic>
             <view>true</view>
         </caseLogic>
     </usersRef>
+    <i18n locale="sk">
+        <i18nString name="i18n_field_translation">Toto je slovensky preklad i18n fieldu</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="i18n_field_translation">Dies ist die deutsche Übersetzung von i18n</i18nString>
+    </i18n>
+    <i18n locale="en">
+        <i18nString name="i18n_field_translation">This is english translation of i18n</i18nString>
+    </i18n>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -413,7 +519,8 @@
         <usersRef>
             <id>userList1</id>
             <logic>
-                <assigned>true</assigned>
+                <view>true</view>
+                <perform>true</perform>
             </logic>
         </usersRef>
         <dataGroup>
@@ -506,6 +613,12 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>enumeration_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>enumeration_steppers</id>
@@ -559,6 +672,12 @@
             </dataRef>
             <dataRef>
                 <id>enumeration_list_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map_icon</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -643,6 +762,12 @@
                 </logic>
             </dataRef>
             <dataRef>
+                <id>file_preview</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
                 <id>fileList</id>
                 <logic>
                     <behavior>editable</behavior>
@@ -716,7 +841,23 @@
                 </logic>
             </dataRef>
         </dataGroup>
-
+        <dataGroup>
+            <id>i18ngroup</id>
+            <title>I18n fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>i18n</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>i18n_divider</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
         <dataGroup>
             <id>taskRef</id>
             <title>Task refs</title>
@@ -826,6 +967,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>enumeration_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>multichoice</id>
@@ -868,6 +1015,12 @@
             </dataRef>
             <dataRef>
                 <id>enumeration_list_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map_icon</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -946,6 +1099,12 @@
                 </logic>
             </dataRef>
             <dataRef>
+                <id>file_preview</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
                 <id>fileList</id>
                 <logic>
                     <behavior>visible</behavior>
@@ -1011,6 +1170,23 @@
             </dataRef>
             <dataRef>
                 <id>button_dialog</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>i18n</id>
+            <title>I18n fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>i18n</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>i18n_divider</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
