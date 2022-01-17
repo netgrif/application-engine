@@ -41,11 +41,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        String ip = getClientIP();
-        if (loginAttemptService.isBlocked(ip)) {
-            logger.info("User " + email + " with IP Address " + ip + " is blocked.");
-            throw new RuntimeException("blocked");
-        }
+//        String ip = getClientIP();
+//        if (loginAttemptService.isBlocked(ip)) {
+//            logger.info("User " + email + " with IP Address " + ip + " is blocked.");
+//            throw new RuntimeException("blocked");
+//        }
 
         LoggedUser loggedUser = getLoggedUser(email);
 //        setGroups(loggedUser);
@@ -76,12 +76,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //            loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
 //        }
 //    }
+// TODO: JOZIKE
 
-    protected String getClientIP() {
-        String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null) {
-            return request.getRemoteAddr();
-        }
-        return xfHeader.split(",")[0];
-    }
+//    protected String getClientIP() {
+//        String xfHeader = request.getHeader("X-Forwarded-For");
+//        if (xfHeader == null) {
+//            return request.getRemoteAddr();
+//        }
+//        return xfHeader.split(",")[0];
+//    }
 }

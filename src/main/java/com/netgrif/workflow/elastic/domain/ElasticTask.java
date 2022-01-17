@@ -60,7 +60,7 @@ public class ElasticTask {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ssZZZ")
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyyMMdd HH:mm:ss.SSSSSS")
     private LocalDateTime startDate;
 
     @Field(type = Keyword)
