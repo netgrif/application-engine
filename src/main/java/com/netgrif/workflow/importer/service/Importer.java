@@ -282,7 +282,7 @@ public class Importer {
     @Transactional
     protected void evaluateActions(String s, Action action) {
         try {
-            actionsRunner.getActionCode(action, functions);
+            actionsRunner.getActionCode(action, functions, true);
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
         }
@@ -910,9 +910,12 @@ public class Importer {
     protected Action createAction(com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         if (importedAction.getId() != null) {
-            action.setImportId(importedAction.getId());
+            if(actions.containsKey(this.net.getIdentifier() + "-" + importedAction.getId())) {
+                throw new IllegalArgumentException("Duplicate action id, action with id [" + importedAction.getId() + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
+            }
+            action.setImportId(this.net.getIdentifier() + "-" + importedAction.getId());
         } else {
-            action.setImportId(new ObjectId().toString());
+            action.setImportId(this.net.getIdentifier() + "-" + new ObjectId());
         }
         return action;
     }
