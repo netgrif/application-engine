@@ -59,8 +59,8 @@ abstract class FieldActionsRunner {
         return ((ActionDelegate) code.delegate).outcomes
     }
 
-    Closure getActionCode(Action action, List<Function> functions) {
-        return getActionCode(actionsCacheService.getCompiledAction(action), functions)
+    Closure getActionCode(Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
+        return getActionCode(actionsCacheService.getCompiledAction(action, shouldRewriteCachedActions), functions)
     }
 
     Closure getActionCode(Closure code, List<Function> functions) {
