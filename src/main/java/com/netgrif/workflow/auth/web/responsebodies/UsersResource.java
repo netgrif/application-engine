@@ -15,7 +15,7 @@ public class UsersResource extends CollectionModel<UserResource> {
     public static final String SELF_REL_PROFILE = "profile";
 
     public UsersResource(Collection<UserResource> content, String selfRel) {
-        super(content, new ArrayList<>());
+        super(content, new ArrayList<>(), null);
         buildLinks(selfRel);
     }
 

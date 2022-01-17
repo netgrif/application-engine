@@ -2,6 +2,7 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticTask
+import com.netgrif.workflow.elastic.service.interfaces.IElasticIndexOps
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -31,7 +32,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     private String taskIndex
 
     @Autowired
-    private ElasticsearchRestTemplate template
+    private IElasticIndexOps template
 
     @Override
     void run(String... args) throws Exception {
@@ -40,13 +41,13 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
         }
-        if (!template.indexExists(ElasticCase.class)) {
+        if (!template.indexExists(caseIndex)) {
             log.info "Creating Elasticsearch case index [${caseIndex}]"
             template.createIndex(ElasticCase.class)
         } else {
             log.info "Elasticsearch case index exists [${caseIndex}]"
         }
-        if (!template.indexExists(ElasticTask.class)) {
+        if (!template.indexExists(taskIndex)) {
             log.info "Creating Elasticsearch task index [${taskIndex}]"
             template.createIndex(ElasticTask.class)
         } else {
