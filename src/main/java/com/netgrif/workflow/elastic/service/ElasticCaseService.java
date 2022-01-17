@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
+import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
@@ -19,12 +20,16 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
@@ -43,6 +48,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     private ElasticCaseRepository repository;
 
     private IWorkflowService workflowService;
+
+    @Value("${spring.data.elasticsearch.index.case}")
+    private String caseIndex;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
     private ElasticsearchRestTemplate template;
@@ -134,7 +145,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            Page<ElasticCase> indexedCases = repository.search(query);
+            SearchHits<ElasticCase> hits = elasticsearchTemplate.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
+            Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
