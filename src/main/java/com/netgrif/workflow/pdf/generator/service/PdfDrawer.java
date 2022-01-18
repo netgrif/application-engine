@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.netgrif.workflow.pdf.generator.service.renderer.Renderer.removeUnsupportedChars;
+
 /**
  * A drawer service that is able to draw elements to a content stream
  */
@@ -209,7 +211,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.setFont(font, fontSize);
         contentStream.beginText();
         contentStream.newLineAtOffset(x, y);
-        contentStream.showText(text.replaceAll("\\s{1,}", " "));
+        contentStream.showText(removeUnsupportedChars(text, resource));
         contentStream.endText();
     }
 

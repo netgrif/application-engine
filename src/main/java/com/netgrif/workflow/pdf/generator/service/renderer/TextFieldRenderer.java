@@ -27,7 +27,7 @@ public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
     }
 
     private void renderValue(PdfField field, int lineCounter, float strokeWidth) throws IOException {
-        float textWidth = getTextWidth(field.getValues(), resource.getValueFont(), fontValueSize);
+        float textWidth = getTextWidth(field.getValues(), resource.getValueFont(), fontValueSize, resource);
         int maxLineSize = getMaxValueLineSize(field.getWidth() - 3 * padding);
         List<String> multiLineText = field.getValues();
         int x = field.getX() + padding, y = renderLinePosY(field, lineCounter);

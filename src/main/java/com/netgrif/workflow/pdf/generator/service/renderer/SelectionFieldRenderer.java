@@ -18,7 +18,7 @@ public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T> {
 
         for (String choice : field.getChoices()) {
             boolean buttonDrawn = false;
-            float textWidth = getTextWidth(Collections.singletonList(choice), resource.getValueFont(), fontValueSize);
+            float textWidth = getTextWidth(Collections.singletonList(choice), resource.getValueFont(), fontValueSize, resource);
             multiLineText = new ArrayList<String>() {{
                 add(choice);
             }};
