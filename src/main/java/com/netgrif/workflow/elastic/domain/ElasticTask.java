@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -39,8 +40,12 @@ public class ElasticTask {
     private String caseId;
 
     @Field(type = Keyword)
+    private String taskId;
+
+    @Field(type = Keyword)
     private String transitionId;
 
+    @Field(type = Keyword)
     private String title; //TODO: i18n
 
     @Field(type = Keyword)
@@ -99,6 +104,7 @@ public class ElasticTask {
     public ElasticTask(Task task) {
         this.stringId = task.getStringId();
         this.processId = task.getProcessId();
+        this.taskId = task.getStringId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
         this.title = task.getTitle().getDefaultValue();
