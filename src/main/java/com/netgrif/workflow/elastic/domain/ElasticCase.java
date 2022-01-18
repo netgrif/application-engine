@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -31,6 +32,7 @@ public class ElasticCase {
     @Id
     private String id;
 
+    @Version
     private Long version;
 
     private Long lastModified;
@@ -55,10 +57,16 @@ public class ElasticCase {
 
     private Long creationDateSortable;
 
+    @Field(type = Keyword)
     private String author;
 
+    @Field(type = Keyword)
+    private String mongoId;
+
+    @Field(type = Keyword)
     private String authorName;
 
+    @Field(type = Keyword)
     private String authorEmail;
 
     private Map<String, DataField> dataSet;
@@ -97,6 +105,7 @@ public class ElasticCase {
      */
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
@@ -120,7 +129,7 @@ public class ElasticCase {
     }
 
     public void update(ElasticCase useCase) {
-//        version++;
+        version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
