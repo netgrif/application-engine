@@ -5,6 +5,7 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.font.encoding.WinAnsiEncoding;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public abstract class Renderer {
     protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize) throws IOException {
         int result = 0;
         for (String value : values) {
-            String formattedValue = Jsoup.parse(value.replaceAll("\\s{1,}", " ")).text();
+            String formattedValue = removeUnsupportedChars(value);
             if (result < font.getStringWidth(formattedValue) / 1000 * fontSize)
                 result = (int) (font.getStringWidth(formattedValue) / 1000 * fontSize);
         }
@@ -56,5 +57,16 @@ public abstract class Renderer {
 
     protected int getMaxLabelLineSize(int fieldWidth, int fontSize) {
         return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
+    }
+
+    public static String removeUnsupportedChars(String input) {
+        String value = Jsoup.parse(input.replaceAll("\\s{1,}", " ")).text();
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            if (WinAnsiEncoding.INSTANCE.contains(value.charAt(i))) {
+                b.append(value.charAt(i));
+            }
+        }
+        return b.toString();
     }
 }
