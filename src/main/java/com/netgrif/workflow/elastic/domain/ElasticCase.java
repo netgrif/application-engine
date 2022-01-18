@@ -50,7 +50,7 @@ public class ElasticCase {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyyMMdd HH:mm:ss.SSSSSS")
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime creationDate;
 
     private Long creationDateSortable;
