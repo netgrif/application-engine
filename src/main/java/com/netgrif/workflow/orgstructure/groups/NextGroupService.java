@@ -106,6 +106,8 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
+        author.addGroup(outcome.getCase().getStringId());
+        userService.save(author);
         return outcome;
     }
 
