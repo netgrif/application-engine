@@ -92,7 +92,8 @@
                     make and_view, visible on t2 when {true}
                     make trimmed_origin_view_id, visible on t1 when {true}
                     make trimmed_origin_view_id, visible on t2 when {true}
-                    make origin_view_id, forbidden on t1 when {true}
+                    make origin_view_id, hidden on t1 when {true}
+                    make origin_view_id, hidden on t2 when {true}
                 </action>
             </actions>
         </event>
@@ -765,6 +766,21 @@
                 <layout>
                     <x>1</x>
                     <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>3</cols>
                     <offset>0</offset>
