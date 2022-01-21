@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10956/tab/release-report-all-issues"></a>
+## 4.5.1 (15.02.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10850/tab/release-report-all-issues"></a>
 ## 4.5.0 - Orange Bubble (22.12.2020)
 ### Bug fixes
