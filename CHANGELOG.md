@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10957/tab/release-report-all-issues"></a>
+## 4.5.2 (21.01.2022)
+### Bug fixes
+* [NAE-1566](https://netgrif.atlassian.net/browse/NAE-1566) - Ignorovanie nepovolených znakov v PDF generátore
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10956/tab/release-report-all-issues"></a>
 ## 4.5.1 (15.02.2021)
 ### Bug fixes
