@@ -308,8 +308,15 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
+      <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch -->
+      <dependency>
+          <groupId>org.springframework.data</groupId>
+          <artifactId>spring-data-elasticsearch</artifactId>
+          <version>4.2.8</version>
+      </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+
+      <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
