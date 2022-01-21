@@ -376,7 +376,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
 
         // TODO: improvement? wildcard does not scale good
-        QueryBuilder fullTextQuery = queryStringQuery("\\*" + request.fullText + "\\*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
 
