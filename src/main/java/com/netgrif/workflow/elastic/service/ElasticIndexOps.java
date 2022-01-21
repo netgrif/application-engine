@@ -1,5 +1,6 @@
 package com.netgrif.workflow.elastic.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticIndexOps;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
@@ -69,6 +70,15 @@ public class ElasticIndexOps implements IElasticIndexOps {
                 settingMap.put("number_of_shards", getShardsFromClass(clazz));
                 settingMap.put("number_of_replicas", getReplicasFromClass(clazz));
                 settingMap.put("max_result_window", 10000000);
+//                HashMap<String, Object> analyzer = new HashMap<>();  //TODO: Analyzer
+//                HashMap<String, Object> netgrif = new HashMap<>();
+//                HashMap<String, Object> filter = new HashMap<>();
+//                String[] stringArray = { "lowercase", "asciifolding"};
+//                netgrif.put("tokenizer", "keyword");
+//                netgrif.put("filter", stringArray);
+//                filter.put("netgrif", netgrif);
+//                analyzer.put("analyzer", filter);
+//                settingMap.put("analysis", analyzer);
                 Document settings = Document.from(settingMap);
                 log.info("Creating new index - {} ", indexName);
                 return elasticsearchTemplate.indexOps(IndexCoordinates.of(indexName)).create(settings);
