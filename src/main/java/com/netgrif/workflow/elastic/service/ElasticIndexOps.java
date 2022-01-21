@@ -1,6 +1,5 @@
 package com.netgrif.workflow.elastic.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticIndexOps;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
