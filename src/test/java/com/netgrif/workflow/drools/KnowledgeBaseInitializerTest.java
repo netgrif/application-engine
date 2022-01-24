@@ -7,7 +7,6 @@ import com.netgrif.workflow.configuration.drools.throwable.RuleValidationExcepti
 import com.netgrif.workflow.rules.domain.StoredRule;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(

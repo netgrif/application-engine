@@ -17,7 +17,6 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
-import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService

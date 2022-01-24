@@ -21,13 +21,11 @@ import java.time.LocalDateTime;
 @SpringBootTest
 public class TokenServiceTest {
 
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     @Autowired
     IRegistrationService service;
-
     @Autowired
     UserRepository repository;
-
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     @BeforeEach
     public void setUp() {

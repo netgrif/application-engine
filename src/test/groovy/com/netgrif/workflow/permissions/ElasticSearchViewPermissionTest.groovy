@@ -16,23 +16,18 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.workflow.workflow.service.CaseSearchService
-import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.kie.dmn.model.api.Import
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
