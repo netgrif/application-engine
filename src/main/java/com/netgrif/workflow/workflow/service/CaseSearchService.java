@@ -144,8 +144,6 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
         return null;
-//        else if(query.containsKey(PETRINET_ID) && allowedNets.stream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
-//            return QCase.case$.petriNet._id.e
     }
 
     public Predicate author(Object query) {

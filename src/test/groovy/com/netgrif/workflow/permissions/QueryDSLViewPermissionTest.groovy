@@ -7,9 +7,6 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
-import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
@@ -19,12 +16,9 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.workflow.workflow.service.CaseSearchService
-import com.netgrif.workflow.workflow.service.TaskSearchService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest
-import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -53,7 +52,7 @@ public class RegistrationServiceTest {
         NewUserRequest request = new NewUserRequest();
         request.email = "test@test.com";
 
-        RegisteredUser user =  service.createNewUser(request);
+        RegisteredUser user = service.createNewUser(request);
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
         registrationRequest.token = service.encodeToken(user.getEmail(), user.getToken());
