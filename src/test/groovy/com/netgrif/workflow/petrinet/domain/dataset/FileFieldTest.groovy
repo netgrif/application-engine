@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
-import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -102,7 +102,7 @@ class FileFieldTest {
     void downloadFileByCase() {
         PetriNet net = getNet()
 
-        User user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
@@ -121,7 +121,7 @@ class FileFieldTest {
     void downloadFileByTask() {
         PetriNet net = getNet()
 
-        User user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()

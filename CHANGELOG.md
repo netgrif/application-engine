@@ -9,6 +9,29 @@ None
 ### Features
 * [NAE-1296](https://netgrif.atlassian.net/browse/NAE-1296) - Event Outcome refactor
 
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10943/tab/release-report-all-issues"></a>
+## 5.7.5 (11.01.2022)
+### Bug Fixes
+* [NAE-1542](https://netgrif.atlassian.net/browse/NAE-1533) - PDF generátor generovanie hodnoty dátumov
+* [NAE-1543](https://netgrif.atlassian.net/browse/NAE-1533) - Prisposobenie generovania PDF pre nove layouty ktore si vieme definovat na konkretnu datagrupu
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10943/tab/release-report-all-issues"></a>
+## 5.7.4 (21.12.2021)
+### Bug Fixes
+* [NAE-1533](https://netgrif.atlassian.net/browse/NAE-1533) - Mongo case search exceeds maximum query nesting level
+
+### Improvements
+None
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10940/tab/release-report-all-issues"></a>
 ## 5.7.3 (23.11.2021)
 ### Bug Fixes
@@ -122,6 +145,29 @@ None
 
 ### Features
 * [NAE-1407](https://netgrif.atlassian.net/browse/NAE-1407) - Static functions
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10947/tab/release-report-all-issues"></a>
+## 5.5.5 (06.01.2022)
+### Bug fixes
+* [NAE-1530](https://netgrif.atlassian.net/browse/NAE-1530) - Cez simple search nie je možné vyhľadávať podľa visual ID
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10946/tab/release-report-all-issues"></a>
+## 5.5.4 (20.12.2021)
+### Bug fixes
+* [NAE-1522](https://netgrif.atlassian.net/browse/NAE-1522) - Neda sa stahovat subory, ktore maju v nazve ciarku
+* [NAE-1536](https://netgrif.atlassian.net/browse/NAE-1536) - Cez simple search nie je možné vyhľadávať hodnoty obsahujúce pomlčku
+
+### Improvements
+None
+
+### Features
+None
 
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
 ## 5.5.2 (19.07.2021)
