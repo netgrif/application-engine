@@ -3,7 +3,6 @@ package com.netgrif.workflow.petrinet.domain
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.ImportHelper
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

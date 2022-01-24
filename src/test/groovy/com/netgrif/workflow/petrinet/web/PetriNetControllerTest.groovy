@@ -12,10 +12,10 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 //import com.netgrif.workflow.orgstructure.domain.Group
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

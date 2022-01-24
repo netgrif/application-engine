@@ -75,7 +75,7 @@ class WorkflowServiceTest {
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
         assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
-        assert  workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
+        assert workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
     }
 
     @Test
@@ -90,7 +90,7 @@ class WorkflowServiceTest {
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
         assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
-        assert  workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
+        assert workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
     }
 
 
