@@ -437,6 +437,14 @@ class ActionDelegate {
             }
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
+            if (field instanceof FileListField && task.isPresent()) {
+                field.value.namesPaths.forEach(namePath -> {
+                    dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
+                })
+            }
+            if (field instanceof FileField && task.isPresent()) {
+                dataService.deleteFile(task.get().stringId, field.stringId)
+            }
             field.clearValue()
             saveChangedValue(field)
         }
