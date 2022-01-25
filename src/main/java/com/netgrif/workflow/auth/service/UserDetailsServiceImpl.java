@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -41,14 +40,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//        String ip = getClientIP();
-//        if (loginAttemptService.isBlocked(ip)) {
-//            logger.info("User " + email + " with IP Address " + ip + " is blocked.");
-//            throw new RuntimeException("blocked");
-//        }
+        String ip = getClientIP();
+        if (loginAttemptService.isBlocked(ip)) {
+            logger.info("User " + email + " with IP Address " + ip + " is blocked.");
+            throw new RuntimeException("blocked");
+        }
 
         LoggedUser loggedUser = getLoggedUser(email);
-//        setGroups(loggedUser);
 
         publisher.publishEvent(new UserLoginEvent(loggedUser));
 
@@ -70,19 +68,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return user.transformToLoggedUser();
     }
 
-//    protected void setGroups(LoggedUser loggedUser) {
-//        Member member = memberService.findByEmail(loggedUser.getUsername());
-//        if (member != null) {
-//            loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
-//        }
-//    }
-// TODO: JOZIKE
 
-//    protected String getClientIP() {
-//        String xfHeader = request.getHeader("X-Forwarded-For");
-//        if (xfHeader == null) {
-//            return request.getRemoteAddr();
-//        }
-//        return xfHeader.split(",")[0];
-//    }
+    protected String getClientIP() {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
+    }
 }

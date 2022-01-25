@@ -52,15 +52,21 @@ public class ElasticCase {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyyMMdd HH:mm:ss.SSSSSS")
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     private LocalDateTime creationDate;
 
     private Long creationDateSortable;
 
+    @Field(type = Keyword)
     private String author;
 
+    @Field(type = Keyword)
+    private String mongoId;
+
+    @Field(type = Keyword)
     private String authorName;
 
+    @Field(type = Keyword)
     private String authorEmail;
 
     private Map<String, DataField> dataSet;
@@ -99,6 +105,7 @@ public class ElasticCase {
      */
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         processId = useCase.getPetriNetId();
@@ -122,7 +129,7 @@ public class ElasticCase {
     }
 
     public void update(ElasticCase useCase) {
-//        version++;
+        version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
