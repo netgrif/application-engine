@@ -2,6 +2,7 @@ package com.netgrif.workflow.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.configuration.ElasticsearchConfiguration;
 import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
@@ -22,12 +23,16 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.scheduling.annotation.Async;
@@ -50,6 +55,12 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     private ITaskService taskService;
     private ElasticsearchRestTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    @Value("${spring.data.elasticsearch.index.task}")
+    private String taskIndex;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -136,7 +147,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            Page<ElasticTask> indexedTasks = repository.search(query);
+            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class,  IndexCoordinates.of(taskIndex));
+            Page<ElasticTask> indexedTasks = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
         } else {
