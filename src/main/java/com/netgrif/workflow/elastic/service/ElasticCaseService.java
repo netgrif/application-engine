@@ -19,12 +19,16 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
@@ -43,6 +47,12 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     private ElasticCaseRepository repository;
 
     private IWorkflowService workflowService;
+
+    @Value("${spring.data.elasticsearch.index.case}")
+    private String caseIndex;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
     private ElasticsearchRestTemplate template;
@@ -66,9 +76,10 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f
+            "title.keyword", 2f,
+            "authorName.keyword", 1f,
+            "authorEmail.keyword", 1f,
+            "visualId.keyword", 2f
     );
 
     /**
@@ -133,7 +144,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            Page<ElasticCase> indexedCases = repository.search(query);
+            SearchHits<ElasticCase> hits = elasticsearchTemplate.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
+            Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
@@ -363,7 +375,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
 
         // TODO: improvement? wildcard does not scale good
-        QueryBuilder fullTextQuery = queryStringQuery("\\*" + request.fullText + "\\*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
 

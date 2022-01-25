@@ -29,6 +29,7 @@ public class ForwardConfiguration {
         return "forward:/";
     }
 
+
     @RequestMapping("/**/{path:[^.]+}")
     public String forward() {
         return "forward:/";

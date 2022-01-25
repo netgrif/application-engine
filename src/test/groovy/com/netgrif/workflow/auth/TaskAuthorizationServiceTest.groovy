@@ -19,11 +19,10 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthorizationServic
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
+import org.junit.jupiter.api.BeforeEach
 
 //import com.netgrif.workflow.orgstructure.domain.Group
 
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -125,7 +124,7 @@ class TaskAuthorizationServiceTest {
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
-                [processRoles.find({it.name.equals("role")})] as ProcessRole[])
+                [processRoles.find({ it.name.equals("role") })] as ProcessRole[])
 
         userId = user.getStringId()
         this.userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")

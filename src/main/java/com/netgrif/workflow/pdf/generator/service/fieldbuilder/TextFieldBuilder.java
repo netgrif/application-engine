@@ -12,9 +12,10 @@ import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import org.jsoup.Jsoup;
 
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class TextFieldBuilder extends FieldBuilder {
@@ -60,26 +61,26 @@ public class TextFieldBuilder extends FieldBuilder {
     }
 
     private String formatDate(LocalisedField field) {
-        Date value = new Date();
+        ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
             if (field.getValue() instanceof LocalDate)
-                value = DateUtils.localDateToDate((LocalDate) field.getValue());
+                value = DateUtils.localDateToZonedDate((LocalDate) field.getValue(), resource.getDateZoneId());
             else if (field.getValue() instanceof Date)
-                value = (Date) field.getValue();
-            return new SimpleDateFormat(resource.getDateFormat().getValue()).format(value);
+                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
+            return DateTimeFormatter.ofPattern(resource.getDateFormat().getValue()).format(value);
         } else {
             return "";
         }
     }
 
     private String formatDateTime(LocalisedField field) {
-        Date value = new Date();
+        ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
             if (field.getValue() instanceof LocalDateTime)
-                value = DateUtils.localDateTimeToDate((LocalDateTime) field.getValue());
+                value = DateUtils.localDateTimeToZonedDateTime((LocalDateTime) field.getValue(), resource.getDateZoneId());
             else if (field.getValue() instanceof Date)
-                value = (Date) field.getValue();
-            return new SimpleDateFormat(resource.getDateTimeFormat().getValue()).format(value);
+                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
+            return DateTimeFormatter.ofPattern(resource.getDateTimeFormat().getValue()).format(value);
         } else {
             return "";
         }
