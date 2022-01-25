@@ -173,7 +173,7 @@ class PdfUtils {
         return file
     }
 
-    static Map<String,String> readPdfForm(InputStream inputStream) {
+    static Map<String, String> readPdfForm(InputStream inputStream) {
 
         Map<String, String> result = new HashMap<>()
 
@@ -192,15 +192,14 @@ class PdfUtils {
         return result
     }
 
-    static addAllFieldsAndChildFields(PDField field, Map<String,String> result) {
+    static addAllFieldsAndChildFields(PDField field, Map<String, String> result) {
 
-        if (field instanceof PDNonTerminalField)
-        {
+        if (field instanceof PDNonTerminalField) {
             PDNonTerminalField nonTerminalField = (PDNonTerminalField) field
             nonTerminalField.getChildren().forEach({
                 //Non terminal fields are not written to map at the moment
                 //If needed, add it here
-                addAllFieldsAndChildFields(it ,result)
+                addAllFieldsAndChildFields(it, result)
             })
         } else {
             result.put(field.getFullyQualifiedName(), field.getValueAsString())

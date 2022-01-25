@@ -1,27 +1,23 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 
-import java.util.ArrayList;
-import java.util.Map;
 
-public class EventOutcomeWithMessageResource extends Resource<EventOutcomeWithMessage> {
+public class EventOutcomeWithMessageResource {
 
-    public EventOutcomeWithMessageResource(EventOutcomeWithMessage content) {
-        super(content, new ArrayList<>());
+    private EventOutcomeWithMessageResource(){
     }
 
-    public static EventOutcomeWithMessageResource successMessage(String successMsg, LocalisedEventOutcome outcome){
-        return new EventOutcomeWithMessageResource(new EventOutcomeWithMessage(successMsg,outcome));
+    public static EntityModel<EventOutcomeWithMessage> successMessage(String successMsg, LocalisedEventOutcome outcome){
+        return  EntityModel.of(EventOutcomeWithMessage.withSuccessMessage(successMsg,outcome));
     }
 
-    public static EventOutcomeWithMessageResource errorMessage(String errorMsg){
-        return new EventOutcomeWithMessageResource(new EventOutcomeWithMessage(errorMsg));
+    public static EntityModel<EventOutcomeWithMessage> errorMessage(String errorMsg){
+        return EntityModel.of(new EventOutcomeWithMessage(errorMsg));
     }
 
-    public static EventOutcomeWithMessageResource errorMessage(String errorMsg, Map<String, ChangedField> changedFields){
-        return new EventOutcomeWithMessageResource(new EventOutcomeWithMessage(errorMsg, changedFields));
+    public static EntityModel<EventOutcomeWithMessage> errorMessage(String errorMsg, LocalisedEventOutcome outcome){
+        return EntityModel.of(EventOutcomeWithMessage.withErrorMessage(errorMsg, outcome));
     }
 }

@@ -1,8 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -13,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
@@ -27,14 +23,12 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Autowired
     private IPetriNetService petriNetService;
 
-    @Autowired
-    private IUserService userService;
-
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
-        return user.isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE)
-                || userHasUserListPermission(user.transformToAnonymousUser(), requestedCase, ProcessRolePermission.DELETE);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user.transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(user.transformToAnonymousUser(), requestedCase, ProcessRolePermission.DELETE);
+        return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
     @Override
@@ -44,7 +38,7 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     }
 
     @Override
-    public boolean userHasAtLeastOneRolePermission(User user, PetriNet net, ProcessRolePermission... permissions) {
+    public Boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {
@@ -53,51 +47,25 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
             }
         }
 
-        if (net.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey(permissions[0].toString()) &&
-                        role.getValue().get(permissions[0].toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).isEmpty()) {
-            return true;
-        }
-
         return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 
     @Override
-    public boolean userHasUserListPermission(User user, Case useCase, ProcessRolePermission... permissions) {
-        Map<Long, Map<String, Boolean>> users = useCase.getUsers();
+    public Boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions) {
+        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
+            return null;
 
-        if (!users.containsKey(user.getId()))
-            return false;
+        if (!useCase.getUsers().containsKey(user.getStringId()))
+            return null;
 
-        Map<String, Boolean> userPermissions = users.get(user.getId());
+        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
 
         for (ProcessRolePermission permission : permissions) {
-            Boolean hasPermission = userPermissions.get(permission.toString());
-            if (hasPermission != null && hasPermission) {
-                return true;
+            Boolean perm = userPermissions.get(permission.toString());
+            if (hasRestrictedPermission(perm)) {
+                return false;
             }
         }
-        return false;
-    }
-
-    private Map<String, Boolean> getAggregatePermissions(User user, PetriNet net) {
-        Map<String, Boolean> aggregatePermissions = new HashMap<>();
-
-        Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role ->  role.get_id().toString()).collect(Collectors.toSet());
-
-        for (Map.Entry<String, Map<String, Boolean>> role : net.getPermissions().entrySet()) {
-            if (userProcessRoleIDs.contains(role.getKey())) {
-                for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
-                    if (aggregatePermissions.containsKey(permission.getKey())) {
-                        aggregatePermissions.put(permission.getKey(), aggregatePermissions.get(permission.getKey()) || permission.getValue());
-                    } else {
-                        aggregatePermissions.put(permission.getKey(), permission.getValue());
-                    }
-                }
-            }
-        }
-
-        return aggregatePermissions;
+        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
     }
 }

@@ -12,7 +12,7 @@ public class PreferencesService implements IPreferencesService {
     private PreferencesRepository repository;
 
     @Override
-    public Preferences get(Long userId) {
+    public Preferences get(String userId) {
         return repository.findByUserId(userId);
     }
 

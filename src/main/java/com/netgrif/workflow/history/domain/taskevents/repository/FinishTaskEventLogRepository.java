@@ -10,5 +10,5 @@ public interface FinishTaskEventLogRepository extends MongoRepository<FinishTask
 
     List<FinishTaskEventLog> findAllByTaskId(ObjectId taskId);
 
-    List<FinishTaskEventLog> findAllByUserId(Long id);
+    List<FinishTaskEventLog> findAllByUserId(String id);
 }

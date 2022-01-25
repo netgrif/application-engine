@@ -1,19 +1,22 @@
 package com.netgrif.workflow.configuration;
 
+
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
+import com.netgrif.workflow.ldap.domain.LdapUser;
+import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
+import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.NaeLdapProperties;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
-import com.netgrif.workflow.ldap.domain.LdapUser;
+
 import com.netgrif.workflow.ldap.domain.LdapUserRef;
-import com.netgrif.workflow.ldap.domain.repository.LdapUserRefRepository;
 import com.netgrif.workflow.ldap.service.LdapUserService;
-import com.netgrif.workflow.ldap.service.interfaces.ILdapUserRefService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +61,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnExpression("${nae.ldap.enabled} && !${server.security.static.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled} && !${server.security.static.enabled} && !${nae.oauth.enabled}")
 public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -84,9 +87,6 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
 
     @Autowired
     private ILdapUserRefService ldapUserRefService;
-
-    @Autowired
-    private LdapUserRefRepository ldapUserRefRepository;
 
     @Autowired
     private SecurityConfigProperties properties;
@@ -130,6 +130,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
+        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -193,31 +194,35 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         return (ProviderManager) super.authenticationManager();
     }
 
+    @Bean
+    protected IAfterRegistrationAuthService authenticationService() throws Exception {
+        return new AfterRegistrationAuthService(authenticationManager());
+    }
 
     @Override
-    boolean isOpenRegistration() {
+    protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override
-    boolean isCsrfEnabled() {
+    protected boolean isCsrfEnabled() {
         return properties.isCsrf();
     }
 
     @Override
-    String[] getStaticPatterns() {
+    protected String[] getStaticPatterns() {
         return new String[]{
                 "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
-    String[] getServerPatterns() {
+    protected String[] getServerPatterns() {
         return this.serverPatterns;
     }
 
     @Override
-    Environment getEnvironment() {
+    protected Environment getEnvironment() {
         return env;
     }
 
@@ -250,7 +255,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
         @Override
         public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> authorities) {
             dirContextOperations.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
-            User user = ldapUserService.findByDn(dirContextOperations.getDn());
+            IUser user = ldapUserService.findByDn(dirContextOperations.getDn());
             if (user == null) {
                 LdapUserRef ldapUserOptional = ldapUserRefService.findById(dirContextOperations.getDn());
                 if (ldapUserOptional == null) {
@@ -258,7 +263,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
                     return null;
                 }
                 user = ldapUserRefService.createUser(ldapUserOptional);
-            } else if( user instanceof LdapUser ){
+            } else if( user instanceof LdapUser){
                 ldapUserRefService.updateById(dirContextOperations.getDn(), user);
             }
             assert user != null;

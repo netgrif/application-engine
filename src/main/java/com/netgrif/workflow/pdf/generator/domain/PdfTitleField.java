@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PdfTitleField extends PdfField {
 
-    public PdfTitleField(String fieldId, int layoutX, int layoutY, int width, int height, String label, PdfResource resource){
+    public PdfTitleField(String fieldId, int layoutX, int layoutY, int width, int height, String label, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;
         this.layoutX = layoutX;

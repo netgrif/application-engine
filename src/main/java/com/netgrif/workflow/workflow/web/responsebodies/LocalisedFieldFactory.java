@@ -11,7 +11,7 @@ public class LocalisedFieldFactory {
         if (field instanceof EnumerationField) {
             return fromEnumeration((EnumerationField) field, locale);
         } else if (field instanceof MultichoiceField) {
-            return fromMultichoice((MultichoiceField)   field, locale);
+            return fromMultichoice((MultichoiceField) field, locale);
             // case, file,
         } else if (field instanceof NumberField) {
             return fromNumber((NumberField) field, locale);

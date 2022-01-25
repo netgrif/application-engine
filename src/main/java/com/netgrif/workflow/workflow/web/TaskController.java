@@ -6,6 +6,7 @@ import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -21,8 +22,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,20 +57,20 @@ public class TaskController extends AbstractTaskController {
     @Override
     @ApiOperation(value = "Get all tasks", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getAll(auth, pageable, assembler, locale);
     }
 
     @Override
     @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getAllByCases(cases, pageable, assembler, locale);
     }
 
     @Override
     @ApiOperation(value = "Get tasks of the case", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
         return super.getTasksOfCase(caseId, locale);
     }
@@ -89,7 +91,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.assign(loggedUser, taskId, locale);
     }
@@ -103,7 +105,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage>  delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.delegate(loggedUser, taskId, delegatedId, locale);
     }
@@ -117,7 +119,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage>  finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.finish(loggedUser, taskId, locale);
     }
@@ -131,7 +133,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage>  cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.cancel(loggedUser, taskId, locale);
     }
@@ -139,28 +141,28 @@ public class TaskController extends AbstractTaskController {
     @Override
     @ApiOperation(value = "Get all tasks assigned to logged user", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/my", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getMy(auth, pageable, assembler, locale);
     }
 
     @Override
     @ApiOperation(value = "Get all finished tasks by logged user", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/my/finished", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.getMyFinished(pageable, auth, assembler, locale);
     }
 
     @Override
     @ApiOperation(value = "Generic task search on Mongo database", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    public PagedModel<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.search(auth, pageable, searchBody, operation, assembler, locale);
     }
 
     @Override
     @ApiOperation(value = "Generic task search on Elasticsearch database", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/search_es", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
+    @RequestMapping(value = "/search_es", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         return super.searchElastic(auth, pageable, searchBody, operation, assembler, locale);
     }
 
@@ -174,7 +176,7 @@ public class TaskController extends AbstractTaskController {
     @Override
     @ApiOperation(value = "Get all task data", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public EventOutcomeWithMessageResource getData(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage>  getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
     }
 
@@ -187,7 +189,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public EntityModel<EventOutcomeWithMessage>  setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         return super.setData(taskId, dataBody);
     }
 
@@ -200,7 +202,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws IOException {
+    public EntityModel<EventOutcomeWithMessage>  saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
         return super.saveFile(taskId, fieldId, multipartFile);
     }
 
@@ -232,7 +234,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EventOutcomeWithMessageResource saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+    public EntityModel<EventOutcomeWithMessage>  saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                       @RequestParam(value = "files") MultipartFile[] multipartFiles) throws IOException {
         return super.saveFiles(taskId, fieldId, multipartFiles);
     }

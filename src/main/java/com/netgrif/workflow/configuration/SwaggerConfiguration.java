@@ -9,10 +9,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -23,9 +24,9 @@ import springfox.documentation.service.BasicAuth;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.Tag;
 import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+//import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -36,7 +37,8 @@ import java.net.URL;
 import java.util.*;
 
 @Configuration
-@EnableSwagger2
+@EnableSwagger2WebMvc
+@EnableWebMvc
 @Import(BeanValidatorPluginsConfiguration.class)
 public class SwaggerConfiguration {
 
@@ -57,12 +59,12 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.ant("/api/**"))
                 .build()
-                .pathProvider(new RelativePathProvider(servletContext) {
-                    @Override
-                    public String getApplicationBasePath() {
-                        return "/api";
-                    }
-                })
+//                .pathProvider(new RelativePathProvider(servletContext) {
+//                    @Override
+//                    public String getApplicationBasePath() {
+//                        return "/api";
+//                    }
+//                })
                 .ignoredParameterTypes(
                         File.class, URI.class, URL.class,
                         InputStream.class, OutputStream.class, Authentication.class, Throwable.class,
@@ -75,7 +77,7 @@ public class SwaggerConfiguration {
                 .apiInfo(info())
                 .protocols(new HashSet<>(Arrays.asList("http", "https")))
                 .securitySchemes(Collections.singletonList(new BasicAuth("BasicAuth")))
-                .genericModelSubstitutes(PagedResources.class, ResponseEntity.class, List.class)
+                .genericModelSubstitutes(PagedModel.class, ResponseEntity.class, List.class)
                 .useDefaultResponseMessages(false)
                 .tags(
                         new Tag("Admin console", "Administrator console"),

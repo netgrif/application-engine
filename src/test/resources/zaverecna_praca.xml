@@ -3,8 +3,8 @@
     <id>zaverecna_praca.xml</id>
     <initials>TST</initials>
     <title>Test</title>
-	<!-- ========== DATA ========== -->
-	<data type="text">
+    <!-- ========== DATA ========== -->
+    <data type="text">
         <id>1</id>
         <title>Úplný názov práce</title>
     </data>
@@ -50,20 +50,20 @@
         <title>Autor</title>
         <values>5</values>
     </data>
-	<!-- ========== ROLES ========== -->
-	<role>
+    <!-- ========== ROLES ========== -->
+    <role>
         <id>1</id>
         <name>Vedúci</name>
     </role>
-	<role>
+    <role>
         <id>2</id>
         <name>Garant</name>
     </role>
-	<role>
+    <role>
         <id>3</id>
         <name>Oponent</name>
     </role>
-	<role>
+    <role>
         <id>4</id>
         <name>Predseda komisie</name>
     </role>
@@ -71,7 +71,7 @@
         <id>5</id>
         <name>Študent</name>
     </role>
-	<!-- ========== PLACES ========== -->
+    <!-- ========== PLACES ========== -->
     <place>
         <id>1</id>
         <x>60</x>
@@ -160,59 +160,59 @@
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
-	<!-- ========== TRANSITIONS ========== -->
+    <!-- ========== TRANSITIONS ========== -->
     <transition>
         <id>2</id>
         <x>140</x>
         <y>220</y>
         <label>Vypísanie témy</label>
-		<roleRef>
+        <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-		<dataRef>
+        <dataRef>
             <id>1</id>
             <logic>
                 <editable>true</editable>
-				<required>true</required>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
                 <editable>true</editable>
-				<required>true</required>
+                <required>true</required>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>3</id>
             <logic>
                 <editable>true</editable>
-				<required>true</required>
-				<autoPlus ref="2">8m</autoPlus>
+                <required>true</required>
+                <autoPlus ref="2">8m</autoPlus>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>4</id>
             <logic>
                 <editable>true</editable>
-				<required>true</required>
+                <required>true</required>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>5</id>
             <logic>
                 <editable>true</editable>
-				<required>true</required>
+                <required>true</required>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>6</id>
             <logic>
                 <editable>true</editable>
-				<required>true</required>
+                <required>true</required>
             </logic>
         </dataRef>
     </transition>
@@ -221,7 +221,7 @@
         <x>300</x>
         <y>220</y>
         <label>Schválenie témy</label>
-		<roleRef>
+        <roleRef>
             <id>2</id>
             <logic>
                 <perform>true</perform>
@@ -233,7 +233,7 @@
         <x>460</x>
         <y>140</y>
         <label>Výber témy</label>
-		<roleRef>
+        <roleRef>
             <id>5</id>
             <logic>
                 <perform>true</perform>
@@ -252,7 +252,7 @@
         <x>460</x>
         <y>260</y>
         <label>Zamietnutie</label>
-		<roleRef>
+        <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
@@ -276,7 +276,7 @@
         <x>620</x>
         <y>220</y>
         <label>Schválenie študenta</label>
-		<roleRef>
+        <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
@@ -300,7 +300,7 @@
         <x>900</x>
         <y>140</y>
         <label>Pridelenie oponenta</label>
-		<roleRef>
+        <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
@@ -319,7 +319,7 @@
         <x>900</x>
         <y>300</y>
         <label>Posudok</label>
-		<roleRef>
+        <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
@@ -344,7 +344,7 @@
         <x>1060</x>
         <y>140</y>
         <label>Posudok</label>
-		<roleRef>
+        <roleRef>
             <id>3</id>
             <logic>
                 <perform>true</perform>
@@ -356,7 +356,7 @@
         <x>1140</x>
         <y>220</y>
         <label>Obhajoba</label>
-		<roleRef>
+        <roleRef>
             <id>4</id>
             <logic>
                 <perform>true</perform>
@@ -368,7 +368,7 @@
         <x>780</x>
         <y>220</y>
         <label>Odovzdanie práce</label>
-		<roleRef>
+        <roleRef>
             <id>5</id>
             <logic>
                 <perform>true</perform>
@@ -382,7 +382,7 @@
             </logic>
         </dataRef>
     </transition>
-	<!-- ========== ARCS ========== -->
+    <!-- ========== ARCS ========== -->
     <arc>
         <id>26</id>
         <type>regular</type>

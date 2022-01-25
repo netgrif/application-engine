@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>financial_data</id>
     <initials>FIN</initials>
     <title>Financial Data</title>
@@ -61,7 +61,7 @@
         <i18nString name="income_desc">Zadajte priemerný mesačný príjem</i18nString>
         <i18nString name="loan_amount_tite">Výška hypotéky v EUR</i18nString>
         <i18nString name="period_title">Doba splácania v rokoch</i18nString>
-        <i18nString name="monthly_payment_title">Výška mesačnej splátky v EUR </i18nString>
+        <i18nString name="monthly_payment_title">Výška mesačnej splátky v EUR</i18nString>
         <i18nString name="financial_data">Finančné údaje</i18nString>
     </i18n>
 
@@ -78,11 +78,13 @@
                     <!-- @formatter:off -->
                     taskDoc: f.task_doc;
 
-                    def document = createCase("financial_data_doc", "${useCase.title} - Doc" as String, "color-fg-amber-500")
-                    def document2 = createCase("financial_data_doc", "${useCase.title} - Doc 2" as String, "color-fg-amber-500")
+                    def document = createCase("financial_data_doc", "${useCase.title} - Doc" as String,
+                    "color-fg-amber-500")
+                    def document2 = createCase("financial_data_doc", "${useCase.title} - Doc 2" as String,
+                    "color-fg-amber-500")
 
                     change taskDoc value {
-                        [document.tasks.first().task, document2.tasks.first().task]
+                    [document.tasks.first().task, document2.tasks.first().task]
                     }
 
                     <!-- @formatter:on -->
@@ -147,43 +149,43 @@
 
 
     </transition>
-	<!-- PLACES -->
-	<place>
-		<id>1</id>
-		<x>60</x>
-		<y>60</y>
-		<label></label>
-		<tokens>1</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>2</id>
-		<x>340</x>
-		<y>60</y>
-		<label></label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<!-- ARCS -->
-	<arc>
-		<id>3</id>
-		<type>regular</type>
-		<sourceId>1</sourceId>
-		<destinationId>constructor</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>4</id>
-		<type>regular</type>
-		<sourceId>constructor</sourceId>
-		<destinationId>2</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>5</id>
-		<type>read</type>
-		<sourceId>2</sourceId>
-		<destinationId>financial_data</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>60</x>
+        <y>60</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>2</id>
+        <x>340</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>3</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>constructor</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>constructor</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>5</id>
+        <type>read</type>
+        <sourceId>2</sourceId>
+        <destinationId>financial_data</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
 </document>

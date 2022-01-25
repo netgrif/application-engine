@@ -3,8 +3,8 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -41,13 +41,13 @@ public class Task {
 
     private Map<String, Map<String, Boolean>> roles;
 
-    private Map<Long, Map<String, Boolean>> users;
+    private Map<String, Map<String, Boolean>> users;
 
     private LocalDateTime startDate;
 
     private LocalDateTime finishDate;
 
-    private Long finishedBy;
+    private String finishedBy;
 
     private String transactionId;
 

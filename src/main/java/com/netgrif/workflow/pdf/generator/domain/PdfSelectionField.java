@@ -10,11 +10,12 @@ import java.util.List;
 
 public abstract class PdfSelectionField extends PdfField {
 
-    public PdfSelectionField(PdfResource resource){
+    public PdfSelectionField(PdfResource resource) {
         super(resource);
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected List<String> choices = null;
 
     @Override
@@ -22,7 +23,7 @@ public abstract class PdfSelectionField extends PdfField {
         int padding = resource.getPadding();
         int lineHeight = resource.getLineHeight();
         int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);
-        int maxValueLineLength = getMaxValueLineSize(this.width - 2 * padding , resource.getFontValueSize(), padding);
+        int maxValueLineLength = getMaxValueLineSize(this.width - 2 * padding, resource.getFontValueSize(), padding);
         int multiLineHeight = 0;
 
         List<String> splitLabel = FieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
