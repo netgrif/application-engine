@@ -2,6 +2,7 @@ package com.netgrif.workflow.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.configuration.ElasticsearchConfiguration;
 import com.netgrif.workflow.elastic.domain.ElasticQueryConstants;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
@@ -22,14 +23,18 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -40,23 +45,28 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
-public class ElasticTaskService implements IElasticTaskService {
+public class ElasticTaskService extends ElasticViewPermissionService implements IElasticTaskService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
     private ElasticTaskRepository repository;
     private ITaskService taskService;
-    private ElasticsearchTemplate template;
+    private ElasticsearchRestTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    @Value("${spring.data.elasticsearch.index.task}")
+    private String taskIndex;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchTemplate template) {
+    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchRestTemplate template) {
         this.repository = repository;
         this.template = template;
     }
@@ -133,11 +143,12 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
-            Page<ElasticTask> indexedTasks = repository.search(query);
+            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class,  IndexCoordinates.of(taskIndex));
+            Page<ElasticTask> indexedTasks = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
         } else {
@@ -150,7 +161,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
@@ -158,7 +169,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    private SearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    private NativeSearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -187,11 +198,9 @@ public class ElasticTaskService implements IElasticTaskService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         addRolesQueryConstraint(request, user);
-        addUsersQueryConstraint(request, user);
 
         BoolQueryBuilder query = boolQuery();
-
-        buildPermissionQuery(request, query, user);
+        buildViewPermissionQuery(query, user);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -215,80 +224,6 @@ public class ElasticTaskService implements IElasticTaskService {
         } else {
             request.role = new ArrayList<>(user.getProcessRoles());
         }
-    }
-
-    protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
-        if (request.users != null && !request.users.isEmpty()) {
-            Set<Long> users = new HashSet<>(request.users);
-            users.add(user.getId());
-            request.users = new ArrayList<>(users);
-        } else {
-            request.users = Collections.singletonList(user.getId());
-        }
-    }
-
-    protected void buildPermissionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(request, userRoleQuery);
-        negativeUsersAndRolesQuery(userRoleQuery, user);
-
-        query.filter(userRoleQuery);
-    }
-
-    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeQuery = boolQuery();
-        buildNegativeViewRoleQuery(negativeQuery, user);
-        buildNegativeViewUsersQuery(negativeQuery, user);
-        query.should(negativeQuery);
-    }
-
-    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
-        }
-
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildUsersAndRolesQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.users == null || request.users.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder existingUsersQuery = boolQuery();
-        BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder usersRoleQuery = boolQuery();
-        BoolQueryBuilder usersExist = boolQuery();
-        BoolQueryBuilder notExists = boolQuery();
-
-        notExists.mustNot(existsQuery("userRefs"));
-        notExists.mustNot(existsQuery("roles"));
-
-        for (Long userId : request.users) {
-            existingUsersQuery.should(termQuery("users", userId));
-        }
-
-        usersExist.must(existsQuery("userRefs"));
-        usersExist.must(existingUsersQuery);
-
-        usersRoleQuery.should(usersExist);
-        usersRoleQuery.should(notExists);
-
-        if (request.role != null && !request.role.isEmpty()) {
-            for (String roleId : request.role) {
-                roleQuery.should(termQuery("roles", roleId));
-            }
-            usersRoleQuery.should(roleQuery);
-        }
-
-        query.must(usersRoleQuery);
     }
 
 
@@ -392,7 +327,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder userQuery = boolQuery();
-        for (Long user : request.user) {
+        for (String user : request.user) {
             userQuery.should(termQuery("userId", user));
         }
 

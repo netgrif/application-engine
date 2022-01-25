@@ -1,6 +1,5 @@
 package com.netgrif.workflow.history.service;
 
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.history.domain.baseevent.EventLog;
 import com.netgrif.workflow.history.domain.baseevent.repository.EventLogRepository;
 import com.netgrif.workflow.history.domain.caseevents.CreateCaseEventLog;
@@ -21,12 +20,9 @@ import com.netgrif.workflow.history.domain.taskevents.FinishTaskEventLog;
 import com.netgrif.workflow.history.domain.taskevents.repository.AssignTaskEventLogRepository;
 import com.netgrif.workflow.history.domain.taskevents.repository.CancelTaskEventLogRepository;
 import com.netgrif.workflow.history.domain.taskevents.repository.FinishTaskEventLogRepository;
-import com.netgrif.workflow.history.domain.userevents.IUserEventLog;
 import com.netgrif.workflow.history.domain.userevents.UserEventLogRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,11 +66,6 @@ public class HistoryService implements IHistoryService {
     @Override
     public void save(EventLog eventLog) {
         eventLogRepository.save(eventLog);
-    }
-
-    @Override
-    public Page<IUserEventLog> findAllByUser(Pageable pageable, User user) {
-        return userEventLogRepository.findAllByEmail(pageable, user.getEmail());
     }
 
     @Override
@@ -128,7 +119,7 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<AssignTaskEventLog> findAllAssignTaskEventLogsByUserId(Long userId) {
+    public List<AssignTaskEventLog> findAllAssignTaskEventLogsByUserId(String userId) {
         return assignTaskEventLogRepository.findAllByUserId(userId);
     }
 
@@ -138,7 +129,7 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<CancelTaskEventLog> findAllCancelTaskEventLogsByUserId(Long userId) {
+    public List<CancelTaskEventLog> findAllCancelTaskEventLogsByUserId(String userId) {
         return cancelTaskEventLogRepository.findAllByUserId(userId);
     }
 
@@ -148,7 +139,7 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
-    public List<FinishTaskEventLog> findAllFinishTaskEventLogsByUserId(Long userId) {
+    public List<FinishTaskEventLog> findAllFinishTaskEventLogsByUserId(String userId) {
         return finishTaskEventLogRepository.findAllByUserId(userId);
     }
 }

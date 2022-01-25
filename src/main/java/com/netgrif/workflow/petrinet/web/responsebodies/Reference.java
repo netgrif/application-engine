@@ -8,7 +8,8 @@ public class Reference {
     protected String stringId;
     protected String title;
 
-    public Reference() {}
+    public Reference() {
+    }
 
     public Reference(String stringId, String title) {
         this.stringId = stringId;

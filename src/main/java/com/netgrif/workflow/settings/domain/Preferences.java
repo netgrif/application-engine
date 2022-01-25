@@ -26,7 +26,7 @@ import java.util.Map;
 public class Preferences implements Serializable {
 
     @Id
-    private Long userId;
+    private String userId;
 
     private String locale;
 
@@ -50,7 +50,7 @@ public class Preferences implements Serializable {
     @Field
     private Map<String, List<String>> headers = new HashMap<>();
 
-    public Preferences(Long userId) {
+    public Preferences(String userId) {
         this.userId = userId;
         this.drawerWidth = 200;
     }

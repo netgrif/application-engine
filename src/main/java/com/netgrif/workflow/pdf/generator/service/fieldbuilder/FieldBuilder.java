@@ -6,7 +6,6 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
-import lombok.Data;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -20,12 +19,8 @@ public abstract class FieldBuilder {
     @Getter
     protected int lastX, lastY;
 
-    public FieldBuilder(PdfResource resource){
+    public FieldBuilder(PdfResource resource) {
         this.resource = resource;
-    }
-
-    protected String getTranslatedLabel(String fieldStringId, PetriNet petriNet){
-        return petriNet.getDataSet().get(fieldStringId).getName().getTranslation(resource.getTextLocale());
     }
 
     protected void setFieldParams(DataGroup dg, LocalisedField field, PdfField pdfField) {
@@ -39,14 +34,17 @@ public abstract class FieldBuilder {
         pdfField.setX(countPosX(pdfField));
         pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
         pdfField.setTopY(countTopPosY(pdfField, resource));
-        pdfField.setOriginalBottomY(countBottomPosY(pdfField,resource));
-        pdfField.setBottomY(countBottomPosY(pdfField,resource));
+        pdfField.setOriginalBottomY(countBottomPosY(pdfField, resource));
+        pdfField.setBottomY(countBottomPosY(pdfField, resource));
         pdfField.countMultiLineHeight(fontSize, resource);
     }
 
     private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
-        if (field.getLayout() != null  && !isStretch(dataGroup)) {
+        if (isDgFlow(dataGroup)) {
+            x = lastX < resource.getFormGridCols() ? lastX : 0;
+            lastX = x + 1;
+        } else if (field.getLayout() != null && !isStretch(dataGroup)) {
             x = field.getLayout().getX();
             lastX = x;
         } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
@@ -58,14 +56,21 @@ public abstract class FieldBuilder {
 
     private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
         int y;
-        if (checkFullRow(dataGroup, field)){
+        if (isDgFlow(dataGroup)) {
+            if (resource.getRowGridFree() - 1 > 0) {
+                resource.setRowGridFree(resource.getRowGridFree() - 1);
+                y = lastY;
+            } else {
+                y = lastY++;
+            }
+        } else if (checkFullRow(dataGroup, field)) {
             y = ++lastY;
             resolveRowGridFree(dataGroup, field.getLayout());
         } else {
-            if(lastX == 0){
+            if (lastX == 0) {
                 y = ++lastY;
                 resolveRowGridFree(dataGroup, field.getLayout());
-            }else{
+            } else {
                 y = lastY;
                 resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
             }
@@ -101,7 +106,7 @@ public abstract class FieldBuilder {
                     output.append("\n");
                     lineLen = 0;
                 }
-                output.append(word + " ");
+                output.append(word).append(" ");
                 lineLen += word.length() + 1;
             }
             lineLen = 0;
@@ -111,7 +116,9 @@ public abstract class FieldBuilder {
     }
 
     private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
-        if (checkCol(field.getLayout()) && !isStretch(dataGroup)) {
+        if (isDgFlow(dataGroup)) {
+            return resource.getFormGridColWidth() - resource.getPadding();
+        } else if (checkCol(field.getLayout()) && !isStretch(dataGroup)) {
             return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
         } else {
             return (isStretch(dataGroup) ?
@@ -124,12 +131,12 @@ public abstract class FieldBuilder {
         return resource.getFormGridRowHeight() - resource.getPadding();
     }
 
-    private boolean checkFullRow(DataGroup dataGroup, LocalisedField field){
+    private boolean checkFullRow(DataGroup dataGroup, LocalisedField field) {
         return (isStretch(dataGroup)) ||
                 (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
     }
 
-    private boolean checkCol(FieldLayout layout){
+    private boolean checkCol(FieldLayout layout) {
         return layout != null && layout.getCols() != null;
     }
 
@@ -137,13 +144,17 @@ public abstract class FieldBuilder {
         return dataGroup.getStretch() != null && dataGroup.getStretch();
     }
 
-    private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout){
-        if(checkCol(layout)){
+    private boolean isDgFlow(DataGroup dataGroup) {
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("flow");
+    }
+
+    private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {
+        if (checkCol(layout)) {
             resource.setRowGridFree(resource.getFormGridCols() - layout.getCols());
-        }else{
-            if(isStretch(dataGroup))
+        } else {
+            if (isStretch(dataGroup))
                 resource.setRowGridFree(0);
-            else{
+            else {
                 resource.setRowGridFree(resource.getFormGridCols() - 2);
             }
         }

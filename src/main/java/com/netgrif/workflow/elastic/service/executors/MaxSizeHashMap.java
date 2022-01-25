@@ -34,7 +34,7 @@ public class MaxSizeHashMap<T> extends LinkedHashMap<String, T> {
     protected boolean removeEldestEntry(Map.Entry<String, T> eldest) {
         boolean removeEntry = size() > maxSize;
         if (removeEntry && removeEldest != null) {
-           removeEldest.accept(eldest.getValue());
+            removeEldest.accept(eldest.getValue());
         }
         return removeEntry;
     }

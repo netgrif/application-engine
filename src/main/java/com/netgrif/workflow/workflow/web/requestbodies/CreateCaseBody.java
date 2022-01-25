@@ -9,5 +9,6 @@ public class CreateCaseBody {
     public String netId;
     public String color;
 
-    public CreateCaseBody() {}
+    public CreateCaseBody() {
+    }
 }

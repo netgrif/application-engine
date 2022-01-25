@@ -13,8 +13,8 @@ public abstract class SelectionFieldBuilder extends FieldBuilder {
         pdfField.setX(countPosX(pdfField));
         pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
         pdfField.setTopY(countTopPosY(pdfField, resource));
-        pdfField.setOriginalBottomY(countBottomPosY(pdfField,resource));
-        pdfField.setBottomY(countBottomPosY(pdfField,resource));
+        pdfField.setOriginalBottomY(countBottomPosY(pdfField, resource));
+        pdfField.setBottomY(countBottomPosY(pdfField, resource));
         pdfField.countMultiLineHeight(fontSize, resource);
     }
 }

@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome
+import org.codehaus.groovy.control.CompilerConfiguration
 import com.netgrif.workflow.workflow.service.interfaces.IFieldActionsCacheService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -29,14 +29,16 @@
                     def refedCase = createCase("referenced");
                     def task = findTask({it.caseId.eq(refedCase.stringId)});
                     change taskref value {
-                        return [task.stringId]
+                    return [task.stringId]
                     }
                 </action>
             </actions>
         </event>
         <dataRef>
             <id>ref</id>
-            <logic><behavior>editable</behavior></logic>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
         </dataRef>
     </transition>
     <!-- PLACES -->

@@ -11,6 +11,9 @@ import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.workflow.petrinet.domain.events.DataEvent
 import com.netgrif.workflow.petrinet.domain.events.DataEventType
 import com.netgrif.workflow.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType

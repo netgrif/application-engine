@@ -84,6 +84,7 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     protected List<String> initializeImports() {
         List<String> imports = new ArrayList<>();
         globals.forEach(global -> imports.add(asImport(global.fullyQualifiedName())));
+        imports.add(asImport("com.netgrif.workflow.petrinet.domain.events.*"));
         return imports;
     }
 

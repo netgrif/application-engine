@@ -32,7 +32,7 @@ abstract class CaseFieldsExpressionRunner {
     }
 
     def run(Case useCase, Expression expression) {
-        return run(useCase, useCase.getDataSet().keySet().collectEntries {[(it): (it)]} as Map<String, String>, expression)
+        return run(useCase, useCase.getDataSet().keySet().collectEntries { [(it): (it)] } as Map<String, String>, expression)
     }
 
     def run(Case useCase, Map<String, String> fields, Expression expression) {

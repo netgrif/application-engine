@@ -19,7 +19,8 @@ public enum ProcessRolePermission {
     public String toString() {
         return getValue();
     }
-    public boolean equal(String str){
+
+    public boolean equal(String str) {
         return str != null && this.value.equalsIgnoreCase(str);
     }
 }

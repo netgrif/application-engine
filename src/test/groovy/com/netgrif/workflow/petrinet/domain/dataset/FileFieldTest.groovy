@@ -2,18 +2,19 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
-import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -21,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -75,7 +76,7 @@ class FileFieldTest {
 
     private MockMvc mockMvc
 
-    @Before
+    @BeforeEach
     void setup() {
         testHelper.truncateDbs()
         mockMvc = MockMvcBuilders
@@ -85,7 +86,7 @@ class FileFieldTest {
     }
 
     PetriNet getNet() {
-        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), "major", superCreator.getLoggedSuper());
+        def netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/remoteFileField.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assert netOptional.getNet() != null
         return netOptional.getNet()
     }
@@ -94,17 +95,17 @@ class FileFieldTest {
     void testRemoteAttribute() {
         PetriNet net = getNet()
         assert net.getField(FIELD_ID).isPresent()
-        assert net.getField(FIELD_ID).get().isRemote()
+        assert (net.getField(FIELD_ID).get() as FileField).isRemote()
     }
 
     @Test
     void downloadFileByCase() {
         PetriNet net = getNet()
 
-        User user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getACase()
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID)
@@ -120,10 +121,10 @@ class FileFieldTest {
     void downloadFileByTask() {
         PetriNet net = getNet()
 
-        User user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
-        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getACase()
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID).

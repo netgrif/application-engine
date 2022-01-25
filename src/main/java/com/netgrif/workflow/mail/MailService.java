@@ -1,6 +1,6 @@
 package com.netgrif.workflow.mail;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.mail.domain.MailDraft;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import javax.mail.MessagingException;
@@ -27,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
+@Service
 public class MailService implements IMailService {
 
     public static final String TOKEN = "token";
@@ -66,7 +68,7 @@ public class MailService implements IMailService {
     protected Configuration configuration;
 
     @Override
-    public void sendRegistrationEmail(User user) throws MessagingException, IOException, TemplateException {
+    public void sendRegistrationEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {
         List<String> recipients = new LinkedList<>();
         Map<String, Object> model = new HashMap<>();
 
@@ -86,7 +88,7 @@ public class MailService implements IMailService {
     }
 
     @Override
-    public void sendPasswordResetEmail(User user) throws MessagingException, IOException, TemplateException {
+    public void sendPasswordResetEmail(RegisteredUser user) throws MessagingException, IOException, TemplateException {
         Map<String, Object> model = new HashMap<>();
 
         model.put(NAME, user.getName());

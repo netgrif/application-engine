@@ -2,10 +2,11 @@ package com.netgrif.workflow.petrinet.domain.roles;
 
 
 public enum RolePermission {
-    PERFORM("perform"),
     DELEGATE("delegate"),
     CANCEL("cancel"),
-    ASSIGNED("assigned"),
+    ASSIGN("assign"),
+    FINISH("finish"),
+    SET("set"),
     VIEW("view");
 
     private String value;
@@ -22,7 +23,8 @@ public enum RolePermission {
     public String toString() {
         return getValue();
     }
-    public boolean equal(String str){
+
+    public boolean equal(String str) {
         return str != null && this.value.equalsIgnoreCase(str);
     }
 }

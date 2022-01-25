@@ -2,28 +2,29 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.petrinet.domain.VersionType
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
 @ActiveProfiles(["test"])
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 class DynamicValidationTest {
 
     @Autowired
@@ -47,12 +48,13 @@ class DynamicValidationTest {
     @Autowired
     private IWorkflowService workflowService
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs();
     }
 
     @Test
+    @Disabled
     void testValidations() {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         Case useCase = importHelper.createCase("test", optNet.getNet())
@@ -67,8 +69,8 @@ class DynamicValidationTest {
         assert (data["date"]).validations[0] instanceof DynamicValidation
         assert (data["date"]).validations[0].compiledRule == ("between past,today-P${useCase.dataSet["max"].value as Integer}D" as String)
 
-        ChangedFieldsTree changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": true],
-                                                      "text_valid_switch"  : ["type": "boolean", "value": true]])
+        SetDataEventOutcome changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": true],
+                                                        "text_valid_switch"  : ["type": "boolean", "value": true]])
         assert (changes.changedFields["number"].attributes["validations"] as List)[0]["validationRule"] == "odd"
         assert (changes.changedFields["text"].attributes["validations"] as List)[0]["validationRule"] == "email"
 
@@ -109,9 +111,9 @@ class DynamicValidationTest {
         return dataService.getData(task, useCase).getData().collectEntries { [(it.importId): (it)] }
     }
 
-    ChangedFieldsTree setData(Case useCase, Map<String, Map<String, Object>> values) {
+    SetDataEventOutcome setData(Case useCase, Map<String, Map<String, Object>> values) {
         Task task = task(useCase)
-        return dataService.setData(task, ImportHelper.populateDataset(values)).getData()
+        return dataService.setData(task, ImportHelper.populateDataset(values))
     }
 
     Task task(Case useCase) {

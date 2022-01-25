@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
     <id>taskref_demo2</id>
     <version>1.0.0</version>
     <initials>TRD</initials>
@@ -28,13 +28,13 @@
             taskref: f.taskref;
 
             change taskref value {
-                if (taskrefInput.value.defaultValue.contains("Fyzická osoba")) {
-                    return [getTaskId("2")]
-                } else if (taskrefInput.value.defaultValue.contains("Právnická osoba")) {
-                    return [getTaskId("3")]
-                } else {
-                    return [getTaskId("4")]
-                }
+            if (taskrefInput.value.defaultValue.contains("Fyzická osoba")) {
+            return [getTaskId("2")]
+            } else if (taskrefInput.value.defaultValue.contains("Právnická osoba")) {
+            return [getTaskId("3")]
+            } else {
+            return [getTaskId("4")]
+            }
             }
             <!--@formatter:on-->
         </action>
@@ -145,10 +145,10 @@
                     <!--@formatter:off-->
                     taskref: f.nested_taskref;
                     change taskref value {
-                        return [
-                            getTaskId("3"),
-                            getTaskId("2")
-                        ]
+                    return [
+                    getTaskId("3"),
+                    getTaskId("2")
+                    ]
                     }
                     <!--@formatter:on-->
                 </action>

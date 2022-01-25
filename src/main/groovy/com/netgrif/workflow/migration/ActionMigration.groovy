@@ -21,7 +21,7 @@ class ActionMigration {
     @Autowired
     private IUserService userService;
 
-    void migrateActions(String petriNetPath){
+    void migrateActions(String petriNetPath) {
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
         ImportPetriNetEventOutcome newPetriNet = petriNetService.importPetriNet(netStream, "major", userService.loggedOrSystem.transformToLoggedUser())
         List<PetriNet> oldPetriNets
@@ -49,21 +49,21 @@ class ActionMigration {
         }
     }
 
-    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet){
-            newPetriNet.dataSet.each {key, data ->
-                if (data.events != null && data.events.size() > 0){
-                    oldPetriNet.dataSet[key].events = data.events
-                }
+    private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+        newPetriNet.dataSet.each { key, data ->
+            if (data.events != null && data.events.size() > 0) {
+                oldPetriNet.dataSet[key].events = data.events
             }
+        }
     }
 
-    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet){
-        newPetriNet.transitions.each {transKey, trans ->
-           trans.dataSet.each {dataKey, data ->
-               if(data.events != null && data.events.size() > 0){
-                   oldPetriNet.transitions[transKey].dataSet[dataKey].events = data.events
-               }
-           }
+    private void migrateDataRefActions(PetriNet newPetriNet, PetriNet oldPetriNet) {
+        newPetriNet.transitions.each { transKey, trans ->
+            trans.dataSet.each { dataKey, data ->
+                if (data.events != null && data.events.size() > 0) {
+                    oldPetriNet.transitions[transKey].dataSet[dataKey].events = data.events
+                }
+            }
         }
     }
 

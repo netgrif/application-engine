@@ -22,7 +22,7 @@ public abstract class CaseEventLog extends PetriNetEventLog {
     }
 
     protected CaseEventLog(Case useCase, EventPhase eventPhase) {
-        super(useCase.get_id(), eventPhase, useCase.getPetriNetObjectId());
+        this(useCase.get_id(), useCase, eventPhase);
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();
     }
