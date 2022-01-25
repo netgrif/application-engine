@@ -13,6 +13,6 @@ public class DataFieldsResource extends CollectionModel<LocalisedField> {
     public DataFieldsResource(Collection<Field> content, Locale locale) {
         super(content.stream()
                 .map(f -> LocalisedFieldFactory.from(f, locale))
-                .collect(Collectors.toList()), new ArrayList<>());
+                .collect(Collectors.toList()), new ArrayList<>(), null);
     }
 }
