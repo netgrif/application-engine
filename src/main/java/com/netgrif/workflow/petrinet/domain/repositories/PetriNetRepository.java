@@ -6,10 +6,11 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.List;
 
-public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
+public interface PetriNetRepository extends MongoRepository<PetriNet, String>, QuerydslPredicateExecutor<PetriNet> {
 
     List<PetriNet> findByTitle_DefaultValue(String title);
 
@@ -20,6 +21,8 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
     PetriNet findByIdentifierAndVersion(String identifier, Version version);
 
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
+
+    Page<PetriNet> findByIdentifierIn(List<String> identifier, Pageable pageable);
 
     List<PetriNet> findAllByVersion(Version version);
 

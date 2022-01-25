@@ -13,7 +13,7 @@ public class DataEvent extends BaseEvent {
 
     private DataEventType type;
 
-    public DataEvent(){
+    public DataEvent() {
         initActions();
     }
 
@@ -27,7 +27,7 @@ public class DataEvent extends BaseEvent {
         this.type = DataEventType.fromString(type);
     }
 
-    public EventPhase getDefaultPhase(){
+    public EventPhase getDefaultPhase() {
         try {
             if (type.equals(DataEventType.GET))
                 return EventPhase.PRE;

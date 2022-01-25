@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<menusWithFilters>
+  <menus>
+    <menu name="defaultMenu">
+      <menuEntry useIcon="true">
+        <entryName>My cases</entryName>
+        <filterCaseId>618b9afb5f420c67b6d6ce66</filterCaseId>
+        <entryRole type="banned">
+          <roleImportId>client</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="banned">
+          <roleImportId>account_clerk</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="banned">
+          <roleImportId>loan_officer</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="banned">
+          <roleImportId>property_appraiser</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+      </menuEntry>
+      <menuEntry useIcon="true">
+        <entryName>All cases</entryName>
+        <filterCaseId>618b9afc5f420c67b6d6d36b</filterCaseId>
+        <entryRole type="allowed">
+          <roleImportId>client</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="allowed">
+          <roleImportId>account_clerk</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="allowed">
+          <roleImportId>loan_officer</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="allowed">
+          <roleImportId>property_appraiser</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+      </menuEntry>
+    </menu>
+    <menu name="newMenu">
+      <menuEntry useIcon="false">
+        <entryName>All tasks</entryName>
+        <filterCaseId>618b9af95f420c67b6d6c45c</filterCaseId>
+        <entryRole type="allowed">
+          <roleImportId>client</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="allowed">
+          <roleImportId>account_clerk</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="banned">
+          <roleImportId>loan_officer</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+        <entryRole type="banned">
+          <roleImportId>property_appraiser</roleImportId>
+          <netImportId>mortgage</netImportId>
+        </entryRole>
+      </menuEntry>
+      <menuEntry useIcon="false">
+        <entryName>My tasks</entryName>
+        <filterCaseId>618b9afa5f420c67b6d6c961</filterCaseId>
+      </menuEntry>
+    </menu>
+  </menus>
+  <filters>
+    <filter>
+      <caseId>618b9afb5f420c67b6d6ce66</caseId>
+      <filterName>
+        <defaultValue>My cases</defaultValue>
+        <translations>
+          <de>Meine Fälle</de>
+          <sk>Moje prípady</sk>
+        </translations>
+      </filterName>
+      <filterValue>(author:&lt;&lt;me>>)</filterValue>
+      <visibility>public</visibility>
+      <type>Case</type>
+      <icon>assignment_ind</icon>
+      <filterMetadata>
+        <filterType>Case</filterType>
+        <defaultSearchCategories>true</defaultSearchCategories>
+        <inheritAllowedNets>true</inheritAllowedNets>
+        <searchCategories>
+          <searchCategory>case_author</searchCategory>
+        </searchCategories>
+        <predicateMetadata>
+          <predicateMetadataItem>
+            <predicate>
+              <category>case_author</category>
+              <configuration>
+                <operator>equals</operator>
+              </configuration>
+              <mapValues>
+                <mapValue>
+                  <text>search.category.userMe</text>
+                  <stringValues>
+                    <stringValue>&lt;&lt;me>></stringValue>
+                  </stringValues>
+                </mapValue>
+              </mapValues>
+            </predicate>
+          </predicateMetadataItem>
+        </predicateMetadata>
+      </filterMetadata>
+    </filter>
+    <filter>
+      <caseId>618b9afc5f420c67b6d6d36b</caseId>
+      <filterName>
+        <defaultValue>All cases</defaultValue>
+        <translations>
+          <de>Alle Fälle</de>
+          <sk>Všetky prípady</sk>
+        </translations>
+      </filterName>
+      <visibility>public</visibility>
+      <type>Case</type>
+      <icon>assignment</icon>
+      <filterMetadata>
+        <filterType>Case</filterType>
+        <defaultSearchCategories>true</defaultSearchCategories>
+        <inheritAllowedNets>true</inheritAllowedNets>
+      </filterMetadata>
+    </filter>
+    <filter>
+      <caseId>618b9af95f420c67b6d6c45c</caseId>
+      <filterName>
+        <defaultValue>All tasks</defaultValue>
+        <translations>
+          <de>Alle Aufgaben</de>
+          <sk>Všetky úlohy</sk>
+        </translations>
+      </filterName>
+      <visibility>public</visibility>
+      <type>Task</type>
+      <icon>library_add_check</icon>
+      <filterMetadata>
+        <filterType>Task</filterType>
+        <defaultSearchCategories>true</defaultSearchCategories>
+        <inheritAllowedNets>true</inheritAllowedNets>
+      </filterMetadata>
+    </filter>
+    <filter>
+      <caseId>618b9afa5f420c67b6d6c961</caseId>
+      <filterName>
+        <defaultValue>My tasks</defaultValue>
+        <translations>
+          <de>Meine Aufgaben</de>
+          <sk>Moje úlohy</sk>
+        </translations>
+      </filterName>
+      <filterValue>(userId:&lt;&lt;me>>)</filterValue>
+      <visibility>public</visibility>
+      <type>Task</type>
+      <icon>account_box</icon>
+      <filterMetadata>
+        <filterType>Task</filterType>
+        <defaultSearchCategories>true</defaultSearchCategories>
+        <inheritAllowedNets>true</inheritAllowedNets>
+        <searchCategories>
+          <searchCategory>task_assignee</searchCategory>
+        </searchCategories>
+        <predicateMetadata>
+          <predicateMetadataItem>
+            <predicate>
+              <category>task_assignee</category>
+              <configuration>
+                <operator>equals</operator>
+              </configuration>
+              <mapValues>
+                <mapValue>
+                  <text>search.category.userMe</text>
+                  <stringValues>
+                    <stringValue>&lt;&lt;me>></stringValue>
+                  </stringValues>
+                </mapValue>
+              </mapValues>
+            </predicate>
+          </predicateMetadataItem>
+        </predicateMetadata>
+      </filterMetadata>
+    </filter>
+  </filters>
+</menusWithFilters>

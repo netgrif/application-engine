@@ -10,5 +10,5 @@ public interface CancelTaskEventLogRepository extends MongoRepository<CancelTask
 
     List<CancelTaskEventLog> findAllByTaskId(ObjectId taskId);
 
-    List<CancelTaskEventLog> findAllByUserId(Long id);
+    List<CancelTaskEventLog> findAllByUserId(String id);
 }

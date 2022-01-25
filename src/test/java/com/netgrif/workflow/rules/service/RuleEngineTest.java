@@ -2,7 +2,7 @@ package com.netgrif.workflow.rules.service;
 
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -20,17 +20,17 @@ import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.Impor
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,39 +46,35 @@ import java.util.stream.IntStream;
         locations = "classpath:application-test.properties"
 )
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RuleEngineTest {
 
+    public static final String TEXT_VALUE = "new text value";
+    public static final Double NUM_VALUE = 99.0;
+    public static final String TRANS_1 = "2";
     @Autowired
     private TestHelper testHelper;
-
     @Autowired
     private RuleRepository ruleRepository;
-    
     @Autowired
     private RefreshableKieBase refreshableKieBase;
-
     @Autowired
     private IWorkflowService workflowService;
-
     @Autowired
     private ITaskService taskService;
-
     @Autowired
     private IPetriNetService petriNetService;
-
     @Autowired
     private FactRepository factRepository;
-
     @Autowired
     private SuperCreator superCreator;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
 
-    @After
+    @AfterEach
     public void after() {
         ruleRepository.deleteAll();
         factRepository.deleteAll();
@@ -199,12 +195,12 @@ public class RuleEngineTest {
         ruleRepository.save(rule4);
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
-        assert caseOutcome.getACase().getTitle().equals(NEW_CASE_TITLE);
+        assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
-        Task task = findTask(caseOutcome.getACase(), TRANS_1);
+        Task task = findTask(caseOutcome.getCase(), TRANS_1);
         taskService.assignTask(task, superCreator.getLoggedSuper().transformToUser());
         taskService.finishTask(task, superCreator.getLoggedSuper().transformToUser());
-        Case newCase = workflowService.findOne(caseOutcome.getACase().getStringId());
+        Case newCase = workflowService.findOne(caseOutcome.getCase().getStringId());
         assert newCase.getTitle().equals(NEW_CASE_TITLE);
         assert !newCase.getColor().equals(NEW_CASE_TITLE_2);
 
@@ -219,11 +215,6 @@ public class RuleEngineTest {
 
         assert newCase.getTitle().equals(NEW_CASE_TITLE_2);
     }
-
-
-    public static final String TEXT_VALUE = "new text value";
-    public static final Double NUM_VALUE = 99.0;
-    public static final String TRANS_1 = "2";
 
     @Test
     public void testAssign() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
@@ -252,9 +243,9 @@ public class RuleEngineTest {
 
         Case caze = newCase();
         Task task = findTask(caze, TRANS_1);
-        User user = superCreator.getLoggedSuper().transformToUser();
+        IUser user = superCreator.getLoggedSuper().transformToUser();
         taskService.assignTask(task, user);
-        taskService.delegateTask(user.transformToLoggedUser(), user.getId(), task.getStringId());
+        taskService.delegateTask(user.transformToLoggedUser(), user.getStringId(), task.getStringId());
         caze = workflowService.findOne(caze.getStringId());
 
         assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
@@ -271,7 +262,7 @@ public class RuleEngineTest {
 
         Case caze = newCase();
         Task task = findTask(caze, TRANS_1);
-        User user = superCreator.getLoggedSuper().transformToUser();
+        IUser user = superCreator.getLoggedSuper().transformToUser();
         taskService.assignTask(task, user);
         taskService.finishTask(task, user);
         caze = workflowService.findOne(caze.getStringId());
@@ -290,7 +281,7 @@ public class RuleEngineTest {
 
         Case caze = newCase();
         Task task = findTask(caze, TRANS_1);
-        User user = superCreator.getLoggedSuper().transformToUser();
+        IUser user = superCreator.getLoggedSuper().transformToUser();
 
         taskService.assignTask(task, user);
         taskService.cancelTask(task, user);
@@ -324,7 +315,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    @Ignore
+    @Disabled("TODO:")
     public void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.workflow.petrinet.domain.events.EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
@@ -366,7 +357,7 @@ public class RuleEngineTest {
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
-        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getACase();
+        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getCase();
     }
 
     private Task findTask(Case caze, String trans) {
@@ -382,12 +373,12 @@ public class RuleEngineTest {
             this.number = number;
         }
 
-        public Integer increment() {
-            return ++number;
-        }
-
         public static TestFact instance(String caseId, Integer number) {
             return new TestFact(caseId, number);
+        }
+
+        public Integer increment() {
+            return ++number;
         }
     }
 

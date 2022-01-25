@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TitleRenderer extends Renderer{
+public class TitleRenderer extends Renderer {
 
     private int fieldY, fieldWidth;
     private String label;

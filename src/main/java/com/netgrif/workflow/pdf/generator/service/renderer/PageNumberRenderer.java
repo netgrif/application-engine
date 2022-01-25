@@ -16,11 +16,13 @@ public class PageNumberRenderer extends Renderer {
         pdfDrawer.writeString(resource.getValueFont(), fontValueSize, resource.getPageNumberPosition(), marginBottom - 2 * lineHeight, numberText);
     }
 
-    private String generateNumberText(int counter, int pageCount){
+    private String generateNumberText(int counter, int pageCount) {
         return counter + (!format.getFormat().equals("") ? format.getFormat() + pageCount : "");
     }
 
     @Override
-    public int renderLabel(PdfField field) throws IOException {return 0;}
+    public int renderLabel(PdfField field) throws IOException {
+        return 0;
+    }
 
 }

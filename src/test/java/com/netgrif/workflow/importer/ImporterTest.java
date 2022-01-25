@@ -11,14 +11,14 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,23 +28,8 @@ import java.util.stream.Collectors;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ImporterTest {
-
-    @Autowired
-    private TestHelper testHelper;
-
-    @Autowired
-    private PetriNetRepository repository;
-
-    @Autowired
-    private IWorkflowService workflowService;
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private SuperCreator superCreator;
 
     private static final String NET_ID = "prikladFM_test.xml";
     private static final String NET_TITLE = "Test";
@@ -54,8 +39,18 @@ public class ImporterTest {
     private static final Integer NET_ARCS = 21;
     private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
+    @Autowired
+    private TestHelper testHelper;
+    @Autowired
+    private PetriNetRepository repository;
+    @Autowired
+    private IWorkflowService workflowService;
+    @Autowired
+    private IPetriNetService petriNetService;
+    @Autowired
+    private SuperCreator superCreator;
 
-    @Before
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
     }
@@ -73,7 +68,7 @@ public class ImporterTest {
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
 
-        assert caseOutcome.getACase() != null;
+        assert caseOutcome.getCase() != null;
     }
 
     @Test
@@ -95,7 +90,6 @@ public class ImporterTest {
         assertExternalMappingImport(outcome.getNet());
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void assertExternalMappingImport(PetriNet imported) {
         assert imported != null;
 

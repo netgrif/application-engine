@@ -1,7 +1,9 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
+
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.workflow.web.responsebodies.ResponseMessage;
 import lombok.Data;
+
 import java.util.Locale;
 
 @Data

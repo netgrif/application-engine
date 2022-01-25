@@ -21,20 +21,21 @@ public class Component {
     @Setter
     private List<Icon> optionIcons;
 
-    public Component(){}
+    public Component() {
+    }
 
-    public Component(String name){
+    public Component(String name) {
         this.name = name;
         this.properties = new HashMap<>();
         this.optionIcons = new ArrayList<>();
     }
 
-    public Component(String name, Map<String, String> properties){
+    public Component(String name, Map<String, String> properties) {
         this(name);
         this.properties = properties;
     }
 
-    public Component(String name, Map<String, String> properties, List<Icon> optionIcons){
+    public Component(String name, Map<String, String> properties, List<Icon> optionIcons) {
         this(name);
         this.properties = properties;
         this.optionIcons = optionIcons;

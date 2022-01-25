@@ -6,4 +6,5 @@ import com.netgrif.workflow.utils.SingleItemAsList;
 import com.netgrif.workflow.utils.SingleItemAsListDeserializer;
 
 @JsonDeserialize(using = SingleItemAsListDeserializer.class, contentAs = CaseSearchRequest.class)
-public class SingleCaseSearchRequestAsList extends SingleItemAsList<CaseSearchRequest> {}
+public class SingleCaseSearchRequestAsList extends SingleItemAsList<CaseSearchRequest> {
+}

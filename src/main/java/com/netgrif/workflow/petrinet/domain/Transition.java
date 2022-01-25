@@ -24,53 +24,68 @@ import java.util.stream.Collectors;
 public class Transition extends Node {
 
     @Field("dataGroups")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, DataGroup> dataGroups;
 
     @Field("dataSet")
-    @Getter @Setter
+    @Getter
+    @Setter
     private LinkedHashMap<String, DataFieldLogic> dataSet;
 
     @Field("roles")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Map<String, Boolean>> roles;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<String> negativeViewRoles;
 
     @Field("users")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Map<String, Boolean>> userRefs;
 
     @Field("triggers")
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Trigger> triggers;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TaskLayout layout;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer priority;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private AssignPolicy assignPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String icon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private DataFocusPolicy dataFocusPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private FinishPolicy finishPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<EventType, Event> events;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Boolean> assignedUserPolicy;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String defaultRoleId;
 
     public Transition() {
@@ -95,7 +110,7 @@ public class Transition extends Node {
             if(layout != null) dataSet.get(field).setLayout(layout);
             if(component != null) dataSet.get(field).setComponent(component);
         } else {
-            dataSet.put(field,new DataFieldLogic(behavior, events, layout, component));
+            dataSet.put(field, new DataFieldLogic(behavior, events, layout, component));
         }
     }
 
@@ -113,7 +128,9 @@ public class Transition extends Node {
         }
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
+    }
 
     public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
         if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
@@ -131,12 +148,12 @@ public class Transition extends Node {
         this.triggers.add(trigger);
     }
 
-    public boolean isDisplayable(String fieldId){
+    public boolean isDisplayable(String fieldId) {
         DataFieldLogic logic = dataSet.get(fieldId);
         return logic != null && logic.isDisplayable();
     }
 
-    public List<String> getImmediateData(){
+    public List<String> getImmediateData() {
         return dataSet.entrySet().stream().filter(entry -> entry.getValue().getBehavior().contains(FieldBehavior.IMMEDIATE))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
@@ -202,7 +219,7 @@ public class Transition extends Node {
     }
 
     private I18nString getMessage(EventType type) {
-        if (events.containsKey(type) )
+        if (events.containsKey(type))
             return events.get(type).getMessage();
         return null;
     }

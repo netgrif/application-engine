@@ -42,6 +42,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private boolean anonymousRoleEnabled;
+
+    @Getter
+    @Setter
     private I18nString defaultCaseName;
 
     @Getter
@@ -175,11 +179,13 @@ public class PetriNet extends PetriNetObject {
         }
     }
 
-    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
+    public void addNegativeViewRole(String roleId) {
+        negativeViewRoles.add(roleId);
+    }
 
     public void addFunction(Function function) { functions.add(function); }
 
-    public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
+    public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
             this.userRefs.get(usersRefId).putAll(permissions);
         } else {

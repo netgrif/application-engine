@@ -1,8 +1,6 @@
 package com.netgrif.workflow.importer.service;
 
 
-import com.netgrif.workflow.auth.domain.UserProcessRole;
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.importer.model.CaseLogic;
 import com.netgrif.workflow.importer.model.Logic;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -23,16 +21,14 @@ public class RoleFactory {
     @Autowired
     private ProcessRoleRepository repository;
 
-    @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository;
-
     Map<String, Boolean> getPermissions(Logic roleLogic) {
         Map<String, Boolean> permissions = new HashMap<>();
 
         addPerform(permissions, roleLogic);
+        addFinish(permissions, roleLogic);
         addDelegate(permissions, roleLogic);
         addCancel(permissions, roleLogic);
-        addAssigned(permissions, roleLogic);
+        addAssign(permissions, roleLogic);
         addView(permissions, roleLogic);
 
         return permissions;
@@ -49,8 +45,13 @@ public class RoleFactory {
     }
 
     private void addPerform(Map<String, Boolean> permissions, Logic roleLogic) {
-        if (roleLogic.isPerform() != null)
-            permissions.put(RolePermission.PERFORM.toString(), roleLogic.isPerform());
+        if (roleLogic.isPerform() != null) {
+            permissions.put(RolePermission.ASSIGN.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.CANCEL.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.FINISH.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.VIEW.toString(), roleLogic.isPerform());
+            permissions.put(RolePermission.SET.toString(), roleLogic.isPerform());
+        }
     }
 
     private void addDelegate(Map<String, Boolean> permissions, Logic roleLogic) {
@@ -63,9 +64,17 @@ public class RoleFactory {
             permissions.put(RolePermission.CANCEL.toString(), roleLogic.isCancel());
     }
 
-    private void addAssigned(Map<String, Boolean> permissions, Logic roleLogic) {
+    private void addFinish(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isFinish() != null)
+            permissions.put(RolePermission.FINISH.toString(), roleLogic.isFinish());
+    }
+
+    private void addAssign(Map<String, Boolean> permissions, Logic roleLogic) {
+        /* Part roleLogic.isAssigned() is deprecated and can be removed in future releases. */
         if (roleLogic.isAssigned() != null)
-            permissions.put(RolePermission.ASSIGNED.toString(), roleLogic.isAssigned());
+            permissions.put(RolePermission.ASSIGN.toString(), roleLogic.isAssigned());
+        else if (roleLogic.isAssign() != null)
+            permissions.put(RolePermission.ASSIGN.toString(), roleLogic.isAssign());
     }
 
     private void addCreate(Map<String, Boolean> permissions, CaseLogic roleLogic) {
@@ -94,7 +103,6 @@ public class RoleFactory {
         role.setImportId(net.getStringId() + "_" + transition.getImportId());
 //        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());
         role = repository.save(role);
-        userProcessRoleRepository.save(new UserProcessRole(role.getStringId()));
         return role;
     }
 }

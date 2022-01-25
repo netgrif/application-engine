@@ -52,7 +52,7 @@ public class ElasticController {
     @ApiOperation(value = "Reindex specified cases",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/reindex", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @RequestMapping(value = "/reindex", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),

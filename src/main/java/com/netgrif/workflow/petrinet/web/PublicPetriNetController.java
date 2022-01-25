@@ -6,19 +6,15 @@ import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResource;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResourceAssembler;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,12 +60,12 @@ public class PublicPetriNetController {
     }
 
     @ApiOperation(value = "Search processes")
-    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         Page<PetriNetReference> nets = petriNetService.search(criteria, userService.getAnonymousLogged(), pageable, locale);
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicPetriNetController.class)
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PublicPetriNetController.class)
                 .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
-        PagedResources<PetriNetReferenceResource> resources = assembler.toResource(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PagedModel<PetriNetReferenceResource> resources = assembler.toModel(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
     }
@@ -89,7 +85,7 @@ public class PublicPetriNetController {
     }
 
     @ApiOperation(value = "Get data fields of transitions")
-    @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
         return new DataFieldReferencesResource(petriNetService.getDataFieldReferences(referenceBody, locale));
     }

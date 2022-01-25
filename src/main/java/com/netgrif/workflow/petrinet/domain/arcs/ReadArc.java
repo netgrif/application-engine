@@ -12,9 +12,10 @@ public class ReadArc extends PTArc {
 
     /**
      * Returns true if source place has fewer tokens then arc weight.
+     *
      * @return true if <br>
-     *     <center><b><i>m(p) &ge; w</i></b><br></center>
-     *     false otherwise.
+     * <center><b><i>m(p) &ge; w</i></b><br></center>
+     * false otherwise.
      */
     @Override
     public boolean isExecutable() {

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>gridExample</id>
+    <version>1.0.0</version>
+    <initials>GEX</initials>
+    <title>Grid Layout Example</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="text">
+        <id>text_0</id>
+        <title>Text 1</title>
+        <placeholder>placeholder</placeholder>
+        <desc>description</desc>
+        <init>value</init>
+        <view>
+            <area/>
+        </view>
+    </data>
+    <data type="text">
+        <id>text_1</id>
+        <title>Text 2</title>
+        <placeholder>placeholder</placeholder>
+        <desc>description</desc>
+        <init>value</init>
+        <view>
+            <area/>
+        </view>
+    </data>
+    <data type="text">
+        <id>text_2</id>
+        <title>Text 3</title>
+        <placeholder>placeholder</placeholder>
+        <desc>description</desc>
+        <init>value</init>
+        <view>
+            <area/>
+        </view>
+    </data>
+    <data type="text">
+        <id>text_3</id>
+        <title>Text 4</title>
+        <placeholder>placeholder</placeholder>
+        <desc>description</desc>
+        <init>value</init>
+        <view>
+            <area/>
+        </view>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>645</x>
+        <y>256</y>
+        <layout>
+            <cols>5</cols>
+        </layout>
+        <label></label>
+        <dataGroup>
+            <id>1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>1</y>
+                    <rows>2</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
