@@ -27,7 +27,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
-    private final Authority anonymousRole;
+    private final Authority anonymousAuthority;
 
     private final static String JWT_HEADER_NAME = "X-Jwt-Token";
     private final static String BEARER = "Bearer ";
@@ -38,11 +38,11 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final IUserService userService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                      Authority anonymousRole, String[] urls, String[] exceptions, IJwtService jwtService,
+                                      Authority anonymousAuthority, String[] urls, String[] exceptions, IJwtService jwtService,
                                       IUserService userService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
-        this.anonymousRole = anonymousRole;
+        this.anonymousAuthority = anonymousAuthority;
         this.anonymousAccessUrls = urls;
         this.exceptions = exceptions;
         this.jwtService = jwtService;
@@ -60,11 +60,11 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void authenticate(HttpServletRequest request, String jwtToken){
+    private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 UserProperties.ANONYMOUS_AUTH_KEY,
-                jwtService.getLoggedUser(jwtToken, this.anonymousRole),
-                Collections.singleton(this.anonymousRole)
+                jwtService.getLoggedUser(jwtToken, this.anonymousAuthority),
+                Collections.singleton(this.anonymousAuthority)
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);
@@ -99,19 +99,18 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         LoggedUser loggedUser = createAnonymousUser(request);
 
         if (claims.containsKey("user")) {
-            User user = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
+            IUser user = userService.findAnonymousByEmail((String) ((LinkedHashMap) claims.get("user")).get("email"), false);
             if (user != null)
                 loggedUser = user.transformToLoggedUser();
         }
 
         claims.put("user", loggedUser);
-        claims.put("authorities", this.anonymousRole);
     }
 
     private LoggedUser createAnonymousUser(HttpServletRequest request) {
         String hash = new ObjectId().toString();
 
-        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
+        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findAnonymousByEmail(hash + "@nae.com", false);
 
         if (anonymousUser == null) {
             anonymousUser = new AnonymousUser(hash + "@anonymous.nae",

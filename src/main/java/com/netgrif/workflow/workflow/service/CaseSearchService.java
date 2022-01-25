@@ -1,11 +1,11 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,6 +66,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (requestQuery.containsKey(FULLTEXT)) {
             builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
         }
+        if (requestQuery.containsKey(ROLE)) {
+            builder.and(role(requestQuery.get(ROLE)));
+        }
         if (requestQuery.containsKey(DATA)) {
             builder.and(data(requestQuery.get(DATA)));
         }
@@ -81,44 +83,48 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
-
-        BooleanBuilder constraints = new BooleanBuilder(role(user.getProcessRoles()));
-        constraints.or(buildViewUsersQueryConstraint(user));
-
-        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
-        negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
-
-        constraints.andNot(negativeConstraints);
-        builder.and(constraints);
-
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
+        permissionConstraints.or(buildViewUserQueryConstraint(user));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        builder.and(permissionConstraints);
         return builder;
     }
 
-    protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleNegativeQuery).collect(Collectors.toList());
+    protected Predicate buildViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::viewRoleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    public Predicate roleNegativeQuery(String role) {
+    public Predicate viewRoleQuery(String role) {
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewRoles.contains(role));
+    }
+
+    protected Predicate buildViewUserQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUserQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUserQuery(String userId) {
+        return QCase.case$.viewUserRefs.isEmpty().and(QCase.case$.viewRoles.isEmpty()).or(QCase.case$.viewUsers.contains(userId));
+    }
+
+    protected Predicate buildNegativeViewRoleQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::negativeViewRoleQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewRoleQuery(String role) {
         return QCase.case$.negativeViewRoles.contains(role);
     }
 
     protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = negativeViewUsersQuery(user.getId());
+        Predicate roleConstraints = negativeViewUserQuery(user.getId());
         return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
     }
 
-    public Predicate negativeViewUsersQuery(Long userId) {
+    public Predicate negativeViewUserQuery(String userId) {
         return QCase.case$.negativeViewUsers.contains(userId);
-    }
-
-    protected Predicate buildViewUsersQueryConstraint(LoggedUser user) {
-        Predicate roleConstraints = viewUsersQuery(user.getId());
-        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
-    }
-
-    public Predicate viewUsersQuery(Long userId) {
-        return QCase.case$.users.containsKey(userId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
@@ -138,8 +144,6 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
         return null;
-//        else if(query.containsKey(PETRINET_ID) && allowedNets.stream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
-//            return QCase.case$.petriNet._id.e
     }
 
     public Predicate author(Object query) {
@@ -154,8 +158,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return null;
     }
 
-    public Predicate role(Set<String> o) {
-            return QCase.case$.viewRoles.any().in(o);
+    public Predicate role(Object o) {
+        if (o instanceof ArrayList) {
+            return QCase.case$.enabledRoles.any().in((ArrayList<String>) o);
+        }
+        return null;
     }
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {
@@ -164,11 +171,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         else if (query.containsKey(AUTHOR_NAME))
             return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
         else if (query.containsKey(AUTHOR_ID)) {
-            Long searchValue = -1L;
-            if (query.get(AUTHOR_ID) instanceof Long)
-                searchValue = (Long) query.get(AUTHOR_ID);
-            else if (query.get(AUTHOR_ID) instanceof Integer)
-                searchValue = ((Integer) query.get(AUTHOR_ID)).longValue();
+            String searchValue = "";
+            if (query.get(AUTHOR_ID) instanceof String)
+                searchValue = (String) query.get(AUTHOR_ID);
             return QCase.case$.author.id.eq(searchValue);
         }
         return null;
@@ -206,14 +211,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
                     switch (type) {
                         case USER:
-                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k),"value");
-                            Path idPath = Expressions.stringPath(valuePath,"id");
-                            Expression<Long> constant = Expressions.constant(Long.valueOf(""+fieldValue));
+                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
+                            Path idPath = Expressions.stringPath(valuePath, "id");
+                            Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
                             predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
                             break;
                     }
                 } catch (IllegalArgumentException e) {
-                    log.error("Unrecognized Field type "+entry.getKey());
+                    log.error("Unrecognized Field type " + entry.getKey());
                 }
             } else {
                 predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
@@ -236,12 +241,12 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
 
         List<PetriNet> petriNets;
-        if(processes.isEmpty()) {
+        if (processes.isEmpty()) {
             petriNets = petriNetService.getAll();
         } else {
             petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
         }
-        if(petriNets.isEmpty())
+        if (petriNets.isEmpty())
             return null;
 
         List<BooleanExpression> predicates = new ArrayList<>();
@@ -277,9 +282,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
                         LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if(field.getType() == FieldType.ENUMERATION) {
-                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()),"value");
-                        Path defaultValuePath = Expressions.stringPath(valuePath,"defaultValue");
+                    } else if (field.getType() == FieldType.ENUMERATION) {
+                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
+                        Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");
                         Expression<String> constant = Expressions.constant(searchPhrase);
                         predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
                     }

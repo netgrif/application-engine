@@ -44,15 +44,21 @@
         <label>task</label>
         <dataRef>
             <id>btn1</id>
-            <logic><behavior>editable</behavior></logic>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
         </dataRef>
         <dataRef>
             <id>btn2</id>
-            <logic><behavior>visible</behavior></logic>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
         </dataRef>
         <dataRef>
             <id>num</id>
-            <logic><behavior>visible</behavior></logic>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
         </dataRef>
     </transition>
     <!-- PLACES -->

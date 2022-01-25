@@ -1,14 +1,15 @@
 package com.netgrif.workflow.event.events.user;
 
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.RegisteredUser;
 import com.netgrif.workflow.utils.DateUtils;
 
 public class UserRegistrationEvent extends UserEvent {
 
-    public UserRegistrationEvent(User user) {
+    public UserRegistrationEvent(RegisteredUser user) {
         super(new LoggedUser(
-                user.getId(),
+                user.getStringId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getAuthorities()
@@ -17,6 +18,15 @@ public class UserRegistrationEvent extends UserEvent {
 
     public UserRegistrationEvent(LoggedUser user) {
         super(user);
+    }
+
+    public UserRegistrationEvent(IUser user) {
+        super(new LoggedUser(
+                user.getStringId(),
+                user.getEmail(),
+                "",
+                user.getAuthorities()
+        ));
     }
 
     @Override

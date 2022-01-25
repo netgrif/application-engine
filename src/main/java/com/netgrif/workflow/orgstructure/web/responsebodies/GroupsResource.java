@@ -1,11 +1,11 @@
 package com.netgrif.workflow.orgstructure.web.responsebodies;
 
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.web.GroupController;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-public class GroupsResource extends Resources<Group> {
+
+public class GroupsResource extends CollectionModel<Group> {
 
     public GroupsResource(Iterable<Group> content) {
         super(content);
@@ -13,7 +13,7 @@ public class GroupsResource extends Resources<Group> {
     }
 
     private void buildLinks(){
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(GroupController.class)
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GroupController.class)
                 .getAllGroups()).withSelfRel());
     }
 }

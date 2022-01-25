@@ -4,11 +4,15 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
+import com.netgrif.workflow.workflow.web.responsebodies.CaseResource;
+import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,11 +37,11 @@ public class PublicWorkflowController {
 
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Create new case")
-    public EventOutcomeWithMessageResource createCase(@RequestBody CreateCaseBody body, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
             CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case created succesfully",
+            return EventOutcomeWithMessageResource.successMessage("Case created successfully",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) {
             log.error("Creating case failed:" + e.getMessage(), e);

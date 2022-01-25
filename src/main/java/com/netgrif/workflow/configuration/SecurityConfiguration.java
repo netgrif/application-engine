@@ -1,6 +1,7 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.UserProperties;
 import com.netgrif.workflow.auth.service.AfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
@@ -30,6 +31,7 @@ import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -43,7 +45,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnExpression("!${server.security.static.enabled} && !${nae.ldap.enabled}")
+@ConditionalOnExpression("!${nae.oauth.enabled} && !${server.security.static.enabled} && !${nae.ldap.enabled}")
 public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -73,11 +75,14 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Value("${nae.security.anonymous-exceptions}")
     private String[] anonymousExceptions;
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
-
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
         return HeaderHttpSessionIdResolver.xAuthToken();
+    }
+
+    @Bean
+    public RequestContextListener requestContextListener(){
+        return new RequestContextListener();
     }
 
     @Bean
@@ -87,7 +92,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOrigin("*");
+        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -121,7 +126,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
@@ -137,29 +142,29 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     @Override
-    boolean isOpenRegistration() {
+    protected boolean isOpenRegistration() {
         return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override
-    boolean isCsrfEnabled() {
+    protected boolean isCsrfEnabled() {
         return properties.isCsrf();
     }
 
     @Override
-    String[] getStaticPatterns() {
+    protected String[] getStaticPatterns() {
         return new String[]{
                 "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
-    String[] getServerPatterns() {
+    protected String[] getServerPatterns() {
         return this.serverPatterns;
     }
 
     @Override
-    Environment getEnvironment() {
+    protected Environment getEnvironment() {
         return env;
     }
 
@@ -167,13 +172,13 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
-                    authenticationManager(),
-                    new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                    authority,
-                    this.serverPatterns,
-                    this.anonymousExceptions,
-                    this.jwtService,
-                    this.userService
-                );
+                authenticationManager(),
+                new AnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
+                authority,
+                this.serverPatterns,
+                this.anonymousExceptions,
+                this.jwtService,
+                this.userService
+        );
     }
 }

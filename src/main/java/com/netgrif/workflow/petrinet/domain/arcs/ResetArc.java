@@ -14,6 +14,7 @@ public class ResetArc extends PTArc {
 
     /**
      * Always returns true, because Reset arc does not alter the enabling condition.
+     *
      * @return true
      */
     @Override

@@ -1,73 +1,76 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.AnonymousUser;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
-import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 
 public interface IUserService {
 
-    User findByAuth(Authentication auth);
+    IUser findByAuth(Authentication auth);
 
-    User save(User user);
+    IUser save(IUser user);
 
-    User saveNewAndAuthenticate(User user);
+    IUser saveNewAndAuthenticate(IUser user);
 
-    User saveNew(User user);
+    IUser saveNew(IUser user);
 
     AnonymousUser saveNewAnonymous(AnonymousUser user);
 
-    User update(User user, UpdateUserRequest updates);
+    IUser update(IUser user, UpdateUserRequest updates);
 
-    Member upsertGroupMember(User user);
+    IUser findById(String id, boolean small);
 
-    User findById(Long id, boolean small);
+    IUser resolveById(String id, boolean small);
 
-    User findByEmail(String email, boolean small);
+    IUser findByEmail(String email, boolean small);
 
-    List<User> findAll(boolean small);
+    IUser findAnonymousByEmail(String email, boolean small);
 
-    Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);
+    List<IUser> findAll(boolean small);
 
-    Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
+    Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);
 
-    List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
+    List<IUser> findAllByIds(Set<String> ids, boolean small);
 
-    List<User> findAllByIds(Set<Long> ids, boolean small);
+    Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
-    void assignAuthority(Long userId, Long authorityId);
+    void addDefaultRole(IUser user);
 
-    void addDefaultRole(User user);
+    List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
-    void addDefaultAuthorities(User user);
+    void addDefaultAuthorities(IUser user);
 
-    void encodeUserPassword(User user);
+    void assignAuthority(String userId, String authorityId);
 
-    boolean stringMatchesUserPassword(User user, String passwordToCompare);
+    IUser getLoggedOrSystem();
 
-    User getLoggedOrSystem();
+    IUser getLoggedUser();
 
-    User getLoggedUser();
-
-    User getSystem();
+    IUser getSystem();
 
     LoggedUser getAnonymousLogged();
 
-    User addRole(User user, String roleStringId);
+    IUser addRole(IUser user, String roleStringId);
 
-    Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
-    User removeRole(User user, String roleStringId);
+    IUser removeRole(IUser user, String roleStringId);
 
-    void deleteUser(User user);
+    void removeRoleOfDeletedPetriNet(PetriNet net);
 
-    Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    void deleteUser(IUser user);
+
+    Page<IUser> searchAllCoMembers(String query, List<ObjectId> roles, List<ObjectId> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+
+    IUser createSystemUser();
+
 }

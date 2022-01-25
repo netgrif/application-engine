@@ -1,33 +1,30 @@
 package com.netgrif.workflow.workflow.domain.eventoutcomes.response;
 
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.workflow.web.responsebodies.ResponseMessage;
 import com.netgrif.workflow.workflow.web.responsebodies.eventoutcomes.base.LocalisedEventOutcome;
 import lombok.Data;
-
-import java.util.Map;
 
 @Data
 public class EventOutcomeWithMessage extends ResponseMessage {
 
     private LocalisedEventOutcome outcome;
-    private Map<String, ChangedField> changedFields;
 
-    public EventOutcomeWithMessage(String errorMessage){
-        super();
-        setError(errorMessage);
+    public EventOutcomeWithMessage(LocalisedEventOutcome outcome) {
+        this.outcome = outcome;
+    }
+    public EventOutcomeWithMessage(String errorMsg) {
+        setError(errorMsg);
     }
 
-    public EventOutcomeWithMessage(String successMessage, LocalisedEventOutcome outcome){
-        super();
-        setOutcome(outcome);
-        setSuccess(successMessage);
+    public static EventOutcomeWithMessage withSuccessMessage(String successMessage, LocalisedEventOutcome outcome){
+        EventOutcomeWithMessage outcomeWithMessage = new EventOutcomeWithMessage(outcome);
+        outcomeWithMessage.setSuccess(successMessage);
+        return outcomeWithMessage;
     }
 
-    public EventOutcomeWithMessage(String errorMessage, Map<String, ChangedField> changedFields ){
-        super();
-        setError(errorMessage);
-        this.changedFields.putAll(changedFields);
+    public static EventOutcomeWithMessage withErrorMessage(String errorMessage, LocalisedEventOutcome outcome){
+        EventOutcomeWithMessage outcomeWithMessage = new EventOutcomeWithMessage(outcome);
+        outcomeWithMessage.setError(errorMessage);
+        return outcomeWithMessage;
     }
-
 }

@@ -32,7 +32,7 @@ class ChangedField {
     }
 
     boolean isChangedOn(String taskId) {
-        return changedOn.any {it.taskId == taskId }
+        return changedOn.any { it.taskId == taskId }
     }
 
     void addAttribute(String name, Object value) {
@@ -45,11 +45,11 @@ class ChangedField {
     void addBehavior(Map<String, Set<FieldBehavior>> behavior) {
         Map<String, Map<String, Boolean>> behs = new HashMap<>()
         behavior.each { trans, fieldBehaviors ->
-            Map<String,Boolean> b = new HashMap<>()
-            fieldBehaviors.each {b.put(it.toString(),true)}
-            behs.put(trans,b)
+            Map<String, Boolean> b = new HashMap<>()
+            fieldBehaviors.each { b.put(it.toString(), true) }
+            behs.put(trans, b)
         }
-        attributes.put("behavior",behs)
+        attributes.put("behavior", behs)
     }
 
     void merge(ChangedField changedField) {
@@ -104,6 +104,9 @@ class ChangedField {
     class TaskPair {
         String taskId
         String transition
+
+        TaskPair() {
+        }
 
         TaskPair(String taskId, String transition) {
             this.taskId = taskId

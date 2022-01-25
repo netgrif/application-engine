@@ -8,11 +8,10 @@ class RunnerController {
     private List order = [
             ElasticsearchRunner,
             MongoDbRunner,
-            Neo4jRunner,
             StorageRunner,
             RuleEngineRunner,
             DefaultRoleRunner,
-            DefaultGroupRunner,
+            AnonymousRoleRunner,
             AuthorityRunner,
             SystemUserRunner,
             FunctionsCacheRunner,
@@ -23,11 +22,11 @@ class RunnerController {
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
-            DummyUserRunner,
             DemoRunner,
             QuartzSchedulerRunner,
             PdfRunner,
-            FinisherRunner
+            FinisherRunnerSuperCreator,
+            FinisherRunner,
     ]
 
     protected List getOrderList() {

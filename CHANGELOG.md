@@ -1,3 +1,95 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10920/tab/release-report-all-issues"></a>
+## 5.8.0 (26.11.2021)
+### Bug Fixes
+None
+
+### Improvements
+* [NAE-1469](https://netgrif.atlassian.net/browse/NAE-1469) - Data group layouts refactor
+
+### Features
+* [NAE-1296](https://netgrif.atlassian.net/browse/NAE-1296) - Event Outcome refactor
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10943/tab/release-report-all-issues"></a>
+## 5.7.5 (11.01.2022)
+### Bug Fixes
+* [NAE-1542](https://netgrif.atlassian.net/browse/NAE-1533) - PDF generátor generovanie hodnoty dátumov
+* [NAE-1543](https://netgrif.atlassian.net/browse/NAE-1533) - Prisposobenie generovania PDF pre nove layouty ktore si vieme definovat na konkretnu datagrupu
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10943/tab/release-report-all-issues"></a>
+## 5.7.4 (21.12.2021)
+### Bug Fixes
+* [NAE-1533](https://netgrif.atlassian.net/browse/NAE-1533) - Mongo case search exceeds maximum query nesting level
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10940/tab/release-report-all-issues"></a>
+## 5.7.3 (23.11.2021)
+### Bug Fixes
+None
+
+### Improvements
+None
+
+### Features
+* [NAE-1493](https://netgrif.atlassian.net/browse/NAE-1493) - i18n divider data field
+
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10933/tab/release-report-all-issues"></a>
+## 5.7.2 (23.11.2021)
+### Bug Fixes
+* [NAE-1518](https://netgrif.atlassian.net/browse/NAE-1518) - Export of chained filters
+
+### Improvements
+* [NAE-1439](https://netgrif.atlassian.net/browse/NAE-1439) - Deprecate values
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10913/tab/release-report-all-issues"></a>
+## 5.7.1 (08.11.2021)
+### Bug Fixes
+* [NAE-1487](https://netgrif.atlassian.net/browse/NAE-1487) - Assign button on assigned task
+* [NAE-1485](https://netgrif.atlassian.net/browse/NAE-1485) - Case datafield behavior is not initially set
+* [NAE-1492](https://netgrif.atlassian.net/browse/NAE-1492) - View permission on case is broken when delete permission is present
+* [NAE-1483](https://netgrif.atlassian.net/browse/NAE-1483) - TaskRef init value setting deletes new value of task field
+* [NAE-1520](https://netgrif.atlassian.net/browse/NAE-1520) - Security Configuration Ldap fix
+
+### Improvements
+* [NAE-1515](https://netgrif.atlassian.net/browse/NAE-1515) - Filter process UX improvements
+* [NAE-1516](https://netgrif.atlassian.net/browse/NAE-1516) - Group process UX improvements
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10901/tab/release-report-all-issues"></a>
+## 5.7.0 (29.10.2021)
+### Bug fixes
+* [NAE-1375](https://netgrif.atlassian.net/browse/NAE-1375) - Form field layouting does not respect rows
+* [NAE-1422](https://netgrif.atlassian.net/browse/NAE-1422) - Case view permission query with no users
+* [NAE-1509](https://netgrif.atlassian.net/browse/NAE-1509) - Broken jackson dependencies
+* [NAE-1281](https://netgrif.atlassian.net/browse/NAE-1281) - Immediate file field
+* [NAE-1332](https://netgrif.atlassian.net/browse/NAE-1332) - Cancel Task po kliknutí na rozkliknutý task nekontroluje či user môže daný Task cancelnúť
+* [NAE-1460](https://netgrif.atlassian.net/browse/NAE-1460) - Datafield Spinner Attribute Refactor
+
+### Improvements
+* [NAE-1390](https://netgrif.atlassian.net/browse/NAE-1390) - Update "Process file could not be uploaded" message
+* [NAE-1438](https://netgrif.atlassian.net/browse/NAE-1438) - Unique key constraint on options
+
+### Features
+* [NAE-1402](https://netgrif.atlassian.net/browse/NAE-1451) - Configurable group navigation with role constraints
+* [NAE-1406](https://netgrif.atlassian.net/browse/NAE-1406) - Filter import/export
+* [NAE-1417](https://netgrif.atlassian.net/browse/NAE-1417) - Menu import/export
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10910/tab/release-report-done"></a>
 ## 5.6.3 (27.09.2021)
 ### Bug fixes
@@ -53,6 +145,29 @@ None
 
 ### Features
 * [NAE-1407](https://netgrif.atlassian.net/browse/NAE-1407) - Static functions
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10947/tab/release-report-all-issues"></a>
+## 5.5.5 (06.01.2022)
+### Bug fixes
+* [NAE-1530](https://netgrif.atlassian.net/browse/NAE-1530) - Cez simple search nie je možné vyhľadávať podľa visual ID
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10946/tab/release-report-all-issues"></a>
+## 5.5.4 (20.12.2021)
+### Bug fixes
+* [NAE-1522](https://netgrif.atlassian.net/browse/NAE-1522) - Neda sa stahovat subory, ktore maju v nazve ciarku
+* [NAE-1536](https://netgrif.atlassian.net/browse/NAE-1536) - Cez simple search nie je možné vyhľadávať hodnoty obsahujúce pomlčku
+
+### Improvements
+None
+
+### Features
+None
 
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
 ## 5.5.2 (19.07.2021)

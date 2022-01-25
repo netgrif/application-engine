@@ -11,6 +11,6 @@ public class SecurityConfigProperties {
 
     /**
      * Defines whether Cross Site Request Forgery is enabled
-     * */
+     */
     private boolean csrf = true;
 }

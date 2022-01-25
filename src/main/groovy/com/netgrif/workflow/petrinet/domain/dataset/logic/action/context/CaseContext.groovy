@@ -7,5 +7,4 @@ class CaseContext {
     Case useCase
 
 
-
 }

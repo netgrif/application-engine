@@ -18,5 +18,5 @@ public interface IAuthorityService {
 
     List<Authority> getAllRoles();
 
-    Authority getOne(Long id);
+    Authority getOne(String id);
 }

@@ -7,7 +7,7 @@ class BooleanField extends Field<Boolean> {
 
     BooleanField() {
         super()
-        super.defaultValue = false
+        defaultValue = false
     }
 
     @Override

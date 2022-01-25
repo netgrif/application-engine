@@ -1,189 +1,190 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
-	<id>new_init_test</id>
-	<initials>NIT</initials>
-	<title>New init test</title>
-	<defaultRole>true</defaultRole>
-	<transitionRole>false</transitionRole>
-	<!-- TRANSACTIONS -->
-	<!-- ROLES -->
-	<!-- PROCESS ROLE REFS -->
-	<!-- PROCESS USER REFS -->
-	<!-- DATA -->
-	<data type="multichoice">
-		<id>old_init_multichoice</id>
-		<title>Old init multichoice</title>
-		<values>Alice</values>
-		<values>Bob</values>
-		<values>Carol</values>
-		<init>Alice,Bob</init>
-	</data>
-	<data type="multichoice">
-		<id>new_init_multichoice</id>
-		<title>New init multichoice</title>
-		<values>Alice</values>
-		<values>Bob</values>
-		<values>Carol</values>
-		<inits>
-			<init>Alice</init>
-			<init>Bob</init>
-		</inits>
-	</data>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>new_init_test</id>
+    <initials>NIT</initials>
+    <title>New init test</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="multichoice">
+        <id>old_init_multichoice</id>
+        <title>Old init multichoice</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Alice,Bob</init>
+    </data>
+    <data type="multichoice">
+        <id>new_init_multichoice</id>
+        <title>New init multichoice</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <inits>
+            <init>Alice</init>
+            <init>Bob</init>
+        </inits>
+    </data>
 
-	<data type="multichoice_map">
-		<id>old_init_multichoice_map</id>
-		<title>Old init multichoice Map</title>
-		<options>
-			<option key="al">Alice</option>
-			<option key="bo">Bob</option>
-			<option key="ca">Carol</option>
-		</options>
-		<init>al,ca</init>
-	</data>
-	<data type="multichoice_map">
-		<id>new_init_multichoice_map</id>
-		<title>New init multichoice Map</title>
-		<options>
-			<option key="al">Alice</option>
-			<option key="bo">Bob</option>
-			<option key="ca">Carol</option>
-		</options>
-		<inits>
-			<init>al</init>
-			<init>ca</init>
-		</inits>
-	</data>
-	<data type="taskRef">
-		<id>old_init_taskref</id>
-		<title>Old init taskref</title>
-		<init>t2</init>
-	</data>
-	<data type="taskRef">
-		<id>new_init_taskref</id>
-		<title>Old init taskref</title>
-		<inits>
-			<init>t3</init>
-		</inits>
-	</data>
-	<data type="text">
-		<id>old_init_task_ref_text</id>
-		<title>Old init taskref test value</title>
-		<init>Old init works correctly</init>
-	</data>
-	<data type="text">
-		<id>new_init_task_ref_text</id>
-		<title>New init taskref test value</title>
-		<init>New init works correctly</init>
-	</data>
-	<data type="fileList">
-		<id>old_init_fileList</id>
-		<title>Old init remote File List</title>
-		<placeholder>Old initRemote file list</placeholder>
-		<init>test-file.txt:https://netgrif.com,test-file-list.txt:https://netgrif.com</init>
-		<remote/>
-	</data>
-	<data type="fileList">
-		<id>new_init_fileList</id>
-		<title>New init remote File List</title>
-		<placeholder>New initRemote file list</placeholder>
-		<inits>
-			<init>test-file-list.txt:https://netgrif.com</init>
-			<init>test-file.txt:https://netgrif.com</init>
-		</inits>
-		<remote/>
-	</data>
-	<!-- I18NS -->
-	<!-- TRANSITIONS -->
-	<transition>
-		<id>t1</id>
-		<x>174</x>
-		<y>114</y>
-		<label>New init test transition</label>
-		<dataGroup>
-			<id>taskref_group</id>
-			<title>Task ref group</title>
-			<dataRef>
-				<id>old_init_taskref</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>new_init_taskref</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>fileLists</id>
-			<title>Filelists group</title>
-			<dataRef>
-				<id>new_init_fileList</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>old_init_fileList</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>multichoice_test_group</id>
-			<title>Multichoice group</title>
-			<dataRef>
-				<id>old_init_multichoice</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>new_init_multichoice</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>old_init_multichoice_map</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>new_init_multichoice_map</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
-		<id>t2</id>
-		<x>174</x>
-		<y>114</y>
-		<label>Old init task ref test transition</label>
-		<dataRef>
-			<id>old_init_task_ref_text</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-		</dataRef>
-	</transition>
-	<transition>
-		<id>t3</id>
-		<x>174</x>
-		<y>114</y>
-		<label>New init task ref test transition</label>
-		<dataRef>
-			<id>new_init_task_ref_text</id>
-			<logic>
-				<behavior>visible</behavior>
-			</logic>
-		</dataRef>
-	</transition>
-	<!-- PLACES -->
-	<!-- ARCS -->
+    <data type="multichoice_map">
+        <id>old_init_multichoice_map</id>
+        <title>Old init multichoice Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <init>al,ca</init>
+    </data>
+    <data type="multichoice_map">
+        <id>new_init_multichoice_map</id>
+        <title>New init multichoice Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <inits>
+            <init>al</init>
+            <init>ca</init>
+        </inits>
+    </data>
+    <data type="taskRef">
+        <id>old_init_taskref</id>
+        <title>Old init taskref</title>
+        <init>t2</init>
+    </data>
+    <data type="taskRef">
+        <id>new_init_taskref</id>
+        <title>Old init taskref</title>
+        <inits>
+            <init>t3</init>
+        </inits>
+    </data>
+    <data type="text">
+        <id>old_init_task_ref_text</id>
+        <title>Old init taskref test value</title>
+        <init>Old init works correctly</init>
+    </data>
+    <data type="text">
+        <id>new_init_task_ref_text</id>
+        <title>New init taskref test value</title>
+        <init>New init works correctly</init>
+    </data>
+    <data type="fileList">
+        <id>old_init_fileList</id>
+        <title>Old init remote File List</title>
+        <placeholder>Old initRemote file list</placeholder>
+        <init>test-file.txt:https://netgrif.com,test-file-list.txt:https://netgrif.com</init>
+        <remote/>
+    </data>
+    <data type="fileList">
+        <id>new_init_fileList</id>
+        <title>New init remote File List</title>
+        <placeholder>New initRemote file list</placeholder>
+        <inits>
+            <init>test-file-list.txt:https://netgrif.com</init>
+            <init>test-file.txt:https://netgrif.com</init>
+        </inits>
+        <remote/>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t1</id>
+        <x>174</x>
+        <y>114</y>
+        <label>New init test transition</label>
+        <dataGroup>
+            <id>taskref_group</id>
+            <title>Task ref group</title>
+            <dataRef>
+                <id>old_init_taskref</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>new_init_taskref</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>fileLists</id>
+            <title>Filelists group</title>
+            <dataRef>
+                <id>new_init_fileList</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>old_init_fileList</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>multichoice_test_group</id>
+            <title>Multichoice group</title>
+            <dataRef>
+                <id>old_init_multichoice</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>new_init_multichoice</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>old_init_multichoice_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>new_init_multichoice_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>174</x>
+        <y>114</y>
+        <label>Old init task ref test transition</label>
+        <dataRef>
+            <id>old_init_task_ref_text</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>t3</id>
+        <x>174</x>
+        <y>114</y>
+        <label>New init task ref test transition</label>
+        <dataRef>
+            <id>new_init_task_ref_text</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
 </document>

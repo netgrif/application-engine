@@ -36,7 +36,7 @@ public class MailDraft {
     @Builder.Default
     Map<String, File> attachments = new HashMap<>();
 
-    public static MailDraftBuilder builder(String from, List<String> to){
+    public static MailDraftBuilder builder(String from, List<String> to) {
         return mailDraftBuilder().from(from).to(to).subject("").body("").isHtml(false).attachments(new HashMap<>());
     }
 

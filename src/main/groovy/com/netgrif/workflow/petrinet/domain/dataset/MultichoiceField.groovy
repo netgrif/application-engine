@@ -38,13 +38,13 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         }
     }
 
-    void setDefaultValues(List<String> inits){
-        if(inits == null || inits.isEmpty()){
+    void setDefaultValues(List<String> inits) {
+        if (inits == null || inits.isEmpty()) {
             this.defaultValue = null
         } else {
             Set<I18nString> defaults = new HashSet<>()
             inits.forEach { initValue ->
-                defaults << choices.find{ choice ->
+                defaults << choices.find { choice ->
                     choice.defaultValue == initValue.trim()
                 }
             }

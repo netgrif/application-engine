@@ -8,10 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Place extends Node implements Referencable {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer tokens;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean isStatic;
 
     public Place() {

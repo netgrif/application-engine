@@ -1,22 +1,22 @@
 package com.netgrif.workflow.pdf.service;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.FileInputStream;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class PdfUtilsTest {
 
     @Test
-    @Ignore // TODO: 4/6/18 font fix
+    @Disabled("TODO: 4/6/18 font fix")
     public void fillPdfForm() throws Exception {
         File input = new File("src/test/resources/pdf/test.pdf");
         File xml = new File("src/test/resources/pdf/test.xml");
@@ -27,7 +27,7 @@ public class PdfUtilsTest {
     }
 
     @Test
-    @Ignore // TODO: 4/6/18 font fix
+    @Disabled("// TODO: 4/6/18 font fix")
     public void fillPdfFormPoisteniePremioveByvanie() throws Exception {
         File input = new File("src/test/resources/pdf/draft.pdf");
         File xml = new File("src/test/resources/pdf/draft.xml");

@@ -19,14 +19,18 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,20 +40,30 @@ import java.util.stream.Collectors;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
-public class ElasticCaseService implements IElasticCaseService {
+public class ElasticCaseService extends ElasticViewPermissionService implements IElasticCaseService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     private ElasticCaseRepository repository;
+
     private IWorkflowService workflowService;
-    private ElasticsearchTemplate template;
+
+    @Value("${spring.data.elasticsearch.index.case}")
+    private String caseIndex;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchTemplate;
+
+    @Autowired
+    private ElasticsearchRestTemplate template;
+
     private Executor executors;
 
     @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchTemplate template, Executor executors) {
+    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
         this.repository = repository;
         this.template = template;
         this.executors = executors;
@@ -62,9 +76,10 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f
+            "title.keyword", 2f,
+            "authorName.keyword", 1f,
+            "authorEmail.keyword", 1f,
+            "visualId.keyword", 2f
     );
 
     /**
@@ -125,11 +140,12 @@ public class ElasticCaseService implements IElasticCaseService {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
-            Page<ElasticCase> indexedCases = repository.search(query);
+            SearchHits<ElasticCase> hits = elasticsearchTemplate.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
+            Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
@@ -146,7 +162,7 @@ public class ElasticCaseService implements IElasticCaseService {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
         } else {
@@ -154,7 +170,7 @@ public class ElasticCaseService implements IElasticCaseService {
         }
     }
 
-    private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
@@ -181,10 +197,11 @@ public class ElasticCaseService implements IElasticCaseService {
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
-        buildPermissionQuery(query, user);
+        buildViewPermissionQuery(query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
+        buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query, user);
@@ -197,61 +214,6 @@ public class ElasticCaseService implements IElasticCaseService {
             return null;
         else
             return query;
-    }
-
-    protected void buildPermissionQuery(BoolQueryBuilder query, LoggedUser user){
-        BoolQueryBuilder userRoleQuery = boolQuery();
-        buildUsersAndRolesQuery(userRoleQuery, user);
-        negativeUsersAndRolesQuery(userRoleQuery, user);
-        query.filter(userRoleQuery);
-    }
-
-    private void negativeUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeQuery = boolQuery();
-        buildNegativeViewRoleQuery(negativeQuery, user);
-        buildNegativeViewUsersQuery(negativeQuery, user);
-        query.should(negativeQuery);
-    }
-
-    private void buildUsersAndRolesQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder roleQuery = boolQuery();
-        BoolQueryBuilder viewRoleQuery = boolQuery();
-        BoolQueryBuilder usersRoleQuery = boolQuery();
-        BoolQueryBuilder usersExist = boolQuery();
-        BoolQueryBuilder notExists = boolQuery();
-
-        notExists.mustNot(existsQuery("viewUserRefs"));
-        notExists.must(existsQuery("viewRoles"));
-
-        usersExist.must(existsQuery("viewUserRefs"));
-        usersExist.must(termQuery("users", user.getId()));
-
-        usersRoleQuery.should(usersExist);
-        usersRoleQuery.should(notExists);
-
-        for (String roleId : user.getProcessRoles()) {
-            viewRoleQuery.should(termQuery("viewRoles", roleId));
-        }
-        roleQuery.must(existsQuery("viewRoles"));
-        roleQuery.must(viewRoleQuery);
-        usersRoleQuery.should(roleQuery);
-
-        query.must(usersRoleQuery);
-    }
-
-    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeRoleQuery = boolQuery();
-        for (String roleId : user.getProcessRoles()) {
-            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
-        }
-
-        query.mustNot(negativeRoleQuery);
-    }
-
-    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
-        BoolQueryBuilder negativeUsersQuery = boolQuery();
-        negativeUsersQuery.should(termQuery("negativeViewUsers", user.getId()));
-        query.mustNot(negativeUsersQuery);
     }
 
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
@@ -347,6 +309,37 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     /**
+     * Cases with active role "5cb07b6ff05be15f0b972c36"
+     * <pre>
+     * {
+     *     "role": "5cb07b6ff05be15f0b972c36"
+     * }
+     * </pre>
+     * <p>
+     * Cases with active role "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
+     * <pre>
+     * {
+     *     "role" [
+     *         "5cb07b6ff05be15f0b972c36",
+     *         "5cb07b6ff05be15f0b972c31"
+     *     ]
+     * }
+     * </pre>
+     */
+    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.role == null || request.role.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder roleQuery = boolQuery();
+        for (String roleId : request.role) {
+            roleQuery.should(termQuery("enabledRoles", roleId));
+        }
+
+        query.filter(roleQuery);
+    }
+
+    /**
      * Cases where "text_field" has value EXACTLY "text" AND "number_field" has value EXACTLY "125".<br>
      * <pre>
      * {
@@ -364,7 +357,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            if(field.getKey().contains("."))
+            if (field.getKey().contains("."))
                 dataQuery.must(termQuery("dataSet." + field.getKey(), field.getValue()));
             else
                 dataQuery.must(termQuery("dataSet." + field.getKey() + ".fulltextValue.keyword", field.getValue()));
@@ -418,7 +411,7 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
     private void buildCaseIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
-        if(request.stringId == null || request.stringId.isEmpty()) {
+        if (request.stringId == null || request.stringId.isEmpty()) {
             return;
         }
 

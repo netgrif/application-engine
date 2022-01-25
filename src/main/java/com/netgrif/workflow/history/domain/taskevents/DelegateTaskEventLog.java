@@ -8,12 +8,12 @@ import lombok.Getter;
 public class DelegateTaskEventLog extends TaskEventLog{
 
     @Getter
-    private Long delegator;
+    private String delegator;
 
     @Getter
-    private Long delegatee;
+    private String delegatee;
 
-    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, Long delegator, Long delegatee) {
+    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String delegator, String delegatee) {
         super(task, useCase, eventPhase);
         this.delegator = delegator;
         this.delegatee = delegatee;

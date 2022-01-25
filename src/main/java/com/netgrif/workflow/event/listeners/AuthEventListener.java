@@ -2,7 +2,6 @@ package com.netgrif.workflow.event.listeners;
 
 import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;

@@ -1,15 +1,15 @@
 package com.netgrif.workflow.elastic.service;
 
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.domain.BooleanField;
 import com.netgrif.workflow.elastic.domain.DateField;
 import com.netgrif.workflow.elastic.domain.FileField;
 import com.netgrif.workflow.elastic.domain.NumberField;
 import com.netgrif.workflow.elastic.domain.TextField;
 import com.netgrif.workflow.elastic.domain.UserField;
+import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
@@ -174,28 +174,36 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformUserField(com.netgrif.workflow.workflow.domain.DataField userField) {
-        User user = (User) userField.getValue();
+        UserFieldValue user = (UserFieldValue) userField.getValue();
         if (user == null)
             return Optional.empty();
         return Optional.of(new UserField(this.transformUserValue(user)));
     }
 
     protected Optional<DataField> transformUserListField(com.netgrif.workflow.workflow.domain.DataField userListField) {
-        List<Long> userIds = (List<Long>) userListField.getValue();
-        List<User> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
+        List<String> userIds = (List<String>) userListField.getValue();
+        List<IUser> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
         return Optional.of(new UserField(users.stream().map(this::transformUserValue).toArray(UserField.UserMappingData[]::new)));
     }
 
-    private UserField.UserMappingData transformUserValue(User user) {
+    private UserField.UserMappingData transformUserValue(UserFieldValue user) {
+        return new UserField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
+    }
+
+    private UserField.UserMappingData transformUserValue(IUser user) {
+        return new UserField.UserMappingData(user.getStringId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
+    }
+
+    private StringBuilder buildFullName(String name, String surname) {
         StringBuilder fullName = new StringBuilder();
-        if (user.getName() != null) {
-            fullName.append(user.getName());
+        if (name != null) {
+            fullName.append(name);
             fullName.append(" ");
         }
-        if (user.getSurname() != null) {
-            fullName.append(user.getSurname());
+        if (surname != null) {
+            fullName.append(surname);
         }
-        return new UserField.UserMappingData(user.getId(), user.getEmail(), fullName.toString());
+        return fullName;
     }
 
     protected Optional<DataField> transformDateField(com.netgrif.workflow.workflow.domain.DataField dateField, com.netgrif.workflow.petrinet.domain.dataset.DateField netField) {
