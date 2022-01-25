@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class TransitionReferencesResource extends CollectionModel<TransitionReference> {
 
     public TransitionReferencesResource(Iterable<TransitionReference> content) {
-        super(content, new ArrayList<Link>());
+        super(content);
         buildLinks();
     }
 

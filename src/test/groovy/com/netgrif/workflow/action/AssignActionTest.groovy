@@ -141,7 +141,7 @@ class AssignActionTest {
         String adminMainId = processRoleRepository.findByName_DefaultValue("admin_main").stringId
         String adminSecondaryId = processRoleRepository.findByName_DefaultValue("admin_secondary").stringId
 
-        assert roles.find {it.stringId == adminMainId}
-        assert roles.find {it.stringId == adminSecondaryId}
+        assert roles.find { it.stringId == adminMainId }
+        assert roles.find { it.stringId == adminSecondaryId }
     }
 }

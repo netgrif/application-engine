@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class DataFieldReferencesResource extends CollectionModel<DataFieldReference> {
     public DataFieldReferencesResource(Iterable<DataFieldReference> content) {
-        super(content, new ArrayList<>());
+        super(content);
         buildLinks();
     }
 
