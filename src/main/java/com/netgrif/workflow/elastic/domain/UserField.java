@@ -22,7 +22,7 @@ public class UserField extends DataField {
     @Field(type = Text)
     private String[] fullNameValue;
 
-    @Field(type = Long)
+    @Field(type = Text)
     private String[] userIdValue;
 
     public UserField(UserMappingData value) {

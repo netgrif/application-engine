@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class AuthoritiesResources extends CollectionModel<Authority> {
     public AuthoritiesResources(Iterable<Authority> content) {
-        super(content, new ArrayList<>());
+        super(content);
         buildLinks();
     }
 
