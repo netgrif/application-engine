@@ -11,7 +11,7 @@ import java.util.Locale;
 public class PetriNetReferenceWithMessageResource extends CollectionModel<PetriNetReferenceWithMessage> {
 
     public PetriNetReferenceWithMessageResource(PetriNetReferenceWithMessage content) {
-        super(Collections.singleton(content), new ArrayList<Link>());
+        super(Collections.singleton(content));
     }
 
     public static PetriNetReferenceWithMessageResource successMessage(String msg, PetriNet net, Locale locale) {
