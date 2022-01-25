@@ -75,8 +75,8 @@ public class FieldActionsCacheService implements IFieldActionsCacheService {
     }
 
     @Override
-    public Closure getCompiledAction(Action action) {
-        if (!actionsCache.containsKey(action.getImportId())) {
+    public Closure getCompiledAction(Action action, boolean shouldRewriteCachedActions) {
+        if (shouldRewriteCachedActions || !actionsCache.containsKey(action.getImportId())) {
             Closure code = (Closure) shell.evaluate("{-> " + action.getDefinition() + "}");
             actionsCache.put(action.getImportId(), code);
         }
