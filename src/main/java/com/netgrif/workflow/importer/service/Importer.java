@@ -909,15 +909,21 @@ public class Importer {
 
     protected Action createAction(com.netgrif.workflow.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
-        if (importedAction.getId() != null) {
-            if(actions.containsKey(this.net.getIdentifier() + "-" + importedAction.getId())) {
-                throw new IllegalArgumentException("Duplicate action id, action with id [" + importedAction.getId() + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
-            }
-            action.setImportId(this.net.getIdentifier() + "-" + importedAction.getId());
-        } else {
-            action.setImportId(this.net.getIdentifier() + "-" + new ObjectId());
-        }
+        action.setImportId(buildActionId(importedAction.getId()));
         return action;
+    }
+
+    protected String buildActionId(String importedActionId) {
+        String sanitizedImportedId;
+        if (importedActionId != null){
+            if(actions.containsKey(this.net.getIdentifier() + "-" + importedActionId)){
+                throw new IllegalArgumentException("Duplicate action id, action with id [" + importedActionId + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
+            }
+            sanitizedImportedId = importedActionId;
+        } else {
+            sanitizedImportedId = new ObjectId().toString();
+        }
+        return this.net.getIdentifier() + "-" + sanitizedImportedId;
     }
 
     protected void parseIds(String fieldId, String transitionId, com.netgrif.workflow.importer.model.Action importedAction, Action action) {
