@@ -65,7 +65,6 @@ public class QuartzConfiguration {
     }
 
 
-    //TODO: JOZIKE
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         Properties properties = new Properties();

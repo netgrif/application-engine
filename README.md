@@ -17,7 +17,7 @@ It can be embedded into Java 11 project or used as a standalone process server. 
 additional components to make integration to your project/environment seamless.
 
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
-* Web Site: [https://engine.netgrif.com](https://engine.netgrif.com)
+* Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
 * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started)
 * Issue Tracker: [Github issues](https://github.com/netgrif/application-engine/issues)
 * Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
@@ -26,22 +26,39 @@ additional components to make integration to your project/environment seamless.
 
 ## Components
 
-// TODO spísať komponenty v engine a len jednou vetou čo robia + link na dokumentáciu
-
-
+// TODO linky do dokumentácie
+Netgrif Application Engine (or NAE for short) consists of several key components:
+ * **Workflow engine**
+   * **Process executions** - Process instance and task management
+   * **Actions and Events processing** - Compiling and running action's code, handling events in processes
+   * **Roles management and permissions resolution** - Permissions and restrictions resolving for processes
+   * **Search and filters** - Indexing, querying and filter management.
+ * **Authentication and authorization** - User management and application-wide permissions
+   * **LDAP** - Integration to authentication solution via LDAP protocol.
+   * **Organization structures** - Managing organization structure for application users
+ * **Business rules engine** - Rules execution across whole application based on [Drools](https://drools.org/)
+ * **Logging and auditing** - Logging to text file and Event/Audit log generation to the main database 
+ * **Mail service** - Mail client for sending and receiving emails
+ * **Extension services**
+   * **PDF generator** - Generate PDF from process form / task
+   * **QR code generator** - Generate QR code from process data
 
 ## Requirements
 
-// TODO spísať čo všetko je treba pre rozbehania. Databázy (poskytnúť docker compose) + Java 11
 The Application engine has some requirements for runtime environment. The following table is summary of requirements 
 to run and use the engine:
 
-| Name          | Version | Description                                                     | Recommendation       |
-|---------------|---------|-----------------------------------------------------------------|----------------------|
-| Java          | 11+     | Runtime Virtual Machine                                         | OpenJDK 11           |
-| Redis         | 5+      | Key-value in-memory database used for user sessions and caching | Redis 6.2.6          |
-| MongoDB       | 4.4+    | Main document store database                                    | MongoDB 4.4.11       |
-| Elasticsearch | 7.10+   | Index database used for better application search               | Elasticsearch 7.10.2 |
+| Name                                                   | Version | Description                                                     | Recommendation                                                         |
+|--------------------------------------------------------|---------|-----------------------------------------------------------------|------------------------------------------------------------------------|
+| [Java](https://openjdk.java.net/)                      | 11+     | Java Development Kit                                            | [OpenJDK 11](https://openjdk.java.net/install/)                        |
+| [Redis](https://redis.io/)                             | 5+      | Key-value in-memory database used for user sessions and caching | [Redis 6.2.6](https://redis.io/download)                               |
+| [MongoDB](https://www.mongodb.com/)                    | 4.4+    | Main document store database                                    | [MongoDB 4.4.11](https://docs.mongodb.com/v4.4/installation/)          |
+| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 7.10+   | Index database used for better application search               | [Elasticsearch 7.10.2](https://www.elastic.co/downloads/elasticsearch) |
+
+If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml) configuration to run all
+necessary databases to develop with NAE.
+
+If you are going to deploy your application on Kubernetes cluster please check out documentation for [Kubernetes deployment](https://engine.netgrif.com/devops/kubernetes).
 
 ## Installation
 
@@ -67,7 +84,7 @@ for building frontend applications in Application Engine platform powered by Pet
 For creating processes in Petriflow language try our free Application Builder on [https://builder.netgrif.com](https://builder.netgrif.com).
 You can start from scratch or import existing process in BPMN 2.0 and builder automatically converts it into Petriflow.
 
-### NCLI
+### NCLI (Coming soon)
 
 If you need help with setting up project or looking for tool to automate your developer work with NAE based applications,
 take a look on [NCLI (Netgrif Command Line Interface)](https://github.com/netgrif/ncli).
