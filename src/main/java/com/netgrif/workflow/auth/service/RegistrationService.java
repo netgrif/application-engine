@@ -135,8 +135,7 @@ public class RegistrationService implements IRegistrationService {
         }
         userService.addDefaultRole(user);
         user =  userRepository.save(user);
-        groupService.createGroup(user);
-        groupService.addUserToDefaultGroup(user);
+
         if (newUser.groups != null && !newUser.groups.isEmpty()) {
             for (String group : newUser.groups){
                 groupService.addUser((IUser) user, group);

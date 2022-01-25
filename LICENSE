@@ -21,80 +21,77 @@
 
     1.  Definitions.
 
+        "Business" means goods and/or services provided or to be provided
+        at standard commercial terms between You and the Partner. For
+        the avoidance of any doubt, the sole subject of the Business must
+        not be use, provision, development or integration of the Software
+        and/or Subsequent Work and such activities can only be ancillary
+        to Your core business.
+
         "License" shall mean the rights specified in Section 2 granted
         under this Agreement.
 
         "Licensor" shall mean the owner of the Software specified above.
 
-        "You" (or "Your") shall mean an individual or legal entity
-        exercising permissions granted by this License.
+        "PaaS" shall mean providing Software and/or Subsequent Work as
+        a service enabling any Partner to create directly and/or via
+        its APIs Subsequent Work.
+
+        "Partner" means any third-party person.
+
+        "Public Service" means any service provided in public interest
+        by institutions (governmental bodies, municipalities, independent
+        state-funded institutes such as schools etc.) or non-profit
+        organizations within their role or mission.
+
+        "SaaS" shall mean providing Software and/or Subsequent Work
+        as a service enabling any Partner to use directly and/or via
+        its APIs the Software and/or Subsequent Work.
 
         "Software" shall mean the computer program designated to enable
         creation of application, representing a work of authorship
         proprietary to Licensor, made available under the License to
         which this Agreement is attached.
 
-        "Derivative Works" shall mean any work that is based on (or
-        derived from) the Software and for which the editorial revisions,
-        annotations, elaborations, or other modifications represent, as
-        a whole, an original work of authorship created by You. For the
-        purposes of this License, Derivative Works shall not include works
-        that remain separable from, or merely link (or bind by name) to
-        the interfaces of, the Software and Derivative Works thereof.
+        "Subsequent Works" shall mean any work that is based on (or derived
+        from) the Software. For the purposes of this License, Subsequent 
+        Work shall not include work that remain separable from, or merely 
+        link (or bind by name) to the interfaces of, the Software and/or 
+        Subsequent Work thereof.
 
-        “Business” means goods and/or services provided or to be provided
-        at standard commercial terms between You and the Partner.
-
-        “Partner” means any third-party person to whom You provide or by
-        any means intent to provide any goods and/or services or who
-        provides any or by any means intents to provides goods and/or
-        services to You.
-
-        “Subsequent Works” shall mean any work that is based on (or derived
-        from) the Software and/or Derivative Works and for which the
-        editorial revisions, annotations, elaborations, or other
-        modifications represent, as a whole, an original work of authorship
-        created by Partner. For the purposes of this License, Subsequent
-        Works shall not include works that remain separable from, or merely
-        link (or bind by name) to the interfaces of, the Software and/or
-        Derivative Works and Subsequent Works thereof.
+        "You" (or "Your") shall mean an individual or legal entity
+        exercising permissions granted by this License.
 
     2.  Grant of the License. Subject to the terms and conditions of
         this License, Licensor hereby grants to You a perpetual, worldwide,
         non-exclusive, free of charge, irrevocable license to a copy of
         the Software, enabling you to use, copy, modify or merge the copy
-        of the Software and/or prepare Derivative Works of, publicly display,
+        of the Software and/or prepare Subsequent Works of, publicly display,
         publicly perform, sublicense, and distribute the Software and such
-        Derivative Works.
+        Subsequent Works.
 
     3.  Redistribution. You may reproduce and distribute copies of
-        the Software or Derivative Works thereof in any medium, with or
+        the Software or Subsequent Works thereof in any medium, with or
         without modifications, provided that You meet the following
         conditions:
 
         (a) You must procure that any other recipients of the Software
-            or Derivative Works is familiar with this Agreement and adheres
+            or Subsequent Works is familiar with this Agreement and adheres
             to scope of License and restrictions formulated in this Agreement;
 
         (b) You must cause any modified files to carry prominent notices
             stating that You changed the files;
 
-        (c) You must not use Software and/or Derivative Works as a cloud-based
-            platform enabling any Partner to create Subsequent Works;
+        (c) You must not provide Paas;
 
-        (d) You must not use Software and/or Derivative Works as a “software
-            provided as a service” enabling any Partner to use (or access via
-            its APIs) the Software and/or, Derivative Works for other purposes
-            than
-            (i) as an integral part of the Business (in relationship between
-                You and the Partner);
-            (ii) as an integral part of the Business (in relationship between
-                 Your Partners).
+        (d) You must not provide SaaS for other purposes than as an integral
+            part of the Business or Public Service (in relationship between
+            You and the Partner);
 
         You may add Your own notices to Your modifications and may provide
         additional or different license terms and conditions for use,
         reproduction, or distribution of Your modifications, or for any
-        such Derivative Works as a whole, provided Your use, reproduction,
+        such Subsequent Works as a whole, provided Your use, reproduction,
         and distribution of the Software otherwise complies with the conditions
         stated in this License.
 
