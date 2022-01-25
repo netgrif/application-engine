@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import org.springframework.lang.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -36,7 +36,7 @@ public class FilterDeserializer extends UntypedObjectDeserializer {
     @Override
     protected Object mapObject(JsonParser parser, DeserializationContext context) throws IOException {
 
-        @Nullable String firstKey;
+        String firstKey;
         JsonToken token = parser.getCurrentToken();
         if (token == JsonToken.START_OBJECT) {
             firstKey = parser.nextFieldName();

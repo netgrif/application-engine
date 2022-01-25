@@ -8,8 +8,13 @@ import java.util.stream.Collectors;
 
 public class PetriNetReferenceResources extends CollectionModel<PetriNetReferenceResource> {
 
-    public PetriNetReferenceResources(Iterable<PetriNetReferenceResource> content, Link... links) {
-        super(content, links);
+    public PetriNetReferenceResources(Iterable<PetriNetReferenceResource> content, Iterable<Link> links) {
+        super(content, links, null);
+        buildLinks();
+    }
+
+    public PetriNetReferenceResources(Iterable<PetriNetReferenceResource> content) {
+        super(content);
         buildLinks();
     }
 

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class TransactionsResource extends CollectionModel<TransactionResource> {
 
     public TransactionsResource(Iterable<TransactionResource> content, String netId) {
-        super(content, new ArrayList<>());
+        super(content);
         buildLinks(netId);
     }
 
