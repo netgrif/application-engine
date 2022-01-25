@@ -307,6 +307,7 @@ public class Case {
     }
 
     public void resolveViewRoles() {
+        getViewRoles();
         this.viewRoles.clear();
         this.permissions.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
@@ -316,6 +317,7 @@ public class Case {
     }
 
     public void resolveViewUserRefs() {
+        getViewUserRefs();
         this.viewUserRefs.clear();
         this.userRefs.forEach((userRef, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
@@ -325,6 +327,7 @@ public class Case {
     }
 
     public void resolveViewUsers() {
+        getViewUsers();
         this.viewUsers.clear();
         this.users.forEach((user, perms) -> {
             if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
