@@ -51,8 +51,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
     private ElasticsearchRestTemplate template;
@@ -144,7 +142,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = elasticsearchTemplate.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
             Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
@@ -263,13 +261,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         for (CaseSearchRequest.Author author : request.author) {
             BoolQueryBuilder authorQuery = boolQuery();
             if (author.email != null) {
-                authorQuery.must(termQuery("authorEmail.keyword", author.email));
+                authorQuery.must(termQuery("authorEmail", author.email));
             }
             if (author.id != null) {
                 authorQuery.must(matchQuery("author", author.id));
             }
             if (author.name != null) {
-                authorQuery.must(termQuery("authorName.keyword", author.name));
+                authorQuery.must(termQuery("authorName", author.name));
             }
             authorsQuery.should(authorQuery);
         }
