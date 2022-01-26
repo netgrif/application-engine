@@ -14,6 +14,7 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.workflow.workflow.domain.menu.MenuAndFilters
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.UserFilterSearchService
@@ -179,12 +180,8 @@ class MenuImportExportTest {
         workflowService.save(groupCase)
 
         task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(groupCase.stringId)));
-        dataService.setData(task, ImportHelper.populateDataset([
-                (EXPORT_BUTTON_FIELD): [
-                        "value": "1",
-                        "type" : "button"
-                ]
-        ]))
+        setData(task, [(EXPORT_BUTTON_FIELD): ["type": "button", "value": "1"]])
+
         caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
         assert caseOpt.isPresent()
         groupCase = caseOpt.get()
@@ -205,4 +202,11 @@ class MenuImportExportTest {
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
+
+
+    private SetDataEventOutcome setData(task, Map<String, Map<String, Object>> values) {
+        return dataService.setData(task, ImportHelper.populateDataset(values))
+    }
+
+
 }

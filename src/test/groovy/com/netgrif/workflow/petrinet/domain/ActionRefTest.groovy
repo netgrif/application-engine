@@ -61,7 +61,7 @@ class ActionRefTest {
     @Disabled("TODO: deprecated action ref")
     void testEventImport() {
 
-        def net = petriNetService.importPetriNet(new FileInputStream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).get()
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         assert net.dataSet.get("text_1").events.size() == 8
         assert net.transitions.get("task").dataSet.get("text_1").events.size() == 8

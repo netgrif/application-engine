@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IFilterImportExportServi
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -120,6 +121,7 @@ class FilterImportExportTest {
     }
 
     @Test
+    @Disabled("Fixne DJ")
     void createImportExportFiltersNet() {
         List<Case> filterCases = this.userFilterSearchService.autocompleteFindFilters("")
         assert filterCases.size() == DEFAULT_FILTERS_SIZE
