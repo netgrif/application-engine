@@ -26,7 +26,6 @@ additional components to make integration to your project/environment seamless.
 
 ## Components
 
-// TODO linky do dokumentácie
 Netgrif Application Engine (or NAE for short) consists of several key components:
  * **Workflow engine**
    * **Process executions** - Process instance and task management
@@ -64,13 +63,59 @@ If you are going to deploy your application on Kubernetes cluster please check o
 
 ### Running as standalone
 
-// TODO stručný popis ako rozbehať rovno z jarka engine a otestovať si deployment. odkázať sa na podrobnejší popis v docs
+You can start using the NAE by its self and then upload your processes via API. You run the NAE from JAR (Java Archive) file or as docker container.
+
+#### Running a JAR file
+
+To run the engine from the jar file you can use a release package available from this repository.
+The latest release package you can download from [here](https://github.com/netgrif/application-engine/releases/latest).
+Before you start you must generate own security certificate for session tokens, you can follow [this guide](https://engine.netgrif.com/views/public_view).
+
+To quickly start working with the engine just write the following commands to download, unzip, generate certificates and start:
+
+```shell
+$ wget -O nae.zip https://github.com/netgrif/application-engine/releases/latest
+$ unzip nae.zip
+$ cd nae
+$ cd resources/certificates && openssl req -newkey rsa:4096 -nodes -keyout private.pem -x509 -days 3650 -out certificate.crt && cat certificate.crt > cert.pem && openssl x509 -outform der -in cert.pem -out private.der && rm cert.pem && cd ../..
+$ java -jar nae.jar
+```
+
+By default, the engine assumes that all databases are running locally. If you are running required database on server or on different ports, 
+you can pass these settings as arguments to NAE.
+
+```shell
+$ java -jar nae.jar --***REMOVED***/nae --***REMOVED*** --***REMOVED***
+```
+
+For complete list of all configurable application properties see [article in documentation](https://engine.netgrif.com/properties).
+
+#### Running as Docker container
+
+You can also use docker to run the engine from the official distributed image on [Docker hub](https://hub.docker.com/).
+
+```shell
+$ docker pull netgrif/application-engine
+$ docker run -d -p 8080:8080 netgrif/application-engine
+```
+
+As the engine connects defaultly to locally runned databases for more precaise configuration we recommend to use Docker
+compose file or Kubernetes manifest to run whole stack all at once. You can read more about it in [this guide](https://engine.netgrif.com/devops).
 
 ### Embedding
 
-// TODO stručný popis ako to zahrnúť v spring projekte cez maven. odkázať sa na podrobnejší popis v docs
+The Application Engine can be used inside your java application as a java library. The engine is written in Spring 
+framework so you can seemlessly integrate it to your Spring Boot application. The engine can be linked
+as a Maven dependency:
 
-For more information please follow instructions in [Get Started](https://engine.netgrif.com/get_started)
+```XML
+<dependency>
+  <groupId>com.netgrif</groupId>
+  <artifactId>application-engine</artifactId>
+</dependency>
+```
+
+For more information please read instructions in [Get Started](https://engine.netgrif.com/get_started)
 
 ## Other projects
 
