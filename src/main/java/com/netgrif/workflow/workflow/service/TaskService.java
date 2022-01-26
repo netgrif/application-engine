@@ -797,6 +797,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(Iterable<? extends Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
+        log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
@@ -804,6 +805,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(Iterable<? extends Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
+        log.info("[" + caseId + "]: Tasks of case are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
