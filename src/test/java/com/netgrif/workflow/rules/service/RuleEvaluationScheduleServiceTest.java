@@ -1,7 +1,7 @@
 package com.netgrif.workflow.rules.service;
 
 import com.netgrif.workflow.TestHelper;
-import com.netgrif.workflow.WorkflowManagementSystemApplication;
+import com.netgrif.workflow.ApplicationEngine;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.VersionType;
@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @TestPropertySource(
         locations = "classpath:application-test.properties"

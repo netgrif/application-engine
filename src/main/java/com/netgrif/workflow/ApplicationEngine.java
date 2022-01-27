@@ -31,7 +31,7 @@ import java.util.List;
 @EnableMongoAuditing
 @Aspect
 @Slf4j
-public class WorkflowManagementSystemApplication {
+public class ApplicationEngine {
 
     @Around("execution(* com.netgrif.workflow.startup.AbstractOrderedCommandLineRunner+.run(..))")
     void logRun(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -58,6 +58,6 @@ public class WorkflowManagementSystemApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(WorkflowManagementSystemApplication.class, args);
+        SpringApplication.run(ApplicationEngine.class, args);
     }
 }

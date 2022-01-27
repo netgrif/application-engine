@@ -1,7 +1,7 @@
 package com.netgrif.workflow.rules.service;
 
 import com.netgrif.workflow.TestHelper;
-import com.netgrif.workflow.WorkflowManagementSystemApplication;
+import com.netgrif.workflow.ApplicationEngine;
 import com.netgrif.workflow.auth.domain.IUser;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
@@ -40,7 +40,7 @@ import java.util.stream.IntStream;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @TestPropertySource(
         locations = "classpath:application-test.properties"
