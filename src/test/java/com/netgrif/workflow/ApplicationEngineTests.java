@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles({"test"})
 @SpringBootTest
-public class WorkflowManagementSystemApplicationTests {
+public class ApplicationEngineTests {
 
     @Test
     public void contextLoads() {

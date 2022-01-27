@@ -2,7 +2,7 @@ package com.netgrif.workflow.workflow
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.ApplicationEngine
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @Disabled("searchByMoreValues")
 @AutoConfigureMockMvc

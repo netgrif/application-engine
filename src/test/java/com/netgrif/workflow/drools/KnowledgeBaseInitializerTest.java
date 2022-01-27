@@ -1,7 +1,7 @@
 package com.netgrif.workflow.drools;
 
 import com.netgrif.workflow.TestHelper;
-import com.netgrif.workflow.WorkflowManagementSystemApplication;
+import com.netgrif.workflow.ApplicationEngine;
 import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.workflow.configuration.drools.throwable.RuleValidationException;
 import com.netgrif.workflow.rules.domain.StoredRule;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @TestPropertySource(
         locations = "classpath:application-test.properties"
