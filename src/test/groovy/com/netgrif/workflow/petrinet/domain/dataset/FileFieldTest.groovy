@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.ApplicationEngine
 import com.netgrif.workflow.auth.domain.IUser
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.service.Importer
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc
 class FileFieldTest {

@@ -48,36 +48,37 @@
         <relativePath/>
     </parent>
 
-  <properties>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <junit-jupiter.version>5.8.1</junit-jupiter.version>
-    <java.version>11</java.version>
-    <groovy.version>3.0.9</groovy.version>
-    <jasypt.version>1.9.2</jasypt.version>
-    <querydsl.version>5.0.0</querydsl.version>
-    <drools.version>7.55.0.Final</drools.version>
-    <!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
-  </properties>
+    <properties>
+        <elasticsearch.version>7.10.2</elasticsearch.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <junit-jupiter.version>5.8.1</junit-jupiter.version>
+        <java.version>11</java.version>
+        <groovy.version>3.0.9</groovy.version>
+        <jasypt.version>1.9.2</jasypt.version>
+        <querydsl.version>5.0.0</querydsl.version>
+        <drools.version>7.55.0.Final</drools.version>
+        <!--        <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+    </properties>
 
-  <dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
+            <!-- ElasticSearch Api -->
+            <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>2.17.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-      <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
-      <dependency>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-api</artifactId>
-          <version>2.17.1</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <dependencies>
-    <!-- Batch -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-batch</artifactId>
-    </dependency>
+        <!-- Batch -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId>
+        </dependency>
 
         <!-- Cache -->
         <dependency>
@@ -303,20 +304,20 @@
             <version>2.6.0</version>
         </dependency>
 
-    <!-- ElasticSearch -->
+        <!-- ElasticSearch -->
         <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
-      <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch -->
-      <dependency>
-          <groupId>org.springframework.data</groupId>
-          <artifactId>spring-data-elasticsearch</artifactId>
-          <version>4.2.8</version>
-      </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+            <version>4.2.8</version>
+        </dependency>
 
 
-      <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>

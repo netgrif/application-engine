@@ -1,7 +1,7 @@
 package com.netgrif.workflow.elastic
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.ApplicationEngine
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc
 @TestPropertySource(

@@ -1,7 +1,7 @@
 package com.netgrif.workflow.drools;
 
 import com.netgrif.workflow.TestHelper;
-import com.netgrif.workflow.WorkflowManagementSystemApplication;
+import com.netgrif.workflow.ApplicationEngine;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @TestPropertySource(
         locations = "classpath:application-test.properties"

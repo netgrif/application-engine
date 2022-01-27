@@ -1,7 +1,7 @@
 package com.netgrif.workflow.elastic
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.WorkflowManagementSystemApplication
+import com.netgrif.workflow.ApplicationEngine
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.elastic.service.ReindexingTask
 import com.netgrif.workflow.petrinet.domain.VersionType
@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = WorkflowManagementSystemApplication.class
+        classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc
 class ElasticTaskTest {
