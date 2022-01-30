@@ -29,7 +29,7 @@ Next thing, please read and edit the PR description below the following way:
 - To mention someone, use at `@` symbol.
 - To reference specific code, use an absolute link to the source code file with suffix `#L` and the number of the desired line of code.
 
-For whole markdown documentation please read [Github Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+For whole markdown documentation please read [GitHub Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
 
 If you read these whole instructions and have done everything, **you are the best** :+1: .
 You can now safely **delete all between two horizontal lines**, so the instructions don't look bad in your PR.

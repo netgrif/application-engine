@@ -1,10 +1,10 @@
 # Netgrif Application Engine
 
-[![GitHub](https://img.shields.io/github/license/netgrif/application-engine)](https://netgrif.com/engine/license)
+[![GitHub](https://img.shields.io/github/license/netgrif/application-engine)](https://netgrif.com/license)
 [![Java](https://img.shields.io/badge/Java-11-red)](https://openjdk.java.net/projects/jdk/11/)
 [![Petriflow 1.0.1](https://img.shields.io/badge/Petriflow-1.0.1-0aa8ff)](https://petriflow.com)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/netgrif/application-engine?sort=semver&display_name=tag)](https://github.com/netgrif/application-engine/releases)
-[![build](https://github.com/netgrif/application-engine/actions/workflows/master-build.yml/badge.svg)](https://github.com/netgrif/application-engine/actions/workflows/release-build.yml)
+[![build](https://github.com/netgrif/application-engine/actions/workflows/master-build.yml/badge.svg)](https://github.com/netgrif/application-engine/actions/workflows/master-build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=netgrif_application-engine&metric=alert_status)](https://sonarcloud.io/dashboard?id=netgrif_application-engine)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=netgrif_application-engine&metric=coverage)](https://sonarcloud.io/dashboard?id=netgrif_application-engine)
 [![Known Vulnerabilities](https://snyk.io/test/github/netgrif/application-engine/badge.svg)](https://snyk.io/test/github/netgrif/application-engine)
@@ -19,27 +19,27 @@ additional components to make integration to your project/environment seamless.
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
 * Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
 * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started)
-* Issue Tracker: [Github issues](https://github.com/netgrif/application-engine/issues)
+* Issue Tracker: [GitHub issues](https://github.com/netgrif/application-engine/issues)
 * Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
 * Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/roadmap)
-* License: [NETGRIF Community License](https://github.com/netgrif/application-engine/blob/master/LICENSE)
+* License: [NETGRIF Community License](https://netgrif.com/license)
 
 ## Components
 
 Netgrif Application Engine (or NAE for short) consists of several key components:
  * **Workflow engine**
    * **Process executions** - Process instance and task management
-   * **Actions and Events processing** - Compiling and running action's code, handling events in processes
-   * **Roles management and permissions resolution** - Permissions and restrictions resolving for processes
-   * **Search and filters** - Indexing, querying and filter management.
+   * [**Actions and Events processing**](https://engine.netgrif.com/events/events) - Compiling and running action's code, handling events in processes
+   * [**Roles management and permissions resolution**](https://engine.netgrif.com/roles/permissions) - Permissions and restrictions resolving for processes
+   * [**Search and filters**](https://engine.netgrif.com/search/filter) - Indexing, querying and filter management.
  * **Authentication and authorization** - User management and application-wide permissions
-   * **LDAP** - Integration to authentication solution via LDAP protocol.
+   * [**LDAP**](https://engine.netgrif.com/integration/ad_kerberos) - Integration to authentication solution via LDAP protocol.
    * **Organization structures** - Managing organization structure for application users
  * **Business rules engine** - Rules execution across whole application based on [Drools](https://drools.org/)
  * **Logging and auditing** - Logging to text file and Event/Audit log generation to the main database 
  * **Mail service** - Mail client for sending and receiving emails
  * **Extension services**
-   * **PDF generator** - Generate PDF from process form / task
+   * [**PDF generator**](https://engine.netgrif.com/services/pdf_generator) - Generate PDF from process form / task
    * **QR code generator** - Generate QR code from process data
 
 ## Requirements
@@ -92,14 +92,14 @@ For complete list of all configurable application properties see [article in doc
 
 #### Running as Docker container
 
-You can also use docker to run the engine from the official distributed image on [Docker hub](https://hub.docker.com/).
+You can also use docker to run the engine from the official image on [Docker hub](https://hub.docker.com/r/netgrif/application-engine).
 
 ```shell
 $ docker pull netgrif/application-engine
 $ docker run -d -p 8080:8080 netgrif/application-engine
 ```
 
-As the engine connects defaultly to locally runned databases for more precaise configuration we recommend to use Docker
+As the engine connects by default to locally ran databases for more precise configuration we recommend to use Docker
 compose file or Kubernetes manifest to run whole stack all at once. You can read more about it in [this guide](https://engine.netgrif.com/devops).
 
 ### Embedding
@@ -121,7 +121,7 @@ For more information please read instructions in [Get Started](https://engine.ne
 
 ### Frontend library
 
-For complete Netgrif Application Engine experience check out our [Angular library](https://github.com/netgrif/components) 
+For complete Netgrif Application Engine experience check out our [Angular library - Netgrif Components](https://github.com/netgrif/components) 
 for building frontend applications in Application Engine platform powered by Petriflow processes.
 
 ### Application Builder
@@ -136,7 +136,8 @@ take a look on [NCLI (Netgrif Command Line Interface)](https://github.com/netgri
 
 ## Reporting issues
 
-If you find a bug, let us know at [Issue page](https://github.com/netgrif/application-engine/issues). First, please read our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
+If you find a bug, let us know at [Issue page](https://github.com/netgrif/application-engine/issues). 
+First, please read our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
 
 ## License
 
