@@ -579,23 +579,28 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--      <plugin>-->
-            <!--        <groupId>org.apache.maven.plugins</groupId>-->
-            <!--        <artifactId>maven-javadoc-plugin</artifactId>-->
-            <!--        <executions>-->
-            <!--          <execution>-->
-            <!--            <id>attach-javadocs</id>-->
-            <!--            <goals>-->
-            <!--              <goal>jar</goal>-->
-            <!--            </goals>-->
-            <!--          </execution>-->
-            <!--        </executions>-->
-            <!--        <configuration>-->
-            <!--          <source>11</source>-->
-            <!--          <doclint>none</doclint>-->
-            <!--          <detectJavaApiLink>false</detectJavaApiLink>-->
-            <!--        </configuration>-->
-            <!--      </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <id>attach-javadocs</id>-->
+            <!--                        <goals>-->
+            <!--                            <goal>jar</goal>-->
+            <!--                        </goals>-->
+            <!--                        <phase>install</phase>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <source>11</source>-->
+            <!--                    <doclint>none</doclint>-->
+            <!--                    <detectJavaApiLink>false</detectJavaApiLink>-->
+            <!--                    <failOnError>false</failOnError>-->
+            <!--                    <additionalOptions>-->
+            <!--                        <additionalOption>-Xdoclint:none</additionalOption>-->
+            <!--                    </additionalOptions>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
