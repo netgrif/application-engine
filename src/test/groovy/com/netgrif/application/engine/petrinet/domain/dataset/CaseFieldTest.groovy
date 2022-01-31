@@ -165,8 +165,7 @@ class CaseFieldTest {
     }
 
     @Test
-    //TODO:  JOZIKE
-    @Disabled()
+    @Disabled("Please fix this test")
     void testChangeValueAction() {
         def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert notAllowedNet.getNet() != null
