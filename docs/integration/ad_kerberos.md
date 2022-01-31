@@ -125,7 +125,7 @@ Security configuration override:
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 @ConditionalOnExpression("${application.specific.kerberos.enabled}")
-public class KerberosSecurityConfiguration extends com.netgrif.workflow.configuration.SecurityConfiguration {
+public class KerberosSecurityConfiguration extends com.netgrif.application.engine.configuration.SecurityConfiguration {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

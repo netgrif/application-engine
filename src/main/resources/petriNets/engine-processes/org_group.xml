@@ -14,9 +14,9 @@
 	<!-- FUNCTIONS -->
 	<function scope="process" name="updateFilterAutocompleteOptions">
 	{
-		com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
-		com.netgrif.workflow.petrinet.domain.dataset.TaskField previewTaskRef,
-		com.netgrif.workflow.petrinet.domain.dataset.CaseField referencedFiltersList
+		com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+		com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
+		com.netgrif.application.engine.petrinet.domain.dataset.CaseField referencedFiltersList
 		->
 			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
 				change previewTaskRef value {

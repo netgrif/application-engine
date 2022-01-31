@@ -25,7 +25,7 @@
 
     <!-- CUSTOM CONFIG -->
     <logger name="org.apache.pdfbox.pdmodel" level="ERROR"/>
-    <logger name="com.netgrif.workflow.configuration.logging.ControllerRequestLoggingFilter">
+    <logger name="com.netgrif.application.engine.configuration.logging.ControllerRequestLoggingFilter">
         <level value="DEBUG"/>
     </logger>
     <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">

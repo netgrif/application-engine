@@ -358,7 +358,7 @@ It is not referenced by anything outside the process, so it can be freely modifi
 ```xml
 <function scope="process" name="initializeMyFullFilterTaskRef">
     {
-        com.netgrif.workflow.petrinet.domain.dataset.TaskField myFullFilter
+        com.netgrif.application.engine.petrinet.domain.dataset.TaskField myFullFilter
     ->
         change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
     }
