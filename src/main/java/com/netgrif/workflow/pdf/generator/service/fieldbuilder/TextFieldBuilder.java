@@ -1,0 +1,106 @@
+package com.netgrif.workflow.pdf.generator.service.fieldbuilder;
+
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.pdf.generator.config.PdfResource;
+import com.netgrif.workflow.pdf.generator.domain.PdfField;
+import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
+import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.workflow.petrinet.domain.dataset.FileListFieldValue;
+import com.netgrif.workflow.utils.DateUtils;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
+import org.jsoup.Jsoup;
+
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashSet;
+
+public class TextFieldBuilder extends FieldBuilder{
+
+    public TextFieldBuilder(PdfResource resource) {
+        super(resource);
+    }
+
+    public PdfField buildField(DataGroup dataGroup, LocalisedField field, int lastX, int lastY){
+        this.lastX = lastX;
+        this.lastY = lastY;
+        String value;
+        switch (field.getType()) {
+            case DATE:
+                value =  field.getValue() != null ? formatDate(field) : "";
+                break;
+            case DATETIME:
+                value =  field.getValue() != null ? formatDateTime(field) : "";
+                break;
+            case NUMBER:
+                double number = field.getValue() != null ? (double) field.getValue() : 0.0;
+                NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
+                value = nf2.format(number);
+                break;
+            case FILE:
+                value = field.getValue() != null ? shortenFileName(((FileFieldValue)field.getValue()).getName()) : "";
+                break;
+            case FILELIST:
+                value = field.getValue() != null ? resolveFileListNames((FileListFieldValue)field.getValue()) : "";
+                break;
+            case USER:
+                value = field.getValue() != null ? ((User)field.getValue()).getFullName() : "";
+                break;
+            default:
+                value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
+                break;
+        }
+        String translatedTitle = field.getName();
+        PdfField pdfField = new PdfTextField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
+        setFieldParams(dataGroup, field, pdfField);
+        setFieldPositions(pdfField, resource.getFontLabelSize());
+        return pdfField;
+    }
+
+    private String formatDate(LocalisedField field) {
+        Date value = new Date();
+        if (field.getValue() != null) {
+            if(field.getValue() instanceof LocalDate)
+                value = DateUtils.localDateToDate((LocalDate) field.getValue());
+            else if(field.getValue() instanceof Date)
+                value = (Date) field.getValue();
+            return new SimpleDateFormat(resource.getDateFormat().getValue()).format(value);
+        } else {
+            return "";
+        }
+    }
+
+    private String formatDateTime(LocalisedField field) {
+        Date value = new Date();
+        if (field.getValue() != null) {
+            if(field.getValue() instanceof LocalDateTime)
+                value = DateUtils.localDateTimeToDate((LocalDateTime) field.getValue());
+            else if(field.getValue() instanceof Date)
+                value = (Date) field.getValue();
+            return new SimpleDateFormat(resource.getDateTimeFormat().getValue()).format(value);
+        } else {
+            return "";
+        }
+    }
+
+    private String resolveFileListNames(FileListFieldValue files) {
+        StringBuilder builder = new StringBuilder();
+
+        files.getNamesPaths().forEach(value -> {
+            builder.append(shortenFileName(value.getName()));
+            builder.append(", ");
+        });
+
+        return builder.toString();
+    }
+
+    private String shortenFileName(String fileName) {
+        if (fileName.length() > 24) {
+            return fileName.substring(24, fileName.length() - 1);
+        }
+        return fileName;
+    }
+}
