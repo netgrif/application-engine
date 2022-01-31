@@ -34,7 +34,7 @@
         <title>user</title>
         <init dynamic="true">
             def user = userService.getLoggedOrSystem()
-            return new com.netgrif.workflow.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.name, user.surname, user.email)
+            return new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.getStringId(), user.name, user.surname, user.email)
         </init>
     </data>
 
