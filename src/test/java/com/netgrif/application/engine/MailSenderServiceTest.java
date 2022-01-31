@@ -27,7 +27,7 @@ import java.util.Collections;
 @ExtendWith(SpringExtension.class)
 public class MailSenderServiceTest {
 
-    static final String FROM = "noreply@netgrif.com";
+    static final String FROM = "test@example.com";
     static final String RECIPIENT = "userTest@netgrif.com";
     static final String TOKEN = "čšňť";
 
@@ -79,14 +79,14 @@ public class MailSenderServiceTest {
 
         MimeMessage message = messages[0];
 
-        assert "noreply@netgrif.com".equalsIgnoreCase(message.getFrom()[0].toString());
+        assert "test@example.com".equalsIgnoreCase(message.getFrom()[0].toString());
         assert EmailType.REGISTRATION.getSubject().equalsIgnoreCase(message.getSubject());
     }
 
     private void assertMessageDraftReceived(MimeMessage[] messages) throws MessagingException, IOException {
         assert messages.length > 0;
         MimeMessage message = messages[0];
-        assert "noreply@netgrif.com".equalsIgnoreCase(message.getFrom()[0].toString());
+        assert "test@example.com".equalsIgnoreCase(message.getFrom()[0].toString());
         assert "Subject draft".equalsIgnoreCase(message.getSubject());
     }
 }
