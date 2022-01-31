@@ -44,19 +44,19 @@ public class MailService implements IMailService {
     private ServerAuthProperties serverAuthProperties;
 
     @Getter
-    @Value("${mail.server.port}")
+    @Value("${nae.mail.redirect-to.port}")
     protected String port;
 
     @Getter
-    @Value("${mail.server.host.domain}")
+    @Value("${nae.mail.redirect-to.host}")
     protected String domain;
 
     @Getter
-    @Value("${mail.server.host.ssl}")
+    @Value("${nae.mail.redirect-to.ssl}")
     protected boolean ssl;
 
     @Getter
-    @Value("${mail.from}")
+    @Value("${nae.mail.from}")
     protected String mailFrom;
 
     @Getter

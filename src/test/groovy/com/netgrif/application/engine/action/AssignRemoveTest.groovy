@@ -61,7 +61,7 @@ class AssignRemoveTest {
         auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
-//TODO: jozike
+
     @Test
     @Disabled("Create functions or update test")
     public void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {

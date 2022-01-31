@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class EncryptionConfiguration {
 
-    @Value("${database.password}")
+    @Value("${nae.database.password}")
     private String password;
 
     @Autowired

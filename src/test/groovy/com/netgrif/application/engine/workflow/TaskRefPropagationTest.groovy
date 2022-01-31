@@ -136,7 +136,7 @@ class TaskRefPropagationTest {
         assert childText6.stringId == CHILD_FIELD_TEXT6_ID
         assert childText6.parentTaskId == childTaskId
     }
-//  TODO:   JOZIKE
+//  TODO:
 //        /* test propagation Parent -> Child -> Parent */
 //        ChangedFieldsTree changed = dataService.setData(parentTaskId, ImportHelper.populateDataset([
 //                (PARENT_FIELD_TEXT_ID): ["value": "VALUE", "type": "text"]

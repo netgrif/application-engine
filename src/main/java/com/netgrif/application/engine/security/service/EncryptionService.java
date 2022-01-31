@@ -14,10 +14,10 @@ public class EncryptionService implements IEncryptionService {
     @Autowired
     private StandardPBEStringEncryptor standardEncryptor;
 
-    @Value("database.password")
+    @Value("nae.database.password")
     private String PASSWORD;
 
-    @Value("database.algorithm")
+    @Value("nae.database.algorithm")
     private String STANDARD_ALGORITHM;
 
     private final String PREFIX = "#encrypted";
