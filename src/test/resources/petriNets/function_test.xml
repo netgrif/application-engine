@@ -118,8 +118,8 @@
         <title>Boolean</title>
         <init>false</init>
         <action trigger="set">
-            def user = new com.netgrif.workflow.auth.domain.User("test@test.com", "password", "test", "test")
-            user.state = com.netgrif.workflow.auth.domain.UserState.ACTIVE
+            def user = new com.netgrif.application.engine.auth.domain.User("test@test.com", "password", "test", "test")
+            user.state = com.netgrif.application.engine.auth.domain.UserState.ACTIVE
             function_res.createUser(user)
         </action>
     </data>

@@ -31,7 +31,7 @@
     <!-- FUNCTIONS -->
     <function scope="process" name="initializeMyFullFilterTaskRef">
         {
-            com.netgrif.workflow.petrinet.domain.dataset.TaskField myFullFilter
+            com.netgrif.application.engine.petrinet.domain.dataset.TaskField myFullFilter
                 ->
                 change myFullFilter value {return [findTask({it.caseId.eq(useCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
         }
@@ -285,7 +285,7 @@
                         userTitle: f.new_title,
                         i18nName: f.i18n_filter_name;
 
-                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(userTitle.value) }
+                        change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(userTitle.value) }
                     </action>
                 </logic>
                 <layout>
@@ -637,7 +637,7 @@
                         name: f.new_title,
                         i18nName: f.i18n_filter_name;
 
-                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
+                        change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.value) }
                     </action>
                 </logic>
             </dataRef>
@@ -815,7 +815,7 @@
                         name: f.new_title,
                         i18nName: f.i18n_filter_name;
 
-                        change i18nName value { new com.netgrif.workflow.petrinet.domain.I18nString(name.value) }
+                        change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.value) }
                     </action>
                 </logic>
                 <layout>
