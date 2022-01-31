@@ -12,7 +12,7 @@
             <!-- @formatter:off -->
             field: f.2;
             change field about {
-                return "2";
+            return "2";
             }
             <!-- @formatter:on -->
         </action>
@@ -20,7 +20,7 @@
             <!-- @formatter:off -->
             field: f.3;
             change field about {
-                return "3";
+            return "3";
             }
             <!-- @formatter:on -->
         </action>

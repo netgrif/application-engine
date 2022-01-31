@@ -1,0 +1,132 @@
+                        NETGRIF Community License
+                        Version 1.0, January 2022
+                    https://netgrif.com/license
+
+    This NETGRIF Community License (“Agreement”) sets forth the terms
+    and conditions on which NETGRIF, s.r.o., with the registered office
+    at Slávičie údolie 106, 811 02, Bratislava, Slovak Republic,
+    ID No.: 50 903 403 (“Licensor”) makes available the Software (as
+    defined below).
+
+    BY INSTALLING, DOWNLOADING, ACCESSING, USING OR DISTRIBUTING
+    THE SOFTWARE YOU (as specified below) INDICATE YOUR ACCEPTANCE TO,
+    AND ARE ENTERING INTO A CONTRACT WITH, THE LICENSOR ON THE TERMS SET
+    OUT IN THIS AGREEMENT. IF YOU DO NOT AGREE TO THESE TERMS, YOU MUST
+    NOT USE THE SOFTWARE. IF YOU ARE RECEIVING THE SOFTWARE ON BEHALF OF
+    A LEGAL ENTITY, YOU REPRESENT AND WARRANT THAT YOU HAVE THE ACTUAL
+    AUTHORITY TO AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT ON
+    BEHALF OF SUCH ENTITY.
+
+    THIS IS NOT A PURCHASE AGREEMENT BUT A LICENCE AGREEMENT WITH YOU
+    (as defined below).
+
+    1.  Definitions.
+
+        "Business" means goods and/or services provided or to be provided
+        at standard commercial terms between You and the Partner. For
+        the avoidance of any doubt, the sole subject of the Business must
+        not be use, provision, development or integration of the Software
+        and/or Subsequent Work and such activities can only be ancillary
+        to Your core business.
+
+        "License" shall mean the rights specified in Section 2 granted
+        under this Agreement.
+
+        "Licensor" shall mean the owner of the Software specified above.
+
+        "PaaS" shall mean providing Software and/or Subsequent Work as
+        a service enabling any Partner to create Subsequent Work directly 
+        and/or via its APIs.
+
+        "Partner" means any third-party person.
+
+        "Public Service" means any service provided in public interest
+        by institutions (governmental bodies, municipalities, independent
+        state-funded institutes such as schools etc.) or non-profit
+        organizations within their role or mission.
+
+        "SaaS" shall mean providing Software and/or Subsequent Work
+        as a service enabling any Partner to use the Software and/or 
+        Subsequent Work directly and/or via its APIs.
+
+        "Software" shall mean the computer program designated to enable
+        creation of application, representing a work of authorship
+        proprietary to Licensor, made available under the License to
+        which this Agreement is attached.
+
+        "Subsequent Works" shall mean any work that is based on (or derived
+        from) the Software. For the purposes of this License, Subsequent 
+        Work shall not include work that remain separable from, or merely 
+        link (or bind by name) to the interfaces of, the Software and/or 
+        Subsequent Work thereof.
+
+        "You" (or "Your") shall mean an individual or legal entity
+        exercising permissions granted by this License.
+
+    2.  Grant of the License. Subject to the terms and conditions of
+        this License, Licensor hereby grants to You a perpetual, worldwide,
+        non-exclusive, free of charge, irrevocable license to a copy of
+        the Software, enabling you to use, copy, modify or merge the copy
+        of the Software and/or prepare Subsequent Works of, publicly display,
+        publicly perform, sublicense, and distribute the Software and such
+        Subsequent Works.
+
+    3.  Redistribution. You may reproduce and distribute copies of
+        the Software or Subsequent Works thereof in any medium, with or
+        without modifications, provided that You meet the following
+        conditions:
+
+        (a) You must procure that any other recipients of the Software
+            or Subsequent Works is familiar with this Agreement and adheres
+            to scope of License and restrictions formulated in this Agreement;
+
+        (b) You must cause any modified files to carry prominent notices
+            stating that You changed the files;
+
+        (c) You must not provide Paas;
+
+        (d) You must not provide SaaS for other purposes than as an integral
+            part of the Business or Public Service (in relationship between
+            You and the Partner);
+
+        You may add Your own notices to Your modifications and may provide
+        additional or different license terms and conditions for use,
+        reproduction, or distribution of Your modifications, or for any
+        such Subsequent Works as a whole, provided Your use, reproduction,
+        and distribution of the Software otherwise complies with the conditions
+        stated in this License.
+
+    4.  Third-Party Software. The Software includes third party open-source
+        code software. Any third-party open-source code software included
+        herein is provided pursuant to its license terms and conditions with
+        which You must comply. The list of Third-Party Software components
+        is listed in the Annex 1 to this Agreement.
+
+    5.  Disclaimer of Warranty. Unless required by applicable law or agreed
+        to in writing, Licensor provides the Software on an "AS IS" BASIS,
+        WITHOUT WARRANTY OF ANY KIND, either express or implied, including,
+        without limitation, any implied warranties of MERCHANTABILITY or
+        FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+        determining the appropriateness of using or redistributing the
+        Software and assume any risks associated with Your exercise of
+        permissions under this License.
+
+    6.  Limitation of Liability. In no event, unless required by applicable
+        law or agreed to in writing, shall Licensor be liable to You for any
+        damages of any type arising as a result of this License or out of
+        the use or inability to use the Software (including but not limited
+        to damages for loss of goodwill, work stoppage, computer failure or
+        malfunction, or any and all other commercial damages or losses), even
+        if Licensor has been advised of the possibility of such damages. If
+        the liability for damages cannot be excluded under applicable law,
+        Licensor will be liable up to the amount paid for use of License by You.
+
+    7.  Termination. If you are in breach of the terms and conditions of this
+        License, this Agreement, including the rights granted under it,
+        will automatically terminate with immediate effect.
+
+    8.  Governing law and jurisdiction. Slovak law shall apply exclusively,
+        excluding the conflict of laws rules of private international law
+        (IPR) and the UN Convention on Contracts for the International Sale
+        of Goods (CISG). All disputes arising from or in connection with
+        this Agreement shall be finally resolved by the courts of Slovak Republic.
