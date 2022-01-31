@@ -13,7 +13,7 @@ import org.springframework.session.web.http.HttpSessionIdResolver;
 @Configuration
 @EnableRedisHttpSession(redisNamespace = "spring:session:${spring.session.redis.namespace}")
 @ConditionalOnProperty(
-        value = "server.security.static.enabled",
+        value = "nae.server.security.static.enabled",
         havingValue = "false"
 )
 public class SessionConfiguration {

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Controller;
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 @ConditionalOnProperty(
-        value = "server.security.static.enabled",
+        value = "nae.server.security.static.enabled",
         havingValue = "true"
 )
 public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfiguration {
