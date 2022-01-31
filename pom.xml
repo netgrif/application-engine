@@ -15,7 +15,7 @@
     <licenses>
         <license>
             <name>NETGRIF Community License</name>
-            <url>https://netgrif.com/engine/license</url>
+            <url>https://netgrif.com/license</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -26,7 +26,7 @@
     <developers>
         <developer>
             <name>Netgrif</name>
-            <email>info@netgrif.com</email>
+            <email>oss@netgrif.com</email>
             <organization>NETGRIF, s.r.o.</organization>
             <organizationUrl>https://netgrif.com</organizationUrl>
         </developer>
@@ -579,28 +579,29 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>attach-javadocs</id>-->
-            <!--                        <goals>-->
-            <!--                            <goal>jar</goal>-->
-            <!--                        </goals>-->
-            <!--                        <phase>install</phase>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--                <configuration>-->
-            <!--                    <source>11</source>-->
-            <!--                    <doclint>none</doclint>-->
-            <!--                    <detectJavaApiLink>false</detectJavaApiLink>-->
-            <!--                    <failOnError>false</failOnError>-->
-            <!--                    <additionalOptions>-->
-            <!--                        <additionalOption>-Xdoclint:none</additionalOption>-->
-            <!--                    </additionalOptions>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>attach-javadocs</id>-->
+<!--                        <goals>-->
+<!--                            <goal>jar</goal>-->
+<!--                        </goals>-->
+<!--                        <phase>install</phase>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <source>11</source>-->
+<!--                    <doclint>none</doclint>-->
+<!--                    <detectJavaApiLink>false</detectJavaApiLink>-->
+<!--                    <failOnWarnings>false</failOnWarnings>-->
+<!--                    <quiet>true</quiet>-->
+<!--                    <additionalOptions>-->
+<!--                        <additionalOption>-Xdoclint:none</additionalOption>-->
+<!--                    </additionalOptions>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -753,6 +754,30 @@
                     <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
                 </snapshotRepository>
             </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
