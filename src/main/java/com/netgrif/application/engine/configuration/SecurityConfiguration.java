@@ -45,7 +45,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnExpression("!${nae.oauth.enabled} && !${server.security.static.enabled} && !${nae.ldap.enabled}")
+@ConditionalOnExpression("!${nae.server.security.static.enabled} && !${nae.ldap.enabled}")
 public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired

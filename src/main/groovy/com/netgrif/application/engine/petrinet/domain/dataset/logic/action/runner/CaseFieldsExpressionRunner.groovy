@@ -27,7 +27,7 @@ abstract class CaseFieldsExpressionRunner {
     private Map<String, Closure> cache = new MaxSizeHashMap<>(cacheSize)
 
     @Autowired
-    CaseFieldsExpressionRunner(@Value('${expressions.runner.cache-size}') int cacheSize) {
+    CaseFieldsExpressionRunner(@Value('${nae.expressions.runner.cache-size}') int cacheSize) {
         this.cacheSize = cacheSize
     }
 
