@@ -12,10 +12,10 @@
             <!--@formatter:off-->
             cost: f.1;
             execute "static_edit_limits" with ([
-                "delta_limit": [
-                    value: cost.value,
-                    type: "number",
-                ]
+            "delta_limit": [
+            value: cost.value,
+            type: "number",
+            ]
             ] as Map)
             <!--@formatter:on-->
         </action>
