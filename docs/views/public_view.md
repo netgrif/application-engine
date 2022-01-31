@@ -156,10 +156,10 @@ rm cert.pem
    properties:
 
 ```properties
-***REMOVED***
-***REMOVED***
+nae.security.jwt.expiration=900000
+nae.security.jwt.algorithm=RSA
 nae.security.jwt.private-key=classpath:certificates/private.der
-***REMOVED***
+nae.security.server-patterns=/api/auth/signup,/api/auth/token/verify,/api/auth/reset,/api/auth/recover,/v2/api-docs,/swagger-ui.html,/api/public/**
 ```
 
 4. To prevent maven to compile these certificate and key files you have to add a maven plugin to your project:

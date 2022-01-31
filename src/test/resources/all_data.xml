@@ -598,11 +598,11 @@
                     enumMap: f.enumeration_map_changed,
                     multiMap: f.multichoice_map_changed;
 
-                    def optionD = new com.netgrif.workflow.petrinet.domain.I18nString("David");
+                    def optionD = new com.netgrif.application.engine.petrinet.domain.I18nString("David");
                     optionD.addTranslation("sk", "Dávid");
-                    def optionE = new com.netgrif.workflow.petrinet.domain.I18nString("Eve");
+                    def optionE = new com.netgrif.application.engine.petrinet.domain.I18nString("Eve");
                     optionE.addTranslation("sk", "Eva");
-                    def optionF = new com.netgrif.workflow.petrinet.domain.I18nString("Felix");
+                    def optionF = new com.netgrif.application.engine.petrinet.domain.I18nString("Felix");
                     optionF.addTranslation("sk", "Félix");
 
                     change enumMap options {

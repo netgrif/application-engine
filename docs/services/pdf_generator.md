@@ -107,7 +107,7 @@ PdfResource bean:
 | Example in application.properties | Example of getting bean and setting attribute in actions|
 |-----------------------------------|---------------------------------------------------------|
 | `properties nae.pdf.properties.pageWidth=650` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)` |
-| `properties ***REMOVED***` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)`|
+| `properties nae.pdf.resources.templateResource=classpath:src/main/resources/pdfGenerator/template_pdf.pdf` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)`|
 
 ## Setup
 
