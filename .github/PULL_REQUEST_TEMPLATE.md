@@ -26,7 +26,7 @@ Next thing, please read and edit the PR description below the following way:
 - If a statement is between `<` `>` symbols, replace it with your content according to the instructions in the statement.
 - If a slash `/` is between two statements, choose to fill only one or the other.
 - To reference a JIRA issue, use the issue key wrapped by `[ ]` brackets.
-- To mention someone, use at `@` symbol.
+- To mention someone (or team), use at `@` symbol.
 - To reference specific code, use an absolute link to the source code file with suffix `#L` and the number of the desired line of code.
 
 For whole markdown documentation please read [GitHub Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
@@ -68,7 +68,7 @@ You can now safely **delete all between two horizontal lines**, so the instructi
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
-- [ ] My changes have been checked, personally or remotely, with at least one of the reviewer
+- [ ] My changes have been checked, personally or remotely, with @...
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have resolved all conflicts with the target branch of the PR
 - [ ] I have updated and synced my code with the target branch
