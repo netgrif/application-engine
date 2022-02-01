@@ -11,10 +11,11 @@
 
 > Next-generation end-to-end low code platform.
 
-Application Engine is a workflow management system fully supporting low-code language Petriflow. Application Engine (NAE for short)
-is based on Spring framework with fully complaint Petriflow language interpreter. NAE runs inside the Java Virtual Machine.
-It can be embedded into Java 11 project or used as a standalone process server. On top of the process server, NAE provides
-additional components to make integration to your project/environment seamless.
+Application Engine is a workflow management system fully supporting low-code language Petriflow. Application Engine (NAE
+for short)
+is based on Spring framework with fully complaint Petriflow language interpreter. NAE runs inside the Java Virtual
+Machine. It can be embedded into Java 11 project or used as a standalone process server. On top of the process server,
+NAE provides additional components to make integration to your project/environment seamless.
 
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
 * Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
@@ -27,25 +28,29 @@ additional components to make integration to your project/environment seamless.
 ## Components
 
 Netgrif Application Engine (or NAE for short) consists of several key components:
- * **Workflow engine**
-   * **Process executions** - Process instance and task management
-   * [**Actions and Events processing**](https://engine.netgrif.com/events/events) - Compiling and running action's code, handling events in processes
-   * [**Roles management and permissions resolution**](https://engine.netgrif.com/roles/permissions) - Permissions and restrictions resolving for processes
-   * [**Search and filters**](https://engine.netgrif.com/search/filter) - Indexing, querying and filter management.
- * **Authentication and authorization** - User management and application-wide permissions
-   * [**LDAP**](https://engine.netgrif.com/integration/ad_kerberos) - Integration to authentication solution via LDAP protocol.
-   * **Organization structures** - Managing organization structure for application users
- * **Business rules engine** - Rules execution across whole application based on [Drools](https://drools.org/)
- * **Logging and auditing** - Logging to text file and Event/Audit log generation to the main database 
- * **Mail service** - Mail client for sending and receiving emails
- * **Extension services**
-   * [**PDF generator**](https://engine.netgrif.com/services/pdf_generator) - Generate PDF from process form / task
-   * **QR code generator** - Generate QR code from process data
+
+* **Workflow engine**
+    * **Process executions** - Process instance and task management
+    * [**Actions and Events processing**](https://engine.netgrif.com/events/events) - Compiling and running action's
+      code, handling events in processes
+    * [**Roles management and permissions resolution**](https://engine.netgrif.com/roles/permissions) - Permissions and
+      restrictions resolving for processes
+    * [**Search and filters**](https://engine.netgrif.com/search/filter) - Indexing, querying and filter management.
+* **Authentication and authorization** - User management and application-wide permissions
+    * [**LDAP**](https://engine.netgrif.com/integration/ad_kerberos) - Integration to authentication solution via LDAP
+      protocol.
+    * **Organization structures** - Managing organization structure for application users
+* **Business rules engine** - Rules execution across whole application based on [Drools](https://drools.org/)
+* **Logging and auditing** - Logging to text file and Event/Audit log generation to the main database
+* **Mail service** - Mail client for sending and receiving emails
+* **Extension services**
+    * [**PDF generator**](https://engine.netgrif.com/services/pdf_generator) - Generate PDF from process form / task
+    * **QR code generator** - Generate QR code from process data
 
 ## Requirements
 
-The Application engine has some requirements for runtime environment. The following table is summary of requirements 
-to run and use the engine:
+The Application engine has some requirements for runtime environment. The following table is summary of requirements to
+run and use the engine:
 
 | Name                                                   | Version | Description                                                     | Recommendation                                                         |
 |--------------------------------------------------------|---------|-----------------------------------------------------------------|------------------------------------------------------------------------|
@@ -54,24 +59,28 @@ to run and use the engine:
 | [MongoDB](https://www.mongodb.com/)                    | 4.4+    | Main document store database                                    | [MongoDB 4.4.11](https://docs.mongodb.com/v4.4/installation/)          |
 | [Elasticsearch](https://www.elastic.co/elasticsearch/) | 7.10+   | Index database used for better application search               | [Elasticsearch 7.10.2](https://www.elastic.co/downloads/elasticsearch) |
 
-If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml) configuration to run all
-necessary databases to develop with NAE.
+If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
+configuration to run all necessary databases to develop with NAE.
 
-If you are going to deploy your application on Kubernetes cluster please check out documentation for [Kubernetes deployment](https://engine.netgrif.com/devops/kubernetes).
+If you are going to deploy your application on Kubernetes cluster please check out documentation
+for [Kubernetes deployment](https://engine.netgrif.com/devops/kubernetes).
 
 ## Installation
 
 ### Running as standalone
 
-You can start using the NAE by its self and then upload your processes via API. You run the NAE from JAR (Java Archive) file or as docker container.
+You can start using the NAE by its self and then upload your processes via API. You run the NAE from JAR (Java Archive)
+file or as docker container.
 
 #### Running a JAR file
 
-To run the engine from the jar file you can use a release package available from this repository.
-The latest release package you can download from [here](https://github.com/netgrif/application-engine/releases/latest).
-Before you start you must generate own RSA key pair for session tokens, you can follow [this guide](https://engine.netgrif.com/views/public_view).
+To run the engine from the jar file you can use a release package available from this repository. The latest release
+package you can download from [here](https://github.com/netgrif/application-engine/releases/latest). Before you start
+you must generate own RSA key pair for session tokens, you can
+follow [this guide](https://engine.netgrif.com/views/public_view).
 
-To quickly start working with the engine just write the following commands to download, unzip, generate security keys and start:
+To quickly start working with the engine just write the following commands to download, unzip, generate security keys
+and start:
 
 ```shell
 $ wget -O nae.zip https://github.com/netgrif/application-engine/releases/latest
@@ -81,18 +90,20 @@ $ cd resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl r
 $ java -jar nae.jar
 ```
 
-By default, the engine assumes that all databases are running locally. If you are running required database on server or on different ports, 
-you can pass these settings as arguments to NAE.
+By default, the engine assumes that all databases are running locally. If you are running required database on server or
+on different ports, you can pass these settings as arguments to NAE.
 
 ```shell
 $ java -jar nae.jar --***REMOVED***/nae --***REMOVED*** --***REMOVED***
 ```
 
-For complete list of all configurable application properties see [article in documentation](https://engine.netgrif.com/properties).
+For complete list of all configurable application properties
+see [article in documentation](https://engine.netgrif.com/properties).
 
 #### Running as Docker container
 
-You can also use docker to run the engine from the official image on [Docker hub](https://hub.docker.com/r/netgrif/application-engine).
+You can also use docker to run the engine from the official image
+on [Docker hub](https://hub.docker.com/r/netgrif/application-engine).
 
 ```shell
 $ docker pull netgrif/application-engine
@@ -100,18 +111,20 @@ $ docker run -d -p 8080:8080 netgrif/application-engine
 ```
 
 As the engine connects by default to locally ran databases for more precise configuration we recommend to use Docker
-compose file or Kubernetes manifest to run whole stack all at once. You can read more about it in [this guide](https://engine.netgrif.com/devops).
+compose file or Kubernetes manifest to run whole stack all at once. You can read more about it
+in [this guide](https://engine.netgrif.com/devops).
 
 ### Embedding
 
-The Application Engine can be used inside your java application as a java library. The engine is written in Spring 
-framework so you can seemlessly integrate it to your Spring Boot application. The engine can be linked
-as a Maven dependency:
+The Application Engine can be used inside your java application as a java library. The engine is written in Spring
+framework, so you can seamlessly integrate it to your Spring Boot application. The engine can be linked as a Maven
+dependency:
 
 ```XML
+
 <dependency>
-  <groupId>com.netgrif</groupId>
-  <artifactId>application-engine</artifactId>
+    <groupId>com.netgrif</groupId>
+    <artifactId>application-engine</artifactId>
 </dependency>
 ```
 
@@ -121,24 +134,27 @@ For more information please read instructions in [Get Started](https://engine.ne
 
 ### Frontend library
 
-For complete Netgrif Application Engine experience check out our [Angular library - Netgrif Components](https://github.com/netgrif/components) 
+For complete Netgrif Application Engine experience check out
+our [Angular library - Netgrif Components](https://github.com/netgrif/components)
 for building frontend applications in Application Engine platform powered by Petriflow processes.
 
 ### Application Builder
 
-For creating processes in Petriflow language try our free Application Builder on [https://builder.netgrif.com](https://builder.netgrif.com).
-You can start from scratch or import existing process in BPMN 2.0 and builder automatically converts it into Petriflow.
+For creating processes in Petriflow language try our free Application Builder
+on [https://builder.netgrif.com](https://builder.netgrif.com). You can start from scratch or import existing process in
+BPMN 2.0 and builder automatically converts it into Petriflow.
 
 ### NCLI (Coming soon)
 
-If you need help with setting up project or looking for tool to automate your developer work with NAE based applications,
-take a look on [NCLI (Netgrif Command Line Interface)](https://github.com/netgrif/ncli).
+If you need help with setting up project or looking for tool to automate your developer work with NAE based
+applications, take a look on [NCLI (Netgrif Command Line Interface)](https://github.com/netgrif/ncli).
 
 ## Reporting issues
 
-If you find a bug, let us know at [Issue page](https://github.com/netgrif/application-engine/issues). 
-First, please read our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
+If you find a bug, let us know at [Issue page](https://github.com/netgrif/application-engine/issues). First, please read
+our [Contribution guide](https://github.com/netgrif/application-engine/blob/master/CONTRIBUTING.md)
 
 ## License
 
-The software is licensed under NETGRIF Community license. You may be found this license at [the LICENSE file](https://github.com/netgrif/application-engine/blob/master/LICENSE) in the repository. 
+The software is licensed under NETGRIF Community license. You may be found this license
+at [the LICENSE file](https://github.com/netgrif/application-engine/blob/master/LICENSE) in the repository. 
