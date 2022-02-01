@@ -40,4 +40,7 @@ public class MailDraft {
         return mailDraftBuilder().from(from).to(to).subject("").body("").isHtml(false).attachments(new HashMap<>());
     }
 
+    public static class MailDraftBuilder {
+    }
+
 }
