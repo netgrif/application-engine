@@ -137,17 +137,16 @@ That's all for frontend.
 To make JWT authentication work on backend, you will need to create a self-signed private key for JwtService to be able
 to create the JWT token. You can create and place the key in your project following these steps:
 
-1. Generate a .CRT and a .DER file using OpenSSL
+1. Generate a .CRT (public key) and a .DER (private key) file using OpenSSL
     - On Linux use OpenSSL of the Linux system
     - On Windows, use OpenSSL of Git Bash (if you do not have installed Git or Git bash on Windows, visit Git -
       Installing Git (git-scm.com))
     - You can generate private key and certificate with following command:
 
 ```shell
-openssl req -newkey rsa:4096 -nodes -keyout private.pem -x509 -days 3650 - out certificate.crt
-cat certificate.crt > cert.pem
-openssl x509 -outform der -in cert.pem -out private.der
-rm cert.pem
+openssl genrsa -out keypair.pem 4096
+openssl rsa -in keypair.pem -pubout -out public.crt
+openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der
 ```
 
 2. After generating .DER and .CRT files, places them in your project under resources/certificates folder.

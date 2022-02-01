@@ -69,15 +69,15 @@ You can start using the NAE by its self and then upload your processes via API. 
 
 To run the engine from the jar file you can use a release package available from this repository.
 The latest release package you can download from [here](https://github.com/netgrif/application-engine/releases/latest).
-Before you start you must generate own security certificate for session tokens, you can follow [this guide](https://engine.netgrif.com/views/public_view).
+Before you start you must generate own RSA key pair for session tokens, you can follow [this guide](https://engine.netgrif.com/views/public_view).
 
-To quickly start working with the engine just write the following commands to download, unzip, generate certificates and start:
+To quickly start working with the engine just write the following commands to download, unzip, generate security keys and start:
 
 ```shell
 $ wget -O nae.zip https://github.com/netgrif/application-engine/releases/latest
 $ unzip nae.zip
 $ cd nae
-$ cd resources/certificates && openssl req -newkey rsa:4096 -nodes -keyout private.pem -x509 -days 3650 -out certificate.crt && cat certificate.crt > cert.pem && openssl x509 -outform der -in cert.pem -out private.der && rm cert.pem && cd ../..
+$ cd resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../..
 $ java -jar nae.jar
 ```
 
