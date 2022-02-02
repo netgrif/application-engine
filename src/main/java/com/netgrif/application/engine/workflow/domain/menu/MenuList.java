@@ -5,7 +5,10 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +26,22 @@ public class MenuList {
     @JacksonXmlProperty(localName = "menu")
     protected List<Menu> menus;
 
-    public MenuList () {
+    public MenuList() {
         this.menus = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MenuList menuList = (MenuList) o;
+
+        return menus.equals(menuList.menus);
+    }
+
+    @Override
+    public int hashCode() {
+        return menus.hashCode();
     }
 }

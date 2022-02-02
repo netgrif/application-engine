@@ -193,7 +193,7 @@ class MenuImportExportTest {
         MenuAndFilters original = menuImportExportService.invokeMethod("loadFromXML", [FileFieldValue.fromString(testXmlMenu.getName() + ":" + testXmlMenu.getPath())] as Object[]) as MenuAndFilters
         MenuAndFilters exported = menuImportExportService.invokeMethod("loadFromXML", [exportFileField] as Object[]) as MenuAndFilters
 
-        assert original == exported
+        assert Objects.equals(original, exported);
     }
 
     private User createDummyUser() {

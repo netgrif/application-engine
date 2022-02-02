@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class that wraps and holds list of filters, which are meant to be exported/imported.
@@ -27,5 +28,20 @@ public class FilterImportExportList {
 
     public FilterImportExportList() {
         this.filters = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FilterImportExportList that = (FilterImportExportList) o;
+
+        return Objects.equals(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return filters != null ? filters.hashCode() : 0;
     }
 }

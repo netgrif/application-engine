@@ -39,7 +39,7 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
     @Autowired
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Value("${server.security.csrf}")
+    @Value("${nae.server.security.csrf}")
     private boolean csrf = true;
 
     @Bean

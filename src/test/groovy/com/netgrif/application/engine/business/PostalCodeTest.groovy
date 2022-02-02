@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@SpringBootTest(properties = "postal.codes.import=true")
+@SpringBootTest(properties = "nae.postal.codes.import=true")
 @SuppressWarnings("GrMethodMayBeStatic")
 class PostalCodeTest {
 
@@ -61,6 +61,6 @@ class PostalCodeTest {
     private assertMultipleMatch(List<PostalCode> cities) {
         assert cities != null
         assert cities.size() > 1
-        assert cities.find { it.city == "Bratislava - Čunovo" }
+        assert cities.find { it.city == "Bratislava - Rusovce" } != null
     }
 }

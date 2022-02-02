@@ -6,8 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import javax.xml.bind.annotation.*;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -29,4 +34,25 @@ public class MenuEntry {
     protected List<MenuEntryRole> menuEntryRoleList;
     @JacksonXmlProperty(isAttribute = true)
     protected Boolean useIcon;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MenuEntry menuEntry = (MenuEntry) o;
+
+        if (!Objects.equals(entryName, menuEntry.entryName)) return false;
+        if (!Objects.equals(menuEntryRoleList, menuEntry.menuEntryRoleList))
+            return false;
+        return Objects.equals(useIcon, menuEntry.useIcon);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = entryName != null ? entryName.hashCode() : 0;
+        result = 31 * result + (menuEntryRoleList != null ? menuEntryRoleList.hashCode() : 0);
+        result = 31 * result + (useIcon != null ? useIcon.hashCode() : 0);
+        return result;
+    }
 }

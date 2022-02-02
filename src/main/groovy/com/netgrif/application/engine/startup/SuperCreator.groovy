@@ -31,7 +31,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IProcessRoleService processRoleService
 
-    @Value('${admin.password}')
+    @Value('${nae.admin.password}')
     private String superAdminPassword
 
     private IUser superUser
