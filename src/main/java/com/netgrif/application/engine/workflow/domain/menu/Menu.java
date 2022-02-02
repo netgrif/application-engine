@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +27,22 @@ public class Menu {
 
     @JacksonXmlProperty(isAttribute = true, localName = "name")
     protected String menuIdentifier;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Menu menu = (Menu) o;
+
+        if (!Objects.equals(menuEntries, menu.menuEntries)) return false;
+        return Objects.equals(menuIdentifier, menu.menuIdentifier);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = menuEntries != null ? menuEntries.hashCode() : 0;
+        result = 31 * result + (menuIdentifier != null ? menuIdentifier.hashCode() : 0);
+        return result;
+    }
 }

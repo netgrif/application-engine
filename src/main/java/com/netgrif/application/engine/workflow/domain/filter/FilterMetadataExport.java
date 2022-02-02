@@ -5,10 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class represents complex structure of filter field metadata object.
@@ -75,5 +72,30 @@ public class FilterMetadataExport {
         mapObject.put("predicateMetadata", listPredicateMetadata);
         mapObject.put("searchCategories", searchCategories != null ? searchCategories : new ArrayList<String>());
         return mapObject;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FilterMetadataExport that = (FilterMetadataExport) o;
+
+        if (defaultSearchCategories != that.defaultSearchCategories) return false;
+        if (inheritAllowedNets != that.inheritAllowedNets) return false;
+        if (!Objects.equals(filterType, that.filterType)) return false;
+        if (!Objects.equals(searchCategories, that.searchCategories))
+            return false;
+        return Objects.equals(predicateMetadata, that.predicateMetadata);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = filterType != null ? filterType.hashCode() : 0;
+        result = 31 * result + (defaultSearchCategories ? 1 : 0);
+        result = 31 * result + (inheritAllowedNets ? 1 : 0);
+        result = 31 * result + (searchCategories != null ? searchCategories.hashCode() : 0);
+        result = 31 * result + (predicateMetadata != null ? predicateMetadata.hashCode() : 0);
+        return result;
     }
 }

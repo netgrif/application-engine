@@ -5,10 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class wraps and holds list of predicates.
@@ -48,5 +45,20 @@ public class PredicateArray {
             mapObject.add(val.getMapObject());
         }
         return mapObject;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PredicateArray that = (PredicateArray) o;
+
+        return predicates.size() == that.predicates.size(); // TODO implements better comparison of two PredicateArrays
+    }
+
+    @Override
+    public int hashCode() {
+        return predicates != null ? predicates.hashCode() : 0;
     }
 }

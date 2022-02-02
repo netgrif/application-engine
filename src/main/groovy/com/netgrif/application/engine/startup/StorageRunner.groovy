@@ -14,7 +14,7 @@ class StorageRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(StorageRunner)
 
-    @Value('${storage.clean}')
+    @Value('${nae.storage.clean}')
     private boolean cleanStorage
 
     @Autowired

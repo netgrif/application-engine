@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Class that represents one exported filter.
@@ -39,5 +40,34 @@ public class FilterImportExport {
 
     public void setFilterMetadataExport(Map<String, Object> value) {
         this.filterMetadataExport = new FilterMetadataExport(value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FilterImportExport that = (FilterImportExport) o;
+
+        if (!Objects.equals(parentViewId, that.parentViewId)) return false;
+        if (!Objects.equals(filterName, that.filterName)) return false;
+        if (!Objects.equals(filterValue, that.filterValue)) return false;
+        if (!Objects.equals(visibility, that.visibility)) return false;
+        if (!Objects.equals(type, that.type)) return false;
+        if (!Objects.equals(allowedNets, that.allowedNets)) return false;
+        return Objects.equals(filterMetadataExport, that.filterMetadataExport);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = parentViewId != null ? parentViewId.hashCode() : 0;
+        result = 31 * result + (filterName != null ? filterName.hashCode() : 0);
+        result = 31 * result + (filterValue != null ? filterValue.hashCode() : 0);
+        result = 31 * result + (visibility != null ? visibility.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (icon != null ? icon.hashCode() : 0);
+        result = 31 * result + (allowedNets != null ? allowedNets.hashCode() : 0);
+        result = 31 * result + (filterMetadataExport != null ? filterMetadataExport.hashCode() : 0);
+        return result;
     }
 }
