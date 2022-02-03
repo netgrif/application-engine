@@ -1,13 +1,13 @@
 ---
-name: Feature request
+Name: Feature request
 
-about: Suggest an idea for this project
+About: Suggest an idea for this project
 
-title: ''
+###Title: ''
 
-labels: ''
+Labels: ''
 
-assignees: ''
+Assignees: ''
 
 ---
 
