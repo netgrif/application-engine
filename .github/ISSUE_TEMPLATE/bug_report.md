@@ -1,13 +1,13 @@
 ---
-name: Bug report
+Name: Bug report
 
-about: Create a report to help us improve
+About: Create a report to help us improve
 
-title: ''
+###Title: ''
 
-labels: ''
+Labels: ''
 
-assignees: ''
+Assignees: ''
 
 ---
 
