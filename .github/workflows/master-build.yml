@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 11
+          distribution: 'adopt'
 
       - name: Cache Maven packages
         uses: actions/cache@v1
@@ -70,6 +71,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 11
+          distribution: 'adopt'
 
       - name: Cache Maven packages
         uses: actions/cache@v1
@@ -108,7 +110,7 @@ jobs:
           - name: Set up Maven Central Repository
             uses: actions/setup-java@v2
             with:
-              java-version: '11'
+              java-version: 11
               distribution: 'adopt'
               server-id: ossrh
               server-username: MAVEN_USERNAME
