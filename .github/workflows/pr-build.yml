@@ -43,7 +43,7 @@ jobs:
           - 6379/tcp
 
       elasticsearch:
-        image: elasticsearch:7.10.2
+        image: elasticsearch:7.10.1
         ports:
           - 9200/tcp
           - 9300/tcp
