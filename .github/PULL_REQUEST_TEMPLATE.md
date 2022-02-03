@@ -80,7 +80,7 @@ You can now safely **delete all between two horizontal lines**, so the instructi
     - [ ] Integration tests
 - [ ] I have checked my contribution with code analysis tools:
     - [ ] [SonarCloud](https://sonarcloud.io/project/overview?id=netgrif_application-engine)
-    - [ ] [Snyk](https://app.snyk.io/org/netgrif)
+    - [ ] [Snyk](https://app.snyk.io/org/netgrif/project/ea82b3b8-658d-41f5-89a7-76cd600da01f)
 - [ ] I have made corresponding changes to the documentation:
     - [ ] Developer documentation
     - [ ] User Guides
