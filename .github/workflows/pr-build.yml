@@ -16,6 +16,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 11
+          distribution: 'adopt'
 
       - name: Cache Maven packages
         uses: actions/cache@v1
@@ -25,7 +26,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build
-        run: mvn clear verify -DskipTests=true
+        run: mvn clean verify -DskipTests=true
 
   test:
     name: Test
@@ -64,6 +65,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 11
+          distribution: 'adopt'
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
@@ -80,7 +82,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build
-        run: mvn clear package install -DskipTests=true
+        run: mvn clean package install -DskipTests=true
 
       - name: Build, test, and analyze
         env:
