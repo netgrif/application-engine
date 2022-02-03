@@ -44,7 +44,7 @@ jobs:
         ports:
           - 6379/tcp
       elasticsearch:
-        image: elasticsearch:7.10.2
+        image: elasticsearch:7.10.1
         ports:
           - 9200/tcp
         options: -e="discovery.type=single-node;http.host=0.0.0.0;cluster.name=elasticsearch;transport.host=0.0.0.0" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
