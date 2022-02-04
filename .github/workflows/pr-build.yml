@@ -35,12 +35,12 @@ jobs:
       mongo:
         image: mongo:4.4
         ports:
-          - 27017/tcp
+          - 27017:27017
 
       redis:
         image: redis
         ports:
-          - 6379/tcp
+          - 6379:6379
 
       elasticsearch:
         image: elasticsearch:7.10.1
@@ -80,6 +80,10 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: Generate certificates
+        run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
+
 
       - name: Build
         run: mvn clean package install -DskipTests=true
