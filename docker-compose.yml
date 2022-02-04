@@ -5,9 +5,6 @@ services:
     image: mongo:4.4
     ports:
     - "27017:27017"
-#      environment:
-#          MONGO_INITDB_ROOT_USERNAME: netgrif_nae
-#          MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
 
   docker-elastic:
     image: elasticsearch:7.10.1
