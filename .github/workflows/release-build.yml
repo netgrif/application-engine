@@ -190,7 +190,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-assets:
-    name: GitHub append new Assets
+    name: Upload Release Assets
     needs: test
     runs-on: ubuntu-latest
     permissions:
@@ -198,3 +198,6 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v2
+      - name: Build project
+        run: |
+          zip
