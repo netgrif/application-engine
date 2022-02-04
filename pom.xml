@@ -481,6 +481,14 @@
 
     <repositories>
         <repository>
+            <id>mvnrepository1</id>
+            <url>https://maven.imagej.net/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>mvnrepository2</id>
+            <url>https://repo.spring.io/plugins-release/</url>
+        </repository>
+        <repository>
             <id>mulesoft</id>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
