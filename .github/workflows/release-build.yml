@@ -198,6 +198,46 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v2
+
+      - name: Generate certificates
+        run: cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
+
+      - name: Build
+        run: mvn clean package install -DskipTests=true
+
       - name: Build project
         run: |
-          zip
+          mkdir netgrif-application-engine
+          cp target/*-exec.jar netgrif-application-engine
+          cp -R src/main/resources/*  netgrif-application-engine
+          zip --junk-paths netgrif-application-engine netgrif-application-engine
+
+      - uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /repos/:repository/releases/latest
+          repository: ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: get upload url
+        id: get_upload_url
+        run: |
+          url=$(echo "$response" | jq -r '.upload_url')
+          echo "::set-output name=url::$url"
+        env:
+          response: ${{ steps.get_latest_release.outputs.data }}
+
+      - name: Upload a Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # The URL for uploading assets to the release
+          upload_url: ${{steps.get_upload_url.outputs.url}}
+          # The path to the asset you want to upload
+          asset_path: ./netgrif-application-engine.zip
+          # The name of the asset you want to upload
+          asset_name: netgrif-application-engine.zip
+          # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
+          asset_content_type: application/zip
