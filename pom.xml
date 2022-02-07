@@ -747,6 +747,34 @@
             </properties>
         </profile>
         <profile>
+            <id>docker-build</id>
+            <build>
+                <finalName>app</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.3.2</version>
+                        <executions>
+                            <execution>
+                                <id>exec</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>exec</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <finalName>app</finalName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>github-publish</id>
             <distributionManagement>
                 <repository>
