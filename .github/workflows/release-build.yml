@@ -96,6 +96,7 @@ jobs:
 
   publish-OSSRH:
     runs-on: ubuntu-latest
+    name: Publish to Maven Central
     needs: test
     permissions:
       contents: read
@@ -184,6 +185,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       - name: Publish artifact on GitHub Packages
         run: mvn -B -P github-publish clean deploy -DskipTests
         env:
@@ -204,7 +217,7 @@ jobs:
 
       - name: Build project
         run: |
-          mkdir netgrif-application-engine
+          mkdir -p netgrif-application-engine/src/main/resources/
           cp target/*-exec.jar netgrif-application-engine
           cp -R src/main/resources/*  netgrif-application-engine/src/main/resources/
           zip --junk-paths netgrif-application-engine.zip netgrif-application-engine
