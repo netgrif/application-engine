@@ -120,7 +120,7 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Publish package
-        run: mvn --batch-mode -P ossrh-publish -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}  deploy
+        run: mvn -DskipTests=true --batch-mode -P ossrh-publish -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
@@ -221,10 +221,10 @@ jobs:
 
       - name: Build project
         run: |
-          mkdir -p netgrif-application-engine/src/main/resources/
-          cp target/*-exec.jar netgrif-application-engine
-          cp -R src/main/resources/*  netgrif-application-engine/src/main/resources/
-          zip --junk-paths netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip netgrif-application-engine
+          mkdir -p netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
+          cp target/*-exec.jar netgrif-application-engine-${{ steps.getVersion.outputs.version }}
+          cp -R src/main/resources/*  netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
+          zip -r netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip netgrif-application-engine-${{ steps.getVersion.outputs.version }}
 
       - uses: octokit/request-action@v2.x
         id: get_latest_release
@@ -248,6 +248,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{steps.get_upload_url.outputs.url}}
-          asset_path: ./netgrif-application-engine.zip
-          asset_name: netgrif-application-engine.zip
+          asset_path: ./netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip
+          asset_name: netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip
           asset_content_type: application/zip
