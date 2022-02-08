@@ -229,8 +229,9 @@ jobs:
       - uses: octokit/request-action@v2.x
         id: get_latest_release
         with:
-          route: GET /repos/:repository/releases/latest
-          repository: ${{ github.repository }}
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: netgrif
+          repo: application-engine
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
