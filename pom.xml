@@ -749,19 +749,13 @@
         <profile>
             <id>docker-build</id>
             <build>
-                <finalName>app</finalName>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>2.3.2</version>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>exec</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
+                                <id>repackage</id>
                                 <configuration>
                                     <classifier>exec</classifier>
                                 </configuration>
@@ -783,6 +777,25 @@
                     <url>https://maven.pkg.github.com/netgrif/application-engine</url>
                 </repository>
             </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>repackage</id>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>ossrh-publish</id>
@@ -793,7 +806,7 @@
                     <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
                 <snapshotRepository>
-                    <id>ossrh-snapshot</id>
+                    <id>ossrh</id>
                     <name>Central Repository OSSRG Snapshots</name>
                     <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
                 </snapshotRepository>
@@ -819,6 +832,21 @@
                                 <arg>loopback</arg>
                             </gpgArguments>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>repackage</id>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
