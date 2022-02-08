@@ -157,7 +157,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_AUTH_TOKEN }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Get Project Version from pom.xml
         uses: entimaniac/read-pom-version-action@1.0.0
@@ -226,29 +226,7 @@ jobs:
           cp -R src/main/resources/*  netgrif-application-engine-${{ steps.getVersion.outputs.version }}/src/main/resources/
           zip -r netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip netgrif-application-engine-${{ steps.getVersion.outputs.version }}
 
-      - uses: octokit/request-action@v2.x
-        id: get_latest_release
+      - uses: shogo82148/actions-upload-release-asset@v1
         with:
-          route: GET /repos/{owner}/{repo}/releases/latest
-          owner: netgrif
-          repo: application-engine
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: get upload url
-        id: get_upload_url
-        run: |
-          url=$(echo "$response" | jq -r '.upload_url')
-          echo "::set-output name=url::$url"
-        env:
-          response: ${{ steps.get_latest_release.outputs.data }}
-
-      - name: Upload a Release Asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{steps.get_upload_url.outputs.url}}
-          asset_path: ./netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip
-          asset_name: netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip
-          asset_content_type: application/zip
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip
