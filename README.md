@@ -19,10 +19,10 @@ NAE provides additional components to make integration to your project/environme
 
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
 * Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
-* Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started)
+<!-- * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started) -->
 * Issue Tracker: [GitHub issues](https://github.com/netgrif/application-engine/issues)
 * Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
-* Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/#/roadmap)
+<!-- * Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/#/roadmap) -->
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
 ## Components
