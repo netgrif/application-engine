@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <role>
-        <id>role1</id>
-        <name>role1</name>
+    <id>role1</id>
+    <name>role1</name>
     <!-- DATA -->
     <data type="date">
         <id>datum</id>
@@ -105,7 +106,7 @@
                         veduci: f.praca_veduci;
 
                         change veduci value {
-                            useCase.author.fullName
+                        useCase.author.fullName
                         }
                     </action>
                 </logic>

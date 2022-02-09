@@ -22,11 +22,15 @@
         <label>Task</label>
         <roleRef>
             <id>worker</id>
-            <logic><perform>true</perform></logic>
+            <logic>
+                <perform>true</perform>
+            </logic>
         </roleRef>
         <roleRef>
             <id>manager</id>
-            <logic><cancel>true</cancel></logic>
+            <logic>
+                <cancel>true</cancel>
+            </logic>
         </roleRef>
     </transition>
     <!-- PLACES -->

@@ -1,567 +1,546 @@
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10920/tab/release-report-all-issues"></a>
-## 5.8.0 (26.11.2021)
-### Bug Fixes
-None
+# Changelog
 
-### Improvements
-* [NAE-1469](https://netgrif.atlassian.net/browse/NAE-1469) - Data group layouts refactor
+All notable changes to this project will be documented in this file.
 
-### Features
-* [NAE-1296](https://netgrif.atlassian.net/browse/NAE-1296) - Event Outcome refactor
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
+to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10940/tab/release-report-all-issues"></a>
-## 5.7.3 (23.11.2021)
-### Bug Fixes
-None
+Full
+Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
-### Improvements
-None
+## [6.0.0](https://github.com/netgrif/application-engine/releases/tag/v6.0.0) (2022-02-09)
 
-### Features
-* [NAE-1493](https://netgrif.atlassian.net/browse/NAE-1493) - i18n divider data field
+### Added
 
+- [NAE-1292] Anonym role
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10933/tab/release-report-all-issues"></a>
-## 5.7.2 (23.11.2021)
-### Bug Fixes
-* [NAE-1518](https://netgrif.atlassian.net/browse/NAE-1518) - Export of chained filters
+### Changed
 
-### Improvements
-* [NAE-1439](https://netgrif.atlassian.net/browse/NAE-1439) - Deprecate values
+- [NAE-1565] Update spring boot to 2.6.2
+- [NAE-1490] Default role permissions
+- [NAE-1503] Permission refactor phase 1
+- [NAE-315] Group management migration to MongoDB
+- [NAE-435] Update Spring Boot 2.3.x, rewrite tests
+- [NAE-448] User management migration to MongoDB
+- [NAE-1401] Configurable LDAP integration
 
-### Features
-None
+### Fixed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10913/tab/release-report-all-issues"></a>
-## 5.7.1 (08.11.2021)
-### Bug Fixes
-* [NAE-1487](https://netgrif.atlassian.net/browse/NAE-1487) - Assign button on assigned task
-* [NAE-1485](https://netgrif.atlassian.net/browse/NAE-1485) - Case datafield behavior is not initially set
-* [NAE-1492](https://netgrif.atlassian.net/browse/NAE-1492) - View permission on case is broken when delete permission is present
-* [NAE-1483](https://netgrif.atlassian.net/browse/NAE-1483) - TaskRef init value setting deletes new value of task field
-* [NAE-1520](https://netgrif.atlassian.net/browse/NAE-1520) - Security Configuration Ldap fix
+- [NAE-1552] File field/file list field post event action breaks file upload
+- [NAE-1561] Action tags with ID
+- [NAE-1564] File field value change is not seen on frontend
+- [NAE-1107] ImportHelper & superCreator
 
-### Improvements
-* [NAE-1515](https://netgrif.atlassian.net/browse/NAE-1515) - Filter process UX improvements
-* [NAE-1516](https://netgrif.atlassian.net/browse/NAE-1516) - Group process UX improvements
+## [5.8.0](https://github.com/netgrif/application-engine/releases/tag/5.8.0) (2021-11-26)
 
-### Features
-None
+### Changed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10901/tab/release-report-all-issues"></a>
-## 5.7.0 (29.10.2021)
-### Bug fixes
-* [NAE-1375](https://netgrif.atlassian.net/browse/NAE-1375) - Form field layouting does not respect rows
-* [NAE-1422](https://netgrif.atlassian.net/browse/NAE-1422) - Case view permission query with no users
-* [NAE-1509](https://netgrif.atlassian.net/browse/NAE-1509) - Broken jackson dependencies
-* [NAE-1281](https://netgrif.atlassian.net/browse/NAE-1281) - Immediate file field
-* [NAE-1332](https://netgrif.atlassian.net/browse/NAE-1332) - Cancel Task po kliknutí na rozkliknutý task nekontroluje či user môže daný Task cancelnúť
-* [NAE-1460](https://netgrif.atlassian.net/browse/NAE-1460) - Datafield Spinner Attribute Refactor
+- [NAE-1469] Data group layouts refactor
 
-### Improvements
-* [NAE-1390](https://netgrif.atlassian.net/browse/NAE-1390) - Update "Process file could not be uploaded" message
-* [NAE-1438](https://netgrif.atlassian.net/browse/NAE-1438) - Unique key constraint on options
+### Added
 
-### Features
-* [NAE-1402](https://netgrif.atlassian.net/browse/NAE-1451) - Configurable group navigation with role constraints
-* [NAE-1406](https://netgrif.atlassian.net/browse/NAE-1406) - Filter import/export
-* [NAE-1417](https://netgrif.atlassian.net/browse/NAE-1417) - Menu import/export
+- [NAE-1296] Event Outcome refactor
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10910/tab/release-report-done"></a>
-## 5.6.3 (27.09.2021)
-### Bug fixes
-* [NAE-1467](https://netgrif.atlassian.net/browse/NAE-1467) - Fix table creation for user
-* [NAE-1453](https://netgrif.atlassian.net/browse/NAE-1453) - Example app sign-up broken
-* [NAE-1465](https://netgrif.atlassian.net/browse/NAE-1465) - Display saved filter options with empty input
+## [5.7.5](https://github.com/netgrif/application-engine/releases/tag/5.7.5) (2022-01-11)
 
-### Improvements
-* [NAE-1454](https://netgrif.atlassian.net/browse/NAE-1454) - Dynamic filter chaining
+### Fixed
 
-### Features
-None
+- [NAE-1542] PDF generator generating wrong date format
+- [NAE-1543] Customization of PDF generation for new layout system on a data group
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10909/tab/release-report-all-issues"></a>
-## 5.6.2 (03.09.2021)
-### Bug fixes
-* [NAE-1441](https://netgrif.atlassian.net/browse/NAE-1441) - Var arcs backwards incompatibility
-* [NAE-1442](https://netgrif.atlassian.net/browse/NAE-1442) - LdapUserRef incorrect @Id annotation
+## [5.7.4](https://github.com/netgrif/application-engine/releases/tag/5.7.4) (2021-12-21)
 
-### Improvements
-* [NAE-1443](https://netgrif.atlassian.net/browse/NAE-1443) - LDAP objectClasses not loaded from properties
+### Fixed
 
-### Features
-None
+- [NAE-1533] Mongo case search exceeds maximum query nesting level
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10906/tab/release-report-all-issues"></a>
-## 5.6.1 (30.08.2021)
-### Bug fixes
-* [NAE-1424](https://netgrif.atlassian.net/browse/NAE-1424) - LDAP integration security vulnerability
+## [5.7.3](https://github.com/netgrif/application-engine/releases/tag/5.7.3) (2021-11-23)
 
-### Improvements
-None
+### Added
 
-### Features
-None
+- [NAE-1493] i18n divider data field
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10891/tab/release-report-all-issues"></a>
-## 5.6.0 (26.08.2021)
-### Bug fixes
-* [NAE-1396](https://netgrif.atlassian.net/browse/NAE-1396) - Nefunkčná property na zamedzenie vytvárania grúp pre jednotlivých userov
-* [NAE-1382](https://netgrif.atlassian.net/browse/NAE-1382) - Case ktory ma prvy transition ako executable auto znefunkcni siet
-* [NAE-1372](https://netgrif.atlassian.net/browse/NAE-1372) - Change user list does not work in post create action
-* [NAE-1324](https://netgrif.atlassian.net/browse/NAE-1324) - Delete Petri net with many instances crashes the application
-* [NAE-1312](https://netgrif.atlassian.net/browse/NAE-1312) - Merge issue from NAE-1238_usersRef
+## [5.7.2](https://github.com/netgrif/application-engine/releases/tag/5.7.2) (2021-11-23)
 
-### Improvements
-* [NAE-1400](https://netgrif.atlassian.net/browse/NAE-1400) - Fix multiple access to repository while getting data
-* [NAE-1399](https://netgrif.atlassian.net/browse/NAE-1399) - PDF generator improvement
-* [NAE-1392](https://netgrif.atlassian.net/browse/NAE-1392) - Implement GroovyShell Factory
-* [NAE-1104](https://netgrif.atlassian.net/browse/NAE-1104) - User filters
-* [NAE-335](https://netgrif.atlassian.net/browse/NAE-335) - Variable arc definition rework
-* [NAE-297](https://netgrif.atlassian.net/browse/NAE-297) - Petriflow functions
+### Fixed
 
-### Features
-* [NAE-1407](https://netgrif.atlassian.net/browse/NAE-1407) - Static functions
+- [NAE-1518] Export of chained filters
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10897/tab/release-report-all-issues"></a>
-## 5.5.2 (19.07.2021)
-### Bug fixes
-None
+### Changed
 
-### Improvements
-None
+- [NAE-1439] Deprecate values
 
-### Features
-None
+## [5.7.1](https://github.com/netgrif/application-engine/releases/tag/5.7.1) (2021-11-08)
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10896/tab/release-report-all-issues"></a>
-## 5.5.1 (09.07.2021)
-### Bug fixes
-* [NAE-1374](https://netgrif.atlassian.net/browse/NAE-1374) - setData does not propagate changed allowedNets to frontend
-* [NAE-1323](https://netgrif.atlassian.net/browse/NAE-1323) - Initial value of collection fields is broken
+### Fixed
 
-### Improvements
-None
+- [NAE-1487] Assign button on assigned task
+- [NAE-1485] Case data field behavior is not initially set
+- [NAE-1492] View permission on case is broken when delete permission is present
+- [NAE-1483] TaskRef init value setting deletes new value of task field
+- [NAE-1520] Security Configuration Ldap fix
 
-### Features
-None
+### Changed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10888/tab/release-report-all-issues"></a>
-## 5.5.0 (11.06.2021)
-### Bug fixes
-* [NAE-1319](https://netgrif.atlassian.net/browse/NAE-1319) - Default caseRef value is set to null
-* [NAE-1316](https://netgrif.atlassian.net/browse/NAE-1316) - Currency format sa neprejavuje na number field
+- [NAE-1515] Filter process UX improvements
+- [NAE-1516] Group process UX improvements
 
-### Improvements
-None
+## [5.7.0](https://github.com/netgrif/application-engine/releases/tag/5.7.0) (2021-10-29)
 
-### Features
-* [NAE-1305](https://netgrif.atlassian.net/browse/NAE-1305) - Loading na set data pre button
+### Fixed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10890/tab/release-report-all-issues"></a>
-## 5.4.1 (31.05.2021)
-### Bug fixes
-None
+- [NAE-1375] Form field layout does not respect rows
+- [NAE-1422] Case view permission query with no users
+- [NAE-1509] Broken jackson dependencies
+- [NAE-1281] Immediate file field
+- [NAE-1332] Cancel task action does not check if user has permission to cancel the task
+- [NAE-1460] Data field Spinner Attribute Refactor
 
-### Improvements
-None
+### Changed
 
-### Features
-None
+- [NAE-1390] Update "Process file could not be uploaded" message
+- [NAE-1438] Unique key constraint on options
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10869/tab/release-report-all-issues"></a>
-## 5.4.0 (27.05.2021)
-### Bug fixes
-* [NAE-1211](https://netgrif.atlassian.net/browse/NAE-1211) - Search in several data fields does not work as intended
+### Added
 
-### Improvements
-* [NAE-1228](https://netgrif.atlassian.net/browse/NAE-1228) - Re-enable class name minification
-* [NAE-1207](https://netgrif.atlassian.net/browse/NAE-1207) - Filter management
-* [NAE-412](https://netgrif.atlassian.net/browse/NAE-412) - Process and Case loading refactor
+- [NAE-1402] Configurable group navigation with role constraints
+- [NAE-1406] Filter import/export
+- [NAE-1417] Menu import/export
 
-### Features
-None
+## [5.6.3](https://github.com/netgrif/application-engine/releases/tag/5.6.3) (2021-09-27)
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10886/tab/release-report-all-issues"></a>
-## 5.3.1 (20.05.2021)
-### Bug fixes
-* [NAE-1306](https://netgrif.atlassian.net/browse/NAE-1306) - Custom message dynamickej validacie sa nezapise z xml do objektu siete
-* [NAE-1308](https://netgrif.atlassian.net/browse/NAE-1308) - Cancel Task zla podmienka ci ma user spravne role
+### Fixed
 
-### Improvements
-None
+- [NAE-1467] Fix table creation for user
+- [NAE-1453] Example app sign-up broken
+- [NAE-1465] Display saved filter options with empty input
 
-### Features
-None
+### Changed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10885/tab/release-report-all-issues"></a>
-## 5.3.0 (05.05.2021)
-### Bug fixes
-None
+- [NAE-1454] Dynamic filter chaining
 
-### Improvements
-* [NAE-58](https://netgrif.atlassian.net/browse/NAE-58) - Dynamic Init values
-* [NAE-1276](https://netgrif.atlassian.net/browse/NAE-1276) - Init value as choice
+## [5.6.2](https://github.com/netgrif/application-engine/releases/tag/5.6.2) (2021-09-03)
 
-### Features
-* [NAE-1251](https://netgrif.atlassian.net/browse/NAE-1251) - Dynamic validations
+### Fixed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10862/tab/release-report-all-issues"></a>
-## 5.2.0 (03.05.2021)
-### Bug fixes
-* [NAE-1171](https://netgrif.atlassian.net/browse/NAE-1171) - Filelist Field has initial value type of string
-* [NAE-1280](https://netgrif.atlassian.net/browse/NAE-1280) - Default case name i18n
-* [NAE-1279](https://netgrif.atlassian.net/browse/NAE-1279) - Browser login prompt
+- [NAE-1441] Var arcs backwards incompatibility
+- [NAE-1442] LdapUserRef incorrect @Id annotation
 
-### Improvements
-* [NAE-1242](https://netgrif.atlassian.net/browse/NAE-1242) - TaskRef init value
-* [NAE-1238](https://netgrif.atlassian.net/browse/NAE-1238) - Case event view
-* [NAE-1269](https://netgrif.atlassian.net/browse/NAE-1269) - Enable user preferences for anonym user
+### Changed
 
-### Features
-None
+- [NAE-1443] LDAP objectClasses not loaded from properties
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10883/tab/release-report-all-issues"></a>
-## 5.1.2 (16.04.2021)
-### Bug fixes
-None
+## [5.6.1](https://github.com/netgrif/application-engine/releases/tag/5.6.1) (2021-08-30)
 
-### Improvements
-None
+### Fixed
 
-### Features
-None
+- [NAE-1424] LDAP integration security vulnerability
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10874/tab/release-report-all-issues"></a>
-## 5.1.1 (12.04.2021)
-### Bug fixes
-* [NAE-1265](https://netgrif.atlassian.net/browse/NAE-1265) - Anonym user inconsistence
+## [5.6.0](https://github.com/netgrif/application-engine/releases/tag/5.6.0) (2021-08-26)
 
-### Improvements
-* [NAE-1248](https://netgrif.atlassian.net/browse/NAE-1248) - Icon enum
-* [NAE-1247](https://netgrif.atlassian.net/browse/NAE-1247) - Backend autocomplete enumeration
-* [NAE-1242](https://netgrif.atlassian.net/browse/NAE-1242) - TaskRef init valueNone
+### Fixed
 
-### Features
-None
+- [NAE-1396] Broken property to forbid group creation for users
+- [NAE-1382] Case with first transition set to auto trigger make deadlock in process
+- [NAE-1372] Change user list does not work in post create action
+- [NAE-1324] Delete Petri net with many instances crashes the application
+- [NAE-1312] Merge issue from NAE-1238_usersRef
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10860/tab/release-report-all-issues"></a>
-## 5.1.0 - Black Zinc (25.3.2021)
-### Bug fixes
-* [NAE-1216](https://netgrif.atlassian.net/browse/NAE-1216) - Nesprávne zobrazenie FileListFieldValue vo vygenerovanom PDF
-* [NAE-1227](https://netgrif.atlassian.net/browse/NAE-1227) - Update loggedOrSystem
-* [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
-* [NAE-1275](https://netgrif.atlassian.net/browse/NAE-1275) - MultichoiceMap init value
+### Changed
+
+- [NAE-1400] Fix multiple access to repository while getting data
+- [NAE-1399] PDF generator improvement
+- [NAE-1392] Implement GroovyShell Factory
+- [NAE-1104] User filters
+- [NAE-335] Variable arc definition rework
+- [NAE-297] Petriflow functions
+
+### Added
+
+- [NAE-1407] Static functions
+
+## [5.5.5](https://github.com/netgrif/application-engine/releases/tag/5.5.5) (2022-01-06)
+
+### Fixed
+
+- [NAE-1530] Visual ID of a case is not available in simple search
+
+## [5.5.4](https://github.com/netgrif/application-engine/releases/tag/5.5.4) (2021-12-20)
+
+### Fixed
+
+- [NAE-1522] Files with comma in name cannot be downloaded
+- [NAE-1536] Values with dash cannot be typed into simple search
+
+## [5.5.2](https://github.com/netgrif/application-engine/releases/tag/5.5.2) (2021-07-19)
+
+## [5.5.1](https://github.com/netgrif/application-engine/releases/tag/5.5.1) (2021-07-09)
+
+### Fixed
+
+- [NAE-1374] setData does not propagate changed allowedNets to frontend
+- [NAE-1323] Initial value of collection fields is broken
+
+## [5.5.0](https://github.com/netgrif/application-engine/releases/tag/5.5.0) (2021-06-11)
+
+### Fixed
+
+- [NAE-1319] Default caseRef value is set to null
+- [NAE-1316] Currency format is not shown on number field
+
+### Added
+
+- [NAE-1305] Loading na set data pre button
+
+## [5.4.1](https://github.com/netgrif/application-engine/releases/tag/5.4.1) (2021-05-31)
+
+## [5.4.0](https://github.com/netgrif/application-engine/releases/tag/5.4.0) (2021-05-27)
+
+### Fixed
+
+- [NAE-1211] Search in several data fields does not work as intended
+
+### Changed
+
+- [NAE-1228] Re-enable class name minification
+- [NAE-1207] Filter management
+- [NAE-412] Process and Case loading refactor
+
+## [5.3.1](https://github.com/netgrif/application-engine/releases/tag/5.3.1) (2021-05-20)
+
+### Fixed
+
+- [NAE-1306] Custom message of dynamic validation is not propagated in import
+- [NAE-1308] Cancel Task permission validation error
+
+## [5.3.0](https://github.com/netgrif/application-engine/releases/tag/5.3.0) (2021-05-05)
+
+### Changed
+
+- [NAE-58] Dynamic Init values
+- [NAE-1276] Init value as choice
+
+### Added
+
+- [NAE-1251] Dynamic validations
+
+## [5.2.0](https://github.com/netgrif/application-engine/releases/tag/5.2.0) (2021-05-03)
+
+### Fixed
+
+- [NAE-1171] File-list Field has initial value type of string
+- [NAE-1280] Default case name i18n
+- [NAE-1279] Browser login prompt
+
+### Changed
+
+- [NAE-1242] TaskRef init value
+- [NAE-1238] Case event view
+- [NAE-1269] Enable user preferences for anonym user
+
+## [5.1.2](https://github.com/netgrif/application-engine/releases/tag/5.1.2) (2021-04-16)
+
+## [5.1.1](https://github.com/netgrif/application-engine/releases/tag/5.1.1) (2021-04-12)
+
+### Fixed
+
+- [NAE-1265] Anonym user inconsistency
+
+### Changed
+
+- [NAE-1248] Icon enum
+- [NAE-1247] Backend autocomplete enumeration
+- [NAE-1242] TaskRef init valueNone
+
+## [5.1.0](https://github.com/netgrif/application-engine/releases/tag/5.1.0) (2021-3-25)
+
+### Fixed
+
+- [NAE-1216] Wrong render of FileListFieldValue in generated PDF
+- [NAE-1227] Update loggedOrSystem
+- [NAE-1257] Time trigger exact broken
+- [NAE-1275] Multi-choiceMap init value
 
 ### Improvement
-* [NAE-1217](https://netgrif.atlassian.net/browse/NAE-1217) - Upload file-ov na public view
-* [NAE-1235](https://netgrif.atlassian.net/browse/NAE-1235) - MailDraft improvement
-* [NAE-1236](https://netgrif.atlassian.net/browse/NAE-1236) - Anonym user persistance
-* [NAE-1240](https://netgrif.atlassian.net/browse/NAE-1240) - Add remove role to Action Delegate
-* [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
 
-### Features
+- [NAE-1217] File upload na public view
+- [NAE-1235] MailDraft improvement
+- [NAE-1236] Anonym user persistence
+- [NAE-1240] Add remove role to Action Delegate
+- [NAE-1250] TaskRef of the same case propagation
+
+## [5.0.7](https://github.com/netgrif/application-engine/releases/tag/5.0.7) (2021-03-01)
+
+### Fixed
+
+- [NAE-1257] Time trigger exact broken
+
+## [5.0.6](https://github.com/netgrif/application-engine/releases/tag/5.0.6) (2021-02-24)
+
+### Changed
+
+- [NAE-1250] TaskRef of the same case propagation
+
+## [5.0.5](https://github.com/netgrif/application-engine/releases/tag/5.0.5) (2021-02-19)
+
+## [5.0.4](https://github.com/netgrif/application-engine/releases/tag/5.0.4) (2021-02-19)
+
+## [5.0.3](https://github.com/netgrif/application-engine/releases/tag/5.0.3) (2021-02-09)
+
+## [5.0.2](https://github.com/netgrif/application-engine/releases/tag/5.0.2) (2021-02-07)
+
+## [5.0.1](https://github.com/netgrif/application-engine/releases/tag/5.0.1) (2021-02-04)
+
+## [5.0.0](https://github.com/netgrif/application-engine/releases/tag/5.0.0) (2021-02-28)
+
+### Fixed
+
+- [NAE-1097] Null file field value set by assign action
+- [NAE-1144] Elastic runner doesn't create indices without drop
+- [NAE-1181] Broken regex validation in required data field
+- [NAE-1185] Auto-open subtree not working correctly
+- [NAE-1194] File preview is triggering error message 'downloading failed'
+- [NAE-1197] Excessive memory consuption
+- [NAE-1199] Loading data task
+- [NAE-1201] MailDraft null values
+- [NAE-1206] Borken login
+
+### Changed
+
+- [NAE-1028] Anonymous access
+- [NAE-1149] Immediate task data
+- [NAE-1186] Negatively defined roles permissions
+- [NAE-492] MongoDB v4
+- [NAE-1092] Unifying attributes names in filters
+- [NAE-1180] Allow for developer to define which fields to be exported to PDF
+- [NAE-1195] Update user lists according to roleRef update
+- [NAE-1196] Additional actions for user management
+
+### Added
+
+- [NAE-1054] Public view
+- [NAE-1056] File view with content preview
+- [NAE-1059] JWT Authentication
+- [NAE-1115] User list on task instead of roles
+- [NAE-1119] Constructor and destructor as process meta-data
+- [NAE-1175] Import helper upsert
+- [NAE-1203] User delete
+
+## [4.6.0](https://github.com/netgrif/application-engine/releases/tag/4.6.0) (2021-01-20)
+
+### Fixed
+
+- [NAE-1202] Bug in ChangedFieldTree
+
+### Changed
+
+- [NAE-1109] Task ref set data propagation
+
+## [4.5.0](https://github.com/netgrif/application-engine/releases/tag/4.5.0) (2020-12-22)
+
+### Fixed
+
+- [NAE-1161] PDF tool wrongly generated enumerations, multi-choice, and HTML
+- [NAE-1162] PDF tool null-pointer on layout
+
+### Changed
+
+- [NAE-1178] Cancel and finish error changed fields propagation
+
+### Added
+
+- [NAE-1168] Task ref representation
+- [NAE-1172] Frontend control from process actions
+
+## [4.4.0](https://github.com/netgrif/application-engine/releases/tag/4.4.0) (2020-12-14)
+
+### Fixed
+
+- [NAE-1096] Change MultichoiceMapField/EnumerationMapField value na null hodnotu nefunguje
+- [NAE-1100] Set UserField data after finish
+- [NAE-1102] Broken definition of Multichoice map
+- [NAE-1136] Delegate endpoint doesn't work
+
+### Changed
+
+- [NAE-1109] Task ref set data propagation
+- [NAE-1139] Improve overridability of petri net service
+- [NAE-1142] Whitelist URLs trough application properties
+
+## [4.3.1](https://github.com/netgrif/application-engine/releases/tag/4.3.1) (2020-11-13)
+
+
+
+## [4.3.0](https://github.com/netgrif/application-engine/releases/tag/4.3.0) (2020-11-11)
+
+### Fixed
+
+- [NAE-986] Virtual scroll tab initialization broken
+- [NAE-1006] Broken headers' alignment with 9 columns
+- [NAE-1035] PDF Generator issue due to layout
+- [NAE-1039] PetriNetResourceService bad return type
+- [NAE-1041] Page interface not exported
+- [NAE-1062] Extra process page loaded
+- [NAE-1064] Required
+- [NAE-1065] Fix bug with redirect service
+- [NAE-1066] Fix Empty list text when list has loading
+- [NAE-1069] Enumeration and multi-choice options
+- [NAE-1070] Nested taskRef position calculating
+- [NAE-1073] Registration component stuck with bad token
+- [NAE-1074] User cannot register with new groups
+- [NAE-1076] SignUp endpoint doesn't use email from token
+- [NAE-1078] Tab labels are unaffected by language change
+- [NAE-1081] Deprecated view attributes are ignored
+- [NAE-1082] Incorrect German translation in workflow view
+- [NAE-1083] Enforce minimum password length
+- [NAE-1084] LoadAllPages utility function break if there is no content
+- [NAE-1094] Current CaseTree node reloads incorrectly
+
+### Changed
+
+- [NAE-997] Engine docker image
+- [NAE-1002] Boolean field visible values
+- [NAE-1008] Update demo application
+- [NAE-1014] Pass DI context into ComponentPortals
+- [NAE-1020] Change empty value of number field from 0 to 'empty'
+- [NAE-1023] Password view for text field
+- [NAE-1025] Update Petriflow XSD schema
+- [NAE-1027] Event phases for data fields events
+- [NAE-1063] Display only the newest process version in create case
+- [NAE-1077] Component tag sending all included information
+
+### Added
+
+- [NAE-994] Group Management
+- [NAE-1021] App to Docker guidelines
+- [NAE-1026] Filter by group
+- [NAE-1031] Case delete button
+- [NAE-1048] Process delete
+- [NAE-1075] Recover account component
+
+## [4.2.1](https://github.com/netgrif/application-engine/releases/tag/4.2.1) (2020-9-23)
+
+### Fixed
+
+- [NAE-1024] Redis namespace is not set from application properties
+- [NAE-1001] Security Config
+- [NAE-1010] 500 error po zavolaní getData v taskRefe
+- [NAE-1011] Redis deserialization error
+- [NAE-1012] Broken parsing of data fields
+- [NAE-1013] Reindex via ElasticController ignores some cases
+- [NAE-1015] Data group's title is not showing
+- [NAE-1034] Reindex size property not loaded
+
+### Changed
+
+- [NAE-1022] Repair and update swagger definitions
+
+### Added
+
 None
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10873/tab/release-report-all-issues"></a>
-## 5.0.7 (01.03.2021)
-### Bug fixes
-* [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
+## [4.2.0](https://github.com/netgrif/application-engine/releases/tag/4.2.0) (2020-9-21)
 
-### Improvements
-None
+### Fixed
 
-### Features
-None
+- [NAE-979] Set data on component Rich Text Area
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10871/tab/release-report-all-issues"></a>
-## 5.0.6 (24.02.2021)
-### Bug fixes
-None
+### Changed
 
-### Improvements
-* [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
+- [NAE-966] Task search on MongoDB refactor
+- [NAE-495] Dashboard
+- [NAE-301] Add key param to data-fields of type enumeration and multi-choice
+- [NAE-267] Action result propagation
 
-### Features
-None
+### Added
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10870/tab/release-report-all-issues"></a>
-## 5.0.5 (19.02.2021)
-### Bug fixes
-None
+- [NAE-980] Create HTML textarea field
+- [NAE-542] Dashboard Card
 
-### Improvements
-None
+## [4.1.2](https://github.com/netgrif/application-engine/releases/tag/4.1.2) (2020-9-10)
 
-### Features
-None
+### Fixed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10866/tab/release-report-all-issues"></a>
-## 5.0.4 - Gray Titanium (19.02.2021)
-### Bug fixes
-None
-
-### Improvements
-None
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10864/tab/release-report-all-issues"></a>
-## 5.0.3 - Aqua Copper (09.02.2021)
-### Bug fixes
-None
-
-### Improvements
-None
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10863/tab/release-report-all-issues"></a>
-## 5.0.2 - Navy Lead (07.02.2021)
-### Bug fixes
-None
-
-### Improvements
-None
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10861/tab/release-report-all-issues"></a>
-## 5.0.1 - Teal Brass (04.02.2021)
-### Bug fixes
-None
-
-### Improvements
-None
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10732/tab/release-report-all-issues"></a>
-## 5.0.0 - Silver Steel (28.02.2021)
-### Bug fixes
-* [NAE-1097](https://netgrif.atlassian.net/browse/NAE-1097) - Null file field value set by assign action
-* [NAE-1144](https://netgrif.atlassian.net/browse/NAE-1144) - Elastic runner doesn't create indices without drop
-* [NAE-1181](https://netgrif.atlassian.net/browse/NAE-1181) - Nefunkčný regex pri required field(e)
-* [NAE-1185](https://netgrif.atlassian.net/browse/NAE-1185) - Auto-open subtree not working correctly
-* [NAE-1194](https://netgrif.atlassian.net/browse/NAE-1194) - Náhľad dokumentu spôsobuje vyhodenie chybovej hlášky 'sťahovanie zlyhalo'
-* [NAE-1197](https://netgrif.atlassian.net/browse/NAE-1197) - Frontend - Spotreba RAM
-* [NAE-1199](https://netgrif.atlassian.net/browse/NAE-1199) - Loading data task
-* [NAE-1201](https://netgrif.atlassian.net/browse/NAE-1201) - MailDraft null values
-* [NAE-1206](https://netgrif.atlassian.net/browse/NAE-1206) - Prihlasovanie verzia 5.0.0-SNAPSHOT
-
-### Improvements
-* [NAE-1028](https://netgrif.atlassian.net/browse/NAE-1028) - Anonymous access
-* [NAE-1149](https://netgrif.atlassian.net/browse/NAE-1149) - Immediate task data
-* [NAE-1186](https://netgrif.atlassian.net/browse/NAE-1186) - Negatively defined roles permissions
-* [NAE-492](https://netgrif.atlassian.net/browse/NAE-492) - MongoDB v4
-* [NAE-1092](https://netgrif.atlassian.net/browse/NAE-1092) - Zjednotenie názvov atribútov filtrov
-* [NAE-1180](https://netgrif.atlassian.net/browse/NAE-1180) - PDF Generator - allow for developer to define which fields to be exported to PDF
-* [NAE-1195](https://netgrif.atlassian.net/browse/NAE-1195) - Update userlists according to roleRef update
-* [NAE-1196](https://netgrif.atlassian.net/browse/NAE-1196) - Additional actions for user management
-
-### Features
-* [NAE-1054](https://netgrif.atlassian.net/browse/NAE-1054) - Public view
-* [NAE-1056](https://netgrif.atlassian.net/browse/NAE-1056) - File view with content preview
-* [NAE-1059](https://netgrif.atlassian.net/browse/NAE-1059) - JWT Authentication
-* [NAE-1115](https://netgrif.atlassian.net/browse/NAE-1115) - User list on task instead of roles
-* [NAE-1119](https://netgrif.atlassian.net/browse/NAE-1119) - Constructor and destructor as process meta-data
-* [NAE-1175](https://netgrif.atlassian.net/browse/NAE-1175) - Import helper upsert
-* [NAE-1203](https://netgrif.atlassian.net/browse/NAE-1203) - User delete
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10851/tab/release-report-all-issues"></a>
-## 4.6.0 - Green Silver (20.01.2021)
-### Bug fixes
-* [NAE-1202](https://netgrif.atlassian.net/browse/NAE-1202) - Bug in ChangedFieldTree
-
-### Improvements
-* [NAE-1109](https://netgrif.atlassian.net/browse/NAE-1109) - Task ref set data propagation
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10850/tab/release-report-all-issues"></a>
-## 4.5.0 - Orange Bubble (22.12.2020)
-### Bug fixes
-* [NAE-1161](https://netgrif.atlassian.net/browse/NAE-1161) - PDF tool wrongly generated enumerations, multi-choice, and HTML 
-* [NAE-1162](https://netgrif.atlassian.net/browse/NAE-1162) - PDF tool null-pointer on layout 
-
-### Improvements
-* [NAE-1178](https://netgrif.atlassian.net/browse/NAE-1178) - Cancel and finish error changed fields propagation
-
-### Features
-* [NAE-1168](https://netgrif.atlassian.net/browse/NAE-1168) - Task ref representation
-* [NAE-1172](https://netgrif.atlassian.net/browse/NAE-1172) - Frontend control from process actions
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10826/tab/release-report-all-issues"></a>
-## 4.4.0 - Olive Nickel (14.12.2020)
-### Bug fixes
-* [NAE-1096](https://netgrif.atlassian.net/browse/NAE-1096) - Change MultichoiceMapField/EnumerationMapField value na null hodnotu nefunguje
-* [NAE-1100](https://netgrif.atlassian.net/browse/NAE-1100) - Set UserField data after finish
-* [NAE-1102](https://netgrif.atlassian.net/browse/NAE-1102) - Zlé definovanie Multichoice map
-* [NAE-1136](https://netgrif.atlassian.net/browse/NAE-1136) - Delegate endpoint doesn't work
-
-### Improvements
-* [NAE-1109](https://netgrif.atlassian.net/browse/NAE-1109) - Task ref set data propagation
-* [NAE-1139](https://netgrif.atlassian.net/browse/NAE-1139) - Improve overridability of petri net service
-* [NAE-1142](https://netgrif.atlassian.net/browse/NAE-1142) - Whitelist URLs trough application properties
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10832/tab/release-report-all-issues"></a>
-## 4.3.1 - Green Nickel (13.11.2020)
-### Bug fixes
- None
- 
-### Improvements
- None
- 
-### Features
- None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10815/tab/release-report-all-issues"></a>
-## 4.3.0 - Orange Copper (11.11.2020)
-### Bug fixes
- * [NAE-986](https://netgrif.atlassian.net/browse/NAE-986) - Virtual scroll tab initialization broken
- * [NAE-1006](https://netgrif.atlassian.net/browse/NAE-1006) - Broken headers' alignment with 9 columns
- * [NAE-1035](https://netgrif.atlassian.net/browse/NAE-1035) - PDF Generator issue due to layout
- * [NAE-1039](https://netgrif.atlassian.net/browse/NAE-1039) - PetriNetResourceService bad return type
- * [NAE-1041](https://netgrif.atlassian.net/browse/NAE-1041) - Page interface not exported
- * [NAE-1062](https://netgrif.atlassian.net/browse/NAE-1062) - Extra process page loaded
- * [NAE-1064](https://netgrif.atlassian.net/browse/NAE-1064) - Validácia File Field - Required
- * [NAE-1065](https://netgrif.atlassian.net/browse/NAE-1065) - Fix bug with redirect service
- * [NAE-1066](https://netgrif.atlassian.net/browse/NAE-1066) - Fix Empty list text when list has loading
- * [NAE-1069](https://netgrif.atlassian.net/browse/NAE-1069) - PDF generator - enumeration and multi-choice options
- * [NAE-1070](https://netgrif.atlassian.net/browse/NAE-1070) - PDF generator - nested taskRef position calculating
- * [NAE-1073](https://netgrif.atlassian.net/browse/NAE-1073) - Registration component stuck with bad token
- * [NAE-1074](https://netgrif.atlassian.net/browse/NAE-1074) - User cannot register with new groups
- * [NAE-1076](https://netgrif.atlassian.net/browse/NAE-1076) - SignUp endpoint doesn't use email from token
- * [NAE-1078](https://netgrif.atlassian.net/browse/NAE-1078) - Tab labels are unaffected by language change
- * [NAE-1081](https://netgrif.atlassian.net/browse/NAE-1081) - Deprecated view attributes are ignored
- * [NAE-1082](https://netgrif.atlassian.net/browse/NAE-1082) - Incorrect German translation in workflow view
- * [NAE-1083](https://netgrif.atlassian.net/browse/NAE-1083) - Enforce minimum password length
- * [NAE-1084](https://netgrif.atlassian.net/browse/NAE-1084) - LoadAllPages utility function break if there is no content
- * [NAE-1094](https://netgrif.atlassian.net/browse/NAE-1094) - Current CaseTree node reloads incorrectly
-
-### Improvements
- * [NAE-997](https://netgrif.atlassian.net/browse/NAE-997) - Engine docker image
- * [NAE-1002](https://netgrif.atlassian.net/browse/NAE-1002) - Boolean field visible values
- * [NAE-1008](https://netgrif.atlassian.net/browse/NAE-1008) - Update demo application
- * [NAE-1014](https://netgrif.atlassian.net/browse/NAE-1014) - Pass DI context into ComponentPortals
- * [NAE-1020](https://netgrif.atlassian.net/browse/NAE-1020) - Change empty value of number field from 0 to 'empty'
- * [NAE-1023](https://netgrif.atlassian.net/browse/NAE-1023) - Password view for text field
- * [NAE-1025](https://netgrif.atlassian.net/browse/NAE-1025) - Update Petriflow XSD schema
- * [NAE-1027](https://netgrif.atlassian.net/browse/NAE-1027) - Event phases for data fields events
- * [NAE-1063](https://netgrif.atlassian.net/browse/NAE-1063) - Display only the newest process version in create case
- * [NAE-1077](https://netgrif.atlassian.net/browse/NAE-1077) - Component tag sending all included information
- 
-### Features
- * [NAE-994](https://netgrif.atlassian.net/browse/NAE-994) - Group Management
- * [NAE-1021](https://netgrif.atlassian.net/browse/NAE-1021) - App to Docker guidelines
- * [NAE-1026](https://netgrif.atlassian.net/browse/NAE-1026) - Filter by group
- * [NAE-1031](https://netgrif.atlassian.net/browse/NAE-1031) - Case delete button
- * [NAE-1048](https://netgrif.atlassian.net/browse/NAE-1048) - Process delete
- * [NAE-1075](https://netgrif.atlassian.net/browse/NAE-1075) - Recover account component
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10819/tab/release-report-all-issues"></a>
-## 4.2.1 - Gray Zinc (23.9.2020)
-### Bug fixes
- * [NAE-1024](https://netgrif.atlassian.net/browse/NAE-1024) - Redis namespace is not set from application properties
- * [NAE-1001](https://netgrif.atlassian.net/browse/NAE-1001) - Security Config
- * [NAE-1010](https://netgrif.atlassian.net/browse/NAE-1010) - 500 error po zavolaní getData v taskRefe
- * [NAE-1011](https://netgrif.atlassian.net/browse/NAE-1011) - Redis deserialization error
- * [NAE-1012](https://netgrif.atlassian.net/browse/NAE-1012) - Chybné parsovanie dataFieldov
- * [NAE-1013](https://netgrif.atlassian.net/browse/NAE-1013) - ReindexingTask volane cez ElasticController ignoruje pripady
- * [NAE-1015](https://netgrif.atlassian.net/browse/NAE-1015) - Title pre datagrupu sa nezobrazuje.
- * [NAE-1034](https://netgrif.atlassian.net/browse/NAE-1034) - Reindex size property not loaded
-
-### Improvements
- * [NAE-1022](https://netgrif.atlassian.net/browse/NAE-1022) - Repair and update swagger definitions
-
-### Features
- None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10785/tab/release-report-all-issues"></a>
-## 4.2.0 - Maroon Bronze (21.9.2020)
-### Bug fixes
- * [NAE-979](https://netgrif.atlassian.net/browse/NAE-979) - Set data on component Rich Text Area
-
-### Improvements
- * [NAE-966](https://netgrif.atlassian.net/browse/NAE-966) - Task search on MongoDB refactor
- * [NAE-495](https://netgrif.atlassian.net/browse/NAE-495) - Dashboard
- * [NAE-301](https://netgrif.atlassian.net/browse/NAE-301) - Add key param to data-fields of type enumeration and multi-choice
- * [NAE-267](https://netgrif.atlassian.net/browse/NAE-267) - Action result propagation
-
-### Features
- * [NAE-980](https://netgrif.atlassian.net/browse/NAE-980) - Create HTML textarea field
- * [NAE-542](https://netgrif.atlassian.net/browse/NAE-542) - Dashboard Card
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10813/tab/release-report-all-issues"></a>
-## 4.1.2 - Purple Mercury (10.9.2020)
-### Bug fixes
- * [NAE-970](https://netgrif.atlassian.net/browse/NAE-970) - TaskReference File Upload ResolveActions problem
- * [NAE-977](https://netgrif.atlassian.net/browse/NAE-977) - Taskref layout broken
- 
-### Improvements
- None
- 
-### Features
- None
- 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10807/tab/release-report-all-issues"></a>
-## 4.1.1 - Navy Brass (20.8.2020)
-### Bug fixes
- * [NAE-959](https://netgrif.atlassian.net/browse/NAE-959) - Broken getReferencesByVersion if version is null
- * [NAE-962](https://netgrif.atlassian.net/browse/NAE-962) - Quartz scheduler duplicate initialisation
-
-### Improvements
- * [NAE-480](https://netgrif.atlassian.net/browse/NAE-480) - Task Reindex Task
-
-### Features
-None
-
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10782/tab/release-report-all-issues"></a>
-## 4.1.0 - White Titanium (17.08.2020)
-### Bug Fixes
- * [NAE-912](https://netgrif.atlassian.net/browse/NAE-912) - Task with no data cannot be finished
- * [NAE-824](https://netgrif.atlassian.net/browse/NAE-824) - Action param parsing regex
- 
-### Improvements
- * [NAE-949](https://netgrif.atlassian.net/browse/NAE-949) - Case ID search param
- * [NAE-928](https://netgrif.atlassian.net/browse/NAE-928) - Add conditional property for all controlers
- * [NAE-927](https://netgrif.atlassian.net/browse/NAE-927) - Add getOne Case endpoint
- * [NAE-874](https://netgrif.atlassian.net/browse/NAE-874) - Customisable data field offset
- * [NAE-804](https://netgrif.atlassian.net/browse/NAE-804) - Overridable endpoint authorisation
-
-### Features
- * [NAE-952](https://netgrif.atlassian.net/browse/NAE-952) - Search tasks by transition
- * [NAE-917](https://netgrif.atlassian.net/browse/NAE-917) - File list field
- * [NAE-852](https://netgrif.atlassian.net/browse/NAE-852) - Rule engine
- * [NAE-876](https://netgrif.atlassian.net/browse/NAE-876) - Tree Case View
- * [NAE-396](https://netgrif.atlassian.net/browse/NAE-396) - PDF generator
+- [NAE-970] TaskReference File Upload ResolveActions problem
+- [NAE-977] Taskref layout broken
 
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10792/tab/release-report-all-issues"></a>
-## 4.0.1 - Teal Steel (10.08.2020)
-### Bug Fixes
- * [NAE-930](https://netgrif.atlassian.net/browse/NAE-930) - Duplicitné role pri importe sietí
- * [NAE-926](https://netgrif.atlassian.net/browse/NAE-926) - Problém pri builde aplikácie Spring má problém spracovať elasticTaskService a vytvára cyklickú dependenciu
- * [NAE-883](https://netgrif.atlassian.net/browse/NAE-883) - Net Versioning Broken
- * [NAE-484](https://netgrif.atlassian.net/browse/NAE-484) - Version is stored as String
- * [NAE-878](https://netgrif.atlassian.net/browse/NAE-878) - UserAssignComponent With Pagination
+## [4.1.1](https://github.com/netgrif/application-engine/releases/tag/4.1.1) (2020-8-20)
 
+### Fixed
 
-<a name="https://netgrif.atlassian.net/projects/NAE/versions/10632/tab/release-report-all-issues"></a>
-## 4.0.0 - Blue Aluminium (24.07.2020)
-### Bug Fixes
-  * [NAE-897](https://netgrif.atlassian.net/browse/NAE-897) - Action Delegate Context Leak
+- [NAE-959] Broken getReferencesByVersion if version is null
+- [NAE-962] Quartz scheduler duplicate initialisation
 
-### Improvements
-  * [NAE-849](https://netgrif.atlassian.net/browse/NAE-849) - Boolean data-field validation 
+### Changed
 
-### Tasks
-  * [NAE-822](https://netgrif.atlassian.net/browse/NAE-822) - Datafield layout data
+- [NAE-480] Task Reindex Task
+
+## [4.1.0](https://github.com/netgrif/application-engine/releases/tag/4.1.0) (2020-08-17)
+
+### Fixed
+
+- [NAE-912] Task with no data cannot be finished
+- [NAE-824] Action param parsing regex
+
+### Changed
+
+- [NAE-949] Case ID search param
+- [NAE-928] Add conditional property for all controllers
+- [NAE-927] Add getOne Case endpoint
+- [NAE-874] Customisable data field offset
+- [NAE-804] Overridable endpoint authorisation
+
+### Added
+
+- [NAE-952] Search tasks by transition
+- [NAE-917] File list field
+- [NAE-852] Rule engine
+- [NAE-876] Tree Case View
+- [NAE-396] PDF generator
+
+## [4.0.1](https://github.com/netgrif/application-engine/releases/tag/4.0.1) (2020-08-10)
+
+### Fixed
+
+- [NAE-930] Duplicite roles after import of new net
+- [NAE-926] ElasticTaskService creates cyclic dependency
+- [NAE-883] Net Versioning Broken
+- [NAE-484] Version is stored as String
+- [NAE-878] UserAssignComponent With Pagination
+
+## [4.0.0](https://github.com/netgrif/application-engine/releases/tag/4.0.0) (2020-07-24)
+
+### Fixed
+
+- [NAE-897] Action Delegate Context Leak
+
+### Changed
+
+- [NAE-849] Boolean data-field validation
+
+### Added
+
+- [NAE-822] Data field layout data
+
+<!-- Template
+## [version](https://github.com/netgrif/application-engine/releases/tag/v) (YYYY-MM-dd)
+
+### Added
+ - for new features.
+
+### Changed
+ - for changes in existing functionality.
+
+### Deprecated
+ - for soon-to-be removed features.
+
+### Removed
+ - for now removed features.
+
+### Fixed
+ - for any bug fixes.
+
+### Security
+ - in case of vulnerabilities.
+-->

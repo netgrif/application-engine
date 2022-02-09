@@ -32,11 +32,15 @@
         <label>Transition</label>
         <dataRef>
             <id>file</id>
-            <logic><behavior>editable</behavior></logic>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
         </dataRef>
         <dataRef>
             <id>result</id>
-            <logic><behavior>editable</behavior></logic>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
         </dataRef>
     </transition>
     <!-- PLACES -->

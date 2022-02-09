@@ -7,6 +7,7 @@
     <icon>business</icon>
     <defaultRole>false</defaultRole>
 
+
     <caseName>Nová organizácia</caseName>
     <!-- ROLES -->
     <role>
