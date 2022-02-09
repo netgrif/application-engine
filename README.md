@@ -94,7 +94,7 @@ By default, the engine assumes that all databases are running locally. If you ar
 on different ports, you can pass these settings as arguments to NAE.
 
 ```shell
-$ java -jar nae.jar --***REMOVED***/nae --***REMOVED*** --***REMOVED***
+$ java -jar nae.jar --spring.data.mongodb.uri=mongodb://localhost:27017/nae --spring.data.elasticsearch.url=localhost --spring.session.redis.host=localhost
 ```
 
 For complete list of all configurable application properties

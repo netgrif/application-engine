@@ -25,7 +25,7 @@ public class ActionsProperties {
     /**
      * <pre>
      * Package imports. Example:
-     * <code>***REMOVED***,com.netgrif</code>
+     * <code>nae.actions.star-imports=java.time,com.netgrif</code>
      * Will result in:
      * <code>import java.date.*
      * import com.netgrif.*</code>
@@ -36,7 +36,7 @@ public class ActionsProperties {
     /**
      * <pre>
      * Static property imports. Example:
-     * <code>***REMOVED***</code>
+     * <code>nae.actions.static-star-imports=java.time.LocalDate</code>
      * Will result in:
      * <code>import static java.time.LocalDate.*</code>
      * </pre>

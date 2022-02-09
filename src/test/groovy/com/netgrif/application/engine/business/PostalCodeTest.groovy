@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
-@SpringBootTest(properties = "nae.***REMOVED***")
+@SpringBootTest(properties = "nae.postal.codes.import=false")
 @SuppressWarnings("GrMethodMayBeStatic")
 class PostalCodeTest {
 

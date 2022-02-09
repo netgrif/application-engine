@@ -2,7 +2,7 @@
 
 This page contains information about the structure and properties of Elasticsearch mapping of Case and Task objects.
 
-#***REMOVED*** field types
+## Elasticsearch field types
 
 An overview of index field types supported by Elasticsearch can be found in
 their [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/6.6/mapping-types.html).

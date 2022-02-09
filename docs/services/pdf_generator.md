@@ -1,4 +1,4 @@
-***REMOVED*** Generator
+# PDF Generator
 
 PDF Generator is a tool implemented in Netgrif Application Engine for generating PDF documents from dynamic forms.
 
@@ -107,7 +107,7 @@ PdfResource bean:
 | Example in application.properties | Example of getting bean and setting attribute in actions|
 |-----------------------------------|---------------------------------------------------------|
 | `properties nae.pdf.properties.pageWidth=650` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)` |
-| `properties ***REMOVED***` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)`|
+| `properties nae.pdf.resources.templateResource=classpath:src/main/resources/pdfGenerator/template_pdf.pdf` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)`|
 
 ## Setup
 
@@ -174,6 +174,3 @@ final PDF file.
 
 PDF generator supports standard legacy layout, grid layout and flow layout. You have nothing to do with layout
 configuration as the PDF generator resolves it automatically.
-
-
-
