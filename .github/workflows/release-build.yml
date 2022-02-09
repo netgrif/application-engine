@@ -1,7 +1,7 @@
 name: Publish package to GitHub Packages
 on:
   release:
-    types: [ created ]
+    types: [ published ]
 
 jobs:
   build:
@@ -17,6 +17,18 @@ jobs:
         with:
           java-version: 11
           distribution: 'adopt'
+      - uses: cardinalby/git-get-release-action@v1
+        id: getEnvRelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Project Version from pom.xml
+        uses: entimaniac/read-pom-version-action@1.0.0
+        id: getVersion
+
+      - name: Check Enviroment release
+        if: ${{ !((steps.getEnvRelease.outputs.prerelease && contains(steps.getVersion.outputs.version, '-SNAPSHOT')) || (!steps.getEnvRelease.outputs.prerelease && !contains(steps.getVersion.outputs.version, '-SNAPSHOT'))) }}
+        run: exit 1
 
       - name: Cache Maven packages
         uses: actions/cache@v1
@@ -170,6 +182,7 @@ jobs:
           tags: netgrif/application-engine:${{ steps.getVersion.outputs.version }}
 
       - name: Push Latest
+        if:  ${{ !contains(steps.getVersion.outputs.version, '-SNAPSHOT') }}
         uses: docker/build-push-action@v2
         with:
           push: true
