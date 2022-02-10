@@ -585,6 +585,7 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <phase>package</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -597,7 +598,7 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        <phase>install</phase>
+                        <phase>package</phase>
                     </execution>
                 </executions>
                 <configuration>
