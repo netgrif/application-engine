@@ -102,6 +102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          token: ${{ secrets.PUSH_DOCS }}
           fetch-depth: 0
 
       - name: Set up JDK 11
@@ -129,7 +130,4 @@ jobs:
         with:
           add: docs
           pathspec_error_handling: exitImmediately
-          default_author: github_actions
-          committer_name: Netgrif DevOps
-          committer_email: devops@netgrif.com
           message: 'Update documentation'
