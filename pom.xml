@@ -405,6 +405,13 @@
             <version>2.2.0-rc2</version>
         </dependency>
 
+        <!--Plugins-->
+        <dependency>
+            <groupId>com.netgrif</groupId>
+            <artifactId>plugin-library</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
         <!-- Dev tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
