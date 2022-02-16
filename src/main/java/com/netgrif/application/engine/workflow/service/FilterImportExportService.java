@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
+import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
@@ -161,7 +162,7 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @throws IllegalFilterFileException - if uploaded xml is not in correct xml format and invalidate against schema
      */
     @Override
-    public List<String> importFilters() throws IOException, IllegalFilterFileException {
+    public List<String> importFilters() throws IOException, IllegalFilterFileException, TransitionNotExecutableException {
         log.info("Importing filters");
         FilterImportExportList filterList = loadFromXML();
         return new ArrayList<>(performImport(filterList).values());
@@ -175,12 +176,12 @@ public class FilterImportExportService implements IFilterImportExportService {
      * @throws IOException - if imported file is not found
      */
     @Override
-    public Map<String, String> importFilters (FilterImportExportList filterList) throws IOException {
+    public Map<String, String> importFilters (FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
         log.info("Importing filters from imported menu");
         return performImport(filterList);
     }
 
-    protected Map<String, String> performImport (FilterImportExportList filterList) throws IOException {
+    protected Map<String, String> performImport (FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
         Map<String, String> oldToNewFilterId = new HashMap<>();
         Map<String, String> importedFilterTaskIds = new HashMap<>();
 
@@ -240,6 +241,7 @@ public class FilterImportExportService implements IFilterImportExportService {
             filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
+        taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
         changeFilterField(importedFilterTaskIds.values());
         return importedFilterTaskIds;
     }
