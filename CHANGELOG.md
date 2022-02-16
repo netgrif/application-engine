@@ -9,8 +9,16 @@ Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
 
+## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-02-16)
+
+### Fixed
+
+- [NAE-1572] FilterImportExportService service does not assign import_filter tasks
+- [NAE-1573] GET event is initialized with SET type
+
 ## [6.0.1](https://github.com/netgrif/application-engine/releases/tag/v6.0.1) (2022-02-15)
 
+- Equalizing release to match version of [Netgrif Components libraries](https://github.com/netgrif/components/releases/tag/v6.0.1)
 
 ## [6.0.0](https://github.com/netgrif/application-engine/releases/tag/v6.0.0) (2022-02-09)
 
