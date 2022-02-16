@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.workflow.domain.IllegalFilterFileException;
@@ -21,9 +22,9 @@ public interface IFilterImportExportService {
 
     FilterImportExportList exportFilters(Collection<String> filtersToExport);
 
-    List<String> importFilters() throws IOException, IllegalFilterFileException;
+    List<String> importFilters() throws IOException, IllegalFilterFileException, TransitionNotExecutableException;
 
-    Map<String, String> importFilters(FilterImportExportList filters) throws IOException;
+    Map<String, String> importFilters(FilterImportExportList filters) throws IOException, TransitionNotExecutableException;
 
     void createFilterImport(IUser author);
 

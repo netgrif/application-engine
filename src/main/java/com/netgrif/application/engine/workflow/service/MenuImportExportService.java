@@ -131,7 +131,7 @@ public class MenuImportExportService implements IMenuImportExportService {
      * @throws IllegalMenuFileException - if uploaded xml is not in correct xml format and invalidate against schema
      */
     @Override
-    public List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String parentId) throws IOException, IllegalMenuFileException {
+    public List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String parentId) throws IOException, IllegalMenuFileException, TransitionNotExecutableException {
         StringBuilder resultMessage = new StringBuilder("");
 
         List<String> importedEntryAndFilterCaseIds = new ArrayList<>();
