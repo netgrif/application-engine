@@ -431,7 +431,7 @@ public class Importer {
 
     protected void addActionsToDataEvent(List<Action> actions, Map<DataEventType, DataEvent> dataEvents, DataEventType type){
         if(!dataEvents.containsKey(type) || dataEvents.get(type).getId() == null){
-            dataEvents.put(type, createDefaultEvent(actions, DataEventType.SET));
+            dataEvents.put(type, createDefaultEvent(actions, type));
         } else {
             dataEvents.get(type).addToActionsByDefaultPhase(actions);
         }
