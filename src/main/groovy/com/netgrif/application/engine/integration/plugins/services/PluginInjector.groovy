@@ -2,12 +2,9 @@ package com.netgrif.application.engine.integration.plugins.services
 
 import com.netgrif.application.engine.integration.plugins.config.PluginProperties
 import com.netgrif.application.engine.integration.plugins.exceptions.IncompatibleClassLoaderException
-import com.netgrif.application.engine.integration.plugins.exceptions.IncompatiblePluginException
-import com.netgrif.application.engine.integration.plugins.exceptions.RestrictedPackageException
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import extensions.NaeExtensionPoint
 import groovy.util.logging.Slf4j
-import org.pf4j.ExtensionPoint
 import org.pf4j.PluginClassLoader
 import org.pf4j.PluginWrapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -50,7 +47,6 @@ class PluginInjector {
             String message = "Plugin " + aClass.getName() + " contains restricted packages: " +
                     filteredRestrictedPackages.toString()
             log.error(message)
-            throw new RestrictedPackageException(message)
         }
         aClass.declaredFields.each { field ->
             checkPackages(field.class)
