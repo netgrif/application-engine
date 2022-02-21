@@ -719,11 +719,11 @@ public class DataService implements IDataService {
                 value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
-                String val = node.get("value").asText();
-                if (val == null) {
+                if (node.get("value") == null || node.get("value").asText() == null) {
                     value = null;
                     break;
                 }
+                String val = node.get("value").asText();
                 value = new I18nString(val);
                 break;
             case "user":
