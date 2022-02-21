@@ -74,7 +74,6 @@ class ImporterTestGroovy {
     }
 
     @Test
-
     void thisKeywordInDataEventsTest() {
         PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
