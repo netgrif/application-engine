@@ -330,7 +330,7 @@ public class Importer {
     protected void resolveDataActions(Data data) {
         String fieldId = data.getId();
         if (data.getEvent() != null && !data.getEvent().isEmpty()) {
-            getField(fieldId).setEvents(buildEvents(data.getEvent(), null));
+            getField(fieldId).setEvents(buildEvents(fieldId, data.getEvent(), null));
         }
         if (data.getAction() != null) {
             Map<DataEventType, DataEvent> events = getField(fieldId).getEvents();
@@ -343,15 +343,15 @@ public class Importer {
         }
     }
 
-    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, DataEventType trigger){
+    private List<com.netgrif.application.engine.importer.model.Action> filterActionsByTrigger(List<com.netgrif.application.engine.importer.model.Action> actions, DataEventType trigger) {
         return actions.stream()
                 .filter(action -> action.getTrigger().equalsIgnoreCase(trigger.value))
                 .collect(Collectors.toList());
     }
 
-    private void addActionsToEvent(List<Action> actions, DataEventType type, Map<DataEventType, DataEvent> events){
+    private void addActionsToEvent(List<Action> actions, DataEventType type, Map<DataEventType, DataEvent> events) {
         if (actions.isEmpty()) return;
-        if(events.get(type) != null){
+        if (events.get(type) != null) {
             events.get(type).addToActionsByDefaultPhase(actions);
             return;
         }
@@ -405,9 +405,9 @@ public class Importer {
             Map<DataEventType, DataEvent> dataEvents = new HashMap<>();
             List<Action> getActions = new ArrayList<>();
             List<Action> setActions = new ArrayList<>();
-            if (ref.getEvent() != null && !ref.getEvent().isEmpty()){
-                dataEvents = buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId());
-                getTransition(trans.getId()).setDataEvents(fieldId, buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId()));
+            if (ref.getEvent() != null && !ref.getEvent().isEmpty()) {
+                dataEvents = buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId());
+                getTransition(trans.getId()).setDataEvents(fieldId, buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId()));
             }
             if (ref.getLogic().getAction() != null) {
                 getActions = buildActions(filterActionsByTrigger(ref.getLogic().getAction(), DataEventType.GET),
@@ -429,15 +429,15 @@ public class Importer {
         });
     }
 
-    protected void addActionsToDataEvent(List<Action> actions, Map<DataEventType, DataEvent> dataEvents, DataEventType type){
-        if(!dataEvents.containsKey(type) || dataEvents.get(type).getId() == null){
+    protected void addActionsToDataEvent(List<Action> actions, Map<DataEventType, DataEvent> dataEvents, DataEventType type) {
+        if (!dataEvents.containsKey(type) || dataEvents.get(type).getId() == null) {
             dataEvents.put(type, createDefaultEvent(actions, type));
         } else {
             dataEvents.get(type).addToActionsByDefaultPhase(actions);
         }
     }
 
-    protected DataEvent createDefaultEvent(List<Action> actions, DataEventType type){
+    protected DataEvent createDefaultEvent(List<Action> actions, DataEventType type) {
         DataEvent event = new DataEvent();
         event.setType(type);
         event.setId(new ObjectId().toString());
@@ -617,13 +617,13 @@ public class Importer {
         return actionList;
     }
 
-    protected List<Action> parsePhaseActions(EventPhaseType phase, DataEventType trigger, String transitionId, com.netgrif.application.engine.importer.model.DataEvent dataEvent) {
+    protected List<Action> parsePhaseActions(String fieldId, EventPhaseType phase, DataEventType trigger, String transitionId, com.netgrif.application.engine.importer.model.DataEvent dataEvent) {
         List<Action> actionList = dataEvent.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .flatMap(actions -> actions.getAction().stream()
                         .map(action -> {
                             action.setTrigger(trigger.name());
-                            return parseAction(transitionId, action);
+                            return parseAction(fieldId, transitionId, action);
                         }))
                 .collect(Collectors.toList());
         actionList.addAll(dataEvent.getActions().stream()
@@ -824,42 +824,42 @@ public class Importer {
     }
 
     @Transactional
-    protected Map<DataEventType, DataEvent> buildEvents(List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {
+    protected Map<DataEventType, DataEvent> buildEvents(String fieldId, List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {
         Map<DataEventType, DataEvent> parsedEvents = new HashMap<>();
 
         List<com.netgrif.application.engine.importer.model.DataEvent> filteredEvents = events.stream()
-                                .filter(event -> DataEventType.GET.toString().equalsIgnoreCase(event.getType().toString()))
-                                .collect(Collectors.toList());
-        if(!filteredEvents.isEmpty()){
-            parsedEvents.put(DataEventType.GET, parseDataEvent(filteredEvents,transitionId));
+                .filter(event -> DataEventType.GET.toString().equalsIgnoreCase(event.getType().toString()))
+                .collect(Collectors.toList());
+        if (!filteredEvents.isEmpty()) {
+            parsedEvents.put(DataEventType.GET, parseDataEvent(fieldId, filteredEvents, transitionId));
         }
 
         filteredEvents = events.stream().filter(event -> DataEventType.SET.toString().equalsIgnoreCase(event.getType().toString()))
                 .collect(Collectors.toList());
-        if (!filteredEvents.isEmpty()){
-            parsedEvents.put(DataEventType.SET, parseDataEvent(filteredEvents,transitionId));
+        if (!filteredEvents.isEmpty()) {
+            parsedEvents.put(DataEventType.SET, parseDataEvent(fieldId, filteredEvents, transitionId));
         }
 
         return parsedEvents;
     }
 
-    protected com.netgrif.application.engine.petrinet.domain.events.DataEvent parseDataEvent(List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId){
+    protected com.netgrif.application.engine.petrinet.domain.events.DataEvent parseDataEvent(String fieldId, List<com.netgrif.application.engine.importer.model.DataEvent> events, String transitionId) {
         com.netgrif.application.engine.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent();
         events.forEach(event -> {
             dataEvent.setType(event.getType().value().equalsIgnoreCase(DataEventType.GET.value) ? DataEventType.GET : DataEventType.SET);
-            if(dataEvent.getId() == null) {
+            if (dataEvent.getId() == null) {
                 dataEvent.setId(event.getId());
             }
-            if(dataEvent.getMessage() == null && event.getMessage() != null) {
+            if (dataEvent.getMessage() == null && event.getMessage() != null) {
                 dataEvent.setMessage(toI18NString(event.getMessage()));
             }
             event.getActions().forEach(action -> {
                 EventPhaseType phaseType = action.getPhase();
-                if(action.getPhase() == null){
+                if (action.getPhase() == null) {
                     phaseType = event.getType().toString().equalsIgnoreCase(DataEventType.GET.toString()) ? EventPhaseType.PRE : EventPhaseType.POST;
                 }
-                List<Action> parsedPhaseActions = parsePhaseActions(phaseType, dataEvent.getType(), transitionId, event);
-                if(phaseType == EventPhaseType.PRE){
+                List<Action> parsedPhaseActions = parsePhaseActions(fieldId, phaseType, dataEvent.getType(), transitionId, event);
+                if (phaseType == EventPhaseType.PRE) {
                     dataEvent.getPreActions().addAll(parsedPhaseActions);
                 } else {
                     dataEvent.getPostActions().addAll(parsedPhaseActions);
@@ -915,8 +915,8 @@ public class Importer {
 
     protected String buildActionId(String importedActionId) {
         String sanitizedImportedId;
-        if (importedActionId != null){
-            if(actions.containsKey(this.net.getIdentifier() + "-" + importedActionId)){
+        if (importedActionId != null) {
+            if (actions.containsKey(this.net.getIdentifier() + "-" + importedActionId)) {
                 throw new IllegalArgumentException("Duplicate action id, action with id [" + importedActionId + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
             }
             sanitizedImportedId = importedActionId;
