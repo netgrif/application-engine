@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -30,6 +31,9 @@ class ImporterTestGroovy {
 
     @Autowired
     private IPetriNetService petriNetService
+
+    @Autowired
+    private ITaskService taskService
 
     @Autowired
     private SuperCreator superCreator
@@ -67,6 +71,18 @@ class ImporterTestGroovy {
         assert upserted.present
 
         assert upserted.get().creationDate == net.get().creationDate
+    }
+
+    @Test
+
+    void thisKeywordInDataEventsTest() {
+        PetriNet net = petriNetService.importPetriNet(new ClassPathResource("/this_kw_test.xml").getInputStream(), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+
+        assert net != null
+        Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
+        taskService.assignTask(testCase.getTasks().toList().get(0).getTask())
+        testCase = workflowService.findOne(testCase.getStringId())
+        assert testCase.getDataField("tester_text_field").getValue().equals("Hello world!")
     }
 
     @Test
