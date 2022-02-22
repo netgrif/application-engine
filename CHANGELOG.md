@@ -12,7 +12,10 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 ## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-02-16)
 
 ### Fixed
-
+- [NAE-1557] Cannot clear optional enumeration
+- [NAE-1559] Keyword 'this' in event actions 
+- [NAE-1578] Make createSetDataEventOutcome protected
+- [NAE-1579] Group is not added into User.nextGroups when invited
 - [NAE-1572] FilterImportExportService service does not assign import_filter tasks
 - [NAE-1573] GET event is initialized with SET type
 
