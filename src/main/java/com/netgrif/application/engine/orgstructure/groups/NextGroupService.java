@@ -151,12 +151,16 @@ public class NextGroupService implements INextGroupService {
         IUser user = userService.findByEmail(email, true);
         if (user != null && user.isActive()) {
             log.info("User [" + user.getFullName() + "] has already been registered.");
+            user.addGroup(groupCase.getStringId());
+            userService.save(user);
             return addUser(user, existingUsers);
         } else {
             log.info("Inviting new user to group.");
             NewUserRequest newUserRequest = new NewUserRequest();
             newUserRequest.email = email;
             RegisteredUser regUser = registrationService.createNewUser(newUserRequest);
+            regUser.addGroup(groupCase.getStringId());
+            userService.save(regUser);
 
             try {
                 mailService.sendRegistrationEmail(regUser);
