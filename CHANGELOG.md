@@ -9,7 +9,7 @@ Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
 
-## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-02-16)
+## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-02-22)
 
 ### Fixed
 - [NAE-1557] Cannot clear optional enumeration
