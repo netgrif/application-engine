@@ -1,4 +1,4 @@
 PR_TITLE_REGEX: /(?:\[[A-Z]+-[0-9]+\] .+)|(?:Release [0-9]\.[0-9]\.[0-9](?:-[A-Za-z]+\.[0-9]+)?)/gi
-COMMIT_MESSAGE_REGEX: /\[[A-Z]+-[0-9]+\] .+(?:\n\r? - .*)*/gim
+COMMIT_MESSAGE_REGEX: /((^| )(\[[A-Z]+-[0-9]+\] .+(?:\n\r? - .*)*|(Merge branch .*. into*.*)))/gim
 INVALID_COMMIT_MESSAGE: Commit messages are invalid. Valid format is -> [JIRA-ISSUE-KEY] Main change in the commit \n - other change in the commit
 INVALID_PULL_REQUEST_MESSAGE: Pull request title is invalid -> [JIRA-ISSUE-KEY] Jira issue summary / title
