@@ -41,10 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -378,6 +375,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
+        Query query_total = new Query();
 
         if (!user.isAdmin())
             query.addCriteria(getProcessRolesCriteria(user));
@@ -398,14 +396,12 @@ public class PetriNetService implements IPetriNetService {
             else
                 valueCriteria = Criteria.where(key).is(value);
             query.addCriteria(valueCriteria);
+            query_total.addCriteria(valueCriteria);
         });
 
         query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return PageableExecutionUtils.getPage(nets.stream()
-                        .map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()),
-                pageable,
-                () -> mongoTemplate.count(query, PetriNet.class));
+        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable,  mongoTemplate.count(query_total, PetriNet.class));
     }
 
     @Override
