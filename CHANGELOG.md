@@ -9,7 +9,7 @@ Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
 
-## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-02-22)
+## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-02-24)
 
 ### Fixed
 - [NAE-1557] Cannot clear optional enumeration
@@ -18,6 +18,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1579] Group is not added into User.nextGroups when invited
 - [NAE-1572] FilterImportExportService service does not assign import_filter tasks
 - [NAE-1573] GET event is initialized with SET type
+- [NAE-1581] Public view create case permission check
 
 ## [6.0.1](https://github.com/netgrif/application-engine/releases/tag/v6.0.1) (2022-02-15)
 
