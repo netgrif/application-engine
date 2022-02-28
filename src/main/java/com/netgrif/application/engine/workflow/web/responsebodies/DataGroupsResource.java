@@ -12,7 +12,11 @@ public class DataGroupsResource extends CollectionModel<DataGroup> {
 
     public DataGroupsResource(Collection<com.netgrif.application.engine.petrinet.domain.DataGroup> content, Locale locale) {
         super(content.stream()
-                .map(dg -> new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout(), dg.getParentTaskId(), dg.getParentTransitionId(), dg.getParentCaseId(), dg.getParentTaskRefId(), dg.getNestingLevel()))
+                .map(dg -> {
+                    DataGroup dataGroup = new DataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch(), dg.getLayout(), dg.getParentTaskId(), dg.getParentCaseId(), dg.getParentTaskRefId(), dg.getNestingLevel());
+                    dataGroup.setParentTransitionId(dg.getParentTransitionId());
+                    return dataGroup;
+                })
                 .collect(Collectors.toList()));
         buildLinks();
     }
