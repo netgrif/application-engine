@@ -21,11 +21,6 @@ public class UserEventDispatcher extends AbstractDispatcher {
         return "userEventDispatcher";
     }
 
-    @Override
-    public List<String> getRequiredPluginIds() {
-        return Collections.singletonList("pluginex");
-    }
-
     @EventListener
     public void listen(UserEvent object) {
         super.listen(object);
