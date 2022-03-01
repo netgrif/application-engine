@@ -273,6 +273,7 @@ public class DataService implements IDataService {
                         dataGroup.setParentCaseId(useCase.getStringId());
                         resource.setParentCaseId(useCase.getStringId());
                         dataGroup.setParentTaskId(taskId);
+                        dataGroup.setParentTransitionId(task.getTransitionId());
                         dataGroup.setParentTaskRefId(parentTaskRefId);
                         dataGroup.setNestingLevel(level);
                         resource.setParentTaskId(taskId);
