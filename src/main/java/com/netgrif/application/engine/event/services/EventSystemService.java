@@ -23,15 +23,11 @@ public class EventSystemService implements IEventSystemService {
      * */
     @Override
     public void registerDispatcher(IDispatcher dispatcher) {
-        if (dispatcher.getRequiredPluginIds() != null) {
-            dispatcher.getRequiredPluginIds().forEach(pluginId -> {
-                Plugin plugin = this.pluginService.getPlugin(pluginId);
-                if (plugin instanceof NaePlugin) {
-                    NaePlugin naePlugin = (NaePlugin) plugin;
-                    naePlugin.getEventManager().addDispatcher(dispatcher);
-                    naePlugin.getEventManager().registerSubscribers(dispatcher);
-                }
-            });
-        }
+        this.pluginService.getAllPlugin().stream()
+                .filter(plugin -> plugin.getEventManager().getRequiredDispatchers().contains(dispatcher.getId()))
+                .forEach(plugin -> {
+                    plugin.getEventManager().addDispatcher(dispatcher);
+                    plugin.getEventManager().registerSubscribers(dispatcher);
+                });
     }
 }

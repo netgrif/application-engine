@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service for managing plugins in NAE
@@ -55,8 +56,28 @@ public class PluginService implements IPluginService {
      * @return the required plugin
      * */
     @Override
-    public final Plugin getPlugin(String pluginId) {
-        return this.pluginManager.getPlugin(pluginId).getPlugin();
+    public final NaePlugin getPlugin(String pluginId) {
+        Plugin plugin = this.pluginManager.getPlugin(pluginId).getPlugin();
+        if (!(plugin instanceof NaePlugin)) {
+            log.error("Plugin " + plugin.toString() + " is not type of NaePlugin.");
+            return null;
+        }
+        return (NaePlugin) plugin;
+    }
+
+    /**
+     * Returns all NaePlugin
+     * @return the required plugins
+     * */
+    @Override
+    public final List<NaePlugin> getAllPlugin() {
+        List<NaePlugin> plugins = this.pluginManager.getPlugins().stream().map(pw -> {
+            if (pw.getPlugin() instanceof NaePlugin)
+                return (NaePlugin) pw.getPlugin();
+            else
+                return null;
+        }).collect(Collectors.toList());
+        return plugins;
     }
 
     /**
