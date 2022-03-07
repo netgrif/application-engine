@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>this_kw_test</id>
+    <initials>TKW</initials>
+    <title>This keyword test net</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="text">
+        <id>text_field</id>
+        <title></title>
+        <event type="set">
+            <id>ev</id>
+            <actions phase="pre">
+                <action>
+                    tester_text_field: f.tester_text_field,
+                    tf: f.this;
+                    change tester_text_field value { tf.value }
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="text">
+        <id>tester_text_field</id>
+        <title></title>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t1</id>
+        <x>340</x>
+        <y>140</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label></label>
+        <dataGroup>
+            <id>DataGroup</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>t1_assign</id>
+            <actions phase="pre">
+                <action>
+                    text_field: f.text_field;
+                    change text_field value { "Hello world!"; }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
