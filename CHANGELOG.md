@@ -19,7 +19,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1577] Task reffed change behavior does not propagate
 - [NAE-1579] Group is not added into User.nextGroups when invited
 - [NAE-1581] Public view create case permission check
-- [NAE-1582] Group is not added into User.nextGroups when invited
+- [NAE-1582] PetriNetService search method returns just first page
 - [NAE-1588] DefaultFiltersRunner creates new cases every time
 
 ### Changed
