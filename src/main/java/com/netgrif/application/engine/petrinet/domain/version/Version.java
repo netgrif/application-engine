@@ -11,7 +11,7 @@ import static com.netgrif.application.engine.petrinet.domain.VersionType.MINOR;
 @AllArgsConstructor
 public class Version {
 
-    public static final String NEWEST = "^";
+    public static final String NEWEST = "latest";
 
     private long major;
 
