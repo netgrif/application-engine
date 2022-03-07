@@ -247,7 +247,7 @@ class ActionDelegate {
         }]
     }
 
-    private SetDataEventOutcome createSetDataEventOutcome(){
+    protected SetDataEventOutcome createSetDataEventOutcome(){
         return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
     }
 

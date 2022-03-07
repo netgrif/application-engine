@@ -18,6 +18,8 @@ public class DataGroup {
 
     private String parentTaskId;
 
+    private String parentTransitionId;
+
     private String parentCaseId;
 
     private String parentTaskRefId;
