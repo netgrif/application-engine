@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapFiel
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.IllegalMenuFileException;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
@@ -23,6 +24,6 @@ public interface IMenuImportExportService {
     Map<String, I18nString>  createAvailableEntriesChoices(List<Case> menuItemCases);
     Map<String, I18nString>  addSelectedEntriesToExport(MultichoiceMapField availableEntries, EnumerationMapField menusForExport, String menuidentifier);
     FileFieldValue exportMenu(EnumerationMapField menusForExport, String groupId, FileField fileField) throws IOException;
-    List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String groupCaseId) throws IOException, IllegalMenuFileException;
+    List<String> importMenu(List<Case> menuItemCases, FileFieldValue ffv, String groupCaseId) throws IOException, IllegalMenuFileException, TransitionNotExecutableException;
     String createMenuItemCase(StringBuilder resultMessage, MenuEntry item,  String menuIdentifier, String groupCaseId, String filterCaseId);
 }

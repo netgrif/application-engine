@@ -26,9 +26,9 @@ jobs:
         uses: entimaniac/read-pom-version-action@1.0.0
         id: getVersion
 
-      - name: Check Enviroment release
-        if: ${{ !((steps.getEnvRelease.outputs.prerelease && contains(steps.getVersion.outputs.version, '-SNAPSHOT')) || (!steps.getEnvRelease.outputs.prerelease && !contains(steps.getVersion.outputs.version, '-SNAPSHOT'))) }}
-        run: exit 1
+    #  - name: Check Enviroment release
+    #    if: ${{ !((steps.getEnvRelease.outputs.prerelease && contains(steps.getVersion.outputs.version, '-SNAPSHOT')) || (!steps.getEnvRelease.outputs.prerelease && !contains(steps.getVersion.outputs.version, '-SNAPSHOT'))) }}
+    #    run: exit 1
 
       - name: Cache Maven packages
         uses: actions/cache@v1

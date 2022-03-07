@@ -19,10 +19,10 @@ NAE provides additional components to make integration to your project/environme
 
 * Petriflow low-code language: [http://petriflow.com](https://petriflow.com)
 * Documentation: [https://engine.netgrif.com](https://engine.netgrif.com)
-* Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started)
+<!-- * Getting Started: [https://engine.netgrif.com/get_started](https://engine.netgrif.com/get_started) -->
 * Issue Tracker: [GitHub issues](https://github.com/netgrif/application-engine/issues)
 * Java docs: [https://engine.netgrif.com/javadoc](https://engine.netgrif.com/javadoc)
-* Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/roadmap)
+<!-- * Roadmap: [https://engine.netgrif.com/roadmap](https://engine.netgrif.com/#/roadmap) -->
 * License: [NETGRIF Community License](https://netgrif.com/license)
 
 ## Components
@@ -31,20 +31,20 @@ Netgrif Application Engine (or NAE for short) consists of several key components
 
 * **Workflow engine**
     * **Process executions** - Process instance and task management
-    * [**Actions and Events processing**](https://engine.netgrif.com/events/events) - Compiling and running action's
+    * [**Actions and Events processing**](https://engine.netgrif.com/#/events/events) - Compiling and running action's
       code, handling events in processes
-    * [**Roles management and permissions resolution**](https://engine.netgrif.com/roles/permissions) - Permissions and
+    * [**Roles management and permissions resolution**](https://engine.netgrif.com/#/roles/permissions) - Permissions and
       restrictions resolving for processes
-    * [**Search and filters**](https://engine.netgrif.com/search/filter) - Indexing, querying and filter management.
+    * [**Search and filters**](https://engine.netgrif.com/#/search/filter) - Indexing, querying and filter management.
 * **Authentication and authorization** - User management and application-wide permissions
-    * [**LDAP**](https://engine.netgrif.com/integration/ad_kerberos) - Integration to authentication solution via LDAP
+    * [**LDAP**](https://engine.netgrif.com/#/integration/ad_kerberos) - Integration to authentication solution via LDAP
       protocol.
     * **Organization structures** - Managing organization structure for application users
 * **Business rules engine** - Rules execution across whole application based on [Drools](https://drools.org/)
 * **Logging and auditing** - Logging to text file and Event/Audit log generation to the main database
 * **Mail service** - Mail client for sending and receiving emails
 * **Extension services**
-    * [**PDF generator**](https://engine.netgrif.com/services/pdf_generator) - Generate PDF from process form / task
+    * [**PDF generator**](https://engine.netgrif.com/#/services/pdf_generator) - Generate PDF from process form / task
     * **QR code generator** - Generate QR code from process data
 
 ## Requirements
@@ -62,8 +62,8 @@ run and use the engine:
 If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
 configuration to run all necessary databases to develop with NAE.
 
-If you are going to deploy your application on Kubernetes cluster please check out documentation
-for [Kubernetes deployment](https://engine.netgrif.com/devops/kubernetes).
+<!-- If you are going to deploy your application on Kubernetes cluster please check out documentation
+for [Kubernetes deployment](https://engine.netgrif.com/#/devops/kubernetes). -->
 
 ## Installation
 
@@ -77,7 +77,7 @@ file or as docker container.
 To run the engine from the jar file you can use a release package available from this repository. The latest release
 package you can download from [here](https://github.com/netgrif/application-engine/releases/latest). Before you start
 you must generate own RSA key pair for session tokens, you can
-follow [this guide](https://engine.netgrif.com/views/public_view).
+follow [this guide](https://engine.netgrif.com/#/views/public_view?id=backend).
 
 To quickly start working with the engine just write the following commands to download, unzip, generate security keys
 and start:
@@ -97,8 +97,8 @@ on different ports, you can pass these settings as arguments to NAE.
 $ java -jar nae.jar --spring.data.mongodb.uri=mongodb://localhost:27017/nae --spring.data.elasticsearch.url=localhost --spring.session.redis.host=localhost
 ```
 
-For complete list of all configurable application properties
-see [article in documentation](https://engine.netgrif.com/properties).
+<!-- For complete list of all configurable application properties
+see [article in documentation](https://engine.netgrif.com/properties). -->
 
 #### Running as Docker container
 
@@ -111,8 +111,8 @@ $ docker run -d -p 8080:8080 netgrif/application-engine
 ```
 
 As the engine connects by default to locally ran databases for more precise configuration we recommend to use Docker
-compose file or Kubernetes manifest to run whole stack all at once. You can read more about it
-in [this guide](https://engine.netgrif.com/devops).
+compose file or Kubernetes manifest to run whole stack all at once. <!-- You can read more about it
+in [this guide](https://engine.netgrif.com/#/devops). -->
 
 ### Embedding
 
@@ -128,15 +128,15 @@ dependency:
 </dependency>
 ```
 
-For more information please read instructions in [Get Started](https://engine.netgrif.com/get_started)
+<!-- For more information please read instructions in [Get Started](https://engine.netgrif.com/#/get_started) -->
 
 ## Other projects
 
-### Frontend library
+<!-- ### Frontend library
 
 For complete Netgrif Application Engine experience check out
 our [Angular library - Netgrif Components](https://github.com/netgrif/components)
-for building frontend applications in Application Engine platform powered by Petriflow processes.
+for building frontend applications in Application Engine platform powered by Petriflow processes. -->
 
 ### Application Builder
 
