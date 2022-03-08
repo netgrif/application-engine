@@ -53,9 +53,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return loggedUser;
     }
 
-    public void reloadSecurityContext(LoggedUser loggedUser) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
+    public final void reloadSecurityContext(LoggedUser loggedUser) {
+        if (isUserLogged(loggedUser)) {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(token);
+        }
     }
 
     protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
@@ -75,5 +77,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return request.getRemoteAddr();
         }
         return xfHeader.split(",")[0];
+    }
+
+    private boolean isUserLogged(LoggedUser loggedUser) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser)
+            return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
+        else
+            return false;
     }
 }
