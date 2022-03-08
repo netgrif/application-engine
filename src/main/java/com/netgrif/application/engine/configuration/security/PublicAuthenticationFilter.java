@@ -41,7 +41,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
                                       Authority anonymousAuthority, String[] urls, String[] exceptions, IJwtService jwtService,
                                       IUserService userService) {
         this.authenticationManager = authenticationManager;
-        this.authenticationManager.getProviders().add(provider);
+//        this.authenticationManager.getProviders().add(provider);
         this.anonymousAuthority = anonymousAuthority;
         this.anonymousAccessUrls = urls;
         this.exceptions = exceptions;

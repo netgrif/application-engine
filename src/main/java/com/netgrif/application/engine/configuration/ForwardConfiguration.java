@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ForwardConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfigurationStaticEnabled.class);
+    private static final Logger log = LoggerFactory.getLogger(ForwardConfiguration.class);
 
     @RequestMapping(value = "/{path:[^api]*}")
     public String redirect(HttpServletRequest request) {
