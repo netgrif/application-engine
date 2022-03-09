@@ -223,6 +223,12 @@ public class NextGroupService implements INextGroupService {
                 existingUsers.remove(user);
             }
         });
+        userService.findAllByIds(usersToRemove, false).forEach(user -> {
+            if (!user.getStringId().equals(authorId)) {
+                user.getNextGroups().remove(groupCase.getStringId());
+                userService.save(user);
+            }
+        });
         return existingUsers;
     }
 
