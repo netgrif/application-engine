@@ -6,7 +6,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistration
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.configuration.authenticationProviders.BasicAuthenticationProvider;
+import com.netgrif.application.engine.configuration.authenticationProviders.NetgrifBasicAuthenticationProvider;
 import com.netgrif.application.engine.configuration.authenticationProviders.NetgrifLdapAuthenticationProvider;
 import com.netgrif.application.engine.configuration.authenticationProviders.ldap.UserDetailsContextMapperImpl;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
@@ -67,7 +67,7 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
     private IUserService userService;
 
     @Autowired
-    private BasicAuthenticationProvider basicAuthenticationProvider;
+    private NetgrifBasicAuthenticationProvider netgrifBasicAuthenticationProvider;
 
     private final NetgrifLdapAuthenticationProvider netgrifLdapAuthenticationProvider;
 
@@ -123,11 +123,11 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        basicAuthenticationProvider.setPasswordEncoder(passwordEncoder.bCryptPasswordEncoder());
-        basicAuthenticationProvider.setMFA("TOTOk");
+        netgrifBasicAuthenticationProvider.setPasswordEncoder(passwordEncoder.bCryptPasswordEncoder());
         netgrifLdapAuthenticationProvider.setUserDetailsContextMapper(new UserDetailsContextMapperImpl(ldapUserService, ldapUserRefService, ldapProperties));
+
         auth
-                .authenticationProvider(basicAuthenticationProvider)
+                .authenticationProvider(netgrifBasicAuthenticationProvider)
                 .authenticationProvider(netgrifLdapAuthenticationProvider);
 
     }

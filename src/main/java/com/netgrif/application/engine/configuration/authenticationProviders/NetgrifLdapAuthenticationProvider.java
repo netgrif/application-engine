@@ -55,7 +55,7 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
         LdapContextSource contextSource = new LdapContextSource();
         contextSource.setUrl(ldapProperties.getUrl());
         contextSource.setBase(ldapProperties.getBase());
-        contextSource.setUserDn(ldapProperties.getPeopleSearchBase());
+        contextSource.setUserDn(ldapProperties.getUsername());
         contextSource.setPassword(ldapProperties.getPassword());
         contextSource.afterPropertiesSet();
         return contextSource;
@@ -85,9 +85,9 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
         if (userSearch != null) {
             ldapAuthenticator.setUserSearch(userSearch);
         }
-        if (ldapProperties.getPeopleClass() != null && ldapProperties.getPeopleClass().length > 0) {
-            ldapAuthenticator.setUserDnPatterns(ldapProperties.getPeopleClass());
-        }
+//        if (ldapProperties.getPeopleClass() != null && ldapProperties.getPeopleClass().length > 0) {
+//            ldapAuthenticator.setUserDnPatterns(ldapProperties.getPeopleClass());
+//        }
         return ldapAuthenticator;
     }
 
@@ -125,11 +125,6 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
     }
 
 
-    protected UserDetailsContextMapper getUserDetailsContextMapper() {
-        return userDetailsContextMapper;
-    }
-
-
     public void setUseAuthenticationRequestCredentials(boolean useAuthenticationRequestCredentials) {
         this.useAuthenticationRequestCredentials = useAuthenticationRequestCredentials;
     }
@@ -137,9 +132,6 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-//        log.error("Only UsernamePasswordAuthenticationToken is supported");
-//        Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication, "Only UsernamePasswordAuthenticationToken is supported");
-
         final UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
 
         String username = userToken.getName();

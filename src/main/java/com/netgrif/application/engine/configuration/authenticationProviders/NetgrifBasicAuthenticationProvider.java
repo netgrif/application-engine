@@ -17,7 +17,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 
 @Slf4j
 @Component
-public class BasicAuthenticationProvider extends NetgrifAuthenticationProvider {
+public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationProvider {
 
     @Autowired
     protected UserRepository userRepository;
@@ -88,7 +87,6 @@ public class BasicAuthenticationProvider extends NetgrifAuthenticationProvider {
         }
 
         LoggedUser loggedUser = getLoggedUser(email);
-        loggedUser.setFullName("JOZIKEEEEE");
         publisher.publishEvent(new UserLoginEvent(loggedUser));
 
         return loggedUser;
@@ -106,22 +104,9 @@ public class BasicAuthenticationProvider extends NetgrifAuthenticationProvider {
     }
 
 
-    /**
-     * Sets the PasswordEncoder instance to be used to encode and validate passwords. If
-     * not set, the password will be compared using
-     * {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
-     *
-     * @param passwordEncoder must be an instance of one of the {@code PasswordEncoder}
-     *                        types.
-     */
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         Assert.notNull(passwordEncoder, "passwordEncoder cannot be null");
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public void setMFA(String totok) {
-        System.out.println("BLA BLA BLA BLA");
-        this.mfa = totok;
     }
 
 }
