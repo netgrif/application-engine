@@ -85,9 +85,6 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
         if (userSearch != null) {
             ldapAuthenticator.setUserSearch(userSearch);
         }
-//        if (ldapProperties.getPeopleClass() != null && ldapProperties.getPeopleClass().length > 0) {
-//            ldapAuthenticator.setUserDnPatterns(ldapProperties.getPeopleClass());
-//        }
         return ldapAuthenticator;
     }
 
