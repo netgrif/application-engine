@@ -27,6 +27,7 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
@@ -828,5 +829,20 @@ public class TaskService implements ITaskService {
             outcome.setMessage(transition.getEvents().get(type).getMessage());
         }
         return outcome;
+    }
+
+    @Override
+    public SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId) {
+        SetDataEventOutcome mainOutcome;
+        String key = taskId;
+        if (!outcomes.containsKey(taskId)) {
+            Optional<String> optional = outcomes.keySet().stream().findFirst();
+            if (optional.isPresent()) {
+                key = optional.get();
+            }
+        }
+        mainOutcome = outcomes.remove(key);
+        mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
+        return mainOutcome;
     }
 }

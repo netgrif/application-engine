@@ -137,8 +137,9 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile){
-        return super.saveFile(taskId, fieldId, multipartFile);
+    public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                         @RequestPart(value = "data") ObjectNode dataBody, @RequestPart(value = "file") MultipartFile multipartFile){
+        return super.saveFile(taskId, fieldId, multipartFile, dataBody);
     }
 
     @ApiOperation(value = "Download task file field value")
@@ -173,8 +174,8 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
-        return super.saveFiles(taskId, fieldId, multipartFiles);
+                                                          @RequestPart(value = "data") ObjectNode dataBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
+        return super.saveFiles(taskId, fieldId, multipartFiles, dataBody);
     }
 
     @Override
