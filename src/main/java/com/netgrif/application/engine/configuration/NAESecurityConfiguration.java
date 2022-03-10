@@ -6,9 +6,9 @@ import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistration
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.configuration.authenticationProviders.NetgrifBasicAuthenticationProvider;
-import com.netgrif.application.engine.configuration.authenticationProviders.NetgrifLdapAuthenticationProvider;
-import com.netgrif.application.engine.configuration.authenticationProviders.ldap.UserDetailsContextMapperImpl;
+import com.netgrif.application.engine.configuration.authentication.providers.NetgrifBasicAuthenticationProvider;
+import com.netgrif.application.engine.configuration.authentication.providers.NetgrifLdapAuthenticationProvider;
+import com.netgrif.application.engine.configuration.authentication.providers.ldap.UserDetailsContextMapperImpl;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;

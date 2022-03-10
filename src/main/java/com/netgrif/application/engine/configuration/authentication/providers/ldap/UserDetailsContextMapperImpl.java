@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.configuration.authenticationProviders.ldap;
+package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.ILdapUserRefService;
