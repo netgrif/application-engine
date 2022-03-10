@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,19 +31,9 @@ public abstract class NetgrifAuthenticationProvider implements AuthenticationPro
         return null;
     }
 
+    public abstract Authentication authenticate(Authentication authentication);
 
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
-        return null;
-    }
-
-
-    @Override
-    public boolean supports(Class<?> authentication) {
-
-        return false;
-    }
+    public abstract boolean supports(Class<?> authentication);
 
 
     protected String getClientIP() {

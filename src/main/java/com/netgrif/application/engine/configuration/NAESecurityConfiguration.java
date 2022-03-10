@@ -4,14 +4,17 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.service.AfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.auth.service.interfaces.ILdapUserRefService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authenticationProviders.BasicAuthenticationProvider;
-//import com.netgrif.application.engine.configuration.authenticationProviders.LdapAuthenticationProvider;
+import com.netgrif.application.engine.configuration.authenticationProviders.NetgrifLdapAuthenticationProvider;
+import com.netgrif.application.engine.configuration.authenticationProviders.ldap.UserDetailsContextMapperImpl;
+import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.ldap.service.LdapUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,16 +64,12 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
     private IJwtService jwtService;
 
     @Autowired
-    private IProcessRoleService roleService;
-
-    @Autowired
     private IUserService userService;
 
     @Autowired
     private BasicAuthenticationProvider basicAuthenticationProvider;
 
-//    @Autowired
-//    private LdapAuthenticationProvider ldapAuthenticationProvider;
+    private final NetgrifLdapAuthenticationProvider netgrifLdapAuthenticationProvider;
 
     @Autowired
     private EncryptionConfiguration passwordEncoder;
@@ -83,6 +82,16 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Value("${nae.security.anonymous-exceptions}")
     private String[] anonymousExceptions;
+
+
+    @Autowired
+    protected NaeLdapProperties ldapProperties;
+
+    @Autowired
+    private LdapUserService ldapUserService;
+
+    @Autowired
+    private ILdapUserRefService ldapUserRefService;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
 
@@ -107,21 +116,20 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
         return source;
     }
 
+    public NAESecurityConfiguration(NetgrifLdapAuthenticationProvider netgrifLdapAuthenticationProvider) {
+        netgrifLdapAuthenticationProvider.setUserDetailsContextMapper(new UserDetailsContextMapperImpl(ldapUserService, ldapUserRefService, ldapProperties));
+        this.netgrifLdapAuthenticationProvider = netgrifLdapAuthenticationProvider;
+    }
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         basicAuthenticationProvider.setPasswordEncoder(passwordEncoder.bCryptPasswordEncoder());
         basicAuthenticationProvider.setMFA("TOTOk");
-//        ldapAuthenticationProvider.setLdapProperties(auth);
-//
-//        auth
-//                .authenticationProvider(basicAuthenticationProvider)
-//                .authenticationProvider(ldapAuthenticationProvider);
+        netgrifLdapAuthenticationProvider.setUserDetailsContextMapper(new UserDetailsContextMapperImpl(ldapUserService, ldapUserRefService, ldapProperties));
+        auth
+                .authenticationProvider(basicAuthenticationProvider)
+                .authenticationProvider(netgrifLdapAuthenticationProvider);
 
-
-//        auth.inMemoryAuthentication()
-//                .withUser("memuser")
-//                .password("pass")
-//                .roles("USER");
     }
 
     @Override
