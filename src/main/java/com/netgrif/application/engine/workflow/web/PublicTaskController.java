@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -32,9 +31,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @RestController
 @RequestMapping({"/api/public/task"})
@@ -138,7 +137,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                         @RequestPart(value = "data") ObjectNode dataBody, @RequestPart(value = "file") MultipartFile multipartFile){
+                                                         @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile){
         return super.saveFile(taskId, fieldId, multipartFile, dataBody);
     }
 
@@ -174,7 +173,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                          @RequestPart(value = "data") ObjectNode dataBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
+                                                          @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
         return super.saveFiles(taskId, fieldId, multipartFiles, dataBody);
     }
 
