@@ -4,11 +4,12 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Service for managing security context object, like user resource
@@ -17,16 +18,13 @@ import java.util.Set;
 @Service
 public class SecurityContextService implements ISecurityContextService{
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
     /**
      * List containing user IDs that's state was changed during an action
      * */
     private final Set<String> cachedTokens;
 
     protected SecurityContextService() {
-        this.cachedTokens = new HashSet<>();
+        this.cachedTokens = ConcurrentHashMap.newKeySet();
     }
 
     /**
@@ -34,7 +32,7 @@ public class SecurityContextService implements ISecurityContextService{
      * @param token the token string to be cached
      * */
     @Override
-    public void saveToken(String token) {
+    public final void saveToken(String token) {
         if (!cachedTokens.contains(token))
             this.cachedTokens.add(token);
     }
@@ -44,10 +42,22 @@ public class SecurityContextService implements ISecurityContextService{
      * @param loggedUser currently logged user
      * */
     @Override
-    public void reloadLoggedUserContext(LoggedUser loggedUser) {
+    public final void reloadLoggedUserContext(LoggedUser loggedUser) {
         if (cachedTokens.contains(loggedUser.getId())) {
-            userDetailsService.reloadSecurityContext(loggedUser);
-            cachedTokens.remove(loggedUser.getId());
+            reloadSecurityContext(loggedUser);
+            clearToken(loggedUser.getId());
+        }
+    }
+
+    /**
+     * Reloads the security context according to currently logged user
+     * @param loggedUser the user whose context needs to be reloaded
+     * */
+    @Override
+    public final void reloadSecurityContext(LoggedUser loggedUser) {
+        if (isUserLogged(loggedUser)) {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(token);
         }
     }
 
@@ -58,5 +68,17 @@ public class SecurityContextService implements ISecurityContextService{
     private void clearToken(String token) {
         if (cachedTokens.contains(token))
             this.cachedTokens.remove(token);
+    }
+
+    /**
+     * Checks whether the user is logged in
+     * @param loggedUser the user that is needed to be checked
+     * @return true if logged user is in the security context
+     * */
+    private boolean isUserLogged(LoggedUser loggedUser) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser)
+            return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
+        else
+            return false;
     }
 }

@@ -14,6 +14,7 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.Api;
@@ -65,6 +66,9 @@ public class AuthenticationController {
 
     @Autowired
     private IUserFactory userResponseFactory;
+
+    @Autowired
+    private ISecurityContextService securityContextService;
 
     @ApiOperation(value = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -194,7 +198,7 @@ public class AuthenticationController {
             String password = new String(Base64.getDecoder().decode(request.password));
             if (registrationService.stringMatchesUserPassword(user, password)) {
                 registrationService.changePassword(user, newPassword);
-                userDetailsService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
+                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
 
             } else {
                 return MessageResource.errorMessage("Incorrect password!");

@@ -23,7 +23,7 @@ public class SecurityContextFilter extends OncePerRequestFilter {
     /**
      * Security context service for managing user tokens
      * */
-    private ISecurityContextService securityContextService;
+    private final ISecurityContextService securityContextService;
 
     public SecurityContextFilter(ISecurityContextService securityContextService) {
         this.securityContextService = securityContextService;
@@ -34,8 +34,9 @@ public class SecurityContextFilter extends OncePerRequestFilter {
      * */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser)
+        if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser) {
             securityContextService.reloadLoggedUserContext((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        }
         filterChain.doFilter(request, response);
     }
 }
