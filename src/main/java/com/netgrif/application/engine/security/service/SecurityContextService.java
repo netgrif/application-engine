@@ -32,7 +32,7 @@ public class SecurityContextService implements ISecurityContextService{
      * @param token the token string to be cached
      * */
     @Override
-    public final void saveToken(String token) {
+    public void saveToken(String token) {
         if (!cachedTokens.contains(token))
             this.cachedTokens.add(token);
     }
@@ -42,7 +42,7 @@ public class SecurityContextService implements ISecurityContextService{
      * @param loggedUser currently logged user
      * */
     @Override
-    public final void reloadLoggedUserContext(LoggedUser loggedUser) {
+    public void reloadLoggedUserContext(LoggedUser loggedUser) {
         if (cachedTokens.contains(loggedUser.getId())) {
             reloadSecurityContext(loggedUser);
         }
@@ -53,7 +53,7 @@ public class SecurityContextService implements ISecurityContextService{
      * @param loggedUser the user whose context needs to be reloaded
      * */
     @Override
-    public final void reloadSecurityContext(LoggedUser loggedUser) {
+    public void reloadSecurityContext(LoggedUser loggedUser) {
         if (isUserLogged(loggedUser)) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);
