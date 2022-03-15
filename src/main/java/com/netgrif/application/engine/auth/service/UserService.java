@@ -54,9 +54,6 @@ public class UserService extends AbstractUserService {
     @Autowired
     private IFilterImportExportService filterImportExportService;
 
-    @Autowired
-    private IAfterRegistrationAuthService authenticationService;
-
     @Override
     public IUser saveNewAndAuthenticate(IUser user) {
         return saveNew(user, true);
@@ -68,7 +65,6 @@ public class UserService extends AbstractUserService {
     }
 
     private IUser saveNew(IUser user, boolean login) {
-        String rawPassword = ((RegisteredUser) user).getPassword();
 
         registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
@@ -77,8 +73,6 @@ public class UserService extends AbstractUserService {
         User savedUser = userRepository.save((User) user);
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
-        if (login)
-            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
 
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
@@ -87,8 +81,7 @@ public class UserService extends AbstractUserService {
             groupService.addUserToDefaultGroup(user);
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
-        if (login)
-            authenticationService.logoutAfterRegistrationFinished();
+
         return savedUser;
     }
 

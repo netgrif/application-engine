@@ -48,7 +48,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Configuration
 @Controller
 @EnableWebSecurity
-@Order(SecurityProperties.BASIC_AUTH_ORDER)
+@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
@@ -72,9 +72,6 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
     private final NetgrifLdapAuthenticationProvider netgrifLdapAuthenticationProvider;
 
     @Autowired
-    private EncryptionConfiguration passwordEncoder;
-
-    @Autowired
     private SecurityConfigProperties properties;
 
     @Value("${nae.security.server-patterns}")
@@ -86,12 +83,6 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     protected NaeLdapProperties ldapProperties;
-
-    @Autowired
-    private LdapUserService ldapUserService;
-
-    @Autowired
-    private ILdapUserRefService ldapUserRefService;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
 
@@ -116,20 +107,18 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
         return source;
     }
 
-    public NAESecurityConfiguration(NetgrifLdapAuthenticationProvider netgrifLdapAuthenticationProvider) {
+    public NAESecurityConfiguration(NetgrifLdapAuthenticationProvider netgrifLdapAuthenticationProvider, NetgrifBasicAuthenticationProvider netgrifBasicAuthenticationProvider, EncryptionConfiguration passwordEncoder, LdapUserService ldapUserService, ILdapUserRefService ldapUserRefService, NaeLdapProperties ldapProperties) {
+        netgrifBasicAuthenticationProvider.setPasswordEncoder(passwordEncoder.bCryptPasswordEncoder());
+        this.netgrifBasicAuthenticationProvider = netgrifBasicAuthenticationProvider;
         netgrifLdapAuthenticationProvider.setUserDetailsContextMapper(new UserDetailsContextMapperImpl(ldapUserService, ldapUserRefService, ldapProperties));
         this.netgrifLdapAuthenticationProvider = netgrifLdapAuthenticationProvider;
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        netgrifBasicAuthenticationProvider.setPasswordEncoder(passwordEncoder.bCryptPasswordEncoder());
-        netgrifLdapAuthenticationProvider.setUserDetailsContextMapper(new UserDetailsContextMapperImpl(ldapUserService, ldapUserRefService, ldapProperties));
-
         auth
                 .authenticationProvider(netgrifBasicAuthenticationProvider)
                 .authenticationProvider(netgrifLdapAuthenticationProvider);
-
     }
 
     @Override
@@ -199,7 +188,7 @@ public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
         return env;
     }
 
-    private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
+    protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
