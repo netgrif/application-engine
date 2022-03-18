@@ -6,7 +6,5 @@ public interface ISecurityContextService {
 
     void saveToken(String token);
 
-    void reloadLoggedUserContext(LoggedUser loggedUser);
-
     void reloadSecurityContext(LoggedUser loggedUser);
 }

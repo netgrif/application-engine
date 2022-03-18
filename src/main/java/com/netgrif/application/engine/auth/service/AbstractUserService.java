@@ -75,7 +75,8 @@ public abstract class AbstractUserService implements IUserService {
     public IUser addRole(IUser user, String roleStringId) {
         ProcessRole role = processRoleService.findById(roleStringId);
         user.addProcessRole(role);
-        securityContextService.reloadLoggedUserContext(user.transformToLoggedUser());
+        securityContextService.saveToken(user.getStringId());
+        securityContextService.reloadSecurityContext(user.transformToLoggedUser());
         return save(user);
     }
 
@@ -86,7 +87,8 @@ public abstract class AbstractUserService implements IUserService {
 
     protected IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
-        securityContextService.reloadLoggedUserContext(user.transformToLoggedUser());
+        securityContextService.saveToken(user.getStringId());
+        securityContextService.reloadSecurityContext(user.transformToLoggedUser());
         return save(user);
     }
 

@@ -38,23 +38,12 @@ public class SecurityContextService implements ISecurityContextService{
     }
 
     /**
-     * Checks if logged user has cached token and needs to be refreshed
-     * @param loggedUser currently logged user
-     * */
-    @Override
-    public void reloadLoggedUserContext(LoggedUser loggedUser) {
-        if (cachedTokens.contains(loggedUser.getId())) {
-            reloadSecurityContext(loggedUser);
-        }
-    }
-
-    /**
      * Reloads the security context according to currently logged user
      * @param loggedUser the user whose context needs to be reloaded
      * */
     @Override
     public void reloadSecurityContext(LoggedUser loggedUser) {
-        if (isUserLogged(loggedUser)) {
+        if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);
             clearToken(loggedUser.getId());

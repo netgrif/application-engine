@@ -25,7 +25,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.rules.domain.RuleRepository
-import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
@@ -130,9 +129,6 @@ class ActionDelegate {
 
     @Autowired
     IFilterImportExportService filterImportExportService
-
-    @Autowired
-    ISecurityContextService securityContextService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -658,9 +654,7 @@ class ActionDelegate {
     }
 
     IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
-        // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
         IUser actualUser = userService.addRole(user, roleMongoId)
-        securityContextService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
@@ -672,7 +666,6 @@ class ActionDelegate {
 
     IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
         IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
-        securityContextService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
@@ -683,7 +676,6 @@ class ActionDelegate {
 
     IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
         IUser actualUser = userService.removeRole(user, roleMongoId)
-        securityContextService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
@@ -695,7 +687,6 @@ class ActionDelegate {
 
     IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
         IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
-        securityContextService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
