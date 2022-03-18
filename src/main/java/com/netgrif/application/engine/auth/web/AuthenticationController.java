@@ -198,6 +198,7 @@ public class AuthenticationController {
             String password = new String(Base64.getDecoder().decode(request.password));
             if (registrationService.stringMatchesUserPassword(user, password)) {
                 registrationService.changePassword(user, newPassword);
+                securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
                 securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
 
             } else {

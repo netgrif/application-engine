@@ -104,13 +104,11 @@ public class ProcessRoleService implements IProcessRoleService {
         replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
         runAllPostActions(newRoles, removedRoles, user, petriNet);
 
+        securityContextService.saveToken(userId);
         if (Objects.equals(userId, loggedUser.getId())) {
             loggedUser.getProcessRoles().clear();
             loggedUser.parseProcessRoles(user.getProcessRoles());
-            securityContextService.saveToken(userId);
             securityContextService.reloadSecurityContext(loggedUser);
-        } else {
-            securityContextService.saveToken(userId);
         }
     }
 

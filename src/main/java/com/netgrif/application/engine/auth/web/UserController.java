@@ -153,6 +153,7 @@ public class UserController {
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
         user = userService.update(user, updates);
+        securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
             loggedUser.setFullName(user.getFullName());
             securityContextService.reloadSecurityContext(loggedUser);
