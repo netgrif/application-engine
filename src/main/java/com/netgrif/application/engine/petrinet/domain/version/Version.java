@@ -11,7 +11,10 @@ import static com.netgrif.application.engine.petrinet.domain.VersionType.MINOR;
 @AllArgsConstructor
 public class Version {
 
-    @Deprecated
+    /**
+     * @deprecated since 6.0.3 - please use {@link #LATEST} instead
+     * */
+    @Deprecated(since = "6.0.3")
     public static final String NEWEST = "^";
 
     public static final String LATEST = "latest";
