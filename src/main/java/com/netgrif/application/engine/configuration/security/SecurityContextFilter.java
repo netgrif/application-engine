@@ -1,10 +1,8 @@
 package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.xmlbeans.impl.xb.xsdschema.Attribute;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -34,7 +32,7 @@ public class SecurityContextFilter extends OncePerRequestFilter {
      * */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser)
+        if (securityContextService.isAuthenticatedPrincipalLoggedUser())
             securityContextService.reloadSecurityContext((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         filterChain.doFilter(request, response);
     }

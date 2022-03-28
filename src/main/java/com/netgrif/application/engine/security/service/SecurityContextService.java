@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.security.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,6 @@ public class SecurityContextService implements ISecurityContextService{
      * */
     @Override
     public void saveToken(String token) {
-        if (!cachedTokens.contains(token))
             this.cachedTokens.add(token);
     }
 
@@ -51,6 +48,15 @@ public class SecurityContextService implements ISecurityContextService{
     }
 
     /**
+     * Checks type of SecurityContext
+     * @return true if the SecurityContext exists and is of type LoggedUser
+     * */
+    @Override
+    public boolean isAuthenticatedPrincipalLoggedUser() {
+       return SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser;
+    }
+    
+    /**
      * Removes token from cache if the state of context object was updated
      * @param token the token string to be removed from cache
      * */
@@ -65,7 +71,7 @@ public class SecurityContextService implements ISecurityContextService{
      * @return true if logged user is in the security context
      * */
     private boolean isUserLogged(LoggedUser loggedUser) {
-        if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoggedUser)
+        if (isAuthenticatedPrincipalLoggedUser())
             return ((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(loggedUser.getId());
         else
             return false;

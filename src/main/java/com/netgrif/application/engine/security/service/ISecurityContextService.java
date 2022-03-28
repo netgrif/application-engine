@@ -7,4 +7,6 @@ public interface ISecurityContextService {
     void saveToken(String token);
 
     void reloadSecurityContext(LoggedUser loggedUser);
+
+    boolean isAuthenticatedPrincipalLoggedUser();
 }
