@@ -11,6 +11,7 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
@@ -63,6 +64,9 @@ public class NextGroupService implements INextGroupService {
 
     @Autowired
     protected ITaskService taskService;
+
+    @Autowired
+    protected ISecurityContextService securityContextService;
 
 
     protected final static String GROUP_NET_IDENTIFIER = "org_group";
@@ -195,6 +199,7 @@ public class NextGroupService implements INextGroupService {
         workflowService.save(groupCase);
         user.addGroup(groupCase.getStringId());
         userService.save(user);
+        securityContextService.saveToken(user.getStringId());
     }
 
     @Override
@@ -221,6 +226,7 @@ public class NextGroupService implements INextGroupService {
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
             } else {
                 existingUsers.remove(user);
+                securityContextService.saveToken(user);
             }
         });
         userService.findAllByIds(usersToRemove, false).forEach(user -> {

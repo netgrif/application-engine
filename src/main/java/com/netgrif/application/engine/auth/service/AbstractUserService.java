@@ -8,6 +8,7 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,6 +35,9 @@ public abstract class AbstractUserService implements IUserService {
 
     @Autowired
     protected UserRepository repository;
+
+    @Autowired
+    private ISecurityContextService securityContextService;
 
     @Override
     public void addDefaultRole(IUser user) {
@@ -71,6 +75,8 @@ public abstract class AbstractUserService implements IUserService {
     public IUser addRole(IUser user, String roleStringId) {
         ProcessRole role = processRoleService.findById(roleStringId);
         user.addProcessRole(role);
+        securityContextService.saveToken(user.getStringId());
+        securityContextService.reloadSecurityContext(user.transformToLoggedUser());
         return save(user);
     }
 
@@ -81,6 +87,8 @@ public abstract class AbstractUserService implements IUserService {
 
     protected IUser removeRole(IUser user, ProcessRole role) {
         user.removeProcessRole(role);
+        securityContextService.saveToken(user.getStringId());
+        securityContextService.reloadSecurityContext(user.transformToLoggedUser());
         return save(user);
     }
 
