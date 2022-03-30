@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,11 +49,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         publisher.publishEvent(new UserLoginEvent(loggedUser));
 
         return loggedUser;
-    }
-
-    public void reloadSecurityContext(LoggedUser loggedUser) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
     }
 
     protected LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
