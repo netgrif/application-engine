@@ -231,6 +231,7 @@ public class DataService implements IDataService {
                     changedField.addAttribute("filterMetadata", filterMetadata);
                 }
                 outcome.addChangedField(fieldId, changedField);
+                workflowService.save(useCase);
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField)));
                 outcome.addOutcomes(resolveDataEvents(field,
                         DataEventType.SET, EventPhase.POST, useCase, task));
