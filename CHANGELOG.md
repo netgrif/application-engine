@@ -8,6 +8,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
+## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-03-30)
+
+### Fixed
+
+- [NAE-1589] Role changes for logged users don't take effect
+- [NAE-1593] Remove user does not remove group from user groups
+- [NAE-1590] Taskref with file field must be assigned
+- [NAE-1618] SpringFox swagger failing in combination with spring actuator
+
+### Changed
+
+- [NAE-1571] Change the Version.NEWEST from "^" to "latest"
+
 ## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-03-07)
 
 ### Fixed
