@@ -6,6 +6,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.stereotype.Component;
 
+import static com.netgrif.application.engine.petrinet.domain.version.Version.LATEST;
 import static com.netgrif.application.engine.petrinet.domain.version.Version.NEWEST;
 
 @Component
@@ -16,7 +17,7 @@ public class StringToVersionConverter implements Converter<String, Version> {
 
     @Override
     public Version convert(String source) {
-        if (NEWEST.equals(source)) {
+        if (NEWEST.equals(source) || LATEST.equals(source)) {
             return null;
         }
 
