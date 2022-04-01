@@ -17,7 +17,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1556] Post-set error prevents set
 
 
-## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-03-30)
+## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-04-01)
 
 ### Fixed
 
