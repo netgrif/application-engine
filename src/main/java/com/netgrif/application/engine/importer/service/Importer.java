@@ -702,7 +702,11 @@ public class Importer {
     protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
-        dataGroup.setImportId(importDataGroup.getId());
+
+        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
+            dataGroup.setImportId(importDataGroup.getId());
+        else
+            dataGroup.setImportId(transition.getImportId() + "_" + System.currentTimeMillis());
 
         dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
