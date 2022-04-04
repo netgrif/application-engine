@@ -321,7 +321,7 @@ public class Importer {
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
         mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
         for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
-            addDataGroup(transition, dataGroup);
+            addDataGroup(transition, dataGroup, mapping.getDataGroup().indexOf(dataGroup));
         }
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
     }
@@ -528,7 +528,7 @@ public class Importer {
         }
         if (importTransition.getDataGroup() != null) {
             for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
-                addDataGroup(transition, dataGroup);
+                addDataGroup(transition, dataGroup, importTransition.getDataGroup().indexOf(dataGroup));
             }
         }
 
@@ -699,14 +699,14 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup) throws MissingIconKeyException {
+    protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
 
         if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
             dataGroup.setImportId(importDataGroup.getId());
         else
-            dataGroup.setImportId(transition.getImportId() + "_" + System.currentTimeMillis());
+            dataGroup.setImportId(transition.getImportId() + "_dg_" + index);
 
         dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
