@@ -654,9 +654,7 @@ class ActionDelegate {
     }
 
     IUser assignRole(String roleMongoId, IUser user = userService.loggedUser) {
-        // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
         IUser actualUser = userService.addRole(user, roleMongoId)
-        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
@@ -668,7 +666,6 @@ class ActionDelegate {
 
     IUser assignRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
         IUser actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
-        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
@@ -679,7 +676,6 @@ class ActionDelegate {
 
     IUser removeRole(String roleMongoId, IUser user = userService.loggedUser) {
         IUser actualUser = userService.removeRole(user, roleMongoId)
-        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 
@@ -691,7 +687,6 @@ class ActionDelegate {
 
     IUser removeRole(String roleId, PetriNet net, IUser user = userService.loggedUser) {
         IUser actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId }.stringId)
-        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
         return actualUser
     }
 

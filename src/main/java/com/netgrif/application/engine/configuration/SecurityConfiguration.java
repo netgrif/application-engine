@@ -9,8 +9,10 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
+import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +71,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private SecurityConfigProperties properties;
 
+    @Autowired
+    private ISecurityContextService securityContextService;
+
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
 
@@ -112,6 +117,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .cors()
                 .and()
             .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -180,5 +186,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 this.jwtService,
                 this.userService
         );
+    }
+
+    private SecurityContextFilter createSecurityContextFilter() throws Exception {
+        return new SecurityContextFilter(securityContextService);
     }
 }

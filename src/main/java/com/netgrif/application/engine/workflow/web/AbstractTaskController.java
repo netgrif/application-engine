@@ -37,7 +37,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 
 public abstract class AbstractTaskController {
@@ -199,16 +198,17 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody) {
         Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
-        SetDataEventOutcome mainOutcome = outcomes.get(taskId);
-        outcomes.remove(taskId);
-        mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {
+        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(dataService.saveFile(taskId, fieldId, multipartFile), LocaleContextHolder.getLocale()));
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
@@ -233,9 +233,12 @@ public abstract class AbstractTaskController {
         return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
+    public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
+        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFiles(it.getKey(), fieldId, multipartFiles)));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(dataService.saveFiles(taskId, fieldId, multipartFiles), LocaleContextHolder.getLocale()));
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getNamedFile(String taskId, String fieldId, String name) throws FileNotFoundException {
