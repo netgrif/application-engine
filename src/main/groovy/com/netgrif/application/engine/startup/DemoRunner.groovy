@@ -40,14 +40,5 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        Optional<PetriNet> net = helper.createNet("all_data.xml", VersionType.MAJOR)
-        (1..6).each {it ->
-            def aCase = helper.createCase("Case " + it, net.get())
-            if (it % 2 == 0)
-                aCase.dataSet["text"].value = "Even case"
-            else
-                aCase.dataSet["text"].value = "Odd case"
-            caseRepository.save(aCase)
-        }
     }
 }
