@@ -3,6 +3,8 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.PetriNetObject
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
@@ -38,5 +40,14 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
+        Optional<PetriNet> net = helper.createNet("all_data.xml", VersionType.MAJOR)
+        (1..6).each {it ->
+            def aCase = helper.createCase("Case " + it, net.get())
+            if (it % 2 == 0)
+                aCase.dataSet["text"].value = "Even case"
+            else
+                aCase.dataSet["text"].value = "Odd case"
+            caseRepository.save(aCase)
+        }
     }
 }
