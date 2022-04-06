@@ -56,7 +56,6 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -262,6 +261,7 @@ public class DataService implements IDataService {
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
+            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);
             log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
 
@@ -306,6 +306,13 @@ public class DataService implements IDataService {
         }
 
         return groups;
+    }
+
+    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
+        if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() == "grid") {
+            List<Field> dataGroupFields = dataGroup.getData().stream().map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).collect(Collectors.toList());
+            dataGroup.setData(new LinkedHashSet<>(dataGroupFields.stream().map(Field::getStringId).collect(Collectors.toList())));
+        }
     }
 
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
