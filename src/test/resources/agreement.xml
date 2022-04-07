@@ -169,12 +169,6 @@
 		<x>60</x>
 		<y>500</y>
 		<label>result</label>
-		<roleRef>
-			<id>system</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
 		<dataGroup>
 			<id>t13_0</id>
 			<cols>4</cols>
