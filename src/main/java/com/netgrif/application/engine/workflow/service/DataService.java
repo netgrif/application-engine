@@ -309,9 +309,8 @@ public class DataService implements IDataService {
     }
 
     private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
-        if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() == "grid") {
-            List<Field> dataGroupFields = dataGroup.getData().stream().map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).collect(Collectors.toList());
-            dataGroup.setData(new LinkedHashSet<>(dataGroupFields.stream().map(Field::getStringId).collect(Collectors.toList())));
+        if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
+            dataGroup.setData(dataGroup.getData().stream().map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new)));
         }
     }
 
