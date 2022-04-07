@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -615,12 +616,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        List<Task> page = new LinkedList<>();
-        ids.forEach(id -> {
-            Optional<Task> task = taskRepository.findById(id);
-            task.ifPresent(page::add);
-        });
-        if (page.size() > 0) {
+        List<Task> page = taskRepository.findAllBy_idIn(ids).stream()
+                .filter(Objects::nonNull)
+                .sorted(Ordering.explicit(ids).onResultOf(Task::getStringId))
+                .collect(Collectors.toList());
+
+        if (!page.isEmpty()) {
             page.forEach(this::setUser);
         }
         return page;
