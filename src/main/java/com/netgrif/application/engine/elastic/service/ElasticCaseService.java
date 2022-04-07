@@ -75,8 +75,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title.keyword", 2f,
-            "authorName.keyword", 1f,
-            "authorEmail.keyword", 1f,
+            "authorName", 1f,
+            "authorEmail", 1f,
             "visualId.keyword", 2f
     );
 
@@ -387,7 +387,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         String populatedQuery = request.query.replaceAll(ElasticQueryConstants.USER_ID_TEMPLATE, user.getId().toString());
 
-        query.must(queryStringQuery(populatedQuery));
+        query.must(queryStringQuery(populatedQuery).allowLeadingWildcard(true).analyzeWildcard(true));
     }
 
     /**

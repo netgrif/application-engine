@@ -176,6 +176,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.save(useCase);
         save(task);
         reloadTasks(useCase);
+        useCase = workflowService.findOne(useCase.getStringId());
         return useCase;
     }
 

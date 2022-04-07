@@ -8,6 +8,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
+## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-03-30)
+
+### Fixed
+
+- [NAE-1600] Parallel auto-trigger tasks
+- [NAE-1614] Advanced search substring query
+- [NAE-1556] Post-set error prevents set
+
+
 ## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-04-01)
 
 ### Fixed
