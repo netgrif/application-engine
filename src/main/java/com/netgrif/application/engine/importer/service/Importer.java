@@ -485,7 +485,7 @@ public class Importer {
 
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
-        transition.setTitle(toI18NString(importTransition.getLabel()) != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
+        transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));

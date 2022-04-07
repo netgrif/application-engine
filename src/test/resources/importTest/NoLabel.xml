@@ -6,10 +6,6 @@
     <title>Import Test</title>
     <defaultRole>true</defaultRole>
     <anonymousRole>false</anonymousRole>
-    <role>
-        <id>system</id>
-        <title>System</title>
-    </role>
     <data type="text">
         <id>variable1</id>
         <title>Attribute1</title>
@@ -20,12 +16,6 @@
         <label>Test</label>
         <x>0</x>
         <y>0</y>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <dataGroup>
             <id>dg</id>
             <layout>legacy</layout>
@@ -42,12 +32,6 @@
         <id>layout</id>
         <x>0</x>
         <y>0</y>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <dataGroup>
             <id>dg</id>
             <layout>legacy</layout>
