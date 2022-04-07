@@ -616,15 +616,14 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        List<Task> page = taskRepository.findAllBy_idIn(ids).stream()
+        return taskRepository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Task::getStringId))
+                .map(task -> {
+                    this.setUser(task);
+                    return task;
+                })
                 .collect(Collectors.toList());
-
-        if (!page.isEmpty()) {
-            page.forEach(this::setUser);
-        }
-        return page;
     }
 
     @Override

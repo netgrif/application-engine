@@ -152,17 +152,16 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> findAllById(List<String> ids) {
-        List<Case> page = repository.findAllBy_idIn(ids).stream()
+        return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
+                .map(caze ->  {
+                    caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
+                    decryptDataSet(caze);
+                    setImmediateDataFieldsReadOnly(caze);
+                    return caze;
+                })
                 .collect(Collectors.toList());
-
-        if (!page.isEmpty()) {
-            page.forEach(c -> c.setPetriNet(petriNetService.get(c.getPetriNetObjectId())));
-            decryptDataSets(page);
-            page.forEach(this::setImmediateDataFieldsReadOnly);
-        }
-        return page;
     }
 
     @Override
