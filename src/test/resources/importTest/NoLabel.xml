@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <id>ImportTest</id>
+    <version>1.0.0</version>
+    <initials>imp</initials>
+    <title>Import Test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <data type="text">
+        <id>variable1</id>
+        <title>Attribute1</title>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <label>Test</label>
+        <x>0</x>
+        <y>0</y>
+        <dataGroup>
+            <id>dg</id>
+            <layout>legacy</layout>
+            <dataRef>
+                <id>variable1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <transition>
+        <id>layout</id>
+        <x>0</x>
+        <y>0</y>
+        <dataGroup>
+            <id>dg</id>
+            <layout>legacy</layout>
+            <dataRef>
+                <id>variable1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+</document>
