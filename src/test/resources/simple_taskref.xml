@@ -43,7 +43,7 @@
         </layout>
         <label>simple taskref</label>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup1</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_0</id>
@@ -107,7 +107,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup2</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_2</id>
