@@ -348,4 +348,17 @@ class ImporterTest {
             assert v.getStringId() != null && v.getStringId().length() > 0
         })
     }
+
+    @Test
+    void createTransitionNoLabel(){
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        assert net
+        PetriNet importNet = petriNetService.findByImportId(net.getImportId()).get()
+        assert importNet
+        assert importNet.getTransition("1").getTitle()
+        assert importNet.getTransition("layout").getTitle()
+        assert importNet.getTransition("layout").getTitle().equals("")
+
+    }
+
 }

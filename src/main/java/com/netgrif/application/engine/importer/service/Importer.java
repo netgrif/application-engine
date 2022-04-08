@@ -407,7 +407,7 @@ public class Importer {
             List<Action> setActions = new ArrayList<>();
             if (ref.getEvent() != null && !ref.getEvent().isEmpty()) {
                 dataEvents = buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId());
-                getTransition(trans.getId()).setDataEvents(fieldId, buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId()));
+                getTransition(trans.getId()).setDataEvents(fieldId, dataEvents);
             }
             if (ref.getLogic().getAction() != null) {
                 getActions = buildActions(filterActionsByTrigger(ref.getLogic().getAction(), DataEventType.GET),
@@ -485,7 +485,7 @@ public class Importer {
 
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
-        transition.setTitle(toI18NString(importTransition.getLabel()));
+        transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
