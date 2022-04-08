@@ -15,7 +15,9 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1600] Parallel auto-trigger tasks
 - [NAE-1614] Advanced search substring query
 - [NAE-1556] Post-set error prevents set
-
+- [NAE-1616] - Cannot upload process with action id
+- [NAE-1596] Nets with transitions without titles cannot be read
+- [NAE-1598] DataGroups without ID cannot be saved into mongo
 
 ## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-04-01)
 
