@@ -407,7 +407,7 @@ public class Importer {
             List<Action> setActions = new ArrayList<>();
             if (ref.getEvent() != null && !ref.getEvent().isEmpty()) {
                 dataEvents = buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId());
-                getTransition(trans.getId()).setDataEvents(fieldId, buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId()));
+                getTransition(trans.getId()).setDataEvents(fieldId, dataEvents);
             }
             if (ref.getLogic().getAction() != null) {
                 getActions = buildActions(filterActionsByTrigger(ref.getLogic().getAction(), DataEventType.GET),
