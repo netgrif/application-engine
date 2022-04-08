@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,9 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private ISecurityContextService securityContextService;
 
     private ProcessRole defaultRole;
 
@@ -100,10 +104,11 @@ public class ProcessRoleService implements IProcessRoleService {
         replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
         runAllPostActions(newRoles, removedRoles, user, petriNet);
 
+        securityContextService.saveToken(userId);
         if (Objects.equals(userId, loggedUser.getId())) {
             loggedUser.getProcessRoles().clear();
             loggedUser.parseProcessRoles(user.getProcessRoles());
-            userDetailsService.reloadSecurityContext(loggedUser);
+            securityContextService.reloadSecurityContext(loggedUser);
         }
     }
 
