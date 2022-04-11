@@ -640,6 +640,15 @@
                         change i18nName value { new com.netgrif.application.engine.petrinet.domain.I18nString(name.value) }
                     </action>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
         </dataGroup>
         <dataGroup>
