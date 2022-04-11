@@ -776,6 +776,10 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
+    void generatePDF(Transition t, FileField field) {
+        this.generatePDF(t.getStringId(), field.importId)
+    }
+
     void generatePDF(String transitionId, String fileFieldId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
