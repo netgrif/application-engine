@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
@@ -112,6 +113,23 @@ class PdfGeneratorTest {
         pdfResource.setMarginTitle(100)
         pdfResource.updateProperties()
         pdfResource.setTemplateResource(new ClassPathResource(pdfTemplateFolder))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
+    }
+
+    @Test
+    void testingCustomFunction() {
+        PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[1]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + testCase.stringId + "-" + "fileField1" + "-" + pdfResource.getOutputDefaultName()
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
