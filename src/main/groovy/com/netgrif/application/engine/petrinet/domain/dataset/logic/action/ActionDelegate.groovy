@@ -838,6 +838,21 @@ class ActionDelegate {
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
+    void generatePdf(String transitionId, String fileFieldId) {
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.updateProperties()
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    }
+
     void sendMail(MailDraft mailDraft) {
         mailService.sendMail(mailDraft)
     }
