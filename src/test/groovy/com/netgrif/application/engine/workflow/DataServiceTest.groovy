@@ -44,6 +44,7 @@ class DataServiceTest {
     @Autowired
     private TestHelper testHelper
 
+    private PetriNet agreementNet
 
     @BeforeEach
     void beforeAll() {
@@ -54,6 +55,9 @@ class DataServiceTest {
         net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/data_service_taskref.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
+        def agreementNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/agreement.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert agreementNet.getNet() != null
+        this.agreementNet = agreementNet.getNet()
     }
 
     private PetriNet net
@@ -89,5 +93,20 @@ class DataServiceTest {
         LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
+    }
+
+    @Test
+    void testTaskRefOrderOnGridLayout() {
+        def aCase = importHelper.createCase("Case", this.agreementNet)
+        assert aCase != null
+
+        def taskId = importHelper.getTaskId("summary A", aCase.stringId)
+        assert taskId != null
+
+        importHelper.assignTaskToSuper("summary A", aCase.stringId)
+        List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH).getData()
+        assert datagroups.get(1).getParentTaskRefId() == "taskRef_result"
+        assert datagroups.get(2).getParentTaskRefId() == "taskRef_1"
+        assert datagroups.get(3).getParentTaskRefId() == "taskRef_0"
     }
 }
