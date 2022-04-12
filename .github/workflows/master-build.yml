@@ -130,4 +130,4 @@ jobs:
         with:
           add: docs
           pathspec_error_handling: exitImmediately
-          message: 'Update documentation'
+          message: 'CI - Update documentation'
