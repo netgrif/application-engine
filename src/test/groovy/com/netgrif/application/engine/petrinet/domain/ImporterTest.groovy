@@ -361,4 +361,18 @@ class ImporterTest {
 
     }
 
+    @Test
+    void importWithInvalidDataRefLayoutTest() {
+        boolean exceptionThrown = false
+
+        try {
+            petriNetService.importPetriNet(new FileInputStream("src/test/resources/invalid_data_ref_layout.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true
+            assert e.message.contains("doesn't have a layout")
+        }
+
+        assert exceptionThrown
+    }
+
 }
