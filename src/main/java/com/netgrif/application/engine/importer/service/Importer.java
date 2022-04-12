@@ -715,7 +715,7 @@ public class Importer {
         dataGroup.setStretch(importDataGroup.isStretch());
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
-        DataGroupLayout dataGroupLayout = dataGroup.getLayout();
+        DataGroupLayout dataGroupLayout = dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null ? dataGroup.getLayout() : null;
 
         for (DataRef dataRef : importDataGroup.getDataRef()) {
             if (dataGroupLayout != null && dataGroupLayout.getType().equals(LayoutType.GRID.value()) && dataRef.getLayout() == null) {
