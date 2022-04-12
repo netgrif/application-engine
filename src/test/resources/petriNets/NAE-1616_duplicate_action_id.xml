@@ -1,0 +1,208 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+    <id>NAE_1616</id>
+    <initials>NAE</initials>
+    <title>NAE-1616 - Cannot upload process with action id</title>
+    <icon>bug_report</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <processEvents>
+        <event type="upload">
+            <id>new_model_upload</id>
+            <actions phase="pre">
+                <action id="1">println "process_upload_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="2">println "process_upload_post"</action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents>
+        <event type="create">
+            <id>new_model_create</id>
+            <actions phase="pre">
+                <action id="3">println "case_create_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="4">println "case_create_post"</action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>new_model_delete</id>
+            <actions phase="pre">
+                <action id="5">println "case_delete_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="6">println "case_delete_post"</action>
+            </actions>
+        </event>
+    </caseEvents>
+    <role>
+        <id>newRole_1</id>
+        <title/>
+        <event type="cancel">
+            <id>newRole_1_cancel</id>
+            <actions phase="pre">
+                <action id="7">println "role_cancel_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="8">println "role_cancel_post"</action>
+            </actions>
+        </event>
+        <event type="assign">
+            <id>newRole_1_assign</id>
+            <actions phase="pre">
+                <action id="9">println "role_assign_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="10">println "role_assign_post"</action>
+            </actions>
+        </event>
+    </role>
+    <data type="text">
+        <id>text_0</id>
+        <title/>
+        <action trigger="set" id="11">
+            println "data_trigger_set"
+        </action>
+        <action trigger="get" id="12">
+            println "data_trigger_get"
+        </action>
+        <event type="set">
+            <id>text_0_set</id>
+            <actions phase="pre">
+                <action id="13">println "data_set_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="14">println "data_set_post"</action>
+            </actions>
+        </event>
+        <event type="get">
+            <id>text_0_get</id>
+            <actions phase="pre">
+                <action id="15">println "data_get_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="16">println "data_get_post"</action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>text_1</id>
+        <title/>
+    </data>
+    <transition>
+        <id>t1</id>
+        <x>420</x>
+        <y>140</y>
+        <label/>
+        <dataRef>
+            <id>text_1</id>
+            <logic>
+                <action trigger="get" id="31">
+                    println "text_1_dataref_trigger_get"
+                </action>
+                <action trigger="set" id="32">
+                    println "text_1_dataref_trigger_set"
+                </action>
+            </logic>
+            <event type="set">
+                <id>text_1_set</id>
+                <actions phase="pre">
+                    <action id="33">println "text_1_dataref_set_pre"</action>
+                </actions>
+                <actions phase="post">
+                    <action id="34">println "text_1_dataref_set_post"</action>
+                </actions>
+            </event>
+            <event type="get">
+                <id>text_1_get</id>
+                <actions phase="pre">
+                    <action id="35">println "text_1_dataref_get_pre"</action>
+                </actions>
+                <actions phase="post">
+                    <action id="36">println "text_1_dataref_get_post"</action>
+                </actions>
+            </event>
+        </dataRef>
+        <dataGroup>
+            <id>t1_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                     <action trigger="get" id="17">
+                         println "text_0_dataref_trigger_get"
+                     </action>
+                    <action trigger="set" id="18">
+                        println "text_0_dataref_trigger_set"
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+                <event type="set">
+                    <id>text_0_set</id>
+                    <actions phase="pre">
+                        <action id="19">println "text_0_dataref_set_pre"</action>
+                    </actions>
+                    <actions phase="post">
+                        <action id="20">println "text_0_dataref_set_post"</action>
+                    </actions>
+                </event>
+                <event type="get">
+                    <id>text_0_get</id>
+                    <actions phase="pre">
+                        <action id="21">println "text_0_dataref_get_pre"</action>
+                    </actions>
+                    <actions phase="post">
+                        <action id="22">println "text_0_dataref_get_post"</action>
+                    </actions>
+                </event>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>t1_assign</id>
+            <actions phase="pre">
+                <action id="23">println "task_assign_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="24">println "task_assign_post"</action>
+            </actions>
+        </event>
+        <event type="cancel">
+            <id>t1_cancel</id>
+            <actions phase="pre">
+                <action id="25">println "task_cancel_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="26">println "task_cancel_post"</action>
+            </actions>
+        </event>
+        <event type="delegate">
+            <id>t1_delegate</id>
+            <actions phase="pre">
+                <action id="27">println "task_delegate_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="28">println "task_delegate_post"</action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>t1_finish</id>
+            <actions phase="pre">
+                <action id="29">println "task_finish_pre"</action>
+            </actions>
+            <actions phase="post">
+                <action id="30">println "task_finish_post"</action>
+            </actions>
+        </event>
+    </transition>
+</document>
