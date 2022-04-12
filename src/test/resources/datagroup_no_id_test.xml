@@ -1,0 +1,57 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>Entity1</id>
+	<version>1.0.0</version>
+	<initials>ENT</initials>
+	<title>Entity1</title>
+	<defaultRole>true</defaultRole>
+	<data type="text">
+		<id>variable1</id>
+		<title>Attribute1</title>
+	</data>
+	<data type="text">
+		<id>variable2</id>
+		<title>Attribute2</title>
+	</data>
+	<transition>
+		<id>test</id>
+		<x>100</x>
+		<y>20</y>
+		<label/>
+		<dataGroup>
+			<id/>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>variable1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id/>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>variable2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+</document>
