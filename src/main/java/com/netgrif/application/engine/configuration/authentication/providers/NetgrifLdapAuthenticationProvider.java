@@ -3,6 +3,7 @@ package com.netgrif.application.engine.configuration.authentication.providers;
 
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
@@ -32,6 +33,7 @@ import java.util.Collection;
 
 @Slf4j
 @Component
+@ConditionalOnExpression("${nae.ldap.enabled}")
 public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProvider {
 
     protected NaeLdapProperties ldapProperties;

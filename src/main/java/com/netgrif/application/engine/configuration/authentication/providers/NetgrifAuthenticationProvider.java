@@ -35,7 +35,6 @@ public abstract class NetgrifAuthenticationProvider implements AuthenticationPro
 
     public abstract boolean supports(Class<?> authentication);
 
-
     protected String getClientIP() {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {
@@ -43,7 +42,5 @@ public abstract class NetgrifAuthenticationProvider implements AuthenticationPro
         }
         return xfHeader.split(",")[0];
     }
-
-
 
 }

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
-import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;

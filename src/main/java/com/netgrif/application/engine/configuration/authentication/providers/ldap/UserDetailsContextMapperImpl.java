@@ -15,7 +15,6 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
 import java.util.Collection;
 
-
 @Slf4j
 public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
 
