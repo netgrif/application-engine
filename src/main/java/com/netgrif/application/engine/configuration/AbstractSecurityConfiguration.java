@@ -46,12 +46,12 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
+       List<String> properties = Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList());
         context.getBeansOfType(NetgrifAuthenticationProvider.class)
                 .entrySet().stream()
-                .filter(it -> Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toSet()).contains(it.getKey().toLowerCase()))
-                .sorted(Ordering.explicit(Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList())).onResultOf(entry -> entry.getKey().toLowerCase()))
+                .filter(it -> properties.contains(it.getKey().toLowerCase()))
+                .sorted(Ordering.explicit(properties).onResultOf(entry -> entry.getKey().toLowerCase()))
                 .forEach(it -> auth.authenticationProvider(it.getValue()));
-
     }
 
     protected String[] getPatterns() {
