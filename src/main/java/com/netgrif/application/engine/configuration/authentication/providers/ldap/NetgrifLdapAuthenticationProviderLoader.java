@@ -1,7 +1,6 @@
-package com.netgrif.application.engine.configuration.authentication.providers;
+package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
 import com.netgrif.application.engine.auth.service.interfaces.ILdapUserRefService;
-import com.netgrif.application.engine.configuration.authentication.providers.ldap.UserDetailsContextMapperImpl;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import lombok.extern.slf4j.Slf4j;

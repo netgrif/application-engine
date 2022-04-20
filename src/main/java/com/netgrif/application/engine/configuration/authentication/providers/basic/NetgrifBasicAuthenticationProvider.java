@@ -1,8 +1,9 @@
-package com.netgrif.application.engine.configuration.authentication.providers;
+package com.netgrif.application.engine.configuration.authentication.providers.basic;
 
 
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
+import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;

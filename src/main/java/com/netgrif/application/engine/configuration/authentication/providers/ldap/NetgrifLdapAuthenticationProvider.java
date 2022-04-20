@@ -1,6 +1,7 @@
-package com.netgrif.application.engine.configuration.authentication.providers;
+package com.netgrif.application.engine.configuration.authentication.providers.ldap;
 
 
+import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
