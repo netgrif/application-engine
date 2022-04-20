@@ -321,7 +321,7 @@ public class Importer {
         mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
         mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
         for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : mapping.getDataGroup()) {
-            addDataGroup(transition, dataGroup);
+            addDataGroup(transition, dataGroup, mapping.getDataGroup().indexOf(dataGroup));
         }
         mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
     }
@@ -407,7 +407,7 @@ public class Importer {
             List<Action> setActions = new ArrayList<>();
             if (ref.getEvent() != null && !ref.getEvent().isEmpty()) {
                 dataEvents = buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId());
-                getTransition(trans.getId()).setDataEvents(fieldId, buildEvents(fieldId, ref.getEvent(), getTransition(trans.getId()).getStringId()));
+                getTransition(trans.getId()).setDataEvents(fieldId, dataEvents);
             }
             if (ref.getLogic().getAction() != null) {
                 getActions = buildActions(filterActionsByTrigger(ref.getLogic().getAction(), DataEventType.GET),
@@ -485,7 +485,7 @@ public class Importer {
 
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
-        transition.setTitle(toI18NString(importTransition.getLabel()));
+        transition.setTitle(importTransition.getLabel() != null ? toI18NString(importTransition.getLabel()) : new I18nString(""));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
@@ -528,7 +528,7 @@ public class Importer {
         }
         if (importTransition.getDataGroup() != null) {
             for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
-                addDataGroup(transition, dataGroup);
+                addDataGroup(transition, dataGroup, importTransition.getDataGroup().indexOf(dataGroup));
             }
         }
 
@@ -699,10 +699,14 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup) throws MissingIconKeyException {
+    protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
-        dataGroup.setImportId(importDataGroup.getId());
+
+        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
+            dataGroup.setImportId(importDataGroup.getId());
+        else
+            dataGroup.setImportId(transition.getImportId() + "_dg_" + index);
 
         dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
