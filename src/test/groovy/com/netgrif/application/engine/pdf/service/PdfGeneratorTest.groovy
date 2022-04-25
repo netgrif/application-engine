@@ -88,6 +88,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[3] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[3] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -99,6 +102,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[0] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[0] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -115,6 +121,9 @@ class PdfGeneratorTest {
         pdfResource.setTemplateResource(new ClassPathResource(pdfTemplateFolder))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[1] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -132,6 +141,9 @@ class PdfGeneratorTest {
         pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(storagePath)
+        assert file.exists()
     }
 
     @Test
@@ -143,6 +155,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -157,6 +172,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_page_number_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -179,6 +197,9 @@ class PdfGeneratorTest {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.addCustomField(pdf, pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -190,6 +211,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[4] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[4] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -201,6 +225,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[5] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[5] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -212,6 +239,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[6] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[6] + "_.pdf")
+        assert file.exists()
     }
 
 
