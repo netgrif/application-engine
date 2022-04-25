@@ -8,6 +8,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
+## [6.1.0](https://github.com/netgrif/application-engine/releases/tag/v6.1.0) (2022-04-25)
+
+### Changed
+
+- [NAE-1440] setData on button without value
+- [NAE-1569] Update Groovy 3.0.10
+
+### Removed
+
+- [NAE-1584] Remove petriflow schema
+
 ## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-04-12)
 
 ### Fixed
