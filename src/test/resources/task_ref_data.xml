@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>task_ref_data</id>
+	<initials>TRD</initials>
+	<title>Task ref data</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>text_set_data</id>
+		<title>Reffed text dataField</title>
+		<event type="set">
+			<id>a</id>
+			<actions phase="pre">
+				<action>
+					parent_task_id: f.parent_task_id;
+
+					setData(findTask({ it._id.eq(parent_task_id.value as String) }), [
+					        "native_text": [
+					                "value": "Value changed from child task using normal setData",
+									"type": "text"
+					        ],
+							"child_task_id_that_set_value": [
+							        "value": task.get().stringId,
+									"type": "text"
+							]
+					])
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>parent_set_data_result</id>
+		<title>Result of parent setting value by setDataWithPropagation</title>
+	</data>
+	<data type="file">
+		<id>file</id>
+		<title>test file</title>
+	</data>
+	<data type="text">
+		<id>parent_task_id</id>
+		<title></title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>275</x>
+		<y>165</y>
+		<label>Reffed task</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<title>Task ref data</title>
+			<dataRef>
+				<id>text_set_data</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>parent_set_data_result</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
