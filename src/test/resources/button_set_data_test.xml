@@ -1,0 +1,167 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>button_set_data</id>
+	<initials>SDB</initials>
+	<title>Set Data Button v3</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="text">
+		<id>child_case_id</id>
+		<title/>
+		<event type="get">
+			<id>ref</id>
+			<actions phase="pre">
+				<action>
+					child_case_id: f.child_case_id;
+
+					if (!child_case_id.value) {
+						def childCase = createCase("button_set_data", "Child button set data case")
+						change child_case_id value { childCase.stringId }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>button_0</id>
+		<title/>
+		<placeholder>Set Data</placeholder>
+		<action trigger="set">
+			txt: f.text_0;
+
+			change txt value { "Clicked 0!" }
+		</action>
+	</data>
+	<data type="button">
+		<id>button_1</id>
+		<title/>
+		<placeholder>Set Data</placeholder>
+		<action trigger="set">
+			txt: f.text_1;
+
+			change txt value { "Clicked 1!" }
+		</action>
+	</data>
+	<data type="button">
+		<id>button_2</id>
+		<title/>
+		<placeholder>Set Data</placeholder>
+		<action trigger="set">
+			txt: f.text_2;
+
+			change txt value { "Clicked 2!" }
+		</action>
+	</data>
+	<data type="text">
+		<id>text_0</id>
+		<title>Result 0</title>
+	</data>
+	<data type="text">
+		<id>text_1</id>
+		<title>Result 1</title>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title>Result 2</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>300</x>
+		<y>140</y>
+		<label>task</label>
+		<dataGroup>
+			<id>t1</id>
+			<cols>4</cols>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>child_case_id</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>button_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_2</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>ref</id>
+			<actions phase="pre">
+				<action>
+					child_case_id: f.child_case_id;
+
+					def childCase = workflowService.findOne(child_case_id.value as String)
+
+					setData("t1", childCase, [
+						"button_0": [
+							"type" : "button"
+						],
+						"button_1": [
+							"type" : "button"
+						],
+						"button_2": [
+							"type" : "button"
+						],
+					])
+				</action>
+			</actions>
+		</event>
+	</transition>
+</document>
