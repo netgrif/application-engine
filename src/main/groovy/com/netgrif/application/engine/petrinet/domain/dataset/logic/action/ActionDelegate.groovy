@@ -20,6 +20,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.version.Version
@@ -198,6 +199,11 @@ class ActionDelegate {
         useCase.dataSet.get(field.stringId).makeForbidden(trans.stringId)
     }
 
+    def initial = { Field field, Transition trans ->
+        copyBehavior(field, trans)
+        useCase.dataSet.get(field.stringId).makeInitial(trans.stringId)
+    }
+
     def unchanged = { return UNCHANGED_VALUE }
 
     def initValueOfField = { Field field ->
@@ -236,19 +242,36 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    ChangedField changedField = new ChangedField(field.stringId)
-                    changedField.addAttribute("type", field.type.name)
-                    changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
-                    SetDataEventOutcome outcome = createSetDataEventOutcome()
-                    outcome.addChangedField(field.stringId, changedField)
-                    this.outcomes.add(outcome)
+                    saveFieldBehavior(field, trans)
                 }
             }]
         }]
     }
 
+    def make(List<Field> fields, Closure behavior) {
+        [on: { Transition trans ->
+            fields.forEach  { field ->
+                behavior(field, trans)
+                saveFieldBehavior(field, trans)
+            }
+        }]
+    }
+
     protected SetDataEventOutcome createSetDataEventOutcome(){
         return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
+    }
+
+    def saveFieldBehavior(Field field, Transition trans) {
+        Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
+        if (fieldBehavior.get(trans.getStringId())[0] == FieldBehavior.INITIAL)
+            fieldBehavior = [(trans.stringId): useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior]
+
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("type", field.type.name)
+        changedField.addBehavior(fieldBehavior)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedChoices(ChoiceField field) {

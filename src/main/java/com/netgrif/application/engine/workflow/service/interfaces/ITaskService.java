@@ -104,6 +104,8 @@ public interface ITaskService {
 
     List<TaskReference> findAllByCase(String caseId, Locale locale);
 
+    List<Task> findAllByCase(String caseId);
+
     Task save(Task task);
 
     SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId);
