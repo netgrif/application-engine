@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>task_ref_set_data_test</id>
+	<initials>TRS</initials>
+	<title>Task ref set data test</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="taskRef">
+		<id>taskRef_0</id>
+		<title></title>
+		<event type="get">
+			<id>ref</id>
+			<actions phase="pre">
+				<action>
+					taskRef_0: f.taskRef_0;
+
+					if(taskRef_0.value == null || taskRef_0.value == []){
+						List&lt;String&gt; taskIds = []
+						def testCase = createCase("task_ref_data", "Task ref data case 1")
+						def testTask = findTask({ it.transitionId.eq("t1") &amp; it.caseId.eq(testCase.stringId)})
+						def thisTask = task.get()
+						setData("t1", testCase, [
+						        "parent_task_id": [
+						                "type": "text",
+										"value": thisTask.stringId
+						        ]
+						])
+						taskIds.add(testTask.stringId)
+						testCase = createCase("task_ref_data", "Task ref data case 2")
+						testTask = findTask({ it.transitionId.eq("t1") &amp; it.caseId.eq(testCase.stringId)})
+						setData("t1", testCase, [
+								"parent_task_id": [
+										"type": "text",
+										"value": thisTask.stringId
+								]
+						])
+						taskIds.add(testTask.stringId)
+						change taskRef_0 value { taskIds }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>native_text</id>
+		<title>Result of child setting value by setDataWithPropagation</title>
+		<event type="set">
+			<id>a</id>
+			<actions phase="post">
+				<action>
+					trans: t.t1,
+					native_text_2: f.native_text_2;
+
+					make native_text_2, editable on trans when { true }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>native_text_2</id>
+		<title>Native text used for setting data in child</title>
+		<event type="set">
+			<id>a</id>
+			<actions phase="post">
+				<action>
+					taskRef_0: f.taskRef_0,
+					child_task_id_that_set_value: f.child_task_id_that_set_value;
+
+					def childTaskId = (taskRef_0.value as List&lt;String&gt;).stream().filter({taskId -&gt; taskId != child_task_id_that_set_value.value as String}).findFirst().get()
+					setData(findTask({ it._id.eq(childTaskId as String) }), [
+					        "parent_set_data_result": [
+					                "value": "Value set from parent using normal setData",
+									"type": "text"
+					        ]
+					])
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>child_task_id_that_set_value</id>
+		<title></title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>275</x>
+		<y>165</y>
+		<label>Task ref set data test</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>native</id>
+			<title>Native text fields</title>
+			<layout>
+				<offset>0</offset>
+			</layout>
+			<dataRef>
+				<id>native_text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>native_text_2</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
