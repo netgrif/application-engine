@@ -6,7 +6,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexOp
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.stereotype.Component
 
 @Component

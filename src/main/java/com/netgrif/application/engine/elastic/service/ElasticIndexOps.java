@@ -9,7 +9,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CloseIndexResponse;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.annotation.Id;
