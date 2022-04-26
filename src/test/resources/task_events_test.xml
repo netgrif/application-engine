@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>task_events_test</id>
+	<initials>TTT</initials>
+	<title>Task events test</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>pre_finish</id>
+		<title>Pre finish outcome</title>
+	</data>
+	<data type="text">
+		<id>post_finish</id>
+		<title>Post finish outcome</title>
+	</data>
+	<data type="text">
+		<id>pre_assign</id>
+		<title>Pre assign outcome</title>
+	</data>
+	<data type="text">
+		<id>post_assign</id>
+		<title>Post finish outcome</title>
+	</data>
+	<data type="text">
+		<id>pre_cancel</id>
+		<title>Pre cancel outcome</title>
+	</data>
+	<data type="text">
+		<id>post_cancel</id>
+		<title>Post cancel outcome</title>
+	</data>
+	<data type="text">
+		<id>pre_delegate</id>
+		<title>Pre delegate outcome</title>
+	</data>
+	<data type="text">
+		<id>post_delegate</id>
+		<title>Post delegate outcome</title>
+	</data>
+	<data type="text">
+		<id>interprocess_set_data</id>
+		<title>Interprocess set data outcome</title>
+		<event type="set">
+			<id>setdata</id>
+			<actions phase="pre">
+				<action>
+					pre_set_data: f.pre_set_data;
+
+					change pre_set_data value { "Result of pre SET DATA" }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					post_set_data: f.post_set_data;
+
+					change post_set_data value { "Result of post SET DATA" }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>pre_set_data</id>
+		<title>Pre set data outcome</title>
+	</data>
+	<data type="text">
+		<id>post_set_data</id>
+		<title>Post set data outcome</title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>237</x>
+		<y>98</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Task events test</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>pre_assign</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>post_assign</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>pre_cancel</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>post_cancel</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>pre_delegate</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>post_delegate</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>pre_finish</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>9</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>post_finish</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>10</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>interprocess_set_data</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>12</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>pre_set_data</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>13</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>post_set_data</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>14</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					field: f.pre_assign;
+
+					change field value {"Result of pre ASSIGN event"}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					field: f.post_assign;
+
+					change field value {"Result of post ASSIGN event"}
+
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>cancel</id>
+			<actions phase="pre">
+				<action>
+					field: f.pre_cancel;
+
+					change field value {"Result of pre CANCEL event"}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					field: f.post_cancel;
+
+					change field value {"Result of post CANCEL event"}
+
+				</action>
+			</actions>
+		</event>
+		<event type="delegate">
+			<id>delegate</id>
+			<actions phase="pre">
+				<action>
+					field: f.pre_delegate;
+
+					change field value {"Result of pre DELEGATE event"}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					field: f.post_delegate;
+
+					change field value {"Result of post DELEGATE event"}
+
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					field: f.pre_finish;
+
+					change field value {"Result of pre FINISH event"}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					field: f.post_finish;
+
+					change field value {"Result of post FINISH event"}
+
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>240</x>
+		<y>215</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Task events interprocess test</label>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					def testCase = createCase("task_events_test", "Interprocess communication test case")
+					def testTask = findTask({ it.transitionId.eq("t1") &amp; it.caseId.eq(testCase.stringId)})
+					assignTask(testTask)
+					cancelTask(testTask)
+					assignTask(testTask)
+					setData("t1", testCase, [
+							"interprocess_set_data": [
+									"value": "Result of interprocess SET DATA",
+									"type" : "text",
+							]
+					])
+					finishTask(testTask)
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>

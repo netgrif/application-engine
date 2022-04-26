@@ -54,7 +54,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <junit-jupiter.version>5.8.1</junit-jupiter.version>
         <java.version>11</java.version>
-        <groovy.version>3.0.9</groovy.version>
+        <groovy.version>3.0.10</groovy.version>
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>5.0.0</querydsl.version>
         <drools.version>7.55.0.Final</drools.version>
@@ -212,7 +212,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>3.0.9</version>
+            <version>3.0.10</version>
             <type>pom</type>
         </dependency>
         <dependency>
