@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <defaultRole>true</defaultRole>
     <caseName name="case_name">Nový prípad</caseName>
     <!-- ROLES -->
