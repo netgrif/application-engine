@@ -2,7 +2,6 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -11,7 +10,6 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.DelegateTaskEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome;
-import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
@@ -107,6 +105,8 @@ public interface ITaskService {
     List<Task> findAllByCase(String caseId);
 
     Task save(Task task);
+
+    List<Task> save(List<Task> tasks);
 
     SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId);
 }

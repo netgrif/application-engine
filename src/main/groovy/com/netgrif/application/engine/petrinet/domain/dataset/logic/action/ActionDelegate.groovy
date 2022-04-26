@@ -517,8 +517,8 @@ class ActionDelegate {
 
                 tasks.each { task ->
                     task."case${property.capitalize()}" = value
-                    taskService.save(task)
                 }
+                taskService.save(tasks)
             }
         }]
     }

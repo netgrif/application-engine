@@ -699,6 +699,13 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public List<Task> save(List<Task>  tasks) {
+        tasks = taskRepository.saveAll(tasks);
+        tasks.forEach(task -> elasticTaskService.index(this.taskMappingService.transform(task)));
+        return tasks;
+    }
+
+    @Override
     public void resolveUserRef(Case useCase) {
         useCase.getTasks().forEach(taskPair -> {
             Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
