@@ -218,7 +218,7 @@ class ActionDelegate {
     }
 
     /**
-     * Changes behavior of a given field on given transition if certain condition is being met.
+     * Changes behavior of a given field on given transition if certain condition is being met, or if condition is not used.
      * <br>
      * Example:
      * <pre>
@@ -244,7 +244,17 @@ class ActionDelegate {
                     this.outcomes.add(outcome)
                 }
             }]
-        }]
+        },
+         on: { Transition trans ->
+             behavior(field, trans)
+             ChangedField changedField = new ChangedField(field.stringId)
+             changedField.addAttribute("type", field.type.name)
+             changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
+             SetDataEventOutcome outcome = createSetDataEventOutcome()
+             outcome.addChangedField(field.stringId, changedField)
+             this.outcomes.add(outcome)
+         }
+        ]
     }
 
     protected SetDataEventOutcome createSetDataEventOutcome(){
@@ -305,6 +315,17 @@ class ActionDelegate {
     def execute(String taskId) {
         [with : { Map dataSet ->
             executeTasks(dataSet, taskId, { it._id.isNotNull() })
+        },
+         where: { Closure<Predicate> closure ->
+             [with: { Map dataSet ->
+                 executeTasks(dataSet, taskId, closure)
+             }]
+         }]
+    }
+
+    def execute(Task task) {
+        [with : { Map dataSet ->
+            executeTasks(dataSet, task.stringId, { it._id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { Map dataSet ->
@@ -787,6 +808,17 @@ class ActionDelegate {
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
     }
 
+    void generatePDF(String transitionId, FileField fileField) {
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileField.importId + "-" + pdfResource.getOutputDefaultName()
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileField.importId) value { new FileFieldValue(filename, storagePath) }
+    }
+
     void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
@@ -796,6 +828,17 @@ class ActionDelegate {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    }
+
+    void generatePDF(String transitionId, FileField fileField, List<String> excludedFields) {
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileField.importId + "-" + pdfResource.getOutputDefaultName()
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
+        change useCase.getField(fileField.importId) value { new FileFieldValue(filename, storagePath) }
     }
 
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template) {
@@ -836,6 +879,16 @@ class ActionDelegate {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    }
+
+    void sendEmail(List<String> to, String subject, String body) {
+        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build();
+        sendMail(mailDraft)
+    }
+
+    void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
+        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build();
+        sendMail(mailDraft)
     }
 
     void sendMail(MailDraft mailDraft) {
@@ -951,6 +1004,26 @@ class ActionDelegate {
             cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
 
         userService.deleteUser(user)
+    }
+
+    IUser findUserByEmail(String email) {
+        IUser user = userService.findByEmail(email, false)
+        if (user == null){
+            log.error("Cannot find user with email [" + email + "]")
+            return null
+        } else {
+            return user
+        }
+    }
+
+    IUser findUserById(String id) {
+        IUser user = userService.findById(id, false)
+        if (user == null){
+            log.error("Cannot find user with email [" + email + "]")
+            return null
+        } else {
+            return user
+        }
     }
 
     Validation validation(String rule, I18nString message) {
