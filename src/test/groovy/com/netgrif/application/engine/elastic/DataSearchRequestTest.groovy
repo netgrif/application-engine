@@ -6,7 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexOps
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
@@ -60,7 +60,7 @@ class DataSearchRequestTest {
     private ElasticCaseRepository repository
 
     @Autowired
-    private IElasticIndexOps template
+    private IElasticIndexService template
 
     @Autowired
     private IWorkflowService workflowService
