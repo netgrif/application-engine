@@ -58,6 +58,31 @@ public class ElasticIndexService implements IElasticIndexService {
     }
 
     @Override
+    public <T> String index(Class<T> clazz, T source, String... placeholders) {
+        String indexName = getIndexName(clazz, placeholders);
+        return elasticsearchTemplate.index(new IndexQueryBuilder().withId(getIdFromSource(source))
+                .withObject(source).build(), IndexCoordinates.of(indexName));
+    }
+
+
+    @Override
+    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
+        String indexName = getIndexName(clazz, placeholders);
+        try {
+            if (list != null && !list.isEmpty()) {
+                List<IndexQuery> indexQueries = new ArrayList<>();
+                list.forEach(source ->
+                        indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build()));
+                elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
+            }
+        } catch (Exception e) {
+            log.error("bulkIndex:", e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean createIndex(Class<?> clazz, String... placeholders) {
         try {
             String indexName = getIndexName(clazz, placeholders);
@@ -178,33 +203,6 @@ public class ElasticIndexService implements IElasticIndexService {
             return false;
         }
     }
-
-
-    @Override
-    public <T> String index(Class<T> clazz, T source, String... placeholders) {
-        String indexName = getIndexName(clazz, placeholders);
-        return elasticsearchTemplate.index(new IndexQueryBuilder().withId(getIdFromSource(source))
-                .withObject(source).build(), IndexCoordinates.of(indexName));
-    }
-
-
-    @Override
-    public boolean bulkIndex(List<?> list, Class<?> clazz, String... placeholders) {
-        String indexName = getIndexName(clazz, placeholders);
-        try {
-            if (list != null && !list.isEmpty()) {
-                List<IndexQuery> indexQueries = new ArrayList<>();
-                list.forEach(source ->
-                        indexQueries.add(new IndexQueryBuilder().withId(getIdFromSource(source)).withObject(source).build()));
-                elasticsearchTemplate.bulkIndex(indexQueries, IndexCoordinates.of(indexName));
-            }
-        } catch (Exception e) {
-            log.error("bulkIndex:", e);
-            return false;
-        }
-        return true;
-    }
-
 
     @Override
     public SearchScrollHits<?> scrollFirst(Query query, Class<?> clazz, String... placeholders) {
