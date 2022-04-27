@@ -10,6 +10,7 @@ import com.querydsl.core.types.Predicate;
 import groovy.lang.Closure;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
@@ -21,40 +22,12 @@ public interface IExportService {
 
     Set<String> buildDefaultCsvTaskHeader(List<Task> exportTasks);
 
-    OutputStream fillCsvCaseData(Closure<Predicate> predicate, File outFile);
+    OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(Closure<Predicate> predicate, File outFile, ExportDataConfig config);
+    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(Closure<Predicate> predicate, File outFile, ExportDataConfig config, int pageSize);
+    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
+                                 LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
 
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile);
-
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config);
-
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user);
-
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize);
-
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale);
-
-    OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale, Boolean isIntersection);
-
-    OutputStream fillCsvTaskData(Closure<Predicate> predicate, File outFile);
-
-    OutputStream fillCsvTaskData(Closure<Predicate> predicate, File outFile, ExportDataConfig config);
-
-    OutputStream fillCsvTaskData(Closure<Predicate> predicate, File outFile, ExportDataConfig config, int pageSize);
-
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile);
-
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config);
-
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user);
-
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize);
-
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale);
-
-    OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale, Boolean isIntersection);
-
+    OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException;
 }
