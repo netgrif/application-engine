@@ -47,6 +47,7 @@ import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
@@ -66,6 +67,9 @@ class ActionDelegate {
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
     static final String ONCE_GENERATE = "once"
+
+    @Value('${nae.mail.from}')
+    private String mailFrom
 
     @Autowired
     FieldFactory fieldFactory
