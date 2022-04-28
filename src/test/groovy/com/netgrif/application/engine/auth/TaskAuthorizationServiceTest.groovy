@@ -38,9 +38,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles(["test"])
 @SpringBootTest
+@ActiveProfiles(["test"])
+@ExtendWith(SpringExtension.class)
 class TaskAuthorizationServiceTest {
 
     private static final String ASSIGN_TASK_URL = "/api/task/assign/"
@@ -163,6 +163,7 @@ class TaskAuthorizationServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
+//                [org] as Group[],
                 [] as ProcessRole[])
     }
 
