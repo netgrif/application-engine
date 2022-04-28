@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
@@ -93,6 +94,9 @@ class TaskAuthorizationServiceTest {
     private IWorkflowService workflowService
 
     @Autowired
+    TestHelper testHelper
+
+    @Autowired
     private ITaskService taskService
 
     @Autowired
@@ -152,6 +156,7 @@ class TaskAuthorizationServiceTest {
 
     @BeforeEach
     void init() {
+        testHelper.truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
@@ -164,7 +169,8 @@ class TaskAuthorizationServiceTest {
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
 //                [org] as Group[],
-                [] as ProcessRole[])
+                [] as ProcessRole[]
+        )
     }
 
 

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
@@ -68,6 +69,9 @@ class WorkflowAuthorizationServiceTest {
     private IWorkflowService workflowService
 
     @Autowired
+    TestHelper testHelper
+
+    @Autowired
     private IUserService userService
 
     private PetriNet net
@@ -108,6 +112,7 @@ class WorkflowAuthorizationServiceTest {
 
     @BeforeEach
     void init() {
+        testHelper.truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
