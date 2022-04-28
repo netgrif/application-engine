@@ -22,6 +22,7 @@ import groovy.json.JsonSlurper
 //import com.netgrif.application.engine.orgstructure.domain.Group
 
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -81,7 +82,6 @@ class WorkflowAuthorizationServiceTest {
 
     private Authentication userAuth
     private Authentication adminAuth
-    private Map<String, Authority> auths
     private IUser testUser
 
 //    @BeforeEach
@@ -123,13 +123,14 @@ class WorkflowAuthorizationServiceTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        auths = importHelper.createAuthorities(["user": Authority.user])
+        def auths = importHelper.createAuthorities(["user": Authority.user])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[], [] as ProcessRole[])
+                [auths.get("user")] as Authority[],
+                [] as ProcessRole[])
     }
 
-//    @Test
-//    @Disabled
+    @Test
+    @Disabled
     void testDeleteCase() {
         def body = JsonOutput.toJson([
                 title: "test case",

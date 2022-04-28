@@ -20,25 +20,20 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import org.junit.jupiter.api.BeforeEach
-
-//import com.netgrif.application.engine.orgstructure.domain.Group
-
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -64,7 +59,6 @@ class TaskAuthorizationServiceTest {
 
     private PetriNet net
     private PetriNet netWithUserRefs
-    private Map<String, Authority> auths
     private IUser testUser
 
     private String userId
@@ -108,53 +102,53 @@ class TaskAuthorizationServiceTest {
     private String taskId2
 
 //    @BeforeEach
-    void before() {
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
-
-        this.net = net.getNet()
-
-        mvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build()
-
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-        def processRoles = userProcessRoleRepository.findAllByNetId(this.net.getStringId())
-
-        def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [processRoles.find({ it.name.equals("role") })] as ProcessRole[])
-
-        userId = user.getStringId()
-        this.userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
-
-        importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
-                [] as ProcessRole[])
-
-        this.userWithoutRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITHOUT_ROLE_EMAIL, "password")
-
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
-                [] as ProcessRole[])
-
-        this.adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_USER_EMAIL, "password")
-    }
-
-    void beforeEach() {
-        def aCase = importHelper.createCase("Case", this.net)
-        assert aCase != null
-
-        taskId = importHelper.getTaskId("Transition", aCase.stringId)
-        assert taskId != null
-
-        aCase = importHelper.createCase("Case 2", this.net)
-        assert aCase != null
-
-        taskId2 = importHelper.getTaskId("Transition", aCase.stringId)
-        assert taskId2 != null
-    }
+//    void before() {
+//        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        assert net.getNet() != null
+//
+//        this.net = net.getNet()
+//
+//        mvc = MockMvcBuilders
+//                .webAppContextSetup(wac)
+//                .apply(springSecurity())
+//                .build()
+//
+//        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+//        def processRoles = userProcessRoleRepository.findAllByNetId(this.net.getStringId())
+//
+//        def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("user")] as Authority[],
+//                [processRoles.find({ it.name.equals("role") })] as ProcessRole[])
+//
+//        userId = user.getStringId()
+//        this.userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
+//
+//        importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("user")] as Authority[],
+//                [] as ProcessRole[])
+//
+//        this.userWithoutRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITHOUT_ROLE_EMAIL, "password")
+//
+//        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_USER_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("admin")] as Authority[],
+//                [] as ProcessRole[])
+//
+//        this.adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_USER_EMAIL, "password")
+//    }
+//
+//    void beforeEach() {
+//        def aCase = importHelper.createCase("Case", this.net)
+//        assert aCase != null
+//
+//        taskId = importHelper.getTaskId("Transition", aCase.stringId)
+//        assert taskId != null
+//
+//        aCase = importHelper.createCase("Case 2", this.net)
+//        assert aCase != null
+//
+//        taskId2 = importHelper.getTaskId("Transition", aCase.stringId)
+//        assert taskId2 != null
+//    }
 
     @BeforeEach
     void init() {
@@ -166,14 +160,15 @@ class TaskAuthorizationServiceTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        auths = importHelper.createAuthorities(["user": Authority.user])
+        def auths = importHelper.createAuthorities(["user": Authority.user])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[], [] as ProcessRole[])
+                [auths.get("user")] as Authority[],
+                [] as ProcessRole[])
     }
 
 
-    //@Test
-    //@Disabled("Assign Test")
+    @Test
+    @Disabled("Assign Test")
     void testTaskAuthorizationService() {
         def tests = [
                 { -> testAssignAuthorization() },
@@ -183,10 +178,10 @@ class TaskAuthorizationServiceTest {
                 { -> testSetDataAuthorization() },
 //                { -> testSetFileAuthorization() },
         ]
-        tests.each { t ->
-            beforeEach()
-            t()
-        }
+//        tests.each { t ->
+//            beforeEach()
+//            t()
+//        }
     }
 
     void testAssignAuthorization() {
