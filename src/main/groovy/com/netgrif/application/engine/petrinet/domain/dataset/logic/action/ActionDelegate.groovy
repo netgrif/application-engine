@@ -790,10 +790,14 @@ class ActionDelegate {
         this.generatePDF(t.getStringId(), field.importId)
     }
 
+    String buildStoragePath(String outputFolder, String outputName, Case aCase, String fileFieldId) {
+        return outputFolder + File.separator + aCase.stringId + "-" + fileFieldId + "-" + outputName;
+    }
+
     void generatePDF(String transitionId, String fileFieldId, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + saveToCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = buildStoragePath(pdfResource.getOutputFolder(), pdfResource.getOutputDefaultName(), saveToCase, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
@@ -804,7 +808,7 @@ class ActionDelegate {
     void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + saveToCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = buildStoragePath(pdfResource.getOutputFolder(), pdfResource.getOutputDefaultName(), saveToCase, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
@@ -815,7 +819,7 @@ class ActionDelegate {
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + saveToCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = buildStoragePath(pdfResource.getOutputFolder(), pdfResource.getOutputDefaultName(), saveToCase, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -831,7 +835,7 @@ class ActionDelegate {
     void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + saveToCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = buildStoragePath(pdfResource.getOutputFolder(), pdfResource.getOutputDefaultName(), saveToCase, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
@@ -843,7 +847,7 @@ class ActionDelegate {
     void generatePdfWithZoneId(String transitionId, String fileFieldId, ZoneId dateZoneId = ZoneId.systemDefault(), Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + saveToCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        String storagePath = buildStoragePath(pdfResource.getOutputFolder(), pdfResource.getOutputDefaultName(), saveToCase, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setDateZoneId(dateZoneId)
