@@ -16,14 +16,43 @@ public class Authority implements GrantedAuthority {
 
     public static final long serialVersionUID = 2839744057647464485L;
 
-    public static final String PERMISSION = "PERM_";
-    public static final String ROLE = "ROLE_";
+//    public static final String PERMISSION = "PERM_";
+//    public static final String ROLE = "ROLE_";
+//
+//    public static final String admin = ROLE + "ADMIN";
+//    public static final String systemAdmin = ROLE + "SYSTEMADMIN";
+//    public static final String user = ROLE + "USER";
+//    public static final String anonymous = ROLE + "ANONYMOUS";
 
-    public static final String admin = ROLE + "ADMIN";
-    public static final String systemAdmin = ROLE + "SYSTEMADMIN";
-    public static final String user = ROLE + "USER";
-    public static final String anonymous = ROLE + "ANONYMOUS";
+    /**
+     * Domain constants
+     * */
+    public static final String ADMIN = "*";
+    public static final String PROCESS = "PROCESS";
+    public static final String FILTER = "FILTER";
+    public static final String USER = "USER";
+    public static final String GROUP = "GROUP";
+    public static final String ROLE = "ROLE";
+    public static final String AUTHORITY = "AUTHORITY";
 
+    /**
+     * Authority objects constants
+     * */
+    public static final String processUpload = "PROCESS.UPLOAD";
+    public static final String processDelete = "PROCESS.DELETE";
+    public static final String filterUpload = "FILTER.UPLOAD";
+    public static final String filterDelete = "FILTER.DELETE";
+    public static final String userCreate = "USER.CREATE";
+    public static final String userDelete = "USER.DELETE";
+    public static final String userEdit = "USER.EDIT";
+    public static final String groupCreate = "GROUP.CREATE";
+    public static final String groupDelete = "GROUP.DELETE";
+    public static final String groupAddUser = "GROUP.ADD_USER";
+    public static final String groupRemoveUser = "GROUP.REMOVE_USER";
+    public static final String roleCreate = "ROLE.CREATE";
+    public static final String roleDelete = "ROLE.DELETE";
+    public static final String authorityCreate = "AUTHORITY.CREATE";
+    public static final String authorityDelete = "AUTHORITY.DELETE";
 
     @Id
     @Getter
@@ -45,14 +74,6 @@ public class Authority implements GrantedAuthority {
 
     public Authority(String name) {
         this.name = name;
-    }
-
-    public static Authority createRole(String name) {
-        return new Authority(ROLE + name);
-    }
-
-    public static Authority createPermission(String name) {
-        return new Authority(PERMISSION + name);
     }
 
     public void addUser(IUser user) {
