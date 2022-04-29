@@ -17,6 +17,6 @@ public enum AuthorityEnum {
     AUTHORITY_CREATE("AUTHORITY.CREATE"),
     AUTHORITY_DELETE("AUTHORITY.DELETE");
 
-    AuthorityEnum(String s) {
+    AuthorityEnum(String name) {
     }
 }
