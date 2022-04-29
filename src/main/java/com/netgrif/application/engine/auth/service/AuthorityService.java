@@ -45,6 +45,14 @@ public class AuthorityService implements IAuthorityService {
         return authorities.stream().map(this::getOrCreate).collect(Collectors.toList());
     }
 
+    @Override
+    public void delete(String name) {
+        Authority authority = repository.findByName(name);
+        if (authority == null)
+            throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
+        repository.delete(authority);
+    }
+
     public Authority getOne(String id) {
         Optional<Authority> authority = repository.findById(id);
         if (authority.isEmpty())

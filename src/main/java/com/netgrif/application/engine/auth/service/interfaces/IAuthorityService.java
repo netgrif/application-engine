@@ -15,5 +15,7 @@ public interface IAuthorityService {
 
     List<Authority> getOrCreate(List<AuthorityEnum> authorities);
 
+    void delete(String name);
+
     Authority getOne(String id);
 }
