@@ -10,13 +10,5 @@ public interface IAuthorityService {
 
     Authority getOrCreate(String name);
 
-    Authority getOrCreatePermission(String name);
-
-    Authority getOrCreateRole(String name);
-
-    List<Authority> getAllPermissions();
-
-    List<Authority> getAllRoles();
-
     Authority getOne(String id);
 }
