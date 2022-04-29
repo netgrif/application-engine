@@ -91,10 +91,13 @@ class ImportHelper {
 
 
     @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, Authority> createAuthorities(Map<String, String> authorities) {
-        HashMap<String, Authority> authoritities = new HashMap<>()
+    Map<String, List<Authority>> createAuthorities(Map<String, List<AuthorityEnum>> authorities) {
+        HashMap<String, List<Authority>> authoritities = new HashMap<>()
         authorities.each { authority ->
-            authoritities.put(authority.key, authorityService.getOrCreate(authority.value))
+            authoritities.put(authority.key, new ArrayList<Authority>())
+            authority.value.forEach( a ->
+                    authoritities.get(authority.key).add(authorityService.getOrCreate(a))
+            )
         }
 
         log.info("Creating ${authoritities.size()} authorities")
@@ -122,24 +125,6 @@ class ImportHelper {
         }
         return Optional.of(petriNet)
     }
-
-//    ProcessRole createUserProcessRole(PetriNet net, String name) {
-//        ProcessRole role = processRoleRepository.save(new ProcessRole(roleId:
-//                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
-//        log.info("Created user process role $name")
-//        return role
-//    }
-//
-//    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
-//        HashMap<String, ProcessRole> userRoles = new HashMap<>()
-//        roles.each { it ->
-//            userRoles.put(it.key, createUserProcessRole(net, it.value))
-//        }
-//
-//        log.info("Created ${userRoles.size()} process roles")
-//        return userRoles
-//    }
-
 
     ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
         ProcessRole role = net.roles.values().find { it -> it.importId == roleId }

@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.auth.domain;
 
-public enum AuthorityEnum {ADMIN("*"),
+public enum AuthorityEnum {
+    ADMIN("*"),
+    ANONYMOUS("-"),
     PROCESS("PROCESS"),
     FILTER("FILTER"),
     USER("USER"),

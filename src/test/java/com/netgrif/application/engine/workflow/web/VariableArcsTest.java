@@ -119,7 +119,7 @@ public class VariableArcsTest {
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
-                new Authority[]{authorityService.getOrCreate(Authority.user)},
+                authorityService.getOrCreate(Authority.defaultUserAuthorities).toArray(new Authority[]{}),
                 new ProcessRole[]{});
 
         finishCase = importHelper.createCase("finish case", loaded);

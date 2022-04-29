@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @Profile("test")
@@ -18,7 +19,7 @@ public class MockService {
     private IAuthorityService authorityService;
 
     public LoggedUser mockLoggedUser() {
-        Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser));
+        List<Authority> authorityUser = authorityService.getOrCreate(Authority.defaultUserAuthorities);
+        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", authorityUser);
     }
 }

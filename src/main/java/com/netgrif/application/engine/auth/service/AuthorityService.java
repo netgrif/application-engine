@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -34,6 +36,13 @@ public class AuthorityService implements IAuthorityService {
     @Override
     public Authority getOrCreate(AuthorityEnum authorityEnum) {
         return getOrCreate(authorityEnum.name());
+    }
+
+    @Override
+    public List<Authority> getOrCreate(List<AuthorityEnum> authorities) {
+        if (authorities == null)
+            return Collections.emptyList();
+        return authorities.stream().map(this::getOrCreate).collect(Collectors.toList());
     }
 
     public Authority getOne(String id) {

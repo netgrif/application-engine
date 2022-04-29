@@ -130,7 +130,7 @@ public class UserService extends AbstractUserService {
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
-            authorities.add(authorityRepository.findByName(Authority.user));
+            Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityRepository.findByName(a.name())));
             user.setAuthorities(authorities);
         }
     }
@@ -138,7 +138,7 @@ public class UserService extends AbstractUserService {
     public void addAnonymousAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
-            authorities.add(authorityRepository.findByName(Authority.anonymous));
+            authorities.add(authorityRepository.findByName(AuthorityEnum.ANONYMOUS.name()));
             user.setAuthorities(authorities);
         }
     }

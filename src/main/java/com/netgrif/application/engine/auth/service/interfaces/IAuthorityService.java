@@ -13,5 +13,7 @@ public interface IAuthorityService {
 
     Authority getOrCreate(AuthorityEnum authorityEnum);
 
+    List<Authority> getOrCreate(List<AuthorityEnum> authorities);
+
     Authority getOne(String id);
 }

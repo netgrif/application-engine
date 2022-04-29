@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
+import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -36,6 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -132,7 +130,7 @@ public class TaskServiceTest {
     }
 
     public LoggedUser mockLoggedUser() {
-        Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser));
+        List<Authority> authorityUser = authorityService.getOrCreate(Authority.defaultUserAuthorities);
+        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", authorityUser);
     }
 }

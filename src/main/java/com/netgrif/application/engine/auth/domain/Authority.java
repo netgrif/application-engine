@@ -88,6 +88,6 @@ public class Authority implements GrantedAuthority {
     }
 
     public boolean inDomain(AuthorityEnum domain) {
-        return this.name.startsWith(domain.name());
+        return this.name.startsWith(domain.name()) || this.name.equals(AuthorityEnum.ADMIN.name());
     }
 }
