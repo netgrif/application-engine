@@ -80,4 +80,8 @@ public class Authority implements GrantedAuthority {
     public int hashCode() {
         return name.hashCode();
     }
+
+    public boolean inDomain(AuthorityDomainEnum domain) {
+        return this.name.startsWith(domain.name());
+    }
 }
