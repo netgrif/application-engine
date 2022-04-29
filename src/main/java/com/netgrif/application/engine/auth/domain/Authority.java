@@ -19,6 +19,8 @@ public class Authority implements GrantedAuthority {
 
     public static final long serialVersionUID = 2839744057647464485L;
 
+    public static final List<AuthorityEnum> defaultUserAuthorities = Arrays.asList(AuthorityEnum.FILTER, AuthorityEnum.GROUP);
+
     @Id
     @Getter
     private ObjectId _id;
@@ -39,6 +41,10 @@ public class Authority implements GrantedAuthority {
 
     public Authority(String name) {
         this.name = name;
+    }
+
+    public Authority(AuthorityEnum authority) {
+        this.name = authority.name();
     }
 
     public void addUser(IUser user) {
@@ -81,7 +87,7 @@ public class Authority implements GrantedAuthority {
         return name.hashCode();
     }
 
-    public boolean inDomain(AuthorityDomainEnum domain) {
+    public boolean inDomain(AuthorityEnum domain) {
         return this.name.startsWith(domain.name());
     }
 }

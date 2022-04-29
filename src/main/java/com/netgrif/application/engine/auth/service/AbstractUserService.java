@@ -48,7 +48,7 @@ public abstract class AbstractUserService implements IUserService {
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityService.getOrCreate(Authority.user));
+            Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityService.getOrCreate(a)));
             user.setAuthorities(authorities);
         }
     }
@@ -95,9 +95,7 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void removeRoleOfDeletedPetriNet(PetriNet net) {
         List<IUser> users = findAllByProcessRoles(net.getRoles().keySet(), false);
-        users.forEach(u -> {
-            net.getRoles().forEach((k, role) -> removeRole(u, role));
-        });
+        users.forEach(u -> net.getRoles().forEach((k, role) -> removeRole(u, role)));
     }
 
     @Override

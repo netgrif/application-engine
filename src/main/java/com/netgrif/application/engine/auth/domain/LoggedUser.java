@@ -48,7 +48,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     }
 
     public boolean isAdmin() {
-        return getAuthorities().contains(new Authority(Authority.admin));
+        return getAuthorities().contains(new Authority(AuthorityEnum.ADMIN));
     }
 
     public String getEmail() {

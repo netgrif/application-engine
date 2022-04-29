@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.AuthorityEnum;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,14 @@ public class AuthorityService implements IAuthorityService {
         return authority;
     }
 
+    @Override
+    public Authority getOrCreate(AuthorityEnum authorityEnum) {
+        return getOrCreate(authorityEnum.name());
+    }
+
     public Authority getOne(String id) {
         Optional<Authority> authority = repository.findById(id);
-        if (!authority.isPresent())
+        if (authority.isEmpty())
             throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
         return authority.get();
     }

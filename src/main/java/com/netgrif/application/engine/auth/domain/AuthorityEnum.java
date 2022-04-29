@@ -1,6 +1,12 @@
 package com.netgrif.application.engine.auth.domain;
 
-public enum AuthorityEnum {
+public enum AuthorityEnum {ADMIN("*"),
+    PROCESS("PROCESS"),
+    FILTER("FILTER"),
+    USER("USER"),
+    GROUP("GROUP"),
+    ROLE("ROLE"),
+    AUTHORITY("AUTHORITY"),
     PROCESS_UPLOAD("PROCESS.UPLOAD"),
     PROCESS_DELETE("PROCESS.DELETE"),
     FILTER_UPLOAD("FILTER.UPLOAD"),
