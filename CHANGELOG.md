@@ -13,6 +13,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 ### Fixed
 
 - [NAE-1585] Security update to resolve vulnerabilities
+- [NAE-1621] Required data group layout tag if layout type is “grid”
 
 ### Changed
 
