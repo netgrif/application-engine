@@ -129,7 +129,7 @@ public class UserService extends AbstractUserService {
 
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<Authority>();
+            HashSet<Authority> authorities = new HashSet<>();
             Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityRepository.findByName(a.name())));
             user.setAuthorities(authorities);
         }
@@ -137,7 +137,7 @@ public class UserService extends AbstractUserService {
 
     public void addAnonymousAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<Authority>();
+            HashSet<Authority> authorities = new HashSet<>();
             authorities.add(authorityRepository.findByName(AuthorityEnum.ANONYMOUS.name()));
             user.setAuthorities(authorities);
         }
@@ -271,9 +271,9 @@ public class UserService extends AbstractUserService {
         Optional<User> user = userRepository.findById(userId);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
-        if (!user.isPresent())
+        if (user.isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
-        if (!authority.isPresent())
+        if (authority.isEmpty())
             throw new IllegalArgumentException("Could not find authority with id [" + authorityId + "]");
 
         user.get().addAuthority(authority.get());
@@ -304,36 +304,13 @@ public class UserService extends AbstractUserService {
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-//    @Override
-//    public IUser addRole(IUser user, String roleStringId) {
-//        ProcessRole role = processRoleService.findById(roleStringId);
-//        user.addProcessRole(role);
-//        return userRepository.save(user);
-//    }
-//
-//    @Override
-//    public IUser removeRole(IUser user, String roleStringId) {
-//        ProcessRole role = processRoleService.findByImportId(roleStringId);
-//        user.removeProcessRole(role);
-//        return userRepository.save(user);
-//    }
-
     @Override
     public void deleteUser(IUser user) {
         User dbUser = (User) user;
-        if (!userRepository.findById(dbUser.getStringId()).isPresent())
+        if (userRepository.findById(dbUser.getStringId()).isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + dbUser.get_id() + "]");
         userRepository.delete(dbUser);
     }
-
-
-/*    private User loadProcessRoles(User user) {
-        if (user == null)
-            return null;
-        user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
-                .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
-        return user;
-    }*/
 
     private User loadGroups(User user) {
         if (user == null)

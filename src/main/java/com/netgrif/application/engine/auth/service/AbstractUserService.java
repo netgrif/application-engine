@@ -109,6 +109,16 @@ public abstract class AbstractUserService implements IUserService {
         return system;
     }
 
+    @Override
+    public boolean hasAuthority(IUser user, Authority authority) {
+        return user.getAuthorities().stream().anyMatch(a -> a.getStringId().equals(authority.getStringId()));
+    }
+
+    @Override
+    public boolean hasAuthority(IUser user, String authority) {
+        return user.getAuthorities().stream().anyMatch(a -> a.getName().equals(authority));
+    }
+
     public <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {
         return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
     }

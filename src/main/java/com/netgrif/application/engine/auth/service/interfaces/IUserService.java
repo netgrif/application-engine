@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.AnonymousUser;
+import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
@@ -73,4 +74,7 @@ public interface IUserService {
 
     IUser createSystemUser();
 
+    boolean hasAuthority(IUser user, Authority authority);
+
+    boolean hasAuthority(IUser user, String authority);
 }
