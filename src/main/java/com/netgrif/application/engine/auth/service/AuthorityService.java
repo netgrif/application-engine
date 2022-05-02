@@ -39,6 +39,11 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
+    public Authority save(Authority authority) {
+        return repository.save(authority);
+    }
+
+    @Override
     public List<Authority> getOrCreate(List<AuthorityEnum> authorities) {
         if (authorities == null)
             return Collections.emptyList();

@@ -13,6 +13,8 @@ public interface IAuthorityService {
 
     Authority getOrCreate(AuthorityEnum authorityEnum);
 
+    Authority save(Authority authority);
+
     List<Authority> getOrCreate(List<AuthorityEnum> authorities);
 
     Authority delete(String name);

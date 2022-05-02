@@ -9,10 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Document
 public class Authority implements GrantedAuthority {
@@ -37,14 +34,16 @@ public class Authority implements GrantedAuthority {
     private Set<String> users;
 
     public Authority() {
+        this.users = new HashSet<>();
     }
 
     public Authority(String name) {
+        this();
         this.name = name;
     }
 
     public Authority(AuthorityEnum authority) {
-        this.name = authority.name();
+        this(authority.name());
     }
 
     public void addUser(IUser user) {

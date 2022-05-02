@@ -5,6 +5,7 @@ import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -68,7 +69,7 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@petriNetAuthorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Import new process",
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             authorizations = @Authorization("BasicAuth"))
@@ -79,7 +80,7 @@ public class PetriNetController {
     })
     @RequestMapping(value = "/import", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> importPetriNet(
-            @RequestParam(value = "file", required = true) MultipartFile multipartFile,
+            @RequestParam(value = "file") MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
@@ -87,7 +88,7 @@ public class PetriNetController {
             file.createNewFile();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());
-            String release = releaseType == null ? "major" : releaseType;
+            VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType);
 
             ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
             fout.close();

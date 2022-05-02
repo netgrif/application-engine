@@ -44,7 +44,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     private IUser createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(AuthorityEnum.ADMIN)
-        Authority systemAuthority = authorityService.getOrCreate(AuthorityEnum.ADMIN)
 
         IUser superUser = userService.findByEmail("super@netgrif.com", false)
         if (superUser == null) {
@@ -54,7 +53,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     email: "super@netgrif.com",
                     password: superAdminPassword,
                     state: UserState.ACTIVE,
-                    authorities: [adminAuthority, systemAuthority] as Set<Authority>,
+                    authorities: [adminAuthority] as Set<Authority>,
                     processRoles: processRoleService.findAll() as Set<ProcessRole>))
             log.info("Super user created")
         } else {
@@ -62,13 +61,15 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superUser = superUser
         }
 
+        adminAuthority.addUser(this.superUser)
+        authorityService.save(adminAuthority)
         return this.superUser
     }
 
     void setAllToSuperUser() {
         setAllGroups()
         setAllProcessRoles()
-        setAllAuthorities()
+        //setAllAuthorities()
         log.info("Super user updated")
     }
 
