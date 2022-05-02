@@ -46,11 +46,12 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public void delete(String name) {
+    public Authority delete(String name) {
         Authority authority = repository.findByName(name);
         if (authority == null)
             throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
         repository.delete(authority);
+        return authority;
     }
 
     public Authority getOne(String id) {
