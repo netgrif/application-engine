@@ -6,7 +6,7 @@ import org.springframework.data.elasticsearch.core.query.Query;
 
 import java.util.List;
 
-public interface IElasticIndexOps {
+public interface IElasticIndexService {
 
     boolean indexExists(String indexName);
 
