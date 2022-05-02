@@ -3,7 +3,7 @@
     <initials>EXT</initials>
     <title>Export actions test</title>
     <defaultRole>true</defaultRole>
-    <anonymousRole>true</anonymousRole>
+    <anonymousRole>false</anonymousRole>
     <transitionRole>false</transitionRole>
     <role>
         <id>process_role</id>
@@ -87,7 +87,9 @@
         <event type="assign">
             <id>export</id>
             <actions phase="post">
-                <action id="action_0">exportCasesToFile({it.processIdentifier.eq("export_test")} as Closure, "src/test/resources/csv/case_mongo_export.csv")</action>
+                <action id="action_0">
+                    exportCasesToFile({it.processIdentifier.eq("export_test")} as Closure, "src/test/resources/csv/case_mongo_export.csv")
+                </action>
             </actions>
         </event>
         <event type="finish">
@@ -154,11 +156,13 @@
         <event type="assign">
             <id>export</id>
             <actions phase="post">
-                <action id="action_1">def request = new com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest()
-                    request.process = [new com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
-                    def config = new com.netgrif.workflow.export.domain.ExportDataConfig()
-                    config.setDataToExport(["text"] as Set)
-                    exportCasesToFile([request], "src/test/resources/csv/case_elastic_export.csv",config)</action>
+                <action id="action_1">
+                    def request = new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest()
+                    request.process = [new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
+                    def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
+                    config.setDataToExport(["text"] as LinkedHashSet)
+                    exportCasesToFile([request], "src/test/resources/csv/case_elastic_export.csv",config)
+                </action>
             </actions>
         </event>
         <event type="finish">
@@ -211,10 +215,12 @@
         <event type="assign">
             <id>export</id>
             <actions phase="post">
-                <action id="action_2">def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
-                    def config = new com.netgrif.workflow.export.domain.ExportDataConfig()
-                    config.setDataToExport(["immediate_multichoice","immediate_number", "text"] as Set)
-                    exportTasksToFile({it.processId.eq(processId) &amp; it.transitionId.eq("t3")},"src/test/resources/csv/task_mongo_export.csv", config)</action>
+                <action id="action_2">
+                    def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+                    def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
+                    config.setDataToExport(["immediate_multichoice","immediate_number", "text"] as LinkedHashSet)
+                    exportTasksToFile({it.processId.eq(processId) &amp; it.transitionId.eq("t3")},"src/test/resources/csv/task_mongo_export.csv", config)
+                </action>
             </actions>
         </event>
     </transition>
@@ -272,11 +278,13 @@
         <event type="assign">
             <id>export</id>
             <actions phase="post">
-                <action id="action_3">def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
-                    def taskRequest = new com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest()
-                    taskRequest.process = [new com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
+                <action id="action_3">
+                    def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+                    def taskRequest = new com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest()
+                    taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
                     taskRequest.transitionId = ["t4"] as List
-                    exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())</action>
+                    exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
+                </action>
             </actions>
         </event>
     </transition>

@@ -270,6 +270,9 @@ class ExportService implements IExportService {
             case USERLIST:
                 fieldValue = String.join(";", ((UserListField) field).getValue());
                 break;
+            case NUMBER:
+                fieldValue = field.getValue().toString();
+                break;
             default:
                 fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
                 break;

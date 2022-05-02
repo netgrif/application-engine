@@ -1045,8 +1045,7 @@ class ActionDelegate {
     }
 
     OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
-        List<Task> exportTasks = findTasks(predicate, pageSize)
-        return exportService.fillCsvTaskData(outFile, exportTasks, config)
+        return exportService.fillCsvTaskData(predicate, outFile, config, pageSize)
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
