@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -22,6 +23,10 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    public WorkflowAuthorizationService(@Autowired IUserService userService) {
+        super(userService);
+    }
 
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
