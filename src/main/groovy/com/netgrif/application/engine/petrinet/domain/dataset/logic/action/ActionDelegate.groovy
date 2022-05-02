@@ -248,17 +248,7 @@ class ActionDelegate {
                     this.outcomes.add(outcome)
                 }
             }]
-        },
-         on: { Transition trans ->
-             behavior(field, trans)
-             ChangedField changedField = new ChangedField(field.stringId)
-             changedField.addAttribute("type", field.type.name)
-             changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
-             SetDataEventOutcome outcome = createSetDataEventOutcome()
-             outcome.addChangedField(field.stringId, changedField)
-             this.outcomes.add(outcome)
-         }
-        ]
+        }
     }
 
     protected SetDataEventOutcome createSetDataEventOutcome(){
@@ -1023,7 +1013,7 @@ class ActionDelegate {
     IUser findUserById(String id) {
         IUser user = userService.findById(id, false)
         if (user == null){
-            log.error("Cannot find user with email [" + email + "]")
+            log.error("Cannot find user with id [" + id + "]")
             return null
         } else {
             return user
