@@ -247,7 +247,7 @@ class ActionDelegate {
                     outcome.addChangedField(field.stringId, changedField)
                     this.outcomes.add(outcome)
                 }
-            }]
+           }]
         }]
     }
 
