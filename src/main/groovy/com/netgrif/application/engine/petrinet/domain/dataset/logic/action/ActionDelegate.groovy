@@ -248,7 +248,7 @@ class ActionDelegate {
                     this.outcomes.add(outcome)
                 }
             }]
-        }
+        }]
     }
 
     protected SetDataEventOutcome createSetDataEventOutcome(){
