@@ -67,6 +67,7 @@ class ActionDelegate {
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
     static final String ONCE_GENERATE = "once"
+    static final String EACH_TRANSITION = "each transition"
 
     @Autowired
     FieldFactory fieldFactory
@@ -215,6 +216,8 @@ class ActionDelegate {
         return field.defaultValue
     }
 
+    def each = { return EACH_TRANSITION }
+
     def getInit() {
         return initValueOfField
     }
@@ -224,9 +227,9 @@ class ActionDelegate {
     }
 
     /**
-     * Changes behavior of a given field on given transition if certain condition is being met.
+     * Changes behavior of a given field on given transition if certain condition is being met or on each transition containing a field
      * <br>
-     * Example:
+     * Example 1:
      * <pre>
      *     condition: f.conditionId,
      *     text: f.textId,
@@ -234,25 +237,91 @@ class ActionDelegate {
      *
      *     make text,visible on transition when { condition.value == true }* </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
+     *
+     * Example 2:
+     * <pre>
+     *      text: f.textId;
+     *
+     *      if (condition)
+     *          make text, visible on each
+     * </pre>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contain the field <i>text</i>
      * @param field which behaviour will be changed
      * @param behavior one of visible, editable, required, optional, hidden, forbidden
      */
     def make(Field field, Closure behavior) {
-        [on: { Transition trans ->
-            [when: { Closure condition ->
-                if (condition()) {
-                    behavior(field, trans)
-                    saveFieldBehavior(field, trans)
+        [on: { Object optionalTransition ->
+            if (optionalTransition instanceof Transition) {
+                [when: { Closure condition ->
+                    if (condition()) {
+                        behavior(field, optionalTransition)
+                        saveFieldBehavior(field, optionalTransition)
+                    }
+                }]
+            } else if (optionalTransition instanceof Closure) {
+                if (optionalTransition == each) {
+                    useCase.petriNet.transitions.each {transitionEntry ->
+                        Transition trans = transitionEntry.value
+                        if (trans.dataSet.containsKey(field.stringId)) {
+                            behavior(field, trans)
+                            saveFieldBehavior(field, trans)
+                        }
+                    }
                 }
-            }]
+            } else {
+                throw new IllegalArgumentException("Invalid call of make method. Method call should contain transition or keyword \'each\'")
+            }
         }]
     }
 
+    /**
+     * Changes behavior of a given fields on given transition or on each transition containing a field
+     * <br>
+     * Example 1:
+     * <pre>
+     *     text: f.textId,
+     *     otherText: f.otherTextId,
+     *     transition: t.transitionId;
+     *
+     *     if (condition)
+     *          make [text, otherText], visible on transition
+     * </pre>
+     * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on given transition
+     *
+     * Example 2:
+     * <pre>
+     *      text: f.textId,
+     *      otherText: f.otherTextId;
+     *
+     *      if (condition)
+     *          make text, visible on each
+     * </pre>
+     * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on each transition that contain given fields
+     * @param list of fields which behaviour will be changed
+     * @param behavior one of visible, editable, required, optional, hidden, forbidden
+     */
     def make(List<Field> fields, Closure behavior) {
-        [on: { Transition trans ->
+        [on: { Object optionalTransition ->
+            if (optionalTransition instanceof Transition) {
+
             fields.forEach  { field ->
-                behavior(field, trans)
-                saveFieldBehavior(field, trans)
+                behavior(field, optionalTransition)
+                saveFieldBehavior(field, optionalTransition)
+            }
+            } else if (optionalTransition instanceof Closure) {
+                if (optionalTransition == each) {
+                    useCase.petriNet.transitions.each {transitionEntry ->
+                        Transition trans = transitionEntry.value
+                        fields.each { field ->
+                            if (trans.dataSet.containsKey(field.stringId)) {
+                                behavior(field, trans)
+                                saveFieldBehavior(field, trans)
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid call of make method. Method call should contain transition or keyword \'each\'")
             }
         }]
     }
@@ -263,8 +332,8 @@ class ActionDelegate {
 
     def saveFieldBehavior(Field field, Transition trans) {
         Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
-        if (fieldBehavior.get(trans.getStringId())[0] == FieldBehavior.INITIAL)
-            fieldBehavior = [(trans.stringId): useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior]
+        if (fieldBehavior.get(trans.getStringId()).find { it.toString() == FieldBehavior.INITIAL.toString()})
+            fieldBehavior.put(trans.stringId, useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior)
 
         ChangedField changedField = new ChangedField(field.stringId)
         changedField.addAttribute("type", field.type.name)

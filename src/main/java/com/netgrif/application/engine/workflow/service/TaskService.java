@@ -683,11 +683,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Task> findAllByCase(String caseId) {
-        return taskRepository.findAllByCaseId(caseId);
-    }
-
-    @Override
     public Task save(Task task) {
         task = taskRepository.save(task);
         elasticTaskService.index(this.taskMappingService.transform(task));
