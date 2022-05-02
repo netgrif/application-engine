@@ -227,7 +227,7 @@ class ActionDelegate {
     }
 
     /**
-     * Changes behavior of a given field on given transition if certain condition is being met or on each transition containing a field
+     * Changes behavior of a given field on given transition if certain condition is being met or on each transition containing a field.
      * <br>
      * Example 1:
      * <pre>
@@ -236,7 +236,7 @@ class ActionDelegate {
      *     transition: t.transitionId;
      *
      *     make text,visible on transition when { condition.value == true }* </pre>
-     * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>.
      *
      * Example 2:
      * <pre>
@@ -245,7 +245,7 @@ class ActionDelegate {
      *      if (condition)
      *          make text, visible on each
      * </pre>
-     * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contain the field <i>text</i>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contains the field <i>text</i>.
      * @param field which behaviour will be changed
      * @param behavior one of visible, editable, required, optional, hidden, forbidden
      */
@@ -269,13 +269,13 @@ class ActionDelegate {
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Invalid call of make method. Method call should contain transition or keyword \'each\'")
+                throw new IllegalArgumentException("Invalid call of make method. Method call should contain transition or keyword \'each\'.")
             }
         }]
     }
 
     /**
-     * Changes behavior of a given fields on given transition or on each transition containing a field
+     * Changes behavior of a given fields on given transition or on each transition containing a field.
      * <br>
      * Example 1:
      * <pre>
@@ -286,7 +286,7 @@ class ActionDelegate {
      *     if (condition)
      *          make [text, otherText], visible on transition
      * </pre>
-     * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on given transition
+     * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on given transition.
      *
      * Example 2:
      * <pre>
@@ -296,18 +296,17 @@ class ActionDelegate {
      *      if (condition)
      *          make text, visible on each
      * </pre>
-     * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on each transition that contain given fields
+     * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on each transition that contains given fields.
      * @param list of fields which behaviour will be changed
      * @param behavior one of visible, editable, required, optional, hidden, forbidden
      */
     def make(List<Field> fields, Closure behavior) {
         [on: { Object optionalTransition ->
             if (optionalTransition instanceof Transition) {
-
-            fields.forEach  { field ->
-                behavior(field, optionalTransition)
-                saveFieldBehavior(field, optionalTransition)
-            }
+                fields.forEach  { field ->
+                    behavior(field, optionalTransition)
+                    saveFieldBehavior(field, optionalTransition)
+                }
             } else if (optionalTransition instanceof Closure) {
                 if (optionalTransition == each) {
                     useCase.petriNet.transitions.each {transitionEntry ->
@@ -321,7 +320,7 @@ class ActionDelegate {
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Invalid call of make method. Method call should contain transition or keyword \'each\'")
+                throw new IllegalArgumentException("Invalid call of make method. Method call should contain transition or keyword \'each\'.")
             }
         }]
     }
