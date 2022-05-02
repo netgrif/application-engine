@@ -15,6 +15,11 @@ public class PetriNetAuthorizationService extends AbstractBaseAuthorizationServi
     }
 
     @Override
+    public boolean canCallImport(LoggedUser loggedUser) {
+        return loggedUser.isAdmin();
+    }
+
+    @Override
     public boolean canCallProcessDelete(LoggedUser loggedUser, String processId) {
         return loggedUser.isAdmin();
     }

@@ -105,7 +105,7 @@ public class UserController {
     @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
+        small = small != null && small;
         List<ObjectId>  roles = query.getRoles() == null ? null : query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         List<ObjectId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
@@ -135,7 +135,7 @@ public class UserController {
     @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
+        small = small != null && small;
         if (!small)
             return new UserResource(userResponseFactory.getUser(userService.resolveById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
         else
@@ -165,7 +165,7 @@ public class UserController {
     @ApiOperation(value = "Get all users with specified roles", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
-        small = small == null ? false : small;
+        small = small != null && small;
         Page<IUser> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
@@ -174,7 +174,7 @@ public class UserController {
         return resources;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@baseAuthorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -194,7 +194,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@baseAuthorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Get all authorities of the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -207,7 +207,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@baseAuthorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

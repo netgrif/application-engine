@@ -69,7 +69,7 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @PreAuthorize("@petriNetAuthorizationService.hasAuthority('ADMIN')")
+    @PreAuthorize("@petriNetAuthorizationService.canCallImport(#auth.principal)")
     @ApiOperation(value = "Import new process",
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             authorizations = @Authorization("BasicAuth"))
