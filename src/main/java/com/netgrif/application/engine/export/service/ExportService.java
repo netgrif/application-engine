@@ -11,7 +11,6 @@ import com.netgrif.application.engine.export.domain.ExportDataConfig;
 import com.netgrif.application.engine.export.service.interfaces.IExportService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.QTask;
@@ -24,6 +23,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +53,12 @@ class ExportService implements IExportService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private ExportConfiguration exportConfiguration;
+
+    @Autowired
+    private IUserService userService;
+
 
     @Override
     public Set<String> buildDefaultCsvCaseHeader(List<Case> exportCases) {
@@ -74,7 +80,17 @@ class ExportService implements IExportService {
     }
 
     @Override
-     public OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
+    public OutputStream fillCsvCaseData(Predicate predicate, File outFile) throws FileNotFoundException {
+        return fillCsvCaseData(predicate, outFile, null, exportConfiguration.getMongoPageSize());
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config) throws FileNotFoundException {
+        return fillCsvCaseData(predicate, outFile, config, exportConfiguration.getMongoPageSize());
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
         QCase qCase = new QCase("case");
         int numOfPages = (int) (((caseRepository.count(predicate)) / pageSize) + 1);
         List<Case> exportCases = new ArrayList<>();
@@ -85,11 +101,39 @@ class ExportService implements IExportService {
     }
 
     @Override
+    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, null, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, config, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
+                                        LoggedUser user) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, config, user, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
+                                        LoggedUser user, int pageSize) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, config, user, pageSize, LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
+                                        LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException {
+        return fillCsvCaseData(requests, outFile, config, user, pageSize, locale, false);
+    }
+
+    @Override
     public OutputStream fillCsvCaseData(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config,
                                         LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
         int numOfPages = (int) ((elasticCaseService.count(requests, user, locale, isIntersection) / pageSize) + 1);
         List<Case> exportCases = new ArrayList<>();
-        for (int i = 0; i < numOfPages; i++){
+        for (int i = 0; i < numOfPages; i++) {
             exportCases.addAll(elasticCaseService.search(requests, user, PageRequest.of(i, pageSize), locale, isIntersection).toList());
         }
         return buildCaseCsv(exportCases, config, outFile);
@@ -108,6 +152,34 @@ class ExportService implements IExportService {
     }
 
     @Override
+    public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile) throws FileNotFoundException {
+        return fillCsvTaskData(requests, outFile, null, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config) throws FileNotFoundException {
+        return fillCsvTaskData(requests, outFile, config, userService.getLoggedOrSystem().transformToLoggedUser(), exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
+                                        LoggedUser user) throws FileNotFoundException {
+        return fillCsvTaskData(requests, outFile, config, user, exportConfiguration.getMongoPageSize(), LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
+                                        LoggedUser user, int pageSize) throws FileNotFoundException {
+        return fillCsvTaskData(requests, outFile, config, user, pageSize, LocaleContextHolder.getLocale(), false);
+    }
+
+    @Override
+    public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
+                                        LoggedUser user, int pageSize, Locale locale) throws FileNotFoundException {
+        return fillCsvTaskData(requests, outFile, config, user, pageSize, locale, false);
+    }
+
+    @Override
     public OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config,
                                         LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException {
         int numberOfTasks = (int) ((elasticTaskService.count(requests, user, locale, isIntersection) / pageSize) + 1);
@@ -117,6 +189,16 @@ class ExportService implements IExportService {
             exportTasks.addAll(elasticTaskService.search(requests, user, PageRequest.of(0, pageSize), locale, isIntersection).toList());
         }
         return buildTaskCsv(exportTasks, config, outFile);
+    }
+
+    @Override
+    public OutputStream fillCsvTaskData(Predicate predicate, File outFile) throws FileNotFoundException {
+        return fillCsvTaskData(predicate, outFile, null, exportConfiguration.getMongoPageSize());
+    }
+
+    @Override
+    public OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config) throws FileNotFoundException {
+        return fillCsvTaskData(predicate, outFile, config, exportConfiguration.getMongoPageSize());
     }
 
     @Override
@@ -163,7 +245,7 @@ class ExportService implements IExportService {
         switch (field.getType()) {
             case MULTICHOICE_MAP:
                 fieldValue = ((MultichoiceMapField) field).getValue().stream()
-                    .filter(value -> ((MultichoiceMapField) field).getOptions().containsKey(value.trim()))
+                        .filter(value -> ((MultichoiceMapField) field).getOptions().containsKey(value.trim()))
                         .map(value -> ((MultichoiceMapField) field).getOptions().get(value.trim()).getDefaultValue())
                         .collect(Collectors.joining(","));
                 break;
@@ -174,10 +256,10 @@ class ExportService implements IExportService {
                 fieldValue = String.join(",", ((MultichoiceField) field).getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet()));
                 break;
             case FILE:
-                fieldValue = ((FileField)field).getValue().toString();
+                fieldValue = ((FileField) field).getValue().toString();
                 break;
             case FILELIST:
-                fieldValue = String.join(",", ((FileListField)field).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
+                fieldValue = String.join(",", ((FileListField) field).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
                 break;
             case TASK_REF:
                 fieldValue = String.join(";", ((TaskField) field).getValue());
@@ -189,7 +271,7 @@ class ExportService implements IExportService {
                 fieldValue = String.join(";", ((UserListField) field).getValue());
                 break;
             default:
-                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue()  : (String) field.getValue();
+                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
                 break;
         }
         return fieldValue;

@@ -3,11 +3,19 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.auth.domain.Author
 import com.netgrif.application.engine.auth.domain.IUser
+import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.application.engine.export.configuration.ExportConfiguration
+import com.netgrif.application.engine.export.domain.ExportDataConfig
+import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -130,6 +138,18 @@ class ActionDelegate {
     @Autowired
     IFilterImportExportService filterImportExportService
 
+    @Autowired
+    IExportService exportService
+
+    @Autowired
+    IElasticCaseService elasticCaseService
+
+    @Autowired
+    IElasticTaskService elasticTaskService
+
+    @Autowired
+    ExportConfiguration exportConfiguration
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -247,14 +267,14 @@ class ActionDelegate {
         }]
     }
 
-    protected SetDataEventOutcome createSetDataEventOutcome(){
+    protected SetDataEventOutcome createSetDataEventOutcome() {
         return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
         ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("choices", field.choices.collect {it.getTranslation(LocaleContextHolder.locale)})
+        changedField.addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -272,7 +292,7 @@ class ActionDelegate {
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
         ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
+        changedField.addAttribute("options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -328,7 +348,7 @@ class ActionDelegate {
         addTaskOutcomes(task, dataSet)
     }
 
-    private addTaskOutcomes(Task task, Map dataSet){
+    private addTaskOutcomes(Task task, Map dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
         this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
         this.outcomes.add(taskService.finishTask(task.stringId))
@@ -384,42 +404,42 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-        options: { cl ->
-            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
-                    || field instanceof MultichoiceField || field instanceof EnumerationField))
-                return
+         options    : { cl ->
+             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                     || field instanceof MultichoiceField || field instanceof EnumerationField))
+                 return
 
-            def options = cl()
-            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                return
-            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
-                return
+             def options = cl()
+             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                 return
+             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                 return
 
-            if (field instanceof MapOptionsField) {
-                field = (MapOptionsField) field
-                if (options.every { it.getValue() instanceof I18nString }) {
-                    field.setOptions(options)
-                } else {
-                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
-                    field.setOptions(newOptions)
-                }
-                saveChangedOptions(field)
-            } else if (field instanceof ChoiceField) {
-                field = (ChoiceField) field
-                if (options.every { it.getValue() instanceof I18nString }) {
-                    Set<I18nString> choices = new LinkedHashSet<>()
-                    options.forEach({ k, v -> choices.add(v) })
-                    field.setChoices(choices)
-                } else {
-                    Set<I18nString> newChoices = new LinkedHashSet<>();
-                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
-                    field.setChoices(newChoices)
-                }
-                saveChangedChoices(field)
-            }
+             if (field instanceof MapOptionsField) {
+                 field = (MapOptionsField) field
+                 if (options.every { it.getValue() instanceof I18nString }) {
+                     field.setOptions(options)
+                 } else {
+                     Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                     options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                     field.setOptions(newOptions)
+                 }
+                 saveChangedOptions(field)
+             } else if (field instanceof ChoiceField) {
+                 field = (ChoiceField) field
+                 if (options.every { it.getValue() instanceof I18nString }) {
+                     Set<I18nString> choices = new LinkedHashSet<>()
+                     options.forEach({ k, v -> choices.add(v) })
+                     field.setChoices(choices)
+                 } else {
+                     Set<I18nString> newChoices = new LinkedHashSet<>();
+                     options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                     field.setChoices(newChoices)
+                 }
+                 saveChangedChoices(field)
+             }
 
-        },
+         },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -609,7 +629,7 @@ class ActionDelegate {
         this.outcomes.addAll(taskService.cancelTasks(tasks, user))
     }
 
-    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome){
+    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
@@ -726,7 +746,7 @@ class ActionDelegate {
         return setData(task, dataSet)
     }
 
-    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome){
+    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome
     }
@@ -761,7 +781,7 @@ class ActionDelegate {
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
-    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome){
+    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome.getData()
     }
@@ -979,4 +999,70 @@ class ActionDelegate {
     List<String> importFilters() {
         return filterImportExportService.importFilters()
     }
+
+    File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
+                           int pageSize = exportConfiguration.getMongoPageSize()) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(predicate, exportFile, config, pageSize)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
+                             int pageSize = exportConfiguration.getMongoPageSize()) {
+        List<Case> exportCases = findCases(predicate, pageSize)
+        return exportService.fillCsvCaseData(outFile, exportCases, config)
+    }
+
+    File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
+                           Boolean isIntersection = false) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
+                             Boolean isIntersection = false) {
+        List<Case> exportCases = elasticCaseService.search(requests, user, pageSize, locale, isIntersection).toList()
+        return exportService.fillCsvCaseData(outFile, exportCases, config)
+    }
+
+    File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(predicate, exportFile, config, pageSize)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
+        List<Task> exportTasks = findTasks(predicate, pageSize)
+        return exportService.fillCsvTaskData(outFile, exportTasks, config)
+    }
+
+    File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
+                           Boolean isIntersection = false) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
+                             Boolean isIntersection = false) {
+        return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
+    }
+
 }
