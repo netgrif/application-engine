@@ -294,7 +294,7 @@ class ActionDelegate {
      *      otherText: f.otherTextId;
      *
      *      if (condition)
-     *          make text, visible on each
+     *          make [text, otherText] visible on each
      * </pre>
      * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on each transition that contains given fields.
      * @param list of fields which behaviour will be changed
