@@ -86,7 +86,7 @@ public class Authority implements GrantedAuthority {
         return name.hashCode();
     }
 
-    public boolean inDomain(AuthorityEnum domain) {
-        return this.name.startsWith(domain.name()) || this.name.equals(AuthorityEnum.ADMIN.name());
+    public boolean includes(AuthorityEnum authority) {
+        return authority.name().equals(this.name) || authority.name().startsWith(this.name) || this.name.equals(AuthorityEnum.ADMIN.name());
     }
 }

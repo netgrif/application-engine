@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.orgstructure.web;
 
+import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
@@ -31,7 +33,7 @@ public class GroupController {
     @Autowired
     private INextGroupService service;
 
-    @PreAuthorize("@groupAuthorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = AuthorityEnum.GROUP_VIEW_ALL)
     @ApiOperation(value = "Get all groups in the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

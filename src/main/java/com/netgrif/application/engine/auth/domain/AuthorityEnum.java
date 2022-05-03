@@ -20,6 +20,7 @@ public enum AuthorityEnum {
     GROUP_DELETE,
     GROUP_ADD_USER,
     GROUP_REMOVE_USER,
+    GROUP_VIEW_ALL,
     ROLE_CREATE,
     ROLE_DELETE,
     AUTHORITY_CREATE,

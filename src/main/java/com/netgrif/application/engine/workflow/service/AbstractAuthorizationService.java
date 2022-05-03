@@ -1,19 +1,13 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.AbstractBaseAuthorizationService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class AbstractAuthorizationService extends AbstractBaseAuthorizationService {
-
-    public AbstractAuthorizationService(IUserService userService) {
-        super(userService);
-    }
+public abstract class AbstractAuthorizationService {
 
     protected boolean hasPermission(Boolean hasPermission) {
         return hasPermission != null && hasPermission;

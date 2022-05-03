@@ -3,8 +3,6 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.domain.AnonymousUser;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserService;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -21,10 +19,6 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Autowired
     ITaskService taskService;
-
-    public TaskAuthorizationService(@Autowired IUserService userService) {
-        super(userService);
-    }
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {

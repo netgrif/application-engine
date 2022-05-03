@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.elastic.web;
 
+import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.CaseSearchService;
@@ -48,7 +50,7 @@ public class ElasticController {
     @Value("${spring.data.elasticsearch.reindex-size}")
     private int pageSize;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = AuthorityEnum.ADMIN)
     @ApiOperation(value = "Reindex specified cases",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -65,7 +67,7 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (long) ((count / pageSize) + 1);
+                long numOfPages = (count / pageSize) + 1;
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {

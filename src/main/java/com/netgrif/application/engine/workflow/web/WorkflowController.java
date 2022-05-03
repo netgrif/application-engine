@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -165,7 +167,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = AuthorityEnum.ADMIN)
     @ApiOperation(value = "Reload tasks of case",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -188,7 +190,7 @@ public class WorkflowController {
     }
 
     @Deprecated
-    @PreAuthorize("@workflowAuthorizationService.hasAuthority('ADMIN')")
+    @Authorize(authority = AuthorityEnum.ADMIN)
     @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
@@ -201,7 +203,7 @@ public class WorkflowController {
         }
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @Authorize(preAuthorize = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage>  deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
