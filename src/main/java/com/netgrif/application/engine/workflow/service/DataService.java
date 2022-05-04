@@ -776,6 +776,13 @@ public class DataService implements IDataService {
                 }
                 value = parseListStringValues(node);
                 break;
+            case "i18n":
+                if (node.get("value") == null) {
+                    value = new I18nString("");
+                    break;
+                }
+                value = parseI18nStringValues(node);
+                break;
             default:
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
@@ -851,6 +858,17 @@ public class DataService implements IDataService {
             });
         }
         return null;
+    }
+
+    private I18nString parseI18nStringValues(ObjectNode node) {
+        String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
+        Map<String, String> translations = new HashMap<>();
+        if (node.get("value").get("translations") != null) {
+            node.get("value").get("translations").fields().forEachRemaining(entry -> {
+                translations.put(entry.getKey(), entry.getValue().asText());
+            });
+        }
+        return new I18nString(defaultValue, translations);
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
