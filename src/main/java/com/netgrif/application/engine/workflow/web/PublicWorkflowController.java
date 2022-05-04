@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
@@ -34,7 +35,7 @@ public class PublicWorkflowController {
         this.workflowService = workflowService;
     }
 
-    @PreAuthorize("@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
