@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>simple_taskref</id>
     <initials>STR</initials>
     <title>simple taskref</title>
@@ -43,7 +43,7 @@
         </layout>
         <label>simple taskref</label>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup1</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_0</id>
@@ -107,7 +107,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup2</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_2</id>

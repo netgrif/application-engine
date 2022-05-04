@@ -8,14 +8,38 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
-## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-03-30)
+## [6.1.0](https://github.com/netgrif/application-engine/releases/tag/v6.1.0) (2022-04-29)
+
+### Fixed
+
+- [NAE-1585] Security update to resolve vulnerabilities
+- [NAE-1621] Required data group layout tag if layout type is “grid”
+
+### Changed
+
+- [NAE-1440] setData on button without value
+- [NAE-1569] Update Groovy 3.0.10
+- [NAE-1624] Upgrade Elasticsearch Connector
+
+### Removed
+
+- [NAE-1584] Remove petriflow schema
+
+## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-04-12)
 
 ### Fixed
 
 - [NAE-1600] Parallel auto-trigger tasks
 - [NAE-1614] Advanced search substring query
 - [NAE-1556] Post-set error prevents set
+- [NAE-1616] Cannot upload process with action id
+- [NAE-1596] Nets with transitions without titles cannot be read
+- [NAE-1598] DataGroups without ID cannot be saved into mongo
+- [NAE-1599] Task-reffed fields are not placed in correct position
 
+### Changed
+
+- [NAE-1620] Change workflowService findAllById method
 
 ## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-04-01)
 

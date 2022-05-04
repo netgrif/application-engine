@@ -15,7 +15,7 @@ case.
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
   <id>case_events</id>
   <title>Case Events example</title>
   <initials>CEE</initials>
@@ -53,7 +53,7 @@ User lists cannot be associated with the create event, since they don't exist be
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
   <id>case_events</id>
   <title>Case Events example</title>
   <initials>CEE</initials>
@@ -88,7 +88,7 @@ execution.
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
   <id>case_events</id>
   <title>Case Events example</title>
   <initials>CEE</initials>
@@ -126,7 +126,7 @@ User lists can be associated with the delete event
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
   <id>case_events</id>
   <title>Case Events example</title>
   <initials>CEE</initials>

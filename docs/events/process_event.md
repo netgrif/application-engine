@@ -15,7 +15,7 @@ If you want to change data on another cases, you need to use the `setData` funct
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/netgrif/petriflow/main/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>constructor_destructor</id>
     <title>Constructor and Destructor</title>
     <initials>CAD</initials>

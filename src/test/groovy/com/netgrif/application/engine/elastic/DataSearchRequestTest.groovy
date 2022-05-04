@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
@@ -29,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.context.WebApplicationContext
@@ -60,7 +60,7 @@ class DataSearchRequestTest {
     private ElasticCaseRepository repository
 
     @Autowired
-    private ElasticsearchTemplate template
+    private IElasticIndexService template
 
     @Autowired
     private IWorkflowService workflowService

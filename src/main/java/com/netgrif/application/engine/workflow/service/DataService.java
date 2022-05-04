@@ -56,7 +56,6 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -262,6 +261,7 @@ public class DataService implements IDataService {
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
+            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
             resultDataGroups.add(dataGroup);
             log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
 
@@ -306,6 +306,12 @@ public class DataService implements IDataService {
         }
 
         return groups;
+    }
+
+    private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
+        if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
+            dataGroup.setData(dataGroup.getData().stream().map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new)));
+        }
     }
 
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
@@ -769,6 +775,17 @@ public class DataService implements IDataService {
                     break;
                 }
                 value = parseListStringValues(node);
+                break;
+            case "button":
+                if (node.get("value") == null) {
+                    if (dataField.getValue() == null) {
+                        value = 1;
+                        break;
+                    }
+                    value = Integer.parseInt(dataField.getValue().toString()) + 1;
+                } else {
+                    value = node.get("value").asInt();
+                }
                 break;
             default:
                 if (node.get("value") == null || node.get("value").isNull()) {
