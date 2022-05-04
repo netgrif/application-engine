@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="petriNets/petriflow_schema.xsd">
+          xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>datagroup_test</id>
     <initials>DGT</initials>
     <title>Data group test</title>
@@ -127,7 +127,7 @@
         </layout>
         <label>Data ref test</label>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup1</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_0</id>
@@ -383,7 +383,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup2</id>
             <layout>grid</layout>
             <cols>3</cols>
             <dataRef>
@@ -434,7 +434,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup3</id>
             <layout>grid</layout>
             <cols>5</cols>
             <dataRef>
@@ -484,7 +484,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup4</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_12</id>
@@ -548,7 +548,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>DataGroup</id>
+            <id>DataGroup5</id>
             <layout>grid</layout>
             <dataRef>
                 <id>text_14</id>

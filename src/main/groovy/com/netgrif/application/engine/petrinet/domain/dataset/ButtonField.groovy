@@ -3,11 +3,11 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class ButtonField extends Field<String> {
+class ButtonField extends Field<Integer> {
 
     ButtonField() {
         super()
-        value = ""
+        value = 0
     }
 
     @Override
