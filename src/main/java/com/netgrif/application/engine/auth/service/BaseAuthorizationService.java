@@ -30,7 +30,7 @@ public class BaseAuthorizationService extends AbstractBaseAuthorizationService {
         super(userService);
     }
 
-    @Pointcut(value = "@annotation(authorize) && execution(* *(.., org.springframework.security.core.Authentication, ..))")
+    @Pointcut(value = "@annotation(authorize))")
     private void authorizingMethod(Authorize authorize) {}
 
     @Around(value = "authorizingMethod(authorize)", argNames = "joinPoint,authorize")
