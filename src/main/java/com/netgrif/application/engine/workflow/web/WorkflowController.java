@@ -203,7 +203,7 @@ public class WorkflowController {
         }
     }
 
-    @Authorize(preAuthorize = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage>  deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {

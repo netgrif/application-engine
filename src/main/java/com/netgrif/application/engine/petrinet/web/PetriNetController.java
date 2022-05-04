@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.petrinet.web;
 
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
@@ -71,7 +70,7 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @Authorize(authority = AuthorityEnum.PROCESS_UPLOAD)
+    @Authorize(expression = "@petriNetAuthorizationService.canCallImport(#auth.getPrincipal())")
     @ApiOperation(value = "Import new process",
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             authorizations = @Authorization("BasicAuth"))
