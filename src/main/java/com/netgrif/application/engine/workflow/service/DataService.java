@@ -776,6 +776,17 @@ public class DataService implements IDataService {
                 }
                 value = parseListStringValues(node);
                 break;
+            case "button":
+                if (node.get("value") == null) {
+                    if (dataField.getValue() == null) {
+                        value = 1;
+                        break;
+                    }
+                    value = Integer.parseInt(dataField.getValue().toString()) + 1;
+                } else {
+                    value = node.get("value").asInt();
+                }
+                break;
             case "i18n":
                 if (node.get("value") == null) {
                     value = new I18nString("");
