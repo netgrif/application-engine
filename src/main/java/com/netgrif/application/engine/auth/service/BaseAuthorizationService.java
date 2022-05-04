@@ -35,14 +35,14 @@ public class BaseAuthorizationService extends AbstractBaseAuthorizationService {
 
     @Around(value = "authorizingMethod(authorize)", argNames = "joinPoint,authorize")
     public Object authorize(ProceedingJoinPoint joinPoint, Authorize authorize) throws Throwable {
-        if (isAllowed(joinPoint, authorize.expression()) && hasAuthority(authorize.authority())) {
+        if (isAllowedByExpression(joinPoint, authorize.expression()) || hasAuthority(authorize.authority())) {
             return joinPoint.proceed();
         } else {
             return null;
         }
     }
 
-    private boolean isAllowed(ProceedingJoinPoint joinPoint, String expression) {
+    private boolean isAllowedByExpression(ProceedingJoinPoint joinPoint, String expression) {
         ExpressionParser parser = new SpelExpressionParser();
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(new BeanFactoryResolver(ApplicationContextProvider.getAppContext()));
