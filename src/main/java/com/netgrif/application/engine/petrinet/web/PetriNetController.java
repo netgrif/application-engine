@@ -179,7 +179,7 @@ public class PetriNetController {
         return resources;
     }
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @Authorize(expression = "@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
     @ApiOperation(value = "Delete process",
             notes = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             authorizations = @Authorization("BasicAuth"))
