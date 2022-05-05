@@ -119,6 +119,21 @@ public abstract class AbstractUserService implements IUserService {
         return user.getAuthorities().stream().anyMatch(a -> a.getName().equals(authority));
     }
 
+    @Override
+    public boolean isLoggedByEmail(String email) {
+        return this.getLoggedUser().getEmail().equals(email);
+    }
+
+    @Override
+    public boolean isLogged(String id) {
+        return this.getLoggedUser().getStringId().equals(id);
+    }
+
+    @Override
+    public boolean isLogged(IUser user) {
+        return isLogged(user.getStringId());
+    }
+
     public <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {
         return new PageImpl<>(changeType(users.getContent()), pageable, users.getTotalElements());
     }

@@ -77,4 +77,10 @@ public interface IUserService {
     boolean hasAuthority(IUser user, Authority authority);
 
     boolean hasAuthority(IUser user, String authority);
+
+    boolean isLoggedByEmail(String email);
+
+    boolean isLogged(String id);
+
+    boolean isLogged(IUser user);
 }
