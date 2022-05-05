@@ -2,7 +2,7 @@ package com.netgrif.application.engine.configuration;
 
 
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.auth.service.AfterRegistrationAuthService;
@@ -228,7 +228,7 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
     }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(AuthorityEnum.ANONYMOUS);
+        Authority authority = authorityService.getOrCreate(AuthorizingObject.ANONYMOUS);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                 authenticationManager(),

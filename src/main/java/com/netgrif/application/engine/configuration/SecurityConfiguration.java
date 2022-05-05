@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.UserProperties;
 import com.netgrif.application.engine.auth.service.AfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
@@ -176,7 +176,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(AuthorityEnum.ANONYMOUS);
+        Authority authority = authorityService.getOrCreate(AuthorizingObject.ANONYMOUS);
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                 authenticationManager(),

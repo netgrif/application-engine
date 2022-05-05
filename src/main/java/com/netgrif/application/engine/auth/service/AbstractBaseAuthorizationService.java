@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.service.interfaces.IBaseAuthorizationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 
@@ -13,7 +13,7 @@ public abstract class AbstractBaseAuthorizationService implements IBaseAuthoriza
     }
 
     @Override
-    public final boolean hasAuthority(AuthorityEnum authority) {
+    public final boolean hasAuthority(AuthorizingObject authority) {
         return this.userService.getLoggedUser().getAuthorities().stream().anyMatch(a -> a.includes(authority));
     }
 }

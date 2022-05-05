@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.auth.domain.Author
-import com.netgrif.application.engine.auth.domain.AuthorityEnum
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.Authorize
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
@@ -844,7 +844,7 @@ class ActionDelegate {
         mailService.sendMail(mailDraft)
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN, expression = "@userService.isLoggedByEmail(email)")
+    @Authorize(authority = AuthorizingObject.ADMIN, expression = "@userService.isLoggedByEmail(email)")
     def changeUserByEmail(String email) {
         [email  : { cl ->
             changeUserByEmail(email, "email", cl)
@@ -861,7 +861,7 @@ class ActionDelegate {
         ]
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN, expression = "@userService.isLogged(#id)")
+    @Authorize(authority = AuthorizingObject.ADMIN, expression = "@userService.isLogged(#id)")
     def changeUser(String id) {
         [email  : { cl ->
             changeUser(id, "email", cl)
@@ -878,7 +878,7 @@ class ActionDelegate {
         ]
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN, expression = "@userService.isLogged(#user)")
+    @Authorize(authority = AuthorizingObject.ADMIN, expression = "@userService.isLogged(#user)")
     def changeUser(IUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
@@ -895,19 +895,19 @@ class ActionDelegate {
         ]
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN, expression = "@userService.isLoggedByEmail(#email)")
+    @Authorize(authority = AuthorizingObject.ADMIN, expression = "@userService.isLoggedByEmail(#email)")
     def changeUserByEmail(String email, String attribute, def cl) {
         IUser user = userService.findByEmail(email, false)
         changeUser(user, attribute, cl)
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN, expression = "@userService.isLogged(#id)")
+    @Authorize(authority = AuthorizingObject.ADMIN, expression = "@userService.isLogged(#id)")
     def changeUser(String id, String attribute, def cl) {
         IUser user = userService.findById(id, false)
         changeUser(user, attribute, cl)
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN, expression = "@userService.isLogged(#user)")
+    @Authorize(authority = AuthorizingObject.ADMIN, expression = "@userService.isLogged(#user)")
     def changeUser(IUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")

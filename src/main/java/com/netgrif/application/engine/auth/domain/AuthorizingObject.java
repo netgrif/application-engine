@@ -1,6 +1,11 @@
 package com.netgrif.application.engine.auth.domain;
 
-public enum AuthorityEnum {
+/**
+ * The enum of all possible authorizing objects, that are used for creating authority objects. Authorizing object is a
+ * term that defines the goal of the authority, e.g. what kind of system process is protected via an authority created
+ * using given authorizing object.
+ * */
+public enum AuthorizingObject {
     ADMIN,
     ANONYMOUS,
     PROCESS,

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web;
 
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
@@ -10,7 +10,6 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +32,7 @@ public class GroupController {
     @Autowired
     private INextGroupService service;
 
-    @Authorize(authority = AuthorityEnum.GROUP_VIEW_ALL)
+    @Authorize(authority = AuthorizingObject.GROUP_VIEW_ALL)
     @ApiOperation(value = "Get all groups in the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

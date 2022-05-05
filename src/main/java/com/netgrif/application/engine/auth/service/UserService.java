@@ -138,7 +138,7 @@ public class UserService extends AbstractUserService {
     public void addAnonymousAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityRepository.findByName(AuthorityEnum.ANONYMOUS.name()));
+            authorities.add(authorityRepository.findByName(AuthorizingObject.ANONYMOUS.name()));
             user.setAuthorities(authorities);
         }
     }

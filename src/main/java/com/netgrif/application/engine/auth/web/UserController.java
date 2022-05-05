@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
@@ -35,7 +35,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -176,7 +175,7 @@ public class UserController {
         return resources;
     }
 
-    @Authorize(authority = AuthorityEnum.USER_EDIT)
+    @Authorize(authority = AuthorizingObject.USER_EDIT)
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -196,7 +195,7 @@ public class UserController {
         }
     }
 
-    @Authorize(authority = AuthorityEnum.ADMIN)
+    @Authorize(authority = AuthorizingObject.ADMIN)
     @ApiOperation(value = "Get all authorities of the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -209,7 +208,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @Authorize(authority = AuthorityEnum.USER_EDIT)
+    @Authorize(authority = AuthorizingObject.USER_EDIT)
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

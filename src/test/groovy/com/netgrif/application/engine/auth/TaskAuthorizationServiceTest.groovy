@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.AuthorityEnum
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -120,7 +120,7 @@ class TaskAuthorizationServiceTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorityEnum.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
         def processRoles = userProcessRoleRepository.findAllByNetId(this.net.getStringId())
 
         def user = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_WITH_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),

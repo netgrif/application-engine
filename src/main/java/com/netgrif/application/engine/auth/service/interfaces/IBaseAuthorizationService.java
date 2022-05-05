@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 
 public interface IBaseAuthorizationService {
 
-    boolean hasAuthority(AuthorityEnum authority);
+    boolean hasAuthority(AuthorizingObject authority);
 }

@@ -43,7 +43,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     private IUser createSuperUser() {
-        Authority adminAuthority = authorityService.getOrCreate(AuthorityEnum.ADMIN)
+        Authority adminAuthority = authorityService.getOrCreate(AuthorizingObject.ADMIN)
 
         IUser superUser = userService.findByEmail("super@netgrif.com", false)
         if (superUser == null) {

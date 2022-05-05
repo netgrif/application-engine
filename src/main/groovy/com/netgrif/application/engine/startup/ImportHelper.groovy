@@ -91,7 +91,7 @@ class ImportHelper {
 
 
     @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, List<Authority>> createAuthorities(Map<String, List<AuthorityEnum>> authorities) {
+    Map<String, List<Authority>> createAuthorities(Map<String, List<AuthorizingObject>> authorities) {
         HashMap<String, List<Authority>> authoritities = new HashMap<>()
         authorities.each { authority ->
             authoritities.put(authority.key, new ArrayList<Authority>())

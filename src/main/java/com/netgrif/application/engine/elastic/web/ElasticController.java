@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic.web;
 
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +49,7 @@ public class ElasticController {
     @Value("${spring.data.elasticsearch.reindex-size}")
     private int pageSize;
 
-    @Authorize(authority = AuthorityEnum.ADMIN)
+    @Authorize(authority = AuthorizingObject.ADMIN)
     @ApiOperation(value = "Reindex specified cases",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

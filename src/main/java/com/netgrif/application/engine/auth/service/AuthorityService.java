@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorityEnum;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,8 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public Authority getOrCreate(AuthorityEnum authorityEnum) {
-        return getOrCreate(authorityEnum.name());
+    public Authority getOrCreate(AuthorizingObject authorizingObject) {
+        return getOrCreate(authorizingObject.name());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    public List<Authority> getOrCreate(List<AuthorityEnum> authorities) {
+    public List<Authority> getOrCreate(List<AuthorizingObject> authorities) {
         if (authorities == null)
             return Collections.emptyList();
         return authorities.stream().map(this::getOrCreate).collect(Collectors.toList());

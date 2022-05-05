@@ -2,7 +2,7 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.AuthorityEnum
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
@@ -97,7 +97,7 @@ class RemoveActionTest {
 
         this.petriNet = net.getNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorityEnum.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
