@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth
 
 
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -96,17 +97,17 @@ class WorkflowAuthorizationServiceTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorityEnum.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
 
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                auths.get("user").toArray() as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
         userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
+                auths.get("admin").toArray() as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
@@ -125,7 +126,7 @@ class WorkflowAuthorizationServiceTest {
 
         auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[], [] as ProcessRole[])
+                auths.get("user").toArray() as Authority[], [] as ProcessRole[])
     }
 
 //    @Test

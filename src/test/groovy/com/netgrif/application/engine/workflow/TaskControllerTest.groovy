@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
@@ -92,7 +93,7 @@ class TaskControllerTest {
                 email: DUMMY_USER_MAIL,
                 password: "superAdminPassword",
                 state: UserState.ACTIVE,
-                authorities: [authorityService.getOrCreate(Authority.user)] as Set<Authority>,
+                authorities: authorityService.getOrCreate(Authority.defaultUserAuthorities).toSet() as Set<Authority>,
                 processRoles: [] as Set<ProcessRole>))
         importNet()
     }

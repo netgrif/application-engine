@@ -2,8 +2,10 @@ package com.netgrif.application.engine.petrinet.webprocessRolesAndPermissionses
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -11,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import org.junit.Before
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -61,6 +64,9 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private IUserService userService
+
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
@@ -79,21 +85,21 @@ class PetriNetControllerTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorityEnum.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
 
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                auths.get("user").toArray() as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        userAuth = new UsernamePasswordAuthenticationToken(userService.findByEmail(USER_EMAIL, false).transformToLoggedUser(), "password", auths.get("user"))
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
+                auths.get("admin").toArray() as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth = new UsernamePasswordAuthenticationToken(userService.findByEmail(ADMIN_EMAIL, false).transformToLoggedUser(), "password", auths.get("admin"))
     }
 
     private PetriNet net

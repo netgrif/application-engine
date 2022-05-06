@@ -2,6 +2,7 @@ package com.netgrif.application.engine.orgstructure.groups
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.UserService
@@ -45,12 +46,12 @@ class NextGroupServiceTest {
     @Test
     void groupTest() {
         testHelper.truncateDbs()
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorityEnum.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
         importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                auths.get("user").toArray() as Authority[],
                 [] as ProcessRole[])
         importHelper.createUser(new User(name: "Customer", surname: "User", email: CUSTOMER_USER_MAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
+                auths.get("user").toArray() as Authority[],
                 [] as ProcessRole[])
 
         Optional<PetriNet> groupNet = importGroup()

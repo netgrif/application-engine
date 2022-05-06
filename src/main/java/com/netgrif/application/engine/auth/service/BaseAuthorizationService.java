@@ -1,6 +1,9 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.Authorize;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.expression.EvaluationException;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.ExpressionUtils;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +58,7 @@ public class BaseAuthorizationService extends AbstractBaseAuthorizationService {
         if (isAllowedByExpression(joinPoint, authorize.expression()) || hasAuthority(authorize.authority())) {
             return joinPoint.proceed();
         } else {
-            return null;
+            throw new AccessDeniedException("Access Denied");
         }
     }
 
@@ -68,6 +72,10 @@ public class BaseAuthorizationService extends AbstractBaseAuthorizationService {
      * @return the evaluated value, whether the SpEL expression returns true or not
      * */
     private boolean isAllowedByExpression(ProceedingJoinPoint joinPoint, String expression) {
+        if (expression == null || expression.equals("")) {
+            return true;
+        }
+
         ExpressionParser parser = new SpelExpressionParser();
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setBeanResolver(new BeanFactoryResolver(ApplicationContextProvider.getAppContext()));

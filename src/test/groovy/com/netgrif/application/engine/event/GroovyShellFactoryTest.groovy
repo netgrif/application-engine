@@ -83,7 +83,7 @@ class GroovyShellFactoryTest {
 
         def auths = importHelper.createAuthorities(["systemAdmin": [AuthorizingObject.ADMIN]])
         importHelper.createUser(new User(name: "Admin", surname: "User", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
-                [auths.get("systemAdmin")] as Authority[],
+                auths.get("systemAdmin").toArray() as Authority[],
                 [] as ProcessRole[])
 
         def adminAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)

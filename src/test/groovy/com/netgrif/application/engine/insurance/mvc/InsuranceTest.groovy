@@ -3,6 +3,7 @@ package com.netgrif.application.engine.insurance.mvc
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
@@ -15,6 +16,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import org.assertj.core.util.Streams
 import org.hamcrest.CoreMatchers
 import org.junit.jupiter.api.BeforeEach
 
@@ -39,6 +41,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import java.nio.charset.StandardCharsets
+import java.util.stream.Stream
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -133,10 +136,11 @@ class InsuranceTest {
 
         netId = net.getNet().getStringId()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorityEnum.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
+        def authorityArray = Stream.concat(auths.get("user").stream(), auths.get("admin").stream()).toArray()
         def processRoles = importHelper.getProcessRolesByImportId(net.getNet(), ["agent": "1", "company": "2"])
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user"), auths.get("admin")] as Authority[],
+                authorityArray as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
         processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())

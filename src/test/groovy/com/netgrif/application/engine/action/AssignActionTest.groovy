@@ -34,6 +34,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 
 @ExtendWith(SpringExtension.class)
@@ -92,9 +95,10 @@ class AssignActionTest {
         createMainAndSecondaryNet()
 
         def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
+        def authorityList = Stream.concat(auths.get("user").stream(), auths.get("admin").stream()).collect(Collectors.toList()).toArray()
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
-                [auths.get("user"), auths.get("admin")] as Authority[],
+                authorityList as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
     }

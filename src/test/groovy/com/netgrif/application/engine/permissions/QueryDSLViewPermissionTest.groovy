@@ -64,7 +64,7 @@ class QueryDSLViewPermissionTest {
     private PetriNet net
     private PetriNet netWithUserRefs
     private IUser testUser
-    private Authority userAuthority
+    private List<Authority> userAuthority
 
     @BeforeEach
     void inti() {
@@ -77,10 +77,10 @@ class QueryDSLViewPermissionTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        userAuthority = authorityService.getOrCreate(Authority.user)
+        userAuthority = authorityService.getOrCreate(Authority.defaultUserAuthorities)
 
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [userAuthority] as Authority[], [] as ProcessRole[])
+                userAuthority.toArray() as Authority[], [] as ProcessRole[])
     }
 
     @Test
