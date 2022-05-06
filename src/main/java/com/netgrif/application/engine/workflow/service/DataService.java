@@ -875,9 +875,9 @@ public class DataService implements IDataService {
         String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
         Map<String, String> translations = new HashMap<>();
         if (node.get("value").get("translations") != null) {
-            node.get("value").get("translations").fields().forEachRemaining(entry -> {
-                translations.put(entry.getKey(), entry.getValue().asText());
-            });
+            node.get("value").get("translations").fields().forEachRemaining(entry ->
+                translations.put(entry.getKey(), entry.getValue().asText())
+            );
         }
         return new I18nString(defaultValue, translations);
     }
