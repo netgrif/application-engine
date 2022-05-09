@@ -1,7 +1,10 @@
 package com.netgrif.application.engine.workflow
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.DataGroup
+import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
@@ -19,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+
+import java.lang.reflect.Method
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -108,5 +113,32 @@ class DataServiceTest {
         assert datagroups.get(1).getParentTaskRefId() == "taskRef_result"
         assert datagroups.get(2).getParentTaskRefId() == "taskRef_1"
         assert datagroups.get(3).getParentTaskRefId() == "taskRef_0"
+    }
+
+    @Test
+    void testParseI18nStringValues() {
+        ObjectMapper mapper = new ObjectMapper()
+        ObjectNode i18nTranslations = mapper.createObjectNode()
+        i18nTranslations.put("sk", "SK: This is default value")
+        i18nTranslations.put("de", "DE: This is default value")
+
+        ObjectNode i18nValue = mapper.createObjectNode()
+        i18nValue.put("defaultValue", "This is default value")
+        i18nValue.set("translations", i18nTranslations)
+
+        ObjectNode node = mapper.createObjectNode()
+        node.put("type", "i18n")
+        node.set("value", i18nValue)
+
+        Method method = dataService.getClass().getDeclaredMethod("parseI18nStringValues", new Class[]{ObjectNode.class})
+        method.setAccessible(true)
+        I18nString parsedValue = method.invoke(dataService, new Object[]{node}) as I18nString
+
+        assert parsedValue.defaultValue == "This is default value"
+        assert parsedValue.translations.size() == 2
+        assert parsedValue.translations.containsKey("sk")
+        assert parsedValue.translations.containsKey("de")
+        assert parsedValue.translations["sk"] == "SK: This is default value"
+        assert parsedValue.translations["de"] == "DE: This is default value"
     }
 }
