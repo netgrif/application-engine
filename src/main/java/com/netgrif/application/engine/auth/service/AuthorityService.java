@@ -34,6 +34,7 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
+    @Transactional
     public Authority getOrCreate(AuthorizingObject authorizingObject) {
         return getOrCreate(authorizingObject.name());
     }
