@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth
 
-
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.IUser
@@ -19,26 +19,21 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAutho
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-
-//import com.netgrif.application.engine.orgstructure.domain.Group
-
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -75,6 +70,9 @@ class WorkflowAuthorizationServiceTest {
     private IWorkflowService workflowService
 
     @Autowired
+    TestHelper testHelper
+
+    @Autowired
     private IUserService userService
 
     private PetriNet net
@@ -82,40 +80,40 @@ class WorkflowAuthorizationServiceTest {
 
     private Authentication userAuth
     private Authentication adminAuth
-    private Map<String, Authority> auths
     private IUser testUser
 
-//    @BeforeEach
-    void before() {
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
-
-        this.net = net.getNet()
-
-        mvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build()
-
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
-
-        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                auths.get("user").toArray() as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
-
-        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
-
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-                auths.get("admin").toArray() as Authority[],
-//                [] as Group[],
-                [] as ProcessRole[])
-
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
-    }
+////    @BeforeEach
+//    void before() {
+//        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
+//        assert net.getNet() != null
+//
+//        this.net = net.getNet()
+//
+//        mvc = MockMvcBuilders
+//                .webAppContextSetup(wac)
+//                .apply(springSecurity())
+//                .build()
+//
+//        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+//
+//        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("user")] as Authority[],
+////                [] as Group[],
+//                [] as ProcessRole[])
+//
+//        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+//
+//        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
+//                [auths.get("admin")] as Authority[],
+////                [] as Group[],
+//                [] as ProcessRole[])
+//
+//        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+//    }
 
     @BeforeEach
     void init() {
+        testHelper.truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
@@ -124,13 +122,13 @@ class WorkflowAuthorizationServiceTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[], [] as ProcessRole[])
     }
 
-//    @Test
-//    @Disabled
+    @Test
+    @Disabled
     void testDeleteCase() {
         def body = JsonOutput.toJson([
                 title: "test case",

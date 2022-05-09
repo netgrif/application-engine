@@ -455,6 +455,9 @@ class ActionDelegate {
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
             }
+            if (field instanceof NumberField) {
+                value = value as Double
+            }
             field.value = value
             saveChangedValue(field)
         }

@@ -1,0 +1,3270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>set_data_test</id>
+	<initials>SDT</initials>
+	<title>Set data test net</title>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+    <defaultRole>true</defaultRole>
+	<role>
+		<id>process_role</id>
+		<title>Process role</title>
+	</role>
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="number" immediate="true">
+		<id>number</id>
+		<title>Number</title>
+		<init>10000</init>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.number,
+					result: f.number_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of number field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.number,
+					result: f.number_field_post_set_result;
+
+					change result value {"Value changed from pre set event, value of number field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text" immediate="true">
+		<id>text</id>
+		<title>Text</title>
+		<init>Lorem ipsum</init>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.text,
+					result: f.text_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of text field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.text,
+					result: f.text_field_post_set_result;
+
+					change result value {"Value changed from pre set event, value of text field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text" immediate="true">
+		<id>text_area</id>
+		<title>Text area</title>
+		<init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
+            vulputate ut eu sapien. Phasellus vel.
+        </init>
+		<component>
+			<name>textarea</name>
+			<property key="color">red</property>
+			<property key="fontSize">12</property>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.text_area,
+					result: f.text_area_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of text area field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.text_area,
+					result: f.text_area_field_post_set_result;
+
+					change result value {"Value changed from pre set event, value of text area field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="enumeration" immediate="true">
+		<id>enumeration</id>
+		<title>Enumeration</title>
+		<values>Alice</values>
+		<values>Bob</values>
+		<values>Carol</values>
+		<init>Bob</init>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.enumeration,
+					result: f.enumeration_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of enumeration field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.enumeration,
+					result: f.enumeration_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of enumeration field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>enumeration_map</id>
+		<title>Enumeration Map</title>
+		<options>
+			<option key="al">Alice</option>
+			<option key="bo">Bob</option>
+			<option key="ca">Carol</option>
+		</options>
+		<inits>
+			<init>al</init>
+			<init>ca</init>
+		</inits>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.enumeration_map,
+					result: f.enumeration_map_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of enumeration map field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.enumeration_map,
+					result: f.enumeration_map_field_post_set_result;
+
+					change result value {"Value changed from pre post event, value of enumeration map field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice" immediate="true">
+		<id>multichoice</id>
+		<title>Multichoice</title>
+		<values>Alice</values>
+		<values>Bob</values>
+		<values>Carol</values>
+		<inits>
+			<init>Bob</init>
+		</inits>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.multichoice,
+					result: f.multichoice_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of multichoice field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.multichoice,
+					result: f.multichoice_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of multichoice field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>multichoice_map</id>
+		<title>Multichoice Map</title>
+		<options>
+			<option key="al">Alice</option>
+			<option key="bo">Bob</option>
+			<option key="ca">Carol</option>
+		</options>
+		<inits>
+			<init>al</init>
+			<init>bo</init>
+		</inits>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.multichoice_map,
+					result: f.multichoice_map_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of multichoice map field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.multichoice_map,
+					result: f.multichoice_map_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of multichoice map field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>boolean</id>
+		<title>Boolean</title>
+		<placeholder>True</placeholder>
+		<init>false</init>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.boolean,
+					result: f.boolean_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of boolean field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.boolean,
+					result: f.boolean_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of boolean field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="date" immediate="true">
+		<id>date</id>
+		<title>Date</title>
+		<init>2018-12-31T23:00:00.000Z</init>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.date,
+					result: f.date_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of date field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.date,
+					result: f.date_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of date field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="taskRef">
+		<id>taskRef</id>
+		<title>Task Ref</title>
+	</data>
+	<data type="file" immediate="true">
+		<id>file</id>
+		<title>File</title>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.file,
+					result: f.file_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of file field: " + thisField.value?.name as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.file,
+					result: f.file_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of file field: " + thisField.value?.name as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="fileList" immediate="true">
+		<id>fileList</id>
+		<title>File List</title>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.fileList,
+					result: f.filelist_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of file list field: " + (thisField.value?.namesPaths as Set).stream().map({ value -> value.name }).collect(java.util.stream.Collectors.toList()) as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+				thisField: f.fileList,
+				result: f.filelist_field_post_set_result;
+
+				change result value { "Value changed from post set event, value of file list field: " + (thisField.value?.namesPaths as Set).stream().map({ value -> value.name }).collect(java.util.stream.Collectors.toList()) as String }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="user" immediate="true">
+		<id>user</id>
+		<title>User</title>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.user,
+					result: f.user_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of user field: " + thisField.value?.name + " " + thisField.value?.surname}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.user,
+					result: f.user_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of user field: " + thisField.value?.name + " " + thisField.value?.surname}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="dateTime" immediate="true">
+		<id>datetime</id>
+		<title>Datetime</title>
+		<init>2019-01-01T19:00:00.000Z</init>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.datetime,
+					result: f.datetime_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of datetime field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.datetime,
+					result: f.datetime_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of datetime field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button" immediate="true">
+		<id>button</id>
+		<title>Button</title>
+		<placeholder>Push</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					thisField: f.button,
+					result: f.button_field_pre_set_result;
+
+					change result value {"Value changed from pre set event, value of button field: " + thisField.value as String}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					thisField: f.button,
+					result: f.button_field_post_set_result;
+
+					change result value {"Value changed from post set event, value of button field: " + thisField.value as String}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>number_field_pre_set_result</id>
+		<title>Number field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>number_field_post_set_result</id>
+		<title>Number field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>number_field_visibility</id>
+		<title>Change number field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.number;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"  })) {
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" }) ||
+						(useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "hidden" })) 
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>number_field_hide</id>
+		<title>Hide number field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.number;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>number_field_required</id>
+		<title>Change number field requirability </title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.number;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>text_field_pre_set_result</id>
+		<title>Text field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>text_field_post_set_result</id>
+		<title>Text field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>text_field_visibility</id>
+		<title>Change text field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.text;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})){
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>text_field_hide</id>
+		<title>Hide text field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.text;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>text_field_required</id>
+		<title>Change text field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.text;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>text_area_field_visibility</id>
+		<title>Change text area field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.text_area;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>text_area_field_hide</id>
+		<title>Hide text area field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.text_area;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>text_area_field_required</id>
+		<title>Change text area field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.text_area;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>text_area_field_pre_set_result</id>
+		<title>Text area field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>text_area_field_post_set_result</id>
+		<title>Text area field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="text">
+		<id>enumeration_field_pre_set_result</id>
+		<title>Enumeration field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>enumeration_field_post_set_result</id>
+		<title>Enumeration field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>enumeration_field_visibility</id>
+		<title>Change enumeration field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.enumeration;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>enumeration_field_hide</id>
+		<title>Hide enumeration field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.enumeration;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>enumeration_field_required</id>
+		<title>Change enumeration field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.enumeration;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>clear_event_values</id>
+		<title>Clear event result values</title>
+		<placeholder>Clear event result values</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					def fieldMap = [
+						"result1":"number_field_pre_set_result",
+						"result2":"number_field_post_set_result",
+						"result3":"text_field_pre_set_result",
+						"result4":"text_field_post_set_result",
+						"result5":"text_area_field_pre_set_result",
+						"result6":"text_area_field_post_set_result",
+						"result7":"enumeration_field_pre_set_result",
+						"result8":"enumeration_field_post_set_result",
+						"result9":"enumeration_map_field_pre_set_result",
+						"result10":"enumeration_map_field_post_set_result",
+						"result11":"multichoice_field_pre_set_result",
+						"result12":"multichoice_field_post_set_result",
+						"result13":"multichoice_map_field_pre_set_result",
+						"result14":"multichoice_map_field_post_set_result",
+						"result15":"boolean_field_pre_set_result",
+						"result16":"boolean_field_post_set_result",
+						"result17":"date_field_pre_set_result",
+						"result18":"date_field_post_set_result",
+						"result19":"datetime_field_pre_set_result",
+						"result20":"datetime_field_post_set_result",
+						"result21":"file_field_pre_set_result",
+						"result22":"file_field_post_set_result",
+						"result23":"filelist_field_pre_set_result",
+						"result24":"filelist_field_post_set_result",
+						"result25":"user_field_pre_set_result",
+						"result26":"user_field_post_set_result",
+						"result27":"button_field_pre_set_result",
+						"result28":"button_field_post_set_result"
+					]
+
+					for(i in 1..&lt; 29) {
+						if(i % 2 == 1){
+							change useCase.getField(fieldMap["result" + (i as String)]) value { "No value from pre set event" }
+						} else {
+							change useCase.getField(fieldMap["result" + (i as String)]) value { "No value from post set event" }
+						}
+					}
+
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>enumeration_map_field_pre_set_result</id>
+		<title>Enumeration map field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>enumeration_map_field_post_set_result</id>
+		<title>Enumeration map field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>enumeration_map_field_visibility</id>
+		<title>Change enumeration map field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.enumeration_map;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>enumeration_map_field_hide</id>
+		<title>Hide enumeration map field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.enumeration_map;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>enumeration_map_field_required</id>
+		<title>Change enumeration map field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.enumeration_map;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>enumeration_map_field_options</id>
+		<title>Change enumeration field options</title>
+		<placeholder>Change options</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					thisField: f.enumeration_map;
+
+					if ( thisField.options.size() > 3){
+						change thisField options { [
+								"al":new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
+								"bo":new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
+								"ca":new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+						]}
+					} else {
+						change thisField options { [
+								"jo":new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
+								"ju":new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
+								"sa":new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
+								"on":new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
+								"mi":new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+						] }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>enumeration_field_choices</id>
+		<title>Change enumeration field choices</title>
+		<placeholder>Change choices </placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					thisField: f.enumeration;
+
+					if ( thisField.choices.size() > 3){
+						change thisField choices { [
+						        new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
+						        new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
+						        new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+						] }
+					} else {
+						change thisField choices { [
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+						] }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>multichoice_field_pre_set_result</id>
+		<title>Multichoice field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>multichoice_field_post_set_result</id>
+		<title>Multichoice field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>multichoice_field_visibility</id>
+		<title>Change multichoice field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.multichoice;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>multichoice_field_hide</id>
+		<title>Hide multichoice field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.multichoice;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>multichoice_field_required</id>
+		<title>Change multichoice field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.multichoice;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>multichoice_field_choices</id>
+		<title>Change multichoice field choices</title>
+		<placeholder>Change choices</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					thisField: f.multichoice;
+
+					if ( thisField.choices.size() > 3){
+						change thisField choices { [
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+						] }
+					} else {
+						change thisField choices { [
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
+								new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+						] }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>multichoice_map_field_pre_set_result</id>
+		<title>Multichoice map field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>multichoice_map_field_post_set_result</id>
+		<title>Multichoice map field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>multichoice_map_field_visibility</id>
+		<title>Change multichoice map field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.multichoice_map;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>multichoice_map_field_hide</id>
+		<title>Hide multichoice map field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.multichoice_map;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>multichoice_map_field_required</id>
+		<title>Change multichoice map field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.multichoice_map;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>multichoice_map_field_options</id>
+		<title>Change multichoice map field options</title>
+		<placeholder>Change options</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					thisField: f.multichoice_map;
+
+					if ( thisField.options.size() > 3){
+						change thisField options { [
+								"al":new com.netgrif.application.engine.petrinet.domain.I18nString("Alice"),
+								"bo":new com.netgrif.application.engine.petrinet.domain.I18nString("Bob"),
+								"ca":new com.netgrif.application.engine.petrinet.domain.I18nString("Carol")
+						]}
+					} else {
+						change thisField options { [
+								"jo":new com.netgrif.application.engine.petrinet.domain.I18nString("Jozef"),
+								"ju":new com.netgrif.application.engine.petrinet.domain.I18nString("Juraj"),
+								"sa":new com.netgrif.application.engine.petrinet.domain.I18nString("Samuel"),
+								"on":new com.netgrif.application.engine.petrinet.domain.I18nString("Ondrej"),
+								"mi":new com.netgrif.application.engine.petrinet.domain.I18nString("Milan")
+						] }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>date_field_pre_set_result</id>
+		<title>Date field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>date_field_post_set_result</id>
+		<title>Date field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>date_field_visibility</id>
+		<title>Change date field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.date;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>date_field_hide</id>
+		<title>Hide date field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.date;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>date_field_required</id>
+		<title>Change date field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.date;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>datetime_field_pre_set_result</id>
+		<title>Datetime field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>datetime_field_post_set_result</id>
+		<title>Datetime field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>datetime_field_visibility</id>
+		<title>Change datetime field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.datetime;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>datetime_field_hide</id>
+		<title>Hide datetime field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.datetime;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>datetime_field_required</id>
+		<title>Change datetime field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.datetime;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>boolean_field_pre_set_result</id>
+		<title>Boolean field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>boolean_field_post_set_result</id>
+		<title>Boolean field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>boolean_field_visibility</id>
+		<title>Change boolean field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.boolean;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>boolean_field_hide</id>
+		<title>Hide boolean field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.boolean;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>boolean_field_required</id>
+		<title>Change boolean field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.boolean;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>file_field_visibility</id>
+		<title>Change file field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.file;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>file_field_hide</id>
+		<title>Hide file field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.file;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>file_field_required</id>
+		<title>Change file field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.file;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>file_field_pre_set_result</id>
+		<title>File field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>file_field_post_set_result</id>
+		<title>File field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="text">
+		<id>filelist_field_pre_set_result</id>
+		<title>Filelist field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>filelist_field_post_set_result</id>
+		<title>Filelist field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>filelist_field_visibility</id>
+		<title>Change filelist field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.fileList;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>filelist_field_hide</id>
+		<title>Hide filelist field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.fileList;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>filelist_field_required</id>
+		<title>Change filelist field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.fileList;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>user_field_pre_set_result</id>
+		<title>User field pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>user_field_post_set_result</id>
+		<title>User field post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<data type="button">
+		<id>user_field_visibility</id>
+		<title>Change user field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.user;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>user_field_hide</id>
+		<title>Hide user field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.user;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>user_field_required</id>
+		<title>Change user field requirability</title>
+		<placeholder>Required/optional</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.user;
+
+					if ((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden" || fieldBehavior.toString() == "optional" })) {
+						make mainField, required on trans when {true}
+					} else {
+						make mainField, optional on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>button_field_visibility</id>
+		<title>Change button field editability</title>
+		<placeholder>Editable/visible</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.button;
+
+					if((useCase.dataSet[mainField.stringId].behavior["1"] as Set).any({ fieldBehavior -> fieldBehavior.toString() == "visible" || fieldBehavior.toString() == "hidden"})) {
+						make mainField, editable on trans when {true}
+					} else {
+						make mainField, visible on trans when {true}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>button_field_hide</id>
+		<title>Hide button field</title>
+		<placeholder>Hidden</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<event type="set">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					trans: t.1,
+					mainField: f.button;
+
+					make mainField, hidden on trans when {true}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>button_field_pre_set_result</id>
+		<title>User button pre set event result</title>
+		<init>No value from pre set event</init>
+	</data>
+	<data type="text">
+		<id>button_field_post_set_result</id>
+		<title>User button post set event result</title>
+		<init>No value from post set event</init>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>1</id>
+		<x>282</x>
+		<y>63</y>
+		<layout>
+			<cols>6</cols>
+			<offset>0</offset>
+		</layout>
+		<label>Task - editable</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>number</id>
+			<layout>grid</layout>
+			<title>Number</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>text</id>
+			<title>Text</title>
+			<layout>grid</layout>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>text_area</id>
+			<title>Text area</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_area</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_area_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>enum</id>
+			<title>Enumeration</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>10</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>10</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>10</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>11</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>11</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>11</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_field_choices</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>12</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>enum_map</id>
+			<title>Enumeration map</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>enumeration_map</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>14</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>14</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>14</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>15</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>15</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>15</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_field_options</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>16</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>multichoice</id>
+			<title>Multichoice</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>18</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>18</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>18</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>19</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>19</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>19</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_field_choices</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>20</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>multichoice_map</id>
+			<title>Multichoice map</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>multichoice_map</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>22</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>22</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>22</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>23</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>23</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>23</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map_field_options</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>24</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>boolean</id>
+			<title>Boolean</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>26</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>26</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>26</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>27</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>27</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>27</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>date</id>
+			<title>Date</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>29</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>29</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>29</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>30</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>30</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>30</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>datetime</id>
+			<title>Datetime</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>datetime</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>32</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>32</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>32</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>33</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>33</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>datetime_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>33</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>file</id>
+			<title>File</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>35</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>35</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>35</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>36</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>36</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>36</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>file_list</id>
+			<title>File list</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>fileList</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>38</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filelist_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>38</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filelist_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>38</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filelist_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>39</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filelist_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>39</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filelist_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>39</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>user</id>
+			<title>User</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>41</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>41</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>41</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>42</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>42</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user_field_required</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>42</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>button</id>
+			<title>Button</title>
+			<layout>grid</layout>
+			<dataRef>
+				<id>button</id>
+				<logic>
+					<behavior>editable</behavior>
+<!--					<action trigger="set">-->
+<!--                        generatePDF("1","file")-->
+<!--                    -->
+<!--					</action>-->
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>44</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_field_pre_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>44</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_field_post_set_result</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>44</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_field_visibility</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>45</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_field_hide</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>45</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>clear</id>
+			<layout>grid</layout>
+			<title>Clear values</title>
+			<dataRef>
+				<id>clear_event_values</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>46</y>
+					<rows>1</rows>
+					<cols>6</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>2</id>
+		<x>283</x>
+		<y>146</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Task - visible</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>number</id>
+			<title>Number fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>text</id>
+			<title>Text fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text_area</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>enumeration</id>
+			<title>Enumeration fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>multichoice</id>
+			<title>Multichoice fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>multichoice_map</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>boolean</id>
+			<title>Boolean fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>date</id>
+			<title>Date fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>datetime</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>file</id>
+			<title>File fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>fileList</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>user</id>
+			<title>User fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>button</id>
+			<title>Button fields</title>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>button</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>3</id>
+		<x>281</x>
+		<y>229</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Datagroups</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>stretch</id>
+			<title>Stretch</title>
+			<alignment>start</alignment>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>right</id>
+			<title>Alignment - Right</title>
+			<alignment>end</alignment>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>left</id>
+			<title>Alignment - Left</title>
+			<alignment>start</alignment>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>center</id>
+			<title>Alignment - Center</title>
+			<alignment>center</alignment>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>4</id>
+		<x>281</x>
+		<y>307</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Task ref test transition</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>taskref</id>
+			<title>Task ref test group</title>
+			<dataRef>
+				<id>taskref_test_field</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
