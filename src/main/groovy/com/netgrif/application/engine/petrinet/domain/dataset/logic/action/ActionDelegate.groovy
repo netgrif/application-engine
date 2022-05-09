@@ -247,7 +247,7 @@ class ActionDelegate {
      * </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contains the field <i>text</i>.
      * @param field which behaviour will be changed
-     * @param behavior one of visible, editable, required, optional, hidden, forbidden
+     * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
     def make(Field field, Closure behavior) {
         [on: { Object optionalTransition ->
@@ -298,7 +298,7 @@ class ActionDelegate {
      * </pre>
      * This code will change the behavior of fields <i>text</i> and <i>otherText</i> to <i>visible</i> on each transition that contains given fields.
      * @param list of fields which behaviour will be changed
-     * @param behavior one of visible, editable, required, optional, hidden, forbidden
+     * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
     def make(List<Field> fields, Closure behavior) {
         [on: { Object optionalTransition ->
@@ -331,7 +331,7 @@ class ActionDelegate {
 
     def saveFieldBehavior(Field field, Transition trans) {
         Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
-        if (fieldBehavior.get(trans.getStringId()).find { it.toString() == FieldBehavior.INITIAL.toString()})
+        if (fieldBehavior.get(trans.getStringId()).find { it == FieldBehavior.INITIAL})
             fieldBehavior.put(trans.stringId, useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior)
 
         ChangedField changedField = new ChangedField(field.stringId)
