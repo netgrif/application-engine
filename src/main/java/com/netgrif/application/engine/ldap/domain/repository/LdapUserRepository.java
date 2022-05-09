@@ -12,7 +12,6 @@ import java.util.List;
 
 
 @Repository
-
 public interface LdapUserRepository extends MongoRepository<LdapUser, String>, QuerydslPredicateExecutor<LdapUser> {
 
     LdapUser findByDn(String dn);

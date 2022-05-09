@@ -10,7 +10,6 @@ import java.util.List;
 
 
 @Repository
-
 public interface LdapUserRefRepository extends LdapRepository<LdapUserRef>, QuerydslPredicateExecutor<LdapUserRef> {
 
     LdapUserRef findByDn(String dn);

@@ -3,11 +3,14 @@ package com.netgrif.application.engine.ldap.domain;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
+import java.util.Set;
 
 
 @Data
@@ -22,6 +25,8 @@ public class LdapUser extends User {
 
     private String homeDirectory;
 
+    private Set<String> memberOf;
+
     public LdapUser() {
     }
 
@@ -32,7 +37,7 @@ public class LdapUser extends User {
     }
 
     public LdapUser(String dn, String commonName, String uid, String homeDirectory,
-                    String email, String name, String surname, String telNumber) {
+                    String email, String name, String surname, Set<String> memberOf, String telNumber) {
         this.setEmail(email);
         this.setName(name);
         this.setSurname(surname);
@@ -40,6 +45,7 @@ public class LdapUser extends User {
         this.setCommonName(commonName);
         this.setUid(uid);
         this.setHomeDirectory(homeDirectory);
+        this.setMemberOf(memberOf);
         this.setTelNumber(telNumber);
 
     }
@@ -52,7 +58,7 @@ public class LdapUser extends User {
 
     @Override
     public LoggedUser transformToLoggedUser() {
-        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getUid(), getHomeDirectory(), this.getAuthorities());
+        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getStringId(), this.getEmail(), this.getPassword(), getDn(), getCommonName(), getMemberOf(),  getUid(), getHomeDirectory(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());

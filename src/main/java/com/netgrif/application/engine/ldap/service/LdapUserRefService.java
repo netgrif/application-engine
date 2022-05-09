@@ -10,27 +10,37 @@ import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import com.netgrif.application.engine.ldap.domain.repository.LdapUserRefRepository;
+import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.config.GroupConfigurationProperties;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.ldap.query.ContainerCriteria;
+import org.springframework.ldap.query.LdapQuery;
+import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 
 @Service
 @Slf4j
 @ConditionalOnExpression("${nae.ldap.enabled}")
 public class LdapUserRefService implements ILdapUserRefService {
-
-    @Value("${spring.ldap.groups:null}")
-    private String[] ldapSecurityGroups;
 
     @Autowired
     private LdapUserRefRepository repository;
@@ -53,9 +63,12 @@ public class LdapUserRefService implements ILdapUserRefService {
     @Autowired
     private LdapConfiguration ldapUserConfiguration;
 
+    @Autowired
+    protected ILdapGroupRefService ldapGroupRefService;
+
     @Override
     public IUser createUser(LdapUserRef ldapUserRef) {
-        LdapUser ldapUser = new LdapUser(ldapUserRef.getDn().toString(), ldapUserRef.getCn(), ldapUserRef.getUid(), ldapUserRef.getHomeDirectory(), ldapUserRef.getMail(), ldapUserRef.getFirstName(), ldapUserRef.getSurname(), ldapUserRef.getTelNumber());
+        LdapUser ldapUser = new LdapUser(ldapUserRef.getDn().toString(), ldapUserRef.getCn(), ldapUserRef.getUid(), ldapUserRef.getHomeDirectory(), ldapUserRef.getMail(), ldapUserRef.getFirstName(), ldapUserRef.getSurname(), ldapUserRef.getMemberOf(), ldapUserRef.getTelNumber());
         ldapUser.setToken(null);
         ldapUser.setExpirationDate(null);
         ldapUser.setState(UserState.ACTIVE);
@@ -80,7 +93,7 @@ public class LdapUserRefService implements ILdapUserRefService {
     public LdapUserRef findById(Name id) {
         DirContextOperations context
                 = ldapUserConfiguration.ldapTemplate().lookupContext(id);
-        context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
+//        context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
         LdapUserRef user = new LdapUserRef();
         user.setDn(context.getDn());
         user.setCn(verificationData(context, ldapProperties.getMapCn()));
@@ -91,6 +104,18 @@ public class LdapUserRefService implements ILdapUserRefService {
         user.setFullName(verificationData(context, ldapProperties.getMapDisplayName()));
         user.setTelNumber(verificationData(context, ldapProperties.getMapTelNumber()));
         user.setHomeDirectory(verificationData(context, ldapProperties.getMapHomeDirectory()));
+
+        LdapQuery findAllGroupsGetMemberQuery =
+                Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where("objectclass").is(it)).reduce(ContainerCriteria::and)
+                        .orElse(query().where("objectclass").is(ldapProperties.getGroupClass()[0]))
+                        .and((query().where(ldapProperties.getMapGroupMember()).is(
+                                ((DirContextAdapter) context).getDn().toString() + "," +
+                                        ldapUserConfiguration.contextSource().getBaseLdapPathAsString()
+                        )));
+
+        List<DirContextAdapter> ldapGroups = ldapUserConfiguration.ldapTemplate().search(findAllGroupsGetMemberQuery, (ContextMapper) ctx -> ((DirContextAdapter) ctx));
+
+        user.setMemberOf(ldapGroups.stream().map(DirContextAdapter::getDn).map(Objects::toString).collect(Collectors.toSet()));
 
         return user;
     }
@@ -113,16 +138,21 @@ public class LdapUserRefService implements ILdapUserRefService {
         DirContextOperations context = ldapUserConfiguration.ldapTemplate().lookupContext(id);
         context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
         LdapUserRef user = new LdapUserRef();
-        user.setCn(verificationData(context, ldapProperties.getMapCn()));
         user.setUid(verificationData(context, ldapProperties.getMapUid()));
         user.setMail(verificationData(context, ldapProperties.getMapMail()));
         user.setFirstName(verificationData(context, ldapProperties.getMapFirstName()));
         user.setSurname(verificationData(context, ldapProperties.getMapSurname()));
         user.setTelNumber(verificationData(context, ldapProperties.getMapTelNumber()));
+        user.setCn(verificationData(context, ldapProperties.getMapCn()));
         user.setFullName(verificationData(context, ldapProperties.getMapDisplayName()));
+        LdapQuery findAllGroupsGetMemberQuery =
+                Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where("objectclass").is(it)).reduce(ContainerCriteria::and)
+                        .orElse(query().where("objectclass").is(ldapProperties.getGroupClass()[0]))
+                        .and((query().where(ldapProperties.getMapGroupMember()).is(((DirContextAdapter) context).getDn().toString() + "," + ldapUserConfiguration.contextSource().getBaseLdapPathAsString())));
+        List<DirContextAdapter> ldapGroups = ldapUserConfiguration.ldapTemplate().search(findAllGroupsGetMemberQuery, (ContextMapper) ctx -> ((DirContextAdapter) ctx));
+        user.setMemberOf(ldapGroups.stream().map(DirContextAdapter::getDn).map(Objects::toString).collect(Collectors.toSet()));
         user.setHomeDirectory(verificationData(context, ldapProperties.getMapHomeDirectory()));
         LdapUser ldapUser = (LdapUser) savedUser;
-
 
         ldapUser.setCommonName(user.getCn());
         ldapUser.setUid(user.getUid());
@@ -130,8 +160,9 @@ public class LdapUserRefService implements ILdapUserRefService {
         ldapUser.setEmail(user.getMail());
         ldapUser.setTelNumber(user.getTelNumber());
         ldapUser.setName(user.getFirstName());
+        ldapUser.setMemberOf(user.getMemberOf());
         ldapUser.setSurname(user.getSurname());
-        return ldapUserService.save(savedUser);
+        return ldapUserService.save(ldapUser);
     }
 
 
