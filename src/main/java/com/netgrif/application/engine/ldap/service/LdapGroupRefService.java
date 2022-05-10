@@ -47,7 +47,19 @@ public class LdapGroupRefService implements ILdapGroupRefService {
     @Override
     public List<LdapGroupRef> findAllGroups() {
         LdapQuery findAllGroupsQuery = Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where("objectclass").is(it)).reduce(ContainerCriteria::and).orElse(query().where("objectclass").is(ldapProperties.getGroupClass()[0]));
-        List<DirContextAdapter> ldapGroups = ldapConfiguration.ldapTemplate().search(findAllGroupsQuery, (ContextMapper) ctx -> ((DirContextAdapter) ctx));
+        return searchGroups(findAllGroupsQuery);
+    }
+
+    @Override
+    public List<LdapGroupRef> searchGroups(String fulltext) {
+        LdapQuery searchQuerry = Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where("objectclass").is(it)).reduce(ContainerCriteria::and).orElse(query().where("objectclass").is(ldapProperties.getGroupClass()[0]))
+                .and(query().where(ldapProperties.getMapGroupCn()).whitespaceWildcardsLike(fulltext).or(query().where(ldapProperties.getMapGroupDescription()).whitespaceWildcardsLike(fulltext)));
+        return searchGroups(searchQuerry);
+    }
+
+    @Override
+    public List<LdapGroupRef> searchGroups(LdapQuery ldapQuery) {
+        List<DirContextAdapter> ldapGroups = ldapConfiguration.ldapTemplate().search(ldapQuery, (ContextMapper) ctx -> ((DirContextAdapter) ctx));
         return ldapGroups.stream()
                 .map(ldapGroup -> new LdapGroupRef(
                         ldapGroup.getDn(),

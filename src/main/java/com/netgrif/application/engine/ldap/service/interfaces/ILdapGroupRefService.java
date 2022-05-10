@@ -5,6 +5,7 @@ import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.ldap.query.LdapQuery;
 
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,10 @@ import java.util.Set;
 public interface ILdapGroupRefService {
 
     public List<LdapGroupRef> findAllGroups();
+
+    public List<LdapGroupRef> searchGroups(String searchText);
+
+    List<LdapGroupRef> searchGroups(LdapQuery ldapQuery);
 
     public List<LdapGroup> getAllLdapGroupRoles();
 

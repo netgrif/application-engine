@@ -4,14 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LdapGroupRoleAssignRequestBody {
+public class LdapGroupSearchBody {
 
-    private String groupDn;
+    private String fulltext;
 
-    private Set<String> roleIds;
 }

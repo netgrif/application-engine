@@ -5,6 +5,7 @@ import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRoleAssignRequestBody;
+import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupsResource;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
@@ -39,13 +40,18 @@ public class LdapController {
     @ApiOperation(value = "Get all ldap groups",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
-    @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = LdapGroupsResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LdapGroupsResource getAllLdapGroups(Authentication auth) {
-        List<LdapGroupRef> groups = service.findAllGroups();
+    public LdapGroupsResource getAllLdapGroups(@RequestBody LdapGroupSearchBody body, Authentication auth) {
+        List<LdapGroupRef> groups;
+        if(body == null || body.getFulltext().equals("")){
+            groups = service.findAllGroups();
+        }else {
+            groups = service.searchGroups(body.getFulltext());
+        }
         List<LdapGroup> groupRoles = service.getAllLdapGroupRoles();
         Set<LdapGroupResponseBody> ldapGroupResponse = groups.stream()
                 .map(group -> {
