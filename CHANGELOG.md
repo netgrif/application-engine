@@ -8,6 +8,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
+## [6.0.5](https://github.com/netgrif/application-engine/releases/tag/v6.0.5) (2022-05-12)
+
+### Fixed
+
+- [NAE-1621] Required data group layout tag if layout type is “grid”
+
+
 ## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-04-12)
 
 ### Fixed
