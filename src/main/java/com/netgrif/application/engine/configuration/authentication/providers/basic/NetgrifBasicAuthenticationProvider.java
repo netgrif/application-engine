@@ -48,7 +48,11 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
         }
 
         UserDetails userDetails = user.transformToLoggedUser();
-        return new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
+
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
+        result.setDetails(authentication.getDetails());
+
+        return result;
     }
 
     @Override
