@@ -64,7 +64,7 @@ class PetriNetControllerTest {
     private TestHelper testHelper
 
     private PetriNet net
-    private MockMvc mvc
+
     private Authentication userAuth
     private Authentication adminAuth
 
