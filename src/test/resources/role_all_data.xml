@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>all_data</id>
+	<initials>ALL</initials>
+    <title>All Data</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <caseName>All data test default case name</caseName>
+    <!-- ROLES -->
+    <role>
+        <id>admin</id>
+        <title>Create Role</title>
+    </role>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <!-- DATA -->
+    <data type="number" immediate="true">
+        <id>number</id>
+        <title>Number</title>
+        <init>10000</init>
+    </data>
+    <data type="number" immediate="true">
+        <id>number_currency</id>
+        <title>Number currency</title>
+        <init>10000</init>
+        <format>
+            <currency>
+                <code>EUR</code>
+                <fractionSize>2</fractionSize>
+                <locale>sk_SK</locale>
+            </currency>
+        </format>
+    </data>
+
+    <data type="text" immediate="true">
+        <id>text</id>
+        <title>Text</title>
+        <init>Lorem ipsum</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>password_data</id>
+        <title>Password from data</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>password_dataref</id>
+        <title>Password from dataRef</title>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_area</id>
+        <title>Text area</title>
+        <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
+            vulputate ut eu sapien. Phasellus vel.
+        </init>
+        <component>
+            <name>htmltextarea</name>
+            <property key="color">red</property>
+            <property key="fontSize">12</property>
+        </component>
+    </data>
+
+    <data type="enumeration" immediate="true">
+        <id>enumeration</id>
+        <title>Enumeration</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>enumeration_autocomplete</id>
+        <title>Enumeration autocomplete</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+        <component>
+            <name>autocomplete</name>
+        </component>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>enumeration_list</id>
+        <title>Enumeration list</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map</id>
+        <title>Enumeration Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <init>bo</init>
+    </data>
+
+    <data type="multichoice" immediate="true">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <inits>
+            <init>Alice</init>
+            <init>Bob</init>
+        </inits>
+    </data>
+
+    <data type="multichoice" immediate="true">
+        <id>multichoice_list</id>
+        <title>Multichoice list</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Alice,Bob</init>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map</id>
+        <title>Multichoice Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <inits>
+            <init>al</init>
+            <init>ca</init>
+        </inits>
+    </data>
+
+    <data type="boolean" immediate="true">
+        <id>boolean</id>
+        <title>Boolean</title>
+        <placeholder>True</placeholder>
+    </data>
+
+    <data type="date" immediate="true">
+        <id>date</id>
+        <title>Date</title>
+        <init>01.01.2019</init>
+    </data>
+
+    <data type="taskRef">
+        <id>taskRef</id>
+        <title>Task Ref</title>
+        <inits>
+            <init>4</init>
+        </inits>
+    </data>
+
+    <data type="file" immediate="true">
+        <id>file</id>
+        <title>File</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            textfield: f.text;
+            change textfield value {
+                "funguje to"
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+
+    <data type="fileList" immediate="true">
+        <id>fileList</id>
+        <title>File List</title>
+    </data>
+
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>User</title>
+    </data>
+
+    <data type="userList">
+        <id>userList1</id>
+        <title>UserList</title>
+    </data>
+
+    <data type="userList">
+        <id>userList2</id>
+        <title>UserList</title>
+    </data>
+
+    <data type="dateTime" immediate="true">
+        <id>datetime</id>
+        <title>Datetime</title>
+        <init>01.01.2019 20:00</init>
+    </data>
+
+    <data type="button" immediate="true">
+        <id>button</id>
+        <title>Button</title>
+        <placeholder>Push</placeholder>
+        <component>
+            <name>fab</name>
+        </component>
+    </data>
+
+    <data type="text">
+        <id>taskref_test_field</id>
+        <title>Text datafield z iného transitionu</title>
+        <init>Field načítaný pomocou taskrefu</init>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - editable</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>number</id>
+            <title>Number fields</title>
+            <stretch>false</stretch>
+            <rows>2</rows>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number_currency</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>text</id>
+            <title>Text fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_area</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_data</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_dataref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <component>
+                    <name>password</name>
+                </component>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>enumeration</id>
+            <title>Enumeration fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_autocomplete</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>multichoice</id>
+            <title>Multichoice fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>boolean</id>
+            <title>Boolean fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>boolean</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>date</id>
+            <title>Date fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>date</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>datetime</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>file</id>
+            <title>File fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>user</id>
+            <title>User fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>user</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>button</id>
+            <title>Button fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>button</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        generatePDF("1","file")
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>taskRef</id>
+            <title>Task refs</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>taskRef</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task - visible</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>number</id>
+            <title>Number fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number_currency</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>text</id>
+            <title>Text fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_area</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>enumeration</id>
+            <title>Enumeration fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_autocomplete</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_list</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>multichoice</id>
+            <title>Multichoice fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_list</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>boolean</id>
+            <title>Boolean fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>boolean</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>date</id>
+            <title>Date fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>date</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>datetime</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>file</id>
+            <title>File fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>user</id>
+            <title>User fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>user</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>button</id>
+            <title>Button fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>button</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>3</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Datagroups</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>stretch</id>
+            <title>Stretch</title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>right</id>
+            <title>Alignment - Right</title>
+            <alignment>end</alignment>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>left</id>
+            <title>Alignment - Left</title>
+            <alignment>start</alignment>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+		<dataGroup>
+			<id>center</id>
+            <title>Alignment - Center</title>
+			<alignment>center</alignment>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+		</dataGroup>
+    </transition>
+    <transition>
+        <id>4</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task ref test transition</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>taskref</id>
+            <title>Task ref test group</title>
+            <dataRef>
+                <id>taskref_test_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
