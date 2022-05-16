@@ -71,7 +71,7 @@ public class PetriNetController {
     private StringToVersionConverter converter;
 
     @Authorizations(value = {
-            @Authorize(expression = "@petriNetAuthorizationService.canCallImport(#auth.getPrincipal())")
+            @Authorize(authority = "PROCESS_UPLOAD")
     })
     @ApiOperation(value = "Import new process",
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
@@ -103,6 +103,9 @@ public class PetriNetController {
         }
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "PROCESS_VIEW_ALL")
+    })
     @ApiOperation(value = "Get all processes", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
@@ -182,7 +185,7 @@ public class PetriNetController {
     }
 
     @Authorizations(value = {
-            @Authorize(expression = "@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+            @Authorize(authority = "PROCESS_DELETE")
     })
     @ApiOperation(value = "Delete process",
             notes = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",

@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.auth.domain.Authorizations;
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.workflow.domain.Filter;
@@ -54,6 +56,9 @@ public class FilterController {
         return MessageResource.errorMessage("Filter " + newFilter.getTitle() + " has failed to save");
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "FILTER_DELETE")
+    })
     @ApiOperation(value = "Delete filter specified by id", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {

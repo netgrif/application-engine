@@ -75,6 +75,7 @@ public class WorkflowController {
 
 
     @Authorizations(value = {
+            @Authorize(authority = "CASE_CREATE"),
             @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     })
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
@@ -91,6 +92,9 @@ public class WorkflowController {
         }
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "CASE_VIEW_ALL")
+    })
     @ApiOperation(value = "Get all cases of the system", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
@@ -207,6 +211,7 @@ public class WorkflowController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "CASE_DELETE"),
             @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     })
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))

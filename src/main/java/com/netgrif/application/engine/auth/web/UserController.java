@@ -122,7 +122,7 @@ public class UserController {
     public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small != null && small;
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
+        if (!loggedUser.hasAuthority("USER_VIEW_ALL") && !Objects.equals(loggedUser.getId(), userId)) {
             log.info("User " + loggedUser.getUsername() + " trying to get another user with ID " + userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
@@ -147,7 +147,7 @@ public class UserController {
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         IUser user = userService.resolveById(userId, false);
-        if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
+        if (user == null || (!loggedUser.hasAuthority("USER_EDIT_ALL") && !Objects.equals(loggedUser.getId(), userId)))
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
         user = userService.update(user, updates);

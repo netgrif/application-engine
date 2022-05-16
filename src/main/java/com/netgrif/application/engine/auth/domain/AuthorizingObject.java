@@ -7,6 +7,8 @@ package com.netgrif.application.engine.auth.domain;
  * */
 public enum AuthorizingObject {
     PROCESS_UPLOAD,
+    PROCESS_VIEW_ALL,
+    PROCESS_VIEW_MY,
     PROCESS_DELETE_MY,
     PROCESS_DELETE_ALL,
     FILTER_UPLOAD,
@@ -14,8 +16,10 @@ public enum AuthorizingObject {
     FILTER_DELETE_ALL,
     USER_CREATE,
     USER_DELETE,
-    USER_EDIT_MY,
     USER_EDIT_ALL,
+    USER_EDIT_MY,
+    USER_VIEW_ALL,
+    USER_VIEW_MY,
     GROUP_CREATE,
     GROUP_DELETE_MY,
     GROUP_DELETE_ALL,
@@ -28,6 +32,15 @@ public enum AuthorizingObject {
     AUTHORITY_CREATE,
     AUTHORITY_DELETE,
     AUTHORITY_VIEW_ALL,
-    TASK_RELOAD,
+    CASE_VIEW_ALL,
+    CASE_VIEW_MY,
+    CASE_CREATE,
+    CASE_DELETE,
     CASE_DATA_GET_ALL,
+    TASK_RELOAD,
+    TASK_ASSIGN,
+    TASK_FINISH,
+    TASK_CANCEL,
+    TASK_DELEGATE,
+    TASK_SAVE_DATA
 }

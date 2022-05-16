@@ -17,7 +17,8 @@ public abstract class AbstractBaseAuthorizationService implements IBaseAuthoriza
 
     @Override
     public final boolean hasAuthority(String authorizingObject) {
-
-        return this.userService.getLoggedUser().getAuthorities().stream().anyMatch(a -> a.equals(authorizingObject));
+        if (authorizingObject == null || authorizingObject.length() == 0)
+            return true;
+        return this.userService.getLoggedUser().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(authorizingObject));
     }
 }

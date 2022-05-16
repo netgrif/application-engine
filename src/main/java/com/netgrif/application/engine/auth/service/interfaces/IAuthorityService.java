@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
-import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 
 import java.util.List;
 import java.util.Optional;

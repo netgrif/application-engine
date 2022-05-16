@@ -377,7 +377,7 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query query_total = new Query();
 
-        if (!user.isAdmin())
+        if (user.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("PROCESS_VIEW_ALL")))
             query.addCriteria(getProcessRolesCriteria(user));
 
         criteria.forEach((key, value) -> {

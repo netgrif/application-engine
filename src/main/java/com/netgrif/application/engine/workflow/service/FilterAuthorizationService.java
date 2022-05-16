@@ -14,6 +14,6 @@ public class FilterAuthorizationService implements IFilterAuthorizationService {
 
     @Override
     public boolean canCallDelete(LoggedUser user, Filter filter) {
-        return user.isAdmin() || user.getId().equals(filter.getAuthor().getId());
+        return user.getId().equals(filter.getAuthor().getId());
     }
 }

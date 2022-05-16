@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.auth.web;
 
+import com.netgrif.application.engine.auth.domain.Authorizations;
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
@@ -90,12 +92,15 @@ public class AuthenticationController {
         }
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "USER_CREATE")
+    })
     @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
-                return MessageResource.errorMessage("Only admin can invite new users!");
+            if (!serverAuthProperties.isOpenRegistration()) {
+                return MessageResource.errorMessage("Registration is disabled.");
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());

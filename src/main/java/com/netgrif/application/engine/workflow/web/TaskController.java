@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskR
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import io.swagger.annotations.*;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -84,6 +85,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_ASSIGN"),
             @Authorize(expression = "@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Assign task",
@@ -100,6 +102,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_DELEGATE"),
             @Authorize(expression = "@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Delegate task",
@@ -116,6 +119,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_FINISH"),
             @Authorize(expression = "@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Finish task",
@@ -132,6 +136,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_CANCEL"),
             @Authorize(expression = "@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Cancel task",
@@ -191,6 +196,7 @@ public class TaskController extends AbstractTaskController {
 
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_SAVE_DATA"),
             @Authorize(expression = "@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Set task data",
@@ -206,6 +212,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_SAVE_DATA"),
             @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Upload file into the task",
@@ -228,6 +235,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_SAVE_DATA"),
             @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Remove file from the task",
@@ -243,6 +251,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_SAVE_DATA"),
             @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Upload multiple files into the task",
@@ -266,6 +275,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Authorizations(value = {
+            @Authorize(authority = "TASK_SAVE_DATA"),
             @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     })
     @ApiOperation(value = "Remove file from tasks file list field value",
