@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.importer;
 
 import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -21,10 +23,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -88,6 +93,19 @@ public class ImporterTest {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
 
         assertExternalMappingImport(outcome.getNet());
+    }
+
+    @Test
+    void importInvalidDataRefLayoutTest() throws FileNotFoundException {
+        LoggedUser loggedUser = superCreator.getLoggedSuper();
+        assert  loggedUser != null;
+
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/invalid_data_ref_layout.xml");
+
+        assertThatThrownBy(() -> petriNetService.importPetriNet(fileInputStream, VersionType.MAJOR, loggedUser))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("doesn't have a layout");
+
     }
 
     private void assertExternalMappingImport(PetriNet imported) {

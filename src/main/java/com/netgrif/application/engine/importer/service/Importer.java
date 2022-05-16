@@ -715,8 +715,12 @@ public class Importer {
         dataGroup.setStretch(importDataGroup.isStretch());
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
+        DataGroupLayout dataGroupLayout = dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null ? dataGroup.getLayout() : null;
 
         for (DataRef dataRef : importDataGroup.getDataRef()) {
+            if (dataGroupLayout != null && dataGroupLayout.getType().equals(LayoutType.GRID.value()) && dataRef.getLayout() == null) {
+                throw new IllegalArgumentException("Data ref [" + dataRef.getId() + "] of data group [" + dataGroup.getStringId() + "] in transition [" + transition.getStringId() + "] doesn't have a layout.");
+            }
             addDataLogic(transition, dataRef);
             addDataLayout(transition, dataRef);
             addDataComponent(transition, dataRef);

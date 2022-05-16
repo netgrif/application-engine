@@ -468,6 +468,9 @@ class ActionDelegate {
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
             }
+            if (field instanceof NumberField) {
+                value = value as Double
+            }
             field.value = value
             saveChangedValue(field)
         }
@@ -870,6 +873,21 @@ class ActionDelegate {
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setDateZoneId(dateZoneId)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    }
+
+    void generatePdf(String transitionId, String fileFieldId) {
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
