@@ -57,7 +57,7 @@ public class GroupController {
     @ApiOperation(value = "Get logged user's groups in the system",
             notes = "Caller must have the GROUP_VIEW_MY authority",
             authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @RequestMapping(value = "/my", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
