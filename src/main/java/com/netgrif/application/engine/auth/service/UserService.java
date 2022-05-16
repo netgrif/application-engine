@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.*;
-import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
@@ -31,7 +31,7 @@ public class UserService extends AbstractUserService {
     protected UserRepository userRepository;
 
     @Autowired
-    protected AuthorityRepository authorityRepository;
+    protected IAuthorityService authorityService;
 
     @Autowired
     protected IProcessRoleService processRoleService;
@@ -130,7 +130,7 @@ public class UserService extends AbstractUserService {
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityRepository.findByName(a.name())));
+            Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityService.findByName(a)));
             user.setAuthorities(authorities);
         }
     }
@@ -138,7 +138,7 @@ public class UserService extends AbstractUserService {
     public void addAnonymousAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityRepository.findByName(AuthorizingObject.ANONYMOUS.name()));
+            Authority.defaultAnonymousAuthorities.forEach(a -> authorities.add(authorityService.findByName(a)));
             user.setAuthorities(authorities);
         }
     }
@@ -269,7 +269,7 @@ public class UserService extends AbstractUserService {
     @Override
     public void assignAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
-        Optional<Authority> authority = authorityRepository.findById(authorityId);
+        Optional<Authority> authority = authorityService.findById(authorityId);
 
         if (user.isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");

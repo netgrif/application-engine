@@ -4,6 +4,7 @@ package com.netgrif.application.engine.configuration;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.UserProperties;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.auth.service.AfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
@@ -54,6 +55,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
@@ -228,12 +230,12 @@ public class SecurityConfigurationLdap extends AbstractSecurityConfiguration {
     }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(AuthorizingObject.ANONYMOUS);
-        authority.setUsers(new HashSet<>());
+        List<Authority> authorities = authorityService.getOrCreate(Authority.defaultAnonymousAuthorities);
+        authorities.forEach(a -> a.setUsers(new HashSet<>()));
         return new PublicAuthenticationFilter(
                 authenticationManager(),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                authority,
+                new AnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
+                authorities,
                 this.serverPatterns,
                 this.anonymousExceptions,
                 this.jwtService,

@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +33,12 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    @Transactional
-    public Authority getOrCreate(AuthorizingObject authorizingObject) {
-        return getOrCreate(authorizingObject.name());
-    }
-
-    @Override
     public Authority save(Authority authority) {
         return repository.save(authority);
     }
 
     @Override
-    public List<Authority> getOrCreate(List<AuthorizingObject> authorities) {
+    public List<Authority> getOrCreate(List<String> authorities) {
         if (authorities == null)
             return Collections.emptyList();
         return authorities.stream().map(this::getOrCreate).collect(Collectors.toList());
@@ -58,6 +51,31 @@ public class AuthorityService implements IAuthorityService {
             throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
         repository.delete(authority);
         return authority;
+    }
+
+    @Override
+    public List<Authority> findByScope(String scope) {
+        List<Authority> authorities;
+        if (scope.equals("*"))
+            authorities = repository.findAll();
+        else {
+            String prefix = scope.replace("*", "");
+            authorities = repository.findAll().stream().filter(authority -> authority.getName().startsWith(prefix)).collect(Collectors.toList());
+        }
+        return authorities;
+    }
+
+    @Override
+    public Authority findByName(String name) {
+        Authority authority = repository.findByName(name);
+        if (authority == null)
+            throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
+        return authority;
+    }
+
+    @Override
+    public Optional<Authority> findById(String id) {
+        return repository.findById(id);
     }
 
     public Authority getOne(String id) {

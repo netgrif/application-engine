@@ -1,21 +1,27 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
+import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IAuthorityService {
 
     List<Authority> findAll();
 
-    Authority getOrCreate(String name);
+    List<Authority> findByScope(String scope);
 
-    Authority getOrCreate(AuthorizingObject authorizingObject);
+    Authority findByName(String name);
+
+    Optional<Authority> findById(String id);
+
+    Authority getOrCreate(String name);
 
     Authority save(Authority authority);
 
-    List<Authority> getOrCreate(List<AuthorizingObject> authorities);
+    List<Authority> getOrCreate(List<String> authorities);
 
     Authority delete(String name);
 

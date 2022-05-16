@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.auth.domain.Authorize;
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
@@ -32,10 +30,10 @@ import java.util.List;
 @Slf4j
 @Aspect
 @Service
-public class BaseAuthorizationService extends AbstractBaseAuthorizationService {
+public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationService {
 
-    public BaseAuthorizationService(@Autowired IUserService userService) {
-        super(userService);
+    public BaseAuthorizationServiceAspect(@Autowired IUserService userService, @Autowired IAuthorityService authorityService) {
+        super(userService, authorityService);
     }
 
     /**

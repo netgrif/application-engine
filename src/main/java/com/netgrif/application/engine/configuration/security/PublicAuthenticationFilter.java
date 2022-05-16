@@ -27,7 +27,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
-    private final Authority anonymousAuthority;
+    private final List<Authority> anonymousAuthorities;
 
     private final static String JWT_HEADER_NAME = "X-Jwt-Token";
     private final static String BEARER = "Bearer ";
@@ -38,11 +38,11 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final IUserService userService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                      Authority anonymousAuthority, String[] urls, String[] exceptions, IJwtService jwtService,
+                                      List<Authority> anonymousAuthorities, String[] urls, String[] exceptions, IJwtService jwtService,
                                       IUserService userService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
-        this.anonymousAuthority = anonymousAuthority;
+        this.anonymousAuthorities = anonymousAuthorities;
         this.anonymousAccessUrls = urls;
         this.exceptions = exceptions;
         this.jwtService = jwtService;
@@ -63,8 +63,8 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(HttpServletRequest request, String jwtToken) {
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 UserProperties.ANONYMOUS_AUTH_KEY,
-                jwtService.getLoggedUser(jwtToken, this.anonymousAuthority),
-                Collections.singleton(this.anonymousAuthority)
+                jwtService.getLoggedUser(jwtToken, this.anonymousAuthorities),
+                this.anonymousAuthorities
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);

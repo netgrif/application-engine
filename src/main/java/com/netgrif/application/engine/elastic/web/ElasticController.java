@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.web;
 
+import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
@@ -49,7 +50,7 @@ public class ElasticController {
     @Value("${spring.data.elasticsearch.reindex-size}")
     private int pageSize;
 
-    @Authorize(authority = AuthorizingObject.ADMIN)
+    @Authorize(authority = Authority.defaultAdminAuthority)
     @ApiOperation(value = "Reindex specified cases",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

@@ -4,5 +4,5 @@ import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 
 public interface IBaseAuthorizationService {
 
-    boolean hasAuthority(AuthorizingObject authority);
+    boolean hasAuthority(String authorityName);
 }

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
@@ -166,7 +167,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @Authorize(authority = AuthorizingObject.ADMIN)
+    @Authorize(authority = Authority.defaultAdminAuthority)
     @ApiOperation(value = "Reload tasks of case",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -189,7 +190,7 @@ public class WorkflowController {
     }
 
     @Deprecated
-    @Authorize(authority = AuthorizingObject.ADMIN)
+    @Authorize(authority = Authority.defaultAdminAuthority)
     @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {

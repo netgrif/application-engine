@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
-import com.netgrif.application.engine.auth.domain.Authorize;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
@@ -175,7 +172,7 @@ public class UserController {
         return resources;
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT)
+    @Authorize(authority = "USER_EDIT")
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -195,7 +192,7 @@ public class UserController {
         }
     }
 
-    @Authorize(authority = AuthorizingObject.ADMIN)
+    @Authorize(authority = Authority.defaultAdminAuthority)
     @ApiOperation(value = "Get all authorities of the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -208,7 +205,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT)
+    @Authorize(authority = "USER_EDIT")
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

@@ -847,7 +847,7 @@ class ActionDelegate {
         mailService.sendMail(mailDraft)
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT, expression = "@userService.isLoggedByEmail(email)")
+    @Authorize(authority = "USER_EDIT", expression = "@userService.isLoggedByEmail(email)")
     def changeUserByEmail(String email) {
         [email  : { cl ->
             changeUserByEmail(email, "email", cl)
@@ -864,7 +864,7 @@ class ActionDelegate {
         ]
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT, expression = "@userService.isLogged(#id)")
+    @Authorize(authority = "USER_EDIT", expression = "@userService.isLogged(#id)")
     def changeUser(String id) {
         [email  : { cl ->
             changeUser(id, "email", cl)
@@ -881,7 +881,7 @@ class ActionDelegate {
         ]
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT, expression = "@userService.isLogged(#user)")
+    @Authorize(authority = "USER_EDIT", expression = "@userService.isLogged(#user)")
     def changeUser(IUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
@@ -898,19 +898,19 @@ class ActionDelegate {
         ]
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT, expression = "@userService.isLoggedByEmail(#email)")
+    @Authorize(authority = "USER_EDIT", expression = "@userService.isLoggedByEmail(#email)")
     def changeUserByEmail(String email, String attribute, def cl) {
         IUser user = userService.findByEmail(email, false)
         changeUser(user, attribute, cl)
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT, expression = "@userService.isLogged(#id)")
+    @Authorize(authority = "USER_EDIT", expression = "@userService.isLogged(#id)")
     def changeUser(String id, String attribute, def cl) {
         IUser user = userService.findById(id, false)
         changeUser(user, attribute, cl)
     }
 
-    @Authorize(authority = AuthorizingObject.USER_EDIT, expression = "@userService.isLogged(#user)")
+    @Authorize(authority = "USER_EDIT", expression = "@userService.isLogged(#user)")
     def changeUser(IUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
@@ -926,7 +926,7 @@ class ActionDelegate {
         userService.save(user)
     }
 
-    @Authorize(authority = AuthorizingObject.USER_CREATE)
+    @Authorize(authority = "USER_CREATE")
     MessageResource inviteUser(String email) {
         NewUserRequest newUserRequest = new NewUserRequest()
         newUserRequest.email = email
@@ -935,7 +935,7 @@ class ActionDelegate {
         return inviteUser(newUserRequest)
     }
 
-    @Authorize(authority = AuthorizingObject.USER_CREATE)
+    @Authorize(authority = "USER_CREATE")
     MessageResource inviteUser(NewUserRequest newUserRequest) {
         IUser user = registrationService.createNewUser(newUserRequest);
         if (user == null)
@@ -946,7 +946,7 @@ class ActionDelegate {
         return MessageResource.successMessage("Done");
     }
 
-    @Authorize(authority = AuthorizingObject.USER_DELETE)
+    @Authorize(authority = "USER_DELETE")
     void deleteUser(String email) {
         IUser user = userService.findByEmail(email, false)
         if (user == null)
@@ -954,7 +954,7 @@ class ActionDelegate {
         deleteUser(user)
     }
 
-    @Authorize(authority = AuthorizingObject.USER_DELETE)
+    @Authorize(authority = "USER_DELETE")
     void deleteUser(IUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)

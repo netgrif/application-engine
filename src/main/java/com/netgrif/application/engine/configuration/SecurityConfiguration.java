@@ -40,6 +40,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.HashSet;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
@@ -176,12 +177,12 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(AuthorizingObject.ANONYMOUS);
-        authority.setUsers(new HashSet<>());
+        List<Authority> authorities = authorityService.getOrCreate(Authority.defaultAnonymousAuthorities);
+        authorities.forEach(a -> a.setUsers(new HashSet<>()));
         return new PublicAuthenticationFilter(
                 authenticationManager(),
                 new AnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
-                authority,
+                authorities,
                 this.serverPatterns,
                 this.anonymousExceptions,
                 this.jwtService,

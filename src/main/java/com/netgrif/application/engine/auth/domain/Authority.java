@@ -16,7 +16,9 @@ public class Authority implements GrantedAuthority {
 
     public static final long serialVersionUID = 2839744057647464485L;
 
-    public static final List<AuthorizingObject> defaultUserAuthorities = Arrays.asList(AuthorizingObject.FILTER, AuthorizingObject.GROUP);
+    public static final String defaultAdminAuthority = "*";
+    public static final List<String> defaultUserAuthorities = Arrays.asList("FILTER_*", "GROUP_*");
+    public static final List<String> defaultAnonymousAuthorities = Arrays.asList("FILTER_*", "GROUP_*");
 
     @Id
     @Getter
@@ -84,9 +86,5 @@ public class Authority implements GrantedAuthority {
     @Override
     public int hashCode() {
         return name.hashCode();
-    }
-
-    public boolean includes(AuthorizingObject authority) {
-        return authority.name().equals(this.name) || authority.name().startsWith(this.name) || this.name.equals(AuthorizingObject.ADMIN.name());
     }
 }

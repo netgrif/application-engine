@@ -81,7 +81,7 @@ class GroovyShellFactoryTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["systemAdmin": [AuthorizingObject.ADMIN]])
+        def auths = importHelper.createAuthorities(["systemAdmin": [Authority.defaultAdminAuthority]])
         importHelper.createUser(new User(name: "Admin", surname: "User", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 auths.get("systemAdmin").toArray() as Authority[],
                 [] as ProcessRole[])

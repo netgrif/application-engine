@@ -109,7 +109,7 @@ class ElasticSearchTest {
         netId2 = net2.getStringId()
 
 //        def org = importHelper.createGroup("Test")
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [AuthorizingObject.ADMIN]])
+        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
 //        def processRoles = importHelper.getProcessRoles(net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[],
