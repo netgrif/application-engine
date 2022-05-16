@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.service;
 
+import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -37,23 +38,31 @@ public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationSer
     }
 
     /**
-     * Pointcut definition for {@link Authorize} annotation to connect authorization requests from join points to the
-     * {@link #authorize(ProceedingJoinPoint, Authorize)} advice.
-     * @param authorize the annotation with authorization requirements
+     * Pointcut definition for {@link Authorizations} annotation to connect authorization requests from join points to the
+     * {@link #authorize(ProceedingJoinPoint, Authorizations)} advice.
+     * @param authorizations the annotation with authorization requirements
      * */
-    @Pointcut(value = "@annotation(authorize))")
-    protected void authorizingMethod(Authorize authorize) {}
+    @Pointcut(value = "@annotation(authorizations))")
+    protected void authorizingMethod(Authorizations authorizations) {}
 
 
     /**
      * The advice that handles incoming authorization requests from join points from
-     * {@link #authorizingMethod(Authorize)} pointcuts
+     * {@link #authorizingMethod(Authorizations)} pointcuts
      * @param joinPoint the incoming method invocation join point
-     * @param authorize the incoming annotation with authorization parameters
+     * @param authorizations the incoming annotation with authorization parameters
      * */
-    @Around(value = "authorizingMethod(authorize)", argNames = "joinPoint,authorize")
-    protected Object authorize(ProceedingJoinPoint joinPoint, Authorize authorize) throws Throwable {
-        if (isAllowedByExpression(joinPoint, authorize.expression()) || hasAuthority(authorize.authority())) {
+    @Around(value = "authorizingMethod(authorizations)", argNames = "joinPoint,authorizations")
+    protected Object authorize(ProceedingJoinPoint joinPoint, Authorizations authorizations) throws Throwable {
+        boolean result = false;
+
+        if (authorizations.value() != null && authorizations.value().length > 0) {
+            for (Authorize authorize : authorizations.value()) {
+                result = result || (isAllowedByExpression(joinPoint, authorize.expression()) && hasAuthority(authorize.authority()));
+            }
+        }
+
+        if (result) {
             return joinPoint.proceed();
         } else {
             throw new AccessDeniedException("Access Denied");
