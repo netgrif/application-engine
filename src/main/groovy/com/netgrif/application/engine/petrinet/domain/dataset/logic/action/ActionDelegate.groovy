@@ -699,7 +699,7 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(Task task, Map dataSet) {
-        setData(task.stringId, dataSet)
+        return setData(task.stringId, dataSet)
     }
 
     SetDataEventOutcome setData(String taskId, Map dataSet) {
