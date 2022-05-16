@@ -16,7 +16,7 @@ public @interface Authorize {
     /**
      * The authorizing object to be checked, whether the user has it assigned.
      * */
-    AuthorizingObject authority() default AuthorizingObject.ADMIN;
+    String authority() default "";
 
     /**
      * The Spring-EL expression to be evaluated before invoking the protected method.
