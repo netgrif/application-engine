@@ -794,12 +794,16 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
-    void generatePDF(String transitionId, String fileFieldId) {
+    void generatePdf(String transitionId, String fileFieldId, Integer sideMargin = 75, Integer titleMargin = 100) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
         String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setMarginTitle(titleMargin)
+        pdfResource.setMarginLeft(sideMargin)
+        pdfResource.setMarginRight(sideMargin)
+        pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
@@ -873,21 +877,6 @@ class ActionDelegate {
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setDateZoneId(dateZoneId)
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
-    }
-
-    void generatePdf(String transitionId, String fileFieldId) {
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
-
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfResource.setMarginTitle(100)
-        pdfResource.setMarginLeft(75)
-        pdfResource.setMarginRight(75)
-        pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
