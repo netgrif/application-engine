@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
+import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
@@ -69,7 +70,9 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @Authorize(expression = "@petriNetAuthorizationService.canCallImport(#auth.getPrincipal())")
+    @Authorizations(value = {
+            @Authorize(expression = "@petriNetAuthorizationService.canCallImport(#auth.getPrincipal())")
+    })
     @ApiOperation(value = "Import new process",
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             authorizations = @Authorization("BasicAuth"))
@@ -178,7 +181,9 @@ public class PetriNetController {
         return resources;
     }
 
-    @Authorize(expression = "@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @Authorizations(value = {
+            @Authorize(expression = "@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    })
     @ApiOperation(value = "Delete process",
             notes = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             authorizations = @Authorization("BasicAuth"))

@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
-import com.netgrif.application.engine.auth.domain.Authorize;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
@@ -77,7 +74,9 @@ public class WorkflowController {
     private IDataService dataService;
 
 
-    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
+    @Authorizations(value = {
+            @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
+    })
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
@@ -167,7 +166,9 @@ public class WorkflowController {
         return resources;
     }
 
-    @Authorize(authority = Authority.defaultAdminAuthority)
+    @Authorizations(value = {
+            @Authorize(authority = "TASK_RELOAD")
+    })
     @ApiOperation(value = "Reload tasks of case",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -190,7 +191,9 @@ public class WorkflowController {
     }
 
     @Deprecated
-    @Authorize(authority = Authority.defaultAdminAuthority)
+    @Authorizations(value = {
+            @Authorize(authority = "CASE_DATA_GET_ALL")
+    })
     @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
@@ -203,7 +206,9 @@ public class WorkflowController {
         }
     }
 
-    @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    @Authorizations(value = {
+            @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
+    })
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage>  deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {

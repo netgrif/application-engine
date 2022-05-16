@@ -7,19 +7,27 @@ package com.netgrif.application.engine.auth.domain;
  * */
 public enum AuthorizingObject {
     PROCESS_UPLOAD,
-    PROCESS_DELETE,
+    PROCESS_DELETE_MY,
+    PROCESS_DELETE_ALL,
     FILTER_UPLOAD,
-    FILTER_DELETE,
+    FILTER_DELETE_MY,
+    FILTER_DELETE_ALL,
     USER_CREATE,
     USER_DELETE,
-    USER_EDIT,
+    USER_EDIT_MY,
+    USER_EDIT_ALL,
     GROUP_CREATE,
-    GROUP_DELETE,
+    GROUP_DELETE_MY,
+    GROUP_DELETE_ALL,
     GROUP_ADD_USER,
     GROUP_REMOVE_USER,
     GROUP_VIEW_ALL,
-    ROLE_CREATE, // refactor for user "assign"
-    ROLE_DELETE, // refactor for user "deassign"
+    GROUP_VIEW_MY,
+    ROLE_ASSIGN_TO_USER,
+    ROLE_REMOVE_FROM_USER,
     AUTHORITY_CREATE,
-    AUTHORITY_DELETE
+    AUTHORITY_DELETE,
+    AUTHORITY_VIEW_ALL,
+    TASK_RELOAD,
+    CASE_DATA_GET_ALL,
 }

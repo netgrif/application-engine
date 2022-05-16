@@ -172,7 +172,9 @@ public class UserController {
         return resources;
     }
 
-    @Authorize(authority = "USER_EDIT")
+    @Authorizations(value = {
+            @Authorize(authority = "USER_EDIT", expression = "@userService.isLogged(#id)")
+    })
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -192,7 +194,9 @@ public class UserController {
         }
     }
 
-    @Authorize(authority = Authority.defaultAdminAuthority)
+    @Authorizations(value = {
+            @Authorize(authority = "AUTHORITY_VIEW_ALL")
+    })
     @ApiOperation(value = "Get all authorities of the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -205,7 +209,9 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @Authorize(authority = "USER_EDIT")
+    @Authorizations(value = {
+            @Authorize(authority = "USER_EDIT")
+    })
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
