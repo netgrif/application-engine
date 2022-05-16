@@ -52,6 +52,10 @@ public class Authority implements GrantedAuthority {
         users.add(user.getStringId());
     }
 
+    public void removeUser(IUser user) {
+        users.remove(user.getStringId());
+    }
+
     public String getStringId() {
         return _id.toString();
     }

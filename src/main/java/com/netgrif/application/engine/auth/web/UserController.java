@@ -225,6 +225,22 @@ public class UserController {
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "USER_EDIT")
+    })
+    @ApiOperation(value = "Assign authority to the user",
+            notes = "Caller must have the USER_EDIT authority",
+            authorizations = @Authorization("BasicAuth"))
+    @DeleteMapping(value = "/{id}/authority/remove", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public MessageResource removeAuthorityFromUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
+        userService.removeAuthority(userId, authorityId);
+        return MessageResource.successMessage("Authority " + authorityId + " removed from user " + userId);
+    }
+
     @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences(Authentication auth) {

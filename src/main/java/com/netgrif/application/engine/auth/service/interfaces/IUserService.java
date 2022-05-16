@@ -52,6 +52,8 @@ public interface IUserService {
 
     void assignAuthority(String userId, String authorityId);
 
+    void removeAuthority(String userId, String authorityId);
+
     IUser getLoggedOrSystem();
 
     IUser getLoggedUser();

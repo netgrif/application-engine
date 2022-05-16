@@ -283,6 +283,22 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
+    public void removeAuthority(String userId, String authorityId) {
+        Optional<User> user = userRepository.findById(userId);
+        Optional<Authority> authority = authorityService.findById(authorityId);
+
+        if (user.isEmpty())
+            throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
+        if (authority.isEmpty())
+            throw new IllegalArgumentException("Could not find authority with id [" + authorityId + "]");
+
+        user.get().removeAuthority(authority.get());
+        authority.get().removeUser(user.get());
+
+        userRepository.save(user.get());
+    }
+
+    @Override
     public IUser getSystem() {
         return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
     }

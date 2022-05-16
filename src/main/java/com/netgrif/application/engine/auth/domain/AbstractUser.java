@@ -40,6 +40,12 @@ public abstract class AbstractUser implements IUser {
         authorities.add(authority);
     }
 
+    public void removeAuthority(Authority authority) {
+        if (authorities.stream().noneMatch(it -> it.get_id().equals(authority.get_id())))
+            return;
+        authorities.remove(authority);
+    }
+
     public void addProcessRole(ProcessRole role) {
         if (processRoles.stream().anyMatch(it -> it.getStringId().equals(role.getStringId())))
             return;

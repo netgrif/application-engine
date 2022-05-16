@@ -64,6 +64,16 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
+    public void removeAuthority(String userId, String authorityId) {
+        IUser user = resolveById(userId, true);
+        Authority authority = authorityService.getOne(authorityId);
+        user.removeAuthority(authority);
+        authority.removeUser(user);
+
+        save(user);
+    }
+
+    @Override
     public LoggedUser getAnonymousLogged() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
             getLoggedUser().transformToLoggedUser();
