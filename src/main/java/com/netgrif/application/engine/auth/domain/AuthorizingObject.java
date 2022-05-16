@@ -6,14 +6,6 @@ package com.netgrif.application.engine.auth.domain;
  * using given authorizing object.
  * */
 public enum AuthorizingObject {
-    ADMIN,
-    ANONYMOUS,
-    PROCESS,
-    FILTER,
-    USER,
-    GROUP,
-    ROLE,
-    AUTHORITY,
     PROCESS_UPLOAD,
     PROCESS_DELETE,
     FILTER_UPLOAD,
@@ -26,8 +18,8 @@ public enum AuthorizingObject {
     GROUP_ADD_USER,
     GROUP_REMOVE_USER,
     GROUP_VIEW_ALL,
-    ROLE_CREATE,
-    ROLE_DELETE,
+    ROLE_CREATE, // refactor for user "assign"
+    ROLE_DELETE, // refactor for user "deassign"
     AUTHORITY_CREATE,
     AUTHORITY_DELETE
 }
