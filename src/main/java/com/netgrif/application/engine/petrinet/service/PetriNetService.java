@@ -158,8 +158,17 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        Optional<PetriNet> imported = getImporter().importPetriNet(copy(xmlFile));
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = xmlFile.read(buffer)) > -1) {
+            baos.write(buffer, 0, len);
+        }
+        baos.flush();
+        InputStream xmlCopy1 = new ByteArrayInputStream(baos.toByteArray());
+        InputStream xmlCopy2 = new ByteArrayInputStream(baos.toByteArray());
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlCopy1);
         if (!imported.isPresent()) {
             return outcome;
         }
@@ -173,8 +182,9 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.saveAll(net.getRoles().values());
         net.setAuthor(author.transformToAuthor());
         functionCacheService.cachePetriNetFunctions(net);
-        Path savedPath = getImporter().saveNetFile(net, xmlFile);
+        Path savedPath = getImporter().saveNetFile(net, xmlCopy2);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
+
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
         save(net);
