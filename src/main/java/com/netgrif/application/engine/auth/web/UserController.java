@@ -87,6 +87,9 @@ public class UserController {
         return result;
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "USER_VIEW_ALL")
+    })
     @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {

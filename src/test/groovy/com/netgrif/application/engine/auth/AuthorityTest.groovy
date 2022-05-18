@@ -3,9 +3,11 @@ package com.netgrif.application.engine.auth
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.AuthorizingObject
+import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
+import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
 import groovy.json.JsonOutput
@@ -39,11 +41,19 @@ class AuthorityTest {
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
 
+    public static final String ADMIN_EMAIL = "admin@mail.sk"
+    public static final String ADMIN_PASSWORD = "password"
+
     public static final String AUTHORITY_DELETE_API = "/api/authority/delete/{name}"
     public static final String AUTHORITY_CREATE_API = "/api/authority/create"
+    public static final String AUTHORITY_ASSIGN_API = "/api/user/{id}/authority/assign"
+    public static final String AUTHORITY_REMOVE_API = "/api/user/{id}/authority/remove"
 
     @Autowired
     private ImportHelper importHelper
+
+    @Autowired
+    private IUserService userService
 
     @Autowired
     private WebApplicationContext wac
@@ -65,12 +75,16 @@ class AuthorityTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": [AuthorizingObject.AUTHORITY_CREATE.name(),
-                                                             AuthorizingObject.AUTHORITY_DELETE.name()]])
-        def authorityList = auths.get("user").toArray()
+        def auths = importHelper.createAuthorities(["user": ["AUTHORITY_CREATE", "AUTHORITY_DELETE", "TEST_AUTHORITY"],
+                                                    "admin": AuthorizingObject.stringValues()])
+        def userAuths = auths.get("user").toArray()
+        def adminAuths = auths.get("admin").toArray()
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
-                authorityList as Authority[], [] as ProcessRole[])
+                userAuths as Authority[], [] as ProcessRole[])
+
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: ADMIN_EMAIL, password: ADMIN_PASSWORD, state: UserState.ACTIVE),
+                adminAuths as Authority[], [] as ProcessRole[])
     }
 
     @Test
@@ -114,5 +128,51 @@ class AuthorityTest {
         })
 
         assert exception.getMessage() == "Could not find authority with name [TEST_AUTHORITY]"
+    }
+
+    @Test
+    void testAssignAuthorityToUser() {
+        authentication = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, ADMIN_PASSWORD)
+
+        IUser user = userService.findByEmail(USER_EMAIL, false)
+        Authority testAuthority = authorityService.getOrCreate("CREATED_AUTHORITY")
+
+        assert user.getAuthorities().size() == 3
+
+        def content = testAuthority.stringId
+        mvc.perform(MockMvcRequestBuilders.post(AUTHORITY_ASSIGN_API.replace("{id}", user.stringId))
+                .accept(MediaTypes.HAL_JSON_VALUE)
+                .content(content)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
+                .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
+                .with(SecurityMockMvcRequestPostProcessors.authentication(authentication)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+
+        user = userService.findByEmail(USER_EMAIL, false)
+        assert user.getAuthorities().size() == 4
+    }
+
+    @Test
+    void testRemoveAuthorityFromUser() {
+        authentication = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, ADMIN_PASSWORD)
+
+        IUser user = userService.findByEmail(USER_EMAIL, false)
+        Authority testAuthority = authorityService.getOrCreate("TEST_AUTHORITY")
+
+        assert user.getAuthorities().size() == 3
+
+        def content = testAuthority.stringId
+        mvc.perform(MockMvcRequestBuilders.delete(AUTHORITY_REMOVE_API.replace("{id}", user.stringId))
+                .accept(MediaTypes.HAL_JSON_VALUE)
+                .content(content)
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
+                .with(SecurityMockMvcRequestPostProcessors.csrf().asHeader())
+                .with(SecurityMockMvcRequestPostProcessors.authentication(authentication)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+
+        user = userService.findByEmail(USER_EMAIL, false)
+        assert user.getAuthorities().size() == 2
     }
 }

@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component
 @Component
 class AuthorityRunner extends AbstractOrderedCommandLineRunner {
 
-    @Value('${nae.authority.additional:}')
-    private String[] additionalAuthorities
+    @Value('${nae.authority.authorizing-objects:}')
+    private String[] additionalAuthorizingObjects
 
     @Autowired
     private IAuthorityService service
@@ -24,7 +24,7 @@ class AuthorityRunner extends AbstractOrderedCommandLineRunner {
 
     void createAll() {
         AuthorizingObject.values().toList().forEach(authority -> service.getOrCreate(authority.name()))
-        additionalAuthorities.toList().forEach(authority -> service.getOrCreate(authority))
+        additionalAuthorizingObjects.toList().forEach(authority -> service.getOrCreate(authority))
         log.info("Authorities created.")
     }
 }

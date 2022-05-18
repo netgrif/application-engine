@@ -3,6 +3,7 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -42,6 +42,7 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
+    @Transactional
     public List<Authority> getOrCreate(List<String> authorities) {
         if (authorities == null)
             return Collections.emptyList();
@@ -75,7 +76,7 @@ public class AuthorityService implements IAuthorityService {
             authorities = repository.findAll();
         else {
             String prefix = scope.replace("*", "");
-            authorities = repository.findAll().stream().filter(authority -> authority.getName().startsWith(prefix)).collect(Collectors.toList());
+            authorities = repository.findAllByNameStartsWith(prefix);
         }
         return authorities;
     }
@@ -93,7 +94,7 @@ public class AuthorityService implements IAuthorityService {
 
     @Override
     public Optional<Authority> findById(String id) {
-        return repository.findById(id);
+        return Optional.of(repository.findBy_id(new ObjectId(id)));
     }
 
     public Authority getOne(String id) {
