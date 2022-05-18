@@ -514,6 +514,15 @@ class ActionDelegate {
             def value = cl()
             if (value instanceof Closure && value() == UNCHANGED_VALUE) return
             useCase."$property" = value
+
+            if (property == "title" || property == "color") {
+                List<Task> tasks = taskService.findAllByCase(useCase.stringId)
+
+                tasks.each { task ->
+                    task."case${property.capitalize()}" = value
+                }
+                taskService.save(tasks)
+            }
         }]
     }
 
