@@ -30,10 +30,16 @@ public class Executor {
     public void preDestroy() throws InterruptedException {
         this.executors.forEach((id, executor) -> {
             try {
-                executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS);
                 executor.shutdown();
+                if (!executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                    if (!executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS)) {
+                        log.error("Executor " + id + " did not terminate");
+                    }
+                }
             } catch (InterruptedException e) {
-                log.error("Thread was interrupted while waiting for termination: ", e);
+                log.error("Thread (executor " + id + ") was interrupted while waiting for termination: ", e);
+                executor.shutdownNow();
             }
         });
     }
