@@ -13,10 +13,13 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -61,6 +64,9 @@ class PdfGeneratorTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private ITaskService taskService
+
     @Value('${nae.pdf.resources.outputFolder}')
     private String pdfOutputFolder;
 
@@ -78,6 +84,16 @@ class PdfGeneratorTest {
         testHelper.truncateDbs()
     }
 
+    @Test
+    void testActionDelegateFunction() {
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[3]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
+        String taskId = testCase.getTasks().find(taskPair -> taskPair.transition.equals("1")).task
+        taskService.assignTask(taskId)
+        taskService.finishTask(taskId)
+        assert workflowService.findOne(testCase.stringId).getFieldValue("file") != null
+    }
 
     @Test
     void testAllData() {
