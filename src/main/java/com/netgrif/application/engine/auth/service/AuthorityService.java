@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,9 @@ public class AuthorityService implements IAuthorityService {
     @Override
     @Transactional
     public Authority getOrCreate(String name) {
+        if (isScope(name)) {
+            throw new IllegalArgumentException("The authority name is not valid. Scope is suitable for this function.");
+        }
         Authority authority = repository.findByName(name);
         if (authority == null)
             authority = repository.save(new Authority(name));
@@ -41,11 +45,22 @@ public class AuthorityService implements IAuthorityService {
     public List<Authority> getOrCreate(List<String> authorities) {
         if (authorities == null)
             return Collections.emptyList();
-        return authorities.stream().map(this::getOrCreate).collect(Collectors.toList());
+        List<Authority> result = new ArrayList<>();
+        authorities.forEach(a -> {
+            if (isScope(a)) {
+                result.addAll(findByScope(a));
+            } else {
+                result.add(getOrCreate(a));
+            }
+        });
+        return result;
     }
 
     @Override
     public Authority delete(String name) {
+        if (isScope(name)) {
+            throw new IllegalArgumentException("The authority name is not valid. Scope is suitable for this function.");
+        }
         Authority authority = repository.findByName(name);
         if (authority == null)
             throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
@@ -67,6 +82,9 @@ public class AuthorityService implements IAuthorityService {
 
     @Override
     public Authority findByName(String name) {
+        if (isScope(name)) {
+            throw new IllegalArgumentException("The authority name is not valid. Scope is suitable for this function.");
+        }
         Authority authority = repository.findByName(name);
         if (authority == null)
             throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
@@ -83,5 +101,14 @@ public class AuthorityService implements IAuthorityService {
         if (authority.isEmpty())
             throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
         return authority.get();
+    }
+
+    private boolean isScope(String authorityName) {
+        if (authorityName.endsWith("*"))
+            return true;
+        else if (authorityName.contains("*"))
+            throw new IllegalArgumentException("The authority name or scope is not valid.");
+        else
+            return false;
     }
 }
