@@ -19,6 +19,10 @@ class AuthorityRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
+        createAll()
+    }
+
+    void createAll() {
         AuthorizingObject.values().toList().forEach(authority -> service.getOrCreate(authority.name()))
         additionalAuthorities.toList().forEach(authority -> service.getOrCreate(authority))
         log.info("Authorities created.")

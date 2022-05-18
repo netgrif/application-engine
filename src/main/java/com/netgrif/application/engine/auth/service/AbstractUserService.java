@@ -48,7 +48,7 @@ public abstract class AbstractUserService implements IUserService {
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityService.getOrCreate(a)));
+            Authority.defaultUserAuthorities.forEach(a -> authorities.addAll(authorityService.findByScope(a)));
             user.setAuthorities(authorities);
         }
     }

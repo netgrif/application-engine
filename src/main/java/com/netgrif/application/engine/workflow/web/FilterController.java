@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.workflow.domain.Filter;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
+import com.netgrif.application.engine.workflow.service.interfaces.IFilterAuthorizationService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody;
 import com.netgrif.application.engine.workflow.web.responsebodies.FilterResourceAssembler;
@@ -57,7 +58,8 @@ public class FilterController {
     }
 
     @Authorizations(value = {
-            @Authorize(authority = "FILTER_DELETE")
+            @Authorize(authority = "FILTER_DELETE_ALL"),
+            @Authorize(authority = "FILTER_DELETE_MY")
     })
     @ApiOperation(value = "Delete filter specified by id", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)

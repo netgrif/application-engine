@@ -91,13 +91,12 @@ class ImportHelper {
 
 
     @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, List<Authority>> createAuthorities(Map<String, List<AuthorizingObject>> authorities) {
+    Map<String, List<Authority>> createAuthorities(Map<String, List<String>> authorities) {
         HashMap<String, List<Authority>> authoritities = new HashMap<>()
         authorities.each { authority ->
-            authoritities.put(authority.key, new ArrayList<Authority>())
-            authority.value.forEach( a ->
-                    authoritities.get(authority.key).add(authorityService.getOrCreate(a))
-            )
+            if (!authoritities.containsKey(authority.key))
+                authoritities.put(authority.key, new ArrayList<Authority>())
+            authoritities.get(authority.key).addAll(authorityService.getOrCreate(authority.value))
         }
 
         log.info("Creating ${authoritities.size()} authorities")

@@ -173,7 +173,7 @@ public class UserController {
     }
 
     @Authorizations(value = {
-            @Authorize(authority = "USER_EDIT", expression = "@userService.isLogged(#id)")
+            @Authorize(authority = "USER_EDIT_ALL", expression = "@userService.isLogged(#userId)")
     })
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
@@ -210,7 +210,7 @@ public class UserController {
     }
 
     @Authorizations(value = {
-            @Authorize(authority = "USER_EDIT")
+            @Authorize(authority = "USER_EDIT_ALL")
     })
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the ADMIN role",
@@ -226,7 +226,7 @@ public class UserController {
     }
 
     @Authorizations(value = {
-            @Authorize(authority = "USER_EDIT")
+            @Authorize(authority = "USER_EDIT_ALL")
     })
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the USER_EDIT authority",

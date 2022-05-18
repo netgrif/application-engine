@@ -130,7 +130,7 @@ public class UserService extends AbstractUserService {
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<>();
-            Authority.defaultUserAuthorities.forEach(a -> authorities.add(authorityService.findByName(a)));
+            Authority.defaultUserAuthorities.forEach(a -> authorities.addAll(authorityService.findByScope(a)));
             user.setAuthorities(authorities);
         }
     }

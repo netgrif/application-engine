@@ -1,5 +1,9 @@
 package com.netgrif.application.engine.auth.domain;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * The enum of all possible authorizing objects, that are used for creating authority objects. Authorizing object is a
  * term that defines the goal of the authority, e.g. what kind of system process is protected via an authority created
@@ -42,5 +46,9 @@ public enum AuthorizingObject {
     TASK_FINISH,
     TASK_CANCEL,
     TASK_DELEGATE,
-    TASK_SAVE_DATA
+    TASK_SAVE_DATA;
+
+    public static List<String> stringValues() {
+        return Arrays.stream(AuthorizingObject.values()).map(Enum::name).collect(Collectors.toList());
+    }
 }

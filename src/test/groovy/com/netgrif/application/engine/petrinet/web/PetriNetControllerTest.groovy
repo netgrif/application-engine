@@ -11,6 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.AuthorityRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import org.junit.Before
@@ -85,7 +86,9 @@ class PetriNetControllerTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
+
+        def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
+            AuthorizingObject.FILTER_DELETE_MY.name()], "admin": AuthorizingObject.stringValues()])
 
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[],

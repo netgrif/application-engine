@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.Authorizations;
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewAuthorityRequest;
 import com.netgrif.application.engine.auth.web.responsebodies.AuthorityResource;
@@ -32,13 +34,19 @@ public class AuthorityController {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Authorizations(value = {
+            @Authorize(authority = "AUTHORITY_DELETE")
+    })
     @ApiOperation(value = "Delete authority", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<Authority> delete(@PathVariable String name, Authentication auth, Locale locale) {
         Authority deletedAuthority = authorityService.delete(name);
         return AuthorityResource.of(deletedAuthority);
     }
 
+    @Authorizations(value = {
+            @Authorize(authority = "AUTHORITY_CREATE")
+    })
     @ApiOperation(value = "Delete authority", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<Authority> create(@RequestBody NewAuthorityRequest request, Authentication auth, Locale locale) {

@@ -185,7 +185,7 @@ public class PetriNetController {
     }
 
     @Authorizations(value = {
-            @Authorize(authority = "PROCESS_DELETE")
+            @Authorize(authority = "PROCESS_DELETE_ALL")
     })
     @ApiOperation(value = "Delete process",
             notes = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",

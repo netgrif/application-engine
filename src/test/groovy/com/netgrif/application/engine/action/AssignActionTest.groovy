@@ -94,7 +94,8 @@ class AssignActionTest {
 
         createMainAndSecondaryNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
+        def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
+                                                             AuthorizingObject.FILTER_DELETE_MY.name()], "admin": AuthorizingObject.stringValues()])
         def authorityList = Stream.concat(auths.get("user").stream(), auths.get("admin").stream()).collect(Collectors.toList()).toArray()
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
