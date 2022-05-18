@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
@@ -151,17 +152,16 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> findAllById(List<String> ids) {
-        List<Case> page = new LinkedList<>();
-        ids.forEach(id -> {
-            Optional<Case> useCase = repository.findById(id);
-            useCase.ifPresent(page::add);
-        });
-        if (page.size() > 0) {
-            page.forEach(c -> c.setPetriNet(petriNetService.get(c.getPetriNetObjectId())));
-            decryptDataSets(page);
-            page.forEach(this::setImmediateDataFieldsReadOnly);
-        }
-        return page;
+        return repository.findAllBy_idIn(ids).stream()
+                .filter(Objects::nonNull)
+                .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
+                .map(caze ->  {
+                    caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
+                    decryptDataSet(caze);
+                    setImmediateDataFieldsReadOnly(caze);
+                    return caze;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

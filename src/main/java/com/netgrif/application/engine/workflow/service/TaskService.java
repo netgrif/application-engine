@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
+import com.google.common.collect.Ordering;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -27,6 +28,7 @@ import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
 import com.netgrif.application.engine.workflow.domain.triggers.AutoTrigger;
@@ -175,6 +177,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.save(useCase);
         save(task);
         reloadTasks(useCase);
+        useCase = workflowService.findOne(useCase.getStringId());
         return useCase;
     }
 
@@ -613,15 +616,14 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        List<Task> page = new LinkedList<>();
-        ids.forEach(id -> {
-            Optional<Task> task = taskRepository.findById(id);
-            task.ifPresent(page::add);
-        });
-        if (page.size() > 0) {
-            page.forEach(this::setUser);
-        }
-        return page;
+        return taskRepository.findAllBy_idIn(ids).stream()
+                .filter(Objects::nonNull)
+                .sorted(Ordering.explicit(ids).onResultOf(Task::getStringId))
+                .map(task -> {
+                    this.setUser(task);
+                    return task;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -828,5 +830,20 @@ public class TaskService implements ITaskService {
             outcome.setMessage(transition.getEvents().get(type).getMessage());
         }
         return outcome;
+    }
+
+    @Override
+    public SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId) {
+        SetDataEventOutcome mainOutcome;
+        String key = taskId;
+        if (!outcomes.containsKey(taskId)) {
+            Optional<String> optional = outcomes.keySet().stream().findFirst();
+            if (optional.isPresent()) {
+                key = optional.get();
+            }
+        }
+        mainOutcome = outcomes.remove(key);
+        mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
+        return mainOutcome;
     }
 }

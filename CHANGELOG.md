@@ -8,24 +8,57 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
-
-## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-03-04)
+## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-04-11)
 
 ### Fixed
+
+- [NAE-1600] Parallel auto-trigger tasks
+- [NAE-1614] Advanced search substring query
+- [NAE-1556] Post-set error prevents set
+- [NAE-1616] Cannot upload process with action id
+- [NAE-1596] Nets with transitions without titles cannot be read
+- [NAE-1598] DataGroups without ID cannot be saved into mongo
+- [NAE-1599] Task-reffed fields are not placed in correct position
+
+### Changed
+
+- [NAE-1620] Change workflowService findAllById method
+
+## [6.0.3](https://github.com/netgrif/application-engine/releases/tag/v6.0.3) (2022-04-01)
+
+### Fixed
+
+- [NAE-1589] Role changes for logged users don't take effect
+- [NAE-1593] Remove user does not remove group from user groups
+- [NAE-1590] Taskref with file field must be assigned
+- [NAE-1618] SpringFox swagger failing in combination with spring actuator
+
+### Changed
+
+- [NAE-1571] Change the Version.NEWEST from "^" to "latest"
+
+## [6.0.2](https://github.com/netgrif/application-engine/releases/tag/v6.0.2) (2022-03-07)
+
+### Fixed
+
 - [NAE-1557] Cannot clear optional enumeration
-- [NAE-1559] Keyword 'this' in event actions 
-- [NAE-1578] Make createSetDataEventOutcome protected
-- [NAE-1579] Group is not added into User.nextGroups when invited
+- [NAE-1559] Keyword 'this' in event actions
 - [NAE-1572] FilterImportExportService service does not assign import_filter tasks
 - [NAE-1573] GET event is initialized with SET type
-- [NAE-1581] Public view create case permission check
-- [NAE-1582] Group is not added into User.nextGroups when invited
 - [NAE-1577] Task reffed change behavior does not propagate
+- [NAE-1579] Group is not added into User.nextGroups when invited
+- [NAE-1581] Public view create case permission check
+- [NAE-1582] PetriNetService search method returns just first page
 - [NAE-1588] DefaultFiltersRunner creates new cases every time
+
+### Changed
+
+- [NAE-1578] Make createSetDataEventOutcome protected
 
 ## [6.0.1](https://github.com/netgrif/application-engine/releases/tag/v6.0.1) (2022-02-15)
 
-- Equalizing release to match version of [Netgrif Components libraries](https://github.com/netgrif/components/releases/tag/v6.0.1)
+- Equalizing release to match version
+  of [Netgrif Components libraries](https://github.com/netgrif/components/releases/tag/v6.0.1)
 
 ## [6.0.0](https://github.com/netgrif/application-engine/releases/tag/v6.0.0) (2022-02-09)
 
@@ -388,8 +421,6 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 
 ## [4.3.1](https://github.com/netgrif/application-engine/releases/tag/4.3.1) (2020-11-13)
 
-
-
 ## [4.3.0](https://github.com/netgrif/application-engine/releases/tag/4.3.0) (2020-11-11)
 
 ### Fixed
@@ -482,7 +513,6 @@ None
 
 - [NAE-970] TaskReference File Upload ResolveActions problem
 - [NAE-977] Taskref layout broken
-
 
 ## [4.1.1](https://github.com/netgrif/application-engine/releases/tag/4.1.1) (2020-8-20)
 

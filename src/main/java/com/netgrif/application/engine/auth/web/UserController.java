@@ -14,6 +14,7 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.settings.domain.Preferences;
 import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
@@ -78,6 +79,9 @@ public class UserController {
 
     @Autowired
     private Provider<UserResourceAssembler> userResourceAssemblerProvider;
+
+    @Autowired
+    private ISecurityContextService securityContextService;
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();
@@ -149,9 +153,10 @@ public class UserController {
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
         user = userService.update(user, updates);
+        securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
             loggedUser.setFullName(user.getFullName());
-            userDetailsService.reloadSecurityContext(loggedUser);
+            securityContextService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
         return new UserResource(userResponseFactory.getUser(user, locale), "profile");
