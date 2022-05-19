@@ -360,6 +360,13 @@
                 </logic>
             </dataRef>
         </dataGroup>
+        <event type="finish">
+            <actions phase="pre">
+                <action>
+                    generatePDF("1","file")
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>2</id>

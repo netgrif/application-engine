@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
@@ -12,10 +13,13 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,6 +64,9 @@ class PdfGeneratorTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private ITaskService taskService
+
     @Value('${nae.pdf.resources.outputFolder}')
     private String pdfOutputFolder;
 
@@ -77,6 +84,16 @@ class PdfGeneratorTest {
         testHelper.truncateDbs()
     }
 
+    @Test
+    void testActionDelegateFunction() {
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[3]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
+        String taskId = testCase.getTasks().find(taskPair -> taskPair.transition.equals("1")).task
+        taskService.assignTask(taskId)
+        taskService.finishTask(taskId)
+        assert workflowService.findOne(testCase.stringId).getFieldValue("file") != null
+    }
 
     @Test
     void testAllData() {
@@ -87,6 +104,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[3] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[3] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -98,6 +118,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[0] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[0] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -114,6 +137,29 @@ class PdfGeneratorTest {
         pdfResource.setTemplateResource(new ClassPathResource(pdfTemplateFolder))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[1] + "_.pdf")
+        assert file.exists()
+    }
+
+    @Test
+    void testingCustomFunction() {
+        PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
+        ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[1]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
+        testCase.getPetriNet().getTransition("1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH).getData()))
+        String filename = pdfResource.getOutputDefaultName()
+        String storagePath = pdfResource.getOutputFolder() + File.separator + testCase.stringId + "-" + "fileField1" + "-" + pdfResource.getOutputDefaultName()
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.updateProperties()
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(storagePath)
+        assert file.exists()
     }
 
     @Test
@@ -125,6 +171,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -139,6 +188,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_page_number_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -161,6 +213,9 @@ class PdfGeneratorTest {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.addCustomField(pdf, pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[2] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -172,6 +227,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[4] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[4] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -182,6 +240,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[5] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[5] + "_.pdf")
+        assert file.exists()
     }
 
     @Test
@@ -192,6 +253,9 @@ class PdfGeneratorTest {
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder+"/out_" + TESTING_DATA[6] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)
+
+        File file = new File(pdfOutputFolder+"/out_" + TESTING_DATA[6] + "_.pdf")
+        assert file.exists()
     }
 
 
