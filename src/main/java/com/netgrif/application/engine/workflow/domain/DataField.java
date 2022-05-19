@@ -168,10 +168,6 @@ public class DataField implements Referencable {
         changeBehavior(FieldBehavior.FORBIDDEN, transition);
     }
 
-    public void makeInitial(String transition) {
-        changeBehavior(FieldBehavior.INITIAL, transition);
-    }
-
     private void changeBehavior(FieldBehavior behavior, String transition) {
         List<FieldBehavior> tmp = Arrays.asList(behavior.getAntonyms());
         tmp.forEach(beh -> this.behavior.get(transition).remove(beh));

@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic
 import com.netgrif.application.engine.importer.model.Behavior
 
 enum FieldBehavior {
-    INITIAL("initial"),
     REQUIRED("required"),
     OPTIONAL("optional"),
     VISIBLE("visible"),
@@ -24,7 +23,6 @@ enum FieldBehavior {
     FieldBehavior(String name, boolean populate) {
         this.name = name
         if (populate) {
-            INITIAL.setAntonyms()
             REQUIRED.setAntonyms()
             OPTIONAL.setAntonyms()
             VISIBLE.setAntonyms()
@@ -37,8 +35,6 @@ enum FieldBehavior {
 
     private FieldBehavior[] addAntonyms() {
         switch (name) {
-            case "initial":
-                return [] as FieldBehavior[]
             case "required":
                 return (FieldBehavior[]) [VISIBLE, HIDDEN, OPTIONAL, FORBIDDEN].toArray()
             case "optional":

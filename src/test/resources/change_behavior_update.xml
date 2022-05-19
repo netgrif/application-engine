@@ -18,7 +18,7 @@
 	</data>
 	<data type="boolean">
 		<id>boolean_0</id>
-		<title>Edit behavior separately on transition</title>
+		<title>Edit behavior on transition</title>
 		<init>false</init>
 		<action trigger="set">
 			bln: f.this,
@@ -32,51 +32,48 @@
 	</data>
 	<data type="boolean">
 		<id>boolean_1</id>
-		<title>Edit behavior separately without transition</title>
+		<title>Edit behavior on transitions</title>
 		<init>false</init>
 		<action trigger="set">
 			bln: f.this,
 			txt0: f.text_0,
-			txt1: f.text_1;
+			trans: t.t1;
 
-			if (bln.value) {
-				make txt0, editable on each
-				make txt1, editable on each
-			} else {
-				make txt0, visible on each
-				make txt1, visible on each
-			}
+			make txt0, editable on transitions when { bln.value }
+			make txt0, required on transitions when { bln.value }
+
+			make txt0, visible on transitions when { !bln.value }
+			make txt0, optional on transitions when { !bln.value }
 		</action>
 	</data>
 	<data type="boolean">
 		<id>boolean_2</id>
-		<title>Edit behavior at once on transition</title>
+		<title>Edit behavior on multiple transitions</title>
 		<init>false</init>
 		<action trigger="set">
 			bln: f.this,
             txt0: f.text_0,
             txt1: f.text_1,
-            trans: t.t1;
+            trans: t.t1,
+            trans2: t.t3;
 
-            if (bln.value)
-                make [txt0, txt1], editable on trans
-            else
-                make [txt0, txt1], visible on trans
+			make txt0, editable on ([trans, trans2]) when { bln.value }
+			make txt0, visible on ([trans, trans2]) when { !bln.value }
 		</action>
 	</data>
 	<data type="boolean">
 		<id>boolean_3</id>
-		<title>Edit behavior at once without transition</title>
+		<title>Edit behavior of multiple fields on multiple transitions</title>
 		<init>false</init>
 		<action trigger="set">
 			bln: f.this,
 			txt0: f.text_0,
-			txt1: f.text_1;
+			txt1: f.text_1,
+			trans: t.t1,
+			trans2: t.t3;
 
-			if (bln.value)
-				make [txt0, txt1], editable on each
-			else
-				make [txt0, txt1], visible on each
+			make [txt0, txt1], editable on ([trans, trans2]) when { bln.value }
+			make [txt0, txt1], visible on ([trans, trans2]) when { !bln.value }
 		</action>
 	</data>
 	<transition>
@@ -84,6 +81,7 @@
 		<x>340</x>
 		<y>140</y>
 		<label>Test transition</label>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>t1_0</id>
 			<layout>legacy</layout>

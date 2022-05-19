@@ -71,7 +71,7 @@ class ChangeBehaviorTest {
     }
 
     @Test
-    void changeBehaviorOnSingleFieldTest() {
+    void changeBehaviorOfSingleFieldOnSingleTransition() {
         Case testCase = helper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
@@ -90,9 +90,13 @@ class ChangeBehaviorTest {
         assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.EDITABLE.toString() }
         assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.REQUIRED.toString() }
         assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.REQUIRED.toString() } == null
+    }
 
-        testCase = helper.createCase(TEST_CASE_NAME, net)
-        mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
+    @Test
+    void changeBehaviorOnEachTransition() {
+        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+
+        Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
         Task otherTask1 = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask1
@@ -109,17 +113,24 @@ class ChangeBehaviorTest {
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet[BOOLEAN_1_FIELD_ID].value == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find {it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_2).find {it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_3).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.REQUIRED.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.REQUIRED.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.REQUIRED.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_3).find { it.toString() == FieldBehavior.REQUIRED.toString() }
     }
 
     @Test
-    void changeBehaviorOnMultipleFieldsTest() {
+    void changeBehaviorOfSingleFieldOnMultipleTransitions() {
         Case testCase = helper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
+        Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
+        assert otherTask
 
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_2": [
@@ -131,16 +142,19 @@ class ChangeBehaviorTest {
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet[BOOLEAN_2_FIELD_ID].value == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find {it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find {it.toString() == FieldBehavior.EDITABLE.toString() } == null
+    }
 
-        testCase = helper.createCase(TEST_CASE_NAME, net)
-        mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
+    @Test
+    void changeBehaviorOfMultipleFieldsOnMultipleTransitions() {
+        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+
+        Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
-        Task otherTask1 = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
-        assert otherTask1
-        Task otherTask2 = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_2) & QTask.task.caseId.eq(testCase.stringId))
-        assert otherTask2
+        Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
+        assert otherTask
 
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_3": [
@@ -153,13 +167,10 @@ class ChangeBehaviorTest {
         assert testCase.dataSet[BOOLEAN_3_FIELD_ID].value == true
 
         assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_3).find { it.toString() == FieldBehavior.EDITABLE.toString() }
         assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
         assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_3).find { it.toString() == FieldBehavior.EDITABLE.toString() }
+        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.EDITABLE.toString() } == null
     }
 
     @Test
