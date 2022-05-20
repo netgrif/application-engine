@@ -147,6 +147,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.PRE);
         useCase = assignTaskToUser(user, task, useCase.getStringId());
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
@@ -228,6 +229,7 @@ public class TaskService implements ITaskService {
 
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.PRE);
 
         finishExecution(transition, useCase.getStringId());
@@ -281,6 +283,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCase.getStringId() + "]: Canceling task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.PRE);
         task = returnTokens(task, useCase.getStringId());
         useCase = workflowService.findOne(useCase.getStringId());
@@ -354,6 +357,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCase.getStringId() + "]: Delegating task [" + task.getTitle() + "] to user [" + delegatedUser.getEmail() + "]");
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
         delegate(delegatedUser, task, useCase);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser.getStringId(), delegatedUser.getStringId()));
@@ -683,10 +687,22 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public List<Task> findAllByCase(String caseId) {
+        return taskRepository.findAllByCaseId(caseId);
+    }
+
+    @Override
     public Task save(Task task) {
         task = taskRepository.save(task);
         elasticTaskService.index(this.taskMappingService.transform(task));
         return task;
+    }
+
+    @Override
+    public List<Task> save(List<Task>  tasks) {
+        tasks = taskRepository.saveAll(tasks);
+        tasks.forEach(task -> elasticTaskService.index(this.taskMappingService.transform(task)));
+        return tasks;
     }
 
     @Override
