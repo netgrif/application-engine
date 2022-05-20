@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistration
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
+import com.netgrif.application.engine.configuration.security.CredentialsConverterFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
@@ -117,6 +118,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .cors()
                 .and()
             .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+            .addFilterBefore(new CredentialsConverterFilter(), PublicAuthenticationFilter.class)
             .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
