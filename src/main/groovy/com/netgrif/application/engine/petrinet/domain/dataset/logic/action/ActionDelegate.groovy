@@ -1066,8 +1066,8 @@ class ActionDelegate {
 
     OutputStream exportCases(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
                              int pageSize = exportConfiguration.getMongoPageSize()) {
-        List<Case> exportCases = findCases(predicate, pageSize)
-        return exportService.fillCsvCaseData(outFile, exportCases, config)
+        QCase qCase = new QCase("case")
+        return exportService.fillCsvCaseData(predicate(qCase), outFile, config, pageSize)
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
@@ -1086,19 +1086,19 @@ class ActionDelegate {
                              int pageSize = exportConfiguration.getMongoPageSize(),
                              Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false) {
-        List<Case> exportCases = elasticCaseService.search(requests, user, pageSize, locale, isIntersection).toList()
-        return exportService.fillCsvCaseData(outFile, exportCases, config)
+        return exportService.fillCsvCaseData(requests, outFile, config, user, pageSize, locale, isIntersection)
     }
 
-    File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
+    File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null) {
         File exportFile = new File(pathName)
-        OutputStream out = exportTasks(predicate, exportFile, config, pageSize)
+        OutputStream out = exportTasks(predicate, exportFile, config)
         out.close()
         return exportFile
     }
 
     OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
-        return exportService.fillCsvTaskData(predicate, outFile, config, pageSize)
+        QTask qTask = new QTask("task");
+        return exportService.fillCsvTaskData(predicate(qTask), outFile, config, pageSize)
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
