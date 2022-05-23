@@ -42,6 +42,7 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -118,6 +119,32 @@ public class PetriNetController {
             return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)));
         } else {
             return new PetriNetReferenceResources(service.getReferences(user, locale));
+        }
+    }
+
+    @Authorizations(value = {
+            @Authorize(authority = "PROCESS_VIEW_MY")
+    })
+    @ApiOperation(value = "Get all processes", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/my", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetReferenceResources getMy(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        List<PetriNetReference> references;
+        if (identifier != null && version == null) {
+            references = service.getReferencesByIdentifier(identifier, user, locale).stream().filter(ref -> ref.getAuthor().getId().equals(user.getId())).collect(Collectors.toList());
+            return new PetriNetReferenceResources(references);
+        } else if (identifier == null && version != null) {
+            references = service.getReferencesByVersion(converter.convert(version), user, locale).stream().filter(ref -> ref.getAuthor().getId().equals(user.getId())).collect(Collectors.toList());
+            return new PetriNetReferenceResources(references);
+        } else if (identifier != null && version != null) {
+            PetriNetReference reference = service.getReference(identifier, converter.convert(version), user, locale);
+            if (reference.getAuthor().getId().equals(user.getId()))
+                return new PetriNetReferenceResources(Collections.singletonList(reference));
+            else
+                return new PetriNetReferenceResources(new ArrayList<PetriNetReference>());
+        } else {
+            references = service.getReferences(user, locale).stream().filter(ref -> ref.getAuthor().getId().equals(user.getId())).collect(Collectors.toList());
+            return new PetriNetReferenceResources(references);
         }
     }
 
