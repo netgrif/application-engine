@@ -176,6 +176,9 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getFilePreview(taskId, fieldId);
     }
 
+    @Authorizations(value = {
+            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
+    })
     @ApiOperation(value = "Upload multiple files into the task",
             notes = "Caller must be assigned to the task, or must be an ADMIN")
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)

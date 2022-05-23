@@ -5,6 +5,7 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.QCase;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -71,6 +72,26 @@ public class GroupController {
                 .collect(Collectors.toCollection(HashSet::new));
         return new GroupsResource(groupResponse);
     }
+
+    @Authorizations(value = {
+            @Authorize(authority = "GROUP_MEMBEROF_VIEW")
+    })
+    @ApiOperation(value = "Get logged user's groups in the system",
+            notes = "Caller must have the GROUP_VIEW_MY authority",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/my", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
+    public GroupsResource getMembershipGroups(Authentication auth) {
+        Set<Case> groups = service.getGroupCasesOfUser(((LoggedUser)auth.getPrincipal()).transformToUser());
+        Set<Group> groupResponse = groups.stream()
+                .map(aCase -> new Group(aCase.getStringId(), aCase.getTitle()))
+                .collect(Collectors.toCollection(HashSet::new));
+        return new GroupsResource(groupResponse);
+    }
+
 
 //    @ApiOperation(value = "Get all the user's groups", authorizations = @Authorization("BasicAuth"))
 //    @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)

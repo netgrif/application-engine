@@ -269,6 +269,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
+    public Set<Case> getGroupCasesOfUser(IUser groupUser) {
+        List<Case> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId()))).toList();
+        return new HashSet<>(groupList);
+    }
+
+    @Override
     public String getGroupOwnerId(String groupId) {
         return this.getGroupOwnerId(this.findGroup(groupId));
     }

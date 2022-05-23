@@ -44,6 +44,8 @@ public interface INextGroupService {
 
     Set<String> getAllGroupsOfUser(IUser groupUser);
 
+    Set<Case> getGroupCasesOfUser(IUser groupUser);
+
     String getGroupOwnerId(String groupId);
 
     Collection<String> getGroupsOwnerIds(Collection<String> groupIds);
