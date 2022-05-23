@@ -188,7 +188,7 @@ public class PetriNetController {
             @Authorize(authority = "PROCESS_DELETE_ALL")
     })
     @ApiOperation(value = "Delete process",
-            notes = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
+            notes = "Caller must have the PROCESS_DELETE_ALL authority. Removes the specified process, along with it's cases, tasks and process roles.",
             authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
@@ -204,6 +204,32 @@ public class PetriNetController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         this.service.deletePetriNet(decodedProcessId, user);
         return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+    }
+
+    @Authorizations(value = {
+            @Authorize(authority = "PROCESS_DELETE_MY")
+    })
+    @ApiOperation(value = "Delete process",
+            notes = "Caller must have the PROCESS_DELETE_MY authority. Removes the specified process, along with it's cases, tasks and process roles.",
+            authorizations = @Authorization("BasicAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements")
+    })
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource deleteMyPetriNet(@PathVariable("id") String processId, Authentication auth) {
+        String decodedProcessId = decodeUrl(processId);
+        if (Objects.equals(decodedProcessId, "")) {
+            log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
+            return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
+        }
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        PetriNet net = service.getPetriNet(processId);
+        if (net != null && net.getAuthor().getId().equals(user.getId())) {
+            this.service.deletePetriNet(decodedProcessId, user);
+            return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+        }
+        return MessageResource.errorMessage("Petri net " + decodedProcessId + " was not deleted.");
     }
 
     public static String decodeUrl(String s1) {
