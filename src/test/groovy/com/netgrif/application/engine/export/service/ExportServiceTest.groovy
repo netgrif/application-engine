@@ -45,20 +45,20 @@ class ExportServiceTest {
     Case mainCase
 
     @BeforeEach
-    void before(){
+    void before() {
         testHelper.truncateDbs()
-        Optional<PetriNet> optionalTestNet =  importHelper.createNet("NAE-1290_Export_actions.xml", VersionType.MAJOR)
+        Optional<PetriNet> optionalTestNet = importHelper.createNet("NAE-1290_Export_actions.xml", VersionType.MAJOR)
         assert optionalTestNet.isPresent()
         testNet = optionalTestNet.get()
-        mainCase = importHelper.createCase("export test main",testNet)
+        mainCase = importHelper.createCase("export test main", testNet)
         9.times {
-            importHelper.createCase("export test",testNet)
+            importHelper.createCase("export test", testNet)
         }
     }
 
     @Test
-    void testCaseMongoExport(){
-        String exportTask = mainCase.tasks.find{it.transition == "t1"}.task
+    void testCaseMongoExport() {
+        String exportTask = mainCase.tasks.find { it.transition == "t1" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
@@ -66,12 +66,13 @@ class ExportServiceTest {
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
                 && !headerSplit.contains("text"))
-        taskService.cancelTask(userService.getLoggedOrSystem().transformToLoggedUser(),exportTask)
+        taskService.cancelTask(userService.getLoggedOrSystem().transformToLoggedUser(), exportTask)
     }
 
     @Test
-    void testCaseElasticExport(){
-        String exportTask = mainCase.tasks.find{it.transition == "t2"}.task
+    void testCaseElasticExport() {
+        Thread.sleep(5000)  //Elastic wait
+        String exportTask = mainCase.tasks.find { it.transition == "t2" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
         assert csvFile.readLines().size() == 1
@@ -79,13 +80,13 @@ class ExportServiceTest {
         assert (headerSplit.contains("text")
                 && !headerSplit.contains("immediate_multichoice")
                 && !headerSplit.contains("immediate_number"))
-        taskService.cancelTask(userService.getLoggedOrSystem().transformToLoggedUser(),exportTask)
+        taskService.cancelTask(userService.getLoggedOrSystem().transformToLoggedUser(), exportTask)
     }
 
     @Test
-    void testTaskMongoExport(){
-        String exportTask = mainCase.tasks.find{it.transition == "t3"}.task
-        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(),exportTask)
+    void testTaskMongoExport() {
+        String exportTask = mainCase.tasks.find { it.transition == "t3" }.task
+        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/task_mongo_export.csv")
         assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
@@ -93,15 +94,16 @@ class ExportServiceTest {
                 && headerSplit.contains("immediate_number")
                 && headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
-        taskService.cancelTask(userService.getLoggedOrSystem().transformToLoggedUser(),exportTask)
+        taskService.cancelTask(userService.getLoggedOrSystem().transformToLoggedUser(), exportTask)
     }
 
     @Test
-    void testTaskElasticExport(){
-        String exportTask = mainCase.tasks.find{it.transition == "t4"}.task
+    void testTaskElasticExport() {
+        Thread.sleep(5000)  //Elastic wait
+        String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
-        assert csvFile.readLines().size() == 3
+        assert csvFile.readLines().size() == 11
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
