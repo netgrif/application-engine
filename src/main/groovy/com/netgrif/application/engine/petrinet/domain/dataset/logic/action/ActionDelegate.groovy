@@ -530,6 +530,15 @@ class ActionDelegate {
             def value = cl()
             if (value instanceof Closure && value() == UNCHANGED_VALUE) return
             useCase."$property" = value
+
+            if (property == "title" || property == "color") {
+                List<Task> tasks = taskService.findAllByCase(useCase.stringId)
+
+                tasks.each { task ->
+                    task."case${property.capitalize()}" = value
+                }
+                taskService.save(tasks)
+            }
         }]
     }
 
@@ -715,7 +724,11 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(Task task, Map dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
+        return setData(task.stringId, dataSet)
+    }
+
+    SetDataEventOutcome setData(String taskId, Map dataSet) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet)))
     }
 
     SetDataEventOutcome setData(String taskId, Map dataSet) {
@@ -768,6 +781,12 @@ class ActionDelegate {
     }
 
     Map<String, Field> getData(Task task) {
+        def useCase = workflowService.findOne(task.caseId)
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+    }
+
+    Map<String, Field> getData(String taskId) {
+        Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
