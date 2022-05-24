@@ -99,11 +99,11 @@ class ExportServiceTest {
 
     @Test
     void testTaskElasticExport() {
-        Thread.sleep(5000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        Thread.sleep(10000)  //Elastic wait
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
-        assert csvFile.readLines().size() == 11
+        assert csvFile.readLines().size() == 2
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
