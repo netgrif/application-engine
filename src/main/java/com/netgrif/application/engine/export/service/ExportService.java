@@ -12,8 +12,6 @@ import com.netgrif.application.engine.export.service.interfaces.IExportService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository;
