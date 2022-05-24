@@ -3,6 +3,7 @@ package com.netgrif.application.engine.export.service
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
@@ -10,6 +11,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
+import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
@@ -52,6 +54,9 @@ class ExportServiceTest {
 
     @Autowired
     private ActionDelegate actionDelegate
+
+    @Autowired
+    private IExportService exportService
 
     PetriNet testNet
     Case mainCase
@@ -135,6 +140,17 @@ class ExportServiceTest {
                 && !headerSplit.contains("text")
                 && !headerSplit.contains("no_export"))
         taskService.cancelTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+    }
+
+    @Test
+    void buildDefaultCsvTaskHeaderTest(){
+        def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+        String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
+        taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
+        List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))
+        Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
+        assert header != null
+        assert header.size() == 2
     }
 
 }
