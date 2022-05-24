@@ -91,7 +91,6 @@ class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvCaseData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
-        QCase qCase = new QCase("case");
         int numOfPages = (int) (((caseRepository.count(predicate)) / pageSize) + 1);
         List<Case> exportCases = new ArrayList<>();
         for (int i = 0; i < numOfPages; i++) {
@@ -203,7 +202,6 @@ class ExportService implements IExportService {
 
     @Override
     public OutputStream fillCsvTaskData(Predicate predicate, File outFile, ExportDataConfig config, int pageSize) throws FileNotFoundException {
-        QTask qTask = new QTask("task");
         int numberOfTasks = (int) taskRepository.count(predicate);
         List<Task> exportTasks = new ArrayList<>();
         for (int i = 0; i < numberOfTasks; i++) {
@@ -226,14 +224,14 @@ class ExportService implements IExportService {
     }
 
     private List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
-        List<String> record = new LinkedList<>();
+        List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
             if (exportCase.getDataSet().containsKey(dataFieldId)) {
-                record.add(StringEscapeUtils.escapeCsv(resolveFieldValue(exportCase, dataFieldId)));
+                recordStringList.add(StringEscapeUtils.escapeCsv(resolveFieldValue(exportCase, dataFieldId)));
             } else
-                record.add("");
+                recordStringList.add("");
         }
-        return record;
+        return recordStringList;
     }
 
     private String resolveFieldValue(Case exportCase, String exportFieldId) {
