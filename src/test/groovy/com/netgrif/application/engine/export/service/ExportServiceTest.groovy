@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -114,6 +115,7 @@ class ExportServiceTest {
     @Test
     @Order(1)
     void testTaskElasticExport() {
+        Thread.sleep(10000)  //Elastic wait
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         Thread.sleep(20000)  //Elastic wait
