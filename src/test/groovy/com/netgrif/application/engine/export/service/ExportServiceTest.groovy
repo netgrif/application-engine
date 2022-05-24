@@ -112,7 +112,7 @@ class ExportServiceTest {
     void testTaskElasticExport() {
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
-        Thread.sleep(10000)  //Elastic wait
+        Thread.sleep(20000)  //Elastic wait
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         def taskRequest = new ElasticTaskSearchRequest()
         taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
