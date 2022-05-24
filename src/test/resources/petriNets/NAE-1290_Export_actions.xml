@@ -275,18 +275,7 @@
                 </layout>
             </dataRef>
         </dataGroup>
-        <event type="assign">
-            <id>export</id>
-            <actions phase="post">
-                <action id="action_3">
-                    def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
-                    def taskRequest = new com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest()
-                    taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
-                    taskRequest.transitionId = ["t4"] as List
-                    exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
-                </action>
-            </actions>
-        </event>
+
     </transition>
     <place>
         <id>p1</id>

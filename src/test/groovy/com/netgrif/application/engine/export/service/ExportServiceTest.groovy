@@ -2,13 +2,18 @@ package com.netgrif.application.engine.export.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.QTask
+import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.querydsl.core.types.Predicate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,6 +45,12 @@ class ExportServiceTest {
 
     @Autowired
     private TestHelper testHelper
+
+    @Autowired
+    private TaskRepository taskRepository
+
+    @Autowired
+    private ActionDelegate actionDelegate
 
     PetriNet testNet
     Case mainCase
@@ -102,8 +113,13 @@ class ExportServiceTest {
         String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         Thread.sleep(10000)  //Elastic wait
+        def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+        def taskRequest = new ElasticTaskSearchRequest()
+        taskRequest.process = [new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
+        taskRequest.transitionId = ["t4"] as List
+        actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
-        assert csvFile.readLines().size() == 2
+        assert csvFile.readLines().size() == taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))+1
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
