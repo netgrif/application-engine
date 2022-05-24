@@ -119,7 +119,7 @@ class ExportServiceTest {
         taskRequest.transitionId = ["t4"] as List
         actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
-        assert csvFile.readLines().size() == taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))+1
+        assert csvFile.readLines().size() == ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
