@@ -879,6 +879,28 @@ class ActionDelegate {
                 template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
     }
 
+    @NamedVariant
+    void generatePDF(String sourceTransitionId, String targetFileFieldId,
+                     Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
+                     String template = null, List<String> excludedFields = [], Locale locale = null,
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+        if (!sourceTransitionId || !targetFileFieldId)
+            throw new IllegalArgumentException("Source transition or target file field is null")
+        targetTransitionId = targetTransitionId ?: sourceTransitionId
+        generatePdf(sourceTransitionId, targetFileFieldId, sourceCase, targetCase, targetTransitionId,
+                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+    }
+
+    void generatePDF(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
+                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+        if (!sourceTransition || !targetFileField)
+            throw new IllegalArgumentException("Source transition or target file field is null")
+        targetTransition = targetTransition ?: sourceTransition
+        generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
+                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+    }
+
     void generatePdf(String transitionId, FileField fileField, List<String> excludedFields = []) {
         generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileField, excludedFields: excludedFields)
     }

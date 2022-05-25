@@ -140,7 +140,7 @@
 		<id>1</id>
 		<x>340</x>
 		<y>180</y>
-		<label>Transition</label>
+		<label>Transition 1</label>
 		<dataGroup>
 			<id>dataGroup1</id>
 			<layout>legacy</layout>
@@ -280,9 +280,159 @@
 
                     generatePdf(trans, field)
                 </action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>1_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>2</id>
+		<x>440</x>
+		<y>280</y>
+		<label>Transition 2</label>
+		<dataGroup>
+			<id>dataGroup1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>dateTime</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>assign-test</id>
+			<actions phase="post">
 				<action id="action_1">
 					def other = findCase { it.processIdentifier.eq(useCase.petriNet.identifier).and(it._id.ne(useCase.stringId)) }
-					generatePdf sourceTransitionId: '1', targetFileFieldId: 'file', targetCase: other
+					generatePdf sourceTransitionId: '2', targetFileFieldId: 'file', targetCase: other
 				</action>
 			</actions>
 		</event>

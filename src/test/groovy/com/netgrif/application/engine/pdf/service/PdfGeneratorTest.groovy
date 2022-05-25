@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.FileUrlResource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -133,7 +134,7 @@ class PdfGeneratorTest {
         pdfResource.setMarginRight(75)
         pdfResource.setMarginTitle(100)
         pdfResource.updateProperties()
-        pdfResource.setTemplateResource(new ClassPathResource(pdfTemplateFolder))
+        pdfResource.setTemplateResource(new FileUrlResource(pdfTemplateFolder))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
 
@@ -265,10 +266,11 @@ class PdfGeneratorTest {
         assertNotNull(testCase)
         List<TaskReference> tasks = taskService.findAllByCase(testCase.stringId, Locale.ENGLISH)
         assertNotNull(tasks)
-        assertEquals(1, tasks.size())
-        AssignTaskEventOutcome outcome = taskService.assignTask(tasks.get(0).stringId)
+        assertEquals(2, tasks.size())
+        TaskReference task = tasks.find {it.transitionId == "1"}
+        AssignTaskEventOutcome outcome = taskService.assignTask(task.stringId)
         assertNotNull(outcome)
-        assertEquals(tasks.get(0).stringId, outcome.task.stringId)
+        assertEquals(task.stringId, outcome.task.stringId)
         assertEquals(testCase.stringId, outcome.case.stringId)
 
         File file = new File(pdfOutputFolder + File.separator + testCase.stringId + "-file-generated_pdf.pdf")
@@ -287,10 +289,11 @@ class PdfGeneratorTest {
 
         List<TaskReference> tasks = taskService.findAllByCase(testCase.stringId, Locale.ENGLISH)
         assertNotNull(tasks)
-        assertEquals(1, tasks.size())
-        AssignTaskEventOutcome outcome = taskService.assignTask(tasks.get(0).stringId)
+        assertEquals(2, tasks.size())
+        TaskReference task = tasks.find {it.transitionId == "2"}
+        AssignTaskEventOutcome outcome = taskService.assignTask(task.stringId)
         assertNotNull(outcome)
-        assertEquals(tasks.get(0).stringId, outcome.task.stringId)
+        assertEquals(task.stringId, outcome.task.stringId)
         assertEquals(testCase.stringId, outcome.case.stringId)
 
         File file = new File(pdfOutputFolder + File.separator + testCase2.stringId + "-file-generated_pdf.pdf")
