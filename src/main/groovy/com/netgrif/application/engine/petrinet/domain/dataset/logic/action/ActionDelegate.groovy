@@ -731,10 +731,6 @@ class ActionDelegate {
         return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet)))
     }
 
-    SetDataEventOutcome setData(String taskId, Map dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet)))
-    }
-
     SetDataEventOutcome setData(Transition transition, Map dataSet) {
         return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
     }
