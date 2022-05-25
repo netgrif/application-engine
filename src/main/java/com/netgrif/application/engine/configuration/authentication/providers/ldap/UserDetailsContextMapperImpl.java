@@ -9,6 +9,7 @@ import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +19,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import java.util.Collection;
 
 @Slf4j
+@ConditionalOnExpression("${nae.ldap.enabled}")
 public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
     protected LdapUserService ldapUserService;
 

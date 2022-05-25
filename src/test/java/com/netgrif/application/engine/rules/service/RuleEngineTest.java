@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.rules.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
@@ -38,16 +37,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = ApplicationEngine.class
-)
-@TestPropertySource(
-        locations = "classpath:application-test.properties"
-)
+@SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class RuleEngineTest {
+class RuleEngineTest {
 
     public static final String TEXT_VALUE = "new text value";
     public static final Double NUM_VALUE = 99.0;
@@ -76,6 +69,7 @@ public class RuleEngineTest {
 
     @AfterEach
     public void after() {
+        testHelper.truncateDbs();
         ruleRepository.deleteAll();
         factRepository.deleteAll();
     }
@@ -96,7 +90,7 @@ public class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
@@ -133,7 +127,7 @@ public class RuleEngineTest {
 
         assert refreshableKieBase.shouldRefresh();
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),  VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert !refreshableKieBase.shouldRefresh();
 
@@ -154,7 +148,7 @@ public class RuleEngineTest {
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),  VersionType.MAJOR, superCreator.getLoggedSuper());
         assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
@@ -356,7 +350,7 @@ public class RuleEngineTest {
     }
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"),  VersionType.MAJOR, superCreator.getLoggedSuper());
         return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getCase();
     }
 
