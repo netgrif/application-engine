@@ -19,9 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -112,10 +108,8 @@ class NetgrifLdapAuthenticationProviderTest {
     @Test
     void getMyLDAPGroups() throws Exception {
 
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test2, USER_PASSWORD_Test2);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
         MvcResult result = mvc.perform(get("/api/auth/login")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test2, USER_PASSWORD_Test2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -131,10 +125,8 @@ class NetgrifLdapAuthenticationProviderTest {
     @Test
     void noLDAPGroups() throws Exception {
 
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test3, USER_PASSWORD_Test3);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
         MvcResult result = mvc.perform(get("/api/auth/login")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test3, USER_PASSWORD_Test3))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -149,11 +141,9 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void getMyProcessRole() throws Exception {
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test1, USER_PASSWORD_Test1);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         MvcResult result = mvc.perform(get("/api/user/me")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -210,11 +200,9 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void assignRoleGroupAndCheck() throws Exception {
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test1, USER_PASSWORD_Test1);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         MvcResult result = mvc.perform(get("/api/user/me")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -247,7 +235,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
 
         MvcResult result2 = mvc.perform(get("/api/auth/login")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -261,7 +249,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
 
         MvcResult result3 = mvc.perform(get("/api/auth/login")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())

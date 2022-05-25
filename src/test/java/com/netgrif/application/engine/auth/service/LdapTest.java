@@ -7,16 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -68,11 +64,8 @@ public class LdapTest {
     @Test
     void testLogin1() throws Exception {
 
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test1, USER_PASSWORD_Test1);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
-
         mvc.perform(get("/api/auth/login")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -82,7 +75,7 @@ public class LdapTest {
     @Test
     void testLogin2() throws Exception {
 
-        mvc.perform(get("/api/auth/login")
+        mvc.perform(get("/api/user/me")
                         .with(httpBasic(USER_EMAIL_Test2, USER_PASSWORD_Test2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
