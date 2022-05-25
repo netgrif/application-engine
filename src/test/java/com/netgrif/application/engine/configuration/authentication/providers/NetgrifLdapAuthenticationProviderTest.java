@@ -38,25 +38,9 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles({"test"})
+@SpringBootTest
+@ActiveProfiles({"test-ldap"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {
-        "spring.ldap.embedded.base-dn=dc=netgrif,dc=com",
-        "spring.ldap.embedded.credential.username=cn=admin,dc=netgrif,dc=com",
-        "spring.ldap.embedded.credential.password=secret",
-        "spring.ldap.embedded.ldif=file:src/test/resources/test-server.ldif",
-        "spring.ldap.embedded.port=6389",
-        "nae.security.providers=NetgrifBasicAuthenticationProvider,NetgrifLdapAuthenticationProvider",
-        "spring.ldap.embedded.validation.enabled=false",
-        "nae.ldap.enabled=true",
-        "nae.ldap.url=ldap://localhost:6389",
-        "nae.ldap.username=cn=admin,dc=netgrif,dc=com",
-        "nae.ldap.password=secret",
-        "nae.ldap.base=dc=netgrif,dc=com",
-        "nae.ldap.userFilter=cn={0}",
-        "nae.ldap.peopleSearchBase=ou=people",
-        "nae.ldap.groupSearchBase=ou=groups",
-        "nae.ldap.peopleClass=inetOrgPerson,person"})
 class NetgrifLdapAuthenticationProviderTest {
 
     @Autowired
