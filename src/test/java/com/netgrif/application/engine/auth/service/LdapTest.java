@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,15 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=file:src/test/resources/test-server.ldif",
         "spring.ldap.embedded.port=6389",
-        "nae.security.providers=NetgrifBasicAuthenticationProvider,NetgrifLdapAuthenticationProvider",
+        "nae.security.providers=NetgrifLdapAuthenticationProvider",
         "spring.ldap.embedded.validation.enabled=false",
         "nae.ldap.enabled=true",
-        "spring.ldap.urls=ldap://localhost:6389",
-        "spring.ldap.username=cn=admin,dc=netgrif,dc=com",
-        "spring.ldap.password=secret",
-        "spring.ldap.base=dc=netgrif,dc=com",
+        "nae.ldap.url=ldap://localhost:6389",
+        "nae.ldap.username=cn=admin,dc=netgrif,dc=com",
+        "nae.ldap.password=secret",
         "nae.ldap.base=dc=netgrif,dc=com",
-        "nae.ldap.userFilter=(cn={0})",
+        "nae.ldap.userFilter=cn={0}",
         "nae.ldap.peopleSearchBase=ou=people",
         "nae.ldap.groupSearchBase=ou=groups",
         "nae.ldap.peopleClass=inetOrgPerson,person"})
@@ -71,7 +71,7 @@ public class LdapTest {
         UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test1, USER_PASSWORD_Test1);
         user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
-        mvc.perform(get("/api/user/me")
+        mvc.perform(get("/api/auth/login")
                         .with(authentication(user))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
@@ -82,11 +82,8 @@ public class LdapTest {
     @Test
     void testLogin2() throws Exception {
 
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test2, USER_PASSWORD_Test2);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
-
         mvc.perform(get("/api/auth/login")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test2, USER_PASSWORD_Test2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())

@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -100,12 +101,8 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void testLogin() throws Exception {
-
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(USER_EMAIL_Test1, USER_PASSWORD_Test1);
-        user.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
-
         mvc.perform(get("/api/user/me")
-                        .with(authentication(user))
+                        .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
@@ -261,7 +258,6 @@ class NetgrifLdapAuthenticationProviderTest {
         JSONObject json2 = new JSONObject(response2);
         JSONArray countProcessRole2 = (JSONArray) json2.get("processRoles");
         assert countProcessRole2.length() == 1 + roles.size();
-
 
 
         MvcResult result3 = mvc.perform(get("/api/auth/login")
