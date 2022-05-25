@@ -6,12 +6,14 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@ConditionalOnExpression("${nae.ldap.enabled}")
 public class LdapLoggedUser extends LoggedUser {
 
     @Getter

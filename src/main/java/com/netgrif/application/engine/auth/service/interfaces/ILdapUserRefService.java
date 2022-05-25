@@ -6,7 +6,6 @@ import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
 import javax.naming.Name;
-import java.util.Set;
 
 @ConditionalOnExpression("${nae.ldap.enabled}")
 public interface ILdapUserRefService {
