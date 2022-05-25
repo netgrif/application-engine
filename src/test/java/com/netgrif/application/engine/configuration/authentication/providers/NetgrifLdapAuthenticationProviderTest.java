@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.SuperCreator;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,11 +45,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.ldap.embedded.credential.username=cn=admin,dc=netgrif,dc=com",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=file:src/test/resources/test-server.ldif",
-        "spring.ldap.embedded.port=6389",
+        "spring.ldap.embedded.port=7389",
         "nae.security.providers=NetgrifBasicAuthenticationProvider,NetgrifLdapAuthenticationProvider",
         "spring.ldap.embedded.validation.enabled=false",
         "nae.ldap.enabled=true",
-        "nae.ldap.url=ldap://localhost:6389",
+        "nae.ldap.url=ldap://localhost:7389",
         "nae.ldap.username=cn=admin,dc=netgrif,dc=com",
         "nae.ldap.password=secret",
         "nae.ldap.base=dc=netgrif,dc=com",
@@ -86,7 +87,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
     private MockMvc mvc;
 
-    @BeforeEach
+    @AfterEach
     public void before() {
         testHelper.truncateDbs();
         mvc = MockMvcBuilders
