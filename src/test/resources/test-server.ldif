@@ -50,14 +50,14 @@ subschemaSubentry: cn=Subschema
 dn: ou=test1,ou=people,dc=netgrif,dc=com
 objectClass: top
 objectClass: organizationalUnit
-ou: partner
+ou: test1
 structuralObjectClass: organizationalUnit
 subschemaSubentry: cn=Subschema
 
 dn: ou=test2,ou=people,dc=netgrif,dc=com
 objectClass: top
 objectClass: organizationalUnit
-ou: support
+ou: test2
 structuralObjectClass: organizationalUnit
 subschemaSubentry: cn=Subschema
 
@@ -123,7 +123,6 @@ givenName: Simpson
 userPassword: password
 structuralObjectClass: inetOrgPerson
 subschemaSubentry: cn=Subschema
-
 
 dn: cn=watson@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
 objectClass: extensibleObject

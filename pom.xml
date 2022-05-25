@@ -228,6 +228,11 @@
 
         <!-- Test -->
         <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.8.1</version>
@@ -943,3 +948,4 @@
         </profile>
     </profiles>
 </project>
+
