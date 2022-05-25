@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=file:src/test/resources/test-server.ldif",
         "spring.ldap.embedded.port=6389",
-        "nae.security.providers=NetgrifBasicAuthenticationProvider,NetgrifLdapAuthenticationProvider",
+        "nae.security.providers=NetgrifLdapAuthenticationProvider,NetgrifLdapAuthenticationProvider",
         "spring.ldap.embedded.validation.enabled=false",
         "nae.ldap.enabled=true",
         "spring.ldap.urls=ldap://localhost:6389",
