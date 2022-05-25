@@ -45,11 +45,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.ldap.embedded.credential.username=cn=admin,dc=netgrif,dc=com",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=file:src/test/resources/test-server.ldif",
-        "spring.ldap.embedded.port=7389",
+        "spring.ldap.embedded.port=6389",
         "nae.security.providers=NetgrifBasicAuthenticationProvider,NetgrifLdapAuthenticationProvider",
         "spring.ldap.embedded.validation.enabled=false",
         "nae.ldap.enabled=true",
-        "nae.ldap.url=ldap://localhost:7389",
+        "nae.ldap.url=ldap://localhost:6389",
         "nae.ldap.username=cn=admin,dc=netgrif,dc=com",
         "nae.ldap.password=secret",
         "nae.ldap.base=dc=netgrif,dc=com",
@@ -87,7 +87,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
     private MockMvc mvc;
 
-    @AfterEach
+    @BeforeEach
     public void before() {
         testHelper.truncateDbs();
         mvc = MockMvcBuilders
@@ -100,6 +100,17 @@ class NetgrifLdapAuthenticationProviderTest {
     void testLogin() throws Exception {
         mvc.perform(get("/api/user/me")
                         .with(httpBasic(USER_EMAIL_Test1, USER_PASSWORD_Test1))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    void testLogin2() throws Exception {
+
+        mvc.perform(get("/api/auth/login")
+                        .with(httpBasic(USER_EMAIL_Test2, USER_PASSWORD_Test2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk())
