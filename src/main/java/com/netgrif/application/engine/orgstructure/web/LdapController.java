@@ -73,7 +73,7 @@ public class LdapController {
     })
     public MessageResource assignRolesToLdapGroup(@RequestBody LdapGroupRoleAssignRequestBody requestBody, Authentication auth) {
         try {
-            service.addRoleToLdapGroup(requestBody.getGroupDn(), requestBody.getRoleIds(), (LoggedUser) auth.getPrincipal());
+            service.setRoleToLdapGroup(requestBody.getGroupDn(), requestBody.getRoleIds(), (LoggedUser) auth.getPrincipal());
             log.info("Process roles " + requestBody.getRoleIds() + " assigned to group " + requestBody.getGroupDn());
             return MessageResource.successMessage("Selected roles assigned to group " + requestBody.getGroupDn());
         } catch (IllegalArgumentException e) {

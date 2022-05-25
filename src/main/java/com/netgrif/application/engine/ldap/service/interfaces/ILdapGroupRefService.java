@@ -23,6 +23,6 @@ public interface ILdapGroupRefService {
 
     Set<ProcessRole> getProcessRoleByLdapGroup(Set<String> groupDn);
 
-    public void addRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedUser loggedUser);
+    public void setRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedUser loggedUser);
 
 }

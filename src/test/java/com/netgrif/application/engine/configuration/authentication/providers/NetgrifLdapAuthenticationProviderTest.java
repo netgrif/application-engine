@@ -204,7 +204,7 @@ class NetgrifLdapAuthenticationProviderTest {
             role.add(v.getStringId());
         });
         assert role.size() == roles.size();
-        ldapGroupRefService.addRoleToLdapGroup(ldapGroupsTest.get(0).getDn().toString(), role, superCreator.getLoggedSuper());
+        ldapGroupRefService.setRoleToLdapGroup(ldapGroupsTest.get(0).getDn().toString(), role, superCreator.getLoggedSuper());
         Set<String> group = new HashSet<>();
         group.add(ldapGroupsTest.get(0).getDn().toString());
         Set<ProcessRole> getRole = ldapGroupRefService.getProcessRoleByLdapGroup(group);
@@ -241,7 +241,7 @@ class NetgrifLdapAuthenticationProviderTest {
             role.add(v.getStringId());
         });
         assert role.size() == roles.size();
-        ldapGroupRefService.addRoleToLdapGroup(ldapGroupsTest.get(0).getDn().toString(), role, superCreator.getLoggedSuper());
+        ldapGroupRefService.setRoleToLdapGroup(ldapGroupsTest.get(0).getDn().toString(), role, superCreator.getLoggedSuper());
 
         Set<String> group = new HashSet<>();
         group.add(ldapGroupsTest.get(0).getDn().toString());

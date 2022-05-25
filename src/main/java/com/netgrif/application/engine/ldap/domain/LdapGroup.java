@@ -6,12 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.ldap.odm.annotations.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
 
 
 @Data
+@Document
 @NoArgsConstructor
 @AllArgsConstructor
 @ConditionalOnExpression("${nae.ldap.enabled}")
