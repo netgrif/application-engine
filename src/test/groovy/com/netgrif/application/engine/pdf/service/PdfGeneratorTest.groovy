@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.FileUrlResource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -134,7 +135,7 @@ class PdfGeneratorTest {
         pdfResource.setMarginRight(75)
         pdfResource.setMarginTitle(100)
         pdfResource.updateProperties()
-        pdfResource.setTemplateResource(new ClassPathResource(pdfTemplateFolder))
+        pdfResource.setTemplateResource(new FileUrlResource(pdfTemplateFolder))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
 

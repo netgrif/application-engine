@@ -173,6 +173,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformNumberField(com.netgrif.application.engine.workflow.domain.DataField numberField) {
+        if (numberField.getValue() instanceof Integer) { //TODO: Refactor
+            return Optional.of(new NumberField(Double.parseDouble(numberField.getValue().toString())));
+        }
         return Optional.of(new NumberField((Double) numberField.getValue()));
     }
 
