@@ -1,0 +1,26 @@
+dn: dc=netgrif,dc=com
+objectclass: top
+objectclass: domain
+objectclass: extensibleObject
+dc: netgrif
+
+dn: ou=groups,dc=netgrif,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=netgrif,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+dn: cn=ben@netgrif.com,ou=people,dc=netgrif,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: ben@netgrif.com
+sn: Test
+uid: Ben
+userPassword: benpassword
+
