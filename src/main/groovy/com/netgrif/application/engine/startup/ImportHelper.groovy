@@ -164,10 +164,6 @@ class ImportHelper {
     }
 
     IUser createUser(User user, Authority[] authorities, ProcessRole[] roles) {
-        user = userService.findByEmail(user.getEmail(), false);
-        if(user != null){
-            return user
-        }
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.state = UserState.ACTIVE
