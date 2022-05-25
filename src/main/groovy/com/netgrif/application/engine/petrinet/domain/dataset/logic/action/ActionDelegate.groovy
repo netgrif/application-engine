@@ -514,6 +514,15 @@ class ActionDelegate {
             def value = cl()
             if (value instanceof Closure && value() == UNCHANGED_VALUE) return
             useCase."$property" = value
+
+            if (property == "title" || property == "color") {
+                List<Task> tasks = taskService.findAllByCase(useCase.stringId)
+
+                tasks.each { task ->
+                    task."case${property.capitalize()}" = value
+                }
+                taskService.save(tasks)
+            }
         }]
     }
 
@@ -699,7 +708,11 @@ class ActionDelegate {
     }
 
     SetDataEventOutcome setData(Task task, Map dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
+        return setData(task.stringId, dataSet)
+    }
+
+    SetDataEventOutcome setData(String taskId, Map dataSet) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, ImportHelper.populateDataset(dataSet)))
     }
 
     SetDataEventOutcome setData(Transition transition, Map dataSet) {
@@ -752,6 +765,12 @@ class ActionDelegate {
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
+    Map<String, Field> getData(String taskId) {
+        Task task = taskService.findById(taskId)
+        def useCase = workflowService.findOne(task.caseId)
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+    }
+
     Map<String, Field> getData(Transition transition) {
         return getData(transition.stringId, this.useCase)
     }
@@ -779,32 +798,49 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
-    void generatePDF(String transitionId, String fileFieldId) {
+    void generatePDF(Transition t, FileField field) {
+        this.generatePDF(t.getStringId(), field.importId)
+    }
+
+    void savePdfToField(Case aCase, String transitionId, String filename, String storagePath, String fileFieldId) {
+        if (aCase.stringId == useCase.stringId) {
+            change aCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+        } else {
+            String taskId = aCase.getTasks().find(taskPair -> taskPair.transition.equals(transitionId)).task
+            Map dataSet = new HashMap() {{ put(fileFieldId, ["value": filename + ":" + storagePath, "type": "file"] as Map) }}
+            setData(taskId, dataSet)
+        }
+    }
+
+    void generatePDF(String transitionId, String fileFieldId, Case fromCase = useCase, Case saveToCase = useCase, String saveToTransitionId = transitionId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        FileFieldValue fieldValue = new FileFieldValue()
+        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
+        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
     }
 
-    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields) {
+    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        FileFieldValue fieldValue = new FileFieldValue()
+        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
-        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource, excludedFields)
+        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
     }
 
-    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template) {
+    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        FileFieldValue fieldValue = new FileFieldValue()
+        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTemplateResource(new ClassPathResource(template))
@@ -813,29 +849,46 @@ class ActionDelegate {
         pdfResource.setMarginRight(75)
         pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
+        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
     }
 
-    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale) {
+    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale, Case fromCase = useCase, Case saveToCase = useCase) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+        FileFieldValue fieldValue = new FileFieldValue()
+        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
         pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
+        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
     }
 
-    void generatePdfWithZoneId(String transitionId, String fileFieldId, ZoneId dateZoneId = ZoneId.systemDefault()) {
+    void generatePdfWithZoneId(String transitionId, String fileFieldId, ZoneId dateZoneId = ZoneId.systemDefault(), Case fromCase = useCase, Case saveToCase = useCase) {
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputDefaultName()
+        FileFieldValue fieldValue = new FileFieldValue()
+        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setDateZoneId(dateZoneId)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
+        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
+    }
+
+    void generatePdf(String transitionId, String fileFieldId) {
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
         String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfResource.setDateZoneId(dateZoneId)
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }

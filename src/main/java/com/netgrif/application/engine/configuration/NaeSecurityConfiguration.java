@@ -43,7 +43,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
-public class NAESecurityConfiguration extends AbstractSecurityConfiguration {
+public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     private Environment env;
