@@ -220,29 +220,23 @@ class RuleEngineTest {
 
     @Test
     public void testAssign() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        log.info("testAssign");
         StoredRule rule = transitionRulePre(TRANS_1, "com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
         StoredRule rule2 = transitionRulePost(TRANS_1, "com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
-        log.info("create rules");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
-        log.info("save rules");
 
         Case caze = newCase();
         assert caze != null;
-        log.info("create test case");
 
         Task task = findTask(caze, TRANS_1);
         taskService.assignTask(task, superUser.transformToUser());
-        log.info("assignTask");
 
         caze = workflowService.findOne(caze.getStringId());
-        log.info("find caze reload");
 
+        assert caze != null;
         assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
         assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
-        log.info("Final test");
     }
 
     @Test
