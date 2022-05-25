@@ -461,6 +461,13 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <version>6.0.3</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- For Configuration Properties -->
         <dependency>
