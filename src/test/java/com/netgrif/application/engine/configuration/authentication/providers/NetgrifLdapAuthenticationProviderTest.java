@@ -310,7 +310,6 @@ class NetgrifLdapAuthenticationProviderTest {
     void LdapGroupRoleAssignRequestBodyTest() {
         LdapGroupRoleAssignRequestBody test = new LdapGroupRoleAssignRequestBody("groupDn", null);
         assert test.getGroupDn().equals("groupDn");
-        assert test.getRoleIds() != null;
         assert test.toString() != null;
 
         LdapGroupRoleAssignRequestBody ldapGroupRoleAssignRequestBody = new LdapGroupRoleAssignRequestBody();
@@ -325,7 +324,7 @@ class NetgrifLdapAuthenticationProviderTest {
         User test = new User();
         user.loadFromUser(test);
         assert user!= null;
-        LdapUser user2 = new LdapUser(new ObjectId("aaaaa"));
+        LdapUser user2 = new LdapUser(new ObjectId("507f1f77bcf86cd799439011"));
         assert user2 != null;
         assert user2.getStringId() != null;
         LdapUser ldapUser = new LdapUser("dn", "commonName", "uid", "homeDirectory", "email", "name", "surname", null, "telNumber");
