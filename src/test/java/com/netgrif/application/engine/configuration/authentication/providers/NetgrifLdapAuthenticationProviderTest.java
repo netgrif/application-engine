@@ -324,7 +324,7 @@ class NetgrifLdapAuthenticationProviderTest {
         User test = new User();
         user.loadFromUser(test);
         assert user!= null;
-        LdapUser user2 = new LdapUser(new ObjectId("507f1f77bcf86cd799439011"));
+        LdapUser user2 = new LdapUser(new ObjectId());
         assert user2 != null;
         assert user2.getStringId() != null;
         LdapUser ldapUser = new LdapUser("dn", "commonName", "uid", "homeDirectory", "email", "name", "surname", null, "telNumber");
