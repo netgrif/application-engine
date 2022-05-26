@@ -10,7 +10,6 @@ import javax.naming.Name;
 @ConditionalOnExpression("${nae.ldap.enabled}")
 public interface ILdapUserRefService {
 
-
     IUser createUser(LdapUserRef ldapUser);
 
     IUser updateById(Name id, IUser savedUser);

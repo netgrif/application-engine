@@ -27,7 +27,7 @@ public class NaeLdapProperties {
 
     private String superUsername;
 
-    private String userFilter;
+    private String userFilter = "cn={0}";
 
     private String peopleSearchBase;
 
