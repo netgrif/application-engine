@@ -247,7 +247,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-<!--            <optional>true</optional>-->
         </dependency>
 
         <!-- if Update org.codehaus.groovy.modules.http-builder:http-builder:jar:0.7.1 delete -->
