@@ -109,9 +109,12 @@ class ElasticSearchViewPermissionTest {
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet("vpt")] as List
+        sleep(4000)
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
-        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId
+        assert casePage.getContent() != null
+        assert casePage.getContent().size() == 1
+        assert casePage.getContent()[0].stringId == case_.stringId
         userService.removeRole(testUser, posViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
