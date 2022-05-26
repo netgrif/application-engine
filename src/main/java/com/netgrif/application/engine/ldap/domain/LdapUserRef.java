@@ -7,6 +7,7 @@ import org.springframework.ldap.odm.annotations.Id;
 
 import javax.naming.Name;
 import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -36,7 +37,7 @@ public class LdapUserRef {
 
     private List<String> objectClass;
 
-    private List<String> memberOf;
+    private Set<String> memberOf;
 
     private String lockingOut;
 

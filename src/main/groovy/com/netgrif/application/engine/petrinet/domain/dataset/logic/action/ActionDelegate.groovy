@@ -3,11 +3,19 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.auth.domain.Author
 import com.netgrif.application.engine.auth.domain.IUser
+import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.application.engine.export.configuration.ExportConfiguration
+import com.netgrif.application.engine.export.domain.ExportDataConfig
+import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -42,11 +50,13 @@ import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
+import groovy.transform.NamedVariant
 import org.bson.types.ObjectId
 import org.quartz.Scheduler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
@@ -66,6 +76,9 @@ class ActionDelegate {
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
     static final String ONCE_GENERATE = "once"
+
+    @Value('${nae.mail.from}')
+    private String mailFrom
 
     @Autowired
     FieldFactory fieldFactory
@@ -129,6 +142,18 @@ class ActionDelegate {
 
     @Autowired
     IFilterImportExportService filterImportExportService
+
+    @Autowired
+    IExportService exportService
+
+    @Autowired
+    IElasticCaseService elasticCaseService
+
+    @Autowired
+    IElasticTaskService elasticTaskService
+
+    @Autowired
+    ExportConfiguration exportConfiguration
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -218,7 +243,7 @@ class ActionDelegate {
     }
 
     /**
-     * Changes behavior of a given field on given transition if certain condition is being met.
+     * Changes behavior of a given field on given transition if certain condition is being met, or if condition is not used.
      * <br>
      * Example:
      * <pre>
@@ -247,14 +272,14 @@ class ActionDelegate {
         }]
     }
 
-    protected SetDataEventOutcome createSetDataEventOutcome(){
+    protected SetDataEventOutcome createSetDataEventOutcome() {
         return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
         ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("choices", field.choices.collect {it.getTranslation(LocaleContextHolder.locale)})
+        changedField.addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -272,7 +297,7 @@ class ActionDelegate {
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
         ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
+        changedField.addAttribute("options", field.options.collectEntries { key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)] })
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -313,6 +338,17 @@ class ActionDelegate {
          }]
     }
 
+    def execute(Task task) {
+        [with : { Map dataSet ->
+            executeTasks(dataSet, task.stringId, { it._id.isNotNull() })
+        },
+         where: { Closure<Predicate> closure ->
+             [with: { Map dataSet ->
+                 executeTasks(dataSet, taskId, closure)
+             }]
+         }]
+    }
+
     void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
         List<String> caseIds = searchCases(predicateClosure)
         QTask qTask = new QTask("task")
@@ -328,7 +364,7 @@ class ActionDelegate {
         addTaskOutcomes(task, dataSet)
     }
 
-    private addTaskOutcomes(Task task, Map dataSet){
+    private addTaskOutcomes(Task task, Map dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
         this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
         this.outcomes.add(taskService.finishTask(task.stringId))
@@ -384,42 +420,42 @@ class ActionDelegate {
              }
              saveChangedAllowedNets(field)
          },
-        options: { cl ->
-            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
-                    || field instanceof MultichoiceField || field instanceof EnumerationField))
-                return
+         options    : { cl ->
+             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
+                     || field instanceof MultichoiceField || field instanceof EnumerationField))
+                 return
 
-            def options = cl()
-            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
-                return
-            if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
-                return
+             def options = cl()
+             if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                 return
+             if (!(options instanceof Map && options.every { it.getKey() instanceof String }))
+                 return
 
-            if (field instanceof MapOptionsField) {
-                field = (MapOptionsField) field
-                if (options.every { it.getValue() instanceof I18nString }) {
-                    field.setOptions(options)
-                } else {
-                    Map<String, I18nString> newOptions = new LinkedHashMap<>();
-                    options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
-                    field.setOptions(newOptions)
-                }
-                saveChangedOptions(field)
-            } else if (field instanceof ChoiceField) {
-                field = (ChoiceField) field
-                if (options.every { it.getValue() instanceof I18nString }) {
-                    Set<I18nString> choices = new LinkedHashSet<>()
-                    options.forEach({ k, v -> choices.add(v) })
-                    field.setChoices(choices)
-                } else {
-                    Set<I18nString> newChoices = new LinkedHashSet<>();
-                    options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
-                    field.setChoices(newChoices)
-                }
-                saveChangedChoices(field)
-            }
+             if (field instanceof MapOptionsField) {
+                 field = (MapOptionsField) field
+                 if (options.every { it.getValue() instanceof I18nString }) {
+                     field.setOptions(options)
+                 } else {
+                     Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                     options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
+                     field.setOptions(newOptions)
+                 }
+                 saveChangedOptions(field)
+             } else if (field instanceof ChoiceField) {
+                 field = (ChoiceField) field
+                 if (options.every { it.getValue() instanceof I18nString }) {
+                     Set<I18nString> choices = new LinkedHashSet<>()
+                     options.forEach({ k, v -> choices.add(v) })
+                     field.setChoices(choices)
+                 } else {
+                     Set<I18nString> newChoices = new LinkedHashSet<>();
+                     options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
+                     field.setChoices(newChoices)
+                 }
+                 saveChangedChoices(field)
+             }
 
-        },
+         },
          validations: { cl ->
              changeFieldValidations(field, cl)
          }
@@ -460,7 +496,11 @@ class ActionDelegate {
             saveChangedValue(field)
         }
         ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("value", value)
+        if (field instanceof I18nField) {
+            changedField.attributes.put("value", value)
+        } else {
+            changedField.addAttribute("value", value)
+        }
         changedField.addAttribute("type", field.type.name)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
@@ -621,7 +661,7 @@ class ActionDelegate {
         this.outcomes.addAll(taskService.cancelTasks(tasks, user))
     }
 
-    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome){
+    private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome.getTask()
     }
@@ -742,7 +782,7 @@ class ActionDelegate {
         return setData(task, dataSet)
     }
 
-    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome){
+    private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome
     }
@@ -783,7 +823,7 @@ class ActionDelegate {
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
-    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome){
+    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
         return outcome.getData()
     }
@@ -798,100 +838,121 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
-    void generatePDF(Transition t, FileField field) {
-        this.generatePDF(t.getStringId(), field.importId)
-    }
-
-    void savePdfToField(Case aCase, String transitionId, String filename, String storagePath, String fileFieldId) {
-        if (aCase.stringId == useCase.stringId) {
-            change aCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    void saveFileToField(Case targetCase, String targetTransitionId, String targetFieldId, String filename, String storagePath = null) {
+        FileFieldValue fieldValue = new FileFieldValue()
+        fieldValue.setName(filename)
+        if (!storagePath) {
+            storagePath = fieldValue.getPath(targetCase.stringId, targetFieldId)
+        }
+        fieldValue.setPath(storagePath)
+        if (targetCase.stringId == useCase.stringId) {
+            change targetCase.getField(targetFieldId) value { fieldValue }
         } else {
-            String taskId = aCase.getTasks().find(taskPair -> taskPair.transition.equals(transitionId)).task
-            Map dataSet = new HashMap() {{ put(fileFieldId, ["value": filename + ":" + storagePath, "type": "file"] as Map) }}
+            String taskId = targetCase.getTasks().find(taskPair -> taskPair.transition == targetTransitionId).task
+            def dataSet = [
+                    targetFieldId: [
+                            "value": filename + ":" + storagePath,
+                            "type" : "file"
+                    ]
+            ]
             setData(taskId, dataSet)
         }
     }
 
-    void generatePDF(String transitionId, String fileFieldId, Case fromCase = useCase, Case saveToCase = useCase, String saveToTransitionId = transitionId) {
+    @NamedVariant
+    void generatePdf(String sourceTransitionId, String targetFileFieldId,
+                     Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
+                     String template = null, List<String> excludedFields = [], Locale locale = null,
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+        if (!sourceTransitionId || !targetFileFieldId)
+            throw new IllegalArgumentException("Source transition or target file field is null")
+        targetTransitionId = targetTransitionId ?: sourceTransitionId
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        FileFieldValue fieldValue = new FileFieldValue()
-        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
+        String storagePath = ""
+        if (pdfResource.getOutputFolder()) {
+            storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
+        } else {
+            storagePath = new FileFieldValue(filename, "").getPath(targetCase.stringId, targetFileFieldId)
+        }
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        if (template) {
+            pdfResource.setTemplateResource(new ClassPathResource(template))
+        }
+        if (locale) {
+            pdfResource.setTextLocale(locale)
+        }
+        pdfResource.setDateZoneId(dateZoneId)
+        pdfResource.setMarginTitle(titleMargin)
+        pdfResource.setMarginLeft(sideMargin)
+        pdfResource.setMarginRight(sideMargin)
+        pdfResource.updateProperties()
         pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
-        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
+        pdfGenerator.generatePdf(sourceCase, sourceTransitionId, pdfResource, excludedFields)
+        saveFileToField(targetCase, targetTransitionId, targetFileFieldId, filename, storagePath)
     }
 
-    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields, Case fromCase = useCase, Case saveToCase = useCase) {
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        FileFieldValue fieldValue = new FileFieldValue()
-        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
+    void generatePdf(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
+                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+        if (!sourceTransition || !targetFileField)
+            throw new IllegalArgumentException("Source transition or target file field is null")
+        targetTransition = targetTransition ?: sourceTransition
+        generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
+                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+    }
 
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource, excludedFields)
-        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
+    @NamedVariant
+    void generatePDF(String sourceTransitionId, String targetFileFieldId,
+                     Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
+                     String template = null, List<String> excludedFields = [], Locale locale = null,
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+        if (!sourceTransitionId || !targetFileFieldId)
+            throw new IllegalArgumentException("Source transition or target file field is null")
+        targetTransitionId = targetTransitionId ?: sourceTransitionId
+        generatePdf(sourceTransitionId, targetFileFieldId, sourceCase, targetCase, targetTransitionId,
+                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+    }
+
+    void generatePDF(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
+                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+        if (!sourceTransition || !targetFileField)
+            throw new IllegalArgumentException("Source transition or target file field is null")
+        targetTransition = targetTransition ?: sourceTransition
+        generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
+                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+    }
+
+    void generatePdf(String transitionId, FileField fileField, List<String> excludedFields = []) {
+        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileField, excludedFields: excludedFields)
+    }
+
+    void generatePdf(String transitionId, String fileFieldId, List<String> excludedFields, Case fromCase = useCase, Case saveToCase = useCase) {
+        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, excludedFields: excludedFields, sourceCase: fromCase, targetCase: useCase)
     }
 
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template, Case fromCase = useCase, Case saveToCase = useCase) {
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        FileFieldValue fieldValue = new FileFieldValue()
-        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
-
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfResource.setTemplateResource(new ClassPathResource(template))
-        pdfResource.setMarginTitle(100)
-        pdfResource.setMarginLeft(75)
-        pdfResource.setMarginRight(75)
-        pdfResource.updateProperties()
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
-        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
+        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, template: template, sourceCase: fromCase, targetCase: saveToCase)
     }
 
     void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale, Case fromCase = useCase, Case saveToCase = useCase) {
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        FileFieldValue fieldValue = new FileFieldValue()
-        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
-
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfResource.setTextLocale(locale)
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
-        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
+        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, locale: locale, sourceCase: fromCase, targetCase: saveToCase)
     }
 
     void generatePdfWithZoneId(String transitionId, String fileFieldId, ZoneId dateZoneId = ZoneId.systemDefault(), Case fromCase = useCase, Case saveToCase = useCase) {
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        FileFieldValue fieldValue = new FileFieldValue()
-        String storagePath =  fieldValue.getPath(saveToCase.stringId, fileFieldId)
-
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfResource.setDateZoneId(dateZoneId)
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(fromCase, transitionId, pdfResource)
-        savePdfToField(saveToCase, transitionId, filename, storagePath, fileFieldId)
+        generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, dateZoneId: dateZoneId, sourceCase: fromCase, targetCase: saveToCase)
     }
 
-    void generatePdf(String transitionId, String fileFieldId) {
-        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
-        String filename = pdfResource.getOutputDefaultName()
-        String storagePath = pdfResource.getOutputFolder() + File.separator + useCase.stringId + "-" + fileFieldId + "-" + pdfResource.getOutputDefaultName()
+    void sendEmail(List<String> to, String subject, String body) {
+        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build();
+        sendMail(mailDraft)
+    }
 
-        pdfResource.setOutputResource(new ClassPathResource(storagePath))
-        pdfResource.setMarginTitle(100)
-        pdfResource.setMarginLeft(75)
-        pdfResource.setMarginRight(75)
-        pdfResource.updateProperties()
-        pdfGenerator.setupPdfGenerator(pdfResource)
-        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
-        change useCase.getField(fileFieldId) value { new FileFieldValue(filename, storagePath) }
+    void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
+        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build();
+        sendMail(mailDraft)
     }
 
     void sendMail(MailDraft mailDraft) {
@@ -1009,6 +1070,26 @@ class ActionDelegate {
         userService.deleteUser(user)
     }
 
+    IUser findUserByEmail(String email) {
+        IUser user = userService.findByEmail(email, false)
+        if (user == null) {
+            log.error("Cannot find user with email [" + email + "]")
+            return null
+        } else {
+            return user
+        }
+    }
+
+    IUser findUserById(String id) {
+        IUser user = userService.findById(id, false)
+        if (user == null) {
+            log.error("Cannot find user with id [" + id + "]")
+            return null
+        } else {
+            return user
+        }
+    }
+
     Validation validation(String rule, I18nString message) {
         return new Validation(rule, message)
     }
@@ -1035,4 +1116,69 @@ class ActionDelegate {
     List<String> importFilters() {
         return filterImportExportService.importFilters()
     }
+
+    File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
+                           int pageSize = exportConfiguration.getMongoPageSize()) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(predicate, exportFile, config, pageSize)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
+                             int pageSize = exportConfiguration.getMongoPageSize()) {
+        QCase qCase = new QCase("case")
+        return exportService.fillCsvCaseData(predicate(qCase), outFile, config, pageSize)
+    }
+
+    File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
+                           Boolean isIntersection = false) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
+                             Boolean isIntersection = false) {
+        return exportService.fillCsvCaseData(requests, outFile, config, user, pageSize, locale, isIntersection)
+    }
+
+    File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(predicate, exportFile, config)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
+        QTask qTask = new QTask("task");
+        return exportService.fillCsvTaskData(predicate(qTask), outFile, config, pageSize)
+    }
+
+    File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
+                           Boolean isIntersection = false) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
+                             Boolean isIntersection = false) {
+        return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
+    }
+
 }

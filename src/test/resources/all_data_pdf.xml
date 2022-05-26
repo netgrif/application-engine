@@ -355,7 +355,7 @@
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
-                        generatePDF("1","file")
+                        generatePdf("1","file")
                     </action>
                 </logic>
             </dataRef>
@@ -363,7 +363,7 @@
         <event type="finish">
             <actions phase="pre">
                 <action>
-                    generatePDF("1","file")
+                    generatePdf("1","file")
                 </action>
             </actions>
         </event>
