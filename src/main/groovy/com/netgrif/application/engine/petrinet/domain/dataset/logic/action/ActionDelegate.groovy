@@ -28,6 +28,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.version.Version
@@ -76,6 +77,7 @@ class ActionDelegate {
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
     static final String ONCE_GENERATE = "once"
+    static final String TRANSITIONS = "transitions"
 
     @Value('${nae.mail.from}')
     private String mailFrom
@@ -223,6 +225,10 @@ class ActionDelegate {
         useCase.dataSet.get(field.stringId).makeForbidden(trans.stringId)
     }
 
+    def initial = { Field field, Transition trans ->
+        useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior
+    }
+
     def unchanged = { return UNCHANGED_VALUE }
 
     def initValueOfField = { Field field ->
@@ -234,6 +240,8 @@ class ActionDelegate {
         return field.defaultValue
     }
 
+    def transitions = { return TRANSITIONS }
+
     def getInit() {
         return initValueOfField
     }
@@ -243,30 +251,159 @@ class ActionDelegate {
     }
 
     /**
-     * Changes behavior of a given field on given transition if certain condition is being met, or if condition is not used.
+     * Changes behavior of a given field on given transition (transitions) or on each transition containing a field if certain condition is being met.
      * <br>
-     * Example:
+     * Example 1:
      * <pre>
      *     condition: f.conditionId,
      *     text: f.textId,
      *     transition: t.transitionId;
      *
-     *     make text,visible on transition when { condition.value == true }* </pre>
-     * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
+     *     make text, visible on transition when { condition.value == true }
+     * </pre>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> on given transition when field's <i>condition</i> value is equal to <i>true</i>.
+     *
+     * Example 2:
+     * <pre>
+     *     condition: f.conditionId,
+     *     text: f.textId,
+     *     transition: t.transitionId,
+     *     anotherTransition: t.anotherTransitionId;
+     *
+     *     make text, visible on ([transition, anotherTransition]) when { condition.value == true }
+     * </pre>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> on given transitions when field's <i>condition</i> value is equal to <i>true</i>.
+     *
+     * Example 3:
+     * <pre>
+     *     condition: f.conditionId,
+     *     text: f.textId;
+     *
+     *     make text, visible on transitions when { condition.value == true }
+     * </pre>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> on each transition that contains the field <i>text</i> when field's <i>condition</i> value is equal to <i>true</i>.
      * @param field which behaviour will be changed
-     * @param behavior one of visible, editable, required, optional, hidden, forbidden
+     * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
     def make(Field field, Closure behavior) {
-        [on: { Transition trans ->
+        def behaviorClosureResult
+
+        [on: { Object transitionObject ->
             [when: { Closure condition ->
                 if (condition()) {
-                    behavior(field, trans)
-                    ChangedField changedField = new ChangedField(field.stringId)
-                    changedField.addAttribute("type", field.type.name)
-                    changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
-                    SetDataEventOutcome outcome = createSetDataEventOutcome()
-                    outcome.addChangedField(field.stringId, changedField)
-                    this.outcomes.add(outcome)
+                    if (transitionObject instanceof Transition) {
+                        behaviorClosureResult = behavior(field, transitionObject)
+                        saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
+                    } else if (transitionObject instanceof List<?>) {
+                        transitionObject.each { trans ->
+                            if (trans instanceof Transition) {
+                                if (trans.dataSet.containsKey(field.stringId)) {
+                                    behaviorClosureResult = behavior(field, trans)
+                                    saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                }
+                            } else {
+                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
+                            }
+                        }
+                    } else if (transitionObject instanceof Closure) {
+                        if (transitionObject == transitions) {
+                            useCase.petriNet.transitions.each {transitionEntry ->
+                                Transition trans = transitionEntry.value
+                                if (trans.dataSet.containsKey(field.stringId)) {
+                                    behaviorClosureResult = behavior(field, trans)
+                                    saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                }
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
+                    }
+                }
+            }]
+        }]
+    }
+
+    /**
+     * Changes behavior of given fields on given transition (transitions) or on each transition containing given fields if certain condition is being met.
+     * <br>
+     * Example 1:
+     * <pre>
+     *     condition: f.conditionId,
+     *     text: f.textId,
+     *     anotherText: f.anotherTextId,
+     *     transition: t.transitionId;
+     *
+     *     make [text, anotherText], visible on transition when { condition.value == true }
+     * </pre>
+     * This code will change the behavior of fields <i>text</i> and <i>anotherText</i> to <i>visible</i> on given transition when field's <i>condition</i> value is equal to <i>true</i>.
+     *
+     * Example 2:
+     * <pre>
+     *     condition: f.conditionId,
+     *     text: f.textId,
+     *     anotherText: f.anotherTextId,
+     *     transition: t.transitionId,
+     *     anotherTransition: t.anotherTransitionId;
+     *
+     *     make [text, anotherText], visible on ([transition, anotherTransition]) when { condition.value == true }
+     * </pre>
+     * This code will change the behavior of fields <i>text</i> and <i>anotherText</i> to <i>visible</i> on given transition when field's <i>condition</i> value is equal to <i>true</i>.
+     *
+     * Example 3:
+     * <pre>
+     *     condition: f.conditionId,
+     *     text: f.textId,
+     *     anotherText: f.anotherTextId;
+     *
+     *     make [text, anotherText], visible on transitions when { condition.value == true }
+     * </pre>
+     * This code will change the behavior of fields <i>text</i> and <i>anotherText</i> to <i>visible</i> on each transition that contains given fields when field's <i>condition</i> value is equal to <i>true</i>.
+     * @param list of fields which behaviour will be changed
+     * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
+     */
+    def make(List<Field> fields, Closure behavior) {
+        def behaviorClosureResult
+
+        [on: { Object transitionObject ->
+            [when: { Closure condition ->
+                if (condition()) {
+                    if (transitionObject instanceof Transition) {
+                        fields.forEach  { field ->
+                            behaviorClosureResult = behavior(field, transitionObject)
+                            saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
+                        }
+                    } else if (transitionObject instanceof List<?>) {
+                        transitionObject.each { trans ->
+                            if (trans instanceof Transition) {
+                                fields.each { field ->
+                                    if (trans.dataSet.containsKey(field.stringId)) {
+                                        behaviorClosureResult = behavior(field, trans)
+                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                    }
+                                }
+                            } else {
+                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
+                            }
+                        }
+                    } else if (transitionObject instanceof Closure) {
+                        if (transitionObject == transitions) {
+                            useCase.petriNet.transitions.each {transitionEntry ->
+                                Transition trans = transitionEntry.value
+                                fields.each { field ->
+                                    if (trans.dataSet.containsKey(field.stringId)) {
+                                        behaviorClosureResult = behavior(field, trans)
+                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                    }
+                                }
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
+                    }
                 }
             }]
         }]
@@ -274,6 +411,19 @@ class ActionDelegate {
 
     protected SetDataEventOutcome createSetDataEventOutcome() {
         return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
+    }
+
+    def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior) {
+        Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
+        if (initialBehavior != null)
+            fieldBehavior.put(trans.stringId, initialBehavior)
+
+        ChangedField changedField = new ChangedField(field.stringId)
+        changedField.addAttribute("type", field.type.name)
+        changedField.addBehavior(fieldBehavior)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, changedField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedChoices(ChoiceField field) {
@@ -392,6 +542,8 @@ class ActionDelegate {
              def values = cl()
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE))
                  return
+           
+           
              if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
