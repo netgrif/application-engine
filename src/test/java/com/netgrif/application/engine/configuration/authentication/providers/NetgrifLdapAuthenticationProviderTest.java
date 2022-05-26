@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration.authentication.providers;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
@@ -14,6 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.SuperCreator;
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -298,7 +300,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void LdapGroupSearchBodyTest() {
-        LdapGroupSearchBody test = new LdapGroupSearchBody("fulltext" );
+        LdapGroupSearchBody test = new LdapGroupSearchBody("fulltext");
         assert test.getFulltext().equals("fulltext");
         assert test.toString() != null;
         test.setFulltext("aaa");
@@ -307,7 +309,7 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void LdapGroupRoleAssignRequestBodyTest() {
-        LdapGroupRoleAssignRequestBody test = new LdapGroupRoleAssignRequestBody("groupDn" , null);
+        LdapGroupRoleAssignRequestBody test = new LdapGroupRoleAssignRequestBody("groupDn", null);
         assert test.getGroupDn().equals("groupDn");
         assert test.getRoleIds() != null;
         assert test.toString() != null;
@@ -315,6 +317,22 @@ class NetgrifLdapAuthenticationProviderTest {
         LdapGroupRoleAssignRequestBody ldapGroupRoleAssignRequestBody = new LdapGroupRoleAssignRequestBody();
         ldapGroupRoleAssignRequestBody.setGroupDn("aaa");
         assert ldapGroupRoleAssignRequestBody.getGroupDn().equals("aaa");
+    }
+
+    @Test
+    void createLdapUserTest() {
+        LdapUser user = new LdapUser();
+        assert user != null;
+        User test = new User();
+        user.loadFromUser(test);
+        assert user!= null;
+        LdapUser user2 = new LdapUser(new ObjectId("aaaaa"));
+        assert user2 != null;
+        assert user2.getStringId() != null;
+        LdapUser ldapUser = new LdapUser("dn", "commonName", "uid", "homeDirectory", "email", "name", "surname", null, "telNumber");
+        assert ldapUser != null;
+        assert ldapUser.getDn().equals("dn");
+        assert ldapUser.transformToLoggedUser() != null;
     }
 
 }
