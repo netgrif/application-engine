@@ -22,6 +22,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,12 +30,14 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.FileUrlResource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles(["test"])
+@Disabled
 @SpringBootTest
+@ActiveProfiles(["test"])
+@ExtendWith(SpringExtension.class)
 class PdfGeneratorTest {
 
     @Autowired
@@ -85,6 +88,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testActionDelegateFunction() {
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[3]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
@@ -96,6 +100,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testAllData() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[3]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -110,6 +115,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testingNormal() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[0]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -124,6 +130,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testingWithTemplate() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[1]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -134,7 +141,7 @@ class PdfGeneratorTest {
         pdfResource.setMarginRight(75)
         pdfResource.setMarginTitle(100)
         pdfResource.updateProperties()
-        pdfResource.setTemplateResource(new ClassPathResource(pdfTemplateFolder))
+        pdfResource.setTemplateResource(new FileUrlResource(pdfTemplateFolder))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "1", pdfResource)
 
@@ -143,6 +150,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testingCustomFunction() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[1]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -163,6 +171,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testingLongDocument() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -177,6 +186,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testingPageNumber() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -194,6 +204,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testingCustomField() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         PdfField pdf = new PdfTextField("footer_company_title",
@@ -219,6 +230,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testFlowLayout() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[4]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -233,6 +245,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testDataGroup() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[5]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
@@ -246,6 +259,7 @@ class PdfGeneratorTest {
     }
 
     @Test
+    @Disabled
     void testTaskRef() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[6]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())

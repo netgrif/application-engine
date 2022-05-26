@@ -6,11 +6,14 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@ConditionalOnExpression("${nae.ldap.enabled}")
 public class LdapLoggedUser extends LoggedUser {
 
     @Getter
@@ -27,6 +30,10 @@ public class LdapLoggedUser extends LoggedUser {
 
     @Getter
     @Setter
+    private Set<String> memberOf;
+
+    @Getter
+    @Setter
     private String homeDirectory;
 
 
@@ -35,10 +42,11 @@ public class LdapLoggedUser extends LoggedUser {
     }
 
 
-    public LdapLoggedUser(String id, String username, String password, String dn, String commonName, String uid, String homeDirectory, Collection<? extends GrantedAuthority> authorities) {
+    public LdapLoggedUser(String id, String username, String password, String dn, String commonName, Set<String> memberOf, String uid, String homeDirectory, Collection<? extends GrantedAuthority> authorities) {
         super(id, username, password, authorities);
         this.dn = dn;
         this.commonName = commonName;
+        this.memberOf = memberOf;
         this.uid = uid;
         this.homeDirectory = homeDirectory;
     }
@@ -53,6 +61,7 @@ public class LdapLoggedUser extends LoggedUser {
         user.setDn(this.dn);
         user.setCommonName(this.commonName);
         user.setUid(this.uid);
+        user.setMemberOf(this.memberOf);
         user.setHomeDirectory(homeDirectory);
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));

@@ -69,13 +69,13 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     protected List<RuleEngineGlobal> initializeGlobals() {
         List<RuleEngineGlobal> globals = new ArrayList<>();
         globals.add(engineGlobal("com.netgrif.application.engine.workflow.service.interfaces", "ITaskService", "taskService", taskService));
+        globals.add(engineGlobal("com.netgrif.application.engine.auth.service.interfaces", "IUserService", "userService", userService));
         globals.add(engineGlobal("com.netgrif.application.engine.elastic.service.interfaces", "IElasticCaseService", "elasticCaseService", elasticCaseService));
         globals.add(engineGlobal("com.netgrif.application.engine.elastic.service.interfaces", "IElasticTaskService", "elasticTaskService", elasticTaskService));
         globals.add(engineGlobal("com.netgrif.application.engine.rules.domain", "FactRepository", "factRepository", factRepository));
         globals.add(engineGlobal("workflowService", workflowService));
         globals.add(engineGlobal("dataService", dataService));
         globals.add(engineGlobal("mailService", mailService));
-        globals.add(engineGlobal("userService", userService));
         globals.add(engineGlobal("ruleEvaluationScheduleService", ruleEvaluationScheduleService));
         globals.add(engineGlobal("org.slf4j", "Logger", "log", log));
         return globals;
