@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>all_data</id>
-	<title>All Data</title>
 	<initials>ALL</initials>
+    <title>All Data</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
     <caseName>All data test default case name</caseName>
     <!-- ROLES -->
-    <defaultRole>true</defaultRole>
     <role>
-        <id>process_role</id>
-        <title>Process role</title>
+        <id>admin</id>
+        <title>Create Role</title>
     </role>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
     <!-- DATA -->
     <data type="number" immediate="true">
         <id>number</id>
@@ -52,7 +62,7 @@
             vulputate ut eu sapien. Phasellus vel.
         </init>
         <component>
-            <name>textarea</name>
+            <name>htmltextarea</name>
             <property key="color">red</property>
             <property key="fontSize">12</property>
         </component>
@@ -211,12 +221,6 @@
         <title>Text datafield z iného transitionu</title>
         <init>Field načítaný pomocou taskrefu</init>
     </data>
-    <usersRef>
-        <id>userList1</id>
-        <caseLogic>
-            <view>true</view>
-        </caseLogic>
-    </usersRef>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -224,12 +228,6 @@
         <y>273</y>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
-        <usersRef>
-            <id>userList1</id>
-            <logic>
-                <assigned>true</assigned>
-            </logic>
-        </usersRef>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
@@ -397,7 +395,7 @@
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
-                        generatePdf("1","file")
+                        generatePDF("1","file")
                     </action>
                 </logic>
             </dataRef>

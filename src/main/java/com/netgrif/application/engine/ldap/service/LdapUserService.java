@@ -2,8 +2,8 @@ package com.netgrif.application.engine.ldap.service;
 
 
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -23,10 +23,21 @@ public class LdapUserService extends UserService {
     @Autowired
     private LdapUserRepository ldapUserRepository;
 
+    @Autowired
+    private LdapGroupRefService ldapGroupRefService;
+
     public LdapUser findByDn(Name dn) {
         return ldapUserRepository.findByDn(dn.toString());
     }
 
+    @Override
+    public IUser findByEmail(String email, boolean small) {
+        IUser user = userRepository.findByEmail(email);
+        if (user instanceof LdapUser && (((LdapUser) user).getMemberOf() != null && !(((LdapUser) user).getMemberOf().isEmpty()))) {
+            ldapGroupRefService.getProcessRoleByLdapGroup(((LdapUser) user).getMemberOf()).forEach(user::addProcessRole);
+        }
+        return user;
+    }
 
     protected LdapUser getUserFromLdap(IUser user) {
         if (user instanceof LdapUser) {

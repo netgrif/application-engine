@@ -139,7 +139,7 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
-        File template = new File(pdfResource.getTemplateResource().getURI());
+        File template = pdfResource.getTemplateResource().getFile();
         if (template.exists()) {
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }

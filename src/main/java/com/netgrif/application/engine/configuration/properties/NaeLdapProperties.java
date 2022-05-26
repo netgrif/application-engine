@@ -33,6 +33,8 @@ public class NaeLdapProperties {
 
     private String[] peopleClass = {"inetOrgPerson", "person"};
 
+    private String[] groupClass = {"groupOfNames"};
+
     private String groupSearchBase;
 
     private String mapCn = "cn";
@@ -56,5 +58,13 @@ public class NaeLdapProperties {
     private String mapMemberOf = "MemberOf";
 
     private String mapUserPassword = "userPassword";
+
+    private String mapGroupCn = "cn";
+
+    private String mapGroupMember = "member";
+
+    private String mapGroupObjectClass = "objectClass";
+
+    private String mapGroupDescription = "description";
 
 }
