@@ -496,7 +496,11 @@ class ActionDelegate {
             saveChangedValue(field)
         }
         ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("value", value)
+        if (field instanceof I18nField) {
+            changedField.attributes.put("value", value)
+        } else {
+            changedField.addAttribute("value", value)
+        }
         changedField.addAttribute("type", field.type.name)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)

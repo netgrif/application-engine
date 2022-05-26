@@ -19,6 +19,7 @@
     <data type="number">
         <id>number_data</id>
         <title>Number</title>
+        <init>5555</init>
     </data>
     <!-- TRANSITIONS -->
     <transition>

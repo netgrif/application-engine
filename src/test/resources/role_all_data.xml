@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>all_data</id>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>all_data</id>
+	<initials>ALL</initials>
     <title>All Data</title>
-    <initials>ALL</initials>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <caseName>All data test default case name</caseName>
     <!-- ROLES -->
     <role>
-        <id>process_role</id>
-        <title>Process role</title>
+        <id>admin</id>
+        <title>Create Role</title>
     </role>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
     <!-- DATA -->
     <data type="number" immediate="true">
         <id>number</id>
@@ -33,19 +45,35 @@
         <init>Lorem ipsum</init>
     </data>
     <data type="text" immediate="true">
+        <id>password_data</id>
+        <title>Password from data</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>password_dataref</id>
+        <title>Password from dataRef</title>
+    </data>
+    <data type="text" immediate="true">
         <id>text_area</id>
         <title>Text area</title>
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.
         </init>
+        <component>
+            <name>htmltextarea</name>
+            <property key="color">red</property>
+            <property key="fontSize">12</property>
+        </component>
     </data>
 
     <data type="enumeration" immediate="true">
         <id>enumeration</id>
         <title>Enumeration</title>
-        <values name="alice">Alice</values>
-        <values name="bob">Bob</values>
-        <values name="carol">Carol</values>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
         <init>Bob</init>
     </data>
     <data type="enumeration" immediate="true">
@@ -55,9 +83,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <view>
-            <autocomplete/>
-        </view>
+        <component>
+            <name>autocomplete</name>
+        </component>
     </data>
     <data type="enumeration" immediate="true">
         <id>enumeration_list</id>
@@ -66,19 +94,34 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <view>
-            <list/>
-        </view>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map</id>
+        <title>Enumeration Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <init>bo</init>
     </data>
 
     <data type="multichoice" immediate="true">
         <id>multichoice</id>
         <title>Multichoice</title>
-        <values name="alice">Alice</values>
-        <values name="bob">Bob</values>
-        <values name="carol">Carol</values>
-        <init>Carol</init>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <inits>
+            <init>Alice</init>
+            <init>Bob</init>
+        </inits>
     </data>
+
     <data type="multichoice" immediate="true">
         <id>multichoice_list</id>
         <title>Multichoice list</title>
@@ -86,14 +129,29 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Alice,Bob</init>
-        <view>
-            <list/>
-        </view>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map</id>
+        <title>Multichoice Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <inits>
+            <init>al</init>
+            <init>ca</init>
+        </inits>
     </data>
 
     <data type="boolean" immediate="true">
         <id>boolean</id>
         <title>Boolean</title>
+        <placeholder>True</placeholder>
     </data>
 
     <data type="date" immediate="true">
@@ -102,15 +160,45 @@
         <init>01.01.2019</init>
     </data>
 
+    <data type="taskRef">
+        <id>taskRef</id>
+        <title>Task Ref</title>
+        <inits>
+            <init>4</init>
+        </inits>
+    </data>
+
     <data type="file" immediate="true">
         <id>file</id>
         <title>File</title>
-        <init>pom.xml</init>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            textfield: f.text;
+            change textfield value {
+                "funguje to"
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+
+    <data type="fileList" immediate="true">
+        <id>fileList</id>
+        <title>File List</title>
     </data>
 
     <data type="user" immediate="true">
         <id>user</id>
         <title>User</title>
+    </data>
+
+    <data type="userList">
+        <id>userList1</id>
+        <title>UserList</title>
+    </data>
+
+    <data type="userList">
+        <id>userList2</id>
+        <title>UserList</title>
     </data>
 
     <data type="dateTime" immediate="true">
@@ -119,105 +207,25 @@
         <init>01.01.2019 20:00</init>
     </data>
 
-    <data type="enumeration_map" immediate="true">
-        <id>enumeration_map</id>
-        <title>Enumeration map</title>
-        <options>
-            <option key="alice" name="alice">Alice</option>
-            <option key="bob" name="bob">Bob</option>
-            <option key="carol" name="carol">Carol</option>
-        </options>
-        <init>bob</init>
-    </data>
-
-    <data type="multichoice_map" immediate="true">
-        <id>multichoice_map</id>
-        <title>Multichoice map</title>
-        <options>
-            <option key="alice" name="alice">Alice</option>
-            <option key="bob" name="bob">Bob</option>
-            <option key="carol" name="carol">Carol</option>
-        </options>
-        <init>carol</init>
-    </data>
-
-    <data type="fileList" immediate="true">
-        <id>fileList</id>
-        <title>File list</title>
-        <init></init>
-    </data>
-
-    <data type="userList" immediate="true">
-        <id>userList</id>
-        <title>User list</title>
-        <init></init>
-    </data>
-
-    <data type="button">
+    <data type="button" immediate="true">
         <id>button</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
-    </data>
-
-    <data type="text">
-        <id>testActionTrigger</id>
-        <title>Test Action Trigger</title>
-    </data>
-
-    <data type="enumeration_map" immediate="true">
-        <id>enumeration_map_changed</id>
-        <title>Enumeration map changed</title>
-        <options>
-            <option key="alice" name="alice">Alice</option>
-            <option key="bob" name="bob">Bob</option>
-            <option key="carol" name="carol">Carol</option>
-        </options>
-        <init>bob</init>
-    </data>
-
-    <data type="multichoice_map" immediate="true">
-        <id>multichoice_map_changed</id>
-        <title>Multichoice map changed</title>
-        <options>
-            <option key="alice" name="alice">Alice</option>
-            <option key="bob" name="bob">Bob</option>
-            <option key="carol" name="carol">Carol</option>
-        </options>
-        <init>carol</init>
-    </data>
-
-    <data type="i18n" immediate="true">
-        <id>i18n_text</id>
-        <title>Text I18n</title>
-        <placeholder>Text I18n field</placeholder>
-        <init name="i18n_text">Default i18n text value</init>
-    </data>
-
-    <data type="i18n" immediate="true">
-        <id>i18n_divider</id>
-        <title>Divider I18n</title>
-        <placeholder>Divider I18n field</placeholder>
-        <init name="i18n_divider">Default i18n divider value</init>
         <component>
-            <name>divider</name>
+            <name>fab</name>
         </component>
     </data>
 
-    <!-- I18NS -->
-    <i18n locale="sk">
-        <i18nString name="alice">Alica</i18nString>
-        <i18nString name="bob">Bobek</i18nString>
-        <i18nString name="carol">Karla</i18nString>
-        <i18nString name="i18n_text">Default SK i18n text value</i18nString>
-        <i18nString name="i18n_divider">Default SK i18n divider value</i18nString>
-    </i18n>
-
+    <data type="text">
+        <id>taskref_test_field</id>
+        <title>Text datafield z iného transitionu</title>
+        <init>Field načítaný pomocou taskrefu</init>
+    </data>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
         <x>379</x>
         <y>273</y>
-        <cols>6</cols>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
         <dataGroup>
@@ -254,6 +262,21 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>password_data</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_dataref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <component>
+                    <name>password</name>
+                </component>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>enumeration</id>
@@ -277,6 +300,12 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>multichoice</id>
@@ -290,6 +319,12 @@
             </dataRef>
             <dataRef>
                 <id>multichoice_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -333,6 +368,12 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>user</id>
@@ -353,21 +394,18 @@
                 <id>button</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        generatePDF("1","file")
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>i18n</id>
-            <title>I18n fields</title>
+            <id>taskRef</id>
+            <title>Task refs</title>
             <stretch>false</stretch>
             <dataRef>
-                <id>i18n_text</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>i18n_divider</id>
+                <id>taskRef</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -436,6 +474,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>multichoice</id>
@@ -449,6 +493,12 @@
             </dataRef>
             <dataRef>
                 <id>multichoice_list</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -492,6 +542,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>user</id>
@@ -510,23 +566,6 @@
             <stretch>false</stretch>
             <dataRef>
                 <id>button</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>i18n</id>
-            <title>I18n fields</title>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>i18n_text</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>i18n_divider</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -611,17 +650,17 @@
                 </logic>
             </dataRef>
         </dataGroup>
-        <dataGroup>
-            <id>center</id>
+		<dataGroup>
+			<id>center</id>
             <title>Alignment - Center</title>
-            <alignment>center</alignment>
-            <stretch>false</stretch>
-            <dataRef>
-                <id>text</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
+			<alignment>center</alignment>
+			<stretch>false</stretch>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
             <dataRef>
                 <id>number</id>
                 <logic>
@@ -634,51 +673,23 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
+		</dataGroup>
     </transition>
     <transition>
-        <id>2</id>
-        <x>500</x>
-        <y>300</y>
-        <cols>6</cols>
-        <label>Test Action trigger</label>
+        <id>4</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Task ref test transition</label>
         <assignPolicy>auto</assignPolicy>
-        <dataRef>
-            <id>testActionTrigger</id>
-            <logic>
-                <behavior>visible</behavior>
-                <action trigger="set">
-                    enumMap: f.enumeration_map_changed,
-                    multiMap: f.multichoice_map_changed;
-
-                    def optionD = new com.netgrif.application.engine.petrinet.domain.I18nString("David");
-                    optionD.addTranslation("sk", "Dávid");
-                    def optionE = new com.netgrif.application.engine.petrinet.domain.I18nString("Eve");
-                    optionE.addTranslation("sk", "Eva");
-                    def optionF = new com.netgrif.application.engine.petrinet.domain.I18nString("Felix");
-                    optionF.addTranslation("sk", "Félix");
-
-                    change enumMap options {
-                    ["david": optionD,
-                    "eve": optionE,
-                    "felix": optionF]
-                    }
-
-                    change enumMap value {
-                    "eve"
-                    }
-
-                    change multiMap options {
-                    ["david": optionD,
-                    "eve": optionE,
-                    "felix": optionF]
-                    }
-
-                    change multiMap value {
-                    ["eve", "felix"]
-                    }
-                </action>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>taskref</id>
+            <title>Task ref test group</title>
+            <dataRef>
+                <id>taskref_test_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
 </document>

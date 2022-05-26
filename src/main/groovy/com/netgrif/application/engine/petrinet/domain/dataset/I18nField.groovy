@@ -11,6 +11,11 @@ class I18nField extends Field<I18nString> {
     }
 
     @Override
+    void clearValue() {
+        setValue(new I18nString())
+    }
+
+    @Override
     FieldType getType() {
         return FieldType.I18N
     }
