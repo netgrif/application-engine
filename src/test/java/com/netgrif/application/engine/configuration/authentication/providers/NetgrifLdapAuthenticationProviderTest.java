@@ -6,6 +6,7 @@ import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -278,12 +279,29 @@ class NetgrifLdapAuthenticationProviderTest {
     }
 
     @Test
-    void LdapGroupResponseBody() {
+    void LdapGroupResponseBodyTest() {
         LdapGroupResponseBody ldapGroupResponseBody = new LdapGroupResponseBody("dn", "cn", "description", null);
         assert ldapGroupResponseBody.getDn().equals("dn");
         assert ldapGroupResponseBody.getCn().equals("cn");
         assert ldapGroupResponseBody.getDescription().equals("description");
+        assert ldapGroupResponseBody.getProcessRoles() != null;
         assert ldapGroupResponseBody.toString() != null;
+        ldapGroupResponseBody.setDn("aaa");
+        ldapGroupResponseBody.setCn("aaa");
+        ldapGroupResponseBody.setDescription("aaa");
+        assert ldapGroupResponseBody.getDn().equals("aaa");
+        assert ldapGroupResponseBody.getCn().equals("aaa");
+        assert ldapGroupResponseBody.getDescription().equals("aaa");
+
+    }
+
+    @Test
+    void LdapGroupSearchBodyTest() {
+        LdapGroupSearchBody ldapGroupResponseBody = new LdapGroupSearchBody("fulltext" );
+        assert ldapGroupResponseBody.getFulltext().equals("fulltext");
+        assert ldapGroupResponseBody.toString() != null;
+        ldapGroupResponseBody.setFulltext("aaa");
+        assert ldapGroupResponseBody.getFulltext().equals("aaa");
 
     }
 
