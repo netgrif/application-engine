@@ -330,7 +330,7 @@ class NetgrifLdapAuthenticationProviderTest {
         LdapUser ldapUser = new LdapUser("dn", "commonName", "uid", "homeDirectory", "email", "name", "surname", null, "telNumber");
         assert ldapUser != null;
         assert ldapUser.getDn().equals("dn");
-        assert ldapUser.transformToLoggedUser() != null;
+
     }
 
 }
