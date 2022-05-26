@@ -27,7 +27,6 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1623] Action API consolidation
 - [NAE-1622] Change behavior action improvements
 - [NAE-1640] Update spring boot 2.7.0
-- [NAE-1477] New pdfGeneration action in actionDelegate
 - [NAE-1478] ActionDelegate functions overloading
 
 ### Added
@@ -35,6 +34,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1627] LDAP Groups resolving and mapping
 - [NAE-1468] i18n Data field
 - [NAE-1290] Export actions
+- [NAE-1477] New pdfGeneration action in actionDelegate
 
 ### Removed
 
