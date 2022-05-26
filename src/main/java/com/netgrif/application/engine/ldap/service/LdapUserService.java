@@ -2,16 +2,14 @@ package com.netgrif.application.engine.ldap.service;
 
 
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.auth.service.UserService;
+import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.domain.repository.LdapUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
@@ -35,10 +33,8 @@ public class LdapUserService extends UserService {
     @Override
     public IUser findByEmail(String email, boolean small) {
         IUser user = userRepository.findByEmail(email);
-        if (user instanceof LdapUser) {
-            if (((LdapUser) user).getMemberOf()!=null && !(((LdapUser) user).getMemberOf().isEmpty())) {
-                ldapGroupRefService.getProcessRoleByLdapGroup(((LdapUser) user).getMemberOf()).forEach(user::addProcessRole);
-            }
+        if (user instanceof LdapUser && (((LdapUser) user).getMemberOf() != null && !(((LdapUser) user).getMemberOf().isEmpty()))) {
+            ldapGroupRefService.getProcessRoleByLdapGroup(((LdapUser) user).getMemberOf()).forEach(user::addProcessRole);
         }
         return user;
     }

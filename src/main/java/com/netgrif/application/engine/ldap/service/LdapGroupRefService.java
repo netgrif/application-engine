@@ -46,13 +46,13 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Override
     public List<LdapGroupRef> findAllGroups() {
-        LdapQuery findAllGroupsQuery = Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where("objectclass").is(it)).reduce(ContainerCriteria::and).orElse(query().where("objectclass").is(ldapProperties.getGroupClass()[0]));
+        LdapQuery findAllGroupsQuery = Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where(ldapProperties.getMapGroupObjectClass()).is(it)).reduce(ContainerCriteria::and).orElse(query().where(ldapProperties.getMapGroupObjectClass()).is(ldapProperties.getGroupClass()[0]));
         return searchGroups(findAllGroupsQuery);
     }
 
     @Override
     public List<LdapGroupRef> searchGroups(String fulltext) {
-        LdapQuery searchQuerry = Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where("objectclass").is(it)).reduce(ContainerCriteria::and).orElse(query().where("objectclass").is(ldapProperties.getGroupClass()[0]))
+        LdapQuery searchQuerry = Arrays.stream(ldapProperties.getGroupClass()).map(it -> query().where(ldapProperties.getMapGroupObjectClass()).is(it)).reduce(ContainerCriteria::and).orElse(query().where(ldapProperties.getMapGroupObjectClass()).is(ldapProperties.getGroupClass()[0]))
                 .and(query().where(ldapProperties.getMapGroupCn()).whitespaceWildcardsLike(fulltext).or(query().where(ldapProperties.getMapGroupDescription()).whitespaceWildcardsLike(fulltext)));
         return searchGroups(searchQuerry);
     }
@@ -83,7 +83,7 @@ public class LdapGroupRefService implements ILdapGroupRefService {
     @Override
     public void setRoleToLdapGroup(String groupDn, Set<String> requestedRolesIds, LoggedUser loggedUser) {
         Set<ProcessRole> requestedRoles = processRoleRepository.findAllBy_idIn(requestedRolesIds);
-        if (requestedRoles.isEmpty() && requestedRolesIds.size() != 0)
+        if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");

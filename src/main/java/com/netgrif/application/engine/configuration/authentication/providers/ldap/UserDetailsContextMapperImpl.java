@@ -53,11 +53,9 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
         }
         assert user != null;
         LoggedUser loggedUser = user.transformToLoggedUser();
-        if (user instanceof LdapUser) {
-            if (!((LdapUser) user).getMemberOf().isEmpty()) {
+        if (user instanceof LdapUser && (!((LdapUser) user).getMemberOf().isEmpty())) {
                 loggedUser.parseProcessRoles(ldapGroupRefService.getProcessRoleByLdapGroup(((LdapUser) user).getMemberOf()));
             }
-        }
         return loggedUser;
     }
 
