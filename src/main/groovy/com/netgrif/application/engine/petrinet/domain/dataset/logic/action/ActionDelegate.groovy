@@ -288,12 +288,16 @@ class ActionDelegate {
                 if (condition()) {
                     if (transitionObject instanceof Transition) {
                         behaviorClosureResult = behavior(field, transitionObject)
-                        saveFieldBehavior(field, transitionObject, (behaviorClosureResult instanceof Set<FieldBehavior>) ? behaviorClosureResult : null)
-                    } else if (transitionObject instanceof List<Transition>) {
+                        saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
+                    } else if (transitionObject instanceof List<?>) {
                         transitionObject.each { trans ->
-                            if (trans.dataSet.containsKey(field.stringId)) {
-                                behaviorClosureResult = behavior(field, trans)
-                                saveFieldBehavior(field, trans, (behaviorClosureResult instanceof Set<FieldBehavior>) ? behaviorClosureResult : null)
+                            if (trans instanceof Transition) {
+                                if (trans.dataSet.containsKey(field.stringId)) {
+                                    behaviorClosureResult = behavior(field, trans)
+                                    saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                }
+                            } else {
+                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
                             }
                         }
                     } else if (transitionObject instanceof Closure) {
@@ -302,7 +306,7 @@ class ActionDelegate {
                                 Transition trans = transitionEntry.value
                                 if (trans.dataSet.containsKey(field.stringId)) {
                                     behaviorClosureResult = behavior(field, trans)
-                                    saveFieldBehavior(field, trans, (behaviorClosureResult instanceof Set<FieldBehavior>) ? behaviorClosureResult : null)
+                                    saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
                                 }
                             }
                         } else {
@@ -363,15 +367,19 @@ class ActionDelegate {
                     if (transitionObject instanceof Transition) {
                         fields.forEach  { field ->
                             behaviorClosureResult = behavior(field, transitionObject)
-                            saveFieldBehavior(field, transitionObject, (behaviorClosureResult instanceof Set<FieldBehavior>) ? behaviorClosureResult : null)
+                            saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
                         }
-                    } else if (transitionObject instanceof List<Transition>) {
+                    } else if (transitionObject instanceof List<?>) {
                         transitionObject.each { trans ->
-                            fields.each { field ->
-                                if (trans.dataSet.containsKey(field.stringId)) {
-                                    behaviorClosureResult = behavior(field, trans)
-                                    saveFieldBehavior(field, trans, (behaviorClosureResult instanceof Set<FieldBehavior>) ? behaviorClosureResult : null)
+                            if (trans instanceof Transition) {
+                                fields.each { field ->
+                                    if (trans.dataSet.containsKey(field.stringId)) {
+                                        behaviorClosureResult = behavior(field, trans)
+                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
+                                    }
                                 }
+                            } else {
+                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
                             }
                         }
                     } else if (transitionObject instanceof Closure) {
@@ -381,7 +389,7 @@ class ActionDelegate {
                                 fields.each { field ->
                                     if (trans.dataSet.containsKey(field.stringId)) {
                                         behaviorClosureResult = behavior(field, trans)
-                                        saveFieldBehavior(field, trans, (behaviorClosureResult instanceof Set<FieldBehavior>) ? behaviorClosureResult : null)
+                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
                                     }
                                 }
                             }

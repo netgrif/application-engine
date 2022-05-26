@@ -36,8 +36,7 @@
 		<init>false</init>
 		<action trigger="set">
 			bln: f.this,
-			txt0: f.text_0,
-			trans: t.t1;
+			txt0: f.text_0;
 
 			make txt0, editable on transitions when { bln.value }
 			make txt0, required on transitions when { bln.value }
