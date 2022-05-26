@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -26,23 +25,16 @@ import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = ApplicationEngine.class
-)
-@TestPropertySource(
-        locations = "classpath:application-test.properties"
-)
+@SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class RuleEvaluationScheduleServiceTest {
+class RuleEvaluationScheduleServiceTest {
 
     @Autowired
     private TestHelper testHelper;
@@ -68,7 +60,7 @@ public class RuleEvaluationScheduleServiceTest {
     }
 
     @Test
-    public void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
+    void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
         ImportPetriNetEventOutcome importOutcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), VersionType.MAJOR, user);
 
@@ -88,7 +80,10 @@ public class RuleEvaluationScheduleServiceTest {
         assert outcome.getTrigger() != null;
 
         Thread.sleep(10000);
-        Case caze = workflowService.findOne(caseOutcome.getCase().getStringId());
+        String id = caseOutcome.getCase().getStringId();
+        assert id != null;
+        Case caze = workflowService.findOne(id);
+        assert caze != null;
         assert caze.getDataSet().get("number_data").getValue().equals(6.0);
 
     }
