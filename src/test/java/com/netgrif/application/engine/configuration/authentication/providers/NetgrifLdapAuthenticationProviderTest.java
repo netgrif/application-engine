@@ -6,6 +6,7 @@ import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupRoleAssignRequestBody;
 import com.netgrif.application.engine.orgstructure.web.requestbodies.LdapGroupSearchBody;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
@@ -297,12 +298,23 @@ class NetgrifLdapAuthenticationProviderTest {
 
     @Test
     void LdapGroupSearchBodyTest() {
-        LdapGroupSearchBody ldapGroupResponseBody = new LdapGroupSearchBody("fulltext" );
-        assert ldapGroupResponseBody.getFulltext().equals("fulltext");
-        assert ldapGroupResponseBody.toString() != null;
-        ldapGroupResponseBody.setFulltext("aaa");
-        assert ldapGroupResponseBody.getFulltext().equals("aaa");
+        LdapGroupSearchBody test = new LdapGroupSearchBody("fulltext" );
+        assert test.getFulltext().equals("fulltext");
+        assert test.toString() != null;
+        test.setFulltext("aaa");
+        assert test.getFulltext().equals("aaa");
+    }
 
+    @Test
+    void LdapGroupRoleAssignRequestBodyTest() {
+        LdapGroupRoleAssignRequestBody test = new LdapGroupRoleAssignRequestBody("groupDn" , null);
+        assert test.getGroupDn().equals("groupDn");
+        assert test.getRoleIds() != null;
+        assert test.toString() != null;
+
+        LdapGroupRoleAssignRequestBody ldapGroupRoleAssignRequestBody = new LdapGroupRoleAssignRequestBody();
+        ldapGroupRoleAssignRequestBody.setGroupDn("aaa");
+        assert ldapGroupRoleAssignRequestBody.getGroupDn().equals("aaa");
     }
 
 }
