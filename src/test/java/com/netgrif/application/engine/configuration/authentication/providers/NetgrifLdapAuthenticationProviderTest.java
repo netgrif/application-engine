@@ -6,6 +6,7 @@ import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+import com.netgrif.application.engine.orgstructure.web.responsebodies.LdapGroupResponseBody;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
@@ -264,6 +265,26 @@ class NetgrifLdapAuthenticationProviderTest {
         Set<String> findDn = Set.of("nothing");
         Set<ProcessRole> processRoles = ldapGroupRefService.getProcessRoleByLdapGroup(findDn);
         assert processRoles.size() == 0;
+    }
+
+    @Test
+    void LdapUserTest() {
+        LdapUser user = new LdapUser("dn", "commonName", "uid", "homeDirectory", "email", "name", "surname", null, "telNumber");
+        assert user.getDn().equals("dn");
+        assert user.getUid().equals("uid");
+        assert user.getCommonName().equals("commonName");
+        assert user.getHomeDirectory().equals("homeDirectory");
+        assert user.getTelNumber().equals("telNumber");
+    }
+
+    @Test
+    void LdapGroupResponseBody() {
+        LdapGroupResponseBody ldapGroupResponseBody = new LdapGroupResponseBody("dn", "cn", "description", null);
+        assert ldapGroupResponseBody.getDn().equals("dn");
+        assert ldapGroupResponseBody.getCn().equals("cn");
+        assert ldapGroupResponseBody.getDescription().equals("description");
+        assert ldapGroupResponseBody.toString() != null;
+
     }
 
 }
