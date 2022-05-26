@@ -249,7 +249,7 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    generatePDF("t1", "pdf")
+                    generatePdf("t1", "pdf")
                 </action>
             </actions>
         </event>
@@ -273,7 +273,7 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    generatePDF("t1", "pdf")
+                    generatePdf("t1", "pdf")
                 </action>
             </actions>
         </event>
