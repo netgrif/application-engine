@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
@@ -84,7 +86,7 @@ class RuleEvaluationScheduleServiceTest {
         assert id != null;
         Case caze = workflowService.findOne(id);
         assert caze != null;
-        assert caze.getDataSet().get("number_data").getValue().equals(6.0);
+        assert caze.getDataSet().get("number_data").getValue().equals(5561.0);
 
     }
 
