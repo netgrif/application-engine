@@ -228,6 +228,11 @@
 
         <!-- Test -->
         <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.8.1</version>
@@ -488,6 +493,13 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.unboundid</groupId>
+            <artifactId>unboundid-ldapsdk</artifactId>
+            <version>6.0.3</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- For Configuration Properties -->
         <dependency>
@@ -941,3 +953,4 @@
         </profile>
     </profiles>
 </project>
+

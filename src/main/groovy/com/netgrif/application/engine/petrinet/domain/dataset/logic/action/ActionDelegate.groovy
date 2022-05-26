@@ -3,11 +3,19 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 import com.netgrif.application.engine.AsyncRunner
 import com.netgrif.application.engine.auth.domain.Author
 import com.netgrif.application.engine.auth.domain.IUser
+import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.application.engine.export.configuration.ExportConfiguration
+import com.netgrif.application.engine.export.domain.ExportDataConfig
+import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -134,6 +142,18 @@ class ActionDelegate {
 
     @Autowired
     IFilterImportExportService filterImportExportService
+
+    @Autowired
+    IExportService exportService
+
+    @Autowired
+    IElasticCaseService elasticCaseService
+
+    @Autowired
+    IElasticTaskService elasticTaskService
+
+    @Autowired
+    ExportConfiguration exportConfiguration
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -1092,4 +1112,69 @@ class ActionDelegate {
     List<String> importFilters() {
         return filterImportExportService.importFilters()
     }
+
+    File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
+                           int pageSize = exportConfiguration.getMongoPageSize()) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(predicate, exportFile, config, pageSize)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
+                             int pageSize = exportConfiguration.getMongoPageSize()) {
+        QCase qCase = new QCase("case")
+        return exportService.fillCsvCaseData(predicate(qCase), outFile, config, pageSize)
+    }
+
+    File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
+                           Boolean isIntersection = false) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
+                             Boolean isIntersection = false) {
+        return exportService.fillCsvCaseData(requests, outFile, config, user, pageSize, locale, isIntersection)
+    }
+
+    File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(predicate, exportFile, config)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null, int pageSize = exportConfiguration.getMongoPageSize()) {
+        QTask qTask = new QTask("task");
+        return exportService.fillCsvTaskData(predicate(qTask), outFile, config, pageSize)
+    }
+
+    File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
+                           Boolean isIntersection = false) {
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(requests, exportFile, config, user, pageSize, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
+                             Boolean isIntersection = false) {
+        return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
+    }
+
 }

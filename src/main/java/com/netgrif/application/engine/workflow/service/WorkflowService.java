@@ -320,7 +320,7 @@ public class WorkflowService implements IWorkflowService {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
+        log.info("[" + caseId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
@@ -333,7 +333,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
-        log.info("[" + net.getStringId() + "]: Deleting all cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         repository.deleteAllByPetriNetObjectId(net.getObjectId());
