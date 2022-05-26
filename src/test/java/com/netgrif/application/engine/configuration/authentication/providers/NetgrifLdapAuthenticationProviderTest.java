@@ -287,7 +287,6 @@ class NetgrifLdapAuthenticationProviderTest {
         assert ldapGroupResponseBody.getDn().equals("dn");
         assert ldapGroupResponseBody.getCn().equals("cn");
         assert ldapGroupResponseBody.getDescription().equals("description");
-        assert ldapGroupResponseBody.getProcessRoles() != null;
         assert ldapGroupResponseBody.toString() != null;
         ldapGroupResponseBody.setDn("aaa");
         ldapGroupResponseBody.setCn("aaa");
