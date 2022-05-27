@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>all_data</id>
 	<title>All Data</title>
 	<initials>ALL</initials>
@@ -397,7 +397,7 @@
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
-                        generatePDF("1","file")
+                        generatePdf("1","file")
                     </action>
                 </logic>
             </dataRef>

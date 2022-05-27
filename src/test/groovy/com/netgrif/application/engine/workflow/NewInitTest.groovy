@@ -58,5 +58,10 @@ class NewInitTest {
         assert (initTestCase.dataSet["new_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file-list.txt" }
         assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file.txt" }
         assert (initTestCase.dataSet["old_init_fileList"].value as FileListFieldValue).namesPaths.stream().any { it.getName() == "test-file-list.txt" }
+        assert (initTestCase.dataSet["init_i18n"].value as I18nString).defaultValue == "Default i18n test value"
+        assert (initTestCase.dataSet["init_i18n"].value as I18nString).translations.containsKey("sk")
+        assert (initTestCase.dataSet["init_i18n"].value as I18nString).translations.containsKey("de")
+        assert (initTestCase.dataSet["init_i18n"].value as I18nString).translations.get("sk") == "Default SK i18n test value"
+        assert (initTestCase.dataSet["init_i18n"].value as I18nString).translations.get("de") == "Default DE i18n test value"
     }
 }
