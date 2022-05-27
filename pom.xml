@@ -421,6 +421,11 @@
             <artifactId>plugin-library</artifactId>
             <version>0.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.0</version>
+        </dependency>
 
         <!-- Dev tools -->
         <dependency>

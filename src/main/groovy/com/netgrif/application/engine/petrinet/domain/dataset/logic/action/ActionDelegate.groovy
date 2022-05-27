@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.importer.service.FieldFactory
+import com.netgrif.application.engine.integration.plugins.services.interfaces.IDtoConverterService
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
 import com.netgrif.application.engine.mail.interfaces.IMailService
@@ -129,6 +130,9 @@ class ActionDelegate {
 
     @Autowired
     IFilterImportExportService filterImportExportService
+
+    @Autowired
+    IDtoConverterService dtoConverterService
 
     /**
      * Reference of case and task in which current action is taking place.
