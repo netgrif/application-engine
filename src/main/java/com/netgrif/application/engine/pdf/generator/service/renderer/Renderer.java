@@ -8,6 +8,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.List;
 
 @Data
@@ -60,6 +61,7 @@ public abstract class Renderer {
 
     public static String removeUnsupportedChars(String input, PdfResource resource) {
         String value = Jsoup.parse(input.replaceAll("\\s{1,}", " ")).text();
+        value = Normalizer.normalize(value, Normalizer.Form.NFC);
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             if (isCharEncodable(value.charAt(i), resource.getValueFont())) {
