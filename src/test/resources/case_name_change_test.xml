@@ -1,0 +1,120 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>case_name_change_test</id>
+	<initials>CNC</initials>
+	<title>Case name change Test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="boolean">
+		<id>bln</id>
+		<title/>
+		<action trigger="set">
+			changeCaseProperty "title" about { "Set action title" }
+		</action>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>580</x>
+		<y>100</y>
+		<label>Transition 1</label>
+		<dataGroup>
+			<id>t1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>bln</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>test_event0</id>
+			<actions phase="pre">
+				<action>
+					changeCaseProperty "title" about { "Pre assign title" }
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>test_event2</id>
+			<actions phase="pre">
+				<action>
+					changeCaseProperty "title" about { "Pre cancel title" }
+				</action>
+			</actions>
+		</event>
+		<event type="delegate">
+			<id>test_event4</id>
+			<actions phase="pre">
+				<action>
+					changeCaseProperty "title" about { "Pre delegate title" }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>580</x>
+		<y>220</y>
+		<label>Transition 2</label>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>900</x>
+		<y>100</y>
+		<label/>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>420</x>
+		<y>100</y>
+		<label>init</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>740</x>
+		<y>100</y>
+		<label/>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>500</x>
+			<y>60</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakpoint>
+			<x>500</x>
+			<y>140</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

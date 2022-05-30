@@ -1,18 +1,22 @@
 package com.netgrif.application.engine.configuration;
 
+import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
+import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
 import com.netgrif.application.engine.configuration.security.SessionUtilsProperties;
 import com.netgrif.application.engine.ldap.filters.LoginAttemptsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -22,12 +26,32 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     @Autowired
     protected SessionUtilsProperties sessionUtilsProperties;
 
+    @Autowired
+    private NaeAuthProperties naeAuthProperties;
+
+    @Autowired
+    private ApplicationContext context;
+
     protected void setCsrf(HttpSecurity http) throws Exception {
         if (isCsrfEnabled()) {
-            http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+            http
+                    .csrf()
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         } else {
-            http.csrf().disable();
+            http
+                    .csrf()
+                    .disable();
         }
+    }
+
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+       List<String> properties = Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList());
+        context.getBeansOfType(NetgrifAuthenticationProvider.class)
+                .entrySet().stream()
+                .filter(it -> properties.contains(it.getKey().toLowerCase()))
+                .sorted(Ordering.explicit(properties).onResultOf(entry -> entry.getKey().toLowerCase()))
+                .forEach(it -> auth.authenticationProvider(it.getValue()));
     }
 
     protected String[] getPatterns() {

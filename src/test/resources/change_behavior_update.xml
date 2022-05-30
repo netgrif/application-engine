@@ -1,0 +1,233 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>new_model</id>
+	<initials>NEW</initials>
+	<title>New Model</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="text">
+		<id>text_0</id>
+		<title>Text field 1</title>
+		<init>Demo behavior</init>
+	</data>
+	<data type="text">
+		<id>text_1</id>
+		<title>Text field 2</title>
+		<init>Demo behavior</init>
+	</data>
+	<data type="boolean">
+		<id>boolean_0</id>
+		<title>Edit behavior on transition</title>
+		<init>false</init>
+		<action trigger="set">
+			bln: f.this,
+            txt0: f.text_0,
+            trans: t.t1;
+
+            make txt0, editable on trans when { bln.value }
+            make txt0, required on trans when { bln.value }
+            make txt0, initial on trans when { !bln.value }
+		</action>
+	</data>
+	<data type="boolean">
+		<id>boolean_1</id>
+		<title>Edit behavior on transitions</title>
+		<init>false</init>
+		<action trigger="set">
+			bln: f.this,
+			txt0: f.text_0;
+
+			make txt0, editable on transitions when { bln.value }
+			make txt0, required on transitions when { bln.value }
+
+			make txt0, visible on transitions when { !bln.value }
+			make txt0, optional on transitions when { !bln.value }
+		</action>
+	</data>
+	<data type="boolean">
+		<id>boolean_2</id>
+		<title>Edit behavior on multiple transitions</title>
+		<init>false</init>
+		<action trigger="set">
+			bln: f.this,
+            txt0: f.text_0,
+            txt1: f.text_1,
+            trans: t.t1,
+            trans2: t.t3;
+
+			make txt0, editable on ([trans, trans2]) when { bln.value }
+			make txt0, visible on ([trans, trans2]) when { !bln.value }
+		</action>
+	</data>
+	<data type="boolean">
+		<id>boolean_3</id>
+		<title>Edit behavior of multiple fields on multiple transitions</title>
+		<init>false</init>
+		<action trigger="set">
+			bln: f.this,
+			txt0: f.text_0,
+			txt1: f.text_1,
+			trans: t.t1,
+			trans2: t.t3;
+
+			make [txt0, txt1], editable on ([trans, trans2]) when { bln.value }
+			make [txt0, txt1], visible on ([trans, trans2]) when { !bln.value }
+		</action>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>340</x>
+		<y>140</y>
+		<label>Test transition</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>t1_0</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+					<behavior>optional</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>boolean_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>boolean_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>boolean_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>boolean_3</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>740</x>
+		<y>140</y>
+		<label>Test multiple transitions 1</label>
+		<dataGroup>
+			<id>group_1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>740</x>
+		<y>140</y>
+		<label>Test multiple transitions 2</label>
+		<dataGroup>
+			<id>group_1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>740</x>
+		<y>140</y>
+		<label>Test multiple transitions 3</label>
+		<dataGroup>
+			<id>group_1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>group_2</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>540</x>
+		<y>140</y>
+		<label>step</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>100</x>
+		<y>140</y>
+		<label>init</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

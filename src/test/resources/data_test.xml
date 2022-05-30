@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>1</id>
     <initials>TES</initials>
     <title>Data test</title>
@@ -153,6 +153,24 @@
         <desc>Multichoice map description</desc>
         <placeholder>Multichoice map placeholder</placeholder>
     </data>
+    <!-- I18N FIELD -->
+    <data type="i18n">
+        <id>i18n</id>
+        <title>Text I18n</title>
+        <placeholder>Text I18n field</placeholder>
+        <desc>This is I18n text field</desc>
+        <init name="i18n_text">Default i18n text value</init>
+        <validations>
+            <validation>
+                <expression>translationRequired sk,en</expression>
+                <message>Slovak and English language required</message>
+            </validation>
+            <validation>
+                <expression>translationOnly sk,en,cz,de</expression>
+                <message>Only Slovak, English, Czech and German languages allowed</message>
+            </validation>
+        </validations>
+    </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
     <transition>
@@ -240,6 +258,12 @@
         </dataRef>
         <dataRef>
             <id>emptyMultichoiceMap</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>i18n</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
