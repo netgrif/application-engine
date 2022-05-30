@@ -74,7 +74,7 @@ public class GroupController {
     }
 
     @Authorizations(value = {
-            @Authorize(authority = "GROUP_MEMBEROF_VIEW")
+            @Authorize(authority = "GROUP_MEMBERSHIP_MY")
     })
     @ApiOperation(value = "Get logged user's groups in the system",
             notes = "Caller must have the GROUP_VIEW_MY authority",
