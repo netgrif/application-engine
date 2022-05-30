@@ -84,16 +84,6 @@
                 <version>4.4.0-RC1</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>1.21</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>1.9.4</version>
-            </dependency>
-            <dependency>
                 <groupId>com.beust</groupId>
                 <artifactId>jcommander</artifactId>
                 <version>1.75</version>
@@ -107,11 +97,6 @@
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>1.9.4</version>
-            </dependency>
-            <dependency>
-                <groupId>com.beust</groupId>
-                <artifactId>jcommander</artifactId>
-                <version>1.75</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

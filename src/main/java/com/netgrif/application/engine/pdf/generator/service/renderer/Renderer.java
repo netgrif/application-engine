@@ -44,10 +44,10 @@ public abstract class Renderer {
     }
 
 
-    protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize) throws IOException {
+    protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize, PdfResource resource) throws IOException {
         int result = 0;
         for (String value : values) {
-            String formattedValue = Jsoup.parse(value.replaceAll("\\s{1,}", " ")).text();
+            String formattedValue = removeUnsupportedChars(value, resource);
             if (result < font.getStringWidth(formattedValue) / 1000 * fontSize)
                 result = (int) (font.getStringWidth(formattedValue) / 1000 * fontSize);
         }
@@ -56,5 +56,29 @@ public abstract class Renderer {
 
     protected int getMaxLabelLineSize(int fieldWidth, int fontSize) {
         return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
+    }
+
+    public static String removeUnsupportedChars(String input, PdfResource resource) {
+        String value = Jsoup.parse(input.replaceAll("\\s{1,}", " ")).text();
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            if (isCharEncodable(value.charAt(i), resource.getValueFont())) {
+                b.append(value.charAt(i));
+            } else if (isCharEncodable(value.charAt(i), resource.getLabelFont())) {
+                b.append(value.charAt(i));
+            } else if (isCharEncodable(value.charAt(i), resource.getTitleFont())) {
+                b.append(value.charAt(i));
+            }
+        }
+        return b.toString();
+    }
+
+    public static boolean isCharEncodable(char character, PDType0Font font) {
+        try {
+            font.encode(Character.toString(character));
+            return true;
+        } catch (IllegalArgumentException | IOException iae) {
+            return false;
+        }
     }
 }
