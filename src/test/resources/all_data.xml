@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>all_data</id>
-    <initials>ALL</initials>
     <title>All Data</title>
-    <defaultRole>true</defaultRole>
+    <initials>ALL</initials>
     <!-- ROLES -->
     <role>
         <id>process_role</id>
@@ -19,14 +18,13 @@
         <id>number_currency</id>
         <title>Number currency</title>
         <init>10000</init>
-        <component>
-            <name>currency</name>
-            <properties>
-                <property key="code">EUR</property>
-                <property key="fractionSize">2</property>
-                <property key="locale">sk_SK</property>
-            </properties>
-        </component>
+        <format>
+            <currency>
+                <code>EUR</code>
+                <fractionSize>2</fractionSize>
+                <locale>sk_SK</locale>
+            </currency>
+        </format>
     </data>
 
     <data type="text" immediate="true">
@@ -57,9 +55,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <component>
-            <name>autocomplete</name>
-        </component>
+        <view>
+            <autocomplete/>
+        </view>
     </data>
     <data type="enumeration" immediate="true">
         <id>enumeration_list</id>
@@ -68,9 +66,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <component>
-            <name>list</name>
-        </component>
+        <view>
+            <list/>
+        </view>
     </data>
 
     <data type="multichoice" immediate="true">
@@ -88,9 +86,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Alice,Bob</init>
-        <component>
-            <name>list</name>
-        </component>
+        <view>
+            <list/>
+        </view>
     </data>
 
     <data type="boolean" immediate="true">
