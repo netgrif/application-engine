@@ -27,7 +27,7 @@ public class User extends AbstractUser implements RegisteredUser {
     @NotNull
     @Getter
     @Setter
-    @Indexed
+    @Indexed(unique = true)
     protected String email;
 
     @Getter

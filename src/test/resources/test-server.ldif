@@ -57,7 +57,7 @@ subschemaSubentry: cn=Subschema
 dn: ou=test2,ou=people,dc=netgrif,dc=com
 objectClass: top
 objectClass: organizationalUnit
-ou: support
+ou: test2
 structuralObjectClass: organizationalUnit
 subschemaSubentry: cn=Subschema
 
