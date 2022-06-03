@@ -7,7 +7,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 
 import java.util.List;
 
-public class LocalisedMultichoiceFieldDto extends LocalisedChoiceFieldDto {
+public final class LocalisedMultichoiceFieldDto extends LocalisedChoiceFieldDto {
 
     public LocalisedMultichoiceFieldDto() {
     }

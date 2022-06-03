@@ -3,7 +3,7 @@ package api.petrinet.domain.dataset.logic.action;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActionDto {
+public final class ActionDto {
 
     private String importId;
 

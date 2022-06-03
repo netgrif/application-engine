@@ -1,6 +1,6 @@
 package api.petrinet.domain.arcs.reference;
 
-public class ReferenceDto {
+public final class ReferenceDto {
 
     private String reference;
 

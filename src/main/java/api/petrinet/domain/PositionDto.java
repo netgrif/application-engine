@@ -1,6 +1,6 @@
 package api.petrinet.domain;
 
-public class PositionDto {
+public final class PositionDto {
 
     private Integer x;
 

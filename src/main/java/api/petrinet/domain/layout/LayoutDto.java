@@ -1,6 +1,6 @@
 package api.petrinet.domain.layout;
 
-public class LayoutDto {
+public abstract class LayoutDto {
 
     private Integer rows;
 

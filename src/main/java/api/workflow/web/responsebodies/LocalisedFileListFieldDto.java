@@ -7,7 +7,7 @@ import api.petrinet.domain.dataset.logic.validation.LocalisedValidationDto;
 
 import java.util.List;
 
-public class LocalisedFileListFieldDto extends LocalisedFieldDto {
+public final class LocalisedFileListFieldDto extends LocalisedFieldDto {
 
     public LocalisedFileListFieldDto() {
     }

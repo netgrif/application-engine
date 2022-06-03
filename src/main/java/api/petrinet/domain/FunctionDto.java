@@ -1,6 +1,6 @@
 package api.petrinet.domain;
 
-public class FunctionDto extends PetriNetObjectDto {
+public final class FunctionDto extends PetriNetObjectDto {
 
     private String definition;
 

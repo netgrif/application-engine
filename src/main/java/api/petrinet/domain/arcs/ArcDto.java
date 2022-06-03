@@ -3,19 +3,19 @@ package api.petrinet.domain.arcs;
 import api.petrinet.domain.NodeDto;
 import api.petrinet.domain.arcs.reference.ReferenceDto;
 
-public class ArcDto {
+public final class ArcDto {
 
-    protected NodeDto source;
-    
-    protected String sourceId;
+    private NodeDto source;
 
-    protected NodeDto destination;
-    
-    protected String destinationId;
-    
-    protected Integer multiplicity;
-    
-    protected ReferenceDto reference;
+    private String sourceId;
+
+    private NodeDto destination;
+
+    private String destinationId;
+
+    private Integer multiplicity;
+
+    private ReferenceDto reference;
 
     public ArcDto() {
     }

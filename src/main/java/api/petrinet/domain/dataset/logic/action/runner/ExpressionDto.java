@@ -1,10 +1,10 @@
 package api.petrinet.domain.dataset.logic.action.runner;
 
-public class ExpressionDto {
+public final class ExpressionDto {
 
-    protected String id;
+    private String id;
 
-    protected String definition;
+    private String definition;
 
     ExpressionDto() {
     }

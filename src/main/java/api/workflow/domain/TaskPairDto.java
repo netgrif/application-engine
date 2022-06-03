@@ -1,6 +1,6 @@
 package api.workflow.domain;
 
-public class TaskPairDto {
+public final class TaskPairDto {
 
     private String task;
 

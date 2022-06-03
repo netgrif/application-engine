@@ -1,6 +1,6 @@
 package api.petrinet.domain;
 
-public class PetriNetObjectDto extends ImportedDto {
+public abstract class PetriNetObjectDto extends ImportedDto {
 
     private String id;
 

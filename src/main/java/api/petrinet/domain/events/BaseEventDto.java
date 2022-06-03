@@ -6,7 +6,7 @@ import api.petrinet.domain.ImportedDto;
 
 import java.util.List;
 
-public class BaseEventDto extends ImportedDto {
+public abstract class BaseEventDto extends ImportedDto {
 
     private String id;
 

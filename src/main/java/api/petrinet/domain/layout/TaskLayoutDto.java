@@ -1,6 +1,6 @@
 package api.petrinet.domain.layout;
 
-public class TaskLayoutDto extends FormLayoutDto {
+public final class TaskLayoutDto extends FormLayoutDto {
 
     private Integer offset;
 

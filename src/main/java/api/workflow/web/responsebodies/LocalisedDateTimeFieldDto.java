@@ -7,7 +7,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 
 import java.util.List;
 
-public class LocalisedDateTimeFieldDto extends LocalisedFieldDto {
+public final class LocalisedDateTimeFieldDto extends LocalisedFieldDto {
 
     private String minDate;
 

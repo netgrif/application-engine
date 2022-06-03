@@ -2,7 +2,7 @@ package api.petrinet.domain.dataset.logic;
 
 import api.petrinet.domain.layout.LayoutDto;
 
-public class FieldLayoutDto extends LayoutDto {
+public final class FieldLayoutDto extends LayoutDto {
 
     private int x;
 

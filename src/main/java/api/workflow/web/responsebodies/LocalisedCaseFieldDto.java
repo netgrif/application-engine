@@ -7,7 +7,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 
 import java.util.List;
 
-public class LocalisedCaseFieldDto extends LocalisedFieldDto {
+public final class LocalisedCaseFieldDto extends LocalisedFieldDto {
 
     private List<String> allowedNets;
 

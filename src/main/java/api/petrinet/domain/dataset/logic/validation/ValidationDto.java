@@ -3,7 +3,7 @@ package api.petrinet.domain.dataset.logic.validation;
 
 import api.petrinet.domain.I18nStringDto;
 
-public class ValidationDto {
+public final class ValidationDto {
 
     private String validationRule;
 

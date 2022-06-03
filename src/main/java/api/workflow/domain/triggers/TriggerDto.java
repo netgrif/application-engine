@@ -2,7 +2,7 @@ package api.workflow.domain.triggers;
 
 import api.petrinet.domain.ImportedDto;
 
-public class TriggerDto extends ImportedDto {
+public final class TriggerDto extends ImportedDto {
 
     private String id;
 

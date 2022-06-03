@@ -1,6 +1,6 @@
 package api.petrinet.domain.dataset.logic.validation;
 
-public class LocalisedValidationDto {
+public final class LocalisedValidationDto {
 
     private String validationRule;
 

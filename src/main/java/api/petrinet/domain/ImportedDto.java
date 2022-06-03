@@ -1,6 +1,6 @@
 package api.petrinet.domain;
 
-public class ImportedDto {
+public abstract class ImportedDto {
     private String importId;
 
     public String getImportId() {

@@ -1,6 +1,6 @@
 package api.petrinet.domain.layout;
 
-public class FormLayoutDto extends LayoutDto {
+public abstract class FormLayoutDto extends LayoutDto {
 
     private String type;
 

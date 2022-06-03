@@ -2,7 +2,7 @@ package api.petrinet.domain;
 
 import java.util.List;
 
-public class TransactionDto extends PetriNetObjectDto {
+public final class TransactionDto extends PetriNetObjectDto {
 
     private List<String> transitions;
 

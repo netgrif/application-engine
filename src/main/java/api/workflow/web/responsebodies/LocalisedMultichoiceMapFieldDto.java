@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class LocalisedMultichoiceMapFieldDto extends LocalisedMapOptionsFieldDto<Set<String>> {
+public final class LocalisedMultichoiceMapFieldDto extends LocalisedMapOptionsFieldDto<Set<String>> {
 
     public LocalisedMultichoiceMapFieldDto() {
     }

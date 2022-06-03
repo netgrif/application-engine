@@ -4,7 +4,7 @@ import api.workflow.web.responsebodies.LocalisedFieldDto;
 
 import java.util.Collection;
 
-public class DataFieldsResourceDto {
+public final class DataFieldsResourceDto {
 
     private Collection<LocalisedFieldDto> content;
 

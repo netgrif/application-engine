@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransitionDto extends NodeDto {
+public final class TransitionDto extends NodeDto {
 
     private Map<String, DataGroupDto> dataGroups;
 

@@ -8,7 +8,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 import java.util.List;
 import java.util.Set;
 
-public class LocalisedUserFieldDto extends LocalisedFieldDto {
+public final class LocalisedUserFieldDto extends LocalisedFieldDto {
 
     private Set<String> roles;
 

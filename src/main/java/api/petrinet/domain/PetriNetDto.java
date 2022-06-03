@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-public class PetriNetDto extends PetriNetObjectDto {
+public final class PetriNetDto extends PetriNetObjectDto {
     private String identifier;
 
     private I18nStringDto title;

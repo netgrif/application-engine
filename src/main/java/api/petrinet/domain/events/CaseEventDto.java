@@ -5,7 +5,7 @@ import api.petrinet.domain.I18nStringDto;
 
 import java.util.List;
 
-public class CaseEventDto extends BaseEventDto {
+public final class CaseEventDto extends BaseEventDto {
 
     private String type;
 

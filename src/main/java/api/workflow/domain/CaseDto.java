@@ -7,7 +7,7 @@ import api.petrinet.domain.dataset.FieldDto;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class CaseDto {
+public final class CaseDto {
 
     private String id;
 

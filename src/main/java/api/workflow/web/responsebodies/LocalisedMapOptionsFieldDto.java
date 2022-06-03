@@ -8,7 +8,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 import java.util.List;
 import java.util.Map;
 
-public class LocalisedMapOptionsFieldDto<DV> extends LocalisedFieldDto {
+public abstract class LocalisedMapOptionsFieldDto<DV> extends LocalisedFieldDto {
 
     private Map<String, String> options;
 

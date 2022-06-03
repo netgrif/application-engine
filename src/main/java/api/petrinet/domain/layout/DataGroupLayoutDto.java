@@ -1,6 +1,6 @@
 package api.petrinet.domain.layout;
 
-public class DataGroupLayoutDto extends FormLayoutDto {
+public final class DataGroupLayoutDto extends FormLayoutDto {
 
     public DataGroupLayoutDto() {
     }

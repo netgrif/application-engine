@@ -1,6 +1,6 @@
 package api.petrinet.version;
 
-public class VersionDto {
+public final class VersionDto {
 
     private long major;
 

@@ -1,6 +1,6 @@
 package api.petrinet.domain;
 
-public class PlaceDto extends NodeDto {
+public final class PlaceDto extends NodeDto {
 
     private Integer tokens;
 

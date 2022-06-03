@@ -4,7 +4,7 @@ import api.petrinet.domain.layout.DataGroupLayoutDto;
 
 import java.util.Set;
 
-public class DataGroupDto extends PetriNetObjectDto {
+public final class DataGroupDto extends PetriNetObjectDto {
 
     private Set<String> data;
 

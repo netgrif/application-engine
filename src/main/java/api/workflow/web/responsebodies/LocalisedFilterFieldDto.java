@@ -7,7 +7,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 
 import java.util.List;
 
-public class LocalisedFilterFieldDto extends LocalisedFieldDto {
+public final class LocalisedFilterFieldDto extends LocalisedFieldDto {
 
     private List<String> allowedNets;
 

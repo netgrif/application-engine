@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-public class TaskDto {
+public final class TaskDto {
 
     private String id;
 

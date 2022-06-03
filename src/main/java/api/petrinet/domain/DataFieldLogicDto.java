@@ -6,7 +6,7 @@ import api.petrinet.domain.dataset.logic.FieldLayoutDto;
 import java.util.Map;
 import java.util.Set;
 
-public class DataFieldLogicDto {
+public final class DataFieldLogicDto {
 
     private Set<String> behavior;
 

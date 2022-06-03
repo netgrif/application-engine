@@ -1,6 +1,6 @@
 package api.petrinet.domain.arcs.reference;
 
-public class ReferencableDto {
+public final class ReferencableDto {
 
     private int multiplicity;
 

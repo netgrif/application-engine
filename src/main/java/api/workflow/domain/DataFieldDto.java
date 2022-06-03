@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DataFieldDto {
+public final class DataFieldDto {
 
     private Map<String, Set<String>> behavior;
 

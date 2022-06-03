@@ -1,6 +1,6 @@
 package api.petrinet.domain;
 
-public class NodeDto extends PetriNetObjectDto {
+public abstract class NodeDto extends PetriNetObjectDto {
 
     private PositionDto position;
 
