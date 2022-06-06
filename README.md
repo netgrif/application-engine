@@ -57,7 +57,7 @@ run and use the engine:
 | [Java](https://openjdk.java.net/)                      | 11+     | Java Development Kit                                            | [OpenJDK 11](https://openjdk.java.net/install/)                        |
 | [Redis](https://redis.io/)                             | 5+      | Key-value in-memory database used for user sessions and caching | [Redis 6.2.6](https://redis.io/download)                               |
 | [MongoDB](https://www.mongodb.com/)                    | 4.4+    | Main document store database                                    | [MongoDB 4.4.11](https://docs.mongodb.com/v4.4/installation/)          |
-| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 7.10+   | Index database used for better application search               | [Elasticsearch 7.10.2](https://www.elastic.co/downloads/elasticsearch) |
+| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 7.17+   | Index database used for better application search               | [Elasticsearch 7.17.3](https://www.elastic.co/downloads/past-releases/elasticsearch-7-17-3) |
 
 If you are planning on developing docker container based solution you can use our [docker-compose](docker-compose.yml)
 configuration to run all necessary databases to develop with NAE.

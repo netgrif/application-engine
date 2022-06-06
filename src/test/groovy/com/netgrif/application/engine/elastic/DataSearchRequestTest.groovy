@@ -9,6 +9,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
@@ -104,7 +105,7 @@ class DataSearchRequestTest {
 
         repository.deleteAll()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
         def users = userService.findAll(true)

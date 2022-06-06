@@ -252,6 +252,9 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getLoggedOrSystem() {
         try {
+            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
+                return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+            }
             return getLoggedUser();
         } catch (NullPointerException e) {
             return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
