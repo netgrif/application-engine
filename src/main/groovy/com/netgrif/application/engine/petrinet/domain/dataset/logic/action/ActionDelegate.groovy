@@ -1334,7 +1334,7 @@ class ActionDelegate {
         return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
     }
 
-    FileFieldInputStream getFilePreview(Case useCase, Task task, FileField field) {
-        return this.dataService.getFile(useCase, task, field, true)
+    FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
+        return this.dataService.getFile(useCase, task, field, forPreview)
     }
 }
