@@ -36,7 +36,7 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 @Service
 @Slf4j
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserRefService implements ILdapUserRefService {
 
     @Autowired
@@ -83,6 +83,7 @@ public class LdapUserRefService implements ILdapUserRefService {
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
 
+        ldapUser.setPassword("n/a");
         return ldapUserService.save(ldapUser);
     }
 
@@ -90,7 +91,6 @@ public class LdapUserRefService implements ILdapUserRefService {
     public LdapUserRef findById(Name id) {
         DirContextOperations context
                 = ldapUserConfiguration.ldapTemplate().lookupContext(id);
-//        context.setAttributeValues("objectClass", ldapProperties.getPeopleClass());
         LdapUserRef user = new LdapUserRef();
         user.setDn(context.getDn());
         user.setCn(verificationData(context, ldapProperties.getMapCn()));

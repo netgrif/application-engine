@@ -10,7 +10,7 @@ import org.springframework.ldap.query.LdapQuery;
 import java.util.List;
 import java.util.Set;
 
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface ILdapGroupRefService {
 
     public List<LdapGroupRef> findAllGroups();

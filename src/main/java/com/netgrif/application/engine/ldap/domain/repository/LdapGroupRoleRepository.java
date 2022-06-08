@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Repository
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface LdapGroupRoleRepository extends MongoRepository<LdapGroup, String> {
 
     LdapGroup findByDn(String dn);

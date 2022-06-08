@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @Repository
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface LdapUserRefRepository extends LdapRepository<LdapUserRef>, QuerydslPredicateExecutor<LdapUserRef> {
 
     LdapUserRef findByDn(String dn);
