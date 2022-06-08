@@ -1,0 +1,449 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>1</id>
+	<initials>TES</initials>
+	<title>PDF test</title>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="number">
+		<id>number</id>
+		<title>Number</title>
+		<placeholder>Number field placeholder</placeholder>
+		<desc>Number field description</desc>
+		<validations>
+			<validation>
+				<expression>inrange 0,inf</expression>
+			</validation>
+			<validation>
+				<expression>inrange 0,inf</expression>
+				<message>Number field validation message</message>
+			</validation>
+		</validations>
+		<init>102568563</init>
+	</data>
+	<data type="text">
+		<id>text</id>
+		<title>Text</title>
+		<placeholder>Text field placeholder</placeholder>
+		<desc>Text field description</desc>
+		<validations>
+			<validation>
+				<expression>email</expression>
+			</validation>
+			<validation>
+				<expression>email</expression>
+				<message>Mail validation message</message>
+			</validation>
+		</validations>
+		<init>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy
+            text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and
+            typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
+            is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the
+            printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply
+            dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and
+            typesetting industry.</init>
+	</data>
+	<data type="enumeration">
+		<id>enumeration</id>
+		<title>Enumeration</title>
+		<placeholder>Enumeration field placeholder</placeholder>
+		<desc>Enumeration field description</desc>
+		<options>
+			<option key="enumeration">enumeration</option>
+			<option key="enumeration2">enumeration2</option>
+			<option key="enumeration3">enumeration3</option>
+		</options>
+		<init>enumeration</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice</id>
+		<title>Multichoice</title>
+		<placeholder>Multichoice field placeholder</placeholder>
+		<desc>Multichoice field description</desc>
+		<options>
+			<option key="multichoice">multichoice</option>
+			<option key="multichoice2">multichoice2</option>
+			<option key="multichoice3">multichoice3</option>
+		</options>
+		<init>multichoice, multichoice2</init>
+	</data>
+	<data type="boolean">
+		<id>boolean</id>
+		<title>Boolean</title>
+		<placeholder>Boolean field placeholder</placeholder>
+		<desc>Boolean field description</desc>
+		<validations>
+			<validation>
+				<expression>requiredTrue</expression>
+			</validation>
+			<validation>
+				<expression>requiredTrue</expression>
+				<message>Boolean field validation message</message>
+			</validation>
+		</validations>
+		<init>true</init>
+	</data>
+	<data type="date">
+		<id>date</id>
+		<title>Date</title>
+		<placeholder>Date field placeholder</placeholder>
+		<desc>Date field description</desc>
+		<validations>
+			<validation>
+				<expression>between today,future</expression>
+			</validation>
+			<validation>
+				<expression>between today,future</expression>
+				<message>Date field validation message</message>
+			</validation>
+			<validation>
+				<expression>between today,future</expression>
+				<message>Date field validation message 2</message>
+			</validation>
+		</validations>
+		<init>2022-05-24T14:56:08.907Z</init>
+	</data>
+	<data type="file">
+		<id>file</id>
+		<title>File</title>
+		<placeholder>File field placeholder</placeholder>
+		<desc>File field description</desc>
+	</data>
+	<data type="user">
+		<id>user</id>
+		<title>User</title>
+		<placeholder>User field placeholder</placeholder>
+		<desc>User field description</desc>
+	</data>
+	<data type="dateTime">
+		<id>dateTime</id>
+		<title>DateTime</title>
+		<placeholder>DateTime field placeholder</placeholder>
+		<desc>DateTime field description</desc>
+		<validations>
+			<validation>
+				<expression>between today,future</expression>
+			</validation>
+			<validation>
+				<expression>between today,future</expression>
+				<message>Date field validation message</message>
+			</validation>
+			<validation>
+				<expression>between today,future</expression>
+				<message>Date field validation message 2</message>
+			</validation>
+		</validations>
+		<init>2022-05-24T14:56:08.936Z</init>
+	</data>
+	<transition>
+		<id>1</id>
+		<x>340</x>
+		<y>180</y>
+		<label>Transition 1</label>
+		<dataGroup>
+			<id>dataGroup1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>dateTime</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>assign-test</id>
+			<actions phase="post">
+				<action id="action_0">
+                    trans: t.1,
+                    field: f.file;
+
+                    generatePdf(trans, field)
+                </action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>1_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>2</id>
+		<x>440</x>
+		<y>280</y>
+		<label>Transition 2</label>
+		<dataGroup>
+			<id>dataGroup1</id>
+			<layout>legacy</layout>
+			<dataRef>
+				<id>number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>multichoice</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>boolean</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>user</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>dateTime</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>assign-test</id>
+			<actions phase="post">
+				<action id="action_1">
+					def other = findCase { it.processIdentifier.eq(useCase.petriNet.identifier).and(it._id.ne(useCase.stringId)) }
+					generatePdf sourceTransitionId: '2', targetFileFieldId: 'file', targetCase: other
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>1_delegate</id>
+		</event>
+	</transition>
+</document>

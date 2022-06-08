@@ -362,7 +362,7 @@
             <id>finishevent</id>
             <actions phase="pre">
                 <action>
-                    generatePDF("t1","file");
+                    generatePdf("t1","file");
                 </action>
             </actions>
         </event>

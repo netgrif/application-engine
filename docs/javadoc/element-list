@@ -14,6 +14,9 @@ com.netgrif.application.engine.business.orsr
 com.netgrif.application.engine.business.psc
 com.netgrif.application.engine.business.qr
 com.netgrif.application.engine.configuration
+com.netgrif.application.engine.configuration.authentication.providers
+com.netgrif.application.engine.configuration.authentication.providers.basic
+com.netgrif.application.engine.configuration.authentication.providers.ldap
 com.netgrif.application.engine.configuration.drools
 com.netgrif.application.engine.configuration.drools.interfaces
 com.netgrif.application.engine.configuration.drools.throwable
@@ -37,6 +40,9 @@ com.netgrif.application.engine.event.events
 com.netgrif.application.engine.event.events.user
 com.netgrif.application.engine.event.listeners
 com.netgrif.application.engine.eventoutcomes
+com.netgrif.application.engine.export.configuration
+com.netgrif.application.engine.export.domain
+com.netgrif.application.engine.export.service.interfaces
 com.netgrif.application.engine.history.domain.baseevent
 com.netgrif.application.engine.history.domain.baseevent.repository
 com.netgrif.application.engine.history.domain.caseevents
@@ -61,6 +67,7 @@ com.netgrif.application.engine.ldap.domain
 com.netgrif.application.engine.ldap.domain.repository
 com.netgrif.application.engine.ldap.filters
 com.netgrif.application.engine.ldap.service
+com.netgrif.application.engine.ldap.service.interfaces
 com.netgrif.application.engine.mail
 com.netgrif.application.engine.mail.domain
 com.netgrif.application.engine.mail.interfaces
@@ -70,6 +77,7 @@ com.netgrif.application.engine.orgstructure.groups
 com.netgrif.application.engine.orgstructure.groups.config
 com.netgrif.application.engine.orgstructure.groups.interfaces
 com.netgrif.application.engine.orgstructure.web
+com.netgrif.application.engine.orgstructure.web.requestbodies
 com.netgrif.application.engine.orgstructure.web.responsebodies
 com.netgrif.application.engine.pdf.generator.config
 com.netgrif.application.engine.pdf.generator.config.types

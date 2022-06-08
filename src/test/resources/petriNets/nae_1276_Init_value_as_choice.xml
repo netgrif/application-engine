@@ -93,7 +93,19 @@
         </inits>
         <remote/>
     </data>
+    <data type="i18n">
+        <id>init_i18n</id>
+        <title>Init I18n</title>
+        <placeholder>Init I18n field</placeholder>
+        <init name="init_i18n_value">Default i18n test value</init>
+    </data>
     <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="init_i18n_value">Default SK i18n test value</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="init_i18n_value">Default DE i18n test value</i18nString>
+    </i18n>
     <!-- TRANSITIONS -->
     <transition>
         <id>t1</id>
@@ -155,6 +167,16 @@
             </dataRef>
             <dataRef>
                 <id>new_init_multichoice_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>i18n_test_group</id>
+            <title>I18n group</title>
+            <dataRef>
+                <id>init_i18n</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
