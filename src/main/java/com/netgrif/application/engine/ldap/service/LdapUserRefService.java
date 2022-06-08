@@ -72,8 +72,8 @@ public class LdapUserRefService implements ILdapUserRefService {
 
         String generatedString = RandomStringUtils.randomAlphanumeric(35);
         ldapUser.setPassword(generatedString);
-        IUser savedUser = ldapUserService.saveNew(ldapUser);
-        ldapUser.setNextGroups(this.groupService.getAllGroupsOfUser(savedUser));
+        LdapUser savedUser = (LdapUser) ldapUserService.saveNew(ldapUser);
+        savedUser.setNextGroups(this.groupService.getAllGroupsOfUser(savedUser));
 
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(savedUser);
@@ -83,8 +83,8 @@ public class LdapUserRefService implements ILdapUserRefService {
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
 
-        ldapUser.setPassword("n/a");
-        return ldapUserService.save(ldapUser);
+        savedUser.setPassword("n/a");
+        return ldapUserService.save(savedUser);
     }
 
     @Override
