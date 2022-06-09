@@ -86,8 +86,14 @@ and start:
 $ wget -O nae.zip https://github.com/netgrif/application-engine/releases/latest
 $ unzip nae.zip
 $ cd nae
-$ cd resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../..
+$ cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
 $ java -jar nae.jar
+```
+
+Only generate security keys:
+
+```shell
+$ cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
 ```
 
 By default, the engine assumes that all databases are running locally. If you are running required database on server or

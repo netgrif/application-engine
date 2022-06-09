@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Data
 @Document(collection = "user")
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUser extends User {
 
     private String dn;

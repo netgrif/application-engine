@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @Repository
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface LdapUserRepository extends MongoRepository<LdapUser, String>, QuerydslPredicateExecutor<LdapUser> {
 
     LdapUser findByDn(String dn);

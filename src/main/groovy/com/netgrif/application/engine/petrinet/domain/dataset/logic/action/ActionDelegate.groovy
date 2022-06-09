@@ -46,6 +46,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
@@ -1333,4 +1334,7 @@ class ActionDelegate {
         return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
     }
 
+    FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
+        return this.dataService.getFile(useCase, task, field, forPreview)
+    }
 }

@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapGroupsResource extends CollectionModel<LdapGroupResponseBody> {
 
     public LdapGroupsResource(Iterable<LdapGroupResponseBody> content) {

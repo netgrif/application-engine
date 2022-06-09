@@ -34,7 +34,7 @@ import java.util.Collection;
 
 @Slf4j
 @Component
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProvider {
 
     protected NaeLdapProperties ldapProperties;
