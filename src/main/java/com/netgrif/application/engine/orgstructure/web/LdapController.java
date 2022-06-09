@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/api/ldap")
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 @Api(tags = {"Ldap"}, authorizations = @Authorization("BasicAuth"))
 public class LdapController {
 

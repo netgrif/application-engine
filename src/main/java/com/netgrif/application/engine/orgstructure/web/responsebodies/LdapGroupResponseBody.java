@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapGroupResponseBody {
 
     private String dn;
