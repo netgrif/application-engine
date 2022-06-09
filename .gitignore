@@ -137,3 +137,8 @@ rules/
 log/
 !/src/main/java/com/netgrif/workflow/rules/
 !/src/main/java/com/netgrif/workflow/rules/domain/StoredRuleRepository.java
+
+### CERT ###
+/src/main/resources/certificates/keypair.pem
+/src/main/resources/certificates/private.der
+/src/main/resources/certificates/public.crt
