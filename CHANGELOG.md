@@ -8,6 +8,18 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
+## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)
+
+### Fixed
+
+- [NAE-1652] For some PDF documents the file preview is not generating
+- [NAE-1649] File field preview component bug
+- [NAE-1641] Generate PDF with special characters
+
+### Changed
+
+- [NAE-1655] Better Active Directory compatibility
+
 ## [6.1.0](https://github.com/netgrif/application-engine/releases/tag/v6.1.0) (2022-06-01)
 
 ### Fixed

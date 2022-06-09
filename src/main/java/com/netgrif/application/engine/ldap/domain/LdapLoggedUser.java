@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapLoggedUser extends LoggedUser {
 
     @Getter

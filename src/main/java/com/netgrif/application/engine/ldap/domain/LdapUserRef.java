@@ -11,7 +11,7 @@ import java.util.Set;
 
 
 @Data
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserRef {
 
     @Id

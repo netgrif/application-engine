@@ -19,7 +19,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import java.util.Collection;
 
 @Slf4j
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
     protected LdapUserService ldapUserService;
 
