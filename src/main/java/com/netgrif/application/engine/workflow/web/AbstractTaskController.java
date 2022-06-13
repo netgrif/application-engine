@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
@@ -195,15 +194,15 @@ public abstract class AbstractTaskController {
                 LocalisedEventOutcomeFactory.from(outcome,locale));
     }
 
-    public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody) {
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody) {
         Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+        dataBody.getTasks().entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue()))); // TODO: NAE-1645: value.deepCopy
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                 LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) { // TODO: NAE-1645: dataBody?
         Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);

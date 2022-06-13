@@ -9,23 +9,23 @@ import com.google.common.collect.Lists;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
-import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
-import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.DefaultFiltersRunner;
-import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.workflow.domain.*;
+import com.netgrif.application.engine.workflow.domain.filter.FilterImportExport;
+import com.netgrif.application.engine.workflow.domain.filter.FilterImportExportList;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +94,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Override
     public void createFilterImport(IUser author) {
-        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER,"Import filters " + author.getFullName(), "", author.transformToLoggedUser());
+        workflowService.createCaseByIdentifier(IMPORT_NET_IDENTIFIER, "Import filters " + author.getFullName(), "", author.transformToLoggedUser());
     }
 
     @Override
@@ -106,6 +106,7 @@ public class FilterImportExportService implements IFilterImportExportService {
      * Method which performs export of selected filters into xml file.
      * Method finds all cases by provided ids, transform them into FilterImportExportList object
      * and serialize them into xml file on path: storage/filterExport/<userId>/filters.xml
+     *
      * @param filtersToExport - set of ids of filter cases, which should be exported
      * @return FileFieldValue - file field value with path to xml file of exported filters
      * @throws IOException - if file which contains exported filters cannot be created
@@ -119,6 +120,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     /**
      * Method which performs export of selected filters into xml file.
      * Method finds all cases by provided ids, transform them into FilterImportExportList object
+     *
      * @param filtersToExport - set of ids of filter cases, which should be exported
      * @return a serializable wrapper of a list of filter objects in serializable form
      */
@@ -157,8 +159,9 @@ public class FilterImportExportService implements IFilterImportExportService {
      * export located on path: filter_export_schema.xml
      * If the file is correct, method calls performImport method which
      * creates filter cases
+     *
      * @return List<String> - list of task ids of imported filter cases in - import_filter transition
-     * @throws IOException - if imported file is not found
+     * @throws IOException                - if imported file is not found
      * @throws IllegalFilterFileException - if uploaded xml is not in correct xml format and invalidate against schema
      */
     @Override
@@ -171,17 +174,18 @@ public class FilterImportExportService implements IFilterImportExportService {
     /**
      * Method which performs import of filters from already created filter import class instances
      * passed in as parameter.
+     *
      * @param filterList - instance of class FilterImportExportList
      * @return a mapping of original filter case ids to task ids of imported filter cases in - import_filter transition
      * @throws IOException - if imported file is not found
      */
     @Override
-    public Map<String, String> importFilters (FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
+    public Map<String, String> importFilters(FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
         log.info("Importing filters from imported menu");
         return performImport(filterList);
     }
 
-    protected Map<String, String> performImport (FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
+    protected Map<String, String> performImport(FilterImportExportList filterList) throws IOException, TransitionNotExecutableException {
         Map<String, String> oldToNewFilterId = new HashMap<>();
         Map<String, String> importedFilterTaskIds = new HashMap<>();
 
@@ -249,6 +253,7 @@ public class FilterImportExportService implements IFilterImportExportService {
     /**
      * Method which provides reloading of imported filters fields, so if allowed nets are missing,
      * htmlTextArea is shown with list of missing allowed nets, otherwise filter preview is shown.
+     *
      * @param filterFields - list of task ids of filters which value should be reloaded
      */
     @Override
@@ -269,12 +274,11 @@ public class FilterImportExportService implements IFilterImportExportService {
                 htmlTextAreaValue.append("<ul style=\"color: red\">");
                 requiredNets.forEach(net -> htmlTextAreaValue.append("<li>").append(net).append("</li>"));
                 htmlTextAreaValue.append("</ul>");
-                Map<String, Map<String, String>> taskData = new HashMap<>();
-                Map<String, String> missingNets = new HashMap<>();
-                missingNets.put("type", "text");
-                missingNets.put("value", htmlTextAreaValue.toString());
-                taskData.put(FIELD_MISSING_ALLOWED_NETS, missingNets);
-                this.dataService.setData(importedFilterTask, ImportHelper.populateDataset(taskData));
+                DataSet taskData = new DataSet();
+                DataField missingNets = new DataField();
+                missingNets.setValue(htmlTextAreaValue.toString());
+                taskData.getFields().put(FIELD_MISSING_ALLOWED_NETS, missingNets);
+                this.dataService.setData(importedFilterTask, taskData);
                 filterCase = workflowService.findOne(filterCase.getStringId());
                 changeVisibilityByAllowedNets(true, filterCase);
             } else {

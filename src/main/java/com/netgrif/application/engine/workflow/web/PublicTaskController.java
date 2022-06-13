@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
@@ -12,6 +11,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -124,7 +124,7 @@ public class PublicTaskController extends AbstractTaskController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody TaskDataSets dataBody) {
         return super.setData(taskId, dataBody);
     }
 

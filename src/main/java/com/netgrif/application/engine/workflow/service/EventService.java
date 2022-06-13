@@ -58,6 +58,9 @@ public class EventService implements IEventService {
             allOutcomes.addAll(outcomes);
         });
         if (useCase != null) {
+            Case latest = workflowService.findOne(useCase.getStringId());
+            useCase.setTasks(latest.getTasks());
+            useCase.setActivePlaces(latest.getActivePlaces());
             workflowService.save(useCase);
         }
         return allOutcomes;

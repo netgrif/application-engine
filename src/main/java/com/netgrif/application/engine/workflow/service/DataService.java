@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
@@ -34,6 +33,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -182,13 +182,13 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome setData(String taskId, ObjectNode values) {
+    public SetDataEventOutcome setData(String taskId, DataSet dataSet) {
         Task task = taskService.findOne(taskId);
-        return setData(task, values);
+        return setData(task, dataSet);
     }
 
     @Override
-    public SetDataEventOutcome setData(Task task, ObjectNode values) {
+    public SetDataEventOutcome setData(Task task, DataSet dataSet) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
@@ -197,34 +197,33 @@ public class DataService implements IDataService {
             task.setUser(userService.findById(task.getUserId(), false));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        values.fields().forEachRemaining(entry -> {
-            String fieldId = entry.getKey();
+        dataSet.getFields().forEach((fieldId, value) -> {
             DataField dataField = useCase.getDataSet().get(fieldId);
             if (dataField != null) {
                 Field field = useCase.getPetriNet().getField(fieldId).get();
                 outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
                 if (outcome.getMessage() == null) {
-                    Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+                    Map<String, DataFieldLogic> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
                     if (field.getEvents().containsKey(DataEventType.SET) &&
                             ((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage() != null) {
                         outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage());
-                    } else if (dataSet.containsKey(fieldId)
-                            && dataSet.get(fieldId).getEvents().containsKey(DataEventType.SET)
-                            && dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null) {
-                        outcome.setMessage(dataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
+                    } else if (caseDataSet.containsKey(fieldId)
+                            && caseDataSet.get(fieldId).getEvents().containsKey(DataEventType.SET)
+                            && caseDataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null) {
+                        outcome.setMessage(caseDataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
                     }
                 }
-                Object newValue = parseFieldsValues(entry.getValue(), dataField);
+                Object newValue = parseFieldsValues(value, dataField, field);
                 dataField.setValue(newValue);
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
                 changedField.addAttribute("value", newValue);
-                List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
+                List<String> allowedNets = parseAllowedNetsValue(value, field);
                 if (allowedNets != null) {
                     dataField.setAllowedNets(allowedNets);
                     changedField.addAttribute("allowedNets", allowedNets);
                 }
-                Map<String, Object> filterMetadata = parseFilterMetadataValue(entry.getValue());
+                Map<String, Object> filterMetadata = parseFilterMetadataValue(value, field);
                 if (filterMetadata != null) {
                     dataField.setFilterMetadata(filterMetadata);
                     changedField.addAttribute("filterMetadata", filterMetadata);
@@ -419,7 +418,7 @@ public class DataService implements IDataService {
         }
     }
 
-    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase){
+    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase) {
         if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
             DataEvent event = events.get(DataEventType.GET);
             event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
@@ -498,7 +497,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile){
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
@@ -552,7 +551,7 @@ public class DataService implements IDataService {
 
             try {
                 writeFile(oneFile, file);
-            } catch (IOException e){
+            } catch (IOException e) {
                 log.error(e.getMessage());
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
@@ -572,7 +571,7 @@ public class DataService implements IDataService {
         File file = new File(field.getFilePath(useCase.getStringId()));
         try {
             writeFile(multipartFile, file);
-        } catch (IOException e){
+        } catch (IOException e) {
             log.error(e.getMessage());
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
@@ -699,93 +698,90 @@ public class DataService implements IDataService {
         return eventService.processDataEvents(field, trigger, phase, useCase, task);
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
-        ObjectNode node = (ObjectNode) jsonNode;
-        Object value;
-        switch (getFieldTypeFromNode(node)) {
-            case "date":
-                if (node.get("value") == null || node.get("value").isNull()) {
+    private Object parseFieldsValues(DataField newValueField, DataField dataField, Field petriNetField) {
+        Object value = null;
+        //TODO: NAE-1645 check if all types are parsed correctly
+        switch (petriNetField.getType()) {
+            case DATE:
+                if (newValueField.getValue() == null) {
                     value = null;
                     break;
                 }
-                value = FieldFactory.parseDate(node.get("value").asText());
+                value = FieldFactory.parseDate(newValueField.getValue());
                 break;
-            case "dateTime":
-                if (node.get("value") == null || node.get("value").isNull()) {
+            case DATETIME:
+                if (newValueField.getValue() == null) {
                     value = null;
                     break;
                 }
-                value = FieldFactory.parseDateTime(node.get("value").asText());
+                value = FieldFactory.parseDateTime(newValueField.getValue());
                 break;
-            case "boolean":
-                value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();
+            case BOOLEAN:
+                value = !(newValueField.getValue() == null) && ((Boolean) newValueField.getValue());
                 break;
-            case "multichoice":
-                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toSet());
+            case MULTICHOICE:
+//                value = parseMultichoiceFieldValues(newValueField).stream().map(I18nString::new).collect(Collectors.toSet());
+                // TODO: NAE-1645 string > i18nstring?
                 break;
-            case "multichoice_map":
-                value = parseMultichoiceFieldValues(node);
-                break;
-            case "enumeration":
-                if (node.get("value") == null || node.get("value").asText() == null) {
+            case ENUMERATION:
+                if (newValueField.getValue() == null) {
                     value = null;
                     break;
                 }
-                String val = node.get("value").asText();
+                String val = (String) newValueField.getValue();
                 value = new I18nString(val);
                 break;
-            case "user":
-                if (node.get("value") == null || node.get("value").isNull()) {
+            case USER:
+                if (newValueField.getValue() == null) {
                     value = null;
                     break;
                 }
-//                User user = new User(userService.findById(node.get("value").asLong(), true));
+                // TODO: NAE-1645: remove?
+//                User user = new User(userService.findById(newValueField.getValue().asLong(), true));
 //                user.setPassword(null);
 //                user.setGroups(null);
 //                user.setAuthorities(null);
 //                user.setUserProcessRoles(null);
-                value = makeUserFieldValue(node.get("value").asText());
+                value = makeUserFieldValue((String) newValueField.getValue());
                 break;
-            case "number":
-                if (node.get("value") == null || node.get("value").isNull()) {
+            case NUMBER:
+                if (newValueField.getValue() == null) {
                     value = 0.0;
                     break;
                 }
-                value = node.get("value").asDouble();
+                value = newValueField.getValue();
                 break;
-            case "file":
-                if (node.get("value") == null || node.get("value").isNull()) {
+            case FILE:
+                if (newValueField.getValue() == null) {
                     value = new FileFieldValue();
                     break;
                 }
-                value = FileFieldValue.fromString(node.get("value").asText());
+                value = FileFieldValue.fromString((String) newValueField.getValue());
                 break;
-            case "caseRef":
-                List<String> list = parseListStringValues(node);
+            case CASE_REF:
+                List<String> list = (List<String>) newValueField.getValue();
                 validateCaseRefValue(list, dataField.getAllowedNets());
                 value = list;
                 break;
-            case "taskRef":
-                value = parseListStringValues(node);
+            case TASK_REF:
+                value = newValueField.getValue();
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
-            case "userList":
-                if (node.get("value") == null) {
+            case USERLIST:
+                if (newValueField.getValue() == null) {
                     value = null;
                     break;
                 }
-                value = parseListStringValues(node);
+                value = newValueField.getValue();
                 break;
             default:
-                if (node.get("value") == null || node.get("value").isNull()) {
-                    value = null;
-                    break;
-                }
-                value = node.get("value").asText();
+                value = newValueField.getValue(); // TODO: NAE-1645 check null value
                 break;
         }
-        if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
-        else return value;
+        if (value instanceof String && ((String) value).equalsIgnoreCase("null")) {
+            return null;
+        }
+        return value;
     }
 
     protected UserFieldValue makeUserFieldValue(String id) {
@@ -793,63 +789,24 @@ public class DataService implements IDataService {
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 
-    private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
-        HashSet<String> set = new HashSet<>();
-        arrayNode.forEach(item -> set.add(item.asText()));
-        return set;
-    }
-
-    private List<String> parseListStringValues(ObjectNode node) {
-        return parseListString(node, "value");
-    }
-
-    private List<Long> parseListLongValues(ObjectNode node) {
-        ArrayNode arrayNode = (ArrayNode) node.get("value");
-        ArrayList<Long> list = new ArrayList<>();
-        arrayNode.forEach(string -> list.add(string.asLong()));
-        return list;
-    }
-
-    private List<String> parseAllowedNetsValue(JsonNode jsonNode) {
-        ObjectNode node = (ObjectNode) jsonNode;
-        String fieldType = getFieldTypeFromNode(node);
-        if (Objects.equals(fieldType, "caseRef") || Objects.equals(fieldType, "filter")) {
-            return parseListStringAllowedNets(node);
+    private List<String> parseAllowedNetsValue(DataField dataField, Field field) {
+        if (field.getType() == FieldType.CASE_REF || field.getType() == FieldType.FILTER) {
+            return dataField.getAllowedNets();
         }
         return null;
     }
 
-    private List<String> parseListStringAllowedNets(ObjectNode node) {
-        return parseListString(node, "allowedNets");
-    }
-
-    private List<String> parseListString(ObjectNode node, String attributeKey) {
-        ArrayNode arrayNode = (ArrayNode) node.get(attributeKey);
-        if (arrayNode == null) {
-            return null;
-        }
-        ArrayList<String> list = new ArrayList<>();
-        arrayNode.forEach(string -> list.add(string.asText()));
-        return list;
-    }
-
-    private String getFieldTypeFromNode(ObjectNode node) {
-        return node.get("type").asText();
-    }
-
-    private Map<String, Object> parseFilterMetadataValue(JsonNode jsonNode) {
-        ObjectNode node = (ObjectNode) jsonNode;
-        String fieldType = getFieldTypeFromNode(node);
-        if (Objects.equals(fieldType, "filter")) {
-            JsonNode filterMetadata = node.get("filterMetadata");
-            if (filterMetadata == null) {
-                return null;
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>() {
-            });
-        }
+    // TODO: NAE-1645 wtf?
+    private Map<String, Object> parseFilterMetadataValue(DataField dataField, Field field) {
+//        if (field.getType() == FieldType.FILTER) {
+//            JsonNode filterMetadata = node.get("filterMetadata");
+//            if (filterMetadata == null) {
+//                return null;
+//            }
+//            ObjectMapper mapper = new ObjectMapper();
+//            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>() {
+//            });
+//        }
         return null;
     }
 

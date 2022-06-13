@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
@@ -10,6 +9,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,9 +25,9 @@ public interface IDataService {
 
     GetDataEventOutcome getData(Task task, Case useCase);
 
-    SetDataEventOutcome setData(String taskId, ObjectNode values);
+    SetDataEventOutcome setData(String taskId, DataSet values);
 
-    SetDataEventOutcome setData(Task task, ObjectNode values);
+    SetDataEventOutcome setData(Task task, DataSet values);
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview);
 

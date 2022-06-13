@@ -16,7 +16,6 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.DefaultFiltersRunner;
-import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.utils.InputStreamToString;
 import com.netgrif.application.engine.workflow.domain.*;
 import com.netgrif.application.engine.workflow.domain.menu.Menu;
@@ -24,6 +23,7 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntryRole;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,16 +145,15 @@ public class MenuImportExportService implements IMenuImportExportService {
 
         //Change remove_option button value to trigger its SET action
         if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
-            Map<String, Map<String, String>> caseToRemoveData = new HashMap<>();
-            Map<String, String> removeBtnData = new HashMap<>();
-            removeBtnData.put("type", "button");
-            removeBtnData.put("value", "removed");
-            caseToRemoveData.put("remove_option", removeBtnData);
+            DataSet caseToRemoveData = new DataSet();
+            DataField removeBtnData = new DataField();
+            removeBtnData.setValue("removed");
+            caseToRemoveData.getFields().put("remove_option", removeBtnData);
 
             Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            dataService.setData(task, ImportHelper.populateDataset(caseToRemoveData));
+            dataService.setData(task, caseToRemoveData);
         });
 
         //Import filters
@@ -171,12 +170,11 @@ public class MenuImportExportService implements IMenuImportExportService {
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(parentId)));
 
-            Map<String, Map<String, String>> groupData = new HashMap<>();
-            Map<String, String> groupImportResultMessage = new HashMap<>();
-            groupImportResultMessage.put("type", "text");
-            groupImportResultMessage.put("value", resultMessage.toString());
-            groupData.put("import_results", groupImportResultMessage);
-            dataService.setData(task, ImportHelper.populateDataset(groupData));
+            DataSet groupData = new DataSet();
+            DataField groupImportResultMessage = new DataField();
+            groupImportResultMessage.setValue(resultMessage.toString());
+            groupData.getFields().put("import_results", groupImportResultMessage);
+            dataService.setData(task, groupData);
         });
 
         importedFilterTaskIds.values().forEach(taskId -> {
