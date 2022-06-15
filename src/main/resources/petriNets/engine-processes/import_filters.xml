@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>import_filters</id>
+    <id>netgrif/organisation/import_filters</id>
     <initials>FTI</initials>
     <title name="import_filters">Import of filters</title>
     <icon>file_upload</icon>

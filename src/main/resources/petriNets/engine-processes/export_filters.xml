@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>export_filters</id>
+    <id>netgrif/organisation/export_filters</id>
     <initials>FTE</initials>
     <title name="export_filters">Export of filters</title>
     <icon>file_download</icon>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-	<id>preference_filter_item</id>
+	<id>netgrif/organisation/preference_filter_item</id>
 	<initials>PFI</initials>
 	<title>Preference filter item</title>
 	<icon>list</icon>
