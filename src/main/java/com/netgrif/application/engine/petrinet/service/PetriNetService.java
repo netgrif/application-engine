@@ -9,6 +9,8 @@ import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriN
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.petrinet.domain.UriType;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
@@ -108,6 +110,9 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private IHistoryService historyService;
 
+    @Autowired
+    private IUriService navNodeService;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     protected Importer getImporter() {
@@ -165,6 +170,7 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
+        navNodeService.updateOrCreate(net.getIdentifier(), UriType.PROCESS);
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {

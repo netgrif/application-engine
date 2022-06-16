@@ -1,41 +1,61 @@
-package com.netgrif.application.engine.navtree.domain;
+package com.netgrif.application.engine.petrinet.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import java.util.HashSet;
 import java.util.Set;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticNavIndex}")
-public class NavNode {
+@Document(indexName = "#{@elasticUriIndex}")
+public class UriNode {
 
     @Id
+    @Getter
     private String id;
 
+    @Getter
+    @Setter
+    @Field(type = Keyword)
+    private String uri;
+
+    @Getter
+    @Setter
     @Field(type = Keyword)
     private String name;
 
+    @Getter
+    @Setter
     @Field(type = Keyword)
     private String parent;
 
+    @Getter
+    @Setter
     @Field(type = Keyword)
     private Set<String> children;
 
+    @Getter
+    @Setter
     @Field(type = FieldType.Boolean)
     private boolean root;
 
+    @Getter
+    @Setter
     @Field(type = FieldType.Boolean)
     private boolean containsCase;
 
+    @Getter
+    @Setter
     @Field(type = FieldType.Boolean)
-    private boolean containsNet;
+    private boolean containsProcess;
+
+    public UriNode() {
+        this.children = new HashSet<>();
+    }
 
     public boolean containsCase() {
         return containsCase;
@@ -46,10 +66,10 @@ public class NavNode {
     }
 
     public boolean containsNet() {
-        return containsNet;
+        return containsProcess;
     }
 
-    public void setContainsNet(boolean containsNet) {
-        this.containsNet = containsNet;
+    public void setContainsProcess(boolean containsProcess) {
+        this.containsProcess = containsProcess;
     }
 }

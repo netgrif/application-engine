@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-	<id>netgrif/example/all_data</id>
+	<id>netgrif/example/data/all_data</id>
 	<title>All Data</title>
 	<initials>ALL</initials>
     <caseName>All data test default case name</caseName>

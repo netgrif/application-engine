@@ -34,6 +34,10 @@ public class PetriNet extends PetriNetObject {
     private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
 
     @Getter
+    @Setter
+    private String uri;
+
+    @Getter
     private I18nString title;
 
     @Getter
