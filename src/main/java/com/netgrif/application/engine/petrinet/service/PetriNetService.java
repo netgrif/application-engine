@@ -170,7 +170,7 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
-        navNodeService.updateOrCreate(net.getIdentifier(), UriType.PROCESS);
+        navNodeService.getOrCreate(net.getIdentifier(), UriType.PROCESS);
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
