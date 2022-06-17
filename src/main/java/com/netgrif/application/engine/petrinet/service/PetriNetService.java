@@ -108,7 +108,7 @@ public class PetriNetService implements IPetriNetService {
     private IHistoryService historyService;
 
     @Autowired
-    private IUriService navNodeService;
+    private IUriService uriService;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -167,8 +167,8 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
-        UriNode uriNode = navNodeService.getOrCreate(net.getIdentifier(), UriType.PROCESS);
-        net.setUri(uriNode.getId());
+        UriNode uriNode = uriService.getOrCreate(net.getIdentifier(), UriType.PROCESS);
+        net.setUriNodeId(uriNode.getId());
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {

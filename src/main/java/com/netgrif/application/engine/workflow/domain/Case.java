@@ -32,7 +32,7 @@ public class Case {
 
     @Getter
     @Setter
-    private String uri;
+    private String uriNodeId;
 
     @LastModifiedDate
     @Getter

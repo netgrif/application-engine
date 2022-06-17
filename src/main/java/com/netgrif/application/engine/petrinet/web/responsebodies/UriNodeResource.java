@@ -17,7 +17,7 @@ public class UriNodeResource extends EntityModel<UriNode> {
                         .methodOn(UriController.class).getRoots())
                 .withSelfRel());
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(UriController.class).getOne(getContent().getUri()))
+                        .methodOn(UriController.class).getOne(getContent().getUriPath()))
                 .withSelfRel());
     }
 }

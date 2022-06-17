@@ -22,7 +22,7 @@ public class UriNode {
     @Getter
     @Setter
     @Field(type = Keyword)
-    private String uri;
+    private String uriPath;
 
     @Getter
     @Setter
@@ -55,12 +55,10 @@ public class UriNode {
     private boolean root;
 
     @Getter
-    @Setter
     @Field(type = FieldType.Boolean)
     private boolean containsCase;
 
     @Getter
-    @Setter
     @Field(type = FieldType.Boolean)
     private boolean containsProcess;
 

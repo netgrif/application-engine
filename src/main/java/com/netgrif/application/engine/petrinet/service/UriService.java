@@ -80,7 +80,7 @@ public class UriService implements IUriService {
         newParent.getChildrenId().add(node.getId());
 
         node.setParentId(newParent.getId());
-        node.setUri(destUri);
+        node.setUriPath(destUri);
         return uriNodeRepository.save(node);
     }
 
@@ -99,7 +99,7 @@ public class UriService implements IUriService {
                 uriNode = new UriNode();
                 uriNode.setName(uriComponents[i]);
                 uriNode.setRoot(i == 0);
-                uriNode.setUri(uriBuilder.toString());
+                uriNode.setUriPath(uriBuilder.toString());
                 uriNode.setParentId(parent != null ? parent.getId() : null);
             }
             if (i == pathLength - 1 && type != null) {
