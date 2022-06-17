@@ -19,7 +19,6 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.version.Version
@@ -28,6 +27,7 @@ import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -217,6 +217,14 @@ class ActionDelegate {
         return initValueOfField(field)
     }
 
+    void setValue(String fieldId, Object value) {
+
+    }
+
+    void setValue(Field field, Object value) {
+        
+    }
+
     /**
      * Changes behavior of a given field on given transition if certain condition is being met.
      * <br>
@@ -236,8 +244,7 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    ChangedField changedField = new ChangedField(field.stringId)
-                    changedField.addAttribute("type", field.type.name)
+                    DataField changedField = new DataField()
                     changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
                     SetDataEventOutcome outcome = createSetDataEventOutcome()
                     outcome.addChangedField(field.stringId, changedField)
@@ -253,8 +260,8 @@ class ActionDelegate {
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("choices", field.choices.collect {it.getTranslation(LocaleContextHolder.locale)})
+        DataField changedField = new DataField()
+        changedField.setChoices(field.choices)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -262,8 +269,8 @@ class ActionDelegate {
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("allowedNets", field.allowedNets)
+        DataField changedField = new DataField()
+        changedField.setAllowedNets(field.allowedNets)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -271,8 +278,8 @@ class ActionDelegate {
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
+        DataField changedField = new DataField()
+        changedField.setOptions(field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -284,8 +291,8 @@ class ActionDelegate {
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
             it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
         }
-        ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
+        DataField changedField = new DataField()
+        changedField.setValidations(compiled)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -456,9 +463,7 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
-        ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("value", value)
-        changedField.addAttribute("type", field.type.name)
+        DataField changedField = new DataField(value)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -729,19 +734,6 @@ class ActionDelegate {
     private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome){
         this.outcomes.add(outcome)
         return outcome
-    }
-
-    Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
-        return map.collect { fieldAttributes ->
-            ChangedField changedField = new ChangedField(fieldAttributes.key)
-            changedField.wasChangedOn(task)
-            fieldAttributes.value.each { attribute ->
-                changedField.addAttribute(attribute.key, attribute.value)
-            }
-            return changedField
-        }.collectEntries {
-            return [(it.id): (it)]
-        }
     }
 
     Map<String, Field> getData(Task task) {

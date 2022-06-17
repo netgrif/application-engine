@@ -20,8 +20,7 @@ public class DataField implements Referencable {
     @Getter
     private Map<String, Set<FieldBehavior>> behavior;
 
-    @Getter
-    private Object value;
+    private DataFieldValue value;
 
     @Getter
     private Set<I18nString> choices;
@@ -45,7 +44,7 @@ public class DataField implements Referencable {
 
     @Getter
     @Setter
-    private Long version = 0l;
+    private Long version = 0L;
 
     public DataField() {
         behavior = new HashMap<>();
@@ -53,7 +52,7 @@ public class DataField implements Referencable {
 
     public DataField(Object value) {
         this();
-        this.value = value;
+        this.value = new DataFieldValue(value);
     }
 
     public void setBehavior(Map<String, Set<FieldBehavior>> behavior) {
@@ -61,8 +60,19 @@ public class DataField implements Referencable {
         update();
     }
 
+    public Object getValue() {
+        if (value == null) {
+            return null;
+        }
+        return value.getValue();
+    }
+
     public void setValue(Object value) {
-        this.value = value;
+        if (this.value == null) {
+            new DataFieldValue(value);
+        } else {
+            this.value = new DataFieldValue(value);
+        }
         update();
     }
 
@@ -89,15 +99,6 @@ public class DataField implements Referencable {
     public void setValidations(List<Validation> validations) {
         this.validations = validations;
         update();
-    }
-
-    public ObjectNode applyBehavior(String transition, ObjectNode json) {
-        behavior.get(transition).forEach(behav -> json.put(behav.toString(), true));
-        return json;
-    }
-
-    public ObjectNode applyBehavior(String transition) {
-        return applyBehavior(transition, JsonNodeFactory.instance.objectNode());
     }
 
     public void addBehavior(String transition, Set<FieldBehavior> behavior) {
@@ -169,9 +170,25 @@ public class DataField implements Referencable {
     }
 
     private void changeBehavior(FieldBehavior behavior, String transition) {
-        List<FieldBehavior> tmp = Arrays.asList(behavior.getAntonyms());
+        List<FieldBehavior> tmp = behavior.getAntonyms();
         tmp.forEach(beh -> this.behavior.get(transition).remove(beh));
         this.behavior.get(transition).add(behavior);
+        update();
+    }
+
+    public void applyChanges(DataField newVersion) {
+        this.value = newVersion.value;
+        newVersion.behavior.forEach((transitionId, behaviors) -> {
+            behaviors.forEach(behavior -> {
+                this.changeBehavior(behavior, transitionId);
+            });
+        });
+        this.choices = newVersion.choices; // TODO: NAE-1645 copy?
+        this.allowedNets = newVersion.allowedNets;
+        this.options = newVersion.options;
+        this.validations = newVersion.validations;
+        this.filterMetadata = newVersion.filterMetadata;
+        this.encryption = newVersion.encryption;
         update();
     }
 
@@ -200,7 +217,7 @@ public class DataField implements Referencable {
     @Override
     public int getMultiplicity() {
         double parsedValue = Double.parseDouble(String.valueOf(value));
-        if(parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)){
+        if (parsedValue == Math.floor(parsedValue) && !Double.isInfinite(parsedValue)) {
             return (int) Double.parseDouble(String.valueOf(value));
         } else {
             throw new IllegalArgumentException("Variable arc must be an non negative integer");

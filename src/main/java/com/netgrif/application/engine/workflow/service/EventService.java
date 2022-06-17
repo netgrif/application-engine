@@ -52,7 +52,7 @@ public class EventService implements IEventService {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
-                        if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
+                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) return;
                         runEventActionsOnChanged(task.orElse(null), (SetDataEventOutcome) outcome, DataEventType.SET);
                     });
             allOutcomes.addAll(outcomes);
@@ -73,7 +73,7 @@ public class EventService implements IEventService {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
-                        if (((SetDataEventOutcome) outcome).getChangedFields().isEmpty()) return;
+                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) return;
                         runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
                     });
             allOutcomes.addAll(outcomes);
@@ -100,8 +100,8 @@ public class EventService implements IEventService {
 
     @Override
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
-        outcome.getChangedFields().forEach((s, changedField) -> {
-            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && trigger == DataEventType.SET) {
+        outcome.getChangedFields().getFields().forEach((s, changedField) -> {
+            if ((changedField.getValue() != null) && trigger == DataEventType.SET) {
                 Field field = outcome.getCase().getField(s);
                 log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));

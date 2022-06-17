@@ -1,8 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
@@ -14,7 +11,6 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
@@ -28,6 +24,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataGroupsEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -117,21 +114,13 @@ public class DataService implements IDataService {
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
             if (outcome.getMessage() == null) {
-                Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
-                if (field.getEvents().containsKey(DataEventType.GET)
-                        && ((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage() != null) {
-                    outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.GET)).getMessage());
-                } else if (dataSet.containsKey(fieldId)
-                        && dataSet.get(fieldId).getEvents().containsKey(DataEventType.GET)
-                        && dataSet.get(fieldId).getEvents().get(DataEventType.GET).getMessage() != null) {
-                    outcome.setMessage(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(fieldId).getEvents().get(DataEventType.GET).getMessage());
-                }
+                setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.GET);
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
                     Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
+                    validationField.(useCase.getDataSet().get(fieldId).getBehavior().get(transition.getStringId()));
+                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
                     resolveComponents(validationField, transition);
@@ -141,7 +130,7 @@ public class DataService implements IDataService {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
                     Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
+                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
                     resolveComponents(validationField, transition);
@@ -181,6 +170,10 @@ public class DataService implements IDataService {
         }
     }
 
+    public void setCaseData(String caseId, DataSet setData) {
+        Case useCase = workflowService.findOne(caseId);
+    }
+
     @Override
     public SetDataEventOutcome setData(String taskId, DataSet dataSet) {
         Task task = taskService.findOne(taskId);
@@ -197,49 +190,43 @@ public class DataService implements IDataService {
             task.setUser(userService.findById(task.getUserId(), false));
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        dataSet.getFields().forEach((fieldId, value) -> {
-            DataField dataField = useCase.getDataSet().get(fieldId);
-            if (dataField != null) {
-                Field field = useCase.getPetriNet().getField(fieldId).get();
-                outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
-                if (outcome.getMessage() == null) {
-                    Map<String, DataFieldLogic> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
-                    if (field.getEvents().containsKey(DataEventType.SET) &&
-                            ((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage() != null) {
-                        outcome.setMessage(((DataEvent) field.getEvents().get(DataEventType.SET)).getMessage());
-                    } else if (caseDataSet.containsKey(fieldId)
-                            && caseDataSet.get(fieldId).getEvents().containsKey(DataEventType.SET)
-                            && caseDataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage() != null) {
-                        outcome.setMessage(caseDataSet.get(fieldId).getEvents().get(DataEventType.SET).getMessage());
-                    }
-                }
-                Object newValue = parseFieldsValues(value, dataField, field);
-                dataField.setValue(newValue);
-                ChangedField changedField = new ChangedField();
-                changedField.setId(fieldId);
-                changedField.addAttribute("value", newValue);
-                List<String> allowedNets = parseAllowedNetsValue(value, field);
-                if (allowedNets != null) {
-                    dataField.setAllowedNets(allowedNets);
-                    changedField.addAttribute("allowedNets", allowedNets);
-                }
-                Map<String, Object> filterMetadata = parseFilterMetadataValue(value, field);
-                if (filterMetadata != null) {
-                    dataField.setFilterMetadata(filterMetadata);
-                    changedField.addAttribute("filterMetadata", filterMetadata);
-                }
-                outcome.addChangedField(fieldId, changedField);
-                workflowService.save(useCase);
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField)));
-                outcome.addOutcomes(resolveDataEvents(field,
-                        DataEventType.SET, EventPhase.POST, useCase, task));
-
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null));
+        dataSet.getFields().forEach((fieldId, newDataField) -> {
+            Optional<Field> fieldOptional = useCase.getPetriNet().getField(fieldId);
+            if (fieldOptional.isEmpty()) {
+                return;
             }
+            DataField dataField = useCase.getDataSet().get(fieldId);
+            Field field = fieldOptional.get();
+            // PRE
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
+            historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
+            // EXECUTION
+            if (outcome.getMessage() == null) {
+                setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
+            }
+            dataField.applyChanges(newDataField);
+            outcome.addChangedField(fieldId, newDataField);
+            workflowService.save(useCase);
+            historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, Collections.singletonMap(fieldId, newDataField)));
+            // POST
+            outcome.addOutcomes(resolveDataEvents(field,
+                    DataEventType.SET, EventPhase.POST, useCase, task));
+            historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
         });
         updateDataset(useCase);
         outcome.setCase(workflowService.save(useCase));
         return outcome;
+    }
+
+    private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field field, DataEventType type) {
+        Map<String, DataFieldLogic> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+        I18nString message = null;
+        if (field.getEvents().containsKey(type)) {
+            message = ((DataEvent) field.getEvents().get(type)).getMessage();
+        } else if (caseDataSet.containsKey(fieldId) && caseDataSet.get(fieldId).getEvents().containsKey(type)) {
+            message = caseDataSet.get(fieldId).getEvents().get(type).getMessage();
+        }
+        outcome.setMessage(message);
     }
 
     @Override
@@ -333,7 +320,7 @@ public class DataService implements IDataService {
     }
 
     private void changeTaskRefBehavior(LocalisedField field, FieldBehavior behavior) {
-        List<FieldBehavior> antonymBehaviors = Arrays.asList(behavior.getAntonyms());
+        List<FieldBehavior> antonymBehaviors = behavior.getAntonyms();
         antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));
         ObjectNode behaviorNode = JsonNodeFactory.instance.objectNode();
         behaviorNode.put(behavior.toString(), true);
@@ -438,13 +425,13 @@ public class DataService implements IDataService {
             file = new File(field.getValue().getPath());
         }
         int dot = file.getName().lastIndexOf(".");
-        FileFieldDataType fileType = FileFieldDataType.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
+        PreviewExtension fileType = PreviewExtension.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
         BufferedImage image = getBufferedImageFromFile(file, fileType);
         if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
             image = scaleImagePreview(image);
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, !fileType.extension.equals(FileFieldDataType.PDF.extension) ? fileType.extension : FileFieldDataType.JPG.extension, os);
+        ImageIO.write(image, !fileType.extension.equals(PreviewExtension.PDF.extension) ? fileType.extension : PreviewExtension.JPG.extension, os);
         saveFilePreview(localPreview, os);
         return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
     }
@@ -457,9 +444,9 @@ public class DataService implements IDataService {
         fos.close();
     }
 
-    private BufferedImage getBufferedImageFromFile(File file, FileFieldDataType fileType) throws IOException {
+    private BufferedImage getBufferedImageFromFile(File file, PreviewExtension fileType) throws IOException {
         BufferedImage image;
-        if (fileType.equals(FileFieldDataType.PDF)) {
+        if (fileType.equals(PreviewExtension.PDF)) {
             PDDocument document = PDDocument.load(file);
             PDFRenderer renderer = new PDFRenderer(document);
             image = renderer.renderImage(0);

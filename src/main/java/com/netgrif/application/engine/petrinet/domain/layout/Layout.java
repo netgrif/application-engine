@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class Layout {
 
-    private Integer rows;
-    private Integer cols;
+    protected Integer rows;
+    protected Integer cols;
 
     public Layout(Integer rows, Integer cols) {
         this.rows = rows == null || rows == 0 ? null : rows;
