@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -31,12 +32,22 @@ public class UriNode {
     @Getter
     @Setter
     @Field(type = Keyword)
-    private String parent;
+    private String parentId;
+
+    @Getter
+    @Setter
+    @Transient
+    private UriNode parent;
 
     @Getter
     @Setter
     @Field(type = Keyword)
-    private Set<String> children;
+    private Set<String> childrenId;
+
+    @Getter
+    @Setter
+    @Transient
+    private Set<UriNode> children;
 
     @Getter
     @Setter
@@ -54,6 +65,7 @@ public class UriNode {
     private boolean containsProcess;
 
     public UriNode() {
+        this.childrenId = new HashSet<>();
         this.children = new HashSet<>();
     }
 

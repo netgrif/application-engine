@@ -14,5 +14,5 @@ public interface IUriService {
 
     UriNode move(UriNode node, String destUri);
 
-    List<UriNode> getOrCreate(String uri, UriType type);
+    UriNode getOrCreate(String uri, UriType type);
 }

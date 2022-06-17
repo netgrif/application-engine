@@ -1,15 +1,12 @@
 package com.netgrif.application.engine.petrinet.service;
 
-import com.ctc.wstx.shaded.msv_core.util.Uri;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriType;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,18 +40,20 @@ public class UriService implements IUriService {
 
     @Override
     public UriNode move(UriNode node, String destUri) {
-        String newUri = destUri + uriSeparator + node.getUri();
-        List<UriNode> uriNodes = getOrCreate(destUri, null);
-        UriNode parent = ((LinkedList<UriNode>) uriNodes).getLast();
+        UriNode newParent = getOrCreate(destUri, null);
+        UriNode oldParent = findById(node.getParentId());
 
-        node.setParent(parent.getId());
-        node.setUri(newUri);
+        oldParent.getChildrenId().remove(node.getId());
+        newParent.getChildrenId().add(node.getId());
+
+        node.setParentId(newParent.getId());
+        node.setUri(destUri);
         return uriNodeRepository.save(node);
     }
 
     @Override
-    public List<UriNode> getOrCreate(String uri, UriType type) {
-        List<UriNode> uriNodeList = new LinkedList<>();
+    public UriNode getOrCreate(String uri, UriType type) {
+        LinkedList<UriNode> uriNodeList = new LinkedList<>();
         String[] uriComponents = uri.split(uriSeparator);
         int pathLength = uriComponents.length - 1;
         StringBuilder uriBuilder = new StringBuilder();
@@ -68,7 +67,7 @@ public class UriService implements IUriService {
                 uriNode.setName(uriComponents[i]);
                 uriNode.setRoot(i == 0);
                 uriNode.setUri(uriBuilder.toString());
-                uriNode.setParent(parent != null ? parent.getId() : null);
+                uriNode.setParentId(parent != null ? parent.getId() : null);
             }
             if (i == pathLength - 1 && type != null) {
                 uriNode.setContainsCase(type.equals(UriType.CASE));
@@ -76,14 +75,14 @@ public class UriService implements IUriService {
             }
             uriNode = uriNodeRepository.save(uriNode);
             if (parent != null) {
-                parent.getChildren().add(uriNode.getId());
+                parent.getChildrenId().add(uriNode.getId());
                 uriNodeRepository.save(parent);
             }
             uriBuilder.append(uriSeparator);
             uriNodeList.add(uriNode);
             parent = uriNode;
         }
-        return uriNodeList;
+        return uriNodeList.getLast();
     }
 
 }
