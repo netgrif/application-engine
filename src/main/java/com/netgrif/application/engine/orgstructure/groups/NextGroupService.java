@@ -69,10 +69,10 @@ public class NextGroupService implements INextGroupService {
     protected ISecurityContextService securityContextService;
 
 
-    protected final static String GROUP_NET_IDENTIFIER = "org_group";
+    protected final static String GROUP_NET_IDENTIFIER = "netgrif/organisation/groups/org_group";
     protected final static String GROUP_INIT_TASK_ID = "2";
 
-    protected final static String GROUP_CASE_IDENTIFIER = "org_group";
+    protected final static String GROUP_CASE_IDENTIFIER = "netgrif/organisation/groups/org_group";
     protected final static String GROUP_MEMBERS_FIELD = "members";
     protected final static String GROUP_AUTHOR_FIELD = "author";
     protected final static String GROUP_TITLE_FIELD = "group_name";
@@ -220,7 +220,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase) {
-        String authorId = this.getGroupOwnerId(groupCase).toString();
+        String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if (user.equals(authorId)) {
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
@@ -327,7 +327,7 @@ public class NextGroupService implements INextGroupService {
                 taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
                 .findFirst();
 
-        if (!initTaskReference.isPresent()) {
+        if (initTaskReference.isEmpty()) {
             log.error("Initial task of group case is not present!");
             return null;
         }

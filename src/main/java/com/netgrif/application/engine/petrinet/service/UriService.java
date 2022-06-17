@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UriService implements IUriService {
@@ -36,6 +38,26 @@ public class UriService implements IUriService {
     @Override
     public UriNode findByName(String name) {
         return uriNodeRepository.findByName(name);
+    }
+
+    @Override
+    public UriNode findByUri(String uri) {
+        return uriNodeRepository.findByUri(uri);
+    }
+
+    @Override
+    public UriNode populateDirectRelatives(UriNode uriNode) {
+        UriNode parent = findById(uriNode.getParentId());
+        Set<UriNode> children = uriNode.getChildrenId().stream().map(this::findById).collect(Collectors.toSet());
+        uriNode.setParent(parent);
+        uriNode.setChildren(children);
+        return uriNode;
+    }
+
+    @Override
+    public UriNode move(String uri, String destUri) {
+        UriNode uriNode = findByUri(uri);
+        return move(uriNode, destUri);
     }
 
     @Override
