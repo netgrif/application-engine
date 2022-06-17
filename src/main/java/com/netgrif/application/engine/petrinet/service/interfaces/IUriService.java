@@ -3,8 +3,14 @@ package com.netgrif.application.engine.petrinet.service.interfaces;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriType;
 
+import java.util.List;
+
 public interface IUriService {
     UriNode save(UriNode uriNode);
+
+    List<UriNode> findAllByParent(String parentId);
+
+    List<UriNode> getRoots();
 
     UriNode findById(String id);
 

@@ -26,5 +26,7 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String>, Q
 
     List<PetriNet> findAllByVersion(Version version);
 
+    List<PetriNet> findAllByUri(String uri);
+
     void deleteBy_id(ObjectId id);
 }

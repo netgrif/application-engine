@@ -178,7 +178,6 @@ public class Case {
         this();
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
-        uri = petriNet.getUri();
         this.petriNet = petriNet;
         activePlaces = petriNet.getActivePlaces();
         immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));

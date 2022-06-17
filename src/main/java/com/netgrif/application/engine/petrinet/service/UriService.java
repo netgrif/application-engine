@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +26,16 @@ public class UriService implements IUriService {
     @Override
     public UriNode save(UriNode uriNode) {
         return uriNodeRepository.save(uriNode);
+    }
+
+    @Override
+    public List<UriNode> findAllByParent(String parentId) {
+        return uriNodeRepository.findAllByParent(parentId);
+    }
+
+    @Override
+    public List<UriNode> getRoots() {
+        return uriNodeRepository.findAllByRoot(true);
     }
 
     @Override

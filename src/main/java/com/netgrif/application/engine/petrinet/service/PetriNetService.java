@@ -246,6 +246,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    public List<PetriNet> findAllByUri(String uri) {
+        List<PetriNet> nets = repository.findAllByUri(uri);
+        nets.forEach(PetriNet::initializeArcs);
+        return nets;
+    }
+
+    @Override
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty())

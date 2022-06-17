@@ -404,6 +404,7 @@ public class PetriNet extends PetriNetObject {
     public PetriNet clone() {
         PetriNet clone = new PetriNet();
         clone.setIdentifier(this.identifier);
+        clone.setUri(this.uri);
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultRoleEnabled(this.defaultRoleEnabled);

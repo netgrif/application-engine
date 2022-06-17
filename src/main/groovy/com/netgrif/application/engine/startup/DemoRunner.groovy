@@ -39,18 +39,5 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        PetriNet allData = helper.createNet("all_data.xml", VersionType.MAJOR).get()
-        PetriNet leukemia = helper.createNet("leukemia.xml", VersionType.MAJOR).get()
-        PetriNet leukemiaEn = helper.createNet("leukemia_en.xml", VersionType.MAJOR).get()
-
-        (1..3).forEach {
-            helper.createCase("All data " + it, allData)
-        }
-        (1..5).forEach {
-            helper.createCase("Leukemia " + it, leukemia)
-        }
-        (1..7).forEach {
-            helper.createCase("Leukemia en " + it, leukemiaEn)
-        }
     }
 }
