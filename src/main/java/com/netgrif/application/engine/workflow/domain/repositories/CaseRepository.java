@@ -20,7 +20,7 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     List<Case> findAllBy_idIn(Iterable<String> id);
 
-    Page<Case> findAllByUri(String uri, Pageable pageable);
+    Page<Case> findAllByUriNodeId(String uri, Pageable pageable);
 
     List<Case> findAllByPetriNetObjectId(ObjectId petriNetObjectId);
 

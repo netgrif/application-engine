@@ -180,7 +180,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByUri(String uri, Pageable pageable) {
-        Page<Case> page = repository.findAllByUri(uri, pageable);
+        Page<Case> page = repository.findAllByUriNodeId(uri, pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -281,7 +281,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        UriNode uriNode = uriService.getOrCreate(petriNet.getIdentifier(), UriType.CASE);
+        UriNode uriNode = uriService.getOrCreate(petriNet, UriType.CASE);
         useCase.setUriNodeId(uriNode.getId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriType;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class UriService implements IUriService {
 
     private static final String uriSeparator = "/";
+    private static final String defaultRoot = "default";
 
     private final UriNodeRepository uriNodeRepository;
 
@@ -30,7 +32,7 @@ public class UriService implements IUriService {
 
     @Override
     public List<UriNode> findAllByParent(String parentId) {
-        return uriNodeRepository.findAllByParent(parentId);
+        return uriNodeRepository.findAllByParentId(parentId);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class UriService implements IUriService {
 
     @Override
     public UriNode findByUri(String uri) {
-        return uriNodeRepository.findByUri(uri);
+        return uriNodeRepository.findByUriPath(uri);
     }
 
     @Override
@@ -80,21 +82,33 @@ public class UriService implements IUriService {
         newParent.getChildrenId().add(node.getId());
 
         node.setParentId(newParent.getId());
-        node.setUriPath(destUri);
+        node.setUriPath(destUri + uriSeparator + node.getName());
         return uriNodeRepository.save(node);
+    }
+
+    @Override
+    public UriNode getOrCreate(PetriNet petriNet, UriType type) {
+        String identifier = petriNet.getIdentifier();
+        String modifiedUri;
+        if (identifier.contains(uriSeparator))
+            modifiedUri = identifier.substring(0, identifier.lastIndexOf(uriSeparator));
+        else
+            modifiedUri = defaultRoot;
+
+        return getOrCreate(modifiedUri, type);
     }
 
     @Override
     public UriNode getOrCreate(String uri, UriType type) {
         LinkedList<UriNode> uriNodeList = new LinkedList<>();
         String[] uriComponents = uri.split(uriSeparator);
-        int pathLength = uriComponents.length - 1;
         StringBuilder uriBuilder = new StringBuilder();
         UriNode parent = null;
+        int pathLength = uriComponents.length;
 
         for (int i = 0; i < pathLength; i++) {
             uriBuilder.append(uriComponents[i]);
-            UriNode uriNode = uriNodeRepository.findByUri(uriBuilder.toString());
+            UriNode uriNode = uriNodeRepository.findByUriPath(uriBuilder.toString());
             if (uriNode == null) {
                 uriNode = new UriNode();
                 uriNode.setName(uriComponents[i]);

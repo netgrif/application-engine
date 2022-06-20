@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.service.interfaces;
 
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriType;
 
@@ -23,6 +24,8 @@ public interface IUriService {
     UriNode move(String uri, String destUri);
 
     UriNode move(UriNode node, String destUri);
+
+    UriNode getOrCreate(PetriNet petriNet, UriType type);
 
     UriNode getOrCreate(String uri, UriType type);
 }

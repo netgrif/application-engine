@@ -244,7 +244,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             boolean viewOrigin,
             boolean isImported
     ) {
-        PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('filter')
+        PetriNet filterNet = this.petriNetService.getNewestVersionByIdentifier('netgrif/organisation/filters/filter')
         if (filterNet == null) {
             return Optional.empty()
         }
@@ -252,7 +252,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         def loggedUser = this.userService.getLoggedOrSystem()
 
         if (loggedUser.getStringId() == this.userService.getSystem().getStringId()) {
-            Case filterCase = this.workflowService.searchOne(QCase.case$.processIdentifier.eq("filter").and(QCase.case$.title.eq(title)).and(QCase.case$.author.id.eq(userService.getSystem().getStringId())))
+            Case filterCase = this.workflowService.searchOne(QCase.case$.processIdentifier.eq("netgrif/organisation/filters/filter").and(QCase.case$.title.eq(title)).and(QCase.case$.author.id.eq(userService.getSystem().getStringId())))
             if (filterCase != null) {
                 return Optional.of(filterCase)
             }

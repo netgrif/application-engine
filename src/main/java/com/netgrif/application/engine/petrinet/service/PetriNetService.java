@@ -167,7 +167,7 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
-        UriNode uriNode = uriService.getOrCreate(net.getIdentifier(), UriType.PROCESS);
+        UriNode uriNode = uriService.getOrCreate(net, UriType.PROCESS);
         net.setUriNodeId(uriNode.getId());
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
@@ -247,7 +247,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNet> findAllByUri(String uri) {
-        List<PetriNet> nets = repository.findAllByUri(uri);
+        List<PetriNet> nets = repository.findAllByUriNodeId(uri);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }

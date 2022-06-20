@@ -45,8 +45,8 @@ class FilterImportExportTest {
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
     public static final String DUMMY_USER_PASSWORD = "password"
 
-    private static final String EXPORT_NET_IDENTIFIER = "export_filters"
-    private static final String IMPORT_NET_IDENTIFIER = "import_filters"
+    private static final String EXPORT_NET_IDENTIFIER = "netgrif/organisation/filters/export_filters"
+    private static final String IMPORT_NET_IDENTIFIER = "netgrif/organisation/filters/import_filters"
 
     private static final int DEFAULT_FILTERS_SIZE = 5
     private static final String[] FILTERS_TO_EXPORT = ["My cases", "My tasks", "Test filter"]
