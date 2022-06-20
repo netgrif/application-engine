@@ -13,11 +13,15 @@ public class UriNodeResource extends EntityModel<UriNode> {
     }
 
     private void buildLinks() {
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(UriController.class).getRoots())
-                .withSelfRel());
-        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                        .methodOn(UriController.class).getOne(getContent().getUriPath()))
-                .withSelfRel());
+        UriNode content = getContent();
+        if (content != null) {
+            add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
+                            .methodOn(UriController.class).getRoots())
+                    .withSelfRel());
+
+            add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
+                            .methodOn(UriController.class).getOne(getContent().getUriPath()))
+                    .withSelfRel());
+        }
     }
 }
