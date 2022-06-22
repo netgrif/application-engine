@@ -7,6 +7,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
@@ -109,7 +110,7 @@ public class DataService implements IDataService {
         fieldsIds.forEach(fieldId -> {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
-            Field field = useCase.getPetriNet().getField(fieldId).get();
+            Field<?> field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
@@ -118,8 +119,8 @@ public class DataService implements IDataService {
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.(useCase.getDataSet().get(fieldId).getBehavior().get(transition.getStringId()));
+                    Field<?> validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    validationField.setBehavior(useCase.getDataSet().get(fieldId).getBehavior().get(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
@@ -128,8 +129,8 @@ public class DataService implements IDataService {
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
+                    Field<?> validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    validationField.setBehavior(transition.getDataSet().get(fieldId).getBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
@@ -163,7 +164,7 @@ public class DataService implements IDataService {
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
-        if (dataField.getBehavior().containsKey(transition.getImportId())) {
+        if (dataField.getBehavior().contains(transition.getImportId())) {
             return dataField.isForbidden(transition.getImportId());
         } else {
             return transition.getDataSet().get(fieldId).isForbidden();
@@ -266,7 +267,7 @@ public class DataService implements IDataService {
                         resource.setParentTaskId(taskId);
                     }
                     resources.add(resource);
-                    if (field.getType() == FieldType.TASK_REF) {
+                    if (field.getType() == DataType.TASK_REF) {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
                     }
                 }
@@ -301,18 +302,18 @@ public class DataService implements IDataService {
     }
 
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
-        if (taskRefField.getBehavior().has("visible") && taskRefField.getBehavior().get("visible").asBoolean()) {
+        if (taskRefField.getBehavior().contains(FieldBehavior.VISIBLE)) {
             taskRefDataGroups.forEach(dataGroup -> {
                 dataGroup.getFields().getContent().forEach(field -> {
-                    if (field.getBehavior().has("editable") && field.getBehavior().get("editable").asBoolean()) {
+                    if (field.getBehavior().contains(FieldBehavior.EDITABLE)) {
                         changeTaskRefBehavior(field, FieldBehavior.VISIBLE);
                     }
                 });
             });
-        } else if (taskRefField.getBehavior().has("hidden") && taskRefField.getBehavior().get("hidden").asBoolean()) {
+        } else if (taskRefField.getBehavior().contains(FieldBehavior.HIDDEN)) {
             taskRefDataGroups.forEach(dataGroup -> {
                 dataGroup.getFields().getContent().forEach(field -> {
-                    if (!field.getBehavior().has("forbidden") || !field.getBehavior().get("forbidden").asBoolean())
+                    if (!field.getBehavior().contains(FieldBehavior.FORBIDDEN))
                         changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
                 });
             });
@@ -322,9 +323,7 @@ public class DataService implements IDataService {
     private void changeTaskRefBehavior(LocalisedField field, FieldBehavior behavior) {
         List<FieldBehavior> antonymBehaviors = behavior.getAntonyms();
         antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));
-        ObjectNode behaviorNode = JsonNodeFactory.instance.objectNode();
-        behaviorNode.put(behavior.toString(), true);
-        field.setBehavior(behaviorNode);
+        field.setBehavior(Collections.singleton(behavior));
     }
 
     @Override
@@ -696,7 +695,7 @@ public class DataService implements IDataService {
                 }
                 value = FieldFactory.parseDate(newValueField.getValue());
                 break;
-            case DATETIME:
+            case DATE_TIME:
                 if (newValueField.getValue() == null) {
                     value = null;
                     break;
@@ -754,7 +753,7 @@ public class DataService implements IDataService {
                 value = newValueField.getValue();
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
-            case USERLIST:
+            case USER_LIST:
                 if (newValueField.getValue() == null) {
                     value = null;
                     break;
@@ -776,16 +775,16 @@ public class DataService implements IDataService {
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 
-    private List<String> parseAllowedNetsValue(DataField dataField, Field field) {
-        if (field.getType() == FieldType.CASE_REF || field.getType() == FieldType.FILTER) {
+    private List<String> parseAllowedNetsValue(DataField dataField, Field<?> field) {
+        if (field.getType() == DataType.CASE_REF || field.getType() == DataType.FILTER) {
             return dataField.getAllowedNets();
         }
         return null;
     }
 
     // TODO: NAE-1645 wtf?
-    private Map<String, Object> parseFilterMetadataValue(DataField dataField, Field field) {
-//        if (field.getType() == FieldType.FILTER) {
+    private Map<String, Object> parseFilterMetadataValue(DataField dataField, Field<?> field) {
+//        if (field.getType() == DataType.FILTER) {
 //            JsonNode filterMetadata = node.get("filterMetadata");
 //            if (filterMetadata == null) {
 //                return null;

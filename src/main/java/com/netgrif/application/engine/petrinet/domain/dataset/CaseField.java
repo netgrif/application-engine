@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.importer.model.DataType;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ public class CaseField extends FieldWithAllowedNets<List<String>> {
     }
 
     @Override
+    @QueryType(PropertyType.NONE)
     public DataType getType() {
         return DataType.CASE_REF;
     }

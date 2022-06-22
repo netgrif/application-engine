@@ -3,6 +3,8 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 
 import java.util.Map;
 
@@ -22,6 +24,7 @@ public class EnumerationMapField extends MapOptionsField<I18nString, String> {
     }
 
     @Override
+    @QueryType(PropertyType.NONE)
     public DataType getType() {
         return DataType.ENUMERATION_MAP;
     }

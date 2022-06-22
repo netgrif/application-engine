@@ -32,6 +32,13 @@ public abstract class ChoiceField<T> extends Field<T> {
         this.choicesExpression = expression;
     }
 
+    public Expression getExpression() {
+        return choicesExpression;
+    }
+
+    public void setExpression(Expression choicesExpression) {
+        this.choicesExpression = choicesExpression;
+    }
 
     public void setChoicesFromStrings(Collection<String> choices) {
         this.choices = new LinkedHashSet<>();

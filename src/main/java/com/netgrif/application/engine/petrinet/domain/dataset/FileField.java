@@ -2,6 +2,9 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 
 import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 
 @Data
@@ -14,6 +17,7 @@ public class FileField extends Field<FileFieldValue> {
     }
 
     @Override
+    @QueryType(PropertyType.NONE)
     public DataType getType() {
         return DataType.FILE;
     }
@@ -40,11 +44,11 @@ public class FileField extends Field<FileFieldValue> {
         if (this.remote) {
             return this.getValue().getPath();
         }
-        return this.getValue().getPath(caseId, getStringId());
+        return FileStorageConfiguration.getPath(caseId, getStringId(), this.getValue().getName());
     }
 
     public String getFilePreviewPath(String caseId) {
-        return this.getValue().getPreviewPath(caseId, getStringId());
+        return FileStorageConfiguration.getPreviewPath(caseId, getStringId(), this.getValue().getName());
     }
 
     @Override
@@ -53,5 +57,9 @@ public class FileField extends Field<FileFieldValue> {
         super.clone(clone);
         clone.remote = this.remote;
         return clone;
+    }
+
+    public boolean isRemote() {
+        return this.remote != null && this.remote;
     }
 }

@@ -14,7 +14,8 @@ public class LocalisedNumberField extends LocalisedField {
 
     public LocalisedNumberField(NumberField field, Locale locale) {
         super(field, locale);
-        this.minValue = field.getMinValue();
-        this.maxValue = field.getMaxValue();
+//        TODO: NAE-1645: unused?
+//        this.minValue = field.getMinValue();
+//        this.maxValue = field.getMaxValue();
     }
 }

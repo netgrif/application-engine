@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
 import com.netgrif.application.engine.pdf.generator.service.renderer.Renderer;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +27,7 @@ public abstract class PdfField implements Comparable<PdfField> {
 
     @Getter
     @Setter
-    protected FieldType type;
+    protected DataType type;
 
     @Getter
     @Setter

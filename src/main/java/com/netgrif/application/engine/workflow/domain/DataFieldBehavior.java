@@ -19,4 +19,16 @@ public class DataFieldBehavior {
     public DataFieldBehavior() {
         this.behaviors = new HashMap<>();
     }
+
+    public Set<FieldBehavior> get(String transitionId) {
+        return behaviors.get(transitionId);
+    }
+
+    public Set<FieldBehavior> put(String transitionId, Set<FieldBehavior> behavior) {
+        return behaviors.put(transitionId, behavior);
+    }
+
+    public boolean contains(String transitionId) {
+        return behaviors.containsKey(transitionId);
+    }
 }

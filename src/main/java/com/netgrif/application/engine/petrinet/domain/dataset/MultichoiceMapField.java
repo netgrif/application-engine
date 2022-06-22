@@ -2,6 +2,8 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -29,6 +31,7 @@ public class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>
     }
 
     @Override
+    @QueryType(PropertyType.NONE)
     public DataType getType() {
         return DataType.MULTICHOICE_MAP;
     }

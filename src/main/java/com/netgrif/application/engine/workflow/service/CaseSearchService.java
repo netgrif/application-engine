@@ -1,10 +1,11 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -207,7 +208,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 Map.Entry<String, Object> entry = (Map.Entry<String, Object>) ((Map) v).entrySet().iterator().next();
                 Object fieldValue = entry.getValue();
                 try {
-                    FieldType type = FieldType.fromString(entry.getKey());
+                    DataType type = DataType.fromValue(entry.getKey());
 
                     switch (type) {
                         case USER:
@@ -266,23 +267,23 @@ public class CaseSearchService extends MongoSearchService<Case> {
         petriNets.forEach(net -> {
             net.getImmediateFields().forEach(field -> {
                 try {
-                    if (field.getType() == FieldType.TEXT) {
+                    if (field.getType() == DataType.TEXT) {
                         Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
                         Expression<String> constant = Expressions.constant(searchPhrase);
                         predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
-                    } else if (field.getType() == FieldType.NUMBER) {
+                    } else if (field.getType() == DataType.NUMBER) {
                         Double value = FieldFactory.parseDouble(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if (field.getType() == FieldType.DATE) {
+                    } else if (field.getType() == DataType.DATE) {
                         LocalDate value = FieldFactory.parseDate(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if (field.getType() == FieldType.DATETIME) {
+                    } else if (field.getType() == DataType.DATE_TIME) {
                         LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if (field.getType() == FieldType.ENUMERATION) {
+                    } else if (field.getType() == DataType.ENUMERATION) {
                         Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
                         Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");
                         Expression<String> constant = Expressions.constant(searchPhrase);

@@ -8,11 +8,12 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
@@ -441,7 +442,7 @@ public class WorkflowService implements IWorkflowService {
                 Field field = fieldFactory.buildImmediateField(useCase, fieldId);
                 Field clone = field.clone();
                 if (field.getValue() != null) {
-                    if (field.getType() == FieldType.TEXT) {
+                    if (field.getType() == DataType.TEXT) {
                         clone.setValue(field.getValue().toString());
                     } else {
                         clone.setValue(field.getValue());

@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.renderer.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -174,17 +174,17 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
-    public boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException {
+    public boolean drawSelectionButton(List<String> values, String choice, int x, int y, DataType fieldType) throws IOException {
         if (values.contains(choice)) {
-            if (fieldType == FieldType.MULTICHOICE || fieldType == FieldType.MULTICHOICE_MAP) {
+            if (fieldType == DataType.MULTICHOICE || fieldType == DataType.MULTICHOICE_MAP) {
                 drawSvg(resource.getCheckboxChecked(), x, y);
-            } else if (fieldType == FieldType.ENUMERATION || fieldType == FieldType.ENUMERATION_MAP) {
+            } else if (fieldType == DataType.ENUMERATION || fieldType == DataType.ENUMERATION_MAP) {
                 drawSvg(resource.getRadioChecked(), x, y);
             }
         } else {
-            if (fieldType == FieldType.MULTICHOICE || fieldType == FieldType.MULTICHOICE_MAP) {
+            if (fieldType == DataType.MULTICHOICE || fieldType == DataType.MULTICHOICE_MAP) {
                 drawSvg(resource.getCheckboxUnchecked(), x, y);
-            } else if (fieldType == FieldType.ENUMERATION || fieldType == FieldType.ENUMERATION_MAP) {
+            } else if (fieldType == DataType.ENUMERATION || fieldType == DataType.ENUMERATION_MAP) {
                 drawSvg(resource.getRadioUnchecked(), x, y);
             }
         }

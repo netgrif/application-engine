@@ -45,8 +45,8 @@ public final class FieldFactory {
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
 
     // TODO: refactor this shit
-    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
-        Field field;
+    Field<?> getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
+        Field<?> field;
         switch (data.getType()) {
             case TEXT:
                 field = buildTextField(data);
@@ -181,7 +181,7 @@ public final class FieldFactory {
         }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValues(init);
+                field.setDefaultValue(init.stream().map(I18nString::new).collect(Collectors.toSet()));
             }
         });
         return field;
@@ -196,7 +196,7 @@ public final class FieldFactory {
         }
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
-                field.setDefaultValue(init);
+                field.setDefaultValue(new I18nString(init));
             }
         });
         return field;
@@ -243,8 +243,8 @@ public final class FieldFactory {
         }
 
         List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
-                    .map(importer::toI18NString)
-                    .collect(Collectors.toList());
+                .map(importer::toI18NString)
+                .collect(Collectors.toList());
         field.getChoices().addAll(options);
     }
 
@@ -265,7 +265,8 @@ public final class FieldFactory {
         if (values != null && !values.isEmpty())
             value = values.get(0).getValue();
 
-        TextField field = new TextField(value);
+        TextField field = new TextField();
+        field.setValue(value);
         setDefaultValue(field, data, field::setDefaultValue);
         return field;
     }
@@ -338,7 +339,8 @@ public final class FieldFactory {
 
     private UserListField buildUserListField(Data data) {
         UserListField field = new UserListField();
-        setDefaultValues(field, data, inits -> {});
+        setDefaultValues(field, data, inits -> {
+        });
         return field;
     }
 
@@ -411,12 +413,12 @@ public final class FieldFactory {
         return buildField(useCase, fieldId, false, transitionId);
     }
 
-    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
+    public Field<?> buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
         return buildField(useCase, fieldId, true, transitionId);
     }
 
-    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+    private Field<?> buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
+        Field<?> field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
         resolveComponent(field, useCase, transitionId);
@@ -434,7 +436,7 @@ public final class FieldFactory {
     }
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
-    private void resolveValidations(Field field, Case useCase) {
+    private void resolveValidations(Field<?> field, Case useCase) {
         List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
             field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
@@ -443,18 +445,18 @@ public final class FieldFactory {
 
         ((List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
                 .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
-            valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
-        });
+                    valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
+                });
     }
 
-    private void resolveChoices(ChoiceField field, Case useCase) {
+    private void resolveChoices(ChoiceField<?> field, Case useCase) {
         Set<I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
         if (choices == null)
             return;
         field.setChoices(choices);
     }
 
-    private void resolveComponent(Field field, Case useCase, String transitionId) {
+    private void resolveComponent(Field<?> field, Case useCase, String transitionId) {
         if (transitionId == null) {
             return;
         }
@@ -465,14 +467,14 @@ public final class FieldFactory {
         }
     }
 
-    private void resolveMapOptions(MapOptionsField field, Case useCase) {
-        Map options = useCase.getDataField(field.getImportId()).getOptions();
+    private void resolveMapOptions(MapOptionsField<I18nString, ?> field, Case useCase) {
+        Map<String, I18nString> options = useCase.getDataField(field.getImportId()).getOptions();
         if (options == null)
             return;
         field.setOptions(options);
     }
 
-    private void resolveAllowedNets(FieldWithAllowedNets field, Case useCase) {
+    private void resolveAllowedNets(FieldWithAllowedNets<?> field, Case useCase) {
         List<String> allowedNets = useCase.getDataField(field.getImportId()).getAllowedNets();
         if (allowedNets == null)
             return;
@@ -486,46 +488,61 @@ public final class FieldFactory {
         field.setFilterMetadata(metadata);
     }
 
-    public Field buildImmediateField(Case useCase, String fieldId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+    public Field<?> buildImmediateField(Case useCase, String fieldId) {
+        Field<?> field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveDataValues(field, useCase, fieldId);
         resolveAttributeValues(field, useCase, fieldId);
         return field;
     }
 
-    @SuppressWarnings("RedundantCast")
-    private void resolveDataValues(Field field, Case useCase, String fieldId) {
+    private void resolveDataValues(Field<?> field, Case useCase, String fieldId) {
         switch (field.getType()) {
             case DATE:
                 parseDateValue((DateField) field, fieldId, useCase);
                 parseDateDefaultValue((DateField) field);
                 break;
             case NUMBER:
-                field.setValue(parseNumberValue(useCase, fieldId));
+                ((NumberField) field).setValue(parseNumberValue(useCase, fieldId));
                 break;
             case ENUMERATION:
-                field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
+                ((EnumerationField) field).setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
                 break;
             case MULTICHOICE_MAP:
-                field.setValue(parseMultichoiceMapValue(useCase, fieldId));
+                ((MultichoiceMapField) field).setValue(parseMultichoiceMapValue(useCase, fieldId));
                 break;
             case MULTICHOICE:
-                field.setValue(parseMultichoiceValue(useCase, fieldId));
+                ((MultichoiceField) field).setValue(parseMultichoiceValue(useCase, fieldId));
                 break;
-            case DATETIME:
+            case DATE_TIME:
                 parseDateTimeValue((DateTimeField) field, fieldId, useCase);
                 break;
             case FILE:
                 parseFileValue((FileField) field, useCase, fieldId);
                 break;
-            case FILELIST:
+            case FILE_LIST:
                 parseFileListValue((FileListField) field, useCase, fieldId);
                 break;
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
-            default:
-                field.setValue(useCase.getFieldValue(fieldId));
+            case TEXT:
+                ((TextField) field).setValue((String) useCase.getFieldValue(fieldId));
+            case BUTTON:
+                ((ButtonField) field).setValue((String) useCase.getFieldValue(fieldId));
+            case FILTER:
+                ((FilterField) field).setValue((String) useCase.getFieldValue(fieldId));
+            case I_18_N:
+                ((I18nField) field).setValue((I18nString) useCase.getFieldValue(fieldId));
+            case BOOLEAN:
+                ((BooleanField) field).setValue((Boolean) useCase.getFieldValue(fieldId));
+            case CASE_REF:
+                ((CaseField) field).setValue((List<String>) useCase.getFieldValue(fieldId));
+            case TASK_REF:
+                ((TaskField) field).setValue((List<String>) useCase.getFieldValue(fieldId));
+            case USER_LIST:
+                ((UserListField) field).setValue((List<String>) useCase.getFieldValue(fieldId));
+            case ENUMERATION_MAP:
+                ((EnumerationMapField) field).setValue((String) useCase.getFieldValue(fieldId));
         }
     }
 
@@ -550,7 +567,7 @@ public final class FieldFactory {
     public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toSet());
+            return ((ArrayList<?>) values).stream().map(val -> val.toString()).collect(Collectors.toSet());
         } else {
             return (Set<String>) values;
         }
@@ -603,7 +620,7 @@ public final class FieldFactory {
         if (value == null)
             return null;
 
-        List<String> patterns = Arrays.asList("dd.MM.yyyy");
+        List<String> patterns = List.of("dd.MM.yyyy");
         try {
             return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
         } catch (DateTimeParseException e) {
@@ -613,8 +630,7 @@ public final class FieldFactory {
                 for (String pattern : patterns) {
                     try {
                         return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
-                    } catch (DateTimeParseException | IllegalArgumentException exc) {
-                        continue;
+                    } catch (DateTimeParseException | IllegalArgumentException ignored) {
                     }
                 }
             }
@@ -657,8 +673,7 @@ public final class FieldFactory {
                     for (String pattern : patterns) {
                         try {
                             return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
-                        } catch (DateTimeParseException | IllegalArgumentException excp) {
-                            continue;
+                        } catch (DateTimeParseException | IllegalArgumentException ignored) {
                         }
                     }
                 }
@@ -705,17 +720,17 @@ public final class FieldFactory {
         } else if (value instanceof FileListFieldValue) {
             field.setValue((FileListFieldValue) value);
         } else {
-            throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File list field [" + fieldId + "] !");
+            throw new IllegalArgumentException("Object " + value + " cannot be set as value to the File list field [" + fieldId + "] !");
         }
     }
 
-    private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
+    private void resolveAttributeValues(Field<?> field, Case useCase, String fieldId) {
         DataField dataField = useCase.getDataSet().get(fieldId);
-        if (field.getType().equals(FieldType.CASE_REF) || field.getType().equals(FieldType.FILTER)) {
+        if (field.getType().equals(DataType.CASE_REF) || field.getType().equals(DataType.FILTER)) {
             List<String> allowedNets = new ArrayList<>(dataField.getAllowedNets());
-            ((FieldWithAllowedNets) field).setAllowedNets(allowedNets);
+            ((FieldWithAllowedNets<?>) field).setAllowedNets(allowedNets);
         }
-        if (field.getType().equals(FieldType.FILTER)) {
+        if (field.getType().equals(DataType.FILTER)) {
             Map<String, Object> filterMetadata = new HashMap<>(dataField.getFilterMetadata());
             ((FilterField) field).setFilterMetadata(filterMetadata);
         }

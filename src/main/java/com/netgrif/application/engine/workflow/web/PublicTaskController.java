@@ -2,7 +2,6 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -133,7 +132,7 @@ public class PublicTaskController extends AbstractTaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN")
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessage.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
@@ -169,7 +168,7 @@ public class PublicTaskController extends AbstractTaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN")
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessage.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,

@@ -1,9 +1,13 @@
-package com.netgrif.application.engine.petrinet.domain.dataset
+package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
 
 @Data
 public class FileListField extends Field<FileListFieldValue> {
@@ -14,6 +18,7 @@ public class FileListField extends Field<FileListFieldValue> {
     }
 
     @Override
+    @QueryType(PropertyType.NONE)
     public DataType getType() {
         return DataType.FILE_LIST;
     }
@@ -55,10 +60,13 @@ public class FileListField extends Field<FileListFieldValue> {
      */
     public String getFilePath(String caseId, String name) {
         if (this.remote) {
-            FileFieldValue first = this.getValue().getNamesPaths().find({namePath -> namePath.name == name});
-            return first != null ? first.path : null;
+            Optional<FileFieldValue> first = this.getValue().getNamesPaths().stream().filter(fileFieldValue -> fileFieldValue.getName().equals(name)).findFirst();
+            if (first.isEmpty()) {
+                return null;
+            }
+            return first.get().getPath();
         }
-        return FileListFieldValue.getPath(caseId, getStringId(), name);
+        return FileStorageConfiguration.getPath(caseId, getStringId(), name);
     }
 
     public boolean isRemote() {

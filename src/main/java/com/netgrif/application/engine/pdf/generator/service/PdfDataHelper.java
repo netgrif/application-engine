@@ -7,6 +7,7 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataH
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -262,7 +263,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private boolean isNotHidden(LocalisedField field) {
-        return !field.getBehavior().has("hidden") || !field.getBehavior().get("hidden").asBoolean();
+        return !field.getBehavior().contains(FieldBehavior.HIDDEN);
     }
 
     private boolean isNotExcluded(String fieldId) {

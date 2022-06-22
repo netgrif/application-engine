@@ -32,7 +32,7 @@ public class FieldLayout extends Layout {
         return new FieldLayout(this.x, this.getY(), this.getRows(), this.getCols(), this.getOffset(), this.getTemplate(), this.getAppearance(), this.getAlignment());
     }
 
-    boolean isLayoutFilled() {
+    public boolean isLayoutFilled() {
         return (this.rows != null
                 || this.cols != null
                 || this.x != 0

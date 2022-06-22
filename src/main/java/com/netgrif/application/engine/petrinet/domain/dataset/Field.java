@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
@@ -13,7 +14,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.views.View;
-import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -40,7 +42,7 @@ public abstract class Field<T> extends Imported {
     private I18nString description;
     private I18nString placeholder;
     @Transient
-    private DataFieldBehavior behavior;
+    private Set<FieldBehavior> behavior;
     @Transient
     private FieldLayout layout;
     @Transient
@@ -66,6 +68,7 @@ public abstract class Field<T> extends Imported {
         return importId;
     }
 
+    @QueryType(PropertyType.NONE)
     public abstract DataType getType();
 
     public void addActions(Collection<Action> dataEvents, DataEventType type) {

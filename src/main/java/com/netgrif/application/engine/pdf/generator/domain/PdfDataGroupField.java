@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class PdfDataGroupField extends PdfField {
         this.dgField = dgField;
     }
 
-    public PdfDataGroupField(String fieldId, String label, List<String> values, FieldType type,
+    public PdfDataGroupField(String fieldId, String label, List<String> values, DataType type,
                              int x, int bottomY, int width, int height, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;

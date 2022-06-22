@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IPdfDrawer {
+
     void setupDrawer(PDDocument pdf, PdfResource pdfResource);
 
     void setTemplatePdf(PDDocument pdf);
@@ -38,7 +39,7 @@ public interface IPdfDrawer {
 
     void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException;
 
-    boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException;
+    boolean drawSelectionButton(List<String> values, String choice, int x, int y, DataType fieldType) throws IOException;
 
     void writeString(PDType0Font font, int fontSize, int x, int y, String text) throws IOException;
 

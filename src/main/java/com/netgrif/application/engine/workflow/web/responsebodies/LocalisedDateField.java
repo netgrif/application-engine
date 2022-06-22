@@ -14,7 +14,8 @@ public class LocalisedDateField extends LocalisedField {
 
     public LocalisedDateField(DateField field, Locale locale) {
         super(field, locale);
-        this.minDate = field.getMinDate();
-        this.maxDate = field.getMaxDate();
+//        TODO: NAE-1645 unused?
+//        this.minDate = field.getMinDate();
+//        this.maxDate = field.getMaxDate();
     }
 }

@@ -8,6 +8,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -500,9 +501,9 @@ class ActionDelegate {
 
     def generate(String methods, Closure repeated) {
         [into: { Field field ->
-            if (field.type == FieldType.FILE)
+            if (field.type == DataType.FILE)
                 File f = new FileGenerateReflection(useCase, field as FileField, repeated() == ALWAYS_GENERATE).callMethod(methods) as File
-            else if (field.type == FieldType.TEXT)
+            else if (field.type == DataType.TEXT)
                 new TextGenerateReflection(useCase, field as TextField, repeated() == ALWAYS_GENERATE).callMethod(methods) as String
             /*if(f != null) {
                 useCase.dataSet.get(field.objectId).value = f.name

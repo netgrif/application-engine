@@ -32,7 +32,7 @@ public class TextFieldBuilder extends FieldBuilder {
             case DATE:
                 value = field.getValue() != null ? formatDate(field) : "";
                 break;
-            case DATETIME:
+            case DATE_TIME:
                 value = field.getValue() != null ? formatDateTime(field) : "";
                 break;
             case NUMBER:
@@ -43,7 +43,7 @@ public class TextFieldBuilder extends FieldBuilder {
             case FILE:
                 value = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue()).getName()) : "";
                 break;
-            case FILELIST:
+            case FILE_LIST:
                 value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
                 break;
             case USER:

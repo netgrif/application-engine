@@ -290,7 +290,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         FileFieldValue ffv = new FileFieldValue();
         try {
             ffv.setName("menu_" + userService.getLoggedUser().getFullName().replaceAll("\\s+", "") + ".xml");
-            ffv.setPath(ffv.getPath(parentId, fileField.getImportId()));
+            ffv.setPath(FileStorageConfiguration.getPath(parentId, fileField.getImportId(), ffv.getName()));
             File f = new File(ffv.getPath());
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);

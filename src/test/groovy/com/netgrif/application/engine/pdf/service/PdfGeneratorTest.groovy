@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
@@ -11,7 +12,6 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfTextField
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
@@ -147,7 +147,7 @@ class PdfGeneratorTest {
         PdfField pdf = new PdfTextField("footer_company_title",
                 null,
                 "Netgrif Application Engine",
-                FieldType.TEXT,
+                DataType.TEXT,
                 pdfResource.getMarginLeft(),
                 pdfResource.getPageHeight() - pdfResource.getMarginBottom(),
                 (int) (pdfResource.getPageDrawableWidth() / pdfResource.getFormGridCols()),

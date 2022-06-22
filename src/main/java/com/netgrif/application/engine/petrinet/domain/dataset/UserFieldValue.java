@@ -18,7 +18,7 @@ public class UserFieldValue {
         this.email = email;
     }
 
-    String getFullName() {
+    public String getFullName() {
         return name + " " + surname;
     }
 }

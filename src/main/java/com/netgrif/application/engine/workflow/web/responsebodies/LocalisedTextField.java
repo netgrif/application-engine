@@ -16,8 +16,9 @@ public class LocalisedTextField extends LocalisedField {
 
     public LocalisedTextField(TextField field, Locale locale) {
         super(field, locale);
-        this.subType = field.getSubType();
-        this.maxLength = field.getMaxLength();
-        this.formatting = field.getFormatting();
+//        TODO: NAE-1645 unused?
+//        this.subType = field.getSubType();
+//        this.maxLength = field.getMaxLength();
+//        this.formatting = field.getFormatting();
     }
 }

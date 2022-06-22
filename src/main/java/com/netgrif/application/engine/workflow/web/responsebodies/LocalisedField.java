@@ -1,26 +1,28 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.LocalizedValidation;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import com.netgrif.application.engine.petrinet.domain.views.View;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Data
+@NoArgsConstructor
 public class LocalisedField {
 
     private String stringId;
 
-    private FieldType type;
+    private DataType type;
 
     private String name;
 
@@ -28,7 +30,7 @@ public class LocalisedField {
 
     private String placeholder;
 
-    private ObjectNode behavior;
+    private Set<FieldBehavior> behavior;
 
     private FieldLayout layout;
 
@@ -50,10 +52,7 @@ public class LocalisedField {
 
     private String parentCaseId;
 
-    public LocalisedField() {}
-
-    public LocalisedField(Field field, Locale locale) {
-        this();
+    public LocalisedField(Field<?> field, Locale locale) {
         stringId = field.getStringId();
         type = field.getType();
         name = field.getTranslatedName(locale);
@@ -72,10 +71,10 @@ public class LocalisedField {
         parentCaseId = field.getParentCaseId();
     }
 
-    private List<LocalizedValidation> loadValidations(Field field, Locale locale) {
+    private List<LocalizedValidation> loadValidations(Field<?> field, Locale locale) {
         List<LocalizedValidation> locVal = new ArrayList<>();
         if (field.getValidations() != null) {
-            field.getValidations().forEach(val -> locVal.add(((Validation) val).getLocalizedValidation(locale)));
+            field.getValidations().forEach(val -> locVal.add(val.getLocalizedValidation(locale)));
         }
         return locVal;
     }

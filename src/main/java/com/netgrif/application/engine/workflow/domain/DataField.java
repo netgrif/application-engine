@@ -18,7 +18,7 @@ import java.util.*;
 public class DataField implements Referencable {
 
     @Getter
-    private Map<String, Set<FieldBehavior>> behavior;
+    private DataFieldBehavior behavior;
 
     private DataFieldValue value;
 
@@ -47,7 +47,7 @@ public class DataField implements Referencable {
     private Long version = 0L;
 
     public DataField() {
-        behavior = new HashMap<>();
+        behavior = new DataFieldBehavior();
     }
 
     public DataField(Object value) {
@@ -56,7 +56,7 @@ public class DataField implements Referencable {
     }
 
     public void setBehavior(Map<String, Set<FieldBehavior>> behavior) {
-        this.behavior = behavior;
+        this.behavior = new DataFieldBehavior(behavior);
         update();
     }
 
@@ -115,34 +115,33 @@ public class DataField implements Referencable {
     }
 
     public boolean hasDefinedBehavior(String transition) {
-        return this.behavior.containsKey(transition);
+        return this.behavior.contains(transition);
     }
 
     public boolean isDisplayable(String transition) {
-        return behavior.containsKey(transition) && (behavior.get(transition).contains(FieldBehavior.VISIBLE) ||
+        return behavior.contains(transition) && (behavior.get(transition).contains(FieldBehavior.VISIBLE) ||
                 behavior.get(transition).contains(FieldBehavior.EDITABLE) ||
                 behavior.get(transition).contains(FieldBehavior.HIDDEN));
     }
 
     public boolean isRequired(String transitionId) {
-        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.REQUIRED);
+        return behavior.contains(transitionId) && behavior.get(transitionId).contains(FieldBehavior.REQUIRED);
     }
 
     public boolean isVisible(String transitionId) {
-        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.VISIBLE);
+        return behavior.contains(transitionId) && behavior.get(transitionId).contains(FieldBehavior.VISIBLE);
     }
 
     public boolean isUndefined(String transitionId) {
-        return !behavior.containsKey(transitionId);
+        return !behavior.contains(transitionId);
     }
 
     public boolean isDisplayable() {
-        return behavior.values().stream().parallel()
-                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
+        return behavior.getBehaviors().values().stream().anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
     }
 
     public boolean isForbidden(String transitionId) {
-        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.FORBIDDEN);
+        return behavior.contains(transitionId) && behavior.get(transitionId).contains(FieldBehavior.FORBIDDEN);
     }
 
     public void makeVisible(String transition) {
@@ -178,7 +177,7 @@ public class DataField implements Referencable {
 
     public void applyChanges(DataField newVersion) {
         this.value = newVersion.value;
-        newVersion.behavior.forEach((transitionId, behaviors) -> {
+        newVersion.behavior.getBehaviors().forEach((transitionId, behaviors) -> {
             behaviors.forEach(behavior -> {
                 this.changeBehavior(behavior, transitionId);
             });

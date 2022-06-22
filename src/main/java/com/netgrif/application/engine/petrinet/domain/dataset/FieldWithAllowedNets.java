@@ -11,26 +11,26 @@ public abstract class FieldWithAllowedNets<T> extends Field<T> {
 
     private List<String> allowedNets;
 
-    FieldWithAllowedNets() {
+    public FieldWithAllowedNets() {
         super();
         allowedNets = new ArrayList<>();
     }
 
-    FieldWithAllowedNets(List<String> allowedNets) {
+    public FieldWithAllowedNets(List<String> allowedNets) {
         this();
         this.setAllowedNets(allowedNets);
     }
 
-    void clone(FieldWithAllowedNets<T> clone) {
+    public void clone(FieldWithAllowedNets<T> clone) {
         super.clone(clone);
         clone.allowedNets = new ArrayList<>(this.allowedNets);
     }
 
-    List<String> getAllowedNets() {
+    public List<String> getAllowedNets() {
         return allowedNets;
     }
 
-    void setAllowedNets(Collection<String> allowedNets) {
+    public void setAllowedNets(Collection<String> allowedNets) {
         if (allowedNets == this.allowedNets) {
             return;
         }

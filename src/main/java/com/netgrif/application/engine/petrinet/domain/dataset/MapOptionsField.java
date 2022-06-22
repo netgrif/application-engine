@@ -26,6 +26,14 @@ public abstract class MapOptionsField<T, U> extends Field<U> {
         this.optionsExpression = expression;
     }
 
+    public Expression getExpression() {
+        return optionsExpression;
+    }
+
+    public void setExpression(Expression choicesExpression) {
+        this.optionsExpression = choicesExpression;
+    }
+
     public boolean isDynamic() {
         return this.optionsExpression != null;
     }
