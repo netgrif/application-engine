@@ -62,6 +62,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
@@ -1336,5 +1337,88 @@ class ActionDelegate {
 
     FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
         return this.dataService.getFile(useCase, task, field, forPreview)
+    }
+
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param requests the CaseSearchRequest list
+     * @param loggedUser the user who is searching for the requests
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    List<Case> findCases(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                          int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        List<Case> cases = new ArrayList<>()
+        int numOfPages = (int) ((elasticCaseService.count(requests, loggedUser, locale, isIntersection) / pageSize) + 1)
+        (0..(numOfPages - 1)).each {cases.addAll(elasticCaseService.search(requests, loggedUser, PageRequest.of(it, pageSize), locale, isIntersection).toList())}
+        return cases
+    }
+
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param request case search request
+     * @param loggedUser the user who is searching for the requests
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    List<Case> findCases(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                          int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        List<CaseSearchRequest> requests = Collections.singletonList(convertCaseSearchRequest(request))
+        return findCases(requests, loggedUser, pageSize, locale, isIntersection)
+    }
+
+    /**
+     * Mapper function to create CaseSearchRequest object from map
+     * @param request map of request attributes
+     * @return CaseSerachRequest object
+     * */
+    CaseSearchRequest convertCaseSearchRequest(Map<String, Object> request) {
+        CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
+        if (request.containsKey('process') && request.get('process') instanceof List<String>) {
+            List<String> processIdentifiers = request.get('process') as List<String>
+            caseSearchRequest.process = processIdentifiers.stream().map(id -> new CaseSearchRequest.PetriNet(id)).collect(Collectors.toList())
+        }
+        if (request.containsKey('processIdentifier') && request.get('processIdentifier') instanceof List<String>) {
+            caseSearchRequest.processIdentifier = request.get('processIdentifier') as List<String>
+        }
+        if (request.containsKey('author') && request.get('author') instanceof List<Map<String, String>>) {
+            List<Map<String, String>> authors = request.get('author') as List<Map<String, String>>
+            caseSearchRequest.author = authors.stream().map(map ->  {
+                CaseSearchRequest.Author authorRequest = new CaseSearchRequest.Author()
+                if (map.containsKey('id'))
+                    authorRequest.id = map.get('id')
+                if (map.containsKey('name'))
+                    authorRequest.name = map.get('name')
+                if (map.containsKey('email'))
+                    authorRequest.email = map.get('email')
+                return authorRequest
+            }).collect(Collectors.toList())
+        }
+        if (request.containsKey('data') && request.get('data') instanceof Map<String, String>) {
+            caseSearchRequest.data = request.get('data') as Map<String, String>
+        }
+        if (request.containsKey('fullText') && request.get('fullText') instanceof String) {
+            caseSearchRequest.fullText = request.get('fullText')
+        }
+        if (request.containsKey('transition') && request.get('transition') instanceof List<String>) {
+            caseSearchRequest.transition = request.get('transition') as List<String>
+        }
+        if (request.containsKey('role') && request.get('role') instanceof List<String>) {
+            caseSearchRequest.role = request.get('role') as List<String>
+        }
+        if (request.containsKey('query') && request.get('query') instanceof String) {
+            caseSearchRequest.query = request.get('query')
+        }
+        if (request.containsKey('stringId') && request.get('stringId') instanceof List<String>) {
+            caseSearchRequest.stringId = request.get('stringId') as List<String>
+        }
+        if (request.containsKey('group') && request.get('group') instanceof List<String>) {
+            caseSearchRequest.group = request.get('group') as List<String>
+        }
+        return caseSearchRequest
     }
 }
