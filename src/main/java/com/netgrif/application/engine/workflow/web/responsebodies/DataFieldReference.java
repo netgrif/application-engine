@@ -21,7 +21,7 @@ public class DataFieldReference extends Reference {
         this.type = type;
     }
 
-    public DataFieldReference(Field<?> field, Locale locale) {
+    public DataFieldReference(Field field, Locale locale) {
         this(field.getStringId(), field.getTranslatedName(locale), field.getType());
     }
 }

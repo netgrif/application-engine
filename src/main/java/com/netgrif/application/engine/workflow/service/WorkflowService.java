@@ -15,6 +15,8 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -37,6 +39,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpr
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,10 +63,9 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @Service
 public class WorkflowService implements IWorkflowService {
-
-    private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Autowired
     protected CaseRepository repository;
@@ -142,7 +144,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case findOne(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
+        if (caseOptional.isEmpty())
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
@@ -156,11 +158,10 @@ public class WorkflowService implements IWorkflowService {
         return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
-                .map(caze ->  {
+                .peek(caze ->  {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);
                     setImmediateDataFieldsReadOnly(caze);
-                    return caze;
                 })
                 .collect(Collectors.toList());
     }
@@ -418,14 +419,15 @@ public class WorkflowService implements IWorkflowService {
     @Deprecated
     public List<Field> getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
-        if (!optionalUseCase.isPresent())
+        if (optionalUseCase.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
+        }
         Case useCase = optionalUseCase.get();
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
             if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
                 Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-                field.setBehavior(dataField.applyOnlyVisibleBehavior());
+                field.setBehavior(Collections.singleton(FieldBehavior.VISIBLE));
                 fields.add(field);
             }
         });

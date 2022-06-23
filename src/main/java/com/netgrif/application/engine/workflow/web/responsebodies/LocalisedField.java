@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.LocalizedValidation;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import com.netgrif.application.engine.petrinet.domain.views.View;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,7 +53,7 @@ public class LocalisedField {
 
     private String parentCaseId;
 
-    public LocalisedField(Field<?> field, Locale locale) {
+    public LocalisedField(Field field, Locale locale) {
         stringId = field.getStringId();
         type = field.getType();
         name = field.getTranslatedName(locale);
@@ -71,10 +72,11 @@ public class LocalisedField {
         parentCaseId = field.getParentCaseId();
     }
 
-    private List<LocalizedValidation> loadValidations(Field<?> field, Locale locale) {
+    private List<LocalizedValidation> loadValidations(Field field, Locale locale) {
         List<LocalizedValidation> locVal = new ArrayList<>();
-        if (field.getValidations() != null) {
-            field.getValidations().forEach(val -> locVal.add(val.getLocalizedValidation(locale)));
+        List<Validation> fieldValidations = field.getValidations();
+        if (fieldValidations != null) {
+            fieldValidations.forEach(val -> locVal.add(val.getLocalizedValidation(locale)));
         }
         return locVal;
     }

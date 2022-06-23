@@ -6,9 +6,11 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class GetDataEventOutcome extends TaskEventOutcome {
 
     private List<Field> data;
@@ -23,14 +25,6 @@ public class GetDataEventOutcome extends TaskEventOutcome {
 
     public GetDataEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase, Task task, List<Field> data) {
         super(message, outcomes, aCase, task);
-        this.data = data;
-    }
-
-    public List<Field> getData() {
-        return data;
-    }
-
-    public void setData(List<Field> data) {
         this.data = data;
     }
 }

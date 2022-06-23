@@ -108,12 +108,6 @@ public class DataField implements Referencable {
             this.behavior.put(transition, new HashSet<>(behavior));
     }
 
-    public ObjectNode applyOnlyVisibleBehavior() {
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put(FieldBehavior.VISIBLE.toString(), true);
-        return node;
-    }
-
     public boolean hasDefinedBehavior(String transition) {
         return this.behavior.contains(transition);
     }

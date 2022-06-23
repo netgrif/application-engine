@@ -40,7 +40,7 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
     }
 
     @Override
-    public Set<I18nString> evaluateChoices(Case useCase, ChoiceField<?> field) {
+    public Set<I18nString> evaluateChoices(Case useCase, ChoiceField field) {
         Object result = evaluate(useCase, field.getExpression());
         if (!(result instanceof Collection)) {
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic choices not an instance of Collection: " + field.getImportId());

@@ -110,7 +110,7 @@ public class DataService implements IDataService {
         fieldsIds.forEach(fieldId -> {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
-            Field<?> field = useCase.getPetriNet().getField(fieldId).get();
+            Field field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
@@ -119,7 +119,7 @@ public class DataService implements IDataService {
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field<?> validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(useCase.getDataSet().get(fieldId).getBehavior().get(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
@@ -129,7 +129,7 @@ public class DataService implements IDataService {
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field<?> validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehavior(transition.getDataSet().get(fieldId).getBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
@@ -775,7 +775,7 @@ public class DataService implements IDataService {
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 
-    private List<String> parseAllowedNetsValue(DataField dataField, Field<?> field) {
+    private List<String> parseAllowedNetsValue(DataField dataField, Field field) {
         if (field.getType() == DataType.CASE_REF || field.getType() == DataType.FILTER) {
             return dataField.getAllowedNets();
         }
@@ -783,7 +783,7 @@ public class DataService implements IDataService {
     }
 
     // TODO: NAE-1645 wtf?
-    private Map<String, Object> parseFilterMetadataValue(DataField dataField, Field<?> field) {
+    private Map<String, Object> parseFilterMetadataValue(DataField dataField, Field field) {
 //        if (field.getType() == DataType.FILTER) {
 //            JsonNode filterMetadata = node.get("filterMetadata");
 //            if (filterMetadata == null) {

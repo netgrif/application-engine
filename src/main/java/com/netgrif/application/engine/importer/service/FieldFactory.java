@@ -45,8 +45,8 @@ public final class FieldFactory {
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
 
     // TODO: refactor this shit
-    Field<?> getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
-        Field<?> field;
+    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
+        Field field;
         switch (data.getType()) {
             case TEXT:
                 field = buildTextField(data);
@@ -108,7 +108,9 @@ public final class FieldFactory {
 
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
-        field.setImmediate(data.isImmediate());
+        if (data.isImmediate() != null) {
+            field.setImmediate(data.isImmediate());
+        }
         if (data.getLength() != null) {
             field.setLength(data.getLength());
         }
@@ -202,7 +204,7 @@ public final class FieldFactory {
         return field;
     }
 
-    private void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
+    private void setFieldChoices(ChoiceField field, Data data, Importer importer) {
         if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
             field.setExpression(new Expression(data.getValues().get(0).getValue()));
 
@@ -236,7 +238,7 @@ public final class FieldFactory {
         return field;
     }
 
-    private void setFieldOptions(ChoiceField<?> field, Data data, Importer importer) {
+    private void setFieldOptions(ChoiceField field, Data data, Importer importer) {
         if (data.getOptions() != null && data.getOptions().getInit() != null) {
             field.setExpression(new Expression(data.getOptions().getInit().getValue()));
             return;
@@ -413,12 +415,12 @@ public final class FieldFactory {
         return buildField(useCase, fieldId, false, transitionId);
     }
 
-    public Field<?> buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
+    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
         return buildField(useCase, fieldId, true, transitionId);
     }
 
-    private Field<?> buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
-        Field<?> field = useCase.getPetriNet().getDataSet().get(fieldId);
+    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
         resolveComponent(field, useCase, transitionId);
@@ -436,7 +438,7 @@ public final class FieldFactory {
     }
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
-    private void resolveValidations(Field<?> field, Case useCase) {
+    private void resolveValidations(Field field, Case useCase) {
         List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
             field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
@@ -449,14 +451,14 @@ public final class FieldFactory {
                 });
     }
 
-    private void resolveChoices(ChoiceField<?> field, Case useCase) {
+    private void resolveChoices(ChoiceField field, Case useCase) {
         Set<I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
         if (choices == null)
             return;
         field.setChoices(choices);
     }
 
-    private void resolveComponent(Field<?> field, Case useCase, String transitionId) {
+    private void resolveComponent(Field field, Case useCase, String transitionId) {
         if (transitionId == null) {
             return;
         }
@@ -488,30 +490,30 @@ public final class FieldFactory {
         field.setFilterMetadata(metadata);
     }
 
-    public Field<?> buildImmediateField(Case useCase, String fieldId) {
-        Field<?> field = useCase.getPetriNet().getDataSet().get(fieldId);
+    public Field buildImmediateField(Case useCase, String fieldId) {
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveDataValues(field, useCase, fieldId);
         resolveAttributeValues(field, useCase, fieldId);
         return field;
     }
 
-    private void resolveDataValues(Field<?> field, Case useCase, String fieldId) {
+    private void resolveDataValues(Field field, Case useCase, String fieldId) {
         switch (field.getType()) {
             case DATE:
                 parseDateValue((DateField) field, fieldId, useCase);
                 parseDateDefaultValue((DateField) field);
                 break;
             case NUMBER:
-                ((NumberField) field).setValue(parseNumberValue(useCase, fieldId));
+                field.setValue(parseNumberValue(useCase, fieldId));
                 break;
             case ENUMERATION:
-                ((EnumerationField) field).setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
+                field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
                 break;
             case MULTICHOICE_MAP:
-                ((MultichoiceMapField) field).setValue(parseMultichoiceMapValue(useCase, fieldId));
+                field.setValue(parseMultichoiceMapValue(useCase, fieldId));
                 break;
             case MULTICHOICE:
-                ((MultichoiceField) field).setValue(parseMultichoiceValue(useCase, fieldId));
+                field.setValue(parseMultichoiceValue(useCase, fieldId));
                 break;
             case DATE_TIME:
                 parseDateTimeValue((DateTimeField) field, fieldId, useCase);
@@ -526,23 +528,23 @@ public final class FieldFactory {
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
             case TEXT:
-                ((TextField) field).setValue((String) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case BUTTON:
-                ((ButtonField) field).setValue((String) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case FILTER:
-                ((FilterField) field).setValue((String) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case I_18_N:
-                ((I18nField) field).setValue((I18nString) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case BOOLEAN:
-                ((BooleanField) field).setValue((Boolean) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case CASE_REF:
-                ((CaseField) field).setValue((List<String>) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case TASK_REF:
-                ((TaskField) field).setValue((List<String>) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case USER_LIST:
-                ((UserListField) field).setValue((List<String>) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
             case ENUMERATION_MAP:
-                ((EnumerationMapField) field).setValue((String) useCase.getFieldValue(fieldId));
+                field.setValue(useCase.getFieldValue(fieldId));
         }
     }
 
@@ -707,7 +709,7 @@ public final class FieldFactory {
         } else if (value instanceof FileFieldValue) {
             field.setValue((FileFieldValue) value);
         } else
-            throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
+            throw new IllegalArgumentException("Object " + value + " cannot be set as value to the File field [" + fieldId + "] !");
     }
 
     private void parseFileListValue(FileListField field, Case useCase, String fieldId) {
@@ -724,7 +726,7 @@ public final class FieldFactory {
         }
     }
 
-    private void resolveAttributeValues(Field<?> field, Case useCase, String fieldId) {
+    private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
         DataField dataField = useCase.getDataSet().get(fieldId);
         if (field.getType().equals(DataType.CASE_REF) || field.getType().equals(DataType.FILTER)) {
             List<String> allowedNets = new ArrayList<>(dataField.getAllowedNets());

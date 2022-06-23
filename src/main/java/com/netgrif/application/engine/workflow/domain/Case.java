@@ -213,9 +213,9 @@ public class Case {
     }
 
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
-        List<Field<?>> dynamicInitFields = new LinkedList<>();
+        List<Field> dynamicInitFields = new LinkedList<>();
         List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
-        List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
+        List<ChoiceField> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
             if (field.isDynamicDefaultValue()) {
                 dynamicInitFields.add(field);
@@ -236,7 +236,7 @@ public class Case {
                 dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
             }
             if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
-                dynamicChoicesFields.add((ChoiceField<?>) field);
+                dynamicChoicesFields.add((ChoiceField) field);
             }
         });
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
