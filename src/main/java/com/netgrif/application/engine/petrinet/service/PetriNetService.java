@@ -167,7 +167,7 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
-        UriNode uriNode = uriService.getOrCreate(net, UriType.PROCESS);
+        UriNode uriNode = uriService.getOrCreate(net, UriContentType.PROCESS);
         net.setUriNodeId(uriNode.getId());
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());

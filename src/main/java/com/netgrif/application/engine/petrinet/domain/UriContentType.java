@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-public enum UriType {
+public enum UriContentType {
     CASE,
     PROCESS,
     DEFAULT

@@ -2,7 +2,7 @@ package com.netgrif.application.engine.petrinet.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.UriNode
-import com.netgrif.application.engine.petrinet.domain.UriType
+import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
@@ -34,16 +34,16 @@ class UriServiceTest {
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
-        uriService.getOrCreate(testUri1, UriType.DEFAULT)
-        uriService.getOrCreate(testUri2, UriType.DEFAULT)
-        uriService.getOrCreate(testUri3, UriType.DEFAULT)
-        uriService.getOrCreate(testUri4, UriType.DEFAULT)
+        uriService.getOrCreate(testUri1, UriContentType.DEFAULT)
+        uriService.getOrCreate(testUri2, UriContentType.DEFAULT)
+        uriService.getOrCreate(testUri3, UriContentType.DEFAULT)
+        uriService.getOrCreate(testUri4, UriContentType.DEFAULT)
     }
 
     @Test
     void getOrCreateTest() {
         String[] splitUri = testUri1.split(uriSeparator)
-        UriNode uriNode = uriService.getOrCreate(testUri1, UriType.DEFAULT)
+        UriNode uriNode = uriService.getOrCreate(testUri1, UriContentType.DEFAULT)
         assert uriNode != null && uriNode.getName() == splitUri[splitUri.length - 1]
     }
 

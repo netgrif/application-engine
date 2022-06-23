@@ -26,7 +26,7 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
-import com.netgrif.application.engine.petrinet.domain.UriType
+import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
@@ -1347,7 +1347,7 @@ class ActionDelegate {
         return uriService.findByUri(uri);
     }
 
-    def createUri(String uri, UriType type) {
+    def createUri(String uri, UriContentType type) {
         return uriService.getOrCreate(uri, type)
     }
 
