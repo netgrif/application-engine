@@ -49,6 +49,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
+import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
@@ -1372,6 +1373,38 @@ class ActionDelegate {
     }
 
     /**
+     * Action API case search function using Elasticsearch database
+     * @param requests the CaseSearchRequest list
+     * @param loggedUser the user who is searching for the requests
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    List<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        List<Task> tasks = new ArrayList<>()
+        int numOfPages = (int) ((elasticTaskService.count(requests, loggedUser, locale, isIntersection) / pageSize) + 1)
+        (0..(numOfPages - 1)).each {tasks.addAll(elasticTaskService.search(requests, loggedUser, PageRequest.of(it, pageSize), locale, isIntersection).toList())}
+        return tasks
+    }
+
+    /**
+     * Action API case search function using Elasticsearch database
+     * @param request case search request
+     * @param loggedUser the user who is searching for the requests
+     * @param pageable the page configuration that will contain the requests
+     * @param locale the Locale to be used when searching for requests
+     * @param isIntersection to decide null query handling
+     * @return page of cases
+     * */
+    List<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        List<ElasticTaskSearchRequest> requests = Collections.singletonList(convertTaskSearchRequest(request))
+        return findTasks(requests, loggedUser, pageSize, locale, isIntersection)
+    }
+
+    /**
      * Mapper function to create CaseSearchRequest object from map
      * @param request map of request attributes
      * @return CaseSerachRequest object
@@ -1420,5 +1453,54 @@ class ActionDelegate {
             caseSearchRequest.group = request.get('group') as List<String>
         }
         return caseSearchRequest
+    }
+
+    /**
+     * Mapper function to create ElasticTaskSearchRequest object from map
+     * @param request map of request attributes
+     * @return CaseSerachRequest object
+     * */
+    ElasticTaskSearchRequest convertTaskSearchRequest(Map<String, Object> request) {
+        ElasticTaskSearchRequest taskSearchRequest = new ElasticTaskSearchRequest()
+        if (request.containsKey('role') && request.get('role') instanceof List<String>) {
+            taskSearchRequest.role = request.get('role') as List<String>
+        }
+        if (request.containsKey('useCase') && request.get('useCase') instanceof List<Map<String, String>>) {
+            List<Map<String, String>> useCases = request.get('useCase') as List<Map<String, String>>
+            taskSearchRequest.useCase = useCases.stream().map(map ->  {
+                TaskSearchCaseRequest useCase = new TaskSearchCaseRequest();
+                if (map.containsKey('id'))
+                    useCase.id = map.get('id')
+                if (map.containsKey('title'))
+                    useCase.title = map.get('title')
+                return useCase
+            }).collect(Collectors.toList())
+        }
+        if (request.containsKey('title') && request.get('title') instanceof List<String>) {
+            taskSearchRequest.title = request.get('title') as List<String>
+        }
+        if (request.containsKey('user') && request.get('user') instanceof List<String>) {
+            taskSearchRequest.user = request.get('user') as List<String>
+        }
+        if (request.containsKey('process') && request.get('process') instanceof List<String>) {
+            List<String> processIdentifiers = request.get('process') as List<String>
+            taskSearchRequest.process = processIdentifiers.stream().map(id -> new com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet(id)).collect(Collectors.toList())
+        }
+        if (request.containsKey('transitionId') && request.get('transitionId') instanceof List<String>) {
+            taskSearchRequest.transitionId = request.get('transitionId') as List<String>
+        }
+        if (request.containsKey('fullText') && request.get('fullText') instanceof String) {
+            taskSearchRequest.fullText = request.get('fullText')
+        }
+        if (request.containsKey('group') && request.get('group') instanceof List<String>) {
+            taskSearchRequest.group = request.get('group') as List<String>
+        }
+        if (request.containsKey('users') && request.get('users') instanceof List<String>) {
+            taskSearchRequest.users = request.get('users') as List<String>
+        }
+        if (request.containsKey('query') && request.get('query') instanceof String) {
+            taskSearchRequest.query = request.get('query')
+        }
+        return taskSearchRequest
     }
 }
