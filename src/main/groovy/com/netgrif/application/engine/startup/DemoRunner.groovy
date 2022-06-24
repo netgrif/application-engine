@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component
 
 @Profile("dev")
 @Component
+@CompileStatic
 class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired

@@ -5,12 +5,14 @@ import com.netgrif.application.engine.petrinet.domain.events.Event
 import com.netgrif.application.engine.petrinet.domain.events.EventType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
+@CompileStatic
 class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired

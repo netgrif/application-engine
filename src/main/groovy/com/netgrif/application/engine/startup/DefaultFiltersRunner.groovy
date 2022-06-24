@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -57,37 +58,38 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        if (createDefaultFilters) {
-            createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", [], [
-                    "predicateMetadata": [],
-                    "searchCategories" : []
-            ], [
-                    (GERMAN_ISO_3166_CODE): "Alle Fälle",
-                    (SLOVAK_ISO_3166_CODE): "Všetky prípady"
-            ])
-            createCaseFilter("My cases", "assignment_ind", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
-                    "predicateMetadata": [[["category": "case_author", "configuration": ["operator": "equals"], "values": [["text": "search.category.userMe", value: ["<<me>>"]]]]]],
-                    "searchCategories" : ["case_author"]
-            ], [
-                    (GERMAN_ISO_3166_CODE): "Meine Fälle",
-                    (SLOVAK_ISO_3166_CODE): "Moje prípady"
-            ])
-
-            createTaskFilter("All tasks", "library_add_check", FILTER_VISIBILITY_PUBLIC, "", [], [
-                    "predicateMetadata": [],
-                    "searchCategories" : []
-            ], [
-                    (GERMAN_ISO_3166_CODE): "Alle Aufgaben",
-                    (SLOVAK_ISO_3166_CODE): "Všetky úlohy"
-            ])
-            createTaskFilter("My tasks", "account_box", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
-                    "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator": "equals"], "values": [["text": "search.category.userMe", value: ["<<me>>"]]]]]],
-                    "searchCategories" : ["task_assignee"]
-            ], [
-                    (GERMAN_ISO_3166_CODE): "Meine Aufgaben",
-                    (SLOVAK_ISO_3166_CODE): "Moje úlohy"
-            ])
+        if (!createDefaultFilters) {
+            return
         }
+        createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", [], [
+                "predicateMetadata": [],
+                "searchCategories" : []
+        ], [
+                (GERMAN_ISO_3166_CODE): "Alle Fälle",
+                (SLOVAK_ISO_3166_CODE): "Všetky prípady"
+        ])
+        createCaseFilter("My cases", "assignment_ind", FILTER_VISIBILITY_PUBLIC, "(author:<<me>>)", [], [
+                "predicateMetadata": [[["category": "case_author", "configuration": ["operator": "equals"], "values": [["text": "search.category.userMe", value: ["<<me>>"]]]]]],
+                "searchCategories" : ["case_author"]
+        ], [
+                (GERMAN_ISO_3166_CODE): "Meine Fälle",
+                (SLOVAK_ISO_3166_CODE): "Moje prípady"
+        ])
+
+        createTaskFilter("All tasks", "library_add_check", FILTER_VISIBILITY_PUBLIC, "", [], [
+                "predicateMetadata": [],
+                "searchCategories" : []
+        ], [
+                (GERMAN_ISO_3166_CODE): "Alle Aufgaben",
+                (SLOVAK_ISO_3166_CODE): "Všetky úlohy"
+        ])
+        createTaskFilter("My tasks", "account_box", FILTER_VISIBILITY_PUBLIC, "(userId:<<me>>)", [], [
+                "predicateMetadata": [[["category": "task_assignee", "configuration": ["operator": "equals"], "values": [["text": "search.category.userMe", value: ["<<me>>"]]]]]],
+                "searchCategories" : ["task_assignee"]
+        ], [
+                (GERMAN_ISO_3166_CODE): "Meine Aufgaben",
+                (SLOVAK_ISO_3166_CODE): "Moje úlohy"
+        ])
     }
 
     /**

@@ -4,7 +4,6 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -79,7 +78,7 @@ class DataServiceTest {
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
 
-        ChangedFieldByFileFieldContainer changes = dataService.saveFile(taskId, fileField.stringId, file)
+        def changes = dataService.saveFile(taskId, fileField.stringId, file)
         assert changes.changedFields.size() == 1
         LocalisedField textField = findField(datagroups, TEXT_FIELD_TITLE)
         assert changes.changedFields.containsKey(textField.stringId)

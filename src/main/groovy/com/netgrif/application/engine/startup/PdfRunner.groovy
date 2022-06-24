@@ -3,12 +3,14 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.PdfDrawer
 import com.netgrif.application.engine.pdf.generator.service.PdfGenerator
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 @Slf4j
+@CompileStatic
 class PdfRunner extends AbstractOrderedCommandLineRunner{
 
     @Autowired
