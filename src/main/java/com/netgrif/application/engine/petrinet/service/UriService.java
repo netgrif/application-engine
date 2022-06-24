@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 public class UriService implements IUriService {
 
     private static final String uriSeparator = "/";
+
+    /*TODO: insted of multiple roots, there will be one root with level marking*/
     private static final String defaultRoot = "default";
 
     private final UriNodeRepository uriNodeRepository;
@@ -148,7 +150,7 @@ public class UriService implements IUriService {
      * Creates new UriNode from URI path, or retrieves existing one
      * @param uri to be used for creating UriNode
      * @param contentType to decide the content type of UriNode
-     * @return the UriNode that was created or modified
+     * @return the UriNode that was created or modified netgrif/process/test/all_data, netgrif/process
      * */
     @Override
     public UriNode getOrCreate(String uri, UriContentType contentType) {
@@ -164,13 +166,12 @@ public class UriService implements IUriService {
             if (uriNode == null) {
                 uriNode = new UriNode();
                 uriNode.setName(uriComponents[i]);
-                uriNode.setRoot(i == 0);
+                uriNode.setLevel(i + 1);
                 uriNode.setUriPath(uriBuilder.toString());
                 uriNode.setParentId(parent != null ? parent.getId() : null);
             }
             if (i == pathLength - 1 && contentType != null) {
-                uriNode.setContainsCase(contentType.equals(UriContentType.CASE));
-                uriNode.setContainsProcess(contentType.equals(UriContentType.PROCESS));
+                uriNode.addContentType(contentType);
             }
             uriNode = uriNodeRepository.save(uriNode);
             if (parent != null) {

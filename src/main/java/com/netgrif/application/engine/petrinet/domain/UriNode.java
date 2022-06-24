@@ -51,35 +51,30 @@ public class UriNode {
 
     @Getter
     @Setter
-    @Field(type = FieldType.Boolean)
-    private boolean root;
+    @Field(type = FieldType.Integer)
+    private int level;
 
     @Getter
-    @Field(type = FieldType.Boolean)
-    private boolean containsCase;
-
-    @Getter
-    @Field(type = FieldType.Boolean)
-    private boolean containsProcess;
+    @Setter
+    private Set<UriContentType> contentTypes;
 
     public UriNode() {
         this.childrenId = new HashSet<>();
         this.children = new HashSet<>();
+        this.contentTypes = new HashSet<>();
     }
 
     public boolean containsCase() {
-        return containsCase;
+        return contentTypes.contains(UriContentType.CASE);
     }
 
-    public void setContainsCase(boolean containsCase) {
-        this.containsCase = containsCase;
+    public void addContentType(UriContentType contentType) {
+        if (contentTypes == null)
+            contentTypes = new HashSet<>();
+        contentTypes.add(contentType);
     }
 
     public boolean containsNet() {
-        return containsProcess;
-    }
-
-    public void setContainsProcess(boolean containsProcess) {
-        this.containsProcess = containsProcess;
+        return contentTypes.contains(UriContentType.PROCESS);
     }
 }

@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
+
+    /*TODO: change on UriNode Move action*/
     @Getter
     @Setter
     private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
