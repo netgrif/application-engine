@@ -8,12 +8,55 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
+## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)
+
+### Fixed
+
+- [NAE-1652] For some PDF documents the file preview is not generating
+- [NAE-1649] File field preview component bug
+- [NAE-1641] Generate PDF with special characters
+
+### Changed
+
+- [NAE-1655] Better Active Directory compatibility
+
+## [6.1.0](https://github.com/netgrif/application-engine/releases/tag/v6.1.0) (2022-06-01)
+
+### Fixed
+
+- [NAE-1585] Security update to resolve vulnerabilities
+- [NAE-1049] Case name doesn't change
+- [NAE-1637] PDF generator with template does not work
+- [NAE-1636] resolveTaskRefOrderOnGrid with forbidden dataField
+
+### Changed
+
+- [NAE-1440] setData on button without value
+- [NAE-1569] Update Groovy 3.0.10
+- [NAE-1624] Upgrade Elasticsearch Connector
+- [NAE-1562] Improved logging of deleting resources
+- [NAE-1521] Authentication Providers
+- [NAE-1623] Action API consolidation
+- [NAE-1622] Change behavior action improvements
+- [NAE-1640] Update spring boot 2.7.0
+- [NAE-1478] ActionDelegate functions overloading
+
+### Added
+
+- [NAE-1627] LDAP Groups resolving and mapping
+- [NAE-1468] i18n Data field
+- [NAE-1290] Export actions
+- [NAE-1477] New pdfGeneration action in actionDelegate
+
+### Removed
+
+- [NAE-1584] Remove petriflow schema
+
 ## [6.0.5](https://github.com/netgrif/application-engine/releases/tag/v6.0.5) (2022-05-12)
 
 ### Fixed
 
 - [NAE-1621] Required data group layout tag if layout type is “grid”
-
 
 ## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-04-12)
 

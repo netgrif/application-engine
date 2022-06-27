@@ -305,7 +305,11 @@ public final class FieldFactory {
 
     private ButtonField buildButtonField(Data data) {
         ButtonField field = new ButtonField();
-        setDefaultValue(field, data, field::setDefaultValue);
+        setDefaultValue(field, data, defaultValue -> {
+            if (defaultValue != null) {
+                field.setDefaultValue(Integer.parseInt(defaultValue));
+            }
+        });
         return field;
     }
 

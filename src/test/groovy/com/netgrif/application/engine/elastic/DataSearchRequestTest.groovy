@@ -1,15 +1,19 @@
 package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -20,7 +24,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
@@ -29,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.context.WebApplicationContext
@@ -42,7 +44,6 @@ import java.time.LocalTime
 @SpringBootTest()
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-@Disabled("UnsatisfiedDependency Error creating")
 class DataSearchRequestTest {
 
     private static final Logger log = LoggerFactory.getLogger(DataSearchRequestTest)
@@ -60,7 +61,7 @@ class DataSearchRequestTest {
     private ElasticCaseRepository repository
 
     @Autowired
-    private ElasticsearchTemplate template
+    private IElasticIndexService template
 
     @Autowired
     private IWorkflowService workflowService
@@ -86,21 +87,25 @@ class DataSearchRequestTest {
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private TestHelper testHelper
+
     private ArrayList<Map.Entry<String, String>> testCases
 
     @BeforeEach
     void before() {
-        template.deleteIndex(ElasticCase.class)
+        testHelper.truncateDbs()
+//        template.deleteIndex(ElasticCase.class)
         template.createIndex(ElasticCase.class)
         template.putMapping(ElasticCase.class)
 
-        template.deleteIndex(ElasticTask.class)
+//        template.deleteIndex(ElasticTask.class)
         template.createIndex(ElasticTask.class)
         template.putMapping(ElasticTask.class)
 
         repository.deleteAll()
 
-        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), "major", superCreator.getLoggedSuper())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
 
         def users = userService.findAll(true)
@@ -118,7 +123,7 @@ class DataSearchRequestTest {
         _case.dataSet["number"].value = 7.0 as Double
         _case.dataSet["boolean"].value = true
         _case.dataSet["text"].value = "hello world" as String
-        _case.dataSet["user"].value = testUser1
+        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
         _case.dataSet["date"].value = date
         _case.dataSet["datetime"].value = date.atTime(13, 37)
         _case.dataSet["enumeration"].value = (_case.petriNet.dataSet["enumeration"] as ChoiceField).choices.find({ it.defaultValue == "Alice" })
@@ -128,6 +133,8 @@ class DataSearchRequestTest {
         _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
         _case.dataSet["userList"].value = [testUser1.id, testUser2.id]
+        _case.dataSet["i18n_text"].value.defaultValue = "Modified i18n text value"
+        _case.dataSet["i18n_divider"].value.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
 
         Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
@@ -211,6 +218,8 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Félix" as String),
                 new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.keyValue" as String, "eve" as String),
                 new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.keyValue" as String, "felix" as String),
+                new AbstractMap.SimpleEntry<String, String>("i18n_text.textValue.keyword" as String, "Modified i18n text value" as String),
+                new AbstractMap.SimpleEntry<String, String>("i18n_divider.textValue.keyword" as String, "Modified i18n divider value" as String),
         ]
     }
 

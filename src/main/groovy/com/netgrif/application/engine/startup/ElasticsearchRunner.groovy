@@ -4,10 +4,10 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexOps
 import groovy.transform.CompileStatic
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.stereotype.Component
 
 @Component
@@ -34,7 +34,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     private String taskIndex
 
     @Autowired
-    private IElasticIndexOps template
+    private IElasticIndexService template
 
     @Override
     void run(String... args) throws Exception {

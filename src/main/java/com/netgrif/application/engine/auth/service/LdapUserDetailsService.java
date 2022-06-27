@@ -4,8 +4,10 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.ldap.domain.LdapUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserDetailsService extends UserDetailsServiceImpl {
 
     @Override

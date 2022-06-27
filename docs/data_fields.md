@@ -99,9 +99,14 @@ This field also has one validation for maximum number of uploaded files `maxFile
 This field servers to support translations in the application. Value of this field is I18nType, which means, you can set
 default value of this field with translations in all languages you want.
 
-This field has two views. First one is **text** view, which is similar to text field (TODO). Second one is **divider**
+This field has two views. First one is **text** view, which is similar to text field in visible form. In editable form
+you can choose multiple translations as value of this field. Second one is **divider**
 form which is displayed as horizontal line with text (text is optional). This divider view is customizable with font
 size and divider line color.
+
+This field has two validations:
+* `translationRequired` - accepts language codes separated by comma, that are required (eg. `translationRequired sk,pl,cz`) 
+* `translationOnly` - accepts language codes separated by comma, that are only allowed in field (eg. `translationOnly sk,pl,cz,en`) 
 
 #### Component
 

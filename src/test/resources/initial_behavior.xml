@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>initial_behavior</id>
     <title>Initial behavior</title>
     <initials>IBH</initials>
@@ -103,6 +103,13 @@
         <component>
             <name>fab</name>
         </component>
+    </data>
+
+    <data type="i18n">
+        <id>i18n</id>
+        <title>Init I18n</title>
+        <placeholder>Init I18n field</placeholder>
+        <init>Default i18n test value</init>
     </data>
 
     <!-- TRANSITIONS -->
@@ -309,6 +316,23 @@
                 </logic>
                 <layout>
                     <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>i18n</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <behavior>optional</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
                     <y>6</y>
                     <rows>1</rows>
                     <cols>2</cols>

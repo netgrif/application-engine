@@ -104,10 +104,10 @@ public class PdfResource {
 As the `PdfResorce` class extends PdfProperties class, when setting up properties through beans, it is enough to get only
 PdfResource bean:
 
-| Example in application.properties | Example of getting bean and setting attribute in actions|
-|-----------------------------------|---------------------------------------------------------|
-| `properties nae.pdf.properties.pageWidth=650` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)` |
-| `properties nae.pdf.resources.templateResource=classpath:src/main/resources/pdfGenerator/template_pdf.pdf` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)`|
+| Example in application.properties                                                                     | Example of getting bean and setting attribute in actions|
+|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------|
+| `properties nae.pdf.properties.pageWidth=650`                                                         | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)` |
+| `properties nae.pdf.resources.templateResource=file:src/main/resources/pdfGenerator/template_pdf.pdf` | `java PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource` `java pdfResource.setMarginLeft(75)`|
 
 ## Setup
 

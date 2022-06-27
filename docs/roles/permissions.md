@@ -23,7 +23,7 @@ Since the developer may want to apply these roles to "all" transitions a shortha
 The default and the anonymous role can be applied independently of each other.  
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
@@ -234,7 +234,7 @@ In the XML model of the process, you can define roles as child elements of the r
 element. The role is connected to the role reference via the role's ID.
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<role>
 		<id>process_role</id>
@@ -256,7 +256,7 @@ Permission documentation can be found [here](#Permissions). Roles can be referen
 - as a child element of the `document` tag for referencing roles on cases:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<roleRef>
 		<id>process_role</id>
@@ -272,7 +272,7 @@ Permission documentation can be found [here](#Permissions). Roles can be referen
 - as a child element of the `transition` tag for referencing roles on tasks:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<transition>
 		...
@@ -296,7 +296,7 @@ given user list) to Petriflow objects and their actions. User list can be define
 defined, as child element of the root **document** element:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<data type="userList">
 		<id>user_list_1</id>
@@ -316,7 +316,7 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 - as a child element of the `document` tag for referencing user list on cases:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<userRef>
 		<id>user_list_1</id>
@@ -332,7 +332,7 @@ Permission documentation can be found [here](#Permissions). User list can be ref
 - as a child element of the `transition` tag for referencing user list on tasks:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<transition>
 		...
@@ -381,7 +381,7 @@ Each reference element has a child element called **caseLogic**, which can be us
 permissions for case created from process as follows:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 ...
 	<roleRef>
 		<id>process_role</id>
@@ -429,7 +429,7 @@ transition** element. Each reference element has a child element called **logic*
 permissions for task created from transition as follows:
 
 ```
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	...
 	<transition>
 		...

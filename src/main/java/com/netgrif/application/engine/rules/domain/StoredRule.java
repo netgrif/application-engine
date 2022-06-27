@@ -13,9 +13,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
-@Document
 @Data
 @Builder
+@Document
 @AllArgsConstructor
 public class StoredRule {
 

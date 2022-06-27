@@ -4,6 +4,7 @@ package com.netgrif.application.engine.elastic.service;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.domain.BooleanField;
+import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.elastic.domain.FileField;
 import com.netgrif.application.engine.elastic.domain.NumberField;
@@ -60,6 +61,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformMultichoiceField(caseField, (MultichoiceField) netField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.NumberField) {
             return this.transformNumberField(caseField);
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.ButtonField) {
+            return this.transformButtonField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserField) {
             return this.transformUserField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.DateField) {
@@ -170,7 +173,14 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformNumberField(com.netgrif.application.engine.workflow.domain.DataField numberField) {
+        if (numberField.getValue() instanceof Integer) { //TODO: Refactor
+            return Optional.of(new NumberField(Double.parseDouble(numberField.getValue().toString())));
+        }
         return Optional.of(new NumberField((Double) numberField.getValue()));
+    }
+
+    protected Optional<DataField> transformButtonField(com.netgrif.application.engine.workflow.domain.DataField buttonField) {
+        return Optional.of(new ButtonField((Integer) buttonField.getValue()));
     }
 
     protected Optional<DataField> transformUserField(com.netgrif.application.engine.workflow.domain.DataField userField) {

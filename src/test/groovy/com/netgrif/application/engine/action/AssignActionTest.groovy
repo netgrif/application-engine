@@ -23,9 +23,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -34,6 +36,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 
 @ExtendWith(SpringExtension.class)
@@ -122,6 +125,7 @@ class AssignActionTest {
         User user = userRepository.findByEmail(USER_EMAIL)
 
         authentication = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSWORD)
+        authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
 
