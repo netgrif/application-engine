@@ -2,8 +2,6 @@ package com.netgrif.application.engine.workflow.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
@@ -13,7 +11,10 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DataField implements Referencable {
 
@@ -69,10 +70,9 @@ public class DataField implements Referencable {
 
     public void setValue(Object value) {
         if (this.value == null) {
-            new DataFieldValue(value);
-        } else {
-            this.value = new DataFieldValue(value);
+            this.value = new DataFieldValue();
         }
+        this.value.setValue(value);
         update();
     }
 

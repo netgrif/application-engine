@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
@@ -210,8 +208,7 @@ public class DataService implements IDataService {
             workflowService.save(useCase);
             historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, Collections.singletonMap(fieldId, newDataField)));
             // POST
-            outcome.addOutcomes(resolveDataEvents(field,
-                    DataEventType.SET, EventPhase.POST, useCase, task));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task));
             historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
         });
         updateDataset(useCase);
