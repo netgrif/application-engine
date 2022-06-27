@@ -86,4 +86,10 @@ public interface IUriService {
      * @return the UriNode that was created or modified
      * */
     UriNode getOrCreate(String uri, UriContentType contentType);
+
+    /**
+     * Creates default UriNode
+     * @return the UriNode that was created or modified
+     * */
+    UriNode createDefault();
 }

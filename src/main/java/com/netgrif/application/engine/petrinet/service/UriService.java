@@ -22,9 +22,11 @@ public class UriService implements IUriService {
     private static final String uriSeparator = "/";
 
     /*TODO: insted of multiple roots, there will be one root with level marking*/
-    private static final String defaultRoot = "default";
+    private static final String defaultRootUri = "root";
 
-    private static final int firstLevel = 1;
+    private static final String defaultRootName = "root";
+
+    private static final int firstLevel = 0;
     private final UriNodeRepository uriNodeRepository;
 
     public UriService(UriNodeRepository uriNodeRepository) {
@@ -40,7 +42,6 @@ public class UriService implements IUriService {
     public UriNode save(UriNode uriNode) {
         return uriNodeRepository.save(uriNode);
     }
-
 
     /**
      * Retrieves all UriNode based on parent ID
@@ -154,7 +155,7 @@ public class UriService implements IUriService {
         if (identifier.contains(uriSeparator))
             modifiedUri = identifier.substring(0, identifier.lastIndexOf(uriSeparator));
         else
-            modifiedUri = defaultRoot;
+            modifiedUri = defaultRootUri;
 
         return getOrCreate(modifiedUri, contentType);
     }
@@ -170,8 +171,8 @@ public class UriService implements IUriService {
         LinkedList<UriNode> uriNodeList = new LinkedList<>();
         String[] uriComponents = uri.split(uriSeparator);
         StringBuilder uriBuilder = new StringBuilder();
-        UriNode parent = null;
         int pathLength = uriComponents.length;
+        UriNode parent = pathLength > 1 ? uriNodeRepository.findByUriPath(defaultRootUri) : null;
 
         for (int i = 0; i < pathLength; i++) {
             uriBuilder.append(uriComponents[i]);
@@ -196,6 +197,25 @@ public class UriService implements IUriService {
             parent = uriNode;
         }
         return uriNodeList.getLast();
+    }
+
+    /**
+     * Creates default UriNode
+     * @return the UriNode that was created or modified
+     * */
+    @Override
+    public UriNode createDefault() {
+        UriNode uriNode = uriNodeRepository.findByUriPath(defaultRootUri);
+        if (uriNode == null) {
+            uriNode = new UriNode();
+            uriNode.setName(defaultRootName);
+            uriNode.setLevel(firstLevel);
+            uriNode.setUriPath(defaultRootUri);
+            uriNode.setParentId(null);
+        }
+        uriNode.addContentType(UriContentType.DEFAULT);
+        uriNode = uriNodeRepository.save(uriNode);
+        return uriNode;
     }
 
 }
