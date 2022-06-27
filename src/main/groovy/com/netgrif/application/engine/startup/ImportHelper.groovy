@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.importer.model.Data
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -14,6 +15,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
@@ -26,6 +28,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.json.JsonOutput
 import org.slf4j.Logger
@@ -230,10 +233,12 @@ class ImportHelper {
         superCreator.setAllToSuperUser();
     }
 
-    static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
-        ObjectMapper mapper = new ObjectMapper()
-        String json = JsonOutput.toJson(data)
-        return mapper.readTree(json) as ObjectNode
+    static DataSet populateDataset(Map<String, Map<String, String>> data) {
+        DataSet dataSet = new DataSet()
+        data.each {fieldId, config ->
+            dataSet.fields[fieldId] = new DataField(config["value"])
+        }
+        return dataSet
     }
 
     static String getCaseColor() {

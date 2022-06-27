@@ -6,6 +6,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
@@ -18,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class ConcurrencyTest {
 
     private static final Logger log = LoggerFactory.getLogger(ConcurrencyTest)
@@ -44,7 +46,7 @@ class ConcurrencyTest {
             cases << importHelper.createCase("Case 1", mainNet.get())
         }
 
-        def threads = []
+        List<Thread> threads = []
         cases.each { it ->
             String caseId = it.stringId
             threads << new Thread({

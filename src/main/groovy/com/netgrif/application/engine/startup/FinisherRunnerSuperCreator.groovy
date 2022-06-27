@@ -22,5 +22,4 @@ class FinisherRunnerSuperCreator extends AbstractOrderedCommandLineRunner {
        superCreator.setAllToSuperUser()
         log.info("Super Creator update")
     }
-
 }

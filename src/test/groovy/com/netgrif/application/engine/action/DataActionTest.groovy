@@ -52,6 +52,6 @@ class DataActionTest {
                 ] as Map
         ))
         assert (dataSet.outcomes.get(dataSet.outcomes.size() - 1) as SetDataEventOutcome)
-                .getChangedFields()["control_field"].attributes["value"] == ";get-pre;get-pre;get-post;get-post;set-pre;set-pre;set-post;set-post"
+                .getChangedFields().fields["control_field"].value == ";get-pre;get-pre;get-post;get-post;set-pre;set-pre;set-post;set-post"
     }
 }

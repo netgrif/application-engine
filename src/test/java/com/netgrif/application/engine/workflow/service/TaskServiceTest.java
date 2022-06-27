@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -75,6 +76,9 @@ public class TaskServiceTest {
     @Autowired
     private SuperCreator superCreator;
 
+    @Autowired
+    private SuperAdminConfiguration configuration;
+
     @BeforeEach
     public void setUp() throws Exception {
         mongoTemplate.getDb().drop();
@@ -133,6 +137,6 @@ public class TaskServiceTest {
 
     public LoggedUser mockLoggedUser() {
         Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", Collections.singleton(authorityUser));
+        return new LoggedUser(new ObjectId().toString(), configuration.getEmail(), configuration.getPassword(), Collections.singleton(authorityUser));
     }
 }

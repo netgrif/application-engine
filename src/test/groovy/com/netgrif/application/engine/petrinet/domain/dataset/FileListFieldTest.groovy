@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
@@ -45,10 +45,9 @@ class FileListFieldTest {
 
     public static final String FIELD_ID = "fileList"
     public static final String TASK_TITLE = "Task"
-    public static final String USER_EMAIL = "super@netgrif.com"
 
-    @Value('${admin.password:password}')
-    private String userPassword
+    @Autowired
+    private SuperAdminConfiguration configuration
 
     @Autowired
     private ImportHelper importHelper
@@ -102,14 +101,14 @@ class FileListFieldTest {
     void downloadFileByCaseAndName() {
         PetriNet net = getNet()
 
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID + '/test-file.txt')
-                .with(httpBasic(USER_EMAIL, userPassword)))
+                .with(httpBasic(configuration.email, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
@@ -121,14 +120,14 @@ class FileListFieldTest {
     void downloadFileByTask() {
         PetriNet net = getNet()
 
-        IUser user = userService.findByEmail(USER_EMAIL, true)
+        IUser user = userService.findByEmail(configuration.email, true)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
         mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID + '/test-file-list.txt').
-                with(httpBasic(USER_EMAIL, userPassword)))
+                with(httpBasic(configuration.email, configuration.password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

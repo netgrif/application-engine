@@ -3,6 +3,7 @@ package com.netgrif.application.engine.insurance
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -46,6 +47,9 @@ class EncryptionTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private SuperAdminConfiguration configuration
+
     private final String FIELD_NAME = "City"
     private final String FIELD_VALUE = "Bratislava"
 
@@ -88,6 +92,6 @@ class EncryptionTest {
 
     LoggedUser mockLoggedUser() {
         def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUser(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser])
+        return new LoggedUser(superCreator.getSuperUser().getStringId(), configuration.email, configuration.password, [authorityUser])
     }
 }

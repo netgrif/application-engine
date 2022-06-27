@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -14,6 +15,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import groovy.json.JsonOutput
+import groovy.transform.CompileStatic
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -43,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class RemoveActionTest {
 
 
@@ -70,13 +73,16 @@ class RemoveActionTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
     private TestHelper testHelper
+
+    @Autowired
+    private SuperAdminConfiguration configuration
 
     private MockMvc mvc
     private PetriNet petriNet
@@ -113,7 +119,7 @@ class RemoveActionTest {
     @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        auth = new UsernamePasswordAuthenticationToken("super@netgrif.com",)
+        auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 
@@ -155,6 +161,6 @@ class RemoveActionTest {
         roles = updatedUser.getProcessRoles()
 
         Assert.assertNull(roles.find { it.stringId == adminRoleId })
-        Assert.assert(roles.find { it.stringId == managerRoleId })
+        Assert.assertNull(roles.find { it.stringId == managerRoleId })
     }
 }

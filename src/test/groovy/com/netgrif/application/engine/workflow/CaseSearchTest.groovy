@@ -1,8 +1,9 @@
 package com.netgrif.application.engine.workflow
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
+import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.hateoas.MediaTypes
@@ -45,9 +45,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CaseSearchTest {
 
-    @Value('${admin.password:password}')
-    private String userPassword
-
     @Autowired
     private IPetriNetService petriNetService
 
@@ -62,6 +59,9 @@ class CaseSearchTest {
 
     @Autowired
     private SuperCreator superCreator
+
+    @Autowired
+    private SuperAdminConfiguration configuration
 
     private MockMvc mvc
 
@@ -130,7 +130,7 @@ class CaseSearchTest {
 
     @Test
     void searchByAuthorEmail() {
-        performSearch("super@netgrif.com", "Case2")
+        performSearch(configuration.email, "Case2")
     }
 
     @Test
@@ -165,7 +165,7 @@ class CaseSearchTest {
         mvc.perform(post("/api/workflow/case/search2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
-                .with(httpBasic("super@netgrif.com", userPassword))
+                .with(httpBasic(configuration.email, configuration.password))
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())

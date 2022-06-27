@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -39,6 +40,9 @@ class UserRefsTest {
     private IElasticCaseService elasticCaseService
 
     @Autowired
+    private SuperAdminConfiguration configuration
+
+    @Autowired
     private TestHelper helper
 
     List<Case> newCases
@@ -53,7 +57,7 @@ class UserRefsTest {
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/userrefs_test.xml"), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
         assert net
         netId = net.getStringId()
-        def userEmails = ["super@netgrif.com", "engine@netgrif.com"]
+        def userEmails = [configuration.email, "engine@netgrif.com"]
         newCases = new ArrayList<>()
         userIds = new ArrayList<>()
         10.times {

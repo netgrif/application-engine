@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -26,57 +27,56 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class AssignRemoveTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private TestHelper testHelper
 
     @Autowired
-    private IPetriNetService petriNetService;
+    private IPetriNetService petriNetService
 
     @Autowired
-    private SuperCreator superCreator;
+    private SuperCreator superCreator
 
     @Autowired
-    private ImportHelper importHelper;
+    private ImportHelper importHelper
 
     @Autowired
-    private IWorkflowService workflowService;
+    private IWorkflowService workflowService
 
     @Autowired
-    private CaseRepository caseRepository;
+    private CaseRepository caseRepository
 
     @Autowired
     private IUserService userService
 
-    private static final String USER_EMAIL = "test@test.com"
-
     private Authentication auth
 
     @BeforeEach
-    public void before() {
-        testHelper.truncateDbs();
-        def user = userService.system;
+    void before() {
+        testHelper.truncateDbs()
+        def user = userService.system
 
         auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContextHolder.getContext().setAuthentication(auth)
     }
 
     @Test
     @Disabled("Create functions or update test")
-    public void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
-        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
+    void testAssignAndRemoveRole() throws MissingPetriNetMetaDataException, IOException {
+        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/role_assign_remove_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
 
-        assert netOptional.getNet() != null;
+        assert netOptional.getNet() != null
         def net = netOptional.getNet()
-        def roleCount = userService.system.userProcessRoles.size()
+        def roleCount = userService.system.processRoles.size()
 
         // create
         Case caze = workflowService.createCase(net.stringId, 'TEST', '', userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        assert userService.system.userProcessRoles.size() == roleCount + 4
+        assert userService.system.processRoles.size() == roleCount + 4
 
         // delete
         workflowService.deleteCase(caze.stringId)
-        assert userService.system.userProcessRoles.size() == roleCount
+        assert userService.system.processRoles.size() == roleCount
     }
 }

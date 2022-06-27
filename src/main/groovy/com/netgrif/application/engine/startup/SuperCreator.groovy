@@ -2,15 +2,15 @@ package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.configuration.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
@@ -33,8 +33,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IProcessRoleService processRoleService
 
-    @Value('${nae.admin.password}')
-    private String superAdminPassword
+    @Autowired
+    private SuperAdminConfiguration configuration
 
     private IUser superUser
 
@@ -44,27 +44,25 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         createSuperUser()
     }
 
-    private IUser createSuperUser() {
+    private void createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
         Authority systemAuthority = authorityService.getOrCreate(Authority.systemAdmin)
 
-        IUser superUser = userService.findByEmail("super@netgrif.com", false)
-        if (superUser == null) {
-            this.superUser = userService.saveNew(new User(
-                    name: "Admin",
-                    surname: "Netgrif",
-                    email: "super@netgrif.com",
-                    password: superAdminPassword,
-                    state: UserState.ACTIVE,
-                    authorities: [adminAuthority, systemAuthority] as Set<Authority>,
-                    processRoles: processRoleService.findAll() as Set<ProcessRole>))
-            log.info("Super user created")
-        } else {
+        IUser superUser = userService.findByEmail(configuration.email, false)
+        if (superUser != null) {
             log.info("Super user detected")
             this.superUser = superUser
+            return
         }
-
-        return this.superUser
+        this.superUser = userService.saveNew(new User(
+                name: configuration.name,
+                surname: configuration.surname,
+                email: configuration.email,
+                password: configuration.password,
+                state: UserState.ACTIVE,
+                authorities: [adminAuthority, systemAuthority] as Set<Authority>,
+                processRoles: processRoleService.findAll() as Set<ProcessRole>))
+        log.info("Super user created")
     }
 
     void setAllToSuperUser() {
@@ -73,7 +71,6 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         setAllAuthorities()
         log.info("Super user updated")
     }
-
 
     void setAllGroups() {
         groupService.findAllGroups().each {
