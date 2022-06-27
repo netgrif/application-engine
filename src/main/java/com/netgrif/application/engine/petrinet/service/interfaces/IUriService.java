@@ -28,6 +28,13 @@ public interface IUriService {
     List<UriNode> getRoots();
 
     /**
+     * Retrieves UriNode based on level
+     * @param level of UriNode
+     * @return UriNode
+     * */
+    List<UriNode> findByLevel(int level);
+
+    /**
      * Retrieves UriNode based on ID
      * @param id ID of UriNode
      * @return UriNode
@@ -36,10 +43,10 @@ public interface IUriService {
 
     /**
      * Retrieves UriNode based on uri
-     * @param uri ID of UriNode
+     * @param path of UriNode
      * @return UriNode
      * */
-    UriNode findByUri(String name);
+    UriNode findByUri(String path);
 
     /**
      * Collects direct relatives (parent and children) of input UriNode and returns filled object

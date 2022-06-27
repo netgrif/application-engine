@@ -29,7 +29,7 @@ public class UriController {
         this.uriService = uriService;
     }
 
-    @ApiOperation(value = "Get root UriNodes")
+    @ApiOperation(value = "Get root UriNodes", authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
     })
@@ -40,7 +40,7 @@ public class UriController {
         return new UriNodeResources(uriNodes);
     }
 
-    @ApiOperation(value = "Get root UriNodes")
+    @ApiOperation(value = "Get one UriNode by URI path", authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
     })
@@ -49,5 +49,27 @@ public class UriController {
         UriNode uriNode = uriService.findByUri(uri);
         uriNode = uriService.populateDirectRelatives(uriNode);
         return new UriNodeResource(uriNode);
+    }
+
+    @ApiOperation(value = "Get one UriNode by parent id", authorizations = @Authorization("BasicAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
+    })
+    @RequestMapping(value = "/parent/{parentId}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public CollectionModel<UriNode> getByParent(@PathVariable("parentId") String parentId) {
+        List<UriNode> uriNodes = uriService.findAllByParent(parentId);
+        uriNodes.forEach(uriService::populateDirectRelatives);
+        return new UriNodeResources(uriNodes);
+    }
+
+    @ApiOperation(value = "Get one UriNode by URI path", authorizations = @Authorization("BasicAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
+    })
+    @RequestMapping(value = "/level/{level}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public CollectionModel<UriNode> getByLevel(@PathVariable("level") int level) {
+        List<UriNode> uriNodes = uriService.findByLevel(level);
+        uriNodes.forEach(uriService::populateDirectRelatives);
+        return new UriNodeResources(uriNodes);
     }
 }

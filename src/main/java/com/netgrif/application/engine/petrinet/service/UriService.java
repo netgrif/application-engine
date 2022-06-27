@@ -24,6 +24,7 @@ public class UriService implements IUriService {
     /*TODO: insted of multiple roots, there will be one root with level marking*/
     private static final String defaultRoot = "default";
 
+    private static final int firstLevel = 1;
     private final UriNodeRepository uriNodeRepository;
 
     public UriService(UriNodeRepository uriNodeRepository) {
@@ -57,7 +58,17 @@ public class UriService implements IUriService {
      * */
     @Override
     public List<UriNode> getRoots() {
-        return uriNodeRepository.findAllByRoot(true);
+        return uriNodeRepository.findAllByLevel(firstLevel);
+    }
+
+    /**
+     * Retrieves all UriNode based on level
+     * @param level of UriNodes
+     * @return list of UriNodes
+     * */
+    @Override
+    public List<UriNode> findByLevel(int level) {
+        return uriNodeRepository.findAllByLevel(level);
     }
 
     /**
@@ -90,9 +101,11 @@ public class UriService implements IUriService {
      * */
     @Override
     public UriNode populateDirectRelatives(UriNode uriNode) {
-        UriNode parent = findById(uriNode.getParentId());
+        if (uriNode.getLevel() != firstLevel) {
+            UriNode parent = findById(uriNode.getParentId());
+            uriNode.setParent(parent);
+        }
         Set<UriNode> children = uriNode.getChildrenId().stream().map(this::findById).collect(Collectors.toSet());
-        uriNode.setParent(parent);
         uriNode.setChildren(children);
         return uriNode;
     }
