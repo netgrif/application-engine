@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.business
 
 import com.netgrif.application.engine.startup.PostalCodeImporter
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -13,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest(properties = "nae.postal.codes.import=true")
 @SuppressWarnings("GrMethodMayBeStatic")
+@CompileStatic
 class PostalCodeTest {
 
     private static boolean setup = false

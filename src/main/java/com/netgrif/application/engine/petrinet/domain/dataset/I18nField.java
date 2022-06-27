@@ -10,7 +10,13 @@ import lombok.Data;
 public class I18nField extends Field<I18nString> {
 
     public I18nField() {
+        // TODO: NAE-1645 clearValue?
         super();
+    }
+
+    @Override
+    public void clearValue() {
+        setValue(new I18nString());
     }
 
     @Override
@@ -22,6 +28,7 @@ public class I18nField extends Field<I18nString> {
     @Override
     public I18nField clone() {
         I18nField clone = new I18nField();
+        // TODO: NAE-1645 deep copy?
         super.clone(clone);
         return clone;
     }

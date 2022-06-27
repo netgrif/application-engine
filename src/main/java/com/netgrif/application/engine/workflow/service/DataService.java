@@ -764,23 +764,23 @@ public class DataService implements IDataService {
                 }
                 value = newValueField.getValue();
                 break;
-            case "button":
-                if (node.get("value") == null) {
+            case BUTTON:
+                if (newValueField.getValue() == null) {
                     if (dataField.getValue() == null) {
                         value = 1;
                         break;
                     }
                     value = Integer.parseInt(dataField.getValue().toString()) + 1;
                 } else {
-                    value = node.get("value").asInt();
+                    value = newValueField.getValue();
                 }
                 break;
-            case "i18n":
-                if (node.get("value") == null) {
+            case I_18_N:
+                if (newValueField.getValue() == null) {
                     value = new I18nString("");
                     break;
                 }
-                value = parseI18nStringValues(node);
+                value = parseI18nStringValues(newValueField);
                 break;
             default:
                 value = newValueField.getValue(); // TODO: NAE-1645 check null value
@@ -818,15 +818,17 @@ public class DataService implements IDataService {
         return null;
     }
 
-    private I18nString parseI18nStringValues(ObjectNode node) {
-        String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
-        Map<String, String> translations = new HashMap<>();
-        if (node.get("value").get("translations") != null) {
-            node.get("value").get("translations").fields().forEachRemaining(entry ->
-                translations.put(entry.getKey(), entry.getValue().asText())
-            );
-        }
-        return new I18nString(defaultValue, translations);
+    private I18nString parseI18nStringValues(DataField node) {
+        // TODO: NAE-1645 maybe fix
+//        String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
+//        Map<String, String> translations = new HashMap<>();
+//        if (node.get("value").get("translations") != null) {
+//            node.get("value").get("translations").fields().forEachRemaining(entry ->
+//                translations.put(entry.getKey(), entry.getValue().asText())
+//            );
+//        }
+//        return new I18nString(defaultValue, translations);
+        return null;
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {

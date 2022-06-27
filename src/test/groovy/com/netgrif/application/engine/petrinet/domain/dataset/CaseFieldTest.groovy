@@ -48,7 +48,7 @@ class CaseFieldTest {
     @Autowired
     private IWorkflowService workflowService
 
-    private def stream = { String name ->
+    private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
@@ -76,10 +76,8 @@ class CaseFieldTest {
                 ]
         ])
 
-        assert (changed1.outcomes[0] as SetDataEventOutcome).getChangedFields().containsKey("caseref")
-        assert (changed1.outcomes[0] as SetDataEventOutcome).getChangedFields().get("caseref").attributes.containsKey("allowedNets")
-        assert (changed1.outcomes[0] as SetDataEventOutcome).getChangedFields().get("caseref").attributes.get("allowedNets") instanceof List
-        List<String> list1 = (List<String>) (changed1.outcomes[0] as SetDataEventOutcome).getChangedFields().get("caseref").attributes.get("allowedNets")
+        assert (changed1.outcomes[0] as SetDataEventOutcome).changedFields.fields.containsKey("caseref")
+        List<String> list1 = (changed1.outcomes[0] as SetDataEventOutcome).changedFields.fields["caseref"].allowedNets
         assert list1.size() == 2
         assert list1.get(0) == "hello"
         assert list1.get(1) == "world"
@@ -98,10 +96,8 @@ class CaseFieldTest {
                 ]
         ])
 
-        assert (changed2.outcomes[0] as SetDataEventOutcome).getChangedFields().containsKey("caseref")
-        assert (changed2.outcomes[0] as SetDataEventOutcome).getChangedFields().get("caseref").attributes.containsKey("allowedNets")
-        assert (changed2.outcomes[0] as SetDataEventOutcome).getChangedFields().get("caseref").attributes.get("allowedNets") instanceof List
-        List<String> list2 = (List<String>) (changed2.outcomes[0] as SetDataEventOutcome).getChangedFields().get("caseref").attributes.get("allowedNets")
+        assert (changed2.outcomes[0] as SetDataEventOutcome).changedFields.fields.containsKey("caseref")
+        List<String> list2 = (changed2.outcomes[0] as SetDataEventOutcome).changedFields.fields["caseref"].allowedNets
         assert list2.size() == 0
 
         caseOpt = caseRepository.findById(aCase.stringId)

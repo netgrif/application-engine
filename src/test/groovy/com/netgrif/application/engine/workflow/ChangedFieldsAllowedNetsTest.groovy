@@ -2,8 +2,10 @@ package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class ChangedFieldsAllowedNetsTest {
 
     private static final String TASK_TITLE = "Task"
@@ -55,39 +58,34 @@ class ChangedFieldsAllowedNetsTest {
                 [(TRIGGER_FIELD_ID): [
                         "value": "trigger",
                         "type" : "text"
-                ]]
+                ]] as Map<String, Map<String, String>>
         ))
 
         def changeMap = dataSet.outcomes
 
-        assert dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
-            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
-        }
-        assert (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
-            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
-        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID).attributes.containsKey(ALLOWED_NETS_KEY)
-
-        def newAllowedNets = (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
-            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID)
-        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID).attributes.get(ALLOWED_NETS_KEY)
+        SetDataEventOutcome outcome = dataSet.outcomes.find { EventOutcome eventOutcome ->
+            if (eventOutcome instanceof SetDataEventOutcome) {
+                eventOutcome.getChangedFields().fields.containsKey(CASE_REF_FIELD_ID)
+            }
+        } as SetDataEventOutcome
+        assert outcome
+        def newAllowedNets = outcome.changedFields.fields.get(CASE_REF_FIELD_ID).allowedNets
+        assert newAllowedNets != null
         assert newAllowedNets instanceof ArrayList
         assert newAllowedNets.size() == 1
         assert newAllowedNets.get(0) == NET_IDENTIFIER
 
-        assert dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
-            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
-        }
-        assert (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
-            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
-        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID2).attributes.containsKey(ALLOWED_NETS_KEY)
-
-        newAllowedNets = (dataSet.outcomes.find { SetDataEventOutcome eventOutcome ->
-            eventOutcome.getChangedFields().containsKey(CASE_REF_FIELD_ID2)
-        } as SetDataEventOutcome).getChangedFields().get(CASE_REF_FIELD_ID2).attributes.get(ALLOWED_NETS_KEY)
+        outcome = dataSet.outcomes.find { EventOutcome eventOutcome ->
+            if (eventOutcome instanceof SetDataEventOutcome) {
+                eventOutcome.getChangedFields().fields.containsKey(CASE_REF_FIELD_ID2)
+            }
+        } as SetDataEventOutcome
+        assert outcome
+        newAllowedNets = outcome.changedFields.fields.get(CASE_REF_FIELD_ID2).allowedNets
+        assert newAllowedNets != null
         assert newAllowedNets instanceof ArrayList
-        assert newAllowedNets.size() == 2
-        assert newAllowedNets.contains(NET_IDENTIFIER)
-        assert newAllowedNets.contains(NET_IDENTIFIER2)
+        assert newAllowedNets.size() == 1
+        assert newAllowedNets.get(0) == NET_IDENTIFIER2
 
     }
 }

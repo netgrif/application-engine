@@ -12,6 +12,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class SetDataOnButtonTest {
 
     @Autowired
@@ -111,7 +113,7 @@ class SetDataOnButtonTest {
                 "button_2": [
                         "type" : "button"
                 ]
-        ]))
+        ] as Map<String, Map<String, String>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
 

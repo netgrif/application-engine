@@ -11,6 +11,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.CaseSearchService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -43,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @Disabled("searchByMoreValues")
 @AutoConfigureMockMvc
+@CompileStatic
 class CaseSearchTest {
 
     @Autowired
@@ -82,7 +84,7 @@ class CaseSearchTest {
         importHelper.assignTaskToSuper("tran", case1.stringId)
         importHelper.assignTaskToSuper("tran", case2.stringId)
         importHelper.assignTaskToSuper("tran", case3.stringId)
-        importHelper.setTaskData("tran", case1.stringId, ["1": ["type": "number", "value": "25"]])
+        importHelper.setTaskData("tran", case1.stringId, ["1": ["type": "number", "value": "25"]] as Map<String, Map<String, String>>)
         importHelper.setTaskData("tran", case2.stringId, [
                 "1": [
                         "type" : "number",
@@ -92,7 +94,7 @@ class CaseSearchTest {
                         "type" : "text",
                         "value": "Bratislava"
                 ]
-        ])
+        ] as Map<String, Map<String, String>>)
         importHelper.setTaskData("tran", case3.stringId, [
                 "1": [
                         "type" : "number",
@@ -114,7 +116,7 @@ class CaseSearchTest {
                         "type" : "enumeration",
                         "value": "VALUE3"
                 ]
-        ])
+        ] as Map<String, Map<String, String>>)
 
         importHelper.updateSuperUser()
     }

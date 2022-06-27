@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAutho
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

@@ -6,8 +6,10 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.utils.InputStreamToString
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -19,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class WorkflowServiceTest {
 
     public static final String NET_FILE = "case_search_test.xml"
@@ -41,7 +44,7 @@ class WorkflowServiceTest {
     @Autowired
     private SuperCreator superCreator
 
-    private def stream = { String name ->
+    private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 

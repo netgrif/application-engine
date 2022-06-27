@@ -28,7 +28,6 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
 import com.netgrif.application.engine.petrinet.domain.dataset.*
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
@@ -39,6 +38,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.DataField
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -426,13 +426,13 @@ class ActionDelegate {
     }
 
     def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior) {
-        Map<String, Set<FieldBehavior>> fieldBehavior = useCase.dataSet.get(field.stringId).behavior
-        if (initialBehavior != null)
+        DataFieldBehavior fieldBehavior = useCase.dataSet.get(field.stringId).behavior
+        if (initialBehavior != null) {
             fieldBehavior.put(trans.stringId, initialBehavior)
+        }
 
-        ChangedField changedField = new ChangedField(field.stringId)
-        changedField.addAttribute("type", field.type.name)
-        changedField.addBehavior(fieldBehavior)
+        DataField changedField = new DataField(field.stringId)
+        changedField.setBehavior(fieldBehavior)
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)
@@ -661,13 +661,8 @@ class ActionDelegate {
             saveChangedValue(field)
         }
         // TODO: NAE-1645
-        ChangedField changedField = new ChangedField(field.stringId)
-        if (field instanceof I18nField) {
-            changedField.attributes.put("value", value)
-        } else {
-            changedField.addAttribute("value", value)
-        }
-        changedField.addAttribute("type", field.type.name)
+        DataField changedField = new DataField(field.stringId)
+        changedField.value = value
         SetDataEventOutcome outcome = createSetDataEventOutcome()
         outcome.addChangedField(field.stringId, changedField)
         this.outcomes.add(outcome)

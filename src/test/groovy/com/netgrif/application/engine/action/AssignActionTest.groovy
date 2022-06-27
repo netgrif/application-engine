@@ -81,7 +81,7 @@ class AssignActionTest {
     private MockMvc mvc
     private PetriNet mainNet
     private PetriNet secondaryNet
-    private Authentication authentication
+    private UsernamePasswordAuthenticationToken authentication
 
     @BeforeEach
     void before() {

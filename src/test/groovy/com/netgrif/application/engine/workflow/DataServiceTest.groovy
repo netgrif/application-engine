@@ -12,6 +12,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -27,6 +28,7 @@ import java.lang.reflect.Method
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class DataServiceTest {
 
     private static final String TASK_TITLE = "Transition";
@@ -84,17 +86,16 @@ class DataServiceTest {
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
 
         def changes = dataService.saveFile(taskId, fileField.stringId, file)
-        assert changes.changedFields.size() == 1
+        assert changes.changedFields.fields.size() == 1
         LocalisedField textField = findField(datagroups, TEXT_FIELD_TITLE)
-        assert changes.changedFields.containsKey(textField.stringId)
-        assert changes.changedFields.get(textField.stringId).containsKey("value")
-        assert changes.changedFields.get(textField.stringId).get("value") == "OK"
+        assert changes.changedFields.fields.containsKey(textField.stringId)
+        assert changes.changedFields.fields.get(textField.stringId).value == "OK"
     }
 
     LocalisedField findField(List<DataGroup> datagroups, String fieldTitle) {
-        def fieldDataGroup = datagroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
+        def fieldDataGroup = datagroups.find { it -> it.fields.find({ LocalisedField field -> (field.name == fieldTitle) }) != null }
         assert fieldDataGroup != null
-        LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
+        LocalisedField field = fieldDataGroup.fields.find({ LocalisedField field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
     }

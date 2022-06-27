@@ -217,7 +217,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, Map<String, Map<String, String>> data) {
-        ObjectNode dataSet = populateDataset(data)
+        DataSet dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }
 

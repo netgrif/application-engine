@@ -68,7 +68,6 @@ class TaskAuthorizationServiceTest {
     private Authentication userWithoutRoleAuth
     private Authentication adminAuth
 
-
     @Autowired
     private Importer importer
 

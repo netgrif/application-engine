@@ -9,10 +9,14 @@ import java.util.List;
 @Data
 public class FileListFieldValue {
 
-    private final HashSet<FileFieldValue> namesPaths;
+    private HashSet<FileFieldValue> namesPaths;
 
     public FileListFieldValue() {
-        this.namesPaths = new HashSet<>();
+        this(new HashSet<>());
+    }
+
+    public FileListFieldValue(HashSet<FileFieldValue> namesPaths) {
+        this.namesPaths = namesPaths;
     }
 
     public static FileListFieldValue fromString(String value) {

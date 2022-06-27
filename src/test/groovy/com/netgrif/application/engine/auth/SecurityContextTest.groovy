@@ -14,6 +14,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.security.service.ISecurityContextService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class SecurityContextTest {
 
     @Autowired
@@ -59,7 +61,6 @@ class SecurityContextTest {
 
     private PetriNet net
 
-
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -79,10 +80,12 @@ class SecurityContextTest {
         SecurityContextHolder.getContext().setAuthentication(token)
 
         processRoleService.assignRolesToUser(user.getStringId(), roleIds, superCreator.getLoggedSuper())
-        def updatedUser = userService.findById(user.getStringId(), false)
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        IUser updatedUser = userService.findById(user.getStringId(), false)
+        Set<String> updatedUserRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUserRoles
 
         securityContextService.reloadSecurityContext(updatedUser.transformToLoggedUser())
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        updatedUserRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUser
     }
 }

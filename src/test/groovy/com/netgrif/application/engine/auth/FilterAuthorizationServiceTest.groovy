@@ -11,15 +11,11 @@ import com.netgrif.application.engine.workflow.domain.repositories.FilterReposit
 import groovy.json.JsonOutput
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
-//import com.netgrif.application.engine.orgstructure.domain.Group
-
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -60,8 +56,8 @@ class FilterAuthorizationServiceTest {
     @Autowired
     private TestHelper testHelper
 
-    private Authentication userAuth
-    private Authentication adminAuth
+    private UsernamePasswordAuthenticationToken userAuth
+    private UsernamePasswordAuthenticationToken adminAuth
 
     @BeforeEach
     void before() {
@@ -79,16 +75,15 @@ class FilterAuthorizationServiceTest {
                 [] as ProcessRole[])
 
         userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
-        userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+        userAuth.details = new WebAuthenticationDetails(new MockHttpServletRequest())
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("admin")] as Authority[],
                 [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
-        adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+        adminAuth.details = new WebAuthenticationDetails(new MockHttpServletRequest())
     }
-
 
     @Test
     void testDeleteFilter() {

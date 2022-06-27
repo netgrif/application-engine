@@ -254,7 +254,7 @@ class ExportService implements IExportService {
             case FILE:
                 fieldValue = ((FileField) field).getValue().toString();
                 break;
-            case FILELIST:
+            case FILE_LIST:
                 fieldValue = String.join(",", ((FileListField) field).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
                 break;
             case TASK_REF:
@@ -263,7 +263,7 @@ class ExportService implements IExportService {
             case USER:
                 fieldValue = ((UserField) field).getValue().getEmail();
                 break;
-            case USERLIST:
+            case USER_LIST:
                 fieldValue = String.join(";", ((UserListField) field).getValue());
                 break;
             case NUMBER:

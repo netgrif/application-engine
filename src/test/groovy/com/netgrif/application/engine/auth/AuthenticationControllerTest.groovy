@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import groovy.transform.CompileStatic
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -38,6 +39,7 @@ import javax.mail.internet.MimeMultipart
 @ActiveProfiles(["test"])
 @SpringBootTest
 @Disabled("ClassCast")
+@CompileStatic
 class AuthenticationControllerTest {
 
     private static final String EMAIL = "tets@test.com"
@@ -93,7 +95,7 @@ class AuthenticationControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        controller.invite(new NewUserRequest(email: EMAIL, groups: [], processRoles: []), null)
+        controller.invite(new NewUserRequest(email: EMAIL, groups: [] as Set, processRoles: [] as Set), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)

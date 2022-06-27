@@ -23,6 +23,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -35,6 +36,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
+@CompileStatic
 class TaskControllerTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
@@ -159,7 +161,7 @@ class TaskControllerTest {
                         "value": userIds,
                         "type" : "userList"
                 ]
-        ]))
+        ] as Map<String, Map<String, String>>))
     }
 
     void setUserRole() {

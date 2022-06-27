@@ -4,11 +4,11 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 
-public class ButtonField extends Field<String> {
+public class ButtonField extends Field<Integer> {
 
     public ButtonField() {
         super();
-        this.setValue("");
+        this.setValue(0);
     }
 
     @Override

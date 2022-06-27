@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -22,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class TaskRefPropagationTest {
 
     @Autowired
@@ -191,9 +193,9 @@ class TaskRefPropagationTest {
 //    }
 //
     LocalisedField findField(List<DataGroup> dataGroups, String fieldTitle) {
-        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
+        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ LocalisedField field -> (field.name == fieldTitle) }) != null }
         assert fieldDataGroup != null
-        LocalisedField field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as LocalisedField
+        LocalisedField field = fieldDataGroup.fields.find({LocalisedField field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
     }

@@ -57,7 +57,11 @@ public class DataField implements Referencable {
     }
 
     public void setBehavior(Map<String, Set<FieldBehavior>> behavior) {
-        this.behavior = new DataFieldBehavior(behavior);
+        this.setBehavior(new DataFieldBehavior(behavior));
+    }
+
+    public void setBehavior(DataFieldBehavior behavior) {
+        this.behavior = behavior;
         update();
     }
 
