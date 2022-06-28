@@ -33,11 +33,11 @@ public class UriController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
     })
-    @RequestMapping(value = "/roots", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public CollectionModel<UriNode> getRoots() {
-        List<UriNode> uriNodes = uriService.getRoots();
-        uriNodes.forEach(uriService::populateDirectRelatives);
-        return new UriNodeResources(uriNodes);
+    @RequestMapping(value = "/root", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<UriNode> getRoot() {
+        UriNode uriNode = uriService.getRoot();
+        uriService.populateDirectRelatives(uriNode);
+        return new UriNodeResource(uriNode);
     }
 
     @ApiOperation(value = "Get one UriNode by URI path", authorizations = @Authorization("BasicAuth"))

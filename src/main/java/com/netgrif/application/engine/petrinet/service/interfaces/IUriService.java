@@ -22,10 +22,10 @@ public interface IUriService {
     List<UriNode> findAllByParent(String parentId);
 
     /**
-     * Retrieves all UriNode that are root nodes
-     * @return list of UriNode
+     * Retrieves UriNode that is root node
+     * @return root UriNode
      * */
-    List<UriNode> getRoots();
+    UriNode getRoot();
 
     /**
      * Retrieves UriNode based on level

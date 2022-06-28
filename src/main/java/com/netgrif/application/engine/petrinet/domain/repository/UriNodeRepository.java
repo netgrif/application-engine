@@ -15,5 +15,7 @@ public interface UriNodeRepository extends ElasticsearchRepository<UriNode, Stri
 
     List<UriNode> findAllByParentId(String parentId);
 
+    UriNode findByLevel(int level);
+
     List<UriNode> findAllByLevel(int level);
 }

@@ -58,8 +58,8 @@ public class UriService implements IUriService {
      * @return list of UriNode
      * */
     @Override
-    public List<UriNode> getRoots() {
-        return uriNodeRepository.findAllByLevel(firstLevel);
+    public UriNode getRoot() {
+        return uriNodeRepository.findByLevel(firstLevel);
     }
 
     /**

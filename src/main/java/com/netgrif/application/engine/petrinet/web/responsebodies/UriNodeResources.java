@@ -16,7 +16,7 @@ public class UriNodeResources extends CollectionModel<UriNode> {
 
     private void buildLinks(){
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UriController.class)
-                .getRoots()).withSelfRel());
+                .getRoot()).withSelfRel());
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UriController.class)
                 .getByLevel(0)).withSelfRel());
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UriController.class)

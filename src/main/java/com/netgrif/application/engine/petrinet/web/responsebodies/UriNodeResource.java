@@ -16,7 +16,7 @@ public class UriNodeResource extends EntityModel<UriNode> {
         UriNode content = getContent();
         if (content != null) {
             add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                            .methodOn(UriController.class).getRoots())
+                            .methodOn(UriController.class).getRoot())
                     .withSelfRel());
 
             add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
