@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -19,7 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class UriService implements IUriService {
 
-    private static final String uriSeparator = "/";
+    @Value("${nae.uri.separator:/}")
+    private String uriSeparator;
 
     /*TODO: insted of multiple roots, there will be one root with level marking*/
     private static final String defaultRootUri = "root";
