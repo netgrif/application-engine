@@ -61,7 +61,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
         PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
         if (filter != null) {
             log.info("${message} has already been imported.")
-            return Optional.of(filter)
+            return new Optional<>(filter)
         }
 
         Optional<PetriNet> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
