@@ -174,7 +174,7 @@ public class UriService implements IUriService {
         String[] uriComponents = uri.split(uriSeparator);
         StringBuilder uriBuilder = new StringBuilder();
         int pathLength = uriComponents.length;
-        UriNode parent = pathLength > 1 ? uriNodeRepository.findByUriPath(defaultRootUri) : null;
+        UriNode parent = pathLength > 1 || !uri.equals(defaultRootUri) ? uriNodeRepository.findByUriPath(defaultRootUri) : null;
 
         for (int i = 0; i < pathLength; i++) {
             uriBuilder.append(uriComponents[i]);

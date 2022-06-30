@@ -69,10 +69,10 @@ public class NextGroupService implements INextGroupService {
     protected ISecurityContextService securityContextService;
 
 
-    protected final static String GROUP_NET_IDENTIFIER = "netgrif/organisation/groups/org_group";
+    protected final static String GROUP_NET_IDENTIFIER = "org_group";
     protected final static String GROUP_INIT_TASK_ID = "2";
 
-    protected final static String GROUP_CASE_IDENTIFIER = "netgrif/organisation/groups/org_group";
+    protected final static String GROUP_CASE_IDENTIFIER = "org_group";
     protected final static String GROUP_MEMBERS_FIELD = "members";
     protected final static String GROUP_AUTHOR_FIELD = "author";
     protected final static String GROUP_TITLE_FIELD = "group_name";

@@ -51,9 +51,9 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     private static final Logger log = LoggerFactory.getLogger(FilterImportExportService.class);
 
-    private static final String EXPORT_NET_IDENTIFIER = "netgrif/organisation/filters/export_filters";
-    private static final String IMPORT_NET_IDENTIFIER = "netgrif/organisation/filters/import_filters";
-    private static final String FILTER_NET_IDENTIFIER = "netgrif/organisation/filters/filter";
+    private static final String EXPORT_NET_IDENTIFIER = "export_filters";
+    private static final String IMPORT_NET_IDENTIFIER = "import_filters";
+    private static final String FILTER_NET_IDENTIFIER = "filter";
 
     private static final String UPLOAD_FILE_FIELD = "upload_file";
 

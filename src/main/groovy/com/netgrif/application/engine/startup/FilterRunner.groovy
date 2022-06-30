@@ -22,16 +22,16 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     private SystemUserRunner systemCreator
 
     private static final String FILTER_FILE_NAME = "engine-processes/filter.xml"
-    public static final String FILTER_PETRI_NET_IDENTIFIER = "netgrif/organisation/filters/filter"
+    public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
 
     private static final String PREFERRED_FILTER_ITEM_FILE_NAME = "engine-processes/preference_filter_item.xml"
-    private static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "netgrif/organisation/filters/preference_filter_item"
+    private static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "preference_filter_item"
 
     private static final String EXPORT_FILTER_FILE_NAME = "engine-processes/export_filters.xml"
-    private static final String EXPORT_NET_IDENTIFIER = "netgrif/organisation/filters/export_filters"
+    private static final String EXPORT_NET_IDENTIFIER = "export_filters"
 
     private static final String IMPORT_FILTER_FILE_NAME = "engine-processes/import_filters.xml"
-    private static final String IMPORT_NET_IDENTIFIER = "netgrif/organisation/filters/import_filters"
+    private static final String IMPORT_NET_IDENTIFIER = "import_filters"
 
     @Override
     void run(String... args) throws Exception {

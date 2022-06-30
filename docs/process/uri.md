@@ -12,7 +12,7 @@ that is unique for process. E.g.:
 
 ```xml
 <!-- New form -->
-<id>netgrif/example/data/all_data</id>
+<id>data/all_data</id>
 ```
 
 ## Structure

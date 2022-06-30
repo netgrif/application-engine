@@ -111,7 +111,6 @@ public class Case {
 
     @Getter
     @Setter
-    @JsonIgnore
     private Set<TaskPair> tasks;
 
     @Getter

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-	<id>netgrif/organisation/groups/org_group</id>
+	<id>org_group</id>
 	<version>1.0.0</version>
 	<initials>GRP</initials>
 	<title>Organization group</title>
@@ -161,7 +161,8 @@
 				return;
 			}
 
-			def optionCase = createCase("preference_filter_item")
+			def filterCase = findCase({it._id.eq(filterAutocomplete.value)})
+			def optionCase = createCase("preference_filter_item", filterCase == null ? "" : filterCase.title)
 			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 			assignTask(initTask)
 			setData(initTask, [
@@ -486,7 +487,7 @@
 					filterCaseIds = []
 
 					defaultFilters.forEach { filterCase -&gt;
-						def optionCase = createCase("preference_filter_item")
+						def optionCase = createCase("preference_filter_item", filterCase.title + " filter preference")
 
 						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 						assignTask(initTask)
