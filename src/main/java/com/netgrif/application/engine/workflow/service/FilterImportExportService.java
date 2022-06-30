@@ -202,7 +202,6 @@ public class FilterImportExportService implements IFilterImportExportService {
                 if (parentId == null) {
                     log.error("Imported filter with ID '" + filter.getCaseId() + "' could not find an imported mapping of its parent case with original ID '" + filter.getParentCaseId() + "'");
                 }
-                viewOrigin = false;
             } else if (filter.getParentViewId() != null && !filter.getParentViewId().equals("")) {
                 parentId = filter.getParentViewId();
                 viewOrigin = true;
@@ -224,7 +223,7 @@ public class FilterImportExportService implements IFilterImportExportService {
                     true
             );
 
-            if (!filterCase.isPresent()) {
+            if (filterCase.isEmpty()) {
                 return;
             }
 

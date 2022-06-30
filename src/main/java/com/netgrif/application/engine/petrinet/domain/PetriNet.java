@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -29,9 +28,15 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
+
+    /*TODO: change on UriNode Move action*/
     @Getter
     @Setter
     private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
+
+    @Getter
+    @Setter
+    private String uriNodeId;
 
     @Getter
     private I18nString title;
@@ -400,6 +405,7 @@ public class PetriNet extends PetriNetObject {
     public PetriNet clone() {
         PetriNet clone = new PetriNet();
         clone.setIdentifier(this.identifier);
+        clone.setUriNodeId(this.uriNodeId);
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultRoleEnabled(this.defaultRoleEnabled);

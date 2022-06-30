@@ -9,10 +9,9 @@ import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriN
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.petrinet.domain.*;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -108,6 +107,9 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private IHistoryService historyService;
 
+    @Autowired
+    private IUriService uriService;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     protected Importer getImporter() {
@@ -165,6 +167,8 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
+        UriNode uriNode = uriService.getOrCreate(net, UriContentType.PROCESS);
+        net.setUriNodeId(uriNode.getId());
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
@@ -237,6 +241,13 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNet> getByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findAllByIdentifier(identifier);
+        nets.forEach(PetriNet::initializeArcs);
+        return nets;
+    }
+
+    @Override
+    public List<PetriNet> findAllByUri(String uri) {
+        List<PetriNet> nets = repository.findAllByUriNodeId(uri);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }

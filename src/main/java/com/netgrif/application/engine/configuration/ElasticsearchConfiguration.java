@@ -25,6 +25,9 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.index.task}")
     private String taskIndex;
 
+    @Value("${spring.data.elasticsearch.index.uri}")
+    private String uriIndex;
+
     @Value("${spring.data.elasticsearch.reindex}")
     private String cron;
 
@@ -41,6 +44,11 @@ public class ElasticsearchConfiguration {
     @Bean
     public String elasticTaskIndex() {
         return taskIndex;
+    }
+
+    @Bean
+    public String elasticUriIndex() {
+        return uriIndex;
     }
 
     @Bean

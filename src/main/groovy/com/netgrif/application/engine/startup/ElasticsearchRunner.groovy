@@ -3,6 +3,7 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
+import com.netgrif.application.engine.petrinet.domain.UriNode
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -30,6 +31,9 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.elasticsearch.index.task}')
     private String taskIndex
 
+    @Value('${spring.data.elasticsearch.index.uri}')
+    private String uriIndex
+
     @Autowired
     private IElasticIndexService template
 
@@ -39,6 +43,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
+            template.deleteIndex(UriNode.class)
         }
         if (!template.indexExists(caseIndex)) {
             log.info "Creating Elasticsearch case index [${caseIndex}]"
@@ -52,9 +57,17 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         } else {
             log.info "Elasticsearch task index exists [${taskIndex}]"
         }
+        if (!template.indexExists(uriIndex)) {
+            log.info "Creating Elasticsearch uri index [${uriIndex}]"
+            template.createIndex(UriNode.class)
+        } else {
+            log.info "Elasticsearch uri index exists [${uriIndex}]"
+        }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
+        log.info("Updating Elasticsearch uri mapping [${uriIndex}]")
+        template.putMapping(UriNode.class)
     }
 }
