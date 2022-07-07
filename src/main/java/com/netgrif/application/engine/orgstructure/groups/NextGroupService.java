@@ -126,7 +126,12 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findDefaultGroup() {
-        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq("Default system group")));
+        return findByName("Default system group");
+    }
+
+    @Override
+    public Case findByName(String name) {
+        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq(name)));
     }
 
     @Override
