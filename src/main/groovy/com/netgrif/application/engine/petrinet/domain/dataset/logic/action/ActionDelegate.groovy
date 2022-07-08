@@ -1467,7 +1467,7 @@ class ActionDelegate {
              ])
          },
          allowedNets: { cl ->
-             String currentQuery = filter.dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
+             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
              updateFilter(filter, [
                      (DefaultFiltersRunner.FILTER_FIELD_ID): [
                              "type"       : "filter",
@@ -1477,7 +1477,7 @@ class ActionDelegate {
              ])
          },
          filterMetadata: { cl ->
-             String currentQuery = filter.dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
+             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
              updateFilter(filter, [
                      (DefaultFiltersRunner.FILTER_FIELD_ID): [
                              "type"          : "filter",
@@ -1487,16 +1487,19 @@ class ActionDelegate {
              ])
          },
          title      : { cl ->
+             filter = workflowService.findOne(filter.stringId)
              def value = cl()
              filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
              workflowService.save(filter)
          },
          icon       : { cl ->
+             filter = workflowService.findOne(filter.stringId)
              def icon = cl() as String
              filter.setIcon(icon)
              workflowService.save(filter)
          },
          uri        : { cl ->
+             filter = workflowService.findOne(filter.stringId)
              def uri = cl() as String
              filter.setUriNodeId(uriService.findByUri(uri).id)
              workflowService.save(filter)
@@ -1587,6 +1590,7 @@ class ActionDelegate {
              ])
          },
          uri         : { cl ->
+             item = workflowService.findOne(item.stringId)
              def uri = cl() as String
              item.setUriNodeId(uriService.findByUri(uri).id)
              workflowService.save(item)
@@ -1594,6 +1598,7 @@ class ActionDelegate {
     }
 
     private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
+        item = workflowService.findOne(item.stringId)
         def roles = cl()
         def dataField = item.dataSet[roleFieldId]
         if (roles instanceof List<ProcessRole>) {
@@ -1610,9 +1615,10 @@ class ActionDelegate {
      * @return
      */
     def deleteMenuItem(Case item) {
-        setData("view", item, [
+        def task = item.tasks.find { it.transition == "view" }.task
+        dataService.setData(task, ImportHelper.populateDataset([
                 "remove_option": ["type": "button", "value": 0]
-        ])
+        ]))
     }
 
     /**
@@ -1687,9 +1693,10 @@ class ActionDelegate {
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
 
-        setData("append_menu_item", orgGroup, [
+        def task = orgGroup.tasks.find { it.transition == "append_menu_item" }.task
+        dataService.setData(task, ImportHelper.populateDataset([
                 "append_menu_item_stringId": ["type": "text", "value": itemCase.stringId]
-        ])
+        ]))
 
         return workflowService.findOne(itemCase.stringId)
     }
@@ -1710,8 +1717,8 @@ class ActionDelegate {
      * @param name
      * @return
      */
-    Case findMenuItem(String uri, String name) {
-        return findMenuItem(uri, name, null)
+    Case findMenuItem(String uri, String name) { // TODO find by menu_identifier instead
+        return findMenuItemInGroup(uri, name, null)
     }
 
     /**
@@ -1723,7 +1730,7 @@ class ActionDelegate {
      */
     Case findMenuItem(String uri, String name, String groupName) {
         Case orgGroup = nextGroupService.findByName(groupName)
-        return findMenuItem(uri, name, orgGroup)
+        return findMenuItemInGroup(uri, name, orgGroup)
     }
 
     /**
@@ -1733,14 +1740,24 @@ class ActionDelegate {
      * @param orgGroup
      * @return
      */
-    Case findMenuItem(String uri, String name, Case orgGroup) {
+    Case findMenuItemInGroup(String uri, String name, Case orgGroup) {
         return findCaseByUriNameProcessAndGroup(uri, name, "preference_filter_item", orgGroup)
+    }
+
+    /**
+     * Retrieve filter case from preference_filter_item case
+     * @param item
+     * @return
+     */
+    Case getFilterFromMenuItem(Case item) {
+        return workflowService.findOne((item.dataSet["filter_case"].value as List)[0] as String)
     }
 
     private Case findCaseByUriNameProcessAndGroup(String uri, String name, String identifier, Case orgGroup) {
         UriNode uriNode = uriService.findByUri(uri)
         if (!orgGroup) {
-            return uriNode ? findCase { it.processIdentifier.eq(identifier) & it.title.eq(name) & it.uriNodeId.eq(uriNode)} : null
+            // todo elastic?
+            return uriNode ? findCase { it.processIdentifier.eq(identifier) & it.title.eq(name) & it.uriNodeId.eq(uriNode.id)} : null
         }
         List<Case> preferenceItemsOfGroup = workflowService.findAllById((orgGroup.dataSet["filter_tasks"].value ?: []) as List)
         return preferenceItemsOfGroup.find { it.title == name && it.uriNodeId == uriNode.id }
@@ -1765,9 +1782,8 @@ class ActionDelegate {
         } as Map<String, I18nString>
     }
 
-    private Case updateFilter(Case filter, Map dataSet) {
+    private void updateFilter(Case filter, Map dataSet) {
         setData("t2", filter, dataSet)
-        return workflowService.findOne(filter.stringId)
     }
 
     I18nString i18n(String value, Map<String, String> translations) {
