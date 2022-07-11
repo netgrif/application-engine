@@ -251,7 +251,7 @@ class ExportService implements IExportService {
                 fieldValue = ((EnumerationMapField) fieldData).getOptions().get(fieldData).getDefaultValue();
                 break;
             case MULTICHOICE:
-                fieldValue = String.join(",", ((MultichoiceField) fieldData).getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet()));
+                fieldValue = String.join(",", ((List<I18nString>) fieldData).stream().map(I18nString::toString).collect(Collectors.toList()));
                 break;
             case FILE:
                 fieldValue = ((FileField) fieldData).getValue().toString();
