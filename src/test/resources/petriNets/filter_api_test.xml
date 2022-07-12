@@ -65,7 +65,7 @@
 					group: f.group,
 					icon: f.icon;
 
-					def filter = createCaseFilter("netgrif/test", "Test filter", query.value, type.value, ["netgrif/test/filter_api_test"], icon.value)
+					def filter = createCaseFilter("netgrif/test", "Test filter", query.value, ["netgrif/test/filter_api_test"], icon.value)
 
 					if (group.value) {
 						def item = createMenuItem("netgrif/test",
@@ -135,7 +135,7 @@
 					group: f.group,
 					icon: f.icon;
 
-					createFilterInGroup(
+					createFilterInMenu(
 							"netgrif/test",
 							"New test filter",
 							query.value,

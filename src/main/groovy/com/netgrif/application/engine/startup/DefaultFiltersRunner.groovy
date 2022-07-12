@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value
 class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
 
     public static final String AUTO_CREATE_TRANSITION = "auto_create"
+    public static final String DETAILS_TRANSITION = "t2"
 
     public static final String FILTER_TYPE_FIELD_ID = "filter_type"
     public static final String FILTER_ORIGIN_VIEW_ID_FIELD_ID = "origin_view_id"
@@ -35,6 +36,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     public static final String FILTER_TYPE_CASE = "Case"
     public static final String FILTER_TYPE_TASK = "Task"
 
+    public static final String FILTER_VISIBILITY_PRIVATE = "private"
     public static final String FILTER_VISIBILITY_PUBLIC = "public"
 
     @Value('${nae.create.default.filters:false}')
