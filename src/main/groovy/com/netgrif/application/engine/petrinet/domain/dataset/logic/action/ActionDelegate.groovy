@@ -1455,7 +1455,9 @@ class ActionDelegate {
     }
 
     /**
-     * Change filter instance attribute; query, visibility ("public"/"private"), title, allowedNets or uri
+     * Change filter instance attribute; query, visibility ("public"/"private"), title, allowedNets, filterMetadata or uri
+     * if filter is referenced within a menu item, reload said menu item using
+     * changeMenuItem item filter { filter }
      * @param filter
      * @return
      */
@@ -1530,7 +1532,7 @@ class ActionDelegate {
     /**
      * create menu item for given filter instance
      * @param uri
-     * @param identifier
+     * @param identifier - unique item identifier
      * @param filter
      * @param groupName
      * @param allowedRoles ["role_import_id": "net_import_id"]
@@ -1544,7 +1546,7 @@ class ActionDelegate {
     /**
      * create menu item for given filter instance
      * @param uri
-     * @param identifier
+     * @param identifier - unique item identifier
      * @param filter
      * @param groupName
      * @param allowedRoles
@@ -1558,12 +1560,12 @@ class ActionDelegate {
     /**
      * create menu item for given filter instance
      * @param uri
-     * @param identifier
+     * @param identifier - unique item identifier
      * @param filter
      * @param groupName
      * @param allowedRoles ["role_import_id": "net_import_id"]
      * @param bannedRoles ["role_import_id": "net_import_id"]
-     * @param group
+     * @param group - if null, default group is used
      * @return
      */
     Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null) {
@@ -1573,11 +1575,11 @@ class ActionDelegate {
     /**
      * create menu item for given filter instance
      * @param uri
-     * @param identifier
+     * @param identifier - unique item identifier
      * @param filter
      * @param allowedRoles
      * @param bannedRoles
-     * @param group
+     * @param group - if null, default group is used
      * @return
      */
     Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null) {
@@ -1637,17 +1639,18 @@ class ActionDelegate {
     }
 
     /**
-     * simplifies the process of creating a filter, menu item and adding it to a group
+     * simplifies the process of creating a filter, menu item
      * @param uri
+     * @param identifier - unique identifier of menu item
      * @param title
      * @param query
      * @param icon
-     * @param type
-     * @param orgGroup
+     * @param type - "Case" or "Task"
      * @param allowedNets
+     * @param groupName - name of group to add menu item to
      * @param allowedRoles
      * @param bannedRoles
-     * @param visibility
+     * @param visibility - "private" or "public"
      * @return
      */
     Case createFilterInMenu(String uri, String identifier, def title, String query, String type,
@@ -1663,17 +1666,18 @@ class ActionDelegate {
     }
 
     /**
-     * simplifies the process of creating a filter, menu item and adding it to a group
+     * simplifies the process of creating a filter, menu item
      * @param uri
+     * @param identifier - unique identifier of menu item
      * @param title
      * @param query
      * @param icon
-     * @param type
-     * @param orgGroup
+     * @param type - "Case" or "Task"
      * @param allowedNets
      * @param allowedRoles
      * @param bannedRoles
-     * @param visibility
+     * @param visibility - "private" or "public"
+     * @param orgGroup - group to add item to, if null default group is used
      * @return
      */
     Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
@@ -1725,7 +1729,7 @@ class ActionDelegate {
     }
 
     /**
-     *
+     * find filter by uri and title
      * @param uri
      * @param name
      * @return
@@ -1735,7 +1739,7 @@ class ActionDelegate {
     }
 
     /**
-     *
+     * find menu item by unique identifier
      * @param name
      * @return
      */
@@ -1744,7 +1748,7 @@ class ActionDelegate {
     }
 
     /**
-     *
+     * find menu item by uri and name in default group
      * @param uri
      * @param name
      * @return
@@ -1754,7 +1758,7 @@ class ActionDelegate {
     }
 
     /**
-     *
+     * find menu item by uri, title and name of group
      * @param uri
      * @param name
      * @param groupName
@@ -1807,11 +1811,10 @@ class ActionDelegate {
         return result
     }
 
-    private Case findCaseByUriNameProcessAndGroup(String uri, String name, String identifier, Case orgGroup) {
+    private Case findCaseByUriNameProcessAndGroup(String uri, String name, String processIdentifier, Case orgGroup) {
         UriNode uriNode = uriService.findByUri(uri)
         if (!orgGroup) {
-            // todo elastic
-            return uriNode ? findCase { it.processIdentifier.eq(identifier) & it.title.eq(name) & it.uriNodeId.eq(uriNode.id)} : null
+            return uriNode ? findCaseElastic("processIdentifier.keyword:\"$processIdentifier\" AND title.keyword:\"$name\") AND uriNodeId.keyword:\"$uriNode.id\"") : null
         }
         List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
         if (!taskIds) {

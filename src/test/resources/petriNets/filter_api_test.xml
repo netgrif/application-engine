@@ -12,6 +12,11 @@
 		<title>Role 1</title>
 	</role>
 
+	<role>
+		<id>role_2</id>
+		<title>Role 2</title>
+	</role>
+
 	<processEvents>
 		<event type="upload">
 			<id>upload</id>
@@ -23,15 +28,20 @@
 		</event>
 	</processEvents>
 
+
+	<data type="text">
+		<id>menu_stringId</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>filter_stringId</id>
+		<title/>
+	</data>
+
 	<data type="text">
 		<id>query</id>
 		<title/>
-		<init>processIdentifier:netgrif/test/filter_api_test</init>
-	</data>
-	<data type="text">
-		<id>type</id>
-		<title/>
-		<init>Case</init>
+		<init>processIdentifier:"netgrif/test/filter_api_test"</init>
 	</data>
 	<data type="text">
 		<id>icon</id>
@@ -39,18 +49,24 @@
 		<init>device_hub</init>
 	</data>
 	<data type="text">
+		<id>uri</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>allowed_nets</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>title</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>identifier</id>
+		<title/>
+	</data>
+	<data type="text">
 		<id>group</id>
 		<title>Skupina</title>
-	</data>
-	<data type="button">
-		<id>remove_group</id>
-		<title>Zmaž skupinu</title>
-
-		<action trigger="set">
-			group: f.group;
-
-			change group value { null }
-		</action>
 	</data>
 
 	<data type="button">
@@ -60,26 +76,33 @@
 		<event type="set">
 			<actions phase="post">
 				<action>
+					menu_stringId: f.menu_stringId,
+					filter_stringId: f.filter_stringId,
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
 					query: f.query,
-					type: f.type,
 					group: f.group,
+					identifier: f.identifier,
 					icon: f.icon;
 
-					def filter = createCaseFilter("netgrif/test", "Test filter", query.value, ["netgrif/test/filter_api_test"], icon.value)
+					def filter = createCaseFilter(uri.value, title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
+					def item
 
 					if (group.value) {
-						def item = createMenuItem("netgrif/test", "menu_item",
+						item = createMenuItem(uri.value, identifier.value,
 								filter,
 								group.value,
 								["role_1": "netgrif/test/filter_api_test"]
 						)
 					} else {
-						def item = createMenuItem("netgrif/test", "menu_item",
+						item = createMenuItem(uri.value, identifier.value,
 								filter,
 								["role_1": "netgrif/test/filter_api_test"]
 						)
 					}
-
+					change menu_stringId value { item.stringId }
+					change filter_stringId value { filter.stringId }
 				</action>
 			</actions>
 		</event>
@@ -91,19 +114,32 @@
 		<event type="set">
 			<actions phase="post">
 				<action>
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
 					query: f.query,
-					type: f.type,
 					group: f.group,
+					identifier: f.identifier,
 					icon: f.icon;
 
-					def item = findMenuItem("netgrif/test", "Test filter")
+					def item = findMenuItem(identifier.value)
 					def filter = getFilterFromMenuItem(item)
-					changeFilter filter query { query.value + " OR processIdentifier:filter" }
-					changeFilter filter allowedNets { ["netgrif/test/filter_api_test", "filter"] }
-					changeFilter filter icon { "file_upload" }
-					changeFilter filter title { "Nový názov" }
+
+					changeFilter filter query { query.value }
+					changeFilter filter allowedNets { allowed_nets.value.split(",") as List }
+					changeFilter filter icon { icon.value }
+					changeFilter filter title { title.value }
+					changeFilter filter filterMetadata { [
+							"searchCategories"       : [],
+							"predicateMetadata"      : [],
+							"filterType"             : type,
+							"defaultSearchCategories": false,
+							"inheritAllowedNets"     : false
+					] }
 
 					changeMenuItem item filter { filter }
+					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
+					changeMenuItem item uri { uri.value }
 				</action>
 			</actions>
 		</event>
@@ -115,7 +151,10 @@
 		<event type="set">
 			<actions phase="post">
 				<action>
-					def item = findMenuItem("netgrif/test", "Test filter")
+					menu_stringId: f.menu_stringId,
+					identifier: f.identifier;
+
+					def item = workflowService.findOne(menu_stringId.value)
 					def filter = getFilterFromMenuItem(item)
 
 					deleteMenuItem(item)
@@ -131,22 +170,31 @@
 		<event type="set">
 			<actions phase="post">
 				<action>
+					menu_stringId: f.menu_stringId,
+					filter_stringId: f.filter_stringId,
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
 					query: f.query,
-					type: f.type,
 					group: f.group,
+					identifier: f.identifier,
 					icon: f.icon;
 
-					createFilterInMenu(
-							"netgrif/test",
-							"test_filter_item",
-							"New test filter",
+					def item = createFilterInMenu(
+							uri.value,
+							identifier.value,
+							title.value,
 							query.value,
 							type.value,
-							["netgrif/test/filter_api_test"],
+							allowed_nets.value.split(",") as List,
 							["role_1": "netgrif/test/filter_api_test"],
 							[:],
 							icon.value
 					)
+					def filter = getFilterFromMenuItem(item)
+
+					change menu_stringId value { item.stringId }
+					change filter_stringId value { filter.stringId }
 				</action>
 			</actions>
 		</event>
@@ -176,168 +224,7 @@
 		<id>t1</id>
 		<x>700</x>
 		<y>180</y>
-		<label>Create filter and menu item</label>
-		<dataGroup>
-			<id>t1_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>query</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>type</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>group</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>remove_group</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-
-			<dataRef>
-				<id>create_filter_and_menu</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>change_filter_and_menu</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>delete_filter_and_menu</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>4</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>create_filter_in_group</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>5</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>find_filter</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>6</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>found_filter</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>6</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
+		<label>TEST API</label>
 		<event type="assign">
 			<id>t1_assign</id>
 		</event>
