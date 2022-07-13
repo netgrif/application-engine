@@ -131,7 +131,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findByName(String name) {
-        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq(name))); // todo elastic?
+        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq(name))); // todo elastic
     }
 
     @Override

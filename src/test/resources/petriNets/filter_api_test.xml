@@ -68,13 +68,13 @@
 					def filter = createCaseFilter("netgrif/test", "Test filter", query.value, ["netgrif/test/filter_api_test"], icon.value)
 
 					if (group.value) {
-						def item = createMenuItem("netgrif/test",
+						def item = createMenuItem("netgrif/test", "menu_item",
 								filter,
 								group.value,
 								["role_1": "netgrif/test/filter_api_test"]
 						)
 					} else {
-						def item = createMenuItem("netgrif/test",
+						def item = createMenuItem("netgrif/test", "menu_item",
 								filter,
 								["role_1": "netgrif/test/filter_api_test"]
 						)
@@ -101,6 +101,7 @@
 					changeFilter filter query { query.value + " OR processIdentifier:filter" }
 					changeFilter filter allowedNets { ["netgrif/test/filter_api_test", "filter"] }
 					changeFilter filter icon { "file_upload" }
+					changeFilter filter title { "Nový názov" }
 
 					changeMenuItem item filter { filter }
 				</action>
@@ -137,6 +138,7 @@
 
 					createFilterInMenu(
 							"netgrif/test",
+							"test_filter_item",
 							"New test filter",
 							query.value,
 							type.value,

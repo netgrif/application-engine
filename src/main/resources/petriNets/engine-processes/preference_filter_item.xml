@@ -276,6 +276,10 @@
 		<id>new_filter_id</id>
 		<title/>
 	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title>Identifikátor (Filter API)</title>
+	</data>
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
 <!--		<title>Translate menu item title?</title>-->

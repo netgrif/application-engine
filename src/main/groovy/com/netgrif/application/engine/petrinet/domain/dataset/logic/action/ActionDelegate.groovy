@@ -68,6 +68,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
@@ -85,6 +86,7 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
     private static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
     private static final String PREFERENCE_ITEM_FIELD_PARENTID = "parentId"
+    private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
     private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
     private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
@@ -1497,6 +1499,7 @@ class ActionDelegate {
          title      : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def value = cl()
+             filter.setTitle(value as String)
              filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
              workflowService.save(filter)
          },
@@ -1527,32 +1530,35 @@ class ActionDelegate {
     /**
      * create menu item for given filter instance
      * @param uri
+     * @param identifier
      * @param filter
      * @param groupName
      * @param allowedRoles ["role_import_id": "net_import_id"]
      * @param bannedRoles ["role_import_id": "net_import_id"]
      * @return
      */
-    Case createMenuItem(String uri, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:]) {
-        return doCreateMenuItem(uri, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:]) {
+        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
     }
 
     /**
      * create menu item for given filter instance
      * @param uri
+     * @param identifier
      * @param filter
      * @param groupName
      * @param allowedRoles
      * @param bannedRoles
      * @return
      */
-    Case createMenuItem(String uri, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = []) {
-        return doCreateMenuItem(uri, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = []) {
+        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
     }
 
     /**
      * create menu item for given filter instance
      * @param uri
+     * @param identifier
      * @param filter
      * @param groupName
      * @param allowedRoles ["role_import_id": "net_import_id"]
@@ -1560,21 +1566,22 @@ class ActionDelegate {
      * @param group
      * @return
      */
-    Case createMenuItem(String uri, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null) {
-        return doCreateMenuItem(uri, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null) {
+        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
     }
 
     /**
      * create menu item for given filter instance
      * @param uri
+     * @param identifier
      * @param filter
      * @param allowedRoles
      * @param bannedRoles
      * @param group
      * @return
      */
-    Case createMenuItem(String uri, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null) {
-        return doCreateMenuItem(uri, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null) {
+        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
     }
 
     /**
@@ -1643,14 +1650,15 @@ class ActionDelegate {
      * @param visibility
      * @return
      */
-    Case createFilterInMenu(String uri, def title, String query, String type, List<String> allowedNets,
-                             String groupName,
-                             Map<String, String> allowedRoles = [:],
-                             Map<String, String> bannedRoles = [:],
-                             String icon = "",
-                             String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
+    Case createFilterInMenu(String uri, String identifier, def title, String query, String type,
+                            List<String> allowedNets,
+                            String groupName,
+                            Map<String, String> allowedRoles = [:],
+                            Map<String, String> bannedRoles = [:],
+                            String icon = "",
+                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
         Case filter = createFilter(uri, title, query, type, allowedNets, icon, visibility, null)
-        Case menuItem = createMenuItem(uri, filter, groupName, allowedRoles, bannedRoles)
+        Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles)
         return menuItem
     }
 
@@ -1668,18 +1676,21 @@ class ActionDelegate {
      * @param visibility
      * @return
      */
-    Case createFilterInMenu(String uri, def title, String query, String type, List<String> allowedNets,
+    Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
                              Map<String, String> allowedRoles = [:],
                              Map<String, String> bannedRoles = [:],
                              String icon = "",
                              String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
                              Case orgGroup = null) {
         Case filter = createFilter(uri, title, query, type, allowedNets, icon, visibility, null)
-        Case menuItem = createMenuItem(uri, filter, allowedRoles, bannedRoles, orgGroup)
+        Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup)
         return menuItem
     }
 
-    private Case doCreateMenuItem(String uri, Case filter, Case orgGroup, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles) {
+    private Case doCreateMenuItem(String uri, String identifier, Case filter, Case orgGroup, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles) {
+        if (findMenuItem(identifier)) {
+            throw new IllegalArgumentException("Menu item identifier $identifier is not unique!")
+        }
         orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
         Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
         itemCase.setUriNodeId(uriService.findByUri(uri).id)
@@ -1696,6 +1707,10 @@ class ActionDelegate {
                 (PREFERENCE_ITEM_FIELD_PARENTID): [
                         "type" : "text",
                         "value": orgGroup.stringId
+                ],
+                (PREFERENCE_ITEM_FIELD_IDENTIFIER): [
+                        "type" : "text",
+                        "value": identifier
                 ],
         ]
         setData(newItemTask, setDataMap)
@@ -1721,11 +1736,20 @@ class ActionDelegate {
 
     /**
      *
+     * @param name
+     * @return
+     */
+    Case findMenuItem(String menuItemIdentifier) {
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
+    }
+
+    /**
+     *
      * @param uri
      * @param name
      * @return
      */
-    Case findMenuItem(String uri, String name) { // TODO find by menu_identifier instead
+    Case findMenuItem(String uri, String name) {
         return findMenuItemInGroup(uri, name, null)
     }
 
@@ -1761,10 +1785,32 @@ class ActionDelegate {
         return workflowService.findOne((item.dataSet[PREFERENCE_ITEM_FIELD_FILTER_CASE].value as List)[0] as String)
     }
 
+    /**
+     * search elastic with string query for first occurrence
+     * @param query
+     * @return
+     */
+    Case findCaseElastic(String query) {
+        def result = findCasesElastic(query, PageRequest.of(0, 1))
+        return result ? result[0] : null
+    }
+
+    /**
+     * search elastic with string query for cases
+     * @param query
+     * @return
+     */
+    List<Case> findCasesElastic(String query, Pageable pageable) {
+        CaseSearchRequest request = new CaseSearchRequest()
+        request.query = query
+        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        return result
+    }
+
     private Case findCaseByUriNameProcessAndGroup(String uri, String name, String identifier, Case orgGroup) {
         UriNode uriNode = uriService.findByUri(uri)
         if (!orgGroup) {
-            // todo elastic?
+            // todo elastic
             return uriNode ? findCase { it.processIdentifier.eq(identifier) & it.title.eq(name) & it.uriNodeId.eq(uriNode.id)} : null
         }
         List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
