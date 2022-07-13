@@ -17,7 +17,7 @@ public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
     @Override
     public int renderLabel(PdfField field) throws IOException {
         setFieldParams(field);
-        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize);
+        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize, colorLabelString);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
             strokeLineCounter = lineCounter == 1 ? 0 : strokeLineCounter;
             y = renderLinePosY(field, lineCounter);
             strokeLineCounter++;
-            pdfDrawer.writeString(resource.getValueFont(), fontValueSize, x, y, line);
+            pdfDrawer.writeString(resource.getValueFont(), fontValueSize, x, y, line, colorString);
         }
         if (resource.isTextFieldStroke()) {
             pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), strokeLineCounter, strokeWidth);

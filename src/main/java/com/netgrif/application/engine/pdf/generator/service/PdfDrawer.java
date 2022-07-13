@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.netgrif.application.engine.pdf.generator.service.renderer.Renderer.removeUnsupportedChars;
+
 /**
  * A drawer service that is able to draw elements to a content stream
  */
@@ -44,6 +46,8 @@ public class PdfDrawer implements IPdfDrawer {
     private int lineHeight, padding;
     private int boxSize;
 
+    private int titleFontSize;
+
     public void setupDrawer(PDDocument pdf, PdfResource pdfResource) {
         this.pdf = pdf;
         this.resource = pdfResource;
@@ -52,6 +56,7 @@ public class PdfDrawer implements IPdfDrawer {
         this.lineHeight = resource.getLineHeight();
         this.padding = resource.getPadding();
         this.boxSize = resource.getBoxSize();
+        this.titleFontSize = resource.getFontTitleSize();
     }
 
     @Override
@@ -193,23 +198,60 @@ public class PdfDrawer implements IPdfDrawer {
 
     @Override
     public void drawStroke(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException {
-        int customHeight = lineHeight * lineCounter;
-        contentStream.setStrokingColor(Color.GRAY);
+        int height = lineHeight * (lineCounter) - padding;
+        contentStream.setStrokingColor(Color.LIGHT_GRAY);
         contentStream.setLineWidth(strokeWidth);
-        if (fieldPosY < marginBottom && customHeight > 0) {
-            contentStream.addRect(x - padding, y - padding, width, customHeight);
-        } else if (fieldPosY >= marginBottom) {
-            contentStream.addRect(x - padding, y - padding, width, lineHeight * (lineCounter));
+        if (fieldPosY >= marginBottom || height > 0) {
+            width -= 50;
+            y -= 8;
+            x += 8;
+            contentStream.moveTo(x, y);
+            // bottom of rectangle, left to right
+            contentStream.lineTo(x + width, y );
+            contentStream.curveTo(x + width + 5.9f, y + 0.14f,
+                    x + width + 11.06f, y + 5.16f,
+                    x + width + 10.96f, y + 10);
+
+            // right of rectangle, bottom to top
+            contentStream.lineTo(x + width + 10.96f, y + height);
+            contentStream.curveTo(x + width + 11.06f, y + height - 5.16f + 10,
+                    x + width + 5.9f, y + height + 0.14f + 10,
+                    x + width, y + height + 10);
+
+            // top of rectangle, right to left
+            contentStream.lineTo(x, y + height + 10);
+            contentStream.curveTo(x - 5.9f, y + height + 0.14f + 10,
+                    x - 11.06f, y + height - 5.16f + 10,
+                    x - 10.96f, y + height);
+
+            // left of rectangle, top to bottom
+            contentStream.lineTo(x - 10.96f, y + 10);
+            contentStream.curveTo(x - 11.06f, y + 5.16f,
+                    x - 5.9f, y + 0.14f,
+                    x, y);
+
+            contentStream.closePath();
         }
         contentStream.stroke();
     }
 
     @Override
-    public void writeString(PDType0Font font, int fontSize, int x, int y, String text) throws IOException {
+    public void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException {
+        contentStream.setFont(font, fontSize);
+        contentStream.setNonStrokingColor(color);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(x, y);
+        contentStream.showText(removeUnsupportedChars(text, resource));
+        contentStream.endText();
+    }
+
+    @Override
+    public void writeLabel(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException {
+        contentStream.setNonStrokingColor(color != null ? color : Color.GRAY);
         contentStream.setFont(font, fontSize);
         contentStream.beginText();
         contentStream.newLineAtOffset(x, y);
-        contentStream.showText(text.replaceAll("\\s{1,}", " "));
+        contentStream.showText(removeUnsupportedChars(text, resource));
         contentStream.endText();
     }
 

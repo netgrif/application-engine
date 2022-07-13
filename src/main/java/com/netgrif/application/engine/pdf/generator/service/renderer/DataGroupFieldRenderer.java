@@ -15,7 +15,7 @@ public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {
     @Override
     public int renderLabel(PdfField field) throws IOException {
         setFieldParams(field);
-        renderLabel(helperField, resource.getLabelFont(), resource.getFontGroupSize());
+        renderLabel(helperField, resource.getLabelFont(), resource.getFontGroupSize(), colorDataGroupLabel);
         return 0;
     }
 
