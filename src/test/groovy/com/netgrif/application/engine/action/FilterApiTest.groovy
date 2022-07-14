@@ -75,6 +75,9 @@ class FilterApiTest {
         assert filter.dataSet["filter"].allowedNets == ["filter", "preference_filter_item"]
         assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:preference_filter_item"
         assert filter.dataSet["filter_type"].value == "Case"
+
+        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
+        assert taskIds.contains(item.tasks.find { it.transition == "view" }.task)
     }
 
 
