@@ -120,7 +120,19 @@ class FilterApiTest {
 
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(item.stringId))) == null
+    }
 
+
+    @Test
+    void testFindFilter() {
+        Case caze = createMenuItem()
+        Case filter = getFilter(caze)
+
+        caze = setData(caze, [
+                "find_filter": "0"
+        ])
+
+        assert caze.dataSet["found_filter"].value == filter.stringId
     }
 
     Case createMenuItem() {

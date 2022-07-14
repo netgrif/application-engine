@@ -1372,7 +1372,6 @@ class ActionDelegate {
 
     /**
      * create filter instance of type Case, to create a menu item call {@link #createMenuItem()}
-     * @param uri
      * @param title
      * @param query
      * @param icon
@@ -1382,14 +1381,13 @@ class ActionDelegate {
      * @return
      */
     @NamedVariant
-    Case createCaseFilter(String uri, def title, String query, List<String> allowedNets,
+    Case createCaseFilter(def title, String query, List<String> allowedNets,
                           String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
-        return createFilter(uri, title, query, DefaultFiltersRunner.FILTER_TYPE_CASE, allowedNets, icon, visibility, filterMetadata)
+        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_CASE, allowedNets, icon, visibility, filterMetadata)
     }
 
     /**
      * create filter instance of type Task, to create a menu item call {@link #createMenuItem()}
-     * @param uri
      * @param title
      * @param query
      * @param icon
@@ -1399,14 +1397,13 @@ class ActionDelegate {
      * @return
      */
     @NamedVariant
-    Case createTaskFilter(String uri, def title, String query, List<String> allowedNets,
+    Case createTaskFilter(def title, String query, List<String> allowedNets,
                           String icon = "",  String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
-        return createFilter(uri, title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, allowedNets, icon, visibility, filterMetadata)
+        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, allowedNets, icon, visibility, filterMetadata)
     }
 
     /**
      * create filter instance, to create a menu item call {@link #createMenuItem()}
-     * @param uri
      * @param title
      * @param query
      * @param icon
@@ -1417,10 +1414,9 @@ class ActionDelegate {
      * @return
      */
     @NamedVariant
-    Case createFilter(String uri, def title, String query, String type, List<String> allowedNets,
+    Case createFilter(def title, String query, String type, List<String> allowedNets,
                       String icon, String visibility, def filterMetadata) {
         Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, title as String)
-        filterCase.setUriNodeId(uriService.findByUri(uri).id)
         filterCase.setIcon(icon)
         filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
         filterCase = workflowService.save(filterCase)
@@ -1660,7 +1656,7 @@ class ActionDelegate {
                             Map<String, String> bannedRoles = [:],
                             String icon = "",
                             String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
-        Case filter = createFilter(uri, title, query, type, allowedNets, icon, visibility, null)
+        Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
         Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles)
         return menuItem
     }
@@ -1686,7 +1682,7 @@ class ActionDelegate {
                              String icon = "",
                              String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
                              Case orgGroup = null) {
-        Case filter = createFilter(uri, title, query, type, allowedNets, icon, visibility, null)
+        Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
         Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup)
         return menuItem
     }
@@ -1734,8 +1730,8 @@ class ActionDelegate {
      * @param name
      * @return
      */
-    Case findFilter(String uri, String name) {
-        return findCaseByUriNameProcessAndGroup(uri, name, FilterRunner.FILTER_PETRI_NET_IDENTIFIER, null)
+    Case findFilter(String name) {
+        return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"$name\"" as String)
     }
 
     /**
@@ -1777,7 +1773,7 @@ class ActionDelegate {
      * @return
      */
     Case findMenuItemInGroup(String uri, String name, Case orgGroup) {
-        return findCaseByUriNameProcessAndGroup(uri, name, FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, orgGroup)
+        return findMenuItemByUriNameProcessAndGroup(uri, name, orgGroup)
     }
 
     /**
@@ -1811,10 +1807,10 @@ class ActionDelegate {
         return result
     }
 
-    private Case findCaseByUriNameProcessAndGroup(String uri, String name, String processIdentifier, Case orgGroup) {
+    private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
         UriNode uriNode = uriService.findByUri(uri)
         if (!orgGroup) {
-            return uriNode ? findCaseElastic("processIdentifier.keyword:\"$processIdentifier\" AND title.keyword:\"$name\") AND uriNodeId.keyword:\"$uriNode.id\"") : null
+            return uriNode ? findCaseElastic("processIdentifier.keyword:\"$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\") AND uriNodeId.keyword:\"$uriNode.id\"") : null
         }
         List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
         if (!taskIds) {

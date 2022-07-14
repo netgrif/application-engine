@@ -86,7 +86,7 @@
 					identifier: f.identifier,
 					icon: f.icon;
 
-					def filter = createCaseFilter(uri.value, title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
+					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
 					def item
 
 					if (group.value) {
@@ -207,10 +207,11 @@
 		<event type="set">
 			<actions phase="post">
 				<action>
+					title: f.title,
 					found_filter: f.found_filter;
 
-					def filter = findFilter("netgrif/test", "Test filter")
-					change found_filter value { filter.title + ": " + filter.dataSet["filter"].value }
+					def filter = findFilter(title.value)
+					change found_filter value { filter.stringId }
 				</action>
 			</actions>
 		</event>

@@ -1091,7 +1091,7 @@
 
 							// TODO preverit; podivny search
 							def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-								change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+							change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
 						</action>
 					</actions>
 				</event>
