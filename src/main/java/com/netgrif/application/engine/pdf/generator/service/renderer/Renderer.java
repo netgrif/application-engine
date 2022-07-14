@@ -40,8 +40,8 @@ public abstract class Renderer {
         this.pageDrawableWidth = resource.getPageDrawableWidth();
         this.padding = resource.getPadding();
         this.colorString = Color.decode(resource.getColorString().toUpperCase());
-        this.colorDataGroupLabel = Color.decode(resource.getColorDataGroup());
-        this.colorLabelString = Color.decode(resource.getColorLabelString());
+        this.colorDataGroupLabel = Color.decode(resource.getColorDataGroup().toUpperCase());
+        this.colorLabelString = Color.decode(resource.getColorLabelString().toUpperCase());
         this.baseX = resource.getBaseX();
         this.pageHeight = resource.getPageHeight();
         this.fontValueSize = resource.getFontValueSize();

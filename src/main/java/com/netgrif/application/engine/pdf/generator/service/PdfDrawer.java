@@ -7,6 +7,8 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawe
 import com.netgrif.application.engine.pdf.generator.service.renderer.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import lombok.Setter;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.multipdf.PDFCloneUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -79,6 +81,7 @@ public class PdfDrawer implements IPdfDrawer {
             contentStream.close();
         }
         PDPage emptyPage;
+        PDFCloneUtility cloneUtility = new PDFCloneUtility(templatePdf);
         if (!isOnLastPage()) {
             currentPage = pageList.get(pageList.indexOf(currentPage) + 1);
             contentStream = new PDPageContentStream(pdf, currentPage, PDPageContentStream.AppendMode.APPEND, true, true);
@@ -86,7 +89,8 @@ public class PdfDrawer implements IPdfDrawer {
             if (templatePdf != null && pageList.size() == 0) {
                 emptyPage = templatePdf.getPage(0);
             } else if (templatePdf != null && templatePdf.getPages().getCount() > 1) {
-                emptyPage = templatePdf.getPage(1);
+                COSDictionary dictionary = (COSDictionary) cloneUtility.cloneForNewDocument(templatePdf.getPage(1));
+                emptyPage = new PDPage(dictionary);
             } else {
                 emptyPage = new PDPage(resource.getPageSize());
             }
@@ -207,25 +211,25 @@ public class PdfDrawer implements IPdfDrawer {
             x += 8;
             contentStream.moveTo(x, y);
             // bottom of rectangle, left to right
-            contentStream.lineTo(x + width, y );
+            contentStream.lineTo((float) (x + width), y );
             contentStream.curveTo(x + width + 5.9f, y + 0.14f,
                     x + width + 11.06f, y + 5.16f,
-                    x + width + 10.96f, y + 10);
+                    x + width + 10.96f, y + 10f);
 
             // right of rectangle, bottom to top
             contentStream.lineTo(x + width + 10.96f, y + height);
             contentStream.curveTo(x + width + 11.06f, y + height - 5.16f + 10,
                     x + width + 5.9f, y + height + 0.14f + 10,
-                    x + width, y + height + 10);
+                    (float)(x + width), y + height + 10f);
 
             // top of rectangle, right to left
-            contentStream.lineTo(x, y + height + 10);
+            contentStream.lineTo(x, y + height + 10f);
             contentStream.curveTo(x - 5.9f, y + height + 0.14f + 10,
                     x - 11.06f, y + height - 5.16f + 10,
-                    x - 10.96f, y + height);
+                    x - 10.96f, (float) (y + height));
 
             // left of rectangle, top to bottom
-            contentStream.lineTo(x - 10.96f, y + 10);
+            contentStream.lineTo(x - 10.96f, y + 10f);
             contentStream.curveTo(x - 11.06f, y + 5.16f,
                     x - 5.9f, y + 0.14f,
                     x, y);

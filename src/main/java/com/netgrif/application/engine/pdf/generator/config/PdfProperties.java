@@ -16,7 +16,7 @@ import java.util.Locale;
 @Data
 public class PdfProperties {
 
-    protected int unit = 75;
+    protected int unit = 40;
 
     protected PDRectangle pageSize = PDRectangle.A4;
 
