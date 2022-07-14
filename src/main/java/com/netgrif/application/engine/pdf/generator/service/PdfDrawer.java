@@ -211,16 +211,16 @@ public class PdfDrawer implements IPdfDrawer {
             x += 8;
             contentStream.moveTo(x, y);
             // bottom of rectangle, left to right
-            contentStream.lineTo((float) (x + width), y );
+            contentStream.lineTo((float) (x + width), y);
             contentStream.curveTo(x + width + 5.9f, y + 0.14f,
                     x + width + 11.06f, y + 5.16f,
                     x + width + 10.96f, y + 10f);
 
             // right of rectangle, bottom to top
-            contentStream.lineTo(x + width + 10.96f, y + height);
+            contentStream.lineTo(x + width + 10.96f, (float) (y + height));
             contentStream.curveTo(x + width + 11.06f, y + height - 5.16f + 10,
                     x + width + 5.9f, y + height + 0.14f + 10,
-                    (float)(x + width), y + height + 10f);
+                    (float) (x + width), y + height + 10f);
 
             // top of rectangle, right to left
             contentStream.lineTo(x, y + height + 10f);
