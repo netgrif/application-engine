@@ -26,7 +26,7 @@
 	<data type="text">
 		<id>query</id>
 		<title/>
-		<init>processIdentifier:netgrif/test/filter_api_test</init>
+		<init>processIdentifier:preference_filter_item</init>
 	</data>
 	<data type="text">
 		<id>type</id>
@@ -65,7 +65,7 @@
 					group: f.group,
 					icon: f.icon;
 
-					def filter = createCaseFilter("netgrif/test", "Test filter", query.value, ["netgrif/test/filter_api_test"], icon.value)
+					def filter = createCaseFilter("Test filter", query.value, ["netgrif/test/filter_api_test", "preference_filter_item"], icon.value)
 
 					if (group.value) {
 						def item = createMenuItem("netgrif/test", "menu_item",
@@ -99,7 +99,7 @@
 					def item = findMenuItem("netgrif/test", "Test filter")
 					def filter = getFilterFromMenuItem(item)
 					changeFilter filter query { query.value + " OR processIdentifier:filter" }
-					changeFilter filter allowedNets { ["netgrif/test/filter_api_test", "filter"] }
+					changeFilter filter allowedNets { ["netgrif/test/filter_api_test", "filter", "preference_filter_item"] }
 					changeFilter filter icon { "file_upload" }
 					changeFilter filter title { "Nový názov" }
 
@@ -161,7 +161,7 @@
 				<action>
 					found_filter: f.found_filter;
 
-					def filter = findFilter("netgrif/test", "Test filter")
+					def filter = findFilter("Test filter")
 					change found_filter value { filter.title + ": " + filter.dataSet["filter"].value }
 				</action>
 			</actions>

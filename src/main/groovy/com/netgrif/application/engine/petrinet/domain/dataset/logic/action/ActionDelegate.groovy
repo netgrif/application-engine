@@ -1810,7 +1810,7 @@ class ActionDelegate {
     private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
         UriNode uriNode = uriService.findByUri(uri)
         if (!orgGroup) {
-            return uriNode ? findCaseElastic("processIdentifier.keyword:\"$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\") AND uriNodeId.keyword:\"$uriNode.id\"") : null
+            return uriNode ? findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"") : null
         }
         List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
         if (!taskIds) {
@@ -1824,7 +1824,7 @@ class ActionDelegate {
     private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
         return roles.collectEntries { role ->
             PetriNet net = petriNetService.get(new ObjectId(role.netId))
-            return [(role.importId + ":" + net.identifier), (role.getName())]
+            return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
         } as Map<String, I18nString>
     }
 
@@ -1836,7 +1836,7 @@ class ActionDelegate {
             }
             PetriNet net = temp[entry.value]
             ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
-            return [(role.importId + ":" + net.identifier), (role.getName())]
+            return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
         } as Map<String, I18nString>
     }
 
