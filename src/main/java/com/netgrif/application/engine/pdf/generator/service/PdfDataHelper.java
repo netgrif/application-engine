@@ -7,6 +7,7 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataH
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -18,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -98,14 +96,25 @@ public class PdfDataHelper implements IPdfDataHelper {
         this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale()).getData();
 
         dataGroups.forEach(dataGroup -> {
-            refreshGrid(dataGroup);
-            dataGroup.getFields().getContent().forEach(field -> {
-                        generateField(dataGroup, field);
-                    }
-            );
-            this.lastX = Integer.MAX_VALUE;
+            if (dataGroup.getParentTaskRefId() == null) {
+                refreshGrid(dataGroup);
+                generateFromDataGroup(dataGroup);
+                this.lastX = Integer.MAX_VALUE;
+            }
         });
         Collections.sort(pdfFields);
+    }
+
+    private void generateFromDataGroup(DataGroup dataGroup) {
+        dataGroup.getFields().getContent().forEach(field -> {
+                    if (field.getType().equals(FieldType.TASK_REF)) {
+                        Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> dg.getParentTaskRefId() != null && dg.getParentTaskRefId().equals(field.getStringId())).findFirst();
+                        taskRefGroup.ifPresent(this::generateFromDataGroup);
+                    } else {
+                        generateField(dataGroup, field);
+                    }
+                }
+        );
     }
 
     @Override
