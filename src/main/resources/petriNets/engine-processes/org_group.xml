@@ -34,6 +34,16 @@
 			}
 		}
 	</function>
+	<function scope="process" name="updateAvailableEntries">
+		{
+			com.netgrif.application.engine.workflow.domain.Case useCase ->
+
+			def cases = findCasesElastic(
+							"processIdentifier:\"preference_filter_item\" AND dataSet.parentId.textValue.keyword:\"$useCase.stringId\"" as String,
+							org.springframework.data.domain.PageRequest.of(0, 1000))
+			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+		}
+	</function>
 	<role>
 		<id>system</id>
 		<title>System</title>
@@ -182,8 +192,7 @@
 			change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
 			change filterAutocomplete value {return ""}
 
-			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+			updateAvailableEntries(useCase)
 		</action>
 	</data>
 	<data type="file">
@@ -199,8 +208,7 @@
 		<action trigger="set">
 			availableEntries: f.available_export_entries;
 
-			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+			updateAvailableEntries(useCase)
 		</action>
 	</data>
 	<data type="button">
@@ -351,8 +359,7 @@
 			change referencedFiltersList value {return referencedFiltersList.value + filterCaseIds}
 			workflowService.save(useCase)
 
-			def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-			change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+			updateAvailableEntries(useCase)
 		</action>
 	</data>
 	<data type="caseRef">
@@ -515,9 +522,7 @@
 					change referencedFiltersList value {return filterCaseIds}
 
 
-					def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-
-					change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+					updateAvailableEntries(useCase)
 				</action>
 			</actions>
 		</event>
@@ -1089,9 +1094,7 @@
 
 							change menuItemsTaskRef value {return menuItemsTaskRef.value + viewTask.stringId}
 
-							// TODO preverit; podivny search
-							def cases = findCases( { it.processIdentifier.eq("preference_filter_item")}).findAll { it.dataSet["parentId"].value == useCase.stringId }
-							change availableEntries options { return menuImportExportService.createAvailableEntriesChoices(cases) }
+							updateAvailableEntries(useCase)
 						</action>
 					</actions>
 				</event>
