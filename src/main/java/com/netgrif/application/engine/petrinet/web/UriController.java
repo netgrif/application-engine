@@ -4,7 +4,6 @@ import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.UriNodeResource;
 import com.netgrif.application.engine.petrinet.web.responsebodies.UriNodeResources;
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import io.swagger.annotations.*;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Base64;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -31,7 +31,7 @@ public class UriController {
 
     @ApiOperation(value = "Get root UriNodes", authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
+            @ApiResponse(code = 200, message = "OK", response = UriNodeResource.class),
     })
     @RequestMapping(value = "/root", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<UriNode> getRoot() {
@@ -42,18 +42,19 @@ public class UriController {
 
     @ApiOperation(value = "Get one UriNode by URI path", authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
+            @ApiResponse(code = 200, message = "OK", response = UriNodeResource.class),
     })
     @RequestMapping(value = "/{uri}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<UriNode> getOne(@PathVariable("uri") String uri) {
+        uri = new String(Base64.getDecoder().decode(uri));
         UriNode uriNode = uriService.findByUri(uri);
         uriNode = uriService.populateDirectRelatives(uriNode);
         return new UriNodeResource(uriNode);
     }
 
-    @ApiOperation(value = "Get one UriNode by parent id", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Get UriNodes by parent id", authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
+            @ApiResponse(code = 200, message = "OK", response = UriNodeResources.class),
     })
     @RequestMapping(value = "/parent/{parentId}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<UriNode> getByParent(@PathVariable("parentId") String parentId) {
@@ -62,9 +63,9 @@ public class UriController {
         return new UriNodeResources(uriNodes);
     }
 
-    @ApiOperation(value = "Get one UriNode by URI path", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Get UriNodes by on the same level", authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
+            @ApiResponse(code = 200, message = "OK", response = UriNodeResources.class),
     })
     @RequestMapping(value = "/level/{level}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<UriNode> getByLevel(@PathVariable("level") int level) {

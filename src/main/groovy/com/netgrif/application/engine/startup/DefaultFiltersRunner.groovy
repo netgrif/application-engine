@@ -20,19 +20,19 @@ import org.springframework.beans.factory.annotation.Value
 @Component
 class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
 
-    private static final String AUTO_CREATE_TRANSITION = "auto_create"
+    public static final String AUTO_CREATE_TRANSITION = "auto_create"
 
-    private static final String FILTER_TYPE_FIELD_ID = "filter_type"
+    public static final String FILTER_TYPE_FIELD_ID = "filter_type"
     private static final String FILTER_ORIGIN_VIEW_ID_FIELD_ID = "origin_view_id"
     private static final String FILTER_PARENT_CASE_ID_FIELD_ID = "parent_filter_id"
-    private static final String FILTER_VISIBILITY_FIELD_ID = "visibility"
-    private static final String FILTER_FIELD_ID = "filter"
-    private static final String FILTER_I18N_TITLE_FIELD_ID = "i18n_filter_name"
+    public static final String FILTER_VISIBILITY_FIELD_ID = "visibility"
+    public static final String FILTER_FIELD_ID = "filter"
+    public static final String FILTER_I18N_TITLE_FIELD_ID = "i18n_filter_name"
     private static final String GERMAN_ISO_3166_CODE = "de"
     private static final String SLOVAK_ISO_3166_CODE = "sk"
     private static final String IS_IMPORTED = "is_imported"
 
-    private static final String FILTER_TYPE_CASE = "Case"
+    public static final String FILTER_TYPE_CASE = "Case"
     private static final String FILTER_TYPE_TASK = "Task"
 
     private static final String FILTER_VISIBILITY_PUBLIC = "public"
