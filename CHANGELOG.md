@@ -8,7 +8,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
-## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-07-14)
+## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-07-19)
 
 ### Fixed
 
@@ -18,7 +18,8 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 
 - [NAE-1647] Elastic mapping for I18N data field
 - [NAE-1665] Generated PDF colors properties
-
+- [NAE-1660] Filter action API
+- [NAE-1659] Process URI
 
 ## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)
 
