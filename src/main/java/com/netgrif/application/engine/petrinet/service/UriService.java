@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
+import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
@@ -8,11 +9,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Service for managing UriNode objects
@@ -20,19 +19,18 @@ import java.util.stream.Collectors;
 @Service
 public class UriService implements IUriService {
 
-    @Value("${nae.uri.separator:/}")
-    private String uriSeparator;
 
-    /*TODO: insted of multiple roots, there will be one root with level marking*/
     private static final String DEFAULT_ROOT_URI = "root";
 
     private static final String DEFAULT_ROOT_NAME = "root";
 
     private static final int FIRST_LEVEL = 0;
     private final UriNodeRepository uriNodeRepository;
+    private final UriProperties uriProperties;
 
-    public UriService(UriNodeRepository uriNodeRepository) {
+    public UriService(UriNodeRepository uriNodeRepository, UriProperties uriProperties) {
         this.uriNodeRepository = uriNodeRepository;
+        this.uriProperties = uriProperties;
     }
 
 
@@ -119,7 +117,7 @@ public class UriService implements IUriService {
             UriNode parent = findById(uriNode.getParentId());
             uriNode.setParent(parent);
         }
-        Set<UriNode> children = uriNode.getChildrenId().stream().map(this::findById).collect(Collectors.toSet());
+        Set<UriNode> children = StreamSupport.stream(uriNodeRepository.findAllById(uriNode.getChildrenId()).spliterator(), false).collect(Collectors.toSet());
         uriNode.setChildren(children);
         return uriNode;
     }
@@ -153,7 +151,7 @@ public class UriService implements IUriService {
         newParent.getChildrenId().add(node.getId());
 
         node.setParentId(newParent.getId());
-        node.setUriPath(destUri + uriSeparator + node.getName());
+        node.setUriPath(destUri + uriProperties.getSeparator() + node.getName());
         return uriNodeRepository.save(node);
     }
 
@@ -168,8 +166,8 @@ public class UriService implements IUriService {
     public UriNode getOrCreate(PetriNet petriNet, UriContentType contentType) {
         String identifier = petriNet.getIdentifier();
         String modifiedUri;
-        if (identifier.contains(uriSeparator))
-            modifiedUri = identifier.substring(0, identifier.lastIndexOf(uriSeparator));
+        if (identifier.contains(uriProperties.getSeparator()))
+            modifiedUri = identifier.substring(0, identifier.lastIndexOf(uriProperties.getSeparator()));
         else
             modifiedUri = DEFAULT_ROOT_URI;
 
@@ -186,7 +184,7 @@ public class UriService implements IUriService {
     @Override
     public UriNode getOrCreate(String uri, UriContentType contentType) {
         LinkedList<UriNode> uriNodeList = new LinkedList<>();
-        String[] uriComponents = uri.split(uriSeparator);
+        String[] uriComponents = uri.split(uriProperties.getSeparator());
         StringBuilder uriBuilder = new StringBuilder();
         int pathLength = uriComponents.length;
         UriNode parent = pathLength > 1 || !uri.equals(DEFAULT_ROOT_URI) ? uriNodeRepository.findByUriPath(DEFAULT_ROOT_URI) : null;
@@ -209,7 +207,7 @@ public class UriService implements IUriService {
                 parent.getChildrenId().add(uriNode.getId());
                 uriNodeRepository.save(parent);
             }
-            uriBuilder.append(uriSeparator);
+            uriBuilder.append(uriProperties.getSeparator());
             uriNodeList.add(uriNode);
             parent = uriNode;
         }
@@ -230,9 +228,9 @@ public class UriService implements IUriService {
             uriNode.setLevel(FIRST_LEVEL);
             uriNode.setUriPath(DEFAULT_ROOT_URI);
             uriNode.setParentId(null);
+            uriNode.addContentType(UriContentType.DEFAULT);
+            uriNode = uriNodeRepository.save(uriNode);
         }
-        uriNode.addContentType(UriContentType.DEFAULT);
-        uriNode = uriNodeRepository.save(uriNode);
         return uriNode;
     }
 

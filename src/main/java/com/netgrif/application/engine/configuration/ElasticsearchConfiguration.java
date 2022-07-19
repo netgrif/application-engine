@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +27,14 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.index.task}")
     private String taskIndex;
 
-    @Value("${spring.data.elasticsearch.index.uri}")
-    private String uriIndex;
-
     @Value("${spring.data.elasticsearch.reindex}")
     private String cron;
+
+    private final UriProperties uriProperties;
+
+    public ElasticsearchConfiguration(UriProperties uriProperties) {
+        this.uriProperties = uriProperties;
+    }
 
     @Bean
     public String springElasticsearchReindex() {
@@ -48,7 +53,7 @@ public class ElasticsearchConfiguration {
 
     @Bean
     public String elasticUriIndex() {
-        return uriIndex;
+        return uriProperties.getIndex();
     }
 
     @Bean
