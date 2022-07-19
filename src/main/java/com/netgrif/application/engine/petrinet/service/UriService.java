@@ -6,10 +6,12 @@ import com.netgrif.application.engine.petrinet.domain.UriContentType;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -149,6 +151,7 @@ public class UriService implements IUriService {
 
         oldParent.getChildrenId().remove(node.getId());
         newParent.getChildrenId().add(node.getId());
+        uriNodeRepository.saveAll(List.of(oldParent, newParent));
 
         node.setParentId(newParent.getId());
         node.setUriPath(destUri + uriProperties.getSeparator() + node.getName());

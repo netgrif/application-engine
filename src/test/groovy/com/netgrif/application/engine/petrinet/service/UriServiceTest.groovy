@@ -54,8 +54,8 @@ class UriServiceTest {
     @Test
     @Disabled("Fix test")
     void getRootsTest() {
-        List<UriNode> rootList = uriService.getRoot()
-        assert rootList.size() == roots.length
+        UriNode root = uriService.getRoot()
+        assert root.getParentId() == null
     }
 
     @Test
