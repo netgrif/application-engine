@@ -8,6 +8,7 @@ import io.swagger.annotations.*;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class UriController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = UriNodeResource.class),
     })
-    @RequestMapping(value = "/root", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/root", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<UriNode> getRoot() {
         UriNode uriNode = uriService.getRoot();
         uriService.populateDirectRelatives(uriNode);
@@ -44,7 +45,7 @@ public class UriController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = UriNodeResource.class),
     })
-    @RequestMapping(value = "/{uri}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{uri}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<UriNode> getOne(@PathVariable("uri") String uri) {
         uri = new String(Base64.getDecoder().decode(uri));
         UriNode uriNode = uriService.findByUri(uri);
@@ -56,7 +57,7 @@ public class UriController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = UriNodeResources.class),
     })
-    @RequestMapping(value = "/parent/{parentId}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/parent/{parentId}", produces = MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<UriNode> getByParent(@PathVariable("parentId") String parentId) {
         List<UriNode> uriNodes = uriService.findAllByParent(parentId);
         uriNodes.forEach(uriService::populateDirectRelatives);
@@ -67,7 +68,7 @@ public class UriController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = UriNodeResources.class),
     })
-    @RequestMapping(value = "/level/{level}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/level/{level}", produces = MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<UriNode> getByLevel(@PathVariable("level") int level) {
         List<UriNode> uriNodes = uriService.findByLevel(level);
         uriNodes.forEach(uriService::populateDirectRelatives);

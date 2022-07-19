@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.configuration.properties.UriProperties
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
@@ -31,8 +32,8 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.elasticsearch.index.task}')
     private String taskIndex
 
-    @Value('${spring.data.elasticsearch.index.uri}')
-    private String uriIndex
+    @Autowired
+    private UriProperties uriProperties
 
     @Autowired
     private IElasticIndexService template
@@ -57,17 +58,17 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         } else {
             log.info "Elasticsearch task index exists [${taskIndex}]"
         }
-        if (!template.indexExists(uriIndex)) {
-            log.info "Creating Elasticsearch uri index [${uriIndex}]"
+        if (!template.indexExists(uriProperties.index)) {
+            log.info "Creating Elasticsearch uri index [${uriProperties.index}]"
             template.createIndex(UriNode.class)
         } else {
-            log.info "Elasticsearch uri index exists [${uriIndex}]"
+            log.info "Elasticsearch uri index exists [${uriProperties.index}]"
         }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
-        log.info("Updating Elasticsearch uri mapping [${uriIndex}]")
+        log.info("Updating Elasticsearch uri mapping [${uriProperties.index}]")
         template.putMapping(UriNode.class)
     }
 }
