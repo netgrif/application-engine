@@ -5,6 +5,8 @@ import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 
@@ -64,6 +67,9 @@ public class NextGroupService implements INextGroupService {
 
     @Autowired
     protected ITaskService taskService;
+
+    @Autowired
+    protected IElasticCaseService elasticCaseService;
 
     @Autowired
     protected ISecurityContextService securityContextService;
@@ -126,7 +132,15 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findDefaultGroup() {
-        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq("Default system group")));
+        return findByName("Default system group");
+    }
+
+    @Override
+    public Case findByName(String name) {
+        CaseSearchRequest request = new CaseSearchRequest();
+        request.query = "title.keyword:\"" + name + "\"";
+        List<Case> result = elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.getLocale(), false).getContent();
+        return !result.isEmpty() ? result.get(0) : null;
     }
 
     @Override

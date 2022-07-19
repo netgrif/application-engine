@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.petrinet.web.responsebodies;
 
-import com.netgrif.application.engine.orgstructure.web.GroupController;
-import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.web.UriController;
 import org.springframework.hateoas.CollectionModel;
@@ -14,7 +12,7 @@ public class UriNodeResources extends CollectionModel<UriNode> {
         buildLinks();
     }
 
-    private void buildLinks(){
+    private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UriController.class)
                 .getRoot()).withRel("root"));
     }
