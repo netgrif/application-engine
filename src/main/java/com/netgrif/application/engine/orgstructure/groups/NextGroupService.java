@@ -220,7 +220,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase) {
-        String authorId = this.getGroupOwnerId(groupCase).toString();
+        String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if (user.equals(authorId)) {
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
@@ -327,7 +327,7 @@ public class NextGroupService implements INextGroupService {
                 taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
                 .findFirst();
 
-        if (!initTaskReference.isPresent()) {
+        if (initTaskReference.isEmpty()) {
             log.error("Initial task of group case is not present!");
             return null;
         }

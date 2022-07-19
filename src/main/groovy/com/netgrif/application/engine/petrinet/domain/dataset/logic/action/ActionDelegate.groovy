@@ -26,6 +26,7 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
+import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
@@ -33,6 +34,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.D
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
@@ -157,6 +159,9 @@ class ActionDelegate {
 
     @Autowired
     ExportConfiguration exportConfiguration
+
+    @Autowired
+    IUriService uriService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -1336,5 +1341,17 @@ class ActionDelegate {
 
     FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
         return this.dataService.getFile(useCase, task, field, forPreview)
+    }
+
+    def getUri(String uri) {
+        return uriService.findByUri(uri);
+    }
+
+    def createUri(String uri, UriContentType type) {
+        return uriService.getOrCreate(uri, type)
+    }
+
+    def moveUri(String uri, String dest) {
+        return uriService.move(uri, dest)
     }
 }

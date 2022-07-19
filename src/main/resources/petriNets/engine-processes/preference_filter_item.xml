@@ -137,7 +137,7 @@
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>parentId</id>
 		<title></title>
 	</data>
