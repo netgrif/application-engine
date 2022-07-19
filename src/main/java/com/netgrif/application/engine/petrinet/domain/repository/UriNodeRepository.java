@@ -9,13 +9,11 @@ import java.util.List;
 @Repository
 public interface UriNodeRepository extends ElasticsearchRepository<UriNode, String> {
 
-    UriNode findByName(String name);
+    List<UriNode> findByName(String name);
 
     UriNode findByUriPath(String uriPath);
 
     List<UriNode> findAllByParentId(String parentId);
-
-    UriNode findByLevel(int level);
 
     List<UriNode> findAllByLevel(int level);
 }
