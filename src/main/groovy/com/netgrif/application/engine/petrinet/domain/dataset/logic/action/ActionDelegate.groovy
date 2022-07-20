@@ -100,6 +100,9 @@ class ActionDelegate {
     @Value('${nae.mail.from}')
     private String mailFrom
 
+    @Value('${nae.create.default.filters:false}')
+    private Boolean createDefaultFilters
+
     @Autowired
     FieldFactory fieldFactory
 
@@ -1370,6 +1373,13 @@ class ActionDelegate {
         return uriService.move(uri, dest)
     }
 
+    List<Case> findDefaultFilters() {
+        if (!createDefaultFilters) {
+            return []
+        }
+        return findCases({it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId))})
+    }
+
     /**
      * create filter instance of type Case, to create a menu item call {@link #createMenuItem()}
      * @param title
@@ -1441,7 +1451,7 @@ class ActionDelegate {
                                 "predicateMetadata"      : [],
                                 "filterType"             : type,
                                 "defaultSearchCategories": true,
-                                "inheritAllowedNets"     : true
+                                "inheritAllowedNets"     : false
                         ]
                 ]
         ]
