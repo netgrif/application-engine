@@ -100,6 +100,9 @@ class ActionDelegate {
     @Value('${nae.mail.from}')
     private String mailFrom
 
+    @Value('${nae.create.default.filters:false}')
+    private Boolean createDefaultFilters
+
     @Autowired
     FieldFactory fieldFactory
 
@@ -1368,6 +1371,13 @@ class ActionDelegate {
 
     def moveUri(String uri, String dest) {
         return uriService.move(uri, dest)
+    }
+
+    List<Case> findDefaultFilters() {
+        if (!createDefaultFilters) {
+            return []
+        }
+        return findCases({it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId))})
     }
 
     /**

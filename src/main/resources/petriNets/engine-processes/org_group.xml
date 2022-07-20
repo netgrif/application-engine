@@ -497,7 +497,7 @@
 					availableEntries: f.available_export_entries,
 					referencedFiltersList: f.referenced_filters;
 
-                    defaultFilters = findCases({it.processIdentifier.eq("filter").and(it.author.id.eq(userService.getSystem().id))})
+                    defaultFilters = findDefaultFilters()
 
 					filterTaskIds = []
 					filterCaseIds = []
