@@ -1441,7 +1441,7 @@ class ActionDelegate {
                                 "predicateMetadata"      : [],
                                 "filterType"             : type,
                                 "defaultSearchCategories": true,
-                                "inheritAllowedNets"     : true
+                                "inheritAllowedNets"     : false
                         ]
                 ]
         ]
