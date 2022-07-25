@@ -211,12 +211,10 @@
         <title>Text datafield z iného transitionu</title>
         <init>Field načítaný pomocou taskrefu</init>
     </data>
-    <usersRef>
+    <data type="userList">
         <id>userList1</id>
-        <caseLogic>
-            <view>true</view>
-        </caseLogic>
-    </usersRef>
+        <title>UserList</title>
+    </data>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -227,7 +225,8 @@
         <usersRef>
             <id>userList1</id>
             <logic>
-                <assigned>true</assigned>
+                <perform>true</perform>
+                <view>true</view>
             </logic>
         </usersRef>
         <dataGroup>
