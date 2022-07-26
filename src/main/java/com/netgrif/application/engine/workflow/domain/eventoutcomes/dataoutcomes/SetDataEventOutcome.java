@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes;
 
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome;
@@ -24,7 +24,7 @@ public class SetDataEventOutcome extends TaskEventOutcome {
         this.setOutcomes(outcomes);
     }
 
-    public void addChangedField(String fieldId, DataField field) {
+    public void addChangedField(String fieldId, Field<?> field) {
         // TODO: NAE-1645 check
 //        field.wasChangedOn(this.getTask() == null ? "all_data" : this.getTask().getStringId(),
 //                this.getTask() == null ? "all_data_transition" : this.getTask().getTransitionId());

@@ -240,8 +240,4 @@ class ImportHelper {
         }
         return dataSet
     }
-
-    static String getCaseColor() {
-        return "color-fg-amber-500"
-    }
 }

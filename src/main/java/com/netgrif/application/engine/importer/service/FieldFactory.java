@@ -1,19 +1,18 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.importer.model.*;
+import com.netgrif.application.engine.importer.model.Data;
+import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.importer.model.Valid;
+import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
-import com.netgrif.application.engine.petrinet.domain.views.View;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,90 +21,34 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
 @Slf4j
 public final class FieldFactory {
 
-    @Autowired
-    private FormatFactory formatFactory;
+    private final ComponentFactory componentFactory;
 
-    @Autowired
-    private ViewFactory viewFactory;
+    private final IDataValidator dataValidator;
 
-    @Autowired
-    private ComponentFactory componentFactory;
+    private final IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
 
-    @Autowired
-    private IDataValidator dataValidator;
+    private final Map<DataType, FieldBuilder<?>> builders;
 
-    @Autowired
-    private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+    public FieldFactory(List<FieldBuilder<?>> builders, ComponentFactory componentFactory, IDataValidator dataValidator, IDataValidationExpressionEvaluator dataValidationExpressionEvaluator) {
+        this.builders = builders.stream().collect(Collectors.toMap(FieldBuilder::getType, Function.identity()));
+        this.componentFactory = componentFactory;
+        this.dataValidator = dataValidator;
+        this.dataValidationExpressionEvaluator = dataValidationExpressionEvaluator;
+    }
 
-    // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
-        Field field;
-        switch (data.getType()) {
-            case TEXT:
-                field = buildTextField(data);
-                break;
-            case BOOLEAN:
-                field = buildBooleanField(data);
-                break;
-            case DATE:
-                field = buildDateField(data);
-                break;
-            case FILE:
-                field = buildFileField(data);
-                break;
-            case FILE_LIST:
-                field = buildFileListField(data);
-                break;
-            case ENUMERATION:
-                field = buildEnumerationField(data, importer);
-                break;
-            case MULTICHOICE:
-                field = buildMultichoiceField(data, importer);
-                break;
-            case NUMBER:
-                field = buildNumberField(data);
-                break;
-            case USER:
-                field = buildUserField(data, importer);
-                break;
-            case USER_LIST:
-                field = buildUserListField(data);
-                break;
-            case CASE_REF:
-                field = buildCaseField(data);
-                break;
-            case DATE_TIME:
-                field = buildDateTimeField(data);
-                break;
-            case BUTTON:
-                field = buildButtonField(data);
-                break;
-            case TASK_REF:
-                field = buildTaskField(data, importer.getDocument().getTransition());
-                break;
-            case ENUMERATION_MAP:
-                field = buildEnumerationMapField(data, importer);
-                break;
-            case MULTICHOICE_MAP:
-                field = buildMultichoiceMapField(data, importer);
-                break;
-            case FILTER:
-                field = buildFilterField(data);
-                break;
-            case I_18_N:
-                field = buildI18nField(data, importer);
-                break;
-            default:
-                throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
+        FieldBuilder<?> builder = builders.get(data.getType());
+        if (builder == null) {
+            throw new IllegalArgumentException("Field " + data.getId() + " has unsupported type " + data.getType());
         }
-
+        Field field = builder.build(data, importer);
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
         if (data.isImmediate() != null) {
@@ -133,14 +76,15 @@ public final class FieldFactory {
             }
         }
 
-        if (data.getFormat() != null) {
-            Format format = formatFactory.buildFormat(data.getFormat());
-            field.setFormat(format);
-        }
-        if (data.getView() != null) {
-            View view = viewFactory.buildView(data);
-            field.setView(view);
-        }
+        // TODO: NAE-1645 change to component
+//        if (data.getFormat() != null) {
+//            Format format = formatFactory.buildFormat(data.getFormat());
+//            field.setFormat(format);
+//        }
+//        if (data.getView() != null) {
+//            View view = viewFactory.buildView(data);
+//            field.setView(view);
+//        }
 
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
@@ -156,248 +100,6 @@ public final class FieldFactory {
 
     private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
         return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
-    }
-
-    private TaskField buildTaskField(Data data, List<Transition> transitions) {
-        TaskField field = new TaskField();
-        setDefaultValues(field, data, defaultValues -> {
-            if (defaultValues != null && !defaultValues.isEmpty()) {
-                List<String> defaults = new ArrayList<>();
-                defaultValues.forEach(s -> {
-                    if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
-                        log.warn("There is no transition with id [" + s + "]");
-                    defaults.add(s);
-                });
-                field.setDefaultValue(defaults);
-            }
-        });
-        return field;
-    }
-
-    private MultichoiceField buildMultichoiceField(Data data, Importer importer) {
-        MultichoiceField field = new MultichoiceField();
-        if (data.getOptions() != null) {
-            setFieldOptions(field, data, importer);
-        } else {
-            setFieldChoices(field, data, importer);
-        }
-        setDefaultValues(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(init.stream().map(I18nString::new).collect(Collectors.toSet()));
-            }
-        });
-        return field;
-    }
-
-    private EnumerationField buildEnumerationField(Data data, Importer importer) {
-        EnumerationField field = new EnumerationField();
-        if (data.getOptions() != null) {
-            setFieldOptions(field, data, importer);
-        } else {
-            setFieldChoices(field, data, importer);
-        }
-        setDefaultValue(field, data, init -> {
-            if (init != null && !init.equals("")) {
-                field.setDefaultValue(new I18nString(init));
-            }
-        });
-        return field;
-    }
-
-    private void setFieldChoices(ChoiceField field, Data data, Importer importer) {
-        if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
-            field.setExpression(new Expression(data.getValues().get(0).getValue()));
-
-        } else if (data.getValues() != null) {
-            List<I18nString> choices = data.getValues().stream()
-                    .map(importer::toI18NString)
-                    .collect(Collectors.toList());
-            field.getChoices().addAll(choices);
-        }
-    }
-
-    private MultichoiceMapField buildMultichoiceMapField(Data data, Importer importer) {
-        MultichoiceMapField field = new MultichoiceMapField();
-        setFieldOptions(field, data, importer);
-        setDefaultValues(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(new HashSet<>(init));
-            }
-        });
-        return field;
-    }
-
-    private EnumerationMapField buildEnumerationMapField(Data data, Importer importer) {
-        EnumerationMapField field = new EnumerationMapField();
-        setFieldOptions(field, data, importer);
-        setDefaultValue(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(init);
-            }
-        });
-        return field;
-    }
-
-    private void setFieldOptions(ChoiceField field, Data data, Importer importer) {
-        if (data.getOptions() != null && data.getOptions().getInit() != null) {
-            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
-            return;
-        }
-
-        List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
-                .map(importer::toI18NString)
-                .collect(Collectors.toList());
-        field.getChoices().addAll(options);
-    }
-
-    private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
-        if (data.getOptions() != null && data.getOptions().getInit() != null) {
-            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
-            return;
-        }
-
-        Map<String, I18nString> choices = (data.getOptions() == null) ? new LinkedHashMap<>() : data.getOptions().getOption().stream()
-                .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
-        field.setOptions(choices);
-    }
-
-    private TextField buildTextField(Data data) {
-        String value = null;
-        List<I18NStringTypeWithExpression> values = data.getValues();
-        if (values != null && !values.isEmpty())
-            value = values.get(0).getValue();
-
-        TextField field = new TextField();
-        field.setValue(value);
-        setDefaultValue(field, data, field::setDefaultValue);
-        return field;
-    }
-
-    private BooleanField buildBooleanField(Data data) {
-        BooleanField field = new BooleanField();
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Boolean.valueOf(defaultValue));
-            }
-        });
-        return field;
-    }
-
-    private DateField buildDateField(Data data) {
-        DateField field = new DateField();
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(parseDate(defaultValue));
-            }
-        });
-        return field;
-    }
-
-    private NumberField buildNumberField(Data data) {
-        NumberField field = new NumberField();
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Double.parseDouble(defaultValue));
-            }
-        });
-        return field;
-    }
-
-    private ButtonField buildButtonField(Data data) {
-        ButtonField field = new ButtonField();
-        setDefaultValue(field, data, defaultValue -> {
-            if (defaultValue != null) {
-                field.setDefaultValue(Integer.parseInt(defaultValue));
-            }
-        });
-        return field;
-    }
-
-    private DateTimeField buildDateTimeField(Data data) {
-        DateTimeField field = new DateTimeField();
-        setDefaultValue(field, data, defaultValue -> field.setDefaultValue(parseDateTime(defaultValue)));
-        return field;
-    }
-
-    private CaseField buildCaseField(Data data) {
-        AllowedNets nets = data.getAllowedNets();
-        CaseField field;
-        if (nets == null) {
-            field = new CaseField();
-        } else {
-            field = new CaseField(new ArrayList<>(nets.getAllowedNet()));
-        }
-        setDefaultValues(field, data, inits -> {
-        });
-        return field;
-    }
-
-    private UserField buildUserField(Data data, Importer importer) {
-        String[] roles = data.getValues().stream()
-                .map(value -> importer.getRoles().get(value.getValue()).getStringId())
-                .toArray(String[]::new);
-        UserField field = new UserField(roles);
-        setDefaultValues(field, data, inits -> {
-            field.setDefaultValue(null);
-        });
-        return field;
-    }
-
-    private UserListField buildUserListField(Data data) {
-        UserListField field = new UserListField();
-        setDefaultValues(field, data, inits -> {
-        });
-        return field;
-    }
-
-    private FileField buildFileField(Data data) {
-        FileField fileField = new FileField();
-        fileField.setRemote(data.getRemote() != null);
-        setDefaultValue(fileField, data, defaultValue -> {
-            if (defaultValue != null) {
-                fileField.setDefaultValue(defaultValue);
-            }
-        });
-        return fileField;
-    }
-
-    private FileListField buildFileListField(Data data) {
-        FileListField fileListField = new FileListField();
-        fileListField.setRemote(data.getRemote() != null);
-        setDefaultValues(fileListField, data, defaultValues -> {
-            if (defaultValues != null && !defaultValues.isEmpty()) {
-                fileListField.setDefaultValue(defaultValues);
-            }
-        });
-        return fileListField;
-    }
-
-    private FilterField buildFilterField(Data data) {
-        AllowedNets nets = data.getAllowedNets();
-        if (nets == null) {
-            return new FilterField();
-        } else {
-            return new FilterField(new ArrayList<>(nets.getAllowedNet()));
-        }
-    }
-
-    private I18nField buildI18nField(Data data, Importer importer) {
-        I18nField i18nField = new I18nField();
-        String initExpression = getInitExpression(data);
-        if (initExpression != null) {
-            i18nField.setInitExpression(new Expression(initExpression));
-        } else {
-            if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
-                i18nField.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
-            } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {
-                i18nField.setDefaultValue(new I18nString(data.getInit().getValue()));
-            } else if (data.getInit() != null && data.getInit().getName() != null && !data.getInit().getName().equals("")) {
-                i18nField.setDefaultValue(importer.toI18NString(data.getInit()));
-            } else {
-                i18nField.setDefaultValue(new I18nString(""));
-            }
-        }
-        return i18nField;
     }
 
     private void setActions(Field field, Data data) {
@@ -741,48 +443,4 @@ public final class FieldFactory {
             ((FilterField) field).setFilterMetadata(filterMetadata);
         }
     }
-
-    private <T> void setDefaultValue(Field<T> field, Data data, Consumer<String> setDefault) {
-        String initExpression = getInitExpression(data);
-        if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression));
-        } else {
-            setDefault.accept(resolveInit(data));
-        }
-    }
-
-    private <T> void setDefaultValues(Field<T> field, Data data, Consumer<List<String>> setDefault) {
-        String initExpression = getInitExpression(data);
-        if (initExpression != null) {
-            field.setInitExpression(new Expression(initExpression));
-        } else {
-            setDefault.accept(resolveInits(data));
-        }
-    }
-
-    private String getInitExpression(Data data) {
-        if (data.getInit() != null) {
-            if (data.getInit().isDynamic()) {
-                return data.getInit().getValue();
-            }
-        }
-        return null;
-    }
-
-    private String resolveInit(Data data) {
-        if (data.getInits() != null && data.getInits().getInit() != null) {
-            return data.getInits().getInit().get(0).getValue();
-        }
-        if (data.getInit() != null) return data.getInit().getValue();
-        return null;
-    }
-
-    private List<String> resolveInits(Data data) {
-        if (data.getInits() != null && data.getInits().getInit() != null) {
-            return data.getInits().getInit().stream().map(Init::getValue).collect(Collectors.toList());
-        }
-        if (data.getInit() != null) return Arrays.asList(data.getInit().getValue().split(","));
-        return Collections.emptyList();
-    }
-
 }

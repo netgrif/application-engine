@@ -1,7 +1,8 @@
-package com.netgrif.application.engine.importer.service;
+package com.netgrif.application.engine.importer.service.validation;
 
 import com.netgrif.application.engine.importer.model.Transition;
 import com.netgrif.application.engine.importer.service.throwable.BeatingAttributesException;
+import com.netgrif.application.engine.importer.service.validation.IModelValidator;
 
 public interface ITransitionValidator extends IModelValidator {
 

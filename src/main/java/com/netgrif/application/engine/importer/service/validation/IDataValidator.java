@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.importer.service;
+package com.netgrif.application.engine.importer.service.validation;
 
 import com.netgrif.application.engine.importer.model.Data;
 

@@ -2,11 +2,12 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
-import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,7 @@ public class Case {
     private LocalDateTime lastModified;
 
     @Getter
+    @Indexed
     private String visualId;
 
     @NotNull
@@ -80,7 +82,8 @@ public class Case {
     @Getter
     @Setter
     @JsonIgnore
-    private LinkedHashMap<String, DataField> dataSet;
+    @QueryType(PropertyType.NONE)
+    private DataSet dataSet;
 
     /**
      * List of data fields importIds
@@ -107,7 +110,7 @@ public class Case {
 
     @Getter
     @Setter
-    @JsonIgnore
+    @Indexed
     private Set<TaskPair> tasks;
 
     @Getter
@@ -151,30 +154,20 @@ public class Case {
     @Setter
     private List<String> negativeViewUsers;
 
-    public Case() {
+    public Case(PetriNet petriNet) {
         _id = new ObjectId();
-        activePlaces = new HashMap<>();
-        dataSet = new LinkedHashMap<>();
-        immediateDataFields = new LinkedHashSet<>();
+        dataSet = new DataSet();
         consumedTokens = new HashMap<>();
         tasks = new HashSet<>();
-        visualId = generateVisualId();
-        enabledRoles = new HashSet<>();
-        permissions = new HashMap<>();
-        userRefs = new HashMap<>();
         users = new HashMap<>();
         viewRoles = new LinkedList<>();
         viewUserRefs = new LinkedList<>();
         viewUsers = new LinkedList<>();
-        negativeViewRoles = new LinkedList<>();
         negativeViewUsers = new ArrayList<>();
-    }
 
-    public Case(PetriNet petriNet) {
-        this();
+        this.petriNet = petriNet;
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
-        this.petriNet = petriNet;
         activePlaces = petriNet.getActivePlaces();
         immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
@@ -209,48 +202,7 @@ public class Case {
     }
 
     public boolean hasFieldBehavior(String field, String transition) {
-        return this.dataSet.get(field).hasDefinedBehavior(transition);
-    }
-
-    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
-        List<Field> dynamicInitFields = new LinkedList<>();
-        List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
-        List<ChoiceField> dynamicChoicesFields = new LinkedList<>();
-        petriNet.getDataSet().forEach((key, field) -> {
-            if (field.isDynamicDefaultValue()) {
-                dynamicInitFields.add(field);
-                this.dataSet.put(key, new DataField());
-            } else {
-                this.dataSet.put(key, new DataField(field.getDefaultValue()));
-            }
-            if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
-            }
-            if (field instanceof FieldWithAllowedNets) {
-                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
-            }
-            if (field instanceof FilterField) {
-                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
-            }
-            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
-                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
-            }
-            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
-                dynamicChoicesFields.add((ChoiceField) field);
-            }
-        });
-        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
-        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
-        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
-        populateDataSetBehavior();
-    }
-
-    private void populateDataSetBehavior() {
-        petriNet.getTransitions().forEach((transitionKey, transitionValue) -> {
-            transitionValue.getDataSet().forEach((dataKey, dataValue) -> {
-                getDataSet().get(dataKey).addBehavior(transitionKey, new HashSet<>(dataValue.getBehavior()));
-            });
-        });
+        return this.dataSet.get(field).getBehaviors().get(transition) != null;
     }
 
     private String generateVisualId() {
@@ -288,7 +240,7 @@ public class Case {
         return petriNet.getDataSet().get(id);
     }
 
-    public DataField getDataField(String id) {
+    public Field getDataField(String id) {
         return dataSet.get(id);
     }
 

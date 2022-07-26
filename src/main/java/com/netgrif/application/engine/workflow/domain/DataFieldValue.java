@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataFieldValue {
+public class DataFieldValue<T> {
 
-    private Object value;
+    private T value;
 
     @Override
     public String toString() {

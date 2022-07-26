@@ -298,20 +298,20 @@ class ImporterTest {
         assert net
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
 
-        assert testCase.dataSet.get(NUMBER_FIELD).behavior.get("1") == [FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
-        assert testCase.dataSet.get(TEXT_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN] as Set<FieldBehavior>
-        assert testCase.dataSet.get(ENUMERATION_FIELD).behavior.get("1") == [FieldBehavior.VISIBLE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(ENUMERATION_MAP_FIELD).behavior.get("1") == [FieldBehavior.EDITABLE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(MULTICHOICE_FIELD).behavior.get("1") == [FieldBehavior.REQUIRED] as Set<FieldBehavior>
-        assert testCase.dataSet.get(MULTICHOICE_MAP_FIELD).behavior.get("1") == [FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(BOOLEAN_FIELD).behavior.get("1") == [FieldBehavior.OPTIONAL] as Set<FieldBehavior>
-        assert testCase.dataSet.get(DATE_FIELD).behavior.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED] as Set<FieldBehavior>
-        assert testCase.dataSet.get(DATETIME_FIELD).behavior.get("1") == [FieldBehavior.IMMEDIATE, FieldBehavior.REQUIRED] as Set<FieldBehavior>
-        assert testCase.dataSet.get(FILE_FIELD).behavior.get("1") == [FieldBehavior.IMMEDIATE, FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
-        assert testCase.dataSet.get(FILE_LIST_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL] as Set<FieldBehavior>
-        assert testCase.dataSet.get(USER_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(BUTTON_FIELD).behavior.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(I18N_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(NUMBER_FIELD).behaviors.get("1") == [FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
+        assert testCase.dataSet.get(TEXT_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN] as Set<FieldBehavior>
+        assert testCase.dataSet.get(ENUMERATION_FIELD).behaviors.get("1") == [FieldBehavior.VISIBLE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(ENUMERATION_MAP_FIELD).behaviors.get("1") == [FieldBehavior.EDITABLE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(MULTICHOICE_FIELD).behaviors.get("1") == [FieldBehavior.REQUIRED] as Set<FieldBehavior>
+        assert testCase.dataSet.get(MULTICHOICE_MAP_FIELD).behaviors.get("1") == [FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(BOOLEAN_FIELD).behaviors.get("1") == [FieldBehavior.OPTIONAL] as Set<FieldBehavior>
+        assert testCase.dataSet.get(DATE_FIELD).behaviors.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED] as Set<FieldBehavior>
+        assert testCase.dataSet.get(DATETIME_FIELD).behaviors.get("1") == [FieldBehavior.IMMEDIATE, FieldBehavior.REQUIRED] as Set<FieldBehavior>
+        assert testCase.dataSet.get(FILE_FIELD).behaviors.get("1") == [FieldBehavior.IMMEDIATE, FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
+        assert testCase.dataSet.get(FILE_LIST_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL] as Set<FieldBehavior>
+        assert testCase.dataSet.get(USER_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(BUTTON_FIELD).behaviors.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(I18N_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
     }
 
     @Test

@@ -10,11 +10,11 @@ import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -193,11 +193,12 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void addUser(IUser user, Case groupCase) {
-        Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
+        MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataField(GROUP_MEMBERS_FIELD);
+        Map<String, I18nString> existingUsers = field.getOptions();
         if (existingUsers == null) {
             existingUsers = new HashMap<>();
         }
-        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(user, existingUsers));
+        field.setOptions(addUser(user, existingUsers));
         workflowService.save(groupCase);
         user.addGroup(groupCase.getStringId());
         userService.save(user);
@@ -213,16 +214,16 @@ public class NextGroupService implements INextGroupService {
     @Override
     public void removeUser(IUser user, Case groupCase) {
         HashSet<String> userIds = new HashSet<>();
-        Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
-
+        MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataField(GROUP_MEMBERS_FIELD);
+        Map<String, I18nString> existingUsers = field.getOptions();
         userIds.add(user.getStringId());
-        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(removeUser(userIds, existingUsers, groupCase));
+        field.setOptions(removeUser(userIds, existingUsers, groupCase));
         workflowService.save(groupCase);
     }
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase) {
-        String authorId = this.getGroupOwnerId(groupCase).toString();
+        String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if (user.equals(authorId)) {
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");

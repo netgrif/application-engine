@@ -1,64 +1,44 @@
 package com.netgrif.application.engine.petrinet.domain;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DataFieldLogic {
+@Data
+public class DataRef {
 
-    @Getter
-    @Setter
-    private Set<FieldBehavior> behavior;
+    private Field field;
 
-    @Getter
-    @Setter
+    private FieldBehavior behavior;
+
     private Map<DataEventType, DataEvent> events;
 
-    @Getter
-    @Setter
     private FieldLayout layout;
 
-    @Getter
-    @Setter
     private Component component;
 
-    public DataFieldLogic() {
-        this.behavior = new HashSet<>();
+    public DataRef() {
         this.events = new HashMap<>();
         this.layout = new FieldLayout();
     }
 
-    public DataFieldLogic(Set<FieldBehavior> behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+    public DataRef(FieldBehavior behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
         this();
-        this.behavior.addAll(behavior);
+        this.behavior = behavior;
         this.events = events;
         this.layout = layout;
-        if (component != null)
+        if (component != null) {
             this.component = component;
-    }
-
-    public ObjectNode applyBehavior(ObjectNode jsonNode) {
-        behavior.forEach(fieldBehavior -> jsonNode.put(fieldBehavior.toString(), true));
-        return jsonNode;
-    }
-
-    public ObjectNode applyBehavior() {
-        return applyBehavior(JsonNodeFactory.instance.objectNode());
-    }
-
-    public boolean isDisplayable() {
-        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
+        }
     }
 
     public boolean isDisplayableForCase() {
@@ -89,5 +69,8 @@ public class DataFieldLogic {
 
     public boolean layoutExist() {
         return this.layout != null;
+    }
+
+    public boolean isImmediate() {
     }
 }

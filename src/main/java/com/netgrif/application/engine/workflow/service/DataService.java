@@ -16,7 +16,6 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
@@ -100,7 +99,7 @@ public class DataService implements IDataService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
-        List<Field> dataSetFields = new ArrayList<>();
+        List<DataRef> dataSetFields = new ArrayList<>();
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), false));
         }
@@ -117,8 +116,8 @@ public class DataService implements IDataService {
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehavior(useCase.getDataSet().get(fieldId).getBehavior().get(transition.getStringId()));
+                    DataRef validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    validationField.setBehaviors(useCase.getDataSet().get(fieldId).getBehaviors().get(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
@@ -127,8 +126,8 @@ public class DataService implements IDataService {
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehavior(transition.getDataSet().get(fieldId).getBehavior());
+                    DataRef validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    validationField.setBehaviors(transition.getDataSet().get(fieldId).getBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
@@ -142,15 +141,16 @@ public class DataService implements IDataService {
 
         workflowService.save(useCase);
 
-        dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
-            DataField dataField = useCase.getDataSet().get(field.getImportId());
-            if (dataField.getVersion().equals(0L) && dataField.getValue().equals(0.0)) {
-                field.setValue(null);
-            }
-        });
-
-        LongStream.range(0L, dataSetFields.size())
-                .forEach(index -> dataSetFields.get((int) index).setOrder(index));
+        // TODO: NAE-1645 should be ok with field value object
+//        dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
+//            Field dataField = useCase.getDataSet().get(field.getImportId());
+//            if (dataField.getVersion().equals(0L) && dataField.getValue().equals(0.0)) {
+//                field.setValue(null);
+//            }
+//        });
+        // TODO: NAE-1645 wut?
+//        LongStream.range(0L, dataSetFields.size())
+//                .forEach(index -> dataSetFields.get((int) index).setOrder(index));
         outcome.setData(dataSetFields);
         return outcome;
     }
@@ -161,8 +161,8 @@ public class DataService implements IDataService {
             field.setComponent(transitionComponent);
     }
 
-    private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
-        if (dataField.getBehavior().contains(transition.getImportId())) {
+    private boolean isForbidden(String fieldId, Transition transition, Field dataField) {
+        if (dataField.getBehaviors().contains(transition.getImportId())) {
             return dataField.isForbidden(transition.getImportId());
         } else {
             return transition.getDataSet().get(fieldId).isForbidden();
@@ -194,7 +194,7 @@ public class DataService implements IDataService {
             if (fieldOptional.isEmpty()) {
                 return;
             }
-            DataField dataField = useCase.getDataSet().get(fieldId);
+            Field dataField = useCase.getDataSet().get(fieldId);
             Field field = fieldOptional.get();
             // PRE
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
@@ -206,7 +206,7 @@ public class DataService implements IDataService {
             dataField.applyChanges(newDataField);
             outcome.addChangedField(fieldId, newDataField);
             workflowService.save(useCase);
-            historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, Collections.singletonMap(fieldId, newDataField)));
+            historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
             // POST
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task));
             historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
@@ -306,7 +306,7 @@ public class DataService implements IDataService {
     }
 
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
-        if (taskRefField.getBehavior().contains(FieldBehavior.VISIBLE)) {
+        if (taskRefField.getBehaviors().contains(FieldBehavior.VISIBLE)) {
             taskRefDataGroups.forEach(dataGroup -> {
                 dataGroup.getFields().getContent().forEach(field -> {
                     if (field.getBehavior().contains(FieldBehavior.EDITABLE)) {
@@ -314,7 +314,7 @@ public class DataService implements IDataService {
                     }
                 });
             });
-        } else if (taskRefField.getBehavior().contains(FieldBehavior.HIDDEN)) {
+        } else if (taskRefField.getBehaviors().contains(FieldBehavior.HIDDEN)) {
             taskRefDataGroups.forEach(dataGroup -> {
                 dataGroup.getFields().getContent().forEach(field -> {
                     if (!field.getBehavior().contains(FieldBehavior.FORBIDDEN))
@@ -655,7 +655,7 @@ public class DataService implements IDataService {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setValue((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue());
+        field.setValue(((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue()));
         return new ImmutablePair<>(useCase, field);
     }
 
@@ -677,7 +677,7 @@ public class DataService implements IDataService {
 
     private void updateDataset(Case useCase) {
         Case actual = workflowService.findOne(useCase.getStringId());
-        actual.getDataSet().forEach((id, dataField) -> {
+        actual.getDataSet().getFields().forEach((id, dataField) -> {
             if (dataField.isNewerThen(useCase.getDataField(id))) {
                 useCase.getDataSet().put(id, dataField);
             }
@@ -688,147 +688,9 @@ public class DataService implements IDataService {
         return eventService.processDataEvents(field, trigger, phase, useCase, task);
     }
 
-    private Object parseFieldsValues(DataField newValueField, DataField dataField, Field petriNetField) {
-        Object value = null;
-        //TODO: NAE-1645 check if all types are parsed correctly
-        switch (petriNetField.getType()) {
-            case DATE:
-                if (newValueField.getValue() == null) {
-                    value = null;
-                    break;
-                }
-                value = FieldFactory.parseDate(newValueField.getValue());
-                break;
-            case DATE_TIME:
-                if (newValueField.getValue() == null) {
-                    value = null;
-                    break;
-                }
-                value = FieldFactory.parseDateTime(newValueField.getValue());
-                break;
-            case BOOLEAN:
-                value = !(newValueField.getValue() == null) && ((Boolean) newValueField.getValue());
-                break;
-            case MULTICHOICE:
-//                value = parseMultichoiceFieldValues(newValueField).stream().map(I18nString::new).collect(Collectors.toSet());
-                // TODO: NAE-1645 string > i18nstring?
-                break;
-            case ENUMERATION:
-                if (newValueField.getValue() == null) {
-                    value = null;
-                    break;
-                }
-                String val = (String) newValueField.getValue();
-                value = new I18nString(val);
-                break;
-            case USER:
-                if (newValueField.getValue() == null) {
-                    value = null;
-                    break;
-                }
-                // TODO: NAE-1645: remove?
-//                User user = new User(userService.findById(newValueField.getValue().asLong(), true));
-//                user.setPassword(null);
-//                user.setGroups(null);
-//                user.setAuthorities(null);
-//                user.setUserProcessRoles(null);
-                value = makeUserFieldValue((String) newValueField.getValue());
-                break;
-            case NUMBER:
-                if (newValueField.getValue() == null) {
-                    value = 0.0;
-                    break;
-                }
-                value = newValueField.getValue();
-                break;
-            case FILE:
-                if (newValueField.getValue() == null) {
-                    value = new FileFieldValue();
-                    break;
-                }
-                value = FileFieldValue.fromString((String) newValueField.getValue());
-                break;
-            case CASE_REF:
-                List<String> list = (List<String>) newValueField.getValue();
-                validateCaseRefValue(list, dataField.getAllowedNets());
-                value = list;
-                break;
-            case TASK_REF:
-                value = newValueField.getValue();
-                // TODO 29.9.2020: validate task ref value? is such feature desired?
-                break;
-            case USER_LIST:
-                if (newValueField.getValue() == null) {
-                    value = null;
-                    break;
-                }
-                value = newValueField.getValue();
-                break;
-            case BUTTON:
-                if (newValueField.getValue() == null) {
-                    if (dataField.getValue() == null) {
-                        value = 1;
-                        break;
-                    }
-                    value = Integer.parseInt(dataField.getValue().toString()) + 1;
-                } else {
-                    value = newValueField.getValue();
-                }
-                break;
-            case I_18_N:
-                if (newValueField.getValue() == null) {
-                    value = new I18nString("");
-                    break;
-                }
-                value = parseI18nStringValues(newValueField);
-                break;
-            default:
-                value = newValueField.getValue(); // TODO: NAE-1645 check null value
-                break;
-        }
-        if (value instanceof String && ((String) value).equalsIgnoreCase("null")) {
-            return null;
-        }
-        return value;
-    }
-
     protected UserFieldValue makeUserFieldValue(String id) {
         IUser user = userService.resolveById(id, true);
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-    }
-
-    private List<String> parseAllowedNetsValue(DataField dataField, Field field) {
-        if (field.getType() == DataType.CASE_REF || field.getType() == DataType.FILTER) {
-            return dataField.getAllowedNets();
-        }
-        return null;
-    }
-
-    // TODO: NAE-1645 wtf?
-    private Map<String, Object> parseFilterMetadataValue(DataField dataField, Field field) {
-//        if (field.getType() == DataType.FILTER) {
-//            JsonNode filterMetadata = node.get("filterMetadata");
-//            if (filterMetadata == null) {
-//                return null;
-//            }
-//            ObjectMapper mapper = new ObjectMapper();
-//            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>() {
-//            });
-//        }
-        return null;
-    }
-
-    private I18nString parseI18nStringValues(DataField node) {
-        // TODO: NAE-1645 maybe fix
-//        String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
-//        Map<String, String> translations = new HashMap<>();
-//        if (node.get("value").get("translations") != null) {
-//            node.get("value").get("translations").fields().forEachRemaining(entry ->
-//                translations.put(entry.getKey(), entry.getValue().asText())
-//            );
-//        }
-//        return new I18nString(defaultValue, translations);
-        return null;
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {

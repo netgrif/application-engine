@@ -113,7 +113,7 @@ class FunctionsTest {
         aCase = workflowService.findOne(aCase.getStringId())
 
         assert aCase.getDataField("number").isRequired(aCase.tasks.first().transition)
-        def fieldBehavior = aCase.getDataField("number").behavior
+        def fieldBehavior = aCase.getDataField("number").behaviors
         assert fieldBehavior.containsKey(aCase.tasks.first().transition) && fieldBehavior.get(aCase.tasks.first().transition).contains(FieldBehavior.EDITABLE)
 
         petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())

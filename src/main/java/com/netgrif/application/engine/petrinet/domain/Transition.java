@@ -150,11 +150,15 @@ public class Transition extends Node {
 
     public boolean isDisplayable(String fieldId) {
         DataFieldLogic logic = dataSet.get(fieldId);
-        return logic != null && logic.isDisplayable();
+        if (logic == null) {
+            return false;
+        }
+        FieldBehavior behavior = logic.getBehavior();
+        return behavior != null && behavior.isDisplayable();
     }
 
     public List<String> getImmediateData() {
-        return dataSet.entrySet().stream().filter(entry -> entry.getValue().getBehavior().contains(FieldBehavior.IMMEDIATE))
+        return dataSet.entrySet().stream().filter(entry -> entry.getValue().isImmediate())
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 

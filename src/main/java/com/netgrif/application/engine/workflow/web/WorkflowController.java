@@ -187,20 +187,6 @@ public class WorkflowController {
         }
     }
 
-    @Deprecated
-    @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
-    @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId), locale);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of [" + caseId + "] failed:", e);
-            return new DataFieldsResource(new ArrayList<>(), locale);
-        }
-    }
-
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)

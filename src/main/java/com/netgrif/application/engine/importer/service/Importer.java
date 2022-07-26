@@ -2,6 +2,10 @@ package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.importer.service.validation.IActionValidator;
+import com.netgrif.application.engine.importer.service.validation.IDocumentValidator;
+import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
+import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.Place;
@@ -1109,7 +1113,7 @@ public class Importer {
         throw new IllegalArgumentException("Node with id [" + id + "] not found.");
     }
 
-    protected I18nString toI18NString(I18NStringType imported) {
+    public I18nString toI18NString(I18NStringType imported) {
         if (imported == null) {
             return null;
         }

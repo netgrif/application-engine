@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes;
 
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -13,7 +14,7 @@ import java.util.List;
 @Data
 public class GetDataEventOutcome extends TaskEventOutcome {
 
-    private List<Field> data;
+    private List<DataRef> data;
 
     public GetDataEventOutcome(Case aCase, Task task) {
         super(aCase, task);
@@ -23,7 +24,7 @@ public class GetDataEventOutcome extends TaskEventOutcome {
         super(message, aCase, task);
     }
 
-    public GetDataEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase, Task task, List<Field> data) {
+    public GetDataEventOutcome(I18nString message, List<EventOutcome> outcomes, Case aCase, Task task, List<DataRef> data) {
         super(message, outcomes, aCase, task);
         this.data = data;
     }

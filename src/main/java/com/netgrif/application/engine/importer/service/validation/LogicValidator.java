@@ -1,8 +1,8 @@
-package com.netgrif.application.engine.importer.service;
+package com.netgrif.application.engine.importer.service.validation;
 
 import com.netgrif.application.engine.importer.model.Logic;
-import com.netgrif.application.engine.importer.model.Transition;
 import com.netgrif.application.engine.importer.service.throwable.BeatingAttributesException;
+import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;

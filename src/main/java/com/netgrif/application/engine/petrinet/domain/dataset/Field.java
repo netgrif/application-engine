@@ -1,63 +1,52 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.Component;
-import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
+import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.views.View;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
+import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Document
 @Data
-public abstract class Field<T> extends Imported {
+public abstract class Field<T> extends Imported implements Referencable {
 
     @Id
     protected ObjectId _id;
     protected T defaultValue;
     protected Expression initExpression;
     protected List<Validation> validations;
-    @Transient
-    protected String parentTaskId;
-    @Transient
-    protected String parentCaseId;
     private I18nString name;
     private I18nString description;
     private I18nString placeholder;
-    @Transient
-    private Set<FieldBehavior> behavior;
-    @Transient
-    private FieldLayout layout;
-    @Transient
-    private T value;
+    private DataFieldBehaviors behaviors;
+    private DataFieldValue<T> value;
     private Long order;
-    @JsonIgnore
+    //TODO: NAE-1645 jsonignore?
     private boolean immediate;
-    @JsonIgnore
     private Map<DataEventType, DataEvent> events;
-    @JsonIgnore
     private String encryption;
-    private Format format;
-    private View view;
     private Integer length;
     private Component component;
+    private Long version = 0L;
 
     public Field() {
         _id = new ObjectId();
@@ -70,6 +59,13 @@ public abstract class Field<T> extends Imported {
 
     @QueryType(PropertyType.NONE)
     public abstract DataType getType();
+
+    public void setValue(T value) {
+        if (this.value == null) {
+            this.value = new DataFieldValue<>();
+        }
+        this.value.setValue(value);
+    }
 
     public void addActions(Collection<Action> dataEvents, DataEventType type) {
         dataEvents.forEach(action -> addAction(action, type));
@@ -141,6 +137,15 @@ public abstract class Field<T> extends Imported {
         return description.getTranslation(locale);
     }
 
+    public void applyChanges(Field<?> field) {
+        // TODO: NAE-1645
+    }
+
+    public boolean isNewerThen(Field<?> field) {
+        // TODO: NAE-1645
+        return true;
+    }
+
     @Override
     public String toString() {
         return name.getDefaultValue();
@@ -156,8 +161,6 @@ public abstract class Field<T> extends Imported {
         clone.immediate = this.immediate;
         clone.events = this.events;
         clone.encryption = this.encryption;
-        clone.view = this.view;
-        clone.format = this.format;
         clone.length = this.length;
         clone.component = this.component;
         if (this.validations != null) {
@@ -168,4 +171,23 @@ public abstract class Field<T> extends Imported {
     }
 
     public abstract Field<T> clone();
+
+    public boolean isForbidden(String transitionId) {
+        return isBehavior(transitionId, dataFieldBehavior -> dataFieldBehavior.getBehavior() == FieldBehavior.FORBIDDEN);
+    }
+
+    public boolean isDisplayable(String transitionId) {
+        return isBehavior(transitionId, dataFieldBehavior -> dataFieldBehavior.getBehavior() == FieldBehavior.VISIBLE || dataFieldBehavior.getBehavior() == FieldBehavior.EDITABLE);
+    }
+
+    private boolean isBehavior(String transitionId, Function<DataFieldBehavior, Boolean> compare) {
+        if (behaviors == null) {
+            return false;
+        }
+        DataFieldBehavior fieldBehavior = behaviors.get(transitionId);
+        if (fieldBehavior == null) {
+            return false;
+        }
+        return compare.apply(fieldBehavior);
+    }
 }

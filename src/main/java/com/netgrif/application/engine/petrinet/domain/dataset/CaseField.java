@@ -10,7 +10,7 @@ import java.util.List;
 public class CaseField extends FieldWithAllowedNets<List<String>> {
 
     public CaseField() {
-        this(new ArrayList<>());
+        this();
     }
 
     public CaseField(List<String> allowedNets) {
@@ -22,11 +22,6 @@ public class CaseField extends FieldWithAllowedNets<List<String>> {
     @QueryType(PropertyType.NONE)
     public DataType getType() {
         return DataType.CASE_REF;
-    }
-
-    @Override
-    public void clearValue() {
-        this.setValue(new ArrayList<>());
     }
 
     @Override

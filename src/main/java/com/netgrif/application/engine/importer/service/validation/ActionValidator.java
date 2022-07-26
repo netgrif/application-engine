@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.importer.service;
+package com.netgrif.application.engine.importer.service.validation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

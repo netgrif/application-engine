@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -14,7 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
-import com.netgrif.application.engine.workflow.domain.DataField;
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -257,7 +256,7 @@ public class PetriNet extends PetriNetObject {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
     }
 
-    public void initializeArcs(Map<String, DataField> dataSet) {
+    public void initializeArcs(DataSet dataSet) {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
@@ -268,7 +267,7 @@ public class PetriNet extends PetriNetObject {
                 });
     }
 
-    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet){
+    private Referencable getArcReference(String referenceId, Type type, DataSet dataSet){
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {
@@ -299,10 +298,6 @@ public class PetriNet extends PetriNetObject {
 
     public List<Field> getImmediateFields() {
         return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
-    }
-
-    public boolean isDisplayableInAnyTransition(String fieldId) {
-        return transitions.values().stream().parallel().anyMatch(trans -> trans.isDisplayable(fieldId));
     }
 
     public void incrementVersion(VersionType type) {

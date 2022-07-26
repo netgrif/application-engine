@@ -1,34 +1,25 @@
 package com.netgrif.application.engine.workflow.domain;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 @Data
-@AllArgsConstructor
 public class DataFieldBehavior {
-    /**
-     * TransitionId: [FieldBehavior]
-     */
-    private Map<String, Set<FieldBehavior>> behaviors;
+
+    private FieldBehavior behavior;
+
+    private boolean required;
+
+    private boolean immediate;
 
     public DataFieldBehavior() {
-        this.behaviors = new HashMap<>();
+        behavior = FieldBehavior.EDITABLE;
     }
 
-    public Set<FieldBehavior> get(String transitionId) {
-        return behaviors.get(transitionId);
-    }
-
-    public Set<FieldBehavior> put(String transitionId, Set<FieldBehavior> behavior) {
-        return behaviors.put(transitionId, behavior);
-    }
-
-    public boolean contains(String transitionId) {
-        return behaviors.containsKey(transitionId);
+    public void setBehavior(FieldBehavior behavior) {
+        if (behavior == null) {
+            throw new IllegalArgumentException("Behavior can not be null");
+        }
+        this.behavior = behavior;
     }
 }

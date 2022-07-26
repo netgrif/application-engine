@@ -59,7 +59,7 @@ public class LocalisedField {
         name = field.getTranslatedName(locale);
         description = field.getTranslatedDescription(locale);
         placeholder = field.getTranslatedPlaceholder(locale);
-        behavior = field.getBehavior();
+        behavior = field.getBehaviors();
         layout = field.getLayout();
         value = field.getValue();
         order = field.getOrder();

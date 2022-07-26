@@ -13,10 +13,8 @@ import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-
 import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -27,7 +25,6 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
@@ -41,8 +38,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.querydsl.core.types.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
@@ -158,7 +153,7 @@ public class WorkflowService implements IWorkflowService {
         return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
-                .peek(caze ->  {
+                .peek(caze -> {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);
                     setImmediateDataFieldsReadOnly(caze);
@@ -271,7 +266,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setTitle(makeTitle.apply(useCase));
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
-        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty() ));
+        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty()));
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -416,26 +411,6 @@ public class WorkflowService implements IWorkflowService {
         save(useCase);
     }
 
-    @Deprecated
-    public List<Field> getData(String caseId) {
-        Optional<Case> optionalUseCase = repository.findById(caseId);
-        if (optionalUseCase.isEmpty()) {
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        }
-        Case useCase = optionalUseCase.get();
-        List<Field> fields = new ArrayList<>();
-        useCase.getDataSet().forEach((id, dataField) -> {
-            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id, null);
-                field.setBehavior(Collections.singleton(FieldBehavior.VISIBLE));
-                fields.add(field);
-            }
-        });
-
-        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
-        return fields;
-    }
-
     private void setImmediateDataFieldsReadOnly(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
 
@@ -494,23 +469,25 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void applyCryptoMethodOnDataSet(Case useCase, Function<Pair<String, String>, String> method) {
-        Map<DataField, String> dataFields = getEncryptedDataSet(useCase);
+        Map<Field, String> dataFields = getEncryptedDataSet(useCase);
 
-        for (Map.Entry<DataField, String> entry : dataFields.entrySet()) {
-            DataField dataField = entry.getKey();
-            String value = (String) dataField.getValue();
-            String encryption = entry.getValue();
-
-            if (value == null)
+        for (Map.Entry<Field, String> entry : dataFields.entrySet()) {
+            Field dataField = entry.getKey();
+            if (!(dataField instanceof TextField)) {
                 continue;
-
+            }
+            String encryption = entry.getValue();
+            String value = ((TextField) dataField).getValue().getValue();
+            if (value == null) {
+                continue;
+            }
             dataField.setValue(method.apply(Pair.of(value, encryption)));
         }
     }
 
-    private Map<DataField, String> getEncryptedDataSet(Case useCase) {
+    private Map<Field, String> getEncryptedDataSet(Case useCase) {
         PetriNet net = useCase.getPetriNet();
-        Map<DataField, String> encryptedDataSet = new HashMap<>();
+        Map<Field, String> encryptedDataSet = new HashMap<>();
 
         for (Map.Entry<String, Field> entry : net.getDataSet().entrySet()) {
             String encryption = entry.getValue().getEncryption();
@@ -530,7 +507,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {
-        if(net.getCaseEvents().containsKey(type)){
+        if (net.getCaseEvents().containsKey(type)) {
             outcome.setMessage(net.getCaseEvents().get(type).getMessage());
         }
         return outcome;

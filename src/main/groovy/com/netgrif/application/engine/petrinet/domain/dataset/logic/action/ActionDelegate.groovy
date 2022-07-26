@@ -426,7 +426,7 @@ class ActionDelegate {
     }
 
     def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior) {
-        DataFieldBehavior fieldBehavior = useCase.dataSet.get(field.stringId).behavior
+        DataFieldBehavior fieldBehavior = useCase.dataSet.get(field.stringId).behaviors
         if (initialBehavior != null) {
             fieldBehavior.put(trans.stringId, initialBehavior)
         }
