@@ -165,6 +165,12 @@ public class PdfDataHelper implements IPdfDataHelper {
                     pdfField = createMultiChoiceField(dataGroup, (LocalisedMultichoiceField) field);
                     pdfFields.add(pdfField);
                     break;
+                case I18N:
+                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), "divider")) {
+                        pdfField = createI18nDividerField(dataGroup, (LocalisedI18nStringField) field);
+                        pdfFields.add(pdfField);
+                    }
+                    break;
                 default:
                     pdfField = createPdfTextField(dataGroup, field);
                     pdfFields.add(pdfField);
@@ -205,6 +211,13 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     protected PdfField createMultiChoiceMapField(DataGroup dataGroup, LocalisedMultichoiceMapField field) {
         MultiChoiceMapFieldBuilder builder = new MultiChoiceMapFieldBuilder(resource);
+        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+        updateLastCoordinates(builder.getLastX(), builder.getLastY());
+        return pdfField;
+    }
+
+    protected PdfField createI18nDividerField(DataGroup dataGroup, LocalisedI18nStringField field) {
+        I18nDividerFieldBuilder builder = new I18nDividerFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
