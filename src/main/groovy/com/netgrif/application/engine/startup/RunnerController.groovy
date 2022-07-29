@@ -14,6 +14,7 @@ class RunnerController {
             AnonymousRoleRunner,
             AuthorityRunner,
             SystemUserRunner,
+            UriRunner,
             FunctionsCacheRunner,
             FilterRunner,
             GroupRunner,

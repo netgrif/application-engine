@@ -26,14 +26,20 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
+import com.netgrif.application.engine.petrinet.domain.UriContentType
+import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.version.Version
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
+import com.netgrif.application.engine.startup.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
@@ -62,6 +68,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.time.ZoneId
@@ -75,6 +82,16 @@ class ActionDelegate {
 
     static final Logger log = LoggerFactory.getLogger(ActionDelegate)
 
+    private static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
+    private static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
+    private static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
+    private static final String PREFERENCE_ITEM_FIELD_PARENTID = "parentId"
+    private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
+    private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
+    private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
+    private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
+    private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
+
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
     static final String ONCE_GENERATE = "once"
@@ -82,6 +99,9 @@ class ActionDelegate {
 
     @Value('${nae.mail.from}')
     private String mailFrom
+
+    @Value('${nae.create.default.filters:false}')
+    private Boolean createDefaultFilters
 
     @Autowired
     FieldFactory fieldFactory
@@ -157,6 +177,9 @@ class ActionDelegate {
 
     @Autowired
     ExportConfiguration exportConfiguration
+
+    @Autowired
+    IUriService uriService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -543,8 +566,8 @@ class ActionDelegate {
              def values = cl()
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE))
                  return
-           
-           
+
+
              if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
@@ -1337,4 +1360,502 @@ class ActionDelegate {
     FileFieldInputStream getFileFieldStream(Case useCase, Task task, FileField field, boolean forPreview = false) {
         return this.dataService.getFile(useCase, task, field, forPreview)
     }
+
+    def getUri(String uri) {
+        return uriService.findByUri(uri);
+    }
+
+    def createUri(String uri, UriContentType type) {
+        return uriService.getOrCreate(uri, type)
+    }
+
+    def moveUri(String uri, String dest) {
+        return uriService.move(uri, dest)
+    }
+
+    List<Case> findDefaultFilters() {
+        if (!createDefaultFilters) {
+            return []
+        }
+        return findCases({it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId))})
+    }
+
+    /**
+     * create filter instance of type Case, to create a menu item call {@link #createMenuItem()}
+     * @param title
+     * @param query
+     * @param icon
+     * @param allowedNets
+     * @param visibility "private" or "public"
+     * @param filterMetadata
+     * @return
+     */
+    @NamedVariant
+    Case createCaseFilter(def title, String query, List<String> allowedNets,
+                          String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
+        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_CASE, allowedNets, icon, visibility, filterMetadata)
+    }
+
+    /**
+     * create filter instance of type Task, to create a menu item call {@link #createMenuItem()}
+     * @param title
+     * @param query
+     * @param icon
+     * @param allowedNets
+     * @param visibility "private" or "public"
+     * @param filterMetadata
+     * @return
+     */
+    @NamedVariant
+    Case createTaskFilter(def title, String query, List<String> allowedNets,
+                          String icon = "",  String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
+        return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, allowedNets, icon, visibility, filterMetadata)
+    }
+
+    /**
+     * create filter instance, to create a menu item call {@link #createMenuItem()}
+     * @param title
+     * @param query
+     * @param icon
+     * @param type "Case" or "Task"
+     * @param allowedNets
+     * @param visibility "private" or "public"
+     * @param filterMetadata
+     * @return
+     */
+    @NamedVariant
+    Case createFilter(def title, String query, String type, List<String> allowedNets,
+                      String icon, String visibility, def filterMetadata) {
+        Case filterCase = createCase(FilterRunner.FILTER_PETRI_NET_IDENTIFIER, title as String)
+        filterCase.setIcon(icon)
+        filterCase.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (title instanceof I18nString) ? title : new I18nString(title as String)
+        filterCase = workflowService.save(filterCase)
+        Task newFilterTask = findTask { it._id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
+        assignTask(newFilterTask)
+
+        def setDataMap = [
+                (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : [
+                        "type" : "enumeration_map",
+                        "value": type
+                ],
+                (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
+                        "type" : "enumeration_map",
+                        "value": visibility
+                ],
+                (DefaultFiltersRunner.FILTER_FIELD_ID)           : [
+                        "type"       : "filter",
+                        "value"      : query,
+                        "allowedNets": allowedNets,
+                        "filterMetadata": filterMetadata ?: [
+                                "searchCategories"       : [],
+                                "predicateMetadata"      : [],
+                                "filterType"             : type,
+                                "defaultSearchCategories": true,
+                                "inheritAllowedNets"     : false
+                        ]
+                ]
+        ]
+        setData(newFilterTask, setDataMap)
+        finishTask(newFilterTask)
+        return workflowService.findOne(filterCase.stringId)
+    }
+
+    /**
+     * Change filter instance attribute; query, visibility ("public"/"private"), title, allowedNets, filterMetadata or uri
+     * if filter is referenced within a menu item, reload said menu item using
+     * changeMenuItem item filter { filter }
+     * @param filter
+     * @return
+     */
+    def changeFilter(Case filter) {
+        [query      : { cl ->
+            updateFilter(filter, [
+                    (DefaultFiltersRunner.FILTER_FIELD_ID): [
+                            "type" : "enumeration_map",
+                            "value": cl() as String
+                    ]
+            ])
+        },
+         visibility : { cl ->
+             updateFilter(filter, [
+                     (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
+                             "type" : "enumeration_map",
+                             "value": cl() as String
+                     ]
+             ])
+         },
+         allowedNets: { cl ->
+             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
+             updateFilter(filter, [
+                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
+                             "type"       : "filter",
+                             "value"      : currentQuery,
+                             "allowedNets": cl() as List<String>
+                     ]
+             ])
+         },
+         filterMetadata: { cl ->
+             String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
+             updateFilter(filter, [
+                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
+                             "type"          : "filter",
+                             "value"         : currentQuery,
+                             "filterMetadata": cl() as Map<String, Object>
+                     ]
+             ])
+         },
+         title      : { cl ->
+             filter = workflowService.findOne(filter.stringId)
+             def value = cl()
+             filter.setTitle(value as String)
+             filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
+             workflowService.save(filter)
+         },
+         icon       : { cl ->
+             filter = workflowService.findOne(filter.stringId)
+             def icon = cl() as String
+             filter.setIcon(icon)
+             workflowService.save(filter)
+         },
+         uri        : { cl ->
+             filter = workflowService.findOne(filter.stringId)
+             def uri = cl() as String
+             filter.setUriNodeId(uriService.findByUri(uri).id)
+             workflowService.save(filter)
+         }]
+    }
+
+    /**
+     * deletes filter instance
+     * Note: do not call this method if given instance is references in any preference_filter_item instance
+     * @param filter
+     * @return
+     */
+    def deleteFilter(Case filter) {
+        workflowService.deleteCase(filter.stringId)
+    }
+
+    /**
+     * create menu item for given filter instance
+     * @param uri
+     * @param identifier - unique item identifier
+     * @param filter
+     * @param groupName
+     * @param allowedRoles ["role_import_id": "net_import_id"]
+     * @param bannedRoles ["role_import_id": "net_import_id"]
+     * @return
+     */
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:]) {
+        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    }
+
+    /**
+     * create menu item for given filter instance
+     * @param uri
+     * @param identifier - unique item identifier
+     * @param filter
+     * @param groupName
+     * @param allowedRoles
+     * @param bannedRoles
+     * @return
+     */
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = []) {
+        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    }
+
+    /**
+     * create menu item for given filter instance
+     * @param uri
+     * @param identifier - unique item identifier
+     * @param filter
+     * @param groupName
+     * @param allowedRoles ["role_import_id": "net_import_id"]
+     * @param bannedRoles ["role_import_id": "net_import_id"]
+     * @param group - if null, default group is used
+     * @return
+     */
+    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null) {
+        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    }
+
+    /**
+     * create menu item for given filter instance
+     * @param uri
+     * @param identifier - unique item identifier
+     * @param filter
+     * @param allowedRoles
+     * @param bannedRoles
+     * @param group - if null, default group is used
+     * @return
+     */
+    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null) {
+        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    }
+
+    /**
+     * change menu item attribute allowedRoles, bannedRoles or uri
+     * usage:
+     *       changeMenuItem item allowedRoles { newRoles }
+     * @param item
+     * @return
+     */
+    def changeMenuItem(Case item) {
+        [allowedRoles: { cl ->
+            updateMenuItemRoles(item, cl as Closure, PREFERENCE_ITEM_FIELD_ALLOWED_ROLES)
+        },
+         bannedRoles : { cl ->
+             updateMenuItemRoles(item, cl as Closure, PREFERENCE_ITEM_FIELD_BANNED_ROLES)
+         },
+         filter      : { cl ->
+             def filter = cl() as Case
+             setData("change_filter", item, [
+                     (PREFERENCE_ITEM_FIELD_NEW_FILTER_ID): ["type": "text", "value": filter.stringId]
+             ])
+         },
+         uri         : { cl ->
+             item = workflowService.findOne(item.stringId)
+             def uri = cl() as String
+             item.setUriNodeId(uriService.findByUri(uri).id)
+             workflowService.save(item)
+         }]
+    }
+
+    private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
+        item = workflowService.findOne(item.stringId)
+        def roles = cl()
+        def dataField = item.dataSet[roleFieldId]
+        if (roles instanceof List<ProcessRole>) {
+            dataField.options = collectRolesForPreferenceItem(roles)
+        } else if (roles instanceof Map<String, String>) {
+            dataField.options = collectRolesForPreferenceItem(roles)
+        }
+        workflowService.save(item)
+    }
+
+    /**
+     * delete menu item (referenced filter instance will not be deleted)
+     * @param item
+     * @return
+     */
+    def deleteMenuItem(Case item) {
+        def task = item.tasks.find { it.transition == "view" }.task
+        dataService.setData(task, ImportHelper.populateDataset([
+                (PREFERENCE_ITEM_FIELD_REMOVE_OPTION): ["type": "button", "value": 0]
+        ]))
+    }
+
+    /**
+     * simplifies the process of creating a filter, menu item
+     * @param uri
+     * @param identifier - unique identifier of menu item
+     * @param title
+     * @param query
+     * @param icon
+     * @param type - "Case" or "Task"
+     * @param allowedNets
+     * @param groupName - name of group to add menu item to
+     * @param allowedRoles
+     * @param bannedRoles
+     * @param visibility - "private" or "public"
+     * @return
+     */
+    Case createFilterInMenu(String uri, String identifier, def title, String query, String type,
+                            List<String> allowedNets,
+                            String groupName,
+                            Map<String, String> allowedRoles = [:],
+                            Map<String, String> bannedRoles = [:],
+                            String icon = "",
+                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
+        Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
+        Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles)
+        return menuItem
+    }
+
+    /**
+     * simplifies the process of creating a filter, menu item
+     * @param uri
+     * @param identifier - unique identifier of menu item
+     * @param title
+     * @param query
+     * @param icon
+     * @param type - "Case" or "Task"
+     * @param allowedNets
+     * @param allowedRoles
+     * @param bannedRoles
+     * @param visibility - "private" or "public"
+     * @param orgGroup - group to add item to, if null default group is used
+     * @return
+     */
+    Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
+                             Map<String, String> allowedRoles = [:],
+                             Map<String, String> bannedRoles = [:],
+                             String icon = "",
+                             String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
+                             Case orgGroup = null) {
+        Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
+        Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup)
+        return menuItem
+    }
+
+    private Case doCreateMenuItem(String uri, String identifier, Case filter, Case orgGroup, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles) {
+        if (findMenuItem(identifier)) {
+            throw new IllegalArgumentException("Menu item identifier $identifier is not unique!")
+        }
+        orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
+        Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
+        itemCase.setUriNodeId(uriService.findByUri(uri).id)
+        itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
+        itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
+        itemCase = workflowService.save(itemCase)
+        Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
+        assignTask(newItemTask)
+        def setDataMap = [
+                (PREFERENCE_ITEM_FIELD_FILTER_CASE): [
+                        "type" : "caseRef",
+                        "value": [filter.stringId]
+                ],
+                (PREFERENCE_ITEM_FIELD_PARENTID): [
+                        "type" : "text",
+                        "value": orgGroup.stringId
+                ],
+                (PREFERENCE_ITEM_FIELD_IDENTIFIER): [
+                        "type" : "text",
+                        "value": identifier
+                ],
+        ]
+        setData(newItemTask, setDataMap)
+        finishTask(newItemTask)
+
+        def task = orgGroup.tasks.find { it.transition == "append_menu_item" }.task
+        dataService.setData(task, ImportHelper.populateDataset([
+                (PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM): ["type": "text", "value": itemCase.stringId]
+        ]))
+
+        return workflowService.findOne(itemCase.stringId)
+    }
+
+    /**
+     * find filter by uri and title
+     * @param uri
+     * @param name
+     * @return
+     */
+    Case findFilter(String name) {
+        return findCaseElastic("processIdentifier:$FilterRunner.FILTER_PETRI_NET_IDENTIFIER AND title.keyword:\"$name\"" as String)
+    }
+
+    /**
+     * find menu item by unique identifier
+     * @param name
+     * @return
+     */
+    Case findMenuItem(String menuItemIdentifier) {
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
+    }
+
+    /**
+     * find menu item by uri and name in default group
+     * @param uri
+     * @param name
+     * @return
+     */
+    Case findMenuItem(String uri, String name) {
+        return findMenuItemInGroup(uri, name, null)
+    }
+
+    /**
+     * find menu item by uri, title and name of group
+     * @param uri
+     * @param name
+     * @param groupName
+     * @return
+     */
+    Case findMenuItem(String uri, String name, String groupName) {
+        Case orgGroup = nextGroupService.findByName(groupName)
+        return findMenuItemInGroup(uri, name, orgGroup)
+    }
+
+    /**
+     *
+     * @param uri
+     * @param name
+     * @param orgGroup
+     * @return
+     */
+    Case findMenuItemInGroup(String uri, String name, Case orgGroup) {
+        return findMenuItemByUriNameProcessAndGroup(uri, name, orgGroup)
+    }
+
+    /**
+     * Retrieve filter case from preference_filter_item case
+     * @param item
+     * @return
+     */
+    Case getFilterFromMenuItem(Case item) {
+        return workflowService.findOne((item.dataSet[PREFERENCE_ITEM_FIELD_FILTER_CASE].value as List)[0] as String)
+    }
+
+    /**
+     * search elastic with string query for first occurrence
+     * @param query
+     * @return
+     */
+    Case findCaseElastic(String query) {
+        def result = findCasesElastic(query, PageRequest.of(0, 1))
+        return result ? result[0] : null
+    }
+
+    /**
+     * search elastic with string query for cases
+     * @param query
+     * @return
+     */
+    List<Case> findCasesElastic(String query, Pageable pageable) {
+        CaseSearchRequest request = new CaseSearchRequest()
+        request.query = query
+        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        return result
+    }
+
+    private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
+        UriNode uriNode = uriService.findByUri(uri)
+        if (!orgGroup) {
+            return uriNode ? findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"") : null
+        }
+        List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
+        if (!taskIds) {
+            return null
+        }
+        List<Task> tasks = taskService.findAllById(taskIds)
+        List<Case> preferenceItemsOfGroup = workflowService.findAllById(tasks.collect { it.stringId })
+        return preferenceItemsOfGroup.find { it.title == name && it.uriNodeId == uriNode.id }
+    }
+
+    private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
+        return roles.collectEntries { role ->
+            PetriNet net = petriNetService.get(new ObjectId(role.netId))
+            return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
+        } as Map<String, I18nString>
+    }
+
+    private Map<String, I18nString> collectRolesForPreferenceItem(Map<String, String> roles) {
+        Map<String, PetriNet> temp = [:]
+        return roles.collectEntries { entry ->
+            if (!temp.containsKey(entry.value)) {
+                temp.put(entry.value, petriNetService.getNewestVersionByIdentifier(entry.value))
+            }
+            PetriNet net = temp[entry.value]
+            ProcessRole role = net.roles.find { it.value.importId == entry.key }.value
+            return [(role.importId + ":" + net.identifier), ("$role.name ($net.title)" as String)]
+        } as Map<String, I18nString>
+    }
+
+    private void updateFilter(Case filter, Map dataSet) {
+        setData(DefaultFiltersRunner.DETAILS_TRANSITION, filter, dataSet)
+    }
+
+    I18nString i18n(String value, Map<String, String> translations) {
+        return new I18nString(value, translations)
+    }
+
 }

@@ -25,7 +25,7 @@ class FilterRunner extends AbstractOrderedCommandLineRunner {
     public static final String FILTER_PETRI_NET_IDENTIFIER = "filter"
 
     private static final String PREFERRED_FILTER_ITEM_FILE_NAME = "engine-processes/preference_filter_item.xml"
-    private static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "preference_filter_item"
+    public static final String PREFERRED_FILTER_ITEM_NET_IDENTIFIER = "preference_filter_item"
 
     private static final String EXPORT_FILTER_FILE_NAME = "engine-processes/export_filters.xml"
     private static final String EXPORT_NET_IDENTIFIER = "export_filters"
