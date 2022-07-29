@@ -70,8 +70,6 @@ public class PdfProperties {
 
     protected int rowGridFree = formGridCols;
 
-    protected int dividerMargin = 20;
-
     protected float strokeWidth = 0.5f;
 
     protected int boxSize = 10;
