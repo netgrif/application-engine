@@ -120,11 +120,6 @@ class PetriNetControllerTest {
 
     }
 
-    private PetriNet net, userNet
-
-    private Authentication userAuth
-    private Authentication adminAuth
-
     @Test
     void testDeleteProcess() {
         mvc.perform(delete(DELETE_PROCESS_URL + net.stringId)
