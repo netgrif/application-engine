@@ -32,9 +32,7 @@ public class I18nDividerFieldRenderer extends FieldRenderer {
     private void renderValue(PdfField field, PDType0Font font, int fontSize, Color colorLabel) throws IOException {
         float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize, resource);
         int maxLineSize = getMaxLabelLineSize(field.getWidth(), fontSize);
-        List<String> multiLineText = new ArrayList<>() {{
-            addAll(field.getValues());
-        }};
+        List<String> multiLineText = new ArrayList<>(field.getValues());
         int linesOnPage = 0;
         int x = field.getX() + padding, y = renderLinePosY(field, 1);
 
