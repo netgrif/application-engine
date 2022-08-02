@@ -1,10 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
-import com.netgrif.application.engine.auth.domain.UserProperties;
-import com.netgrif.application.engine.auth.service.AfterRegistrationAuthService;
-import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
@@ -112,7 +108,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(getPatterns()).permitAll()
+                .antMatchers(naeAuthProperties.getServerPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -126,8 +122,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
-
-        setCsrf(http);
     }
 
 
