@@ -154,6 +154,11 @@ public class AuthorityService implements IAuthorityService {
         return authority.get();
     }
 
+    /**
+     * Checks for authorityName, if it is valid scope name
+     * @param authorityName of authority
+     * @return boolean whether the provided name is valid scope name
+     * */
     private boolean isScope(String authorityName) {
         if (authorityName.endsWith("*"))
             return true;
