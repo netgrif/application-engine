@@ -4,10 +4,18 @@ services:
   docker-mongo:
     image: mongo:4.4
     ports:
-    - "27017:27017"
+      - "27017:27017"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2G"
+        reservations:
+          cpus: "0.5"
+          memory: "512M"
 
   docker-elastic:
-    image: elasticsearch:7.17.3
+    image: elasticsearch:7.17.4
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
@@ -17,8 +25,24 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2G"
+        reservations:
+          cpus: "0.5"
+          memory: "512M"
 
   docker-redis:
     image: redis:6
     ports:
       - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "2G"
+        reservations:
+          cpus: "0.5"
+          memory: "512M"

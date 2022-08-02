@@ -310,7 +310,14 @@ public class DataService implements IDataService {
 
     private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
         if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
-            dataGroup.setData(dataGroup.getData().stream().map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new)));
+            dataGroup.setData(
+                    dataGroup.getData().stream()
+                            .filter(dataFieldMap::containsKey)
+                            .map(dataFieldMap::get)
+                            .sorted(Comparator.comparingInt(a -> a.getLayout().getY()))
+                            .map(Field::getStringId)
+                            .collect(Collectors.toCollection(LinkedHashSet::new))
+            );
         }
     }
 
@@ -787,6 +794,13 @@ public class DataService implements IDataService {
                     value = node.get("value").asInt();
                 }
                 break;
+            case "i18n":
+                if (node.get("value") == null) {
+                    value = new I18nString("");
+                    break;
+                }
+                value = parseI18nStringValues(node);
+                break;
             default:
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
@@ -862,6 +876,17 @@ public class DataService implements IDataService {
             });
         }
         return null;
+    }
+
+    private I18nString parseI18nStringValues(ObjectNode node) {
+        String defaultValue = node.get("value").get("defaultValue") != null ? node.get("value").get("defaultValue").asText() : "";
+        Map<String, String> translations = new HashMap<>();
+        if (node.get("value").get("translations") != null) {
+            node.get("value").get("translations").fields().forEachRemaining(entry ->
+                translations.put(entry.getKey(), entry.getValue().asText())
+            );
+        }
+        return new I18nString(defaultValue, translations);
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {

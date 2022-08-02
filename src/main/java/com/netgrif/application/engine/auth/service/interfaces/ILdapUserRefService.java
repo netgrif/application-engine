@@ -7,9 +7,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
 import javax.naming.Name;
 
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public interface ILdapUserRefService {
-
 
     IUser createUser(LdapUserRef ldapUser);
 

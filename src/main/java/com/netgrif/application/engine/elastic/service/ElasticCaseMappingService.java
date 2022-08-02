@@ -7,6 +7,7 @@ import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.elastic.domain.FileField;
+import com.netgrif.application.engine.elastic.domain.I18nField;
 import com.netgrif.application.engine.elastic.domain.NumberField;
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.elastic.domain.UserField;
@@ -81,6 +82,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileListField(caseField);
         } else if (netField instanceof UserListField) {
             return this.transformUserListField(caseField);
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.I18nField) {
+            return this.transformI18nField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.I18nField) netField);
         } else {
             String string = caseField.getValue().toString();
             if (string == null)
@@ -101,6 +104,13 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(options.get(key))));
         }
         return Optional.of(new MapField(values));
+    }
+
+    protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
+        Set<String> keys = netField.getValue().getTranslations().keySet();
+        Set<String> values = new HashSet<>(netField.getValue().getTranslations().values());
+        values.add(((I18nString) dataField.getValue()).getDefaultValue());
+        return Optional.of(new I18nField(keys, values));
     }
 
     protected Optional<DataField> transformEnumerationMapField(com.netgrif.application.engine.workflow.domain.DataField enumMap, EnumerationMapField netField) {
@@ -173,6 +183,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformNumberField(com.netgrif.application.engine.workflow.domain.DataField numberField) {
+        if (numberField.getValue() instanceof Integer) { //TODO: Refactor
+            return Optional.of(new NumberField(Double.parseDouble(numberField.getValue().toString())));
+        }
         return Optional.of(new NumberField((Double) numberField.getValue()));
     }
 

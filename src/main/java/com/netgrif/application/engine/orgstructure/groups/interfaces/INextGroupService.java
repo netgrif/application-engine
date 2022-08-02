@@ -24,6 +24,8 @@ public interface INextGroupService {
 
     Case findDefaultGroup();
 
+    Case findByName(String name);
+
     List<Case> findByPredicate(Predicate predicate);
 
     Map<String, I18nString> inviteUser(String email, Map<String, I18nString> existingUsers, Case groupCase);

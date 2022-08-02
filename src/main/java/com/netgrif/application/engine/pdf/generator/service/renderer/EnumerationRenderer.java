@@ -17,7 +17,7 @@ public class EnumerationRenderer extends SelectionFieldRenderer<EnumerationField
     @Override
     public int renderLabel(PdfField field) throws IOException {
         setFieldParams((PdfEnumerationField) field);
-        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize);
+        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize, colorLabelString);
     }
 
     public void renderValue(PdfField field, int lineCounter) throws IOException {

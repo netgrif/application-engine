@@ -7,17 +7,16 @@ import com.netgrif.application.engine.auth.service.AfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
+import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +33,6 @@ import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,13 +42,13 @@ import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
+
 @Slf4j
 @Configuration
 @Controller
 @EnableWebSecurity
-@Order(SecurityProperties.BASIC_AUTH_ORDER)
-@ConditionalOnExpression("!${nae.server.security.static.enabled} && !${nae.ldap.enabled}")
-public class SecurityConfiguration extends AbstractSecurityConfiguration {
+@Order(SecurityProperties.DEFAULT_FILTER_ORDER)
+public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     private Environment env;
@@ -65,10 +63,10 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     private IJwtService jwtService;
 
     @Autowired
-    private IProcessRoleService roleService;
+    private IUserService userService;
 
     @Autowired
-    private IUserService userService;
+    private NaeAuthProperties naeAuthProperties;
 
     @Autowired
     private SecurityConfigProperties properties;
@@ -76,20 +74,14 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private ISecurityContextService securityContextService;
 
-    @Value("${nae.security.server-patterns}")
-    private String[] serverPatterns;
+    @Autowired
+    protected NaeLdapProperties ldapProperties;
 
-    @Value("${nae.security.anonymous-exceptions}")
-    private String[] anonymousExceptions;
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
         return HeaderHttpSessionIdResolver.xAuthToken();
-    }
-
-    @Bean
-    public RequestContextListener requestContextListener(){
-        return new RequestContextListener();
     }
 
     @Bean
@@ -111,38 +103,33 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         log.info("Configuration with frontend separated");
-//        @formatter:off
         http
-            .httpBasic()
+                .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
-            .and()
+                .and()
                 .cors()
                 .and()
-            .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
-            .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
-            .authorizeRequests()
+                .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
+                .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .logout()
+                .and()
+                .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .headers()
+                .and()
+                .headers()
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
-//        @formatter:on
+
         setCsrf(http);
     }
 
-    @Bean
-    protected IAfterRegistrationAuthService authenticationService() throws Exception {
-        return new AfterRegistrationAuthService(authenticationManager());
-    }
 
     @Override
     protected ProviderManager authenticationManager() throws Exception {
@@ -161,14 +148,12 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     protected String[] getStaticPatterns() {
-        return new String[]{
-                "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
-        };
+        return this.naeAuthProperties.getStaticPatterns();
     }
 
     @Override
     protected String[] getServerPatterns() {
-        return this.serverPatterns;
+        return this.naeAuthProperties.getServerPatterns();
     }
 
     @Override
@@ -181,16 +166,16 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         authorities.forEach(a -> a.setUsers(new HashSet<>()));
         return new PublicAuthenticationFilter(
                 authenticationManager(),
-                new AnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
+                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                 authorities,
-                this.serverPatterns,
-                this.anonymousExceptions,
+                this.naeAuthProperties.getServerPatterns(),
+                this.naeAuthProperties.getAnonymousExceptions(),
                 this.jwtService,
                 this.userService
         );
     }
 
-    private SecurityContextFilter createSecurityContextFilter() throws Exception {
+    private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
     }
 }

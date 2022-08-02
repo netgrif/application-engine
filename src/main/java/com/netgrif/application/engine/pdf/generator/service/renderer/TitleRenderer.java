@@ -28,7 +28,7 @@ public class TitleRenderer extends Renderer {
     }
 
     private void renderTitle(String title, int fieldY, int fieldWidth) throws IOException {
-        float textWidth = getTextWidth(Collections.singletonList(title), resource.getTitleFont(), fontTitleSize);
+        float textWidth = getTextWidth(Collections.singletonList(title), resource.getTitleFont(), fontTitleSize, resource);
         List<String> multiLineText = new ArrayList<>();
         int lineCounter = 0, x = (int) (baseX + ((pageDrawableWidth - textWidth) / 2)), y;
         int maxLineSize = getMaxLabelLineSize(fieldWidth, fontTitleSize);
@@ -42,7 +42,7 @@ public class TitleRenderer extends Renderer {
 
         for (String line : multiLineText) {
             y = pageHeight - resource.getMarginTitle() - fieldY - lineHeight * lineCounter;
-            pdfDrawer.writeString(resource.getTitleFont(), fontTitleSize, x, y, line);
+            pdfDrawer.writeString(resource.getTitleFont(), fontTitleSize, x, y, line, colorString);
             lineCounter++;
         }
     }

@@ -9,16 +9,14 @@ import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriN
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.petrinet.domain.*;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -48,12 +46,14 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Provider;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -106,6 +106,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private IHistoryService historyService;
+
+    @Autowired
+    private IUriService uriService;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -164,6 +167,8 @@ public class PetriNetService implements IPetriNetService {
             return outcome;
         }
         PetriNet net = imported.get();
+        UriNode uriNode = uriService.getOrCreate(net, UriContentType.PROCESS);
+        net.setUriNodeId(uriNode.getId());
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
         if (existingNet != null) {
@@ -236,6 +241,13 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNet> getByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findAllByIdentifier(identifier);
+        nets.forEach(PetriNet::initializeArcs);
+        return nets;
+    }
+
+    @Override
+    public List<PetriNet> findAllByUri(String uri) {
+        List<PetriNet> nets = repository.findAllByUriNodeId(uri);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
@@ -419,7 +431,7 @@ public class PetriNetService implements IPetriNetService {
         this.workflowService.deleteInstancesOfPetriNet(petriNet);
         this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
 
-        log.info("[" + processId + "]: Deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());
         this.cache.remove(petriNet.getObjectId());
         // net functions must by removed from cache after it was deleted from repository

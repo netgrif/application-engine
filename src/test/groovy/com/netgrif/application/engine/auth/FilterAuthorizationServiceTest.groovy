@@ -18,8 +18,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -59,6 +61,9 @@ class FilterAuthorizationServiceTest {
     @Autowired
     private TestHelper testHelper
 
+    private Authentication userAuth
+    private Authentication adminAuth
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -76,16 +81,16 @@ class FilterAuthorizationServiceTest {
                 [] as ProcessRole[])
 
         userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
+        userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
                 auths.get("admin").toArray() as Authority[],
                 [] as ProcessRole[])
 
         adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
     }
 
-    private Authentication userAuth
-    private Authentication adminAuth
 
     @Test
     void testDeleteFilter() {

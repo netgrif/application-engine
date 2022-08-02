@@ -355,11 +355,18 @@
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
-                        generatePDF("1","file")
+                        generatePdf("1","file")
                     </action>
                 </logic>
             </dataRef>
         </dataGroup>
+        <event type="finish">
+            <actions phase="pre">
+                <action>
+                    generatePdf("1","file")
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>2</id>
