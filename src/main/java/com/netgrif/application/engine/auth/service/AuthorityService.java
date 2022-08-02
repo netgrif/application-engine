@@ -13,17 +13,31 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service to manage authorities in NAE
+ * */
 @Service
 public class AuthorityService implements IAuthorityService {
 
+    /**
+     * Repository to communicate with database
+     * */
     @Autowired
     private AuthorityRepository repository;
 
+    /**
+     * Retrieve all authorities from database
+     * */
     @Override
     public List<Authority> findAll() {
         return repository.findAll();
     }
 
+    /**
+     * Returns or creates authority based on provided name from/into database
+     * @param name of searched authority
+     * @return Authority object
+     * */
     @Override
     @Transactional
     public Authority getOrCreate(String name) {
@@ -36,11 +50,21 @@ public class AuthorityService implements IAuthorityService {
         return authority;
     }
 
+    /**
+     * Saves new or updated to database
+     * @param authority that will be saved
+     * @return saved authority object
+     * */
     @Override
     public Authority save(Authority authority) {
         return repository.save(authority);
     }
 
+    /**
+     * Returns or creates authorities based on provided names from/into database
+     * @param authorities of searched authority
+     * @return list of authority objects
+     * */
     @Override
     @Transactional
     public List<Authority> getOrCreate(List<String> authorities) {
@@ -57,8 +81,12 @@ public class AuthorityService implements IAuthorityService {
         return result;
     }
 
+    /**
+     * Removes authority from database based on provided name if exists
+     * @param name of authority to be deleted
+     * */
     @Override
-    public Authority delete(String name) {
+    public void delete(String name) {
         if (isScope(name)) {
             throw new IllegalArgumentException("The authority name is not valid. Scope is suitable for this function.");
         }
@@ -66,9 +94,14 @@ public class AuthorityService implements IAuthorityService {
         if (authority == null)
             throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
         repository.delete(authority);
-        return authority;
     }
 
+    /**
+     * Returns authorities of provided scope. A scope contains authorities of the same name prefix, such as authorities
+     * of PROCESS scope: PROCESS_UPLOAD, PROCESS_DELETE etc.
+     * @param scope to be searched for
+     * @return list of authorities of given scope
+     * */
     @Override
     public List<Authority> findByScope(String scope) {
         List<Authority> authorities;
@@ -92,11 +125,22 @@ public class AuthorityService implements IAuthorityService {
         return authority;
     }
 
+    /**
+     * Returns authority from database based on provided ID
+     * @param id of authority to be retrieved
+     * @return optional of authority
+     * */
     @Override
     public Optional<Authority> findById(String id) {
         return Optional.of(repository.findBy_id(new ObjectId(id)));
     }
 
+    /**
+     * Returns authority from database based on provided ID if exists
+     * @param id of authority to be retrieved
+     * @return authority object
+     * */
+    @Override
     public Authority getOne(String id) {
         Optional<Authority> authority = repository.findById(id);
         if (authority.isEmpty())
