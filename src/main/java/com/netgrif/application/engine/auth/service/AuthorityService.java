@@ -114,6 +114,12 @@ public class AuthorityService implements IAuthorityService {
         return authorities;
     }
 
+    /**
+     * Returns authority based on name, throws exception if authority name is not valid or authority with provided name
+     * cannot be found.
+     * @param name of authority
+     * @return authority object
+     * */
     @Override
     public Authority findByName(String name) {
         if (isScope(name)) {
