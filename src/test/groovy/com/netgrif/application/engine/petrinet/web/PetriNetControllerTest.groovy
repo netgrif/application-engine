@@ -106,9 +106,8 @@ class PetriNetControllerTest {
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
-        adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
         adminAuth = new UsernamePasswordAuthenticationToken(userService.findByEmail(ADMIN_EMAIL, false).transformToLoggedUser(), "password", auths.get("admin"))
+        adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
