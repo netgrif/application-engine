@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
  * using given authorizing object.
  * */
 public enum AuthorizingObject {
+    DEFAULT,
     PROCESS_UPLOAD,
     PROCESS_VIEW_ALL,
     PROCESS_VIEW_MY,

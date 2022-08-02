@@ -8,11 +8,9 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 public abstract class AbstractBaseAuthorizationService implements IBaseAuthorizationService {
 
     private final IUserService userService;
-    private final IAuthorityService authorityService;
 
-    public AbstractBaseAuthorizationService(IUserService userService, IAuthorityService authorityService) {
+    public AbstractBaseAuthorizationService(IUserService userService) {
         this.userService = userService;
-        this.authorityService = authorityService;
     }
 
     @Override

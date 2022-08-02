@@ -33,8 +33,8 @@ import java.util.List;
 @Service
 public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationService {
 
-    public BaseAuthorizationServiceAspect(@Autowired IUserService userService, @Autowired IAuthorityService authorityService) {
-        super(userService, authorityService);
+    public BaseAuthorizationServiceAspect(@Autowired IUserService userService) {
+        super(userService);
     }
 
     /**
@@ -65,7 +65,7 @@ public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationSer
         if (result) {
             return joinPoint.proceed();
         } else {
-            throw new AccessDeniedException("Access Denied");
+            throw new AccessDeniedException("Access Denied. User does not have required authorization level.");
         }
     }
 
