@@ -124,8 +124,8 @@ public class PublicTaskController extends AbstractTaskController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return super.setData(taskId, dataBody);
+    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody, Locale locale) {
+        return super.setData(taskId, dataBody, locale);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")

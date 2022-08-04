@@ -190,17 +190,35 @@ public abstract class AbstractTaskController {
 
 
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
+        try {
         GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
         return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
                 LocalisedEventOutcomeFactory.from(outcome,locale));
+        } catch (Exception e) {
+            log.error("Get data on task [" + taskId + "] failed: ", e);
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
+            } else {
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+            }
+        }
     }
 
-    public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody) {
-        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
-        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
+        try {
+            Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+            SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                    LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+        } catch (Exception e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
+            } else {
+                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+            }
+        }
     }
 
     public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {
