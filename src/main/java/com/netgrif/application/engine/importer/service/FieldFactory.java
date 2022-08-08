@@ -136,7 +136,7 @@ public final class FieldFactory {
             field.setFormat(format);
         }
         if (data.getView() != null) {
-            log.warn("Data attribute [view] is deprecated.");
+            log.warn("Data attribute [view] in field [" + field.getImportId()  + "] is deprecated.");
             View view = viewFactory.buildView(data);
             field.setComponent(new Component(view.getValue()));
         }
