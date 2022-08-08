@@ -91,16 +91,17 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(),
-                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId), locale));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
+
     public EntityModel<EventOutcomeWithMessage> delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
-                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId), locale));
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -111,7 +112,7 @@ public abstract class AbstractTaskController {
 
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
-                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId), locale));
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -125,7 +126,7 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
-                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId), locale));
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -191,16 +192,15 @@ public abstract class AbstractTaskController {
 
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
         try {
-        GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
-        return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
-                LocalisedEventOutcomeFactory.from(outcome,locale));
+            GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
+            return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
+                    LocalisedEventOutcomeFactory.from(outcome, locale));
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
         } catch (Exception e) {
             log.error("Get data on task [" + taskId + "] failed: ", e);
-            if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
-            } else {
-                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
-            }
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
         }
     }
 
@@ -211,18 +211,18 @@ public abstract class AbstractTaskController {
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
         } catch (Exception e) {
             log.error("Set data on task [" + taskId + "] failed: ", e);
-            if (e instanceof IllegalArgumentWithChangedFieldsException) {
-                return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(((IllegalArgumentWithChangedFieldsException) e).getOutcome(), locale));
-            } else {
-                return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
-            }
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+
         }
     }
 
     public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {
-        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
@@ -252,7 +252,7 @@ public abstract class AbstractTaskController {
     }
 
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
-        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFiles(it.getKey(), fieldId, multipartFiles)));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
