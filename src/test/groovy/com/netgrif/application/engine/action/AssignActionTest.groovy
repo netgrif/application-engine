@@ -142,8 +142,8 @@ class AssignActionTest {
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
-        String adminMainId = processRoleRepository.findByName_DefaultValue("admin_main").stringId
-        String adminSecondaryId = processRoleRepository.findByName_DefaultValue("admin_secondary").stringId
+        String adminMainId = processRoleRepository.findByName_DefaultValue("admin_main")?.first()?.stringId
+        String adminSecondaryId = processRoleRepository.findByName_DefaultValue("admin_secondary")?.first()?.stringId
 
         assert roles.find { it.stringId == adminMainId }
         assert roles.find { it.stringId == adminSecondaryId }
