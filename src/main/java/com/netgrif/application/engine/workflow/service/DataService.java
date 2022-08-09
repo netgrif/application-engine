@@ -215,10 +215,7 @@ public class DataService implements IDataService {
                     }
                 }
                 Object newValue = parseFieldsValues(entry.getValue(), dataField);
-                dataField.setValue(newValue);
-                ChangedField changedField = new ChangedField();
-                changedField.setId(fieldId);
-                changedField.addAttribute("value", newValue);
+                ChangedField changedField = setDataFieldValue(field, dataField, newValue);
                 List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
                 if (allowedNets != null) {
                     dataField.setAllowedNets(allowedNets);
@@ -693,6 +690,12 @@ public class DataService implements IDataService {
         return fields;
     }
 
+    @Override
+    public UserFieldValue makeUserFieldValue(String id) {
+        IUser user = userService.resolveById(id, true);
+        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
+    }
+
     private void updateDataset(Case useCase) {
         Case actual = workflowService.findOne(useCase.getStringId());
         actual.getDataSet().forEach((id, dataField) -> {
@@ -813,11 +816,6 @@ public class DataService implements IDataService {
         else return value;
     }
 
-    protected UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
-        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-    }
-
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
         ArrayNode arrayNode = (ArrayNode) node.get("value");
         HashSet<String> set = new HashSet<>();
@@ -897,5 +895,19 @@ public class DataService implements IDataService {
                 throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
             }
         });
+    }
+
+    protected ChangedField setDataFieldValue(Field field, DataField dataField, Object newValue) {
+        dataField.setValue(newValue);
+        ChangedField changedField = new ChangedField();
+        changedField.setId(field.getStringId());
+
+        if (field.getType().equals(FieldType.USERLIST)) {
+            changedField.addAttribute("value", ((ArrayList<String>) newValue).stream()
+                    .map(this::makeUserFieldValue).collect(Collectors.toList()));
+        } else {
+            changedField.addAttribute("value", newValue);
+        }
+        return changedField;
     }
 }

@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -40,6 +42,9 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
+
+    @Autowired
+    private IUserService userService;
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
@@ -536,6 +541,9 @@ public final class FieldFactory {
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
+            case USERLIST:
+                parseUserListValues(field, useCase, fieldId);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
@@ -548,6 +556,15 @@ public final class FieldFactory {
             field.setRoles(roles);
         }
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
+    }
+
+    private void parseUserListValues(Field field, Case useCase, String fieldId) {
+        List<UserFieldValue> userFieldValues = ((List<String>) useCase.getFieldValue(fieldId)).stream().map(id -> {
+            IUser user = userService.findById(id, false);
+            return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
+        }).collect(Collectors.toList());
+
+        field.setValue(userFieldValues);
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
