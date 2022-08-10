@@ -231,7 +231,7 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public ProcessRole defaultRole() {
         if (defaultRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
             if (roles.isEmpty())
                 throw new IllegalStateException("No default process role has been found!");
             if (roles.size() > 1)
@@ -244,7 +244,7 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public ProcessRole anonymousRole() {
         if (anonymousRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
+            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
             if (roles.isEmpty())
                 throw new IllegalStateException("No anonymous process role has been found!");
             if (roles.size() > 1)
@@ -262,17 +262,17 @@ public class ProcessRoleService implements IProcessRoleService {
     @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
     public ProcessRole findByImportId(String importId) {
-        return processRoleRepository.findByImportId(importId).stream().findFirst().orElse(null);
+        return processRoleRepository.findAllByImportId(importId).stream().findFirst().orElse(null);
     }
 
     @Override
     public Set<ProcessRole> findAllByImportId(String importId) {
-        return processRoleRepository.findByImportId(importId);
+        return processRoleRepository.findAllByImportId(importId);
     }
 
     @Override
     public Set<ProcessRole> findAllByDefaultName(String name) {
-        return processRoleRepository.findByName_DefaultValue(name);
+        return processRoleRepository.findAllByName_DefaultValue(name);
     }
 
     @Override

@@ -99,7 +99,7 @@ public class VariableArcsTest {
         testHelper.truncateDbs();
         userRunner.run("");
         repository.deleteAll();
-        if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
+        if (roleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
             try {
                 defaultRoleRunner.run();
             } catch (Exception e) {

@@ -20,7 +20,7 @@ class AnonymousRoleRunner extends AbstractOrderedCommandLineRunner {
     void run(String... strings) throws Exception {
         log.info("Creating anonymous process role")
 
-        def role = repository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE)
+        def role = repository.findAllByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE)
         if (role) {
             log.info("Anonymous role already exists")
             return

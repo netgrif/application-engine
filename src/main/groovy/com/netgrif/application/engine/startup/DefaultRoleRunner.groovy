@@ -24,7 +24,7 @@ class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
     void run(String... strings) throws Exception {
         log.info("Creating default process role")
 
-        def role = repository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE)
+        def role = repository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE)
         if (role) {
             log.info("Default role already exists")
             return
