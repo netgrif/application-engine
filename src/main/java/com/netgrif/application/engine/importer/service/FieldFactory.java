@@ -542,7 +542,7 @@ public final class FieldFactory {
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
             case USERLIST:
-                parseUserListValues(field, useCase, fieldId);
+                parseUserListValues((UserListField) field, useCase, fieldId);
                 break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
@@ -558,13 +558,9 @@ public final class FieldFactory {
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
     }
 
-    private void parseUserListValues(Field field, Case useCase, String fieldId) {
-        List<UserFieldValue> userFieldValues = ((List<String>) useCase.getFieldValue(fieldId)).stream().map(id -> {
-            IUser user = userService.findById(id, false);
-            return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-        }).collect(Collectors.toList());
-
-        field.setValue(userFieldValues);
+    private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
+        // parse same as filelistfield
+        field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {

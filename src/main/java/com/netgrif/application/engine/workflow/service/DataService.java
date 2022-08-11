@@ -784,7 +784,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = parseListStringValues(node);
+                value = makeUserListFieldValue(node);
                 break;
             case "button":
                 if (node.get("value") == null) {
@@ -821,6 +821,15 @@ public class DataService implements IDataService {
         HashSet<String> set = new HashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
+    }
+
+    private UserListFieldValue makeUserListFieldValue(ObjectNode nodes) {
+        List<String> userIds = parseListStringValues(nodes);
+
+        if (userIds == null) {
+            return null;
+        }
+        return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toList()));
     }
 
     private List<String> parseListStringValues(ObjectNode node) {
@@ -901,13 +910,7 @@ public class DataService implements IDataService {
         dataField.setValue(newValue);
         ChangedField changedField = new ChangedField();
         changedField.setId(field.getStringId());
-
-        if (field.getType().equals(FieldType.USERLIST)) {
-            changedField.addAttribute("value", ((ArrayList<String>) newValue).stream()
-                    .map(this::makeUserFieldValue).collect(Collectors.toList()));
-        } else {
-            changedField.addAttribute("value", newValue);
-        }
+        changedField.addAttribute("value", newValue);
         return changedField;
     }
 }
