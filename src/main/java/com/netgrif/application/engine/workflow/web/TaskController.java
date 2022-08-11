@@ -189,8 +189,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage>  setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return super.setData(taskId, dataBody);
+    public EntityModel<EventOutcomeWithMessage>  setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody, Locale locale) {
+        return super.setData(taskId, dataBody, locale);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")

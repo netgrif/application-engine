@@ -4,7 +4,7 @@ services:
   docker-mongo:
     image: mongo:4.4
     ports:
-    - "27017:27017"
+      - "27017:27017"
     deploy:
       resources:
         limits:
@@ -15,7 +15,7 @@ services:
           memory: "512M"
 
   docker-elastic:
-    image: elasticsearch:7.17.3
+    image: elasticsearch:7.17.4
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
