@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.migration;
 
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.migration.repository.IRuntimeMigrationServiceAdvice;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
@@ -19,9 +17,9 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
-import javax.swing.event.DocumentEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +27,14 @@ import java.util.stream.Collectors;
 
 /**
  * Aspect service to manage migration for processes, cases and tasks. This
- * class provides functions to migrate collection data.
+ * class provides functions to migrate collection data. This class can be overriden
+ * to add additional migration functions.
  * */
 @Slf4j
+@Order
 @Aspect
-@Service
-public class RuntimeMigrationServiceAspect implements IRuntimeMigrationServiceAdvice {
+@Component
+public class RuntimeMigrationAspect {
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -51,24 +51,72 @@ public class RuntimeMigrationServiceAspect implements IRuntimeMigrationServiceAd
     @Autowired
     private IDataService dataService;
 
+    protected IPetriNetService getPetriNetService() {
+        return petriNetService;
+    }
+
+    protected IWorkflowService getWorkflowService() {
+        return workflowService;
+    }
+
+    protected ITaskService getTaskService() {
+        return taskService;
+    }
+
+    protected IUserService getUserService() {
+        return userService;
+    }
+
+    protected IDataService getDataService() {
+        return dataService;
+    }
+
+    /**
+     * Pointcut expression to make join point to @link{MappingMongoConverter}
+     * */
     @Pointcut(value = "execution(* org.springframework.data.mongodb.core.convert.MappingMongoConverter.read(..)) && args(clazz, bson)", argNames = "clazz,bson")
-    public void checkData(Class<?> clazz, Document bson) {}
+    protected final void checkData(Class<?> clazz, Document bson) {}
 
     @Before(value = "checkData(clazz,bson)", argNames = "clazz,bson")
-    public Document checkDocument(Class<?> clazz, Document bson) {
-        log.info("Hello world!");
-
+    protected final Document checkDocument(Class<?> clazz, Document bson) {
         if (PetriNet.class.equals(clazz)) {
-
+            callProcessMigrations(bson);
         } else if (Case.class.equals(clazz)) {
-            migrateUserListFieldValueType(bson);
+            callCaseMigrations(bson);
         } else if (Task.class.equals(clazz)) {
-
+            callTaskMigrations(bson);
         }
         return bson;
     }
 
-    protected void migrateUserListFieldValueType(Document document) {
+    /**
+     * Function for call the migration functions for processes, this can be overriden and provide
+     * custom order and functions.
+     * @param bson document to be migrated
+     * */
+    public void callProcessMigrations(Document bson) {
+
+    }
+
+    /**
+     * Function for call the migration functions for cases, this can be overriden and provide
+     * custom order and functions.
+     * @param bson document to be migrated
+     * */
+    public void callCaseMigrations(Document bson) {
+        migrateUserListFieldValueType(bson);
+    }
+
+    /**
+     * Function for call the migration functions for tasks, this can be overriden and provide
+     * custom order and functions.
+     * @param bson document to be migrated
+     * */
+    public void callTaskMigrations(Document bson) {
+
+    }
+
+    protected final void migrateUserListFieldValueType(Document document) {
         PetriNet net = retrievePetriNetOfCase(document);
         if (net == null) {
             return;
@@ -80,20 +128,14 @@ public class RuntimeMigrationServiceAspect implements IRuntimeMigrationServiceAd
                 .collect(Collectors.toList());
 
         if(document.get("dataSet") != null) {
-            // iterate through userListFields
             userListFields.forEach(field -> {
-                //retrieve field document from document
                 Document userListField = document.get("dataSet", Document.class).get(field, Document.class);
-
-                //check if value is type of string or userFieldValue
                 if (userListField.get("value") != null && userListField.get("value") instanceof ArrayList) {
                     List<UserFieldValue> userFieldValues = new ArrayList<>();
                     ((ArrayList<String>) userListField.get("value")).forEach(v -> {
                        userFieldValues.add(dataService.makeUserFieldValue(v));
                     });
                     UserListFieldValue userListFieldValue = new UserListFieldValue(userFieldValues);
-
-                    //modify value for field from string to list of userFieldValue
                     userListField.remove("value");
                     userListField.append("value", userListFieldValue);
                 }
@@ -107,5 +149,4 @@ public class RuntimeMigrationServiceAspect implements IRuntimeMigrationServiceAd
         }
         return petriNetService.getNewestVersionByIdentifier(aCase.get("processIdentifier", String.class));
     }
-
 }
