@@ -8,7 +8,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
@@ -36,7 +36,7 @@ public class PublicWorkflowController {
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(@userService.getAnonymousLogged(), #body.netId)")
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
-    @ApiOperation(value = "Create new case")
+    @Operation(summary = "Create new case")
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {

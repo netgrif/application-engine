@@ -18,7 +18,11 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +61,7 @@ import java.util.Map;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Workflow"})
+@Tag(name = "Workflow")
 public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
@@ -76,21 +80,21 @@ public class WorkflowController {
 
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
-    @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
-                    LocalisedEventOutcomeFactory.from(outcome,locale));
+                    LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            log.error("Creating case failed:",e);
+            log.error("Creating case failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
         }
     }
 
-    @ApiOperation(value = "Get all cases of the system", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get all cases of the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.getAll(pageable);
@@ -101,7 +105,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @ApiOperation(value = "Generic case search with QueryDSL predicate", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Generic case search with QueryDSL predicate", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.search(predicate, pageable);
@@ -112,7 +116,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @ApiOperation(value = "Generic case search on Elasticsearch database", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Generic case search on Elasticsearch database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
@@ -126,7 +130,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @ApiOperation(value = "Generic case search on Mongo database", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Generic case search on Mongo database", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/search_mongo", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
@@ -138,14 +142,14 @@ public class WorkflowController {
     }
 
 
-    @ApiOperation(value = "Get count of the cases", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
         long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 
-    @ApiOperation(value = "Get case by id", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get case by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public CaseResource getOne(@PathVariable("id") String caseId) {
         Case aCase = workflowService.findOne(caseId);
@@ -154,7 +158,7 @@ public class WorkflowController {
         return new CaseResource(aCase);
     }
 
-    @ApiOperation(value = "Get all cases by user that created them", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get all cases by user that created them", security = {@SecurityRequirement(name = "BasicAuth")})
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> findAllByAuthor(@PathVariable("id") String authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
@@ -166,13 +170,13 @@ public class WorkflowController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Reload tasks of case",
-            notes = "Caller must have the ADMIN role",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Reload tasks of case",
+            description = "Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/reload/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
@@ -189,7 +193,7 @@ public class WorkflowController {
 
     @Deprecated
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get all case data", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
@@ -202,26 +206,26 @@ public class WorkflowController {
     }
 
     @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
-    @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<EventOutcomeWithMessage>  deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
+    public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             DeleteCaseEventOutcome outcome;
-            if(deleteSubtree) {
+            if (deleteSubtree) {
                 outcome = workflowService.deleteSubtreeRootedAt(caseId);
             } else {
                 outcome = workflowService.deleteCase(caseId);
             }
             return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                    LocalisedEventOutcomeFactory.from(outcome,LocaleContextHolder.getLocale()));
+                    LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case [" + caseId + "] failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
 
-    @ApiOperation(value = "Download case file field value", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
@@ -239,7 +243,7 @@ public class WorkflowController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    @ApiOperation(value = "Download one file from cases file list field value", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Download one file from cases file list field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
