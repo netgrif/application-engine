@@ -244,7 +244,7 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public ProcessRole anonymousRole() {
         if (anonymousRole == null) {
-            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
+            Set<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
             if (roles.isEmpty())
                 throw new IllegalStateException("No anonymous process role has been found!");
             if (roles.size() > 1)

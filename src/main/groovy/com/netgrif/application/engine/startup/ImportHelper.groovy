@@ -11,7 +11,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Filter
@@ -85,7 +85,7 @@ class ImportHelper {
     private INextGroupService groupService
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository
+    private ProcessRoleService processRoleService
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
@@ -155,7 +155,7 @@ class ImportHelper {
     }
 
     Map<String, ProcessRole> getProcessRoles(PetriNet net) {
-        List<ProcessRole> roles = processRoleRepository.findAllByNetId(net.stringId)
+        List<ProcessRole> roles = processRoleService.findAll(net.stringId)
         Map<String, ProcessRole> map = [:]
         net.roles.values().each { netRole ->
             map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }

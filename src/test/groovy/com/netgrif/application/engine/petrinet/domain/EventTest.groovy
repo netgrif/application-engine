@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.DefaultRoleRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -65,9 +64,6 @@ class EventTest {
 
     @Autowired
     private UserRepository userRepository
-
-    @Autowired
-    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner userRunner

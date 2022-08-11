@@ -72,6 +72,7 @@ class ProcessRoleServiceTest {
     void shouldGetDefaultRole() {
         ProcessRole role = processRoleService.defaultRole();
         assertNotNull(role);
+        assertEquals(ProcessRole.DEFAULT_ROLE, role.getImportId());
         assertEquals(ProcessRole.DEFAULT_ROLE, role.getName().getDefaultValue());
     }
 
