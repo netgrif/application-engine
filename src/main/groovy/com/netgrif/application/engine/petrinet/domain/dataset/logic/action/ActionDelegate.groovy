@@ -674,9 +674,6 @@ class ActionDelegate {
         ChangedField changedField = new ChangedField(field.stringId)
         if (field instanceof I18nField) {
             changedField.attributes.put("value", value)
-//        } else if (field instanceof UserListField) {
-//            changedField.attributes.put("value", ((ArrayList<String>) value).stream()
-//                    .map(id -> dataService.makeUserFieldValue(id)).collect(Collectors.toList()))
         } else {
             changedField.addAttribute("value", value)
         }

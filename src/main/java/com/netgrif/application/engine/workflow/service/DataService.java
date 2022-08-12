@@ -215,7 +215,10 @@ public class DataService implements IDataService {
                     }
                 }
                 Object newValue = parseFieldsValues(entry.getValue(), dataField);
-                ChangedField changedField = setDataFieldValue(field, dataField, newValue);
+                dataField.setValue(newValue);
+                ChangedField changedField = new ChangedField();
+                changedField.setId(fieldId);
+                changedField.addAttribute("value", newValue);
                 List<String> allowedNets = parseAllowedNetsValue(entry.getValue());
                 if (allowedNets != null) {
                     dataField.setAllowedNets(allowedNets);
@@ -904,13 +907,5 @@ public class DataService implements IDataService {
                 throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
             }
         });
-    }
-
-    protected ChangedField setDataFieldValue(Field field, DataField dataField, Object newValue) {
-        dataField.setValue(newValue);
-        ChangedField changedField = new ChangedField();
-        changedField.setId(field.getStringId());
-        changedField.addAttribute("value", newValue);
-        return changedField;
     }
 }
