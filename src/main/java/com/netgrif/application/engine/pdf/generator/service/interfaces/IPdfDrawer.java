@@ -29,6 +29,8 @@ public interface IPdfDrawer {
 
     void drawTextField(PdfField field) throws IOException;
 
+    void drawI18nDividerField(PdfField field) throws IOException;
+
     void drawBooleanField(PdfField field) throws IOException;
 
     void drawEnumerationField(PdfField field) throws IOException;
@@ -40,6 +42,8 @@ public interface IPdfDrawer {
     void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException;
 
     boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException;
+
+    void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException;
 
     void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException;
 

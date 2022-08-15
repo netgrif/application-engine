@@ -1039,13 +1039,13 @@ class ActionDelegate {
     void generatePdf(String sourceTransitionId, String targetFileFieldId,
                      Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
                      String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
         if (!sourceTransitionId || !targetFileFieldId)
             throw new IllegalArgumentException("Source transition or target file field is null")
         targetTransitionId = targetTransitionId ?: sourceTransitionId
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()
-        String storagePath = ""
+        String storagePath
         if (pdfResource.getOutputFolder()) {
             storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
         } else {
@@ -1071,7 +1071,7 @@ class ActionDelegate {
 
     void generatePdf(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
                      Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
         if (!sourceTransition || !targetFileField)
             throw new IllegalArgumentException("Source transition or target file field is null")
         targetTransition = targetTransition ?: sourceTransition
@@ -1083,7 +1083,7 @@ class ActionDelegate {
     void generatePDF(String sourceTransitionId, String targetFileFieldId,
                      Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
                      String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 20) {
         if (!sourceTransitionId || !targetFileFieldId)
             throw new IllegalArgumentException("Source transition or target file field is null")
         targetTransitionId = targetTransitionId ?: sourceTransitionId
@@ -1093,7 +1093,7 @@ class ActionDelegate {
 
     void generatePDF(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
                      Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 100) {
+                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
         if (!sourceTransition || !targetFileField)
             throw new IllegalArgumentException("Source transition or target file field is null")
         targetTransition = targetTransition ?: sourceTransition
