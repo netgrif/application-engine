@@ -42,28 +42,21 @@ public abstract class FieldBuilder {
     private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
         if (isDgFlow(dataGroup)) {
-            x = lastX < resource.getFormGridCols() ? lastX : 0;
+            x = isStretch(dataGroup) ? 0 : (lastX < resource.getFormGridCols() ? lastX : 0);
             lastX = x + 1;
-        } else if (field.getLayout() != null && !isStretch(dataGroup)) {
+        } else if (isDgLegacy(dataGroup)) {
+            lastX = isStretch(dataGroup) ? 0 : (lastX == 0 ? 2 : 0);
+            x = lastX;
+        } else if (field.getLayout() != null) {
             x = field.getLayout().getX();
             lastX = x;
-        } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
-            lastX = (lastX == 0 ? 2 : 0);
-            x = lastX;
         }
         return x;
     }
 
     private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
         int y;
-        if (isDgFlow(dataGroup)) {
-            if (resource.getRowGridFree() - 1 > 0) {
-                resource.setRowGridFree(resource.getRowGridFree() - 1);
-                y = lastY;
-            } else {
-                y = lastY++;
-            }
-        } else if (checkFullRow(dataGroup, field)) {
+        if (checkFullRow(dataGroup, field)) {
             y = ++lastY;
             resolveRowGridFree(dataGroup, field.getLayout());
         } else {
@@ -118,12 +111,12 @@ public abstract class FieldBuilder {
     private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
         if (isDgFlow(dataGroup)) {
             return resource.getFormGridColWidth() - resource.getPadding();
-        } else if (checkCol(field.getLayout()) && !isStretch(dataGroup)) {
-            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-        } else {
+        } else if (isDgLegacy(dataGroup)) {
             return (isStretch(dataGroup) ?
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
+        } else {
+            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
         }
     }
 
@@ -146,6 +139,10 @@ public abstract class FieldBuilder {
 
     private boolean isDgFlow(DataGroup dataGroup) {
         return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("flow");
+    }
+
+    private boolean isDgLegacy(DataGroup dataGroup) {
+        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals("legacy");
     }
 
     private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {

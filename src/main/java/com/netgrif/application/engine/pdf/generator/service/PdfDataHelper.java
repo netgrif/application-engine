@@ -99,10 +99,7 @@ public class PdfDataHelper implements IPdfDataHelper {
 
         dataGroups.forEach(dataGroup -> {
             refreshGrid(dataGroup);
-            dataGroup.getFields().getContent().forEach(field -> {
-                        generateField(dataGroup, field);
-                    }
-            );
+            dataGroup.getFields().getContent().forEach(field -> generateField(dataGroup, field));
             this.lastX = Integer.MAX_VALUE;
         });
         Collections.sort(pdfFields);
@@ -257,6 +254,9 @@ public class PdfDataHelper implements IPdfDataHelper {
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null) {
             Integer cols = dataGroup.getLayout().getCols();
             resource.setFormGridCols(cols == null ? this.originalCols : cols);
+            resource.updateProperties();
+        } else {
+            resource.setFormGridCols(this.originalCols);
             resource.updateProperties();
         }
     }
