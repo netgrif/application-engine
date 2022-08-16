@@ -34,13 +34,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/public/user")
 @ConditionalOnProperty(
-        value = "nae.user.web.enabled",
+        value = "nae.public.user.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "User")
+@Tag(name = "Public User Controller")
+@RequestMapping("/api/public/user")
 public class PublicUserController {
 
     @Autowired
@@ -70,7 +70,7 @@ public class PublicUserController {
         return new UserResource(userResponseFactory.getUser(userService.getAnonymousLogged().transformToAnonymousUser(), locale), "profile");
     }
 
-    @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Generic user search")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         small = small == null ? false : small;
@@ -86,7 +86,7 @@ public class PublicUserController {
         return resources;
     }
 
-    @Operation(summary = "Get user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Get user's preferences")
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences() {
         String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
@@ -99,7 +99,7 @@ public class PublicUserController {
         return new PreferencesResource(preferences);
     }
 
-    @Operation(summary = "Set user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Set user's preferences")
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences) {
         try {

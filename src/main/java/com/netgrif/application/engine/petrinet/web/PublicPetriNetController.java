@@ -7,7 +7,9 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -24,9 +26,15 @@ import java.util.Map;
 
 import static com.netgrif.application.engine.petrinet.web.PetriNetController.decodeUrl;
 
-@RestController
-@RequestMapping({"/api/public/petrinet"})
 @Slf4j
+@RestController
+@ConditionalOnProperty(
+        value = "nae.public.petrinet.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@Tag(name = "Public PetriNet Controller")
+@RequestMapping({"/api/public/petrinet"})
 public class PublicPetriNetController {
 
     private final IPetriNetService petriNetService;

@@ -46,9 +46,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 @RestController
 @RequestMapping("/api/petrinet")
 @ConditionalOnProperty(
@@ -56,7 +53,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
         havingValue = "true",
         matchIfMissing = true
 )
-@Tag(name = "Petri net")
+@Tag(name = "PetriNet")
 public class PetriNetController {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
@@ -82,7 +79,7 @@ public class PetriNetController {
             @ApiResponse(responseCode = "400", description = "Process model is invalid"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
-    @RequestMapping(value = "/import", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/import", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
@@ -105,7 +102,7 @@ public class PetriNetController {
     }
 
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         if (identifier != null && version == null) {
@@ -120,47 +117,47 @@ public class PetriNetController {
     }
 
     @Operation(summary = "Get process by id", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/{id}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
     @Operation(summary = "Get process by identifier and version", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/{identifier}/{version}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{identifier}/{version}", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
         String resolvedIdentifier = Base64.isBase64(identifier) ? new String(Base64.decodeBase64(identifier)) : identifier;
         return new PetriNetReferenceResource(service.getReference(resolvedIdentifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
     }
 
     @Operation(summary = "Get transitions of processes", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
         ids.forEach(id -> id = decodeUrl(id));
         return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
     }
 
     @Operation(summary = "Get data fields of transitions", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/data", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
     @Operation(summary = "Get roles of process", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{netId}/roles", produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
         return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
     }
 
     @Operation(summary = "Get transactions of process", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{netId}/transactions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
         PetriNet net = service.getPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/{netId}/file", method = GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
         FileSystemResource fileResource = service.getFile(decodeUrl(netId), decodeUrl(title));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -171,7 +168,7 @@ public class PetriNetController {
     }
 
     @Operation(summary = "Search processes", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/search", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/search", produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PagedModel<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
@@ -191,7 +188,7 @@ public class PetriNetController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deletePetriNet(@PathVariable("id") String processId, Authentication auth) {
         String decodedProcessId = decodeUrl(processId);
         if (Objects.equals(decodedProcessId, "")) {

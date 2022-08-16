@@ -9,7 +9,9 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateCaseBody;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,9 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Locale;
 
-@RestController
-@RequestMapping({"/api/public"})
 @Slf4j
+@RestController
+@ConditionalOnProperty(
+        value = "nae.public.workflow.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@RequestMapping({"/api/public"})
+@Tag(name = "Public Workflow Controller")
 public class PublicWorkflowController {
 
     private final IWorkflowService workflowService;
