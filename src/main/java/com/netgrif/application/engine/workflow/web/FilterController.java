@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
  */
-@Deprecated
+@Deprecated(since = "5.3.0")
 @RestController
 @RequestMapping("/api/filter")
 @ConditionalOnProperty(
@@ -46,7 +46,7 @@ public class FilterController {
     private IFilterService filterService;
 
     @Operation(summary = "Save new filter", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(required = false) MergeFilterOperation operation, Authentication auth, Locale locale) {
         Filter filter = filterService.saveFilter(newFilter, operation, (LoggedUser) auth.getPrincipal());
         if (filter != null)
@@ -55,7 +55,7 @@ public class FilterController {
     }
 
     @Operation(summary = "Delete filter specified by id", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         boolean success = filterService.deleteFilter(filterId, loggedUser);
@@ -65,7 +65,7 @@ public class FilterController {
     }
 
     @Operation(summary = "Search for filter by provided criteria", security = {@SecurityRequirement(name = "BasicAuth")})
-    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedFilterResource> search(@RequestBody Map<String, Object> searchCriteria, Authentication auth, Locale locale, Pageable pageable, PagedResourcesAssembler<Filter> assembler) {
         Page<Filter> page = filterService.search(searchCriteria, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass())
