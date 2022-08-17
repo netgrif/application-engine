@@ -12,6 +12,7 @@ import com.netgrif.application.engine.elastic.domain.NumberField;
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.elastic.domain.UserField;
 import com.netgrif.application.engine.elastic.domain.*;
+import com.netgrif.application.engine.elastic.domain.UserListField;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -26,6 +27,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,7 +82,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileField(caseField);
         } else if (netField instanceof FileListField) {
             return this.transformFileListField(caseField);
-        } else if (netField instanceof UserListField) {
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserListField) {
             return this.transformUserListField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.I18nField) {
             return this.transformI18nField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.I18nField) netField);
@@ -201,17 +203,17 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformUserListField(com.netgrif.application.engine.workflow.domain.DataField userListField) {
-        List<String> userIds = (List<String>) userListField.getValue();
-        List<IUser> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
-        return Optional.of(new UserField(users.stream().map(this::transformUserValue).toArray(UserField.UserMappingData[]::new)));
+        UserListFieldValue userListValue = (UserListFieldValue) userListField.getValue();
+        UserListField.UserMappingData[] userMappingData = userListValue.getUserValues().stream().map(this::transformUserListValue).toArray(UserListField.UserMappingData[]::new);
+        return Optional.of(new UserListField(userMappingData));
     }
 
     private UserField.UserMappingData transformUserValue(UserFieldValue user) {
         return new UserField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
     }
 
-    private UserField.UserMappingData transformUserValue(IUser user) {
-        return new UserField.UserMappingData(user.getStringId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
+    private UserListField.UserMappingData transformUserListValue(UserFieldValue user) {
+        return new UserListField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
     }
 
     private StringBuilder buildFullName(String name, String surname) {
