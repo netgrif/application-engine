@@ -196,8 +196,7 @@ class FieldTest {
         UserListField field = net.dataSet["emptyUserList"] as UserListField
         assert field.name.defaultValue == "Empty user list"
         assert field.description.defaultValue == "User list description"
-        assert field.defaultValue instanceof List
-        assert field.defaultValue.isEmpty()
+        assert field.defaultValue == null
     }
 
     private void assertTaskRef() {
