@@ -139,8 +139,8 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                         @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile) {
-        return super.saveFile(taskId, fieldId, multipartFile, dataBody);
+                                                         @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale) {
+        return super.saveFile(taskId, fieldId, multipartFile, dataBody, locale);
     }
 
     @Operation(summary = "Download task file field value")

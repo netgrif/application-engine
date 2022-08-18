@@ -201,8 +201,6 @@ public class Importer {
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         document.getFunction().forEach(this::createFunction);
-        evaluateFunctions();
-        actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUserRef);
         document.getUserRef().forEach(this::resolveUserRef);
@@ -211,6 +209,8 @@ public class Importer {
 
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
+        evaluateFunctions();
+        actions.forEach(this::evaluateActions);
 
         if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
             net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
