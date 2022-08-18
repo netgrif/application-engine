@@ -79,11 +79,4 @@ class DevConsole {
         }
     }
 
-//    @GetMapping(value = "/login")
-//    def login() {
-//        def remote = new HTTPBuilder("http://localhost:8080/user")
-//        remote.auth.basic('agent@company.com', 'password')
-//        remote.request(Method.GET) {}
-//        return new RedirectView("/offers")
-//    }
 }
