@@ -12,7 +12,8 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UserListField extends DataField {
+public class UserListField extends UserField {
+
     @Field(type = Text)
     private String[] emailValue;
 
@@ -22,8 +23,8 @@ public class UserListField extends DataField {
     @Field(type = Text)
     private String[] userIdValue;
 
-    public UserListField(UserListField.UserMappingData[] values) {
-        super(new String[values.length]);
+    public UserListField(UserMappingData[] values) {
+        super(values);
         this.emailValue = new String[values.length];
         this.fullNameValue = new String[values.length];
         this.userIdValue = new String[values.length];
@@ -33,13 +34,6 @@ public class UserListField extends DataField {
             this.userIdValue[i] = values[i].userId;
             super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].email);
         }
-    }
-
-    @AllArgsConstructor
-    public static class UserMappingData {
-        public String userId;
-        public String email;
-        public String fullName;
     }
 
 }

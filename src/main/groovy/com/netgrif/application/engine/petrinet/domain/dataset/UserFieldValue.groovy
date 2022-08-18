@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
+import com.netgrif.application.engine.auth.domain.IUser
+
 class UserFieldValue {
 
     protected String id
@@ -15,6 +17,13 @@ class UserFieldValue {
         this.name = name
         this.surname = surname
         this.email = email
+    }
+
+    UserFieldValue(IUser user) {
+        this.id = user.stringId
+        this.name = user.name
+        this.surname = user.surname
+        this.email = user.email
     }
 
     String getId() {

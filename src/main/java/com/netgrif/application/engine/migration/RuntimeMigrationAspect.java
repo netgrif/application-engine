@@ -95,7 +95,7 @@ public class RuntimeMigrationAspect {
      * @param bson document to be migrated
      * */
     public void callProcessMigrations(Document bson) {
-
+        /* Override this function to provide content */
     }
 
     /**
@@ -113,7 +113,7 @@ public class RuntimeMigrationAspect {
      * @param bson document to be migrated
      * */
     public void callTaskMigrations(Document bson) {
-
+        /* Override this function to provide content */
     }
 
     protected final void migrateUserListFieldValueType(Document document) {

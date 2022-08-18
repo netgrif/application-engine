@@ -559,7 +559,6 @@ public final class FieldFactory {
     }
 
     private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
-        // parse same as filelistfield
         field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 
