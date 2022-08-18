@@ -203,8 +203,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                         @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile){
-        return super.saveFile(taskId, fieldId, multipartFile, dataBody);
+                                                         @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile,  Locale locale){
+        return super.saveFile(taskId, fieldId, multipartFile, dataBody, locale);
     }
 
     @ApiOperation(value = "Download task file field value", authorizations = @Authorization("BasicAuth"))
