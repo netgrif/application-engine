@@ -696,7 +696,7 @@ public class DataService implements IDataService {
     @Override
     public UserFieldValue makeUserFieldValue(String id) {
         IUser user = userService.resolveById(id, true);
-        return new UserFieldValue(user);
+        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }
 
     private void updateDataset(Case useCase) {

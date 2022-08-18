@@ -12,6 +12,8 @@ class UserFieldValue {
 
     protected String email
 
+    UserFieldValue() {}
+
     UserFieldValue(String id, String name, String surname, String email) {
         this.id = id
         this.name = name
