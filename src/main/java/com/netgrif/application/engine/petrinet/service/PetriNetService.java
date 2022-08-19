@@ -37,6 +37,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.*;
@@ -110,7 +112,8 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private IUriService uriService;
 
-    private Map<ObjectId, PetriNet> cache = new HashMap<>();
+    @Autowired
+    private CacheManager cacheManager;
 
     protected Importer getImporter() {
         return importerProvider.get();
@@ -118,24 +121,31 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public void evictCache() {
-        cache = new HashMap<>();
+        cacheManager.getCache("netsId").clear();
+        cacheManager.getCache("netsNewest").clear();
+        cacheManager.getCache("netsCache").clear();
+        cacheManager.getCache("netsIdentifier").clear();
+    }
+
+    @Override
+    public void evictCache(PetriNet net) {
+        cacheManager.getCache("netsId").evict(net.getStringId());
+        cacheManager.getCache("netsNewest").evict(net.getIdentifier());
+        cacheManager.getCache("netsCache").evict(net.getObjectId());
+        cacheManager.getCache("netsIdentifier").evict(net.getIdentifier() + net.getVersion().toString());
     }
 
     /**
      * Get read only Petri net.
      */
     @Override
+    @Cacheable("netsCache")
     public PetriNet get(ObjectId petriNetId) {
-        PetriNet net = cache.get(petriNetId);
-        if (net == null) {
-            Optional<PetriNet> optional = repository.findById(petriNetId.toString());
-            if (!optional.isPresent()) {
-                throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
-            }
-            net = optional.get();
-            cache.put(petriNetId, net);
+        Optional<PetriNet> optional = repository.findById(petriNetId.toString());
+        if (!optional.isPresent()) {
+            throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
         }
-        return net;
+        return optional.get();
     }
 
     @Override
@@ -187,10 +197,10 @@ public class PetriNetService implements IPetriNetService {
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.POST);
         save(net);
-        cache.put(net.getObjectId(), net);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
+        this.evictCache(net);
         return outcome;
     }
 
@@ -220,6 +230,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    @Cacheable("netsId")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (!net.isPresent())
@@ -230,6 +241,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    @Cacheable(value = "netsIdentifier", key = "#identifier+#version.toString()")
     public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null)
@@ -253,6 +265,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    @Cacheable("netsNewest")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty())
@@ -433,7 +446,7 @@ public class PetriNetService implements IPetriNetService {
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());
-        this.cache.remove(petriNet.getObjectId());
+        this.evictCache(petriNet);
         // net functions must by removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);
         historyService.save(new DeletePetriNetEventLog(null, EventPhase.PRE, petriNet.getObjectId()));

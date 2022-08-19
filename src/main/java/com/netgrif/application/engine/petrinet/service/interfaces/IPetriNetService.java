@@ -80,6 +80,8 @@ public interface IPetriNetService {
 
     void evictCache();
 
+    void evictCache(PetriNet net);
+
     PetriNet get(ObjectId petriNetId);
 
     List<PetriNet> get(Collection<ObjectId> petriNetId);
