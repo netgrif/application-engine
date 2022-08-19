@@ -8,14 +8,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Full
 Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
 
-## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-08-08)
+## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-08-18)
 
 ### Fixed
 
 - [NAE-1666] PDF Generator template file issue
+- [NAE-1702] LdapUser unique dn 
+- [NAE-1699] Create/upload event action is loaded only from the cache
 
 ### Changed
 
+- [NAE-1663] Optional constructor
 - [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
 
 ### Added
@@ -24,6 +27,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1665] Generated PDF colors properties
 - [NAE-1660] Filter action API
 - [NAE-1659] Process URI
+- [NAE-1698] Springdoc OpenAPI 3 generation
 
 ## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)
 
