@@ -154,7 +154,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
+    public EntityModel<EventOutcomeWithMessage> deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
         return super.deleteFile(taskId, fieldId);
     }
 
@@ -192,7 +192,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
         return super.deleteNamedFile(taskId, fieldId, name);
     }
 

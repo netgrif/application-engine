@@ -245,11 +245,12 @@ public abstract class AbstractTaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    public MessageResource deleteFile(String taskId, String fieldId) {
-        if (dataService.deleteFile(taskId, fieldId))
-            return MessageResource.successMessage("File in field " + fieldId + " within task " + taskId + " was successfully deleted");
-        return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
-    }
+    public EntityModel<EventOutcomeWithMessage> deleteFile(String taskId, String fieldId) {
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+        outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));    }
 
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
@@ -275,10 +276,12 @@ public abstract class AbstractTaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    public MessageResource deleteNamedFile(String taskId, String fieldId, String name) {
-        if (dataService.deleteFileByName(taskId, fieldId, name))
-            return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
-        return MessageResource.errorMessage("File with name " + name + " in field " + fieldId + " within task" + taskId + " has failed to delete");
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(String taskId, String fieldId, String name) {
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+        outcomes.put(taskId, dataService.deleteFileByName(taskId, fieldId, name));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getFilePreview(String taskId, String fieldId) throws FileNotFoundException {
