@@ -19,6 +19,9 @@ public abstract class FieldBuilder {
     @Getter
     protected int lastX, lastY;
 
+    private static final String LEGACY = "legacy";
+    private static final String FLOW = "flow";
+
     public FieldBuilder(PdfResource resource) {
         this.resource = resource;
     }
@@ -138,11 +141,11 @@ public abstract class FieldBuilder {
     }
 
     private boolean isDgFlow(DataGroup dataGroup) {
-        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("flow");
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(FLOW);
     }
 
     private boolean isDgLegacy(DataGroup dataGroup) {
-        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals("legacy");
+        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals(LEGACY);
     }
 
     private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {
