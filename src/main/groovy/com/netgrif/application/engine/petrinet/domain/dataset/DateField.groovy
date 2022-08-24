@@ -15,8 +15,11 @@ class DateField extends Field<LocalDate> {
     @Transient
     private String maxDate
 
+    private TimeZone timeZone
+
     DateField() {
         super()
+        this.timeZone = new TimeZone(ZoneId.systemDefault())
     }
 
     @Override
@@ -26,7 +29,7 @@ class DateField extends Field<LocalDate> {
 
 
     void setValue(Date value) {
-        this.value = value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+        this.value = value?.toInstant()?.atZone(this.timeZone.zoneId)?.toLocalDate()
     }
 
     void setDefaultValue(String value) {
@@ -34,7 +37,7 @@ class DateField extends Field<LocalDate> {
     }
 
     void setDefaultValue(Date value) {
-        this.setDefaultValue(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+        this.setDefaultValue(value.toInstant().atZone(this.timeZone.zoneId).toLocalDate())
     }
 
     String getMinDate() {
@@ -51,6 +54,14 @@ class DateField extends Field<LocalDate> {
 
     void setMaxDate(String maxDate) {
         this.maxDate = maxDate
+    }
+
+    TimeZone getTimeZone() {
+        return timeZone
+    }
+
+    void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone
     }
 
     @Override

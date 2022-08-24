@@ -715,14 +715,14 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = FieldFactory.parseDate(node.get("value").asText());
+                value = FieldFactory.parseDate(node.get("value").asText(), dataField.getTimeZone().getZoneId());
                 break;
             case "dateTime":
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
                     break;
                 }
-                value = FieldFactory.parseDateTime(node.get("value").asText());
+                value = FieldFactory.parseDateTime(node.get("value").asText(), dataField.getTimeZone().getZoneId());
                 break;
             case "boolean":
                 value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
+import com.netgrif.application.engine.petrinet.domain.dataset.TimeZone;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import com.querydsl.core.annotations.PropertyType;
@@ -37,6 +38,9 @@ public class DataField implements Referencable {
 
     @Getter
     private Map<String, Object> filterMetadata;
+
+    @Getter
+    private TimeZone timeZone;
 
     @Getter
     @Setter
@@ -89,6 +93,10 @@ public class DataField implements Referencable {
     public void setValidations(List<Validation> validations) {
         this.validations = validations;
         update();
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
     }
 
     public ObjectNode applyBehavior(String transition, ObjectNode json) {

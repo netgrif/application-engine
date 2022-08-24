@@ -241,6 +241,12 @@ public class Case {
             if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
                 dynamicChoicesFields.add((ChoiceField<?>) field);
             }
+            if (field instanceof DateField) {
+                this.dataSet.get(key).setTimeZone(((DateField) field).getTimeZone());
+            }
+            if (field instanceof DateTimeField) {
+                this.dataSet.get(key).setTimeZone(((DateTimeField) field).getTimeZone());
+            }
         });
         dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
         dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
