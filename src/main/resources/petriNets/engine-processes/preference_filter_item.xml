@@ -363,7 +363,7 @@
 		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
 		<i18nString name="banned_roles_desc">Liste der Rollen, die diesen Menüeintrag nicht anzeigen dürfen.</i18nString>
 		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
-		<i18nString name="create_case_button_icon">Kennung des Schaltflächensymbols "Neuer Fall"</i18nString>
+		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
