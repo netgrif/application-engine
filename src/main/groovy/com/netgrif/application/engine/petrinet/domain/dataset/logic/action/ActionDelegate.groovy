@@ -209,24 +209,32 @@ class ActionDelegate {
         }
     }
 
+    /**
+     * Converter for fields at ActionDelegate init. Can be used to convert values to temporary value
+     * E.g.
+     *  in case of DateTimeField values are saved to database as UTC with zone offset. When read in the value is
+     *  combined with time zone. But in case when we use this value to change other DateTimeField with different time
+     *  zone, in the moment of change we do not know the original time zone, so before this conversion, the value is
+     *  converted to system's time zone, and then when changing the value of other field, the changed field will contain
+     *  the correct converted time.
+     *  @param field the field to be converted
+     *  @return converted field
+     * */
+    Field convert(Field field) {
+        switch (field.type) {
+            case FieldType.DATETIME:
+                field.setValue(centralizedTime(field as DateTimeField))
+                break
+            default:
+                break
+        }
+        return field
+    }
+
     def initTransitionsMap(Map<String, String> transitionIds) {
         transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
-    }
-
-    Field convert(Field field) {
-        switch (field.type) {
-            case FieldType.DATETIME:
-                field.setValue(FieldFactory.convertLocalDateTime((LocalDateTime) field.value, ((DateTimeField) field).timeZone.zoneId,  ZoneId.systemDefault()))
-                break
-            case FieldType.DATE:
-                field.setValue(FieldFactory.convertLocalDate((LocalDate) field.value, ((DateField) field).timeZone.zoneId,  ZoneId.systemDefault()))
-                break
-            default:
-                break;
-        }
-        return field
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -1876,4 +1884,22 @@ class ActionDelegate {
         return new I18nString(value, translations)
     }
 
+    /**
+     * Converts DateTimeField value to system's time zone.
+     * @param field that's value will be converted
+     * @return converted LocalDateTime
+     * */
+    LocalDateTime centralizedTime(DateTimeField field) {
+        return centralizedTime(field.value, field.timeZone.zoneId)
+    }
+
+    /**
+     * Converts DateTimeField value to system's time zone.
+     * @param dateTime to be converted
+     * @param zoneId source
+     * @return converted LocalDateTime
+     * */
+    LocalDateTime centralizedTime(LocalDateTime dateTime, ZoneId zoneId) {
+        return FieldFactory.convertLocalDateTime(dateTime, zoneId,  ZoneId.systemDefault())
+    }
 }
