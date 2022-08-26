@@ -156,8 +156,8 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
-        return super.deleteFile(taskId, fieldId);
+    public MessageResource deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam("parentTaskId") String parentTaskId) {
+        return super.deleteFile(parentTaskId, fieldId);
     }
 
     @Operation(summary = "Download preview for file field value")
@@ -186,7 +186,6 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, name);
     }
 
-    @Override
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @DeleteMapping(value = "/{id}/file/{field}/{name}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -194,8 +193,8 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
-        return super.deleteNamedFile(taskId, fieldId, name);
+    public MessageResource deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name, @RequestParam("parentTaskId") String parentTaskId) {
+        return super.deleteNamedFile(parentTaskId, fieldId, name);
     }
 
     @Operation(summary = "Generic task search on Mongo database")
