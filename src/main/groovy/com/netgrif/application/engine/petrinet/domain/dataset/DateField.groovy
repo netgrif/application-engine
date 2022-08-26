@@ -29,7 +29,7 @@ class DateField extends Field<LocalDate> {
 
 
     void setValue(Date value) {
-        this.value = value?.toInstant()?.atZone(this.timeZone.zoneId)?.toLocalDate()
+        this.value = value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
     }
 
     void setDefaultValue(String value) {
@@ -37,7 +37,7 @@ class DateField extends Field<LocalDate> {
     }
 
     void setDefaultValue(Date value) {
-        this.setDefaultValue(value.toInstant().atZone(this.timeZone.zoneId).toLocalDate())
+        this.setDefaultValue(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
     }
 
     String getMinDate() {
@@ -68,6 +68,7 @@ class DateField extends Field<LocalDate> {
     Field clone() {
         DateField clone = new DateField()
         super.clone(clone)
+        clone.timeZone = this.timeZone
         return clone
     }
 }

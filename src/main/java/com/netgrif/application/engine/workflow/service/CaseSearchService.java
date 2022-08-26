@@ -4,8 +4,6 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.DateField;
-import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -28,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -259,7 +256,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));
 
         try {
-            LocalDateTime creation = FieldFactory.parseDateTime(searchPhrase, ZoneId.systemDefault());
+            LocalDateTime creation = FieldFactory.parseDateTime(searchPhrase);
             if (creation != null)
                 predicates.add(QCase.case$.creationDate.eq(creation));
         } catch (Exception e) {
@@ -278,11 +275,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
                     } else if (field.getType() == FieldType.DATE) {
-                        LocalDate value = FieldFactory.parseDate(searchPhrase, ((DateField) field).getTimeZone().getZoneId());
+                        LocalDate value = FieldFactory.parseDate(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
                     } else if (field.getType() == FieldType.DATETIME) {
-                        LocalDateTime value = FieldFactory.parseDateTime(searchPhrase, ((DateTimeField) field).getTimeZone().getZoneId());
+                        LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
                     } else if (field.getType() == FieldType.ENUMERATION) {

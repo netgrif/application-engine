@@ -71,6 +71,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.stream.Collectors
 
@@ -203,7 +205,7 @@ class ActionDelegate {
 
     def initFieldsMap(Map<String, String> fieldIds) {
         fieldIds.each { name, id ->
-            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id, null))
+            set(name, convert(fieldFactory.buildFieldWithoutValidation(useCase, id, null)))
         }
     }
 
@@ -211,6 +213,20 @@ class ActionDelegate {
         transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
+    }
+
+    Field convert(Field field) {
+        switch (field.type) {
+            case FieldType.DATETIME:
+                field.setValue(FieldFactory.convertLocalDateTime((LocalDateTime) field.value, ((DateTimeField) field).timeZone.zoneId,  ZoneId.systemDefault()))
+                break
+            case FieldType.DATE:
+                field.setValue(FieldFactory.convertLocalDate((LocalDate) field.value, ((DateField) field).timeZone.zoneId,  ZoneId.systemDefault()))
+                break
+            default:
+                break;
+        }
+        return field
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -674,6 +690,8 @@ class ActionDelegate {
         ChangedField changedField = new ChangedField(field.stringId)
         if (field instanceof I18nField) {
             changedField.attributes.put("value", value)
+        } else if (field instanceof  DateTimeField)  {
+            changedField.attributes.put("value", FieldFactory.convertLocalDateTime((LocalDateTime) value, ZoneId.systemDefault(), field.timeZone.zoneId))
         } else {
             changedField.addAttribute("value", value)
         }

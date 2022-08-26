@@ -52,6 +52,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -715,14 +717,14 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = FieldFactory.parseDate(node.get("value").asText(), dataField.getTimeZone().getZoneId());
+                value = FieldFactory.parseDate(node.get("value").asText());
                 break;
             case "dateTime":
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
                     break;
                 }
-                value = FieldFactory.parseDateTime(node.get("value").asText(), dataField.getTimeZone().getZoneId());
+                value = FieldFactory.convertLocalDateTime(FieldFactory.parseDateTime(node.get("value").asText()), dataField.getTimeZone().getZoneId(), ZoneId.systemDefault());
                 break;
             case "boolean":
                 value = !(node.get("value") == null || node.get("value").isNull()) && node.get("value").asBoolean();

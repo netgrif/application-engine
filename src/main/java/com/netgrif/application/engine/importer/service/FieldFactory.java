@@ -16,9 +16,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataValidatio
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -288,7 +286,7 @@ public final class FieldFactory {
         }
         setDefaultValue(field, data, defaultValue -> {
             if (defaultValue != null) {
-                field.setDefaultValue(parseDate(defaultValue, field.getTimeZone().getZoneId()));
+                field.setDefaultValue(parseDate(defaultValue));
             }
         });
         return field;
@@ -319,7 +317,7 @@ public final class FieldFactory {
         if (data.getTimeZone() != null && data.getTimeZone().getZoneId() != null) {
             field.setTimeZone(new TimeZone(ZoneId.of(data.getTimeZone().getZoneId().value(), ZoneId.SHORT_IDS)));
         }
-        setDefaultValue(field, data, defaultValue -> field.setDefaultValue(parseDateTime(defaultValue, field.getTimeZone().getZoneId())));
+        setDefaultValue(field, data, defaultValue -> field.setDefaultValue(parseDateTime(defaultValue)));
         return field;
     }
 
@@ -593,17 +591,17 @@ public final class FieldFactory {
 
     private void parseDateValue(DateField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
-        field.setValue(parseDate(value, field.getTimeZone().getZoneId()));
+        field.setValue(parseDate(value));
     }
 
     private void parseDateDefaultValue(DateField field) {
         Object value = field.getDefaultValue();
-        field.setDefaultValue(parseDate(value, field.getTimeZone().getZoneId()));
+        field.setDefaultValue(parseDate(value));
     }
 
-    public static LocalDate parseDate(Object value, ZoneId zoneId) {
+    public static LocalDate parseDate(Object value) {
         if (value instanceof Date) {
-            return ((Date) value).toInstant().atZone(zoneId).toLocalDate();
+            return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         } else if (value instanceof String) {
             return parseDateFromString((String) value);
         } else if (value instanceof LocalDate) {
@@ -643,10 +641,11 @@ public final class FieldFactory {
 
     private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
-        field.setValue(parseDateTime(value, field.getTimeZone().getZoneId()));
+        LocalDateTime localDateTime = parseDateTime(value);
+        field.setValue(convertLocalDateTime(localDateTime, ZoneId.systemDefault(), field.getTimeZone().getZoneId()));
     }
 
-    public static LocalDateTime parseDateTime(Object value, ZoneId zoneId) {
+    public static LocalDateTime parseDateTime(Object value) {
         if (value == null)
             return null;
 
@@ -655,7 +654,7 @@ public final class FieldFactory {
         else if (value instanceof String)
             return parseDateTimeFromString((String) value);
         else if (value instanceof Date)
-            return LocalDateTime.ofInstant(((Date) value).toInstant(), zoneId);
+            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
         return (LocalDateTime) value;
     }
 
@@ -684,6 +683,13 @@ public final class FieldFactory {
             }
         }
         return null;
+    }
+
+    public static LocalDateTime convertLocalDateTime(LocalDateTime localDateTime, ZoneId source, ZoneId dest) {
+        if (localDateTime == null) {
+            return null;
+        }
+        return LocalDateTime.ofInstant(localDateTime.atZone(source).toInstant(), dest);
     }
 
     public static I18nString parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
