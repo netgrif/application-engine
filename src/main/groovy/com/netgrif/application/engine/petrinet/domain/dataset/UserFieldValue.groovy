@@ -22,10 +22,7 @@ class UserFieldValue {
     }
 
     UserFieldValue(IUser user) {
-        this.id = user.stringId
-        this.name = user.name
-        this.surname = user.surname
-        this.email = user.email
+        this(user.getStringId(), user.getName(), user.getSurname(), user.getEmail())
     }
 
     String getId() {
