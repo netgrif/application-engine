@@ -67,6 +67,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.FileUrlResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -1054,7 +1056,7 @@ class ActionDelegate {
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         if (template) {
-            pdfResource.setTemplateResource(new ClassPathResource(template))
+            pdfResource.setTemplateResource(new FileSystemResource(template))
         }
         if (locale) {
             pdfResource.setTextLocale(locale)
