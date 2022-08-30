@@ -5,6 +5,7 @@ import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -85,14 +86,8 @@ public class PetriNetController {
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
-            File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
-            file.createNewFile();
-            FileOutputStream fout = new FileOutputStream(file);
-            fout.write(multipartFile.getBytes());
-            String release = releaseType == null ? "major" : releaseType;
-
-            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
-            fout.close();
+            VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
+            ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
             return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
                     LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
         } catch (IOException e) {
