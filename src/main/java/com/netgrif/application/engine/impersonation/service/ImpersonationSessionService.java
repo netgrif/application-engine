@@ -1,0 +1,32 @@
+package com.netgrif.application.engine.impersonation.service;
+
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
+import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+
+@Service
+public class ImpersonationSessionService implements IImpersonationSessionService {
+
+    @Autowired
+    private FindByIndexNameSessionRepository<? extends Session> sessions;
+
+    @Autowired
+    private SpringSessionBackedSessionRegistry<? extends Session> registry;
+
+    @Override
+    public boolean existsSession(String username) {
+        Collection<? extends Session> usersSessions = this.sessions.findByPrincipalName(username).values();
+        return usersSessions.stream().anyMatch((session) -> !registry.getSessionInformation(session.getId()).isExpired());
+    }
+
+    @Override
+    public boolean isImpersonated(String userId) {
+        // TODO 1678 redis lookup
+        return false;
+    }
+}

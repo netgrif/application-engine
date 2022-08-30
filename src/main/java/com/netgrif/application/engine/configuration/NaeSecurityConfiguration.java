@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
+import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
@@ -106,6 +107,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .and()
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -172,5 +174,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
+    }
+
+    private ImpersonationRequestFilter impersonationRequestFilter() {
+        return new ImpersonationRequestFilter();
     }
 }

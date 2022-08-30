@@ -94,7 +94,7 @@ public class AuthenticationController {
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
+            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
                 return MessageResource.errorMessage("Only admin can invite new users!");
             }
 

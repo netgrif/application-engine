@@ -250,18 +250,6 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public IUser getLoggedOrSystem() {
-        try {
-            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
-                return getSystem();
-            }
-            return getLoggedUser();
-        } catch (NullPointerException e) {
-            return getSystem();
-        }
-    }
-
-    @Override
     public void assignAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
@@ -278,6 +266,18 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
+    public IUser getLoggedOrSystem() {
+        try {
+            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
+                return getSystem();
+            }
+            return getLoggedUserOrImpersonated();
+        } catch (NullPointerException e) {
+            return getSystem();
+        }
+    }
+
+    @Override
     public IUser getSystem() {
         IUser system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
         system.setProcessRoles(new HashSet<>(processRoleService.findAll()));
@@ -286,7 +286,7 @@ public class UserService extends AbstractUserService {
 
     @Override
     public IUser getLoggedUser() {
-        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LoggedUser loggedUser = getLoggedUserFromContext();
         if (!loggedUser.isAnonymous()) {
             return findByEmail(loggedUser.getEmail(), false);
         }
@@ -294,10 +294,23 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
+    public IUser getLoggedUserOrImpersonated() {
+        LoggedUser loggedUser = getLoggedUserFromContext();
+        if (!loggedUser.isAnonymous()) {
+            return findById(loggedUser.getSelfOrImpersonated().getId(), false);
+        }
+        return loggedUser.transformToAnonymousUser();
+    }
+
+    @Override
     public LoggedUser getAnonymousLogged() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
-            getLoggedUser().transformToLoggedUser();
+            return getLoggedUser().transformToLoggedUser();
         }
+        return getLoggedUserFromContext();
+    }
+
+    protected LoggedUser getLoggedUserFromContext() {
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 

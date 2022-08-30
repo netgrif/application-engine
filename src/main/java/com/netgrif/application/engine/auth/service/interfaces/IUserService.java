@@ -55,6 +55,8 @@ public interface IUserService {
 
     IUser getLoggedUser();
 
+    IUser getLoggedUserOrImpersonated();
+
     IUser getSystem();
 
     LoggedUser getAnonymousLogged();

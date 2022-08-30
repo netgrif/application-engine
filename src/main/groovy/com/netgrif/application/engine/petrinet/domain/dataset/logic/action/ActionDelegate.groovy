@@ -830,7 +830,7 @@ class ActionDelegate {
     }
 
     Task cancelTask(Task task, IUser user = userService.loggedOrSystem) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, userService.loggedOrSystem))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user))
     }
 
     void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem) {

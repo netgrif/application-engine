@@ -25,10 +25,13 @@ public class User {
 
     private Set<Authority> authorities;
 
+
     // process roles are set with the factory
     private Set<ProcessRole> processRoles;
 
     private Set<String> nextGroups;
+
+    private User impersonated;
 
     protected User(IUser user) {
         id = user.getStringId();

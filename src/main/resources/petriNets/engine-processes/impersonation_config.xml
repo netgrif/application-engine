@@ -1,0 +1,342 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>impersonation_config</id>
+	<version>1.0.0</version>
+	<initials>IPC</initials>
+	<title>Konfigurácia zastupiteľov</title>
+	<icon>home</icon>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>admin_imp</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>user_imp</id>
+		<caseLogic>
+			<create>true</create>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<userRef>
+		<id>config_owner</id>
+		<caseLogic>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</userRef>
+	<caseEvents>
+		<event type="create">
+			<id>assign_email</id>
+			<actions phase="post">
+				<action>impersonated_email: f.impersonated_email,
+					impersonated: f.impersonated,
+					config_owner: f.config_owner;
+
+					change impersonated value { auditingService.userToValue(userService.findByEmail(useCase.author.email, false)) }
+					change impersonated_email value { useCase.author.email }
+					change config_owner value { [useCase.author.id] }
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<role>
+		<id>admin_imp</id>
+		<title>Admin</title>
+	</role>
+	<role>
+		<id>user_imp</id>
+		<title>Používateľ</title>
+	</role>
+	<data type="text" immediate="true">
+		<id>impersonated_email</id>
+		<title>E-mail zastúpeného</title>
+		<event type="set">
+			<id>impersonated_email_set</id>
+		</event>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>impersonators</id>
+		<title>Zastupitelia</title>
+		<event type="set">
+			<id>make_select_impersonator_null</id>
+		</event>
+	</data>
+	<data type="userList">
+		<id>config_owner</id>
+		<title/>
+	</data>
+	<data type="dateTime" immediate="true">
+		<id>valid_from</id>
+		<title>Platný od</title>
+	</data>
+	<data type="dateTime" immediate="true">
+		<id>valid_to</id>
+		<title>Platný do</title>
+	</data>
+	<data type="user">
+		<id>impersonated</id>
+		<title>Používateľ na zastúpenie</title>
+		<event type="set">
+			<id>impersonated_set</id>
+			<actions phase="post">
+				<action>impersonated_email: f.impersonated_email,
+					impersonated: f.impersonated;
+
+					change impersonated_email value { impersonated.value.email }</action>
+			</actions>
+		</event>
+	</data>
+	<data type="user">
+		<id>select_impersonator</id>
+		<title>Výber zastupiteľa</title>
+		<event type="set">
+			<id>select_impersonator_set</id>
+		</event>
+	</data>
+	<data type="button">
+		<id>remove_impersonator</id>
+		<title/>
+		<placeholder>Vymazať označených</placeholder>
+		<event type="set">
+			<id>remove_impersonator_set</id>
+			<actions phase="pre">
+				<action>impersonators: f.impersonators;
+
+					if (impersonators.value != null &amp;&amp; impersonators.options != null) {
+					def options = impersonators.options
+					def values = impersonators.value
+					values.each { it -&gt; options.remove(it) }
+					change impersonators value { null }
+					change impersonators options { options }
+					}</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>add_selected</id>
+		<title/>
+		<placeholder>Pridať vybraného</placeholder>
+		<event type="set">
+			<id>add_selected_set</id>
+			<actions phase="pre">
+				<action id="10">select_impersonator: f.select_impersonator,
+					impersonators: f.impersonators;
+					if (select_impersonator.value != null) {
+					def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
+					options.put(select_impersonator.value.id, new com.netgrif.application.engine.petrinet.domain.I18nString(select_impersonator.value.id, select_impersonator.value.name + " " + select_impersonator.value.surname + " (" + select_impersonator.value.email + ")"))
+					change impersonators options { options }
+					change impersonators value { options.keySet() }
+
+					}
+					change select_impersonator value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(null, "Vyberte", "používateľa", null) }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>220</x>
+		<y>180</y>
+		<label>Výber zastúpeného</label>
+		<roleRef>
+			<id>admin_imp</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<userRef>
+			<id>config_owner</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>impersonated</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t1_assign</id>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t1_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>500</x>
+		<y>180</y>
+		<label>Výber zastupiteľov</label>
+		<roleRef>
+			<id>admin_imp</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<userRef>
+			<id>config_owner</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>impersonators</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>valid_from</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>valid_to</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>impersonated</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>select_impersonator</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_impersonator</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>stroked</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>add_selected</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>stroked</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t2_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t2_delegate</id>
+		</event>
+	</transition>
+</document>
+

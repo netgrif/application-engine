@@ -93,7 +93,7 @@ public class UserController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
+        Page<IUser> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
@@ -111,7 +111,7 @@ public class UserController {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                ((LoggedUser) auth.getPrincipal()), small, pageable);
+                ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
@@ -123,9 +123,10 @@ public class UserController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small != null && small;
-        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LoggedUser actualUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
-            log.info("User " + loggedUser.getUsername() + " trying to get another user with ID " + userId);
+            log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
         IUser user = userService.resolveById(userId, small);
@@ -134,7 +135,7 @@ public class UserController {
 
     @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
+    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) { // TODO 1678 vratit aj s impersonated
         small = small == null ? false : small;
         if (!small)
             return new UserResource(userResponseFactory.getUser(userService.resolveById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
