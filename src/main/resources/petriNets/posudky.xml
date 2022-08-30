@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>management/posudky</id>
+    <title>Posudky</title>
+    <initials>PSD</initials>
+    <caseName>Posudok</caseName>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <role>
-    <id>role1</id>
-    <name>role1</name>
+        <id>role1</id>
+        <name>role1</name>
+    </role>
     <!-- DATA -->
     <data type="date">
         <id>datum</id>

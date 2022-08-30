@@ -7,6 +7,7 @@ import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.jsoup.Jsoup;
 
+import java.awt.*;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.List;
@@ -25,6 +26,8 @@ public abstract class Renderer {
 
     float strokeWidth;
 
+    Color colorString, colorLabelString, colorDataGroupLabel;
+
     public abstract int renderLabel(PdfField field) throws IOException;
 
     public void setupRenderer(IPdfDrawer pdfDrawer, PdfResource resource) {
@@ -36,6 +39,9 @@ public abstract class Renderer {
         this.lineHeight = resource.getLineHeight();
         this.pageDrawableWidth = resource.getPageDrawableWidth();
         this.padding = resource.getPadding();
+        this.colorString = Color.decode(resource.getColorString().toUpperCase());
+        this.colorDataGroupLabel = Color.decode(resource.getColorDataGroup().toUpperCase());
+        this.colorLabelString = Color.decode(resource.getColorLabelString().toUpperCase());
         this.baseX = resource.getBaseX();
         this.pageHeight = resource.getPageHeight();
         this.fontValueSize = resource.getFontValueSize();
