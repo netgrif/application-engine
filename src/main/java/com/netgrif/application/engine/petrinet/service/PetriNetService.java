@@ -183,6 +183,7 @@ public class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net,  new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
+        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") was saved in a folder: " +savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
