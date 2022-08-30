@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>taskref_demo2</id>
+    <id>data/taskref_demo2</id>
     <version>1.0.0</version>
     <initials>TRD</initials>
     <title>TaskRef demo 2</title>

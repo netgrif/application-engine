@@ -5,6 +5,7 @@ import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBu
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,8 +19,8 @@ public abstract class FieldRenderer<T> extends Renderer {
 
     public abstract void renderValue(PdfField field, int lineCounter) throws IOException;
 
-    protected int renderLabel(PdfField field, PDType0Font font, int fontSize) throws IOException {
-        float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize);
+    protected int renderLabel(PdfField field, PDType0Font font, int fontSize, Color colorLabel) throws IOException {
+        float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize, resource);
         int maxLineSize = getMaxLabelLineSize(field.getWidth(), fontSize);
         List<String> multiLineText = new ArrayList<String>() {{
             add(field.getLabel());
@@ -35,7 +36,7 @@ public abstract class FieldRenderer<T> extends Renderer {
             linesOnPage++;
             linesOnPage = renderPageBrake(field, linesOnPage, y);
             y = renderLinePosY(field, linesOnPage);
-            pdfDrawer.writeString(font, fontSize, x, y, line);
+            pdfDrawer.writeString(font, fontSize, x, y, line, colorLabel);
         }
         pdfDrawer.checkOpenPages();
         return multiLineText.size();

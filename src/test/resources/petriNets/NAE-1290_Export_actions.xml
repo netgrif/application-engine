@@ -1,0 +1,315 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+    <id>export_test</id>
+    <initials>EXT</initials>
+    <title>Export actions test</title>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>false</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <role>
+        <id>process_role</id>
+        <title>Process role</title>
+    </role>
+    <data type="multichoice" immediate="true">
+        <id>immediate_multichoice</id>
+        <title>Multichoice</title>
+        <options>
+            <option key="Alice">Alice</option>
+            <option key="Bob">Bob</option>
+            <option key="Carol">Carol</option>
+        </options>
+        <init>Alice,Bob</init>
+    </data>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>Lorem ipsum</init>
+    </data>
+    <data type="number" immediate="true">
+        <id>immediate_number</id>
+        <title>Number</title>
+        <init>10000</init>
+    </data>
+    <data type="text">
+        <id>no_export</id>
+        <title>No export</title>
+    </data>
+    <transition>
+        <id>t1</id>
+        <x>460</x>
+        <y>60</y>
+        <label>case_mongo_export</label>
+        <dataGroup>
+            <id>NewDataGroup</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>immediate_multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>immediate_number</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>export</id>
+            <actions phase="post">
+                <action id="action_0">
+                    exportCasesToFile({it.processIdentifier.eq("export_test")} as Closure, "src/test/resources/csv/case_mongo_export.csv")
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>t1_finish</id>
+        </event>
+        <event type="cancel">
+            <id>t1_cancel</id>
+        </event>
+        <event type="delegate">
+            <id>t1_delegate</id>
+        </event>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>460</x>
+        <y>140</y>
+        <label>case_elastic_export</label>
+        <dataGroup>
+            <id>NewDataGroup</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>immediate_multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>immediate_number</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>export</id>
+            <actions phase="post">
+                <action id="action_1">
+                    def request = new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest()
+                    request.process = [new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
+                    def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
+                    config.setDataToExport(["text"] as LinkedHashSet)
+                    exportCasesToFile([request], "src/test/resources/csv/case_elastic_export.csv",config)
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>t2_finish</id>
+        </event>
+        <event type="cancel">
+            <id>t2_cancel</id>
+        </event>
+        <event type="delegate">
+            <id>t2_delegate</id>
+        </event>
+    </transition>
+    <transition>
+        <id>t3</id>
+        <x>460</x>
+        <y>220</y>
+        <label>task_mongo_export</label>
+        <dataGroup>
+            <id>NewDataGroup</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>immediate_multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>export</id>
+            <actions phase="post">
+                <action id="action_2">
+                    def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+                    def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
+                    config.setDataToExport(["immediate_multichoice","immediate_number", "text"] as LinkedHashSet)
+                    exportTasksToFile({it.processId.eq(processId) &amp; it.transitionId.eq("t3")},"src/test/resources/csv/task_mongo_export.csv", config)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t4</id>
+        <x>460</x>
+        <y>340</y>
+        <label>task_elastic_export</label>
+        <dataGroup>
+            <id>NewDataGroup</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>immediate_multichoice</id>
+                <logic>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>immediate_number</id>
+                <logic>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>260</x>
+        <y>180</y>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

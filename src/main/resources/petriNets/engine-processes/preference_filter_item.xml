@@ -137,7 +137,7 @@
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>parentId</id>
 		<title></title>
 	</data>
@@ -270,6 +270,15 @@
 		<id>banned_roles</id>
 		<title name="roles_banned">Banned roles</title>
 		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
+	</data>
+
+	<data type="text">
+		<id>new_filter_id</id>
+		<title/>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title>Identifikátor (Filter API)</title>
 	</data>
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->
@@ -779,6 +788,45 @@
 			</dataRef>
 		</dataGroup>
 	</transition>
+
+	<transition>
+		<id>change_filter</id>
+		<x>420</x>
+		<y>350</y>
+		<label>[Change filter]</label>
+
+		<dataRef>
+			<id>new_filter_id</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<event type="set">
+				<id>set_event_0</id>
+				<actions phase="post">
+					<action>
+						new_filter_id: f.new_filter_id,
+						filterTaskRef: f.filter_preview,
+						filterCaseRef: f.filter_case,
+						entryDefaultName: f.entry_default_name,
+						entryName: f.entry_name,
+						icon: f.icon_name;
+
+						change filterCaseRef value { [new_filter_id.value] }
+						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+
+						change entryDefaultName value {return filterCase.title}
+
+						change entryName value {return filterCase.dataSet["i18n_filter_name"].value}
+
+						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+
+						change icon value {filterCase.icon}
+					</action>
+				</actions>
+			</event>
+		</dataRef>
+	</transition>
 	<!-- PLACES -->
 	<place>
 		<id>p1</id>
@@ -816,6 +864,13 @@
 		<type>read</type>
 		<sourceId>p2</sourceId>
 		<destinationId>view</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>change_filter</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

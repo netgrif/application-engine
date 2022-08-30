@@ -105,6 +105,13 @@
         </component>
     </data>
 
+    <data type="i18n">
+        <id>i18n</id>
+        <title>Init I18n</title>
+        <placeholder>Init I18n field</placeholder>
+        <init>Default i18n test value</init>
+    </data>
+
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -309,6 +316,23 @@
                 </logic>
                 <layout>
                     <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>i18n</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <behavior>optional</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
                     <y>6</y>
                     <rows>1</rows>
                     <cols>2</cols>

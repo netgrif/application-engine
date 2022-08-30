@@ -139,8 +139,8 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
-        File template = new File(((ClassPathResource) pdfResource.getTemplateResource()).getPath());
-        if (template.exists()) {
+        if (pdfResource.getTemplateResource().exists()) {
+            InputStream template = pdfResource.getTemplateResource().getInputStream();
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }
         pdfDrawer.newPage();

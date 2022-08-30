@@ -1,0 +1,139 @@
+dn: dc=netgrif,dc=com
+objectClass: organization
+objectClass: dcObject
+objectClass: top
+dc: netgrif
+o: netgrif
+structuralObjectClass: organization
+subschemaSubentry: cn=Subschema
+
+dn: ou=groups,dc=netgrif,dc=com
+objectClass: organizationalUnit
+ou: groups
+structuralObjectClass: organizationalUnit
+subschemaSubentry: cn=Subschema
+
+dn: ou=people,dc=netgrif,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+structuralObjectClass: organizationalUnit
+subschemaSubentry: cn=Subschema
+
+dn: cn=test1,ou=groups,dc=netgrif,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: test1
+member: cn=ben@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
+member: cn=simpson@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
+member: cn=doe@netgrif.com,ou=test2,ou=people,dc=netgrif,dc=com
+description: Testik
+structuralObjectClass: groupOfNames
+subschemaSubentry: cn=Subschema
+
+dn: cn=test2,ou=groups,dc=netgrif,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: test2
+member: cn=simpson@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
+member: cn=hunter@netgrif.com,ou=test3,ou=people,dc=netgrif,dc=com
+structuralObjectClass: groupOfNames
+subschemaSubentry: cn=Subschema
+
+dn: cn=test3,ou=groups,dc=netgrif,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: test3
+structuralObjectClass: groupOfNames
+subschemaSubentry: cn=Subschema
+
+dn: ou=test1,ou=people,dc=netgrif,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: test1
+structuralObjectClass: organizationalUnit
+subschemaSubentry: cn=Subschema
+
+dn: ou=test2,ou=people,dc=netgrif,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: test2
+structuralObjectClass: organizationalUnit
+subschemaSubentry: cn=Subschema
+
+dn: ou=test3,ou=people,dc=netgrif,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: delivery
+structuralObjectClass: organizationalUnit
+subschemaSubentry: cn=Subschema
+
+dn: cn=ben@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
+objectClass: extensibleObject
+objectClass: inetOrgPerson
+objectClass: shadowAccount
+objectClass: person
+cn: ben@netgrif.com
+sn: Taylor
+uid: ben@netgrif.com
+displayName: Ben Taylor
+givenName: Ben
+userPassword: benpassword
+structuralObjectClass: inetOrgPerson
+subschemaSubentry: cn=Subschema
+
+dn: cn=doe@netgrif.com,ou=test2,ou=people,dc=netgrif,dc=com
+objectClass: extensibleObject
+objectClass: inetOrgPerson
+objectClass: shadowAccount
+objectClass: person
+cn: doe@netgrif.com
+sn: Doe
+uid: doe@netgrif.com
+displayName: John Doe
+givenName: John
+userPassword: password
+structuralObjectClass: inetOrgPerson
+subschemaSubentry: cn=Subschema
+
+dn: cn=hunter@netgrif.com,ou=test3,ou=people,dc=netgrif,dc=com
+objectClass: extensibleObject
+objectClass: inetOrgPerson
+objectClass: shadowAccount
+objectClass: person
+cn: hunter@netgrif.com
+sn: Hunter
+uid: hunter@netgrif.com
+displayName: Sebastian Hunter
+givenName: Sebastian
+userPassword: password
+structuralObjectClass: inetOrgPerson
+subschemaSubentry: cn=Subschema
+
+dn: cn=simpson@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
+objectClass: extensibleObject
+objectClass: inetOrgPerson
+objectClass: shadowAccount
+objectClass: person
+cn: simpson@netgrif.com
+sn: Simpson
+uid: simpson@netgrif.com
+displayName: Oliver Simpson
+givenName: Simpson
+userPassword: password
+structuralObjectClass: inetOrgPerson
+subschemaSubentry: cn=Subschema
+
+dn: cn=watson@netgrif.com,ou=test1,ou=people,dc=netgrif,dc=com
+objectClass: extensibleObject
+objectClass: inetOrgPerson
+objectClass: shadowAccount
+objectClass: person
+cn: watson@netgrif.com
+sn: watson
+uid: watson@netgrif.com
+displayName: John Watson
+givenName: John
+userPassword: password
+structuralObjectClass: inetOrgPerson
+subschemaSubentry: cn=Subschema

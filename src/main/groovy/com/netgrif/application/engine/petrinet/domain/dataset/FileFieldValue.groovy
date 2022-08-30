@@ -38,12 +38,12 @@ class FileFieldValue {
     }
 
     String getPath(String caseId, String fieldId) {
-        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration")
+        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
         return "${fileStorageConfiguration.getStoragePath()}/${caseId}-${fieldId}-${name}"
     }
 
     String getPreviewPath(String caseId, String fieldId) {
-        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration")
+        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration") as FileStorageConfiguration
         return "${fileStorageConfiguration.getStoragePath()}/file_preview/${caseId}-${fieldId}-${name}"
     }
 

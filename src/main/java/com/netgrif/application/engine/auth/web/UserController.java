@@ -20,7 +20,11 @@ import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +57,7 @@ import java.util.stream.Collectors;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"User"})
+@Tag(name = "User")
 public class UserController {
 
     @Autowired
@@ -89,7 +93,7 @@ public class UserController {
         return result;
     }
 
-    @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small != null && small;
@@ -102,11 +106,11 @@ public class UserController {
     }
 
 
-    @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Generic user search", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
-        List<ObjectId>  roles = query.getRoles() == null ? null : query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList());
+        List<ObjectId> roles = query.getRoles() == null ? null : query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         List<ObjectId> negativeRoles = query.getNegativeRoles() == null ? null : query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList());
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
@@ -119,7 +123,7 @@ public class UserController {
         return resources;
     }
 
-    @ApiOperation(value = "Get user by id", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get user by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small != null && small;
@@ -132,7 +136,7 @@ public class UserController {
         return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
     }
 
-    @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
         small = small == null ? false : small;
@@ -142,7 +146,7 @@ public class UserController {
             return new UserResource(userResponseFactory.getUser(((LoggedUser) auth.getPrincipal()).transformToUser(), locale), "profile");
     }
 
-    @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource updateUser(@PathVariable("id") String userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
@@ -162,7 +166,7 @@ public class UserController {
         return new UserResource(userResponseFactory.getUser(user, locale), "profile");
     }
 
-    @ApiOperation(value = "Get all users with specified roles", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get all users with specified roles", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Locale locale) {
         small = small == null ? false : small;
@@ -175,13 +179,11 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Assign role to the user",
-            notes = "Caller must have the ADMIN role",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Assign role to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
@@ -195,33 +197,33 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Get all authorities of the system",
-            notes = "Caller must have the ADMIN role",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get all authorities of the system",
+            description = "Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/authority", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public AuthoritiesResources getAllAuthorities(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Assign authority to the user",
-            notes = "Caller must have the ADMIN role",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Assign authority to the user",
+            description = "Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}/authority/assign", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource assignAuthorityToUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
         userService.assignAuthority(userId, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
-    @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences(Authentication auth) {
         String userId = ((LoggedUser) auth.getPrincipal()).getId();
@@ -234,7 +236,7 @@ public class UserController {
         return new PreferencesResource(preferences);
     }
 
-    @ApiOperation(value = "Set user's preferences", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Set user's preferences", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
         try {

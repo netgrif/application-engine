@@ -2,13 +2,16 @@ package com.netgrif.application.engine.ldap.domain;
 
 
 import lombok.Data;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.odm.annotations.Id;
 
 import javax.naming.Name;
 import java.util.List;
+import java.util.Set;
 
 
 @Data
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserRef {
 
     @Id
@@ -34,7 +37,7 @@ public class LdapUserRef {
 
     private List<String> objectClass;
 
-    private List<String> memberOf;
+    private Set<String> memberOf;
 
     private String lockingOut;
 
