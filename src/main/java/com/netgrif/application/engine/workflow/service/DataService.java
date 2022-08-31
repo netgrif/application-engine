@@ -755,7 +755,7 @@ public class DataService implements IDataService {
                 break;
             case "number":
                 if (node.get("value") == null || node.get("value").isNull()) {
-                    value = 0.0;
+                    value = null;
                     break;
                 }
                 value = node.get("value").asDouble();
