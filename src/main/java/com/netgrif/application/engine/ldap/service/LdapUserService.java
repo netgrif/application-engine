@@ -17,7 +17,7 @@ import javax.naming.Name;
 @Slf4j
 @Service
 @Primary
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapUserService extends UserService {
 
     @Autowired

@@ -27,6 +27,8 @@ public class CaseSearchRequest {
 
     public String fullText;
 
+    public String uriNodeId;
+
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> transition;
 

@@ -29,7 +29,7 @@ import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
 @Slf4j
 @Service
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Autowired

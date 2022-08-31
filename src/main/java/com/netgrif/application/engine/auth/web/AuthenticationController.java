@@ -17,9 +17,9 @@ import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,7 +43,7 @@ import java.util.Locale;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Authentication"})
+@Tag(name = "Authentication")
 public class AuthenticationController {
 
     @Autowired
@@ -70,7 +70,7 @@ public class AuthenticationController {
     @Autowired
     private ISecurityContextService securityContextService;
 
-    @ApiOperation(value = "New user registration")
+    @Operation(summary = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
         try {
@@ -90,7 +90,7 @@ public class AuthenticationController {
         }
     }
 
-    @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Send invitation to a new user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
@@ -116,8 +116,7 @@ public class AuthenticationController {
         }
     }
 
-    @ApiOperation(value = "Verify validity of a registration token",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Verify validity of a registration token", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyToken(@RequestBody String token) {
         try {
@@ -131,20 +130,20 @@ public class AuthenticationController {
         }
     }
 
-    @ApiOperation(value = "Verify validity of an authentication token")
+    @Operation(summary = "Verify validity of an authentication token")
     @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyAuthToken(Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
     }
 
-    @ApiOperation(value = "Login to the system", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Login to the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
         return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth), locale), "profile");
     }
 
-    @ApiOperation(value = "Reset password")
+    @Operation(summary = "Reset password")
     @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
         if (mailAttemptService.isBlocked(recoveryEmail)) {
@@ -165,7 +164,7 @@ public class AuthenticationController {
         }
     }
 
-    @ApiOperation(value = "Account recovery")
+    @Operation(summary = "Account recovery")
     @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
         try {
@@ -181,7 +180,7 @@ public class AuthenticationController {
         }
     }
 
-    @ApiOperation(value = "Set a new password", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Set a new password", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {

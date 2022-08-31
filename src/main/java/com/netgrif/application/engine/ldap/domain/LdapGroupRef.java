@@ -9,7 +9,7 @@ import javax.naming.Name;
 
 @Data
 @AllArgsConstructor
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class LdapGroupRef {
 
     @Id

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Lazy;
 
 @Slf4j
 @Configuration
-@ConditionalOnExpression("${nae.ldap.enabled}")
+@ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class NetgrifLdapAuthenticationProviderLoader {
 
     @Lazy
