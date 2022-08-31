@@ -24,19 +24,21 @@ public class CacheResolver implements org.springframework.cache.interceptor.Cach
 
     @Override
     public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
-        String key;
-        if (this.cacheProperties.getCache() != null && this.cacheProperties.getCache().containsKey(context.getOperation().getCacheNames().stream().findFirst().get())) {
-            key = this.cacheProperties.getCache().get(context.getOperation().getCacheNames().stream().findFirst().get());
-        } else {
-            key = context.getOperation().getCacheNames().stream().findFirst().get();
-        }
         Collection<Cache> caches = new ArrayList<Cache>();
-        Cache cache = this.cacheManager.getCache(key);
-        if (cache != null) {
-            caches.add(cache);
-        } else {
-            ((ConcurrentMapCacheManager) this.cacheManager).setCacheNames(List.of(key));
-            caches.add(this.cacheManager.getCache(key));
+        for(String name : context.getOperation().getCacheNames()) {
+            String key;
+            if (this.cacheProperties.getCache() != null && this.cacheProperties.getCache().containsKey(name)) {
+                key = this.cacheProperties.getCache().get(context.getOperation().getCacheNames().stream().findFirst().get());
+            } else {
+                key = context.getOperation().getCacheNames().stream().findFirst().get();
+            }
+            Cache cache = this.cacheManager.getCache(key);
+            if (cache != null) {
+                caches.add(cache);
+            } else {
+                ((ConcurrentMapCacheManager) this.cacheManager).setCacheNames(List.of(key));
+                caches.add(this.cacheManager.getCache(key));
+            }
         }
         return caches;
     }
