@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import com.netgrif.application.engine.history.domain.petrinetevents.DeletePetriNetEventLog;
 import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -115,31 +116,34 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private CacheManager cacheManager;
 
+    @Autowired
+    private CacheProperties cacheProperties;
+
     protected Importer getImporter() {
         return importerProvider.get();
     }
 
     @Override
     public void evictCache() {
-        cacheManager.getCache("netsId").clear();
-        cacheManager.getCache("netsNewest").clear();
-        cacheManager.getCache("netsCache").clear();
-        cacheManager.getCache("netsIdentifier").clear();
+        cacheManager.getCache(cacheProperties.getPetriNetById()).clear();
+        cacheManager.getCache(cacheProperties.getPetriNetNewest()).clear();
+        cacheManager.getCache(cacheProperties.getPetriNetCache()).clear();
+        cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()).clear();
     }
 
     @Override
     public void evictCache(PetriNet net) {
-        cacheManager.getCache("netsId").evict(net.getStringId());
-        cacheManager.getCache("netsNewest").evict(net.getIdentifier());
-        cacheManager.getCache("netsCache").evict(net.getObjectId());
-        cacheManager.getCache("netsIdentifier").evict(net.getIdentifier() + net.getVersion().toString());
+        cacheManager.getCache(cacheProperties.getPetriNetById()).evict(net.getStringId());
+        cacheManager.getCache(cacheProperties.getPetriNetNewest()).evict(net.getIdentifier());
+        cacheManager.getCache(cacheProperties.getPetriNetCache()).evict(net.getObjectId());
+        cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()).evict(net.getIdentifier() + net.getVersion().toString());
     }
 
     /**
      * Get read only Petri net.
      */
     @Override
-    @Cacheable("netsCache")
+    @Cacheable("petriNetCache")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
         if (!optional.isPresent()) {
@@ -230,7 +234,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable("netsId")
+    @Cacheable("petriNetById")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (!net.isPresent())
@@ -241,7 +245,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "netsIdentifier", key = "#identifier+#version.toString()")
+    @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()")
     public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null)
@@ -265,7 +269,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable("netsNewest")
+    @Cacheable("petriNetNewest")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty())

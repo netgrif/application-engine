@@ -5,6 +5,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.petrinet.domain.repository.UriNodeRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.application.engine.petrinet.service.PetriNetService
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
@@ -45,6 +46,8 @@ class TestHelper {
     private FilterRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
+    @Autowired
+    private PetriNetService petriNetService
 
     void truncateDbs() {
         template.db.drop()
@@ -57,6 +60,7 @@ class TestHelper {
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
+        petriNetService.evictCache()
 
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
