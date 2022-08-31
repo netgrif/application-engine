@@ -6,6 +6,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -23,6 +24,7 @@ public class CacheConfiguration extends CachingConfigurerSupport {
 
     @Bean
     @Primary
+    @Override
     public CacheManager cacheManager() {
         Set<String> names = new HashSet<>();
         if (properties.getCache() != null) {
@@ -34,7 +36,8 @@ public class CacheConfiguration extends CachingConfigurerSupport {
 
     @Bean
     @Primary
-    public org.springframework.cache.interceptor.CacheResolver cacheResolver() {
-        return new CacheResolver(cacheManager(), properties);
+    @Override
+    public CacheResolver cacheResolver() {
+        return new NaeCacheResolver(cacheManager(), properties);
     }
 }
