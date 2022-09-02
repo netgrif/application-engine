@@ -19,6 +19,7 @@ class RunnerController {
             FilterRunner,
             GroupRunner,
             DefaultFiltersRunner,
+            ImpersonationRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,

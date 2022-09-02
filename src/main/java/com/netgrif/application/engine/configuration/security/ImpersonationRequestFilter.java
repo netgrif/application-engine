@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.impersonation.domain.Impersonator;
+import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,12 @@ import java.io.IOException;
 public class ImpersonationRequestFilter extends OncePerRequestFilter {
 
     public static final Logger log = LoggerFactory.getLogger(ImpersonationRequestFilter.class);
+
+    private final ImpersonatorRepository impersonatorRepository;
+
+    public ImpersonationRequestFilter(ImpersonatorRepository impersonatorRepository) {
+        this.impersonatorRepository = impersonatorRepository;
+    }
 
     @Override
     public void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -35,8 +43,8 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
 
     void handleImpersonator(LoggedUser loggedUser, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         try {
-            if (loggedUser.isImpersonating()) {
-
+            if (loggedUser.isImpersonating() && impersonatorRepository.findById(loggedUser.getId()).isEmpty()) {
+                logout(servletRequest, servletResponse);
             }
         } catch (Exception e) {
             log.error("ImpersonationRequestFilter error " + e.getMessage(), e);
@@ -46,6 +54,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
     private void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
         try {
             log.debug("Filtering request " + servletRequest.getRequestURI() + ", " + loggedUser.getUsername());
+            impersonatorRepository.findByImpersonatedId(loggedUser.getId()).ifPresent(impersonatorRepository::delete);
 
         } catch (Exception e) {
             log.error("Failed to resolve impersonators for " + loggedUser.getUsername() + ", " + e.getMessage(), e);

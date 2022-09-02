@@ -39,8 +39,8 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
             List<String> queries = new ArrayList<>();
             request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER));
             queries.add("(dataSet.impersonators.keyValue:" + impersonator.getId() + ")");
-            queries.add("(dataSet.valid_from.timestampValue:>" + DateUtils.localDateTimeToDate(LocalDateTime.now()) + ")");
-            queries.add("(dataSet.valid_to.timestampValue:<" + DateUtils.localDateTimeToDate(LocalDateTime.now()) + ")");
+            queries.add("((!(_exists_:dataSet.valid_from.timestampValue)) OR (dataSet.valid_from.timestampValue:<" + DateUtils.localDateTimeToDate(LocalDateTime.now()).getTime() + "))");
+            queries.add("((!(_exists_:dataSet.valid_to.timestampValue)) OR (dataSet.valid_to.timestampValue:>" + DateUtils.localDateTimeToDate(LocalDateTime.now()).getTime() + "))");
             request.query = "(" + String.join(" AND ", queries) + ")";
 
             Page<Case> cases = elasticCaseService.search(Collections.singletonList(request), impersonator, pageable, Locale.getDefault(), false);

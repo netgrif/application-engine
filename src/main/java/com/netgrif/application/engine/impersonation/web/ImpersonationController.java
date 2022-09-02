@@ -82,9 +82,9 @@ public class ImpersonationController {
 
 
     public UserResource resource(LoggedUser loggedUser, Locale locale, boolean small) {
-        IUser user = userService.findById(loggedUser.getId(), small);
+        IUser user = userService.resolveById(loggedUser.getId(), small);
         User localisedUser = loggedUser.isImpersonating() ?
-                localisedUser(user, userService.findById(loggedUser.getImpersonated().getId(), small), locale) :
+                localisedUser(user, userService.resolveById(loggedUser.getImpersonated().getId(), small), locale) :
                 localisedUser(user, locale);
         return new UserResource(localisedUser, "profile");
     }

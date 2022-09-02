@@ -33,13 +33,15 @@
 		<event type="create">
 			<id>assign_email</id>
 			<actions phase="post">
-				<action>impersonated_email: f.impersonated_email,
-					impersonated: f.impersonated,
-					config_owner: f.config_owner;
+				<action id="action_0">
+					impersonated_email: f.impersonated_email,
+                    impersonated: f.impersonated,
+                    config_owner: f.config_owner;
 
-					change impersonated value { auditingService.userToValue(userService.findByEmail(useCase.author.email, false)) }
-					change impersonated_email value { useCase.author.email }
-					change config_owner value { [useCase.author.id] }
+					def user = userService.findByEmail(useCase.author.email, false)
+                    change impersonated value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
+                    change impersonated_email value { useCase.author.email }
+                    change config_owner value { [useCase.author.id] }
 				</action>
 			</actions>
 		</event>
@@ -61,7 +63,7 @@
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>impersonators</id>
-		<title>Zastupitelia</title>
+		<title>Nastavení zastupitelia</title>
 		<event type="set">
 			<id>make_select_impersonator_null</id>
 		</event>
@@ -72,11 +74,11 @@
 	</data>
 	<data type="dateTime" immediate="true">
 		<id>valid_from</id>
-		<title>Platný od</title>
+		<title>Platnosť od</title>
 	</data>
 	<data type="dateTime" immediate="true">
 		<id>valid_to</id>
-		<title>Platný do</title>
+		<title>Platnosť do</title>
 	</data>
 	<data type="user">
 		<id>impersonated</id>
@@ -84,18 +86,29 @@
 		<event type="set">
 			<id>impersonated_set</id>
 			<actions phase="post">
-				<action>impersonated_email: f.impersonated_email,
-					impersonated: f.impersonated;
+				<action id="action_1">
+					impersonated_email: f.impersonated_email,
+                    impersonated: f.impersonated;
 
-					change impersonated_email value { impersonated.value.email }</action>
+                    change impersonated_email value { impersonated.value.email }</action>
 			</actions>
 		</event>
 	</data>
-	<data type="user">
+	<data type="enumeration_map">
 		<id>select_impersonator</id>
 		<title>Výber zastupiteľa</title>
-		<event type="set">
-			<id>select_impersonator_set</id>
+		<event type="get">
+			<id>select_impersonator_get</id>
+
+			<actions phase="post">
+				<action>
+					select_impersonator: f.select_impersonator;
+
+					def selectableUsers = userService.findAllCoMembers(userService.loggedUser.transformToLoggedUser(), false, new com.netgrif.application.engine.utils.FullPageRequest()).content
+					change select_impersonator value { null }
+					change select_impersonator options { selectableUsers.collectEntries { [(it.id): ("$it.fullName ($it.email)" as String)] } }
+				</action>
+			</actions>
 		</event>
 	</data>
 	<data type="button">
@@ -105,15 +118,17 @@
 		<event type="set">
 			<id>remove_impersonator_set</id>
 			<actions phase="pre">
-				<action>impersonators: f.impersonators;
+				<action id="action_2">
+					impersonators: f.impersonators;
 
-					if (impersonators.value != null &amp;&amp; impersonators.options != null) {
-					def options = impersonators.options
-					def values = impersonators.value
-					values.each { it -&gt; options.remove(it) }
-					change impersonators value { null }
-					change impersonators options { options }
-					}</action>
+                    if (impersonators.value != null &amp;&amp; impersonators.options != null) {
+						def options = impersonators.options
+						def values = impersonators.value
+						values.each { it -&gt; options.remove(it) }
+						change impersonators value { null }
+						change impersonators options { options }
+                    }
+				</action>
 			</actions>
 		</event>
 	</data>
@@ -124,73 +139,65 @@
 		<event type="set">
 			<id>add_selected_set</id>
 			<actions phase="pre">
-				<action id="10">select_impersonator: f.select_impersonator,
-					impersonators: f.impersonators;
-					if (select_impersonator.value != null) {
-					def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
-					options.put(select_impersonator.value.id, new com.netgrif.application.engine.petrinet.domain.I18nString(select_impersonator.value.id, select_impersonator.value.name + " " + select_impersonator.value.surname + " (" + select_impersonator.value.email + ")"))
-					change impersonators options { options }
-					change impersonators value { options.keySet() }
+				<action id="10">
+					select_impersonator: f.select_impersonator,
+                    impersonators: f.impersonators;
 
-					}
-					change select_impersonator value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(null, "Vyberte", "používateľa", null) }
+					if (select_impersonator.value != null) {
+						def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
+						options.put(select_impersonator.value, select_impersonator.options[select_impersonator.value])
+						options = options.sort { it.value }
+						change impersonators options { options }
+						change impersonators value { options.keySet() }
+                    }
+                    change select_impersonator value { null }
 				</action>
 			</actions>
 		</event>
 	</data>
-	<transition>
-		<id>t1</id>
-		<x>220</x>
-		<y>180</y>
-		<label>Výber zastúpeného</label>
-		<roleRef>
-			<id>admin_imp</id>
-			<logic>
-				<view>true</view>
-				<cancel>true</cancel>
-				<assign>true</assign>
-				<delegate>true</delegate>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<userRef>
-			<id>config_owner</id>
-			<logic>
-				<view>true</view>
-			</logic>
-		</userRef>
-		<dataGroup>
-			<id>t1_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>impersonated</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<event type="assign">
-			<id>t1_assign</id>
+	<data type="multichoice_map">
+		<id>impersonated_authorities</id>
+		<title>Zastúpené autority</title>
+
+		<event type="get">
+			<id>impersonated_authorities_get</id>
+
+			<actions phase="post">
+				<action>
+					impersonated: f.impersonated,
+					impersonated_authorities: f.impersonated_authorities;
+
+					def impersonatedUser = userService.findById(impersonated.value.id, false)
+					change impersonated_authorities options {
+						impersonatedUser.authorities.collectEntries { [(it.stringId): (it.name)] }
+					}
+				</action>
+			</actions>
 		</event>
-		<event type="finish">
-			<id>t1_finish</id>
+	</data>
+	<data type="multichoice_map">
+		<id>impersonated_roles</id>
+		<title>Zastúpené procesné roly</title>
+
+		<event type="get">
+			<id>impersonated_roles</id>
+
+			<actions phase="post">
+				<action>
+					impersonated: f.impersonated,
+					impersonated_roles: f.impersonated_roles;
+
+					def impersonatedUser = userService.findById(impersonated.value.id, false)
+					change impersonated_roles options {
+						return impersonatedUser.processRoles.findAll { it.netId }.sort { it.netId }.collectEntries {
+							def net = petriNetService.get(new org.bson.types.ObjectId(it.netId))
+							return [(it.stringId): ("$it.name ($net.title $net.identifier-$net.version)" as String)]
+						}
+					}
+				</action>
+			</actions>
 		</event>
-		<event type="cancel">
-			<id>t1_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>t1_delegate</id>
-		</event>
-	</transition>
+	</data>
 	<transition>
 		<id>t2</id>
 		<x>500</x>
@@ -227,7 +234,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -263,27 +270,13 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>impersonated</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>select_impersonator</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>0</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -297,7 +290,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>2</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -314,7 +307,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>1</y>
+					<y>0</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -322,6 +315,40 @@
 				</layout>
 				<component>
 					<name>stroked</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>impersonated_authorities</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>list</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>impersonated_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>list</name>
 				</component>
 			</dataRef>
 		</dataGroup>
@@ -339,4 +366,3 @@
 		</event>
 	</transition>
 </document>
-

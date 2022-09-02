@@ -25,7 +25,6 @@ public class User {
 
     private Set<Authority> authorities;
 
-
     // process roles are set with the factory
     private Set<ProcessRole> processRoles;
 

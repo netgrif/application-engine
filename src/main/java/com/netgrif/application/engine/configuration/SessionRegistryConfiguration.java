@@ -10,7 +10,12 @@ import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 public class SessionRegistryConfiguration {
 
     @Bean
-    SpringSessionBackedSessionRegistry<? extends Session> springSessionBackedSessionRegistry(FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
+    public SpringSessionBackedSessionRegistry<? extends Session> springSessionBackedSessionRegistry(FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
         return new SpringSessionBackedSessionRegistry<>(sessionRepository);
+    }
+
+    @Bean
+    public String impersonatorRedisHash() {
+        return "nae:impersonation:impersonator";
     }
 }
