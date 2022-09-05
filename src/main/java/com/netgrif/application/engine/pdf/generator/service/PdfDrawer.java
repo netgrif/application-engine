@@ -150,6 +150,13 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
+    public void drawI18nDividerField(PdfField field) throws IOException {
+        I18nDividerFieldRenderer i18nDividerFieldRenderer = new I18nDividerFieldRenderer();
+        i18nDividerFieldRenderer.setupRenderer(this, resource);
+        i18nDividerFieldRenderer.renderValue(field, 0);
+    }
+
+    @Override
     public void drawBooleanField(PdfField field) throws IOException {
         BooleanFieldRenderer booleanFieldRenderer = new BooleanFieldRenderer();
         booleanFieldRenderer.setupRenderer(this, resource);
@@ -236,6 +243,14 @@ public class PdfDrawer implements IPdfDrawer {
 
             contentStream.closePath();
         }
+        contentStream.stroke();
+    }
+
+    @Override
+    public void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException {
+        contentStream.setStrokingColor(Color.LIGHT_GRAY);
+        contentStream.moveTo(x, y);
+        contentStream.lineTo((float) (x + width), y);
         contentStream.stroke();
     }
 
