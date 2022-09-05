@@ -52,12 +52,20 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Setter
     private List<String> excludedFields;
 
+    @Getter
+    @Setter
     private PdfResource resource;
 
+    @Getter
+    @Setter
     private Stack<PdfField> changedPdfFields;
 
+    @Getter
+    @Setter
     private int lastX, lastY;
 
+    @Getter
+    @Setter
     private int originalCols;
 
     @Override
@@ -232,7 +240,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         return FieldBuilder.countBottomPosY(pdfField, pdfField.getResource());
     }
 
-    private void shiftFields(PdfField currentField) {
+    protected void shiftFields(PdfField currentField) {
         pdfFields.forEach(field -> {
             if (currentField != field) {
                 shiftField(currentField, field);
@@ -249,7 +257,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    private void generatePdfDataGroup(DataGroup dataGroup, PdfField pdfField) {
+    protected void generatePdfDataGroup(DataGroup dataGroup, PdfField pdfField) {
         PdfField dgField;
         if (dataGroup != null && dataGroup.getTitle() != null) {
             dgField = new DataGroupFieldBuilder(resource).buildField(dataGroup, pdfField);
@@ -259,7 +267,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    private void shiftDown(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
+    protected void shiftDown(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
         int currentDiff;
         currentDiff = cFieldBottomY - belowTopY + resource.getPadding();
         fieldBelow.setTopY(belowTopY + currentDiff);
@@ -270,15 +278,15 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    private boolean isCoveredByDataGroup(PdfField currentField, PdfField fieldBelow) {
+    protected boolean isCoveredByDataGroup(PdfField currentField, PdfField fieldBelow) {
         return currentField.isDgField() && currentField.getOriginalTopY() <= fieldBelow.getOriginalTopY();
     }
 
-    private boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow) {
+    protected boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow) {
         return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
     }
 
-    private void refreshGrid(DataGroup dataGroup) {
+    protected void refreshGrid(DataGroup dataGroup) {
         log.info("Refreshing grid for data group in PDF...");
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null) {
             Integer cols = dataGroup.getLayout().getCols();
@@ -287,11 +295,11 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    private boolean isNotHidden(LocalisedField field) {
+    protected boolean isNotHidden(LocalisedField field) {
         return !field.getBehavior().has("hidden") || !field.getBehavior().get("hidden").asBoolean();
     }
 
-    private boolean isNotExcluded(String fieldId) {
+    protected boolean isNotExcluded(String fieldId) {
         return !excludedFields.contains(fieldId);
     }
 }
