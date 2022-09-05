@@ -10,7 +10,6 @@ import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -80,9 +79,6 @@ class TaskAuthorizationServiceTest {
 
     @Autowired
     private IPetriNetService petriNetService
-
-    @Autowired
-    private ProcessRoleRepository userProcessRoleRepository
 
     @Autowired
     private ITaskAuthorizationService taskAuthorizationService

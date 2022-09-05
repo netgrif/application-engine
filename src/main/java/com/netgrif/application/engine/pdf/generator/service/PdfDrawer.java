@@ -271,7 +271,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.endText();
     }
 
-    private boolean checkBooleanValue(List<String> values, String text) {
+    protected boolean checkBooleanValue(List<String> values, String text) {
         PdfBooleanFormat format = resource.getBooleanFormat();
         if (values.get(0).equals("true")) {
             if (!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)) {
@@ -285,7 +285,7 @@ public class PdfDrawer implements IPdfDrawer {
         return false;
     }
 
-    private void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
+    protected void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
         contentStream.saveGraphicsState();
         AffineTransform transform = new AffineTransform(boxSize, 0.0F, 0.0F, boxSize, x, y - resource.getBoxPadding());
         contentStream.transform(new Matrix(transform));

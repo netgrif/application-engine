@@ -38,11 +38,3 @@ services:
     image: redis:6
     ports:
       - "6379:6379"
-    deploy:
-      resources:
-        limits:
-          cpus: "2"
-          memory: "2G"
-        reservations:
-          cpus: "0.5"
-          memory: "512M"

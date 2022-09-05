@@ -153,7 +153,7 @@ public class PdfGenerator implements IPdfGenerator {
         log.info("PDF is generated from transition.");
     }
 
-    void drawTransitionForm(List<PdfField> pdfFields) throws IOException {
+    protected void drawTransitionForm(List<PdfField> pdfFields) throws IOException {
         log.info("Drawing form to PDF.");
 
         for (PdfField pdfField : pdfFields) {
@@ -187,7 +187,7 @@ public class PdfGenerator implements IPdfGenerator {
         pdfDrawer.drawPageNumber();
     }
 
-    private PDFormXObject getSvg(Resource resource) throws IOException {
+    protected PDFormXObject getSvg(Resource resource) throws IOException {
         String parser = XMLResourceDescriptor.getXMLParserClassName();
         SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
         Document document = f.createDocument(resource.getURI().toString(), resource.getInputStream());
