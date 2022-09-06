@@ -617,10 +617,11 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public boolean deleteFile(String taskId, String fieldId) {
+    public SetDataEventOutcome deleteFile(String taskId, String fieldId) {
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
         Case useCase = pair.getLeft();
+        Task task = taskService.findById(taskId);
 
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
             if (field.isRemote()) {
@@ -631,10 +632,7 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
-
-        updateDataset(useCase);
-        workflowService.save(useCase);
-        return true;
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
     private ImmutablePair<Case, FileField> getCaseAndFileField(String taskId, String fieldId) {
@@ -647,10 +645,11 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public boolean deleteFileByName(String taskId, String fieldId, String name) {
+    public SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name) {
         ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
         FileListField field = pair.getRight();
         Case useCase = pair.getLeft();
+        Task task = taskService.findOne(taskId);
 
         Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
 
@@ -663,10 +662,7 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
         }
-
-        updateDataset(useCase);
-        workflowService.save(useCase);
-        return true;
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
     private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
@@ -761,7 +757,7 @@ public class DataService implements IDataService {
                 break;
             case "number":
                 if (node.get("value") == null || node.get("value").isNull()) {
-                    value = 0.0;
+                    value = null;
                     break;
                 }
                 value = node.get("value").asDouble();

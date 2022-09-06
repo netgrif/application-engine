@@ -48,9 +48,9 @@ public interface IDataService {
 
     SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile);
 
-    boolean deleteFile(String taskId, String fieldId);
+    SetDataEventOutcome deleteFile(String taskId, String fieldId);
 
-    boolean deleteFileByName(String taskId, String fieldId, String name);
+    SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name);
 
     GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale);
 

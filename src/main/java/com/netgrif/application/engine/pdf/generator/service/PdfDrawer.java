@@ -150,6 +150,13 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
+    public void drawI18nDividerField(PdfField field) throws IOException {
+        I18nDividerFieldRenderer i18nDividerFieldRenderer = new I18nDividerFieldRenderer();
+        i18nDividerFieldRenderer.setupRenderer(this, resource);
+        i18nDividerFieldRenderer.renderValue(field, 0);
+    }
+
+    @Override
     public void drawBooleanField(PdfField field) throws IOException {
         BooleanFieldRenderer booleanFieldRenderer = new BooleanFieldRenderer();
         booleanFieldRenderer.setupRenderer(this, resource);
@@ -240,6 +247,14 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
+    public void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException {
+        contentStream.setStrokingColor(Color.LIGHT_GRAY);
+        contentStream.moveTo(x, y);
+        contentStream.lineTo((float) (x + width), y);
+        contentStream.stroke();
+    }
+
+    @Override
     public void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException {
         contentStream.setFont(font, fontSize);
         contentStream.setNonStrokingColor(color);
@@ -259,7 +274,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.endText();
     }
 
-    private boolean checkBooleanValue(List<String> values, String text) {
+    protected boolean checkBooleanValue(List<String> values, String text) {
         PdfBooleanFormat format = resource.getBooleanFormat();
         if (values.get(0).equals("true")) {
             if (!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)) {
@@ -273,7 +288,7 @@ public class PdfDrawer implements IPdfDrawer {
         return false;
     }
 
-    private void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
+    protected void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
         contentStream.saveGraphicsState();
         AffineTransform transform = new AffineTransform(boxSize, 0.0F, 0.0F, boxSize, x, y - resource.getBoxPadding());
         contentStream.transform(new Matrix(transform));

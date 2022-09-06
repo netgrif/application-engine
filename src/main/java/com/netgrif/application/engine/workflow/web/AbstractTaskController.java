@@ -196,7 +196,7 @@ public abstract class AbstractTaskController {
             return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
                     LocalisedEventOutcomeFactory.from(outcome, locale));
         } catch (IllegalArgumentWithChangedFieldsException e) {
-            log.error("Set data on task [" + taskId + "] failed: ", e);
+            log.error("Get data on task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
         } catch (Exception e) {
             log.error("Get data on task [" + taskId + "] failed: ", e);
@@ -209,7 +209,7 @@ public abstract class AbstractTaskController {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-            return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+            return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
         } catch (IllegalArgumentWithChangedFieldsException e) {
             log.error("Set data on task [" + taskId + "] failed: ", e);
@@ -221,12 +221,21 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {
-        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
-        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody, Locale locale) {
+        try {
+            Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+            dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
+            SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
+                    LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
+        } catch (Exception e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+
+        }
     }
 
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
@@ -245,11 +254,12 @@ public abstract class AbstractTaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    public MessageResource deleteFile(String taskId, String fieldId) {
-        if (dataService.deleteFile(taskId, fieldId))
-            return MessageResource.successMessage("File in field " + fieldId + " within task " + taskId + " was successfully deleted");
-        return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
-    }
+    public EntityModel<EventOutcomeWithMessage> deleteFile(String taskId, String fieldId) {
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+        outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));    }
 
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
@@ -275,10 +285,12 @@ public abstract class AbstractTaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    public MessageResource deleteNamedFile(String taskId, String fieldId, String name) {
-        if (dataService.deleteFileByName(taskId, fieldId, name))
-            return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
-        return MessageResource.errorMessage("File with name " + name + " in field " + fieldId + " within task" + taskId + " has failed to delete");
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(String taskId, String fieldId, String name) {
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+        outcomes.put(taskId, dataService.deleteFileByName(taskId, fieldId, name));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getFilePreview(String taskId, String fieldId) throws FileNotFoundException {

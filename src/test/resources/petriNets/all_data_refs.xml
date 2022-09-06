@@ -114,6 +114,11 @@
         </action>
     </data>
 
+    <data type="fileList">
+        <id>fileList</id>
+        <title>File list</title>
+    </data>
+
     <data type="user">
         <id>user</id>
         <title>User</title>
@@ -252,6 +257,17 @@
             <stretch>false</stretch>
             <dataRef>
                 <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>fileList</id>
+            <title>File list fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>fileList</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
