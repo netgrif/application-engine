@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,7 +74,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
-
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
     }
 
@@ -94,6 +97,15 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return anonym;
     }
 
+    // TODO 1678 own implementation?
+    public LoggedUser transformToImpersonatedLoggedUser(List<Authority> authoritiesToImpersonate, List<String> processRolesToImpersonate) {
+        LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), authoritiesToImpersonate);
+        loggedUser.setFullName(this.getFullName());
+        loggedUser.setProcessRoles(new HashSet<>(processRolesToImpersonate));
+        loggedUser.setGroups(this.getGroups());
+        return loggedUser;
+    }
+
     public void impersonate(LoggedUser toImpersonate) {
         this.impersonated = toImpersonate;
     }
@@ -109,6 +121,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     public LoggedUser getSelfOrImpersonated() {
         return this.isImpersonating() ? this.impersonated : this;
     }
+
+
 
     @Override
     public String toString() {

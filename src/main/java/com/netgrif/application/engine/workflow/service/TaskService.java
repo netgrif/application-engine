@@ -131,7 +131,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        IUser user = userService.resolveById(loggedUser.getId(), true);
+        IUser user = getUserFromLoggedUser(loggedUser);
         return assignTask(taskOptional.get(), user);
     }
 
@@ -150,7 +150,7 @@ public class TaskService implements ITaskService {
         task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.PRE);
         useCase = assignTaskToUser(user, task, useCase.getStringId());
-        historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
+        historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId())); // TODO 1678 add impersonator
         outcomes.addAll((eventService.runActions(transition.getPostAssignActions(), useCase, task, transition)));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.POST, user.getStringId()));
@@ -171,9 +171,9 @@ public class TaskService implements ITaskService {
         log.info("[" + useCaseId + "]: Assigning task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
         startExecution(transition, useCase);
-        task.setUserId(user.getStringId());
+        task.setUserId(user.getSelfOrImpersonated().getStringId());
         task.setStartDate(LocalDateTime.now());
-        task.setUser(user);
+        task.setUser(user.getSelfOrImpersonated());
 
         useCase = workflowService.save(useCase);
         save(task);
@@ -205,7 +205,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         Task task = taskOptional.get();
-        IUser user = userService.resolveById(loggedUser.getId(), true);
+        IUser user = getUserFromLoggedUser(loggedUser);
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
@@ -241,7 +241,7 @@ public class TaskService implements ITaskService {
         save(task);
         reloadTasks(useCase);
         useCase = workflowService.findOne(useCase.getStringId());
-        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
+        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId())); // TODO 1678 add impersonator
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
@@ -270,7 +270,7 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
 
-        IUser user = userService.resolveById(loggedUser.getId(), true);
+        IUser user = getUserFromLoggedUser(loggedUser);
         return cancelTask(taskOptional.get(), user);
     }
 
@@ -289,7 +289,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
         useCase = workflowService.findOne(useCase.getStringId());
-        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
+        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId())); // TODO 1678 add impersonator
         outcomes.addAll(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
@@ -344,7 +344,8 @@ public class TaskService implements ITaskService {
     @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
-        IUser delegateUser = userService.resolveById(loggedUser.getId(), true);
+        IUser delegateUser = getUserFromLoggedUser(loggedUser);
+
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
@@ -360,7 +361,7 @@ public class TaskService implements ITaskService {
         task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
         delegate(delegatedUser, task, useCase);
-        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser.getStringId(), delegatedUser.getStringId()));
+        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser.getStringId(), delegatedUser.getStringId())); // TODO 1678 add impersonator
         outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.POST);
 
@@ -863,5 +864,12 @@ public class TaskService implements ITaskService {
         mainOutcome = outcomes.remove(key);
         mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
         return mainOutcome;
+    }
+
+    protected IUser getUserFromLoggedUser(LoggedUser loggedUser) {
+        IUser user = userService.resolveById(loggedUser.getId(), true);
+        IUser fromLogged = loggedUser.transformToUser();
+        user.setImpersonated(fromLogged.getImpersonated());
+        return user;
     }
 }

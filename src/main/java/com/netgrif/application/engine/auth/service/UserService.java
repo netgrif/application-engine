@@ -271,7 +271,7 @@ public class UserService extends AbstractUserService {
             if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
                 return getSystem();
             }
-            return getLoggedUserOrImpersonated();
+            return getLoggedUser();
         } catch (NullPointerException e) {
             return getSystem();
         }
@@ -288,16 +288,11 @@ public class UserService extends AbstractUserService {
     public IUser getLoggedUser() {
         LoggedUser loggedUser = getLoggedUserFromContext();
         if (!loggedUser.isAnonymous()) {
-            return findByEmail(loggedUser.getEmail(), false);
-        }
-        return loggedUser.transformToAnonymousUser();
-    }
-
-    @Override
-    public IUser getLoggedUserOrImpersonated() {
-        LoggedUser loggedUser = getLoggedUserFromContext();
-        if (!loggedUser.isAnonymous()) {
-            return findById(loggedUser.getSelfOrImpersonated().getId(), false);
+            IUser user = findByEmail(loggedUser.getEmail(), false);
+            if (loggedUser.isImpersonating()) {
+                user.setImpersonated(loggedUser.getImpersonated().transformToUser());
+            }
+            return user;
         }
         return loggedUser.transformToAnonymousUser();
     }
@@ -310,7 +305,8 @@ public class UserService extends AbstractUserService {
         return getLoggedUserFromContext();
     }
 
-    protected LoggedUser getLoggedUserFromContext() {
+    @Override
+    public LoggedUser getLoggedUserFromContext() {
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 

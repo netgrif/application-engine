@@ -92,7 +92,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated();
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.assign(loggedUser, taskId, locale);
     }
 
@@ -106,7 +106,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage>  delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
-        LoggedUser loggedUser = ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated();
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.delegate(loggedUser, taskId, delegatedId, locale);
     }
 
@@ -120,7 +120,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage>  finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated();
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.finish(loggedUser, taskId, locale);
     }
 
@@ -134,7 +134,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage>  cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated();
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return super.cancel(loggedUser, taskId, locale);
     }
 

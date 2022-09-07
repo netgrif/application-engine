@@ -33,7 +33,7 @@ public class GroupController {
     @Autowired
     private INextGroupService service;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Get all groups in the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

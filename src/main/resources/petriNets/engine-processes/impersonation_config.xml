@@ -38,7 +38,7 @@
                     impersonated: f.impersonated,
                     config_owner: f.config_owner;
 
-					def user = userService.findByEmail(useCase.author.email, false)
+					def user = userService.loggedUser
                     change impersonated value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
                     change impersonated_email value { useCase.author.email }
                     change config_owner value { [useCase.author.id] }
@@ -80,7 +80,7 @@
 		<id>valid_to</id>
 		<title>Platnosť do</title>
 	</data>
-	<data type="user">
+	<data type="user" immediate="true">
 		<id>impersonated</id>
 		<title>Používateľ na zastúpenie</title>
 		<event type="set">

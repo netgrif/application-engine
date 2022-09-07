@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,7 +53,6 @@ public class LdapLoggedUser extends LoggedUser {
         this.homeDirectory = homeDirectory;
     }
 
-
     public IUser transformToUser() {
         LdapUser user = new LdapUser(new ObjectId(this.id));
         user.setEmail(getUsername());
@@ -70,6 +71,19 @@ public class LdapLoggedUser extends LoggedUser {
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
+    }
+
+    @Override
+    public LoggedUser transformToImpersonatedLoggedUser(List<Authority> authoritiesToImpersonate, List<String> processRolesToImpersonate) {
+        LdapLoggedUser loggedUser = new LdapLoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getDn(), this.getCommonName(), this.getMemberOf(), this.getUid(), getHomeDirectory(), authoritiesToImpersonate);
+        loggedUser.setFullName(this.getFullName());
+        loggedUser.setProcessRoles(new HashSet<>(processRolesToImpersonate));
+        loggedUser.setGroups(this.getGroups());
+
+        return loggedUser;
     }
 }

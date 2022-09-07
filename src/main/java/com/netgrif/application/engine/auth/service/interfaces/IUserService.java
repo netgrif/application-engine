@@ -55,11 +55,11 @@ public interface IUserService {
 
     IUser getLoggedUser();
 
-    IUser getLoggedUserOrImpersonated();
-
     IUser getSystem();
 
     LoggedUser getAnonymousLogged();
+
+    LoggedUser getLoggedUserFromContext();
 
     IUser addRole(IUser user, String roleStringId);
 

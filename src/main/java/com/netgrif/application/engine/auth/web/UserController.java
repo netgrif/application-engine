@@ -93,7 +93,7 @@ public class UserController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), small, pageable);
+        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
@@ -111,7 +111,7 @@ public class UserController {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), small, pageable);
+                (LoggedUser) auth.getPrincipal(), small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
@@ -175,7 +175,7 @@ public class UserController {
         return resources;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -195,7 +195,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Get all authorities of the system",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -208,7 +208,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Assign authority to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))

@@ -58,4 +58,12 @@ public interface IUser {
 
     boolean isActive();
 
+    void setImpersonated(IUser user);
+
+    boolean isImpersonating();
+
+    IUser getSelfOrImpersonated();
+
+    IUser getImpersonated();
+
 }

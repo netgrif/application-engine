@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.impersonation.service;
 
+import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.User;
@@ -7,14 +8,19 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationSessionService;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,12 +38,22 @@ public class ImpersonationService implements IImpersonationService {
     @Autowired
     private ImpersonatorRepository impersonatorRepository;
 
+    @Autowired
+    private IImpersonationAuthorizationService impersonationAuthorizationService;
+
     @Override
     public LoggedUser impersonate(String impersonatedId) throws ImpersonatedUserHasSessionException {
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-
         IUser impersonated = userService.findById(impersonatedId, false);
-        LoggedUser impersonatedLogged = impersonated.transformToLoggedUser();
+
+        List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getId(), impersonatedId);
+        List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs);
+        List<ProcessRole> roles = impersonationAuthorizationService.getRoles(configs);
+
+        LoggedUser impersonatedLogged = impersonated
+                .transformToLoggedUser()
+                .transformToImpersonatedLoggedUser(authorities, roles.stream().map(ProcessRole::getStringId).collect(Collectors.toList()));
+
         if (sessionService.existsSession(impersonatedLogged.getUsername())) {
             throw new ImpersonatedUserHasSessionException(impersonatedLogged, false);
 
@@ -55,7 +71,8 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public LoggedUser endImpersonation() {
-        LoggedUser loggedUser = endImpersonation(userService.getLoggedUser().transformToLoggedUser());
+        LoggedUser loggedUser = endImpersonation(userService.getLoggedUserFromContext());
+        securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
         return loggedUser;
     }

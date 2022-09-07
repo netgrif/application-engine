@@ -138,7 +138,7 @@ public abstract class AbstractTaskController {
     }
 
     public PagedModel<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().transformToUser());
+        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
 
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getMy(auth, pageable, assembler, locale)).withRel("my");

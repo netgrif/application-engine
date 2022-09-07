@@ -165,7 +165,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Reload tasks of case",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
@@ -188,7 +188,7 @@ public class WorkflowController {
     }
 
     @Deprecated
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
