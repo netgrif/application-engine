@@ -3,6 +3,8 @@ package com.netgrif.application.engine.workflow.domain.repositories;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -17,6 +19,8 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
     List<Case> findAllByProcessIdentifier(String identifier);
 
     List<Case> findAllBy_idIn(Iterable<String> id);
+
+    Page<Case> findAllByUriNodeId(String uri, Pageable pageable);
 
     List<Case> findAllByPetriNetObjectId(ObjectId petriNetObjectId);
 

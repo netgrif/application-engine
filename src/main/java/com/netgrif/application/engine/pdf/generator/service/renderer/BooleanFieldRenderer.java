@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
 import java.io.IOException;
 import java.util.List;
 
-public class BooleanFieldRenderer extends FieldRenderer<BooleanField> {
+public class BooleanFieldRenderer extends FieldRenderer {
 
     private PdfBooleanFormat booleanFormat;
 
@@ -22,7 +22,7 @@ public class BooleanFieldRenderer extends FieldRenderer<BooleanField> {
     @Override
     public int renderLabel(PdfField field) throws IOException {
         setFieldParams(field);
-        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize);
+        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize, colorLabelString);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BooleanFieldRenderer extends FieldRenderer<BooleanField> {
         for (String value : booleanValues) {
             x += booleanValues.indexOf(value) * (padding * 9);
             pdfDrawer.drawBooleanBox(field.getValues(), value, x, y);
-            pdfDrawer.writeString(resource.getValueFont(), resource.getFontValueSize(), x + fontLabelSize + padding, y, value);
+            pdfDrawer.writeString(resource.getValueFont(), resource.getFontValueSize(), x + fontLabelSize + padding, y, value, colorString);
         }
         pdfDrawer.checkOpenPages();
     }

@@ -5,7 +5,7 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 
 import java.io.IOException;
 
-public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {
+public class DataGroupFieldRenderer extends FieldRenderer {
 
     public void setFieldParams(PdfField field) {
         helperField = new PdfDataGroupField(field.getFieldId(), field.getLabel(), field.getValues(), field.getType(), resource.getBaseX() + field.getX(),
@@ -15,7 +15,7 @@ public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {
     @Override
     public int renderLabel(PdfField field) throws IOException {
         setFieldParams(field);
-        renderLabel(helperField, resource.getLabelFont(), resource.getFontGroupSize());
+        renderLabel(helperField, resource.getLabelFont(), resource.getFontGroupSize(), colorDataGroupLabel);
         return 0;
     }
 
