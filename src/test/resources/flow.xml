@@ -42,6 +42,7 @@
         <title>test text 5 col</title>
         <init>test text 5 col</init>
     </data>
+
     <data type="text">
         <id>text8</id>
         <title>test text 3 col</title>
@@ -57,6 +58,7 @@
         <title>test text 3 col</title>
         <init>test text 3 col</init>
     </data>
+
     <data type="text">
         <id>text11</id>
         <title>test text 8 col dlhý titleaaaaaaaaaaaaaaaaa</title>
@@ -103,346 +105,176 @@
     </data>
     <transition>
         <id>t1</id>
-        <x>140</x>
-        <y>140</y>
+        <x>220</x>
+        <y>100</y>
         <label/>
         <layout>
             <offset>0</offset>
+            <cols>4</cols>
         </layout>
         <dataGroup>
             <id>1</id>
-            <cols>2</cols>
             <layout>flow</layout>
+            <cols>2</cols>
             <title>2 col dataGroup</title>
             <dataRef>
                 <id>text1</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text2</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
         </dataGroup>
         <dataGroup>
             <id>2</id>
-            <cols>5</cols>
             <layout>flow</layout>
+            <cols>5</cols>
             <title>5 col dataGroup</title>
             <dataRef>
                 <id>text3</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text4</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text5</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text6</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text7</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>4</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
         </dataGroup>
         <dataGroup>
             <id>3</id>
-            <cols>3</cols>
             <layout>flow</layout>
             <title>3 col dataGroup</title>
+            <cols>3</cols>
             <dataRef>
                 <id>text8</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text9</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text10</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
         </dataGroup>
         <dataGroup>
             <id>4</id>
-            <cols>8</cols>
             <layout>flow</layout>
+            <cols>8</cols>
             <title>8 col dataGroup</title>
             <dataRef>
                 <id>text11</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text12</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text13</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>2</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text14</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text15</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>4</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text16</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>5</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text17</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>6</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
             <dataRef>
                 <id>text18</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
-                <layout>
-                    <x>0</x>
-                    <y>7</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
             </dataRef>
         </dataGroup>
         <event type="finish">
             <id>1</id>
             <actions phase="pre">
-                <action id="action_0">generatePdf("t1", "pdf")</action>
-            </actions>
-        </event>
-        <event type="assign">
-            <id>t1_assign</id>
-        </event>
-        <event type="cancel">
-            <id>t1_cancel</id>
-        </event>
-        <event type="delegate">
-            <id>t1_delegate</id>
-        </event>
-    </transition>
-    <transition>
-        <id>t2</id>
-        <x>460</x>
-        <y>180</y>
-        <label/>
-        <layout>
-            <offset>0</offset>
-        </layout>
-        <dataGroup>
-            <id>NewDataGroup</id>
-            <stretch>true</stretch>
-            <dataRef>
-                <id>pdf</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <event type="assign">
-            <id>1</id>
-            <actions phase="pre">
-                <action id="action_1">
+                <action>
                     generatePdf("t1", "pdf")
                 </action>
             </actions>
         </event>
-        <event type="finish">
-            <id>t2_finish</id>
-        </event>
-        <event type="cancel">
-            <id>t2_cancel</id>
-        </event>
-        <event type="delegate">
-            <id>t2_delegate</id>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>220</x>
+        <y>100</y>
+        <label/>
+        <layout>
+            <offset>0</offset>
+            <cols>4</cols>
+        </layout>
+        <dataRef>
+            <id>pdf</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <event type="assign">
+            <id>1</id>
+            <actions phase="pre">
+                <action>
+                    generatePdf("t1", "pdf")
+                </action>
+            </actions>
         </event>
     </transition>
 </document>
