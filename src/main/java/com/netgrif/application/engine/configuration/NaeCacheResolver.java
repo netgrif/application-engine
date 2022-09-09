@@ -8,12 +8,13 @@ import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 import org.springframework.cache.interceptor.CacheResolver;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NaeCacheResolver implements CacheResolver {
 
     private final CacheManager cacheManager;
 
-    private CacheProperties cacheProperties;
+    private final CacheProperties cacheProperties;
 
     public NaeCacheResolver(CacheManager cacheManager, CacheProperties cacheProperties) {
         this.cacheManager = cacheManager;
@@ -22,22 +23,11 @@ public class NaeCacheResolver implements CacheResolver {
 
     @Override
     public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
-        Collection<Cache> caches = new ArrayList<>();
-        for(String name : context.getOperation().getCacheNames()) {
-            String key;
-            if (this.cacheProperties.getCache() != null && this.cacheProperties.getCache().containsKey(name)) {
-                key = this.cacheProperties.getCache().get(context.getOperation().getCacheNames().stream().findFirst().get());
-            } else {
-                key = context.getOperation().getCacheNames().stream().findFirst().get();
-            }
-            Cache cache = this.cacheManager.getCache(key);
-            if (cache != null) {
-                caches.add(cache);
-            } else {
-                ((ConcurrentMapCacheManager) this.cacheManager).setCacheNames(List.of(key));
-                caches.add(this.cacheManager.getCache(key));
-            }
-        }
-        return caches;
+        Set<String> cacheIds = cacheProperties.getAllCaches();
+        return context.getOperation().getCacheNames().stream()
+                .filter(cacheIds::contains)
+                .map(cacheManager::getCache)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 }

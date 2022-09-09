@@ -1,28 +1,29 @@
 package com.netgrif.application.engine.configuration.properties;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
+import java.util.*;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "nae")
+@ConfigurationProperties(prefix = "nae.cache")
 public class CacheProperties {
 
-    private Map<String, String> cache;
+    private String petriNetById = "petriNetById";
 
-    @Value("${nae.cache.petriNetById:petriNetById}")
-    private String petriNetById;
+    private String petriNetByIdentifier = "petriNetByIdentifier";
 
-    @Value("${nae.cache.petriNetByIdentifier:petriNetByIdentifier}")
-    private String petriNetByIdentifier;
+    private String petriNetNewest = "petriNetNewest";
 
-    @Value("${nae.cache.petriNetNewest:petriNetNewest}")
-    private String petriNetNewest;
+    private String petriNetCache = "petriNetCache";
 
-    @Value("${nae.cache.petriNetCache:petriNetCache}")
-    private String petriNetCache;
+    private List<String> additional = new ArrayList<>();
+
+    public Set<String> getAllCaches() {
+        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetNewest, petriNetCache));
+        caches.addAll(additional);
+        return caches;
+    }
 }

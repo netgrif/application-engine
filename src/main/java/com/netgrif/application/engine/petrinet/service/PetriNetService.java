@@ -124,14 +124,13 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public void evictCache() {
+    public void evictAllCaches() {
         cacheManager.getCache(cacheProperties.getPetriNetById()).clear();
         cacheManager.getCache(cacheProperties.getPetriNetNewest()).clear();
         cacheManager.getCache(cacheProperties.getPetriNetCache()).clear();
         cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()).clear();
     }
 
-    @Override
     public void evictCache(PetriNet net) {
         cacheManager.getCache(cacheProperties.getPetriNetById()).evict(net.getStringId());
         cacheManager.getCache(cacheProperties.getPetriNetNewest()).evict(net.getIdentifier());
