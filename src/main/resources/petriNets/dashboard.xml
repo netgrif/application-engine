@@ -2,7 +2,7 @@
 	<id>dashboard</id>
 	<initials>DSH</initials>
 	<title>Dashboard</title>
-	<icon>dashboard_customize</icon>
+	<icon>dashboard</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
@@ -108,6 +108,10 @@
 		</event>
 		<event type="finish">
 			<id>t1_finish</id>
+			<actions phase="post">
+				<action id="1">name: f.name;
+				changeCaseProperty "title" about { name.value; }</action>
+			</actions>
 		</event>
 		<event type="cancel">
 			<id>t1_cancel</id>
@@ -135,6 +139,34 @@
 					<y>0</y>
 					<rows>1</rows>
 					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>cols</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>rows</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>

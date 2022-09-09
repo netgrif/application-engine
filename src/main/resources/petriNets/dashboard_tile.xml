@@ -1,48 +1,100 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
-    <id>new_model</id>
-    <initials>NEW</initials>
-    <title>New Model</title>
-    <icon>device_hub</icon>
+    <id>dashboard_tile</id>
+    <initials>DST</initials>
+    <title name="model_title">Dashboard Tile</title>
+    <icon>dashboard_customize</icon>
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
     <transitionRole>false</transitionRole>
     <data type="number">
         <id>x</id>
-        <title/>
+        <title name="data_x_title">X</title>
     </data>
     <data type="number">
         <id>y</id>
-        <title/>
+        <title name="data_y_title">Y</title>
     </data>
     <data type="number">
         <id>rows</id>
-        <title/>
+        <title name="data_rows_title">Rows</title>
     </data>
     <data type="number">
         <id>cols</id>
-        <title/>
+        <title name="data_cols_title">Cols</title>
     </data>
     <data type="text">
-        <id>text_0</id>
+        <id>tile_component</id>
         <title/>
     </data>
     <data type="enumeration_map">
-        <id>enumeration_map_0</id>
-        <title>Type</title>
+        <id>tile_type</id>
+        <title name="data_tile_type_title">Type</title>
         <options>
-            <option key="blank">Blank</option>
-            <option key="count">Count</option>
-            <option key="graph">Chart</option>
-            <option key="iframe">iframe</option>
-            <option key="pie">Pie</option>
-            <option key="key6">value</option>
+            <option key="count" name="data_tile_type_option_count">Count</option>
+            <option key="iframe" name="data_tile_type_option_iframe">iframe</option>
+            <option key="bar_chart" name="data_tile_type_option_bar_chart">Bar Chart</option>
+            <option key="pie_chart" name="data_tile_type_option_pie_chart">Pie Chart</option>
+            <option key="line_chart" name="data_tile_type_option_line_chart">Line Chart</option>
+            <option key="linear_gauge" name="data_tile_type_option_linear_gauge">Linear Gauge</option>
+            <option key="portal" name="data_tile_type_option_portal">Portal</option>
         </options>
+        <event type="set">
+            <id>tile_type_set</id>
+            <actions phase="post">
+                <action id="1">is_count: f.is_count,
+                tile_type: f.tile_type;</action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>name</id>
+        <title name="data_name_title">Name</title>
+    </data>
+    <data type="text">
+        <id>configuration</id>
+        <title name="data_configuration_title">Configuration</title>
+    </data>
+    <data type="number">
+        <id>is_count</id>
+        <title name="data_is_count_title">Count</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_iframe</id>
+        <title name="data_is_iframe_title">iframe</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_bar_chart</id>
+        <title name="data_is_bar_chart_title">Bar chart</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_pie_chart</id>
+        <title name="data_is_pie_chart_title">Pie chart</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_line_chart</id>
+        <title name="data_is_line_chart_title">Line chart</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_linear_gauge</id>
+        <title name="data_is_linear_gauge_title">Linear Gauge</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_portal</id>
+        <title name="data_is_portal_title">Portal</title>
+        <init>0</init>
     </data>
     <transition>
         <id>t1</id>
-        <x>420</x>
-        <y>180</y>
-        <label/>
+        <x>380</x>
+        <y>340</y>
+        <label name="task_t1_title">Create</label>
+        <assignPolicy>auto</assignPolicy>
         <dataGroup>
             <id>t1_0</id>
             <cols>4</cols>
@@ -50,11 +102,11 @@
             <dataRef>
                 <id>x</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>0</y>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -64,11 +116,11 @@
             <dataRef>
                 <id>y</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>visible</behavior>
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>0</y>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -82,7 +134,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -96,6 +148,102 @@
                 </logic>
                 <layout>
                     <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>configuration</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>2</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+                <component>
+                    <name>textarea</name>
+                </component>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>t1_assign</id>
+        </event>
+        <event type="finish">
+            <id>t1_finish</id>
+        </event>
+        <event type="cancel">
+            <id>t1_cancel</id>
+        </event>
+        <event type="delegate">
+            <id>t1_delegate</id>
+        </event>
+    </transition>
+    <transition>
+        <id>t3</id>
+        <x>740</x>
+        <y>180</y>
+        <label name="task_t3_title">iframe</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>tile_component</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
                     <y>1</y>
                     <rows>1</rows>
                     <cols>2</cols>
@@ -104,9 +252,23 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>enumeration_map_0</id>
+                <id>y</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -117,6 +279,302 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>configuration</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
         </dataGroup>
+        <event type="assign">
+            <id>t3_assign</id>
+        </event>
+        <event type="finish">
+            <id>t3_finish</id>
+        </event>
+        <event type="cancel">
+            <id>t3_cancel</id>
+        </event>
+        <event type="delegate">
+            <id>t3_delegate</id>
+        </event>
     </transition>
+    <transition>
+        <id>t4</id>
+        <x>740</x>
+        <y>100</y>
+        <label name="task_t4_title">Counter</label>
+    </transition>
+    <transition>
+        <id>t5</id>
+        <x>740</x>
+        <y>260</y>
+        <label name="task_t5_title">Bar Chart</label>
+    </transition>
+    <transition>
+        <id>t6</id>
+        <x>740</x>
+        <y>340</y>
+        <label name="task_t6_title">Pie Chart</label>
+    </transition>
+    <transition>
+        <id>t7</id>
+        <x>740</x>
+        <y>420</y>
+        <label name="task_t7_title">Line Chart</label>
+    </transition>
+    <transition>
+        <id>t8</id>
+        <x>740</x>
+        <y>500</y>
+        <label name="task_t8_title">Linear Gauge</label>
+    </transition>
+    <transition>
+        <id>t9</id>
+        <x>740</x>
+        <y>580</y>
+        <label name="task_t9_title">Portal</label>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>260</x>
+        <y>340</y>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>620</x>
+        <y>180</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>620</x>
+        <y>100</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>620</x>
+        <y>260</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p5</id>
+        <x>620</x>
+        <y>340</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p6</id>
+        <x>620</x>
+        <y>420</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p7</id>
+        <x>620</x>
+        <y>500</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p8</id>
+        <x>620</x>
+        <y>580</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_iframe</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>180</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p3</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_count</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>100</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_bar_chart</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>260</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_pie_chart</reference>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p6</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_line_chart</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>420</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a10</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p8</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_portal</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>580</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a11</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p7</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_linear_gauge</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>500</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a12</id>
+        <type>read</type>
+        <sourceId>p3</sourceId>
+        <destinationId>t4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a13</id>
+        <type>read</type>
+        <sourceId>p4</sourceId>
+        <destinationId>t5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>read</type>
+        <sourceId>p5</sourceId>
+        <destinationId>t6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a15</id>
+        <type>read</type>
+        <sourceId>p6</sourceId>
+        <destinationId>t7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a16</id>
+        <type>read</type>
+        <sourceId>p7</sourceId>
+        <destinationId>t8</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a17</id>
+        <type>read</type>
+        <sourceId>p8</sourceId>
+        <destinationId>t9</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
 </document>
