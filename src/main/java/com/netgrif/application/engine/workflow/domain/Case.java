@@ -30,6 +30,10 @@ public class Case {
     @Getter
     private ObjectId _id;
 
+    @Getter
+    @Setter
+    private String uriNodeId;
+
     @LastModifiedDate
     @Getter
     @Setter
@@ -107,7 +111,6 @@ public class Case {
 
     @Getter
     @Setter
-    @JsonIgnore
     private Set<TaskPair> tasks;
 
     @Getter

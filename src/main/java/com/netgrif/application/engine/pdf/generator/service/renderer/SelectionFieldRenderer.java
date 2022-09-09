@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T> {
+public abstract class SelectionFieldRenderer extends FieldRenderer {
 
 
     public void renderValue(PdfSelectionField field, int lineCounter) throws IOException {
@@ -31,7 +31,7 @@ public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T> {
                 lineCounter++;
                 lineCounter = renderPageBrake(field, lineCounter, y);
                 y = renderLinePosY(field, lineCounter);
-                pdfDrawer.writeString(resource.getValueFont(), fontValueSize, x, y, line);
+                pdfDrawer.writeString(resource.getValueFont(), fontValueSize, x, y, line, colorString);
                 if (!buttonDrawn) {
                     buttonDrawn = pdfDrawer.drawSelectionButton(field.getValues(), choice, field.getX() + padding, y, field.getType());
                 }

@@ -32,6 +32,9 @@ public class ElasticCase {
     @Id
     private String id;
 
+    @Field(type = Keyword)
+    private String uriNodeId;
+
     @Version
     private Long version;
 
@@ -105,6 +108,7 @@ public class ElasticCase {
      */
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        uriNodeId = useCase.getUriNodeId();
         mongoId = useCase.getStringId();   //TODO: Duplication
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
@@ -131,6 +135,7 @@ public class ElasticCase {
     public void update(ElasticCase useCase) {
         version++;
         lastModified = useCase.getLastModified();
+        uriNodeId = useCase.getUriNodeId();
         title = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();

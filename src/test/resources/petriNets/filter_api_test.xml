@@ -1,0 +1,242 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>netgrif/test/filter_api_test</id>
+	<initials>FTT</initials>
+	<title>filter_api_test</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<role>
+		<id>role_1</id>
+		<title>Role 1</title>
+	</role>
+
+	<role>
+		<id>role_2</id>
+		<title>Role 2</title>
+	</role>
+
+	<processEvents>
+		<event type="upload">
+			<id>upload</id>
+			<actions phase="post">
+				<action>
+					createCase("netgrif/test/filter_api_test")
+				</action>
+			</actions>
+		</event>
+	</processEvents>
+
+
+	<data type="text">
+		<id>menu_stringId</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>filter_stringId</id>
+		<title/>
+	</data>
+
+	<data type="text">
+		<id>query</id>
+		<title/>
+		<init>processIdentifier:"netgrif/test/filter_api_test"</init>
+	</data>
+	<data type="text">
+		<id>icon</id>
+		<title/>
+		<init>device_hub</init>
+	</data>
+	<data type="text">
+		<id>uri</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>allowed_nets</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>title</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>identifier</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>group</id>
+		<title>Skupina</title>
+	</data>
+
+	<data type="button">
+		<id>create_filter_and_menu</id>
+		<title>create filter and menu</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					menu_stringId: f.menu_stringId,
+					filter_stringId: f.filter_stringId,
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
+					query: f.query,
+					group: f.group,
+					identifier: f.identifier,
+					icon: f.icon;
+
+					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
+					def item
+
+					if (group.value) {
+						item = createMenuItem(uri.value, identifier.value,
+								filter,
+								group.value,
+								["role_1": "netgrif/test/filter_api_test"]
+						)
+					} else {
+						item = createMenuItem(uri.value, identifier.value,
+								filter,
+								["role_1": "netgrif/test/filter_api_test"]
+						)
+					}
+					change menu_stringId value { item.stringId }
+					change filter_stringId value { filter.stringId }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>change_filter_and_menu</id>
+		<title>change filter and menu</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
+					query: f.query,
+					group: f.group,
+					identifier: f.identifier,
+					icon: f.icon;
+
+					def item = findMenuItem(identifier.value)
+					def filter = getFilterFromMenuItem(item)
+
+					changeFilter filter query { query.value }
+					changeFilter filter allowedNets { allowed_nets.value.split(",") as List }
+					changeFilter filter icon { icon.value }
+					changeFilter filter title { title.value }
+					changeFilter filter filterMetadata { [
+							"searchCategories"       : [],
+							"predicateMetadata"      : [],
+							"filterType"             : type,
+							"defaultSearchCategories": false,
+							"inheritAllowedNets"     : false
+					] }
+
+					changeMenuItem item filter { filter }
+					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
+					changeMenuItem item uri { uri.value }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>delete_filter_and_menu</id>
+		<title>delete filter and menu</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					menu_stringId: f.menu_stringId,
+					identifier: f.identifier;
+
+					def item = workflowService.findOne(menu_stringId.value)
+					def filter = getFilterFromMenuItem(item)
+
+					deleteMenuItem(item)
+					deleteFilter(filter)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>create_filter_in_group</id>
+		<title>create filter in group</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					menu_stringId: f.menu_stringId,
+					filter_stringId: f.filter_stringId,
+					uri: f.uri,
+					title: f.title,
+					allowed_nets: f.allowed_nets,
+					query: f.query,
+					group: f.group,
+					identifier: f.identifier,
+					icon: f.icon;
+
+					def item = createFilterInMenu(
+							uri.value,
+							identifier.value,
+							title.value,
+							query.value,
+							type.value,
+							allowed_nets.value.split(",") as List,
+							["role_1": "netgrif/test/filter_api_test"],
+							[:],
+							icon.value
+					)
+					def filter = getFilterFromMenuItem(item)
+
+					change menu_stringId value { item.stringId }
+					change filter_stringId value { filter.stringId }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<data type="button">
+		<id>find_filter</id>
+		<title>find filter</title>
+
+		<event type="set">
+			<actions phase="post">
+				<action>
+					title: f.title,
+					found_filter: f.found_filter;
+
+					def filter = findFilter(title.value)
+					change found_filter value { filter.stringId }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>found_filter</id>
+		<title>found filter</title>
+	</data>
+
+	<transition>
+		<id>t1</id>
+		<x>700</x>
+		<y>180</y>
+		<label>TEST API</label>
+		<event type="assign">
+			<id>t1_assign</id>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t1_delegate</id>
+		</event>
+	</transition>
+</document>
