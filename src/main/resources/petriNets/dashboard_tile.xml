@@ -87,11 +87,10 @@
             <id>tile_type_set</id>
             <actions phase="post">
                 <action id="action_0">tile_type: f.tile_type;
-
                 tile_type.options.keySet().each { option -&gt;
-                    change useCase.getField("is_${option}") value { 0 }
+                    change useCase.getField("is_${option}" as String) value { 0 }
                 }
-                change useCase.getField("is_${file_type.value}") value { 1 }</action>
+                change useCase.getField("is_${tile_type.value}" as String) value { 1 }</action>
             </actions>
         </event>
     </data>

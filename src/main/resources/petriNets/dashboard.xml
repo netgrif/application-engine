@@ -172,18 +172,6 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
-		<event type="assign">
-			<id>t2_assign</id>
-		</event>
-		<event type="finish">
-			<id>t2_finish</id>
-		</event>
-		<event type="cancel">
-			<id>t2_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>t2_delegate</id>
-		</event>
 	</transition>
 	<place>
 		<id>p1</id>
