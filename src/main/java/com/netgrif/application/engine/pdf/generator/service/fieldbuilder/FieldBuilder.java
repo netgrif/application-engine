@@ -47,10 +47,16 @@ public abstract class FieldBuilder {
     private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
         if (isDgFlow(dataGroup)) {
-            x = isStretch(dataGroup) ? 0 : (lastX < resource.getFormGridCols() ? lastX : 0);
+            if (!isStretch(dataGroup)) {
+                x = lastX < resource.getFormGridCols() ? lastX : 0;
+            }
             lastX = x;
         } else if (isDgLegacy(dataGroup)) {
-            lastX = isStretch(dataGroup) ? 0 : (lastX == 0 ? 2 : 0);
+            if (isStretch(dataGroup)) {
+                lastX = 0;
+            } else {
+                lastX = lastX == 0 ? 2 : 0;
+            }
             x = lastX;
         } else if (field.getLayout() != null) {
             x = field.getLayout().getX();

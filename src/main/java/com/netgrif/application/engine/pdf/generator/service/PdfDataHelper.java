@@ -68,7 +68,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Setter
     private int originalCols;
 
-    private final static String DIVIDER = "divider";
+    private static final String DIVIDER = "divider";
 
     @Override
     public void setupDataHelper(PdfResource resource) {
