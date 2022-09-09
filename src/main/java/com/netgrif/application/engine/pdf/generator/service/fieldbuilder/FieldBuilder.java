@@ -22,6 +22,8 @@ public abstract class FieldBuilder {
     private static final String LEGACY = "legacy";
     private static final String FLOW = "flow";
 
+    private static final String GRID = "grid";
+
     public FieldBuilder(PdfResource resource) {
         this.resource = resource;
     }
@@ -46,7 +48,7 @@ public abstract class FieldBuilder {
         int x = 0;
         if (isDgFlow(dataGroup)) {
             x = isStretch(dataGroup) ? 0 : (lastX < resource.getFormGridCols() ? lastX : 0);
-            lastX = x + 1;
+            lastX = x;
         } else if (isDgLegacy(dataGroup)) {
             lastX = isStretch(dataGroup) ? 0 : (lastX == 0 ? 2 : 0);
             x = lastX;
@@ -69,6 +71,9 @@ public abstract class FieldBuilder {
             } else {
                 y = lastY;
                 resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
+            }
+            if (isDgFlow(dataGroup)) {
+                lastX++;
             }
         }
         return y;
