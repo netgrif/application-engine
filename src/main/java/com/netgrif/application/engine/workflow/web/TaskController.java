@@ -192,6 +192,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
+
     public EntityModel<EventOutcomeWithMessage> setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody, Locale locale) {
         return super.setData(taskId, dataBody, locale);
     }

@@ -21,6 +21,10 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https:
 - [NAE-1663] Optional constructor
 - [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
 
+### Changed
+
+- [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
+
 ### Added
 
 - [NAE-1647] Elastic mapping for I18N data field
