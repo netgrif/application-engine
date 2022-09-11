@@ -8,6 +8,7 @@ import com.netgrif.application.engine.ldap.domain.LdapUser;
 import com.netgrif.application.engine.ldap.domain.LdapUserRef;
 import com.netgrif.application.engine.ldap.service.LdapUserService;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.ldap.core.DirContextAdapter;
@@ -38,6 +39,7 @@ public class UserDetailsContextMapperImpl implements UserDetailsContextMapper {
     }
 
     @Override
+    @Synchronized
     public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> authorities) {
         dirContextOperations.setAttributeValues("objectClass", properties.getPeopleClass());
         IUser user = ldapUserService.findByDn(dirContextOperations.getDn());

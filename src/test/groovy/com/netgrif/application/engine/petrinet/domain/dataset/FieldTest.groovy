@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.startup.GroupRunner
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.startup.SystemUserRunner
@@ -35,9 +34,6 @@ class FieldTest {
 
     @Autowired
     private UserRepository userRepository
-
-    @Autowired
-    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner systemUserRunner
@@ -196,8 +192,7 @@ class FieldTest {
         UserListField field = net.dataSet["emptyUserList"] as UserListField
         assert field.name.defaultValue == "Empty user list"
         assert field.description.defaultValue == "User list description"
-        assert field.defaultValue instanceof List
-        assert field.defaultValue.isEmpty()
+        assert field.defaultValue == null
     }
 
     private void assertTaskRef() {

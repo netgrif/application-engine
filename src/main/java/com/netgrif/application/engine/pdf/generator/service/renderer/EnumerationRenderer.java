@@ -7,7 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 
 import java.io.IOException;
 
-public class EnumerationRenderer extends SelectionFieldRenderer<EnumerationField> {
+public class EnumerationRenderer extends SelectionFieldRenderer {
 
     public void setFieldParams(PdfEnumerationField field) {
         helperField = new PdfEnumerationField(field.getFieldId(), field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
