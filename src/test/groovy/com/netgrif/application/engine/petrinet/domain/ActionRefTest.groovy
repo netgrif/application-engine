@@ -3,7 +3,6 @@ package com.netgrif.application.engine.petrinet.domain
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
@@ -45,9 +44,6 @@ class ActionRefTest {
 
     @Autowired
     private UserRepository userRepository
-
-    @Autowired
-    private ProcessRoleRepository roleRepository
 
     @Autowired
     private TestHelper testHelper
