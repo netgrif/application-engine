@@ -150,10 +150,10 @@ public class TaskService implements ITaskService {
         task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.PRE);
         useCase = assignTaskToUser(user, task, useCase.getStringId());
-        historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId())); // TODO 1678 add impersonator
+        historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user));
         outcomes.addAll((eventService.runActions(transition.getPostAssignActions(), useCase, task, transition)));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
-        historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.POST, user.getStringId()));
+        historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.POST, user));
 
         AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
@@ -241,13 +241,13 @@ public class TaskService implements ITaskService {
         save(task);
         reloadTasks(useCase);
         useCase = workflowService.findOne(useCase.getStringId());
-        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId())); // TODO 1678 add impersonator
+        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.PRE, user));
         outcomes.addAll(eventService.runActions(transition.getPostFinishActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
         FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
-        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.POST, user.getStringId()));
+        historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.POST, user));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
 
         return outcome;
@@ -289,7 +289,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
         useCase = workflowService.findOne(useCase.getStringId());
-        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId())); // TODO 1678 add impersonator
+        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.PRE, user));
         outcomes.addAll(eventService.runActions(transition.getPostCancelActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
@@ -297,7 +297,7 @@ public class TaskService implements ITaskService {
         outcome.setOutcomes(outcomes);
         addMessageToOutcome(transition, EventType.CANCEL, outcome);
 
-        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.POST, user.getStringId()));
+        historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.POST, user));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
         return outcome;
     }
@@ -361,7 +361,7 @@ public class TaskService implements ITaskService {
         task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
         delegate(delegatedUser, task, useCase);
-        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser.getStringId(), delegatedUser.getStringId())); // TODO 1678 add impersonator
+        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser, delegatedUser.getStringId()));
         outcomes.addAll(eventService.runActions(transition.getPostDelegateActions(), useCase, task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.POST);
 
@@ -370,7 +370,7 @@ public class TaskService implements ITaskService {
 
         DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
-        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser.getStringId(), delegatedUser.getStringId()));
+        historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser, delegatedUser.getStringId()));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
 
         return outcome;
@@ -558,18 +558,20 @@ public class TaskService implements ITaskService {
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
-        if (loggedUser.getProcessRoles().isEmpty()) {
+        LoggedUser loggedOrImpersonated = loggedUser.getSelfOrImpersonated();
+
+        if (loggedOrImpersonated.getProcessRoles().isEmpty()) {
             tasks = new ArrayList<>();
             return new PageImpl<>(tasks, pageable, 0L);
         } else {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("{$or:[");
-            loggedUser.getProcessRoles().forEach(role -> {
+            loggedOrImpersonated.getProcessRoles().forEach(role -> {
                 queryBuilder.append("{\"roles.");
                 queryBuilder.append(role);
                 queryBuilder.append("\":{$exists:true}},");
             });
-            if (!loggedUser.getProcessRoles().isEmpty())
+            if (!loggedOrImpersonated.getProcessRoles().isEmpty())
                 queryBuilder.deleteCharAt(queryBuilder.length() - 1);
             else
                 queryBuilder.append("{}");
@@ -652,7 +654,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByUser(Pageable pageable, IUser user) {
-        return loadUsers(taskRepository.findByUserId(pageable, user.getStringId()));
+        return loadUsers(taskRepository.findByUserId(pageable, user.getSelfOrImpersonated().getStringId()));
     }
 
     @Override

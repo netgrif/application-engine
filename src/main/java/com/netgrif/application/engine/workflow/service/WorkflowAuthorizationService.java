@@ -26,15 +26,15 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(user.transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(user.transformToAnonymousUser(), requestedCase, ProcessRolePermission.DELETE);
-        return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated().transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(user.getSelfOrImpersonated().transformToUser(), requestedCase, ProcessRolePermission.DELETE);
+        return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
         PetriNet net = petriNetService.getPetriNet(netId);
-        return user.isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, ProcessRolePermission.CREATE);
+        return user.getSelfOrImpersonated().isAdmin() || userHasAtLeastOneRolePermission(user.getSelfOrImpersonated().transformToUser(), net, ProcessRolePermission.CREATE);
     }
 
     @Override

@@ -274,11 +274,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setColor(color);
-        useCase.setAuthor(user.transformToAuthor());
+        useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
         UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);

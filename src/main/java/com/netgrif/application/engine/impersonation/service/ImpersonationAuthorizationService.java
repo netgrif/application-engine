@@ -105,6 +105,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         List<String> queries = new ArrayList<>();
         request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER));
         queries.add("(dataSet.impersonators.keyValue:" + impersonatorId + ")");
+        queries.add("(dataSet.is_active.booleanValue:true)");
         queries.addAll(validityQueries());
         if (impersonatedId != null) {
             queries.add("(dataSet.impersonated.userIdValue.keyword:" + impersonatedId + ")");

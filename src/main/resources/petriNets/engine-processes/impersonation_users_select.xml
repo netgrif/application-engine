@@ -1,0 +1,71 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>impersonation_users_select</id>
+	<version>1.0.0</version>
+	<initials>IPU</initials>
+	<title>Konfigurácia zastupiteľov - user select</title>
+	<icon>home</icon>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+	<data type="text">
+		<id>parentId</id>
+		<title/>
+	</data>
+	<data type="enumeration_map">
+		<id>select_impersonator</id>
+		<title>Výber zastupiteľa</title>
+
+		<event type="get">
+			<id>select_impersonator_get</id>
+
+			<actions phase="post">
+				<action>
+					select_impersonator: f.select_impersonator;
+
+					def selectableUsers = userService.findAllCoMembers(userService.loggedUser.transformToLoggedUser(), false, new com.netgrif.application.engine.utils.FullPageRequest()).content
+					change select_impersonator value { null }
+					change select_impersonator options { selectableUsers.collectEntries { [(it.id): ("$it.fullName ($it.email)" as String)] } }
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<transition>
+		<id>select_user</id>
+		<x>500</x>
+		<y>180</y>
+		<label>[select user]</label>
+		<dataGroup>
+			<id>select_user_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>select_impersonator</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t2_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t2_delegate</id>
+		</event>
+	</transition>
+</document>

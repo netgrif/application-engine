@@ -24,7 +24,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private IPetriNetService petriNetService;
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, user, locale)).collect(Collectors.toList());
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set

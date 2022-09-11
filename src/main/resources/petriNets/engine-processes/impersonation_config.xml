@@ -31,7 +31,7 @@
 	</userRef>
 	<caseEvents>
 		<event type="create">
-			<id>assign_email</id>
+			<id>create</id>
 			<actions phase="post">
 				<action id="action_0">
 					impersonated_email: f.impersonated_email,
@@ -42,6 +42,19 @@
                     change impersonated value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
                     change impersonated_email value { useCase.author.email }
                     change config_owner value { [useCase.author.id] }
+				</action>
+
+				<action>
+					user_select_caseId: f.user_select_caseId,
+					user_select_taskRef: f.user_select_taskRef;
+
+					def userSelectCase = createCase("impersonation_users_select")
+					change user_select_taskRef value { [userSelectCase.tasks.find { it.transition == "select_user" }.task] }
+					change user_select_caseId value { userSelectCase.stringId }
+
+					setData((user_select_taskRef.value as List)[0], [
+							"parentId": ["type": "text", "value": useCase.stringId]
+					])
 				</action>
 			</actions>
 		</event>
@@ -64,9 +77,9 @@
 	<data type="multichoice_map" immediate="true">
 		<id>impersonators</id>
 		<title>Nastavení zastupitelia</title>
-		<event type="set">
-			<id>make_select_impersonator_null</id>
-		</event>
+		<component>
+			<name>list</name>
+		</component>
 	</data>
 	<data type="userList">
 		<id>config_owner</id>
@@ -79,6 +92,10 @@
 	<data type="dateTime" immediate="true">
 		<id>valid_to</id>
 		<title>Platnosť do</title>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_active</id>
+		<title>Aktívna konfigurácia</title>
 	</data>
 	<data type="user" immediate="true">
 		<id>impersonated</id>
@@ -94,23 +111,7 @@
 			</actions>
 		</event>
 	</data>
-	<data type="enumeration_map">
-		<id>select_impersonator</id>
-		<title>Výber zastupiteľa</title>
-		<event type="get">
-			<id>select_impersonator_get</id>
 
-			<actions phase="post">
-				<action>
-					select_impersonator: f.select_impersonator;
-
-					def selectableUsers = userService.findAllCoMembers(userService.loggedUser.transformToLoggedUser(), false, new com.netgrif.application.engine.utils.FullPageRequest()).content
-					change select_impersonator value { null }
-					change select_impersonator options { selectableUsers.collectEntries { [(it.id): ("$it.fullName ($it.email)" as String)] } }
-				</action>
-			</actions>
-		</event>
-	</data>
 	<data type="button">
 		<id>remove_impersonator</id>
 		<title/>
@@ -140,17 +141,27 @@
 			<id>add_selected_set</id>
 			<actions phase="pre">
 				<action id="10">
-					select_impersonator: f.select_impersonator,
-                    impersonators: f.impersonators;
+					user_select_caseId: f.user_select_caseId,
+					user_select_taskRef: f.user_select_taskRef,
+					impersonators: f.impersonators;
 
-					if (select_impersonator.value != null) {
-						def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
-						options.put(select_impersonator.value, select_impersonator.options[select_impersonator.value])
-						options = options.sort { it.value }
-						change impersonators options { options }
-						change impersonators value { options.keySet() }
-                    }
-                    change select_impersonator value { null }
+//					TODO 1678 validate logged user ID (cannot impersonate in this specific process)
+					def userSelectCase = workflowService.findOne(user_select_caseId.value)
+					def selectedUserField = userSelectCase.dataSet["select_impersonator"]
+
+					if (selectedUserField.value == null) {
+						return
+					}
+
+					def options = impersonators.options != null ? impersonators.options : [:] as java.util.Map
+					options.put(selectedUserField.value, selectedUserField.options[selectedUserField.value])
+					options = options.sort { it.value }
+					change impersonators options { options }
+					change impersonators value { options.keySet() }
+
+					setData((user_select_taskRef.value as List)[0], [
+					        "select_impersonator": ["type": "enumeration_map", "value": null]
+					])
 				</action>
 			</actions>
 		</event>
@@ -198,11 +209,20 @@
 			</actions>
 		</event>
 	</data>
+	<data type="taskRef">
+		<id>user_select_taskRef</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>user_select_caseId</id>
+		<title/>
+	</data>
 	<transition>
 		<id>t2</id>
 		<x>500</x>
 		<y>180</y>
 		<label>Výber zastupiteľov</label>
+		<assignPolicy>auto</assignPolicy>
 		<roleRef>
 			<id>admin_imp</id>
 			<logic>
@@ -234,7 +254,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -248,7 +268,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -262,21 +282,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>select_impersonator</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -290,7 +296,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -307,7 +313,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -324,7 +330,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -341,7 +347,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -351,18 +357,239 @@
 					<name>list</name>
 				</component>
 			</dataRef>
+			<dataRef>
+				<id>user_select_taskRef</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
-		<event type="assign">
-			<id>t2_assign</id>
-		</event>
 		<event type="finish">
-			<id>t2_finish</id>
-		</event>
-		<event type="cancel">
-			<id>t2_cancel</id>
-		</event>
-		<event type="delegate">
-			<id>t2_delegate</id>
+			<id>finish</id>
+			<actions phase="post">
+				<action>
+					is_active: f.is_active;
+
+					change is_active value { true }
+				</action>
+			</actions>
 		</event>
 	</transition>
+	<transition>
+		<id>t3</id>
+		<x>660</x>
+		<y>300</y>
+		<label>Deaktivovať</label>
+		<assignPolicy>auto</assignPolicy>
+
+		<roleRef>
+			<id>admin_imp</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<userRef>
+			<id>config_owner</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="post">
+				<action>
+					is_active: f.is_active;
+
+					change is_active value { false }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>820</x>
+		<y>180</y>
+		<label>Znovu aktivovať</label>
+		<assignPolicy>auto</assignPolicy>
+
+		<roleRef>
+			<id>admin_imp</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<userRef>
+			<id>config_owner</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>impersonators</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>impersonated_authorities</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>impersonated_roles</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>valid_from</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>valid_to</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="post">
+				<action>
+					is_active: f.is_active;
+
+					change is_active value { true }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p2</id>
+		<x>660</x>
+		<y>180</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>820</x>
+		<y>300</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
 </document>

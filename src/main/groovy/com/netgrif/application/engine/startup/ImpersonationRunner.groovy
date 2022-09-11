@@ -23,13 +23,17 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
     private static final String IMPERSONATION_CONFIG_FILE_NAME = "engine-processes/impersonation_config.xml"
     public static final String IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER = "impersonation_config"
 
+    private static final String IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME = "engine-processes/impersonation_users_select.xml"
+    public static final String IMPERSONATION_CONFIG_USER_SELECT_PETRI_NET_IDENTIFIER = "impersonation_users_select"
+
     @Override
     void run(String... args) throws Exception {
-        createConfigNet()
+        createConfigNets()
     }
 
-    Optional<PetriNet> createConfigNet() {
-        importProcess("Petri net for filters", IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER, IMPERSONATION_CONFIG_FILE_NAME)
+    void createConfigNets() {
+        importProcess("Petri net for impersonation config", IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER, IMPERSONATION_CONFIG_FILE_NAME)
+        importProcess("Petri net for impersonation user select", IMPERSONATION_CONFIG_USER_SELECT_PETRI_NET_IDENTIFIER, IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME)
     }
 
     Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
@@ -39,12 +43,12 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
             return new Optional<>(filter)
         }
 
-        Optional<PetriNet> filterNet = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
+        Optional<PetriNet> net = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
 
-        if (!filterNet.isPresent()) {
+        if (!net.isPresent()) {
             log.error("Import of ${message} failed!")
         }
 
-        return filterNet
+        return net
     }
 }
