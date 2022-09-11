@@ -125,17 +125,18 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public void evictAllCaches() {
-        cacheManager.getCache(cacheProperties.getPetriNetById()).clear();
-        cacheManager.getCache(cacheProperties.getPetriNetNewest()).clear();
-        cacheManager.getCache(cacheProperties.getPetriNetCache()).clear();
-        cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetNewest()), cacheProperties.getPetriNetNewest()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).clear();
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).clear();
+
     }
 
     public void evictCache(PetriNet net) {
-        cacheManager.getCache(cacheProperties.getPetriNetById()).evict(net.getStringId());
-        cacheManager.getCache(cacheProperties.getPetriNetNewest()).evict(net.getIdentifier());
-        cacheManager.getCache(cacheProperties.getPetriNetCache()).evict(net.getObjectId());
-        cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()).evict(net.getIdentifier() + net.getVersion().toString());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetById()), cacheProperties.getPetriNetById()).evict(net.getStringId());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetNewest()), cacheProperties.getPetriNetNewest()).evict(net.getIdentifier());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).evict(net.getObjectId());
+        requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).evict(net.getIdentifier() + net.getVersion().toString());
     }
 
     /**
@@ -168,7 +169,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException{
+    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
@@ -208,7 +209,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     private ImportPetriNetEventOutcome addMessageToOutcome(PetriNet net, ProcessEventType type, ImportPetriNetEventOutcome outcome) {
-        if(net.getProcessEvents().containsKey(type)){
+        if (net.getProcessEvents().containsKey(type)) {
             outcome.setMessage(net.getProcessEvents().get(type).getMessage());
         }
         return outcome;
@@ -292,7 +293,8 @@ public class PetriNetService implements IPetriNetService {
         AggregationResults<?> groupResults = mongoTemplate.aggregate(
                 agg,
                 PetriNet.class,
-                TypeFactory.defaultInstance().constructType(new TypeReference<Map<String, String>>() {}).getRawClass()
+                TypeFactory.defaultInstance().constructType(new TypeReference<Map<String, String>>() {
+                }).getRawClass()
         );
 
         List<Map<String, String>> result = (List<Map<String, String>>) groupResults.getMappedResults();
@@ -429,7 +431,7 @@ public class PetriNetService implements IPetriNetService {
 
         query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable,  mongoTemplate.count(query_total, PetriNet.class));
+        return new PageImpl<>(nets.stream().map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()), pageable, mongoTemplate.count(query_total, PetriNet.class));
     }
 
     @Override
@@ -469,4 +471,13 @@ public class PetriNetService implements IPetriNetService {
         });
     }
 
+    protected <T> T requireNonNull(T obj, Object... item) {
+        if (obj == null) {
+            if (item.length > 0) {
+                log.error("Null Pointer Exception", item);
+            }
+            throw new NullPointerException();
+        }
+        return obj;
+    }
 }

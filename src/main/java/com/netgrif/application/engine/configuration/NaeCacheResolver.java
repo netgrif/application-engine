@@ -3,11 +3,12 @@ package com.netgrif.application.engine.configuration;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.interceptor.CacheOperationInvocationContext;
 import org.springframework.cache.interceptor.CacheResolver;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NaeCacheResolver implements CacheResolver {
