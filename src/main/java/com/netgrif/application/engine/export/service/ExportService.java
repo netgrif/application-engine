@@ -272,7 +272,7 @@ class ExportService implements IExportService {
                 fieldValue =((Date) fieldData).toString();
                 break;
             case USERLIST:
-                fieldValue = String.join(";", ((UserListField) fieldData).getValue());
+                fieldValue = ((UserListField) fieldData).getValue().getUserValues().stream().map(UserFieldValue::getId).collect(Collectors.joining(";"));
                 break;
             case NUMBER:
                 fieldValue = fieldData.toString();
