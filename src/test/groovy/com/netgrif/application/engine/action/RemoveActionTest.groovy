@@ -134,7 +134,7 @@ class RemoveActionTest {
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
-        String managerRoleId = processRoleRepository.findByName_DefaultValue("manager").stringId
+        String managerRoleId = processRoleRepository.findAllByName_DefaultValue("manager")?.first()?.stringId
 
         assert roles.find { it.getStringId() == adminRoleId }
         assert roles.find { it.getStringId() == managerRoleId }
@@ -156,6 +156,6 @@ class RemoveActionTest {
         roles = updatedUser.getProcessRoles()
 
         Assert.assertNull(roles.find { it.stringId == adminRoleId })
-        Assert.assert(roles.find { it.stringId == managerRoleId })
+        Assert.assertNotNull(roles.find { it.stringId == managerRoleId })
     }
 }

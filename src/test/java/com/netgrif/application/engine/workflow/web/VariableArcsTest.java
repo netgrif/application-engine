@@ -12,9 +12,9 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
@@ -41,6 +41,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -69,7 +71,7 @@ public class VariableArcsTest {
     private DefaultRoleRunner defaultRoleRunner;
 
     @Autowired
-    private ProcessRoleRepository roleRepository;
+    private IProcessRoleService processRoleService;
 
     @Autowired
     private ImportHelper importHelper;
@@ -99,13 +101,7 @@ public class VariableArcsTest {
         testHelper.truncateDbs();
         userRunner.run("");
         repository.deleteAll();
-        if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
-            try {
-                defaultRoleRunner.run();
-            } catch (Exception e) {
-                log.error("VariableArcsTest failed: ", e);
-            }
-        }
+        assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();
         ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 

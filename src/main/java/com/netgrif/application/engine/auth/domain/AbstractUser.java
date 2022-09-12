@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractUser implements IUser {

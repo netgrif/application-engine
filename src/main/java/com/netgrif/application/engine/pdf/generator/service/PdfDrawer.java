@@ -48,8 +48,6 @@ public class PdfDrawer implements IPdfDrawer {
     private int lineHeight, padding;
     private int boxSize;
 
-    private int titleFontSize;
-
     public void setupDrawer(PDDocument pdf, PdfResource pdfResource) {
         this.pdf = pdf;
         this.resource = pdfResource;
@@ -58,7 +56,6 @@ public class PdfDrawer implements IPdfDrawer {
         this.lineHeight = resource.getLineHeight();
         this.padding = resource.getPadding();
         this.boxSize = resource.getBoxSize();
-        this.titleFontSize = resource.getFontTitleSize();
     }
 
     @Override
@@ -147,6 +144,13 @@ public class PdfDrawer implements IPdfDrawer {
         textFieldRenderer.setupRenderer(this, resource);
         int lineCounter = textFieldRenderer.renderLabel(field);
         textFieldRenderer.renderValue(field, lineCounter);
+    }
+
+    @Override
+    public void drawI18nDividerField(PdfField field) throws IOException {
+        I18nDividerFieldRenderer i18nDividerFieldRenderer = new I18nDividerFieldRenderer();
+        i18nDividerFieldRenderer.setupRenderer(this, resource);
+        i18nDividerFieldRenderer.renderValue(field, 0);
     }
 
     @Override
@@ -240,6 +244,14 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
+    public void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth, Color color) throws IOException {
+        contentStream.setStrokingColor(color);
+        contentStream.moveTo(x, y);
+        contentStream.lineTo((float) (x + width), y);
+        contentStream.stroke();
+    }
+
+    @Override
     public void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException {
         contentStream.setFont(font, fontSize);
         contentStream.setNonStrokingColor(color);
@@ -259,7 +271,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.endText();
     }
 
-    private boolean checkBooleanValue(List<String> values, String text) {
+    protected boolean checkBooleanValue(List<String> values, String text) {
         PdfBooleanFormat format = resource.getBooleanFormat();
         if (values.get(0).equals("true")) {
             if (!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)) {
@@ -273,7 +285,7 @@ public class PdfDrawer implements IPdfDrawer {
         return false;
     }
 
-    private void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
+    protected void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {
         contentStream.saveGraphicsState();
         AffineTransform transform = new AffineTransform(boxSize, 0.0F, 0.0F, boxSize, x, y - resource.getBoxPadding());
         contentStream.transform(new Matrix(transform));

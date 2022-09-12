@@ -8,11 +8,17 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QCase;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
@@ -27,22 +33,25 @@ import java.util.stream.Collectors;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Group"}, authorizations = @Authorization("BasicAuth"))
+@Tag(name = "Group")
 public class GroupController {
 
-    @Autowired
-    private INextGroupService service;
+    private final INextGroupService service;
+
+    public GroupController(INextGroupService service) {
+        this.service = service;
+    }
 
     @Authorizations(value = {
             @Authorize(authority = "GROUP_VIEW_ALL")
     })
-    @ApiOperation(value = "Get all groups in the system",
-            notes = "Caller must have the GROUP_VIEW_ALL authority",
-            authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Get all groups in the system",
+            description = "Caller must have the ADMIN role",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public GroupsResource getAllGroups() {
         List<Case> groups = service.findAllGroups();
@@ -55,10 +64,10 @@ public class GroupController {
     @Authorizations(value = {
             @Authorize(authority = "GROUP_VIEW_MY")
     })
-    @ApiOperation(value = "Get logged user's groups in the system",
+    @Operation(value = "Get logged user's groups in the system",
             notes = "Caller must have the GROUP_VIEW_MY authority",
             authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/my", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
@@ -76,7 +85,7 @@ public class GroupController {
     @Authorizations(value = {
             @Authorize(authority = "GROUP_MEMBERSHIP_MY")
     })
-    @ApiOperation(value = "Get logged user's groups in the system",
+    @Operation(value = "Get logged user's groups in the system",
             notes = "Caller must have the GROUP_VIEW_MY authority",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/membership", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)

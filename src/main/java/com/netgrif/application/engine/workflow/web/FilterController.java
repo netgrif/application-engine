@@ -12,9 +12,9 @@ import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBod
 import com.netgrif.application.engine.workflow.web.responsebodies.FilterResourceAssembler;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedFilterResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * @deprecated since 5.3.0 - Filter engine processes should be used instead of native objects
  */
-@Deprecated
+@Deprecated(since = "5.3.0")
 @RestController
 @RequestMapping("/api/filter")
 @ConditionalOnProperty(
@@ -42,14 +42,14 @@ import java.util.Map;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Filter"}, authorizations = @Authorization("BasicAuth"))
+@Tag(name = "Filter")
 public class FilterController {
 
     @Autowired
     private IFilterService filterService;
 
-    @ApiOperation(value = "Save new filter", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Save new filter", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(required = false) MergeFilterOperation operation, Authentication auth, Locale locale) {
         Filter filter = filterService.saveFilter(newFilter, operation, (LoggedUser) auth.getPrincipal());
         if (filter != null)
@@ -57,12 +57,12 @@ public class FilterController {
         return MessageResource.errorMessage("Filter " + newFilter.getTitle() + " has failed to save");
     }
 
+    @Operation(summary = "Delete filter specified by id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Authorizations(value = {
             @Authorize(authority = "FILTER_DELETE_ALL"),
             @Authorize(authority = "FILTER_DELETE_MY")
     })
-    @ApiOperation(value = "Delete filter specified by id", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         boolean success = filterService.deleteFilter(filterId, loggedUser);
@@ -71,8 +71,8 @@ public class FilterController {
         return MessageResource.errorMessage("Filter " + filterId + " has failed to delete");
     }
 
-    @ApiOperation(value = "Search for filter by provided criteria", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Search for filter by provided criteria", security = {@SecurityRequirement(name = "BasicAuth")})
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<LocalisedFilterResource> search(@RequestBody Map<String, Object> searchCriteria, Authentication auth, Locale locale, Pageable pageable, PagedResourcesAssembler<Filter> assembler) {
         Page<Filter> page = filterService.search(searchCriteria, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass())

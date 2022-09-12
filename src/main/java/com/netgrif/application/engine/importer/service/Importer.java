@@ -28,10 +28,10 @@ import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -88,7 +88,7 @@ public class Importer {
     protected IPetriNetService service;
 
     @Autowired
-    protected ProcessRoleRepository roleRepository;
+    protected IProcessRoleService processRoleService;
 
     @Autowired
     protected ArcFactory arcFactory;
@@ -151,8 +151,8 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
-        this.anonymousRole = roleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
+        this.defaultRole = processRoleService.defaultRole();
+        this.anonymousRole = processRoleService.anonymousRole();
         this.i18n = new HashMap<>();
         this.actions = new HashMap<>();
         this.actionRefs = new HashMap<>();
@@ -201,8 +201,6 @@ public class Importer {
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         document.getFunction().forEach(this::createFunction);
-        evaluateFunctions();
-        actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
         document.getUsersRef().forEach(this::resolveUserRef);
         document.getUserRef().forEach(this::resolveUserRef);
@@ -211,6 +209,8 @@ public class Importer {
 
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
+        evaluateFunctions();
+        actions.forEach(this::evaluateActions);
 
         if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
             net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));

@@ -90,7 +90,14 @@ public abstract class AbstractUserService implements IUserService {
         return save(user);
     }
 
+    /**
+     * @deprecated use {@link AbstractUserService#removeRole(IUser, ProcessRole)} instead
+     * @param user
+     * @param roleStringId
+     * @return
+     */
     @Override
+    @Deprecated(since = "6.2.0")
     public IUser removeRole(IUser user, String roleStringId) {
         return removeRole(user, processRoleService.findByImportId(roleStringId));
     }
