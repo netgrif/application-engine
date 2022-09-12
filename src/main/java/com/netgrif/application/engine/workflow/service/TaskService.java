@@ -16,6 +16,8 @@ import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
@@ -722,7 +724,7 @@ public class TaskService implements ITaskService {
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -733,10 +735,12 @@ public class TaskService implements ITaskService {
         return taskRepository.save(task);
     }
 
-    private List<String> getExistingUsers(List<String> userIds) {
-        if (userIds == null)
+    private List<String> getExistingUsers(UserListFieldValue userListValue) {
+        if (userListValue == null)
             return null;
-        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
+        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
+                .filter(id -> userService.resolveById(id, false) != null)
+                .collect(Collectors.toList());
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {

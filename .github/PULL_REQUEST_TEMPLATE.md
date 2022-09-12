@@ -65,6 +65,17 @@ You can now safely **delete all between two horizontal lines**, so the instructi
 
 <Please describe configuration for tests to run if applicable, like program parameters, host OS, VM configuration etc.>
 
+
+| Name                | Tested on |
+|---------------------| --------- |
+| OS                  |           |
+| Runtime             |           |
+| Dependency Manager  |           |
+| Framework version   |           |
+| Run parameters      |           |
+| Other configuration |           |
+
+
 # Checklist:
 
 - [ ] My code follows the style guidelines of this project

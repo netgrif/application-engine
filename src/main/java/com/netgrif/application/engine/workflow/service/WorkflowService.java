@@ -13,9 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -222,7 +220,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -233,11 +231,12 @@ public class WorkflowService implements IWorkflowService {
         return repository.save(useCase);
     }
 
-    private List<String> getExistingUsers(List<String> userIds) {
-        if (userIds == null)
+    private List<String> getExistingUsers(UserListFieldValue userListValue) {
+        if (userListValue == null)
             return null;
-        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
-    }
+        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
+                .filter(id -> userService.resolveById(id, false) != null)
+                .collect(Collectors.toList());    }
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {

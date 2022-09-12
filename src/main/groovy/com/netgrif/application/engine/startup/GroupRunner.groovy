@@ -50,7 +50,7 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
         PetriNet group
         if ((group = petriNetService.getNewestVersionByIdentifier(GROUP_PETRINET_IDENTIFIER)) != null) {
             log.info("Petri net for groups has already been imported.")
-            return new Optional<>(group)
+            return Optional.of(group)
         }
 
         Optional<PetriNet> groupNet =  helper.createNet(GROUP_FILE_NAME, VersionType.MAJOR, systemCreator.loggedSystem)

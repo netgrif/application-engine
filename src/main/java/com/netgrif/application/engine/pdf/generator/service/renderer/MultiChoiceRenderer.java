@@ -7,7 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
 
 import java.io.IOException;
 
-public class MultiChoiceRenderer extends SelectionFieldRenderer<MultichoiceField> {
+public class MultiChoiceRenderer extends SelectionFieldRenderer {
 
     public void setFieldParams(PdfMultiChoiceField field) {
         helperField = new PdfMultiChoiceField(field.getFieldId(), field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
