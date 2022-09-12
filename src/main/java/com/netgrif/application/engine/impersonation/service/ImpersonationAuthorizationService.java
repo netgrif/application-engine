@@ -49,7 +49,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
             return userService.searchAllCoMembers(query, null, null, impersonator, true, pageable);
 
         } else {
-            Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
+            Page<Case> cases = searchConfigs(impersonator.getId(), pageable); // TODO 1678 fix paging somehow
             List<IUser> users = cases.getContent().stream()
                     .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getValue()).getId())
                     .distinct()
