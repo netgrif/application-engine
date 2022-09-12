@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
@@ -60,7 +61,7 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private IUserResourceHelperService userResourceHelperService;
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -135,12 +136,9 @@ public class UserController {
 
     @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) { // TODO 1678 vratit aj s impersonated
-        small = small == null ? false : small;
-        if (!small)
-            return new UserResource(userResponseFactory.getUser(userService.resolveById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
-        else
-            return new UserResource(userResponseFactory.getUser(((LoggedUser) auth.getPrincipal()).transformToUser(), locale), "profile");
+    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
+        small = small != null && small;
+        return userResourceHelperService.resource((LoggedUser) auth.getPrincipal(), locale, small);
     }
 
     @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))

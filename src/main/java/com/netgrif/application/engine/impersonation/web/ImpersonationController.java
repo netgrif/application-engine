@@ -2,9 +2,8 @@ package com.netgrif.application.engine.impersonation.web;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
-import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonationAttemptException;
@@ -42,7 +41,7 @@ public class ImpersonationController {
     private IUserService userService;
 
     @Autowired
-    private IUserFactory userFactory;
+    private IUserResourceHelperService userResourceHelperService;
 
     @Autowired
     private Provider<UserResourceAssembler> userResourceAssemblerProvider;
@@ -71,32 +70,13 @@ public class ImpersonationController {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }
         loggedUser = impersonationService.impersonate(userId);
-        return resource(loggedUser, locale, false);
+        return userResourceHelperService.resource(loggedUser, locale, false);
     }
 
     @PostMapping("/clear")
     public UserResource endImpersonation(Locale locale) {
         LoggedUser loggedUser = impersonationService.endImpersonation();
-        return resource(loggedUser, locale, false);
+        return userResourceHelperService.resource(loggedUser, locale, false);
     }
 
-
-    public UserResource resource(LoggedUser loggedUser, Locale locale, boolean small) {
-        IUser user = userService.resolveById(loggedUser.getId(), small);
-        User localisedUser = loggedUser.isImpersonating() ?
-                localisedUser(user, userService.resolveById(loggedUser.getImpersonated().getId(), small), locale) :
-                localisedUser(user, locale);
-        return new UserResource(localisedUser, "profile");
-    }
-
-    public User localisedUser(IUser user, IUser impersonated, Locale locale) {
-        User localisedUser = localisedUser(user, locale);
-        User impersonatedUser = userFactory.getUser(impersonated, locale);
-        localisedUser.setImpersonated(impersonatedUser);
-        return localisedUser;
-    }
-
-    public User localisedUser(IUser user, Locale locale) {
-        return userFactory.getUser(user, locale);
-    }
 }

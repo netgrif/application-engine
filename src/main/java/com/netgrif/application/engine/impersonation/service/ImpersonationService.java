@@ -3,7 +3,6 @@ package com.netgrif.application.engine.impersonation.service;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
@@ -19,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,13 +45,7 @@ public class ImpersonationService implements IImpersonationService {
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
         IUser impersonated = userService.findById(impersonatedId, false);
 
-        List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getId(), impersonatedId);
-        List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs);
-        List<ProcessRole> roles = impersonationAuthorizationService.getRoles(configs);
-
-        LoggedUser impersonatedLogged = impersonated
-                .transformToLoggedUser()
-                .transformToImpersonatedLoggedUser(authorities, roles.stream().map(ProcessRole::getStringId).collect(Collectors.toList()));
+        LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId()).transformToLoggedUser();
 
         if (sessionService.existsSession(impersonatedLogged.getUsername())) {
             throw new ImpersonatedUserHasSessionException(impersonatedLogged, false);
@@ -71,19 +64,35 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public LoggedUser endImpersonation() {
-        LoggedUser loggedUser = endImpersonation(userService.getLoggedUserFromContext());
-        securityContextService.saveToken(loggedUser.getId());
-        securityContextService.reloadSecurityContext(loggedUser);
-        return loggedUser;
+        return endImpersonation(userService.getLoggedUserFromContext());
     }
 
     @Override
-    public LoggedUser endImpersonation(LoggedUser loggedUser) {
-        LoggedUser impersonated = loggedUser.getImpersonated();
-        removeImpersonatedId(loggedUser);
-        loggedUser.clearImpersonated();
-        log.info(loggedUser.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
-        return loggedUser;
+    public void endImpersonation(String impersonatedId) {
+        impersonatorRepository.findByImpersonatedId(impersonatedId).ifPresent(impersonatorRepository::delete);
+    }
+
+    @Override
+    public LoggedUser endImpersonation(LoggedUser impersonator) {
+        LoggedUser impersonated = impersonator.getImpersonated();
+        removeImpersonatedId(impersonator);
+        impersonator.clearImpersonated();
+        log.info(impersonator.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
+        securityContextService.saveToken(impersonator.getId());
+        securityContextService.reloadSecurityContext(impersonator);
+        return impersonator;
+    }
+
+    @Override
+    public IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId) {
+        List<Case> configs = impersonationAuthorizationService.searchConfigs(impersonatorId, impersonated.getStringId());
+        List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs);
+        List<ProcessRole> roles = impersonationAuthorizationService.getRoles(configs);
+
+        impersonated.setAuthorities(new HashSet<>(authorities));
+        impersonated.setProcessRoles(new HashSet<>(roles));
+
+        return impersonated;
     }
 
     protected void updateImpersonatedId(LoggedUser loggedUser, String id) {

@@ -374,6 +374,7 @@
 		</dataGroup>
 		<event type="finish">
 			<id>finish</id>
+			<title>Publikovať</title>
 			<actions phase="post">
 				<action>
 					is_active: f.is_active;
@@ -550,6 +551,13 @@
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
+	<place>
+		<id>p4</id>
+		<x>660</x>
+		<y>100</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
 	<arc>
 		<id>a2</id>
 		<type>regular</type>
@@ -590,6 +598,20 @@
 		<type>regular</type>
 		<sourceId>p2</sourceId>
 		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>read</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t3</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>
