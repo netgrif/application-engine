@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
+Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.0](https://github.com/netgrif/application-engine/commits/v6.2.0)
 
 ## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-09-12)
 
