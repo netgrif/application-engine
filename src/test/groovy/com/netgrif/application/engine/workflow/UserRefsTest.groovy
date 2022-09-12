@@ -4,9 +4,11 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
@@ -39,6 +41,9 @@ class UserRefsTest {
     private IElasticCaseService elasticCaseService
 
     @Autowired
+    private IDataService dataService
+
+    @Autowired
     private TestHelper helper
 
     List<Case> newCases
@@ -59,7 +64,7 @@ class UserRefsTest {
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
-            _case.dataSet["user_list_1"].value = [id]
+            _case.dataSet["user_list_1"].value = new UserListFieldValue([dataService.makeUserFieldValue(id)])
             newCases.add(workflowService.save(_case))
             userIds.add(id)
         }

@@ -7,10 +7,12 @@ import com.netgrif.application.engine.elastic.domain.BooleanField;
 import com.netgrif.application.engine.elastic.domain.ButtonField;
 import com.netgrif.application.engine.elastic.domain.DateField;
 import com.netgrif.application.engine.elastic.domain.FileField;
+import com.netgrif.application.engine.elastic.domain.I18nField;
 import com.netgrif.application.engine.elastic.domain.NumberField;
 import com.netgrif.application.engine.elastic.domain.TextField;
 import com.netgrif.application.engine.elastic.domain.UserField;
 import com.netgrif.application.engine.elastic.domain.*;
+import com.netgrif.application.engine.elastic.domain.UserListField;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -25,6 +27,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -79,8 +82,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileField(caseField);
         } else if (netField instanceof FileListField) {
             return this.transformFileListField(caseField);
-        } else if (netField instanceof UserListField) {
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserListField) {
             return this.transformUserListField(caseField);
+        } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.I18nField) {
+            return this.transformI18nField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.I18nField) netField);
         } else {
             String string = caseField.getValue().toString();
             if (string == null)
@@ -101,6 +106,13 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(options.get(key))));
         }
         return Optional.of(new MapField(values));
+    }
+
+    protected Optional<DataField> transformI18nField(com.netgrif.application.engine.workflow.domain.DataField dataField, com.netgrif.application.engine.petrinet.domain.dataset.I18nField netField) {
+        Set<String> keys = netField.getValue().getTranslations().keySet();
+        Set<String> values = new HashSet<>(netField.getValue().getTranslations().values());
+        values.add(((I18nString) dataField.getValue()).getDefaultValue());
+        return Optional.of(new I18nField(keys, values));
     }
 
     protected Optional<DataField> transformEnumerationMapField(com.netgrif.application.engine.workflow.domain.DataField enumMap, EnumerationMapField netField) {
@@ -191,17 +203,17 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformUserListField(com.netgrif.application.engine.workflow.domain.DataField userListField) {
-        List<String> userIds = (List<String>) userListField.getValue();
-        List<IUser> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
-        return Optional.of(new UserField(users.stream().map(this::transformUserValue).toArray(UserField.UserMappingData[]::new)));
+        UserListFieldValue userListValue = (UserListFieldValue) userListField.getValue();
+        UserField.UserMappingData[] userMappingData = userListValue.getUserValues().stream().map(this::transformUserListValue).toArray(UserField.UserMappingData[]::new);
+        return Optional.of(new UserListField(userMappingData));
     }
 
     private UserField.UserMappingData transformUserValue(UserFieldValue user) {
         return new UserField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
     }
 
-    private UserField.UserMappingData transformUserValue(IUser user) {
-        return new UserField.UserMappingData(user.getStringId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
+    private UserListField.UserMappingData transformUserListValue(UserFieldValue user) {
+        return new UserListField.UserMappingData(user.getId(), user.getEmail(), buildFullName(user.getName(), user.getSurname()).toString());
     }
 
     private StringBuilder buildFullName(String name, String surname) {
