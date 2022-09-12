@@ -6,6 +6,10 @@
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
     <transitionRole>false</transitionRole>
+    <data type="text">
+        <id>parent_dashboard_id</id>
+        <title/>
+    </data>
     <data type="number">
         <id>x</id>
         <title name="data_x_title">X</title>
@@ -137,6 +141,28 @@
         <title name="data_is_portal_title">Portal</title>
         <init>0</init>
     </data>
+	<data type="button">
+		<id>save_btn</id>
+		<title/>
+		<placeholder>Save</placeholder>
+		<component>
+			<name>flat</name>
+		</component>
+        <event type="set">
+			<id>save_btn_set</id>
+			<actions phase="post">
+				<action>
+                    tile_type: f.tile_type;
+
+                    if (tile_type.value) {
+                        finishTask("t1")
+                    } else {
+                        throw new IllegalArgumentException("Type not selected")
+                    }
+                </action>
+			</actions>
+        </event>
+	</data>
     <transition>
         <id>t1</id>
         <x>380</x>
@@ -207,6 +233,7 @@
                 <id>tile_type</id>
                 <logic>
                     <behavior>editable</behavior>
+					<behavior>required</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -240,7 +267,7 @@
                     <x>0</x>
                     <y>4</y>
                     <rows>2</rows>
-                    <cols>4</cols>
+					<cols>3</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -248,18 +275,64 @@
                     <name>textarea</name>
                 </component>
             </dataRef>
+			<dataRef>
+				<id>save_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>parent_dashboard_id</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
         </dataGroup>
         <event type="assign">
             <id>t1_assign</id>
         </event>
         <event type="finish">
             <id>t1_finish</id>
-        </event>
-        <event type="cancel">
-            <id>t1_cancel</id>
-        </event>
-        <event type="delegate">
-            <id>t1_delegate</id>
+			<actions phase="post">
+				<action>
+                    parent_dashboard_id: f.parent_dashboard_id;
+
+                    try {
+                        log.info("parent_dashboard_id: ${parent_dashboard_id.value}")
+                        log.info("old task: ${task.get().stringId}")
+                        log.info("new task: ${useCase.tasks.first().task}")
+                    } catch (Exception ignored) {
+                        log.info(ignored)
+                    }
+
+                    def parentDashboardCase = findCase { it._id.eq(parent_dashboard_id.value) }
+                    def dashboardValue = parentDashboardCase.dataSet["dashboard"].value as List
+                    dashboardValue.remove(task.get().stringId)
+                    dashboardValue.add(useCase.tasks.first().task)
+                    setData("t2", parentDashboardCase, [
+                            "dashboard": [
+                                    "value": dashboardValue,
+                                    "type": "taskRef"
+                            ]
+                    ])
+                </action>
+			</actions>
         </event>
     </transition>
     <transition>

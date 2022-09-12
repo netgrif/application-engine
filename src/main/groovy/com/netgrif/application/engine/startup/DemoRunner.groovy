@@ -41,6 +41,9 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private ITaskService taskService
 
+    @Autowired
+    private SuperCreator superCreator
+
     private static final Logger log = LoggerFactory.getLogger(DemoRunner)
 
     @Override
@@ -49,27 +52,41 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
         def tileNet = helper.createNet("dashboard_tile.xml").orElseThrow()
         def dashboardCase = helper.createCase("My Dashboard", dashboardNet)
         def tile1Case = helper.createCase("Tile 1", tileNet)
-        def tile2Case = helper.createCase("Tile 1", tileNet)
+        def tile2Case = helper.createCase("Tile 2", tileNet)
+        def tile3Case = helper.createCase("Tile 3", tileNet)
 
         tile1Case.dataSet["x"].value = 0
         tile1Case.dataSet["y"].value = 0
         tile1Case.dataSet["rows"].value = 1
         tile1Case.dataSet["cols"].value = 1
+        tile1Case.dataSet["parent_dashboard_id"].value = dashboardCase.stringId
         workflowService.save(tile1Case)
         tile2Case.dataSet["x"].value = 1
         tile2Case.dataSet["y"].value = 1
         tile2Case.dataSet["rows"].value = 1
         tile2Case.dataSet["cols"].value = 1
+        tile2Case.dataSet["parent_dashboard_id"].value = dashboardCase.stringId
         workflowService.save(tile2Case)
+        tile3Case.dataSet["x"].value = 0
+        tile3Case.dataSet["y"].value = 1
+        tile3Case.dataSet["rows"].value = 1
+        tile3Case.dataSet["cols"].value = 1
+        tile3Case.dataSet["parent_dashboard_id"].value = dashboardCase.stringId
+        workflowService.save(tile3Case)
 
         dashboardCase.dataSet["rows"].value = 2
         dashboardCase.dataSet["cols"].value = 2
         dashboardCase.dataSet["dashboard"].value = [
                 tile1Case.tasks.first().task,
-                tile2Case.tasks.first().task
+                tile2Case.tasks.first().task,
+                tile3Case.tasks.first().task
         ]
         workflowService.save(dashboardCase)
         taskService.assignTask(dashboardCase.tasks.first().task)
         taskService.finishTask(dashboardCase.tasks.first().task)
+
+        taskService.assignTask(superCreator.loggedSuper, tile1Case.tasks.first().task)
+        taskService.assignTask(superCreator.loggedSuper, tile2Case.tasks.first().task)
+        taskService.assignTask(superCreator.loggedSuper, tile3Case.tasks.first().task)
     }
 }
