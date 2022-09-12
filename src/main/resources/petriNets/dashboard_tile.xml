@@ -313,14 +313,6 @@
 				<action>
                     parent_dashboard_id: f.parent_dashboard_id;
 
-                    try {
-                        log.info("parent_dashboard_id: ${parent_dashboard_id.value}")
-                        log.info("old task: ${task.get().stringId}")
-                        log.info("new task: ${useCase.tasks.first().task}")
-                    } catch (Exception ignored) {
-                        log.info(ignored)
-                    }
-
                     def parentDashboardCase = findCase { it._id.eq(parent_dashboard_id.value) }
                     def dashboardValue = parentDashboardCase.dataSet["dashboard"].value as List
                     dashboardValue.remove(task.get().stringId)
