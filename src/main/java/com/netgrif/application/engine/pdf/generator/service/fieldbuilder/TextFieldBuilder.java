@@ -4,9 +4,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import org.jsoup.Jsoup;
@@ -17,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 public class TextFieldBuilder extends FieldBuilder {
 
@@ -48,6 +47,9 @@ public class TextFieldBuilder extends FieldBuilder {
                 break;
             case USER:
                 value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
+                break;
+            case USERLIST:
+                value = field.getValue() != null ? ((UserListFieldValue) field.getValue()).getUserValues().stream().map(UserFieldValue::getFullName).collect(Collectors.joining(", ")) : "";
                 break;
             default:
                 value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
