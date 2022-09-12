@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.repositories.AuthorityReposito
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ public class AuthorityService implements IAuthorityService {
     @Transactional
     public Authority getOrCreate(String name) {
         if (isScope(name)) {
-            throw new IllegalArgumentException("The authority name is not valid. Scope is suitable for this function.");
+            throw new IllegalArgumentException("The authority name is not valid. Scope is not suitable for this function.");
         }
         Authority authority = repository.findByName(name);
         if (authority == null)
@@ -92,7 +93,7 @@ public class AuthorityService implements IAuthorityService {
         }
         Authority authority = repository.findByName(name);
         if (authority == null)
-            throw new IllegalArgumentException("Could not find authority with name [" + name + "]");
+            throw new ResourceNotFoundException("Could not find authority with name [" + name + "]");
         repository.delete(authority);
     }
 
