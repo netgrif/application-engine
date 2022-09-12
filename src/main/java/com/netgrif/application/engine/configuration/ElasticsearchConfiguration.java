@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -28,6 +29,12 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.reindex}")
     private String cron;
 
+    private final UriProperties uriProperties;
+
+    public ElasticsearchConfiguration(UriProperties uriProperties) {
+        this.uriProperties = uriProperties;
+    }
+
     @Bean
     public String springElasticsearchReindex() {
         return cron;
@@ -41,6 +48,11 @@ public class ElasticsearchConfiguration {
     @Bean
     public String elasticTaskIndex() {
         return taskIndex;
+    }
+
+    @Bean
+    public String elasticUriIndex() {
+        return uriProperties.getIndex();
     }
 
     @Bean

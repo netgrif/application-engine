@@ -19,6 +19,11 @@ public abstract class FieldBuilder {
     @Getter
     protected int lastX, lastY;
 
+    private static final String LEGACY = "legacy";
+    private static final String FLOW = "flow";
+
+    private static final String GRID = "grid";
+
     public FieldBuilder(PdfResource resource) {
         this.resource = resource;
     }
@@ -42,28 +47,27 @@ public abstract class FieldBuilder {
     private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
         if (isDgFlow(dataGroup)) {
-            x = lastX < resource.getFormGridCols() ? lastX : 0;
-            lastX = x + 1;
-        } else if (field.getLayout() != null && !isStretch(dataGroup)) {
+            if (!isStretch(dataGroup)) {
+                x = lastX < resource.getFormGridCols() ? lastX : 0;
+            }
+            lastX = x;
+        } else if (isDgLegacy(dataGroup)) {
+            if (isStretch(dataGroup)) {
+                lastX = 0;
+            } else {
+                lastX = lastX == 0 ? 2 : 0;
+            }
+            x = lastX;
+        } else if (field.getLayout() != null) {
             x = field.getLayout().getX();
             lastX = x;
-        } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
-            lastX = (lastX == 0 ? 2 : 0);
-            x = lastX;
         }
         return x;
     }
 
     private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
         int y;
-        if (isDgFlow(dataGroup)) {
-            if (resource.getRowGridFree() - 1 > 0) {
-                resource.setRowGridFree(resource.getRowGridFree() - 1);
-                y = lastY;
-            } else {
-                y = lastY++;
-            }
-        } else if (checkFullRow(dataGroup, field)) {
+        if (checkFullRow(dataGroup, field)) {
             y = ++lastY;
             resolveRowGridFree(dataGroup, field.getLayout());
         } else {
@@ -73,6 +77,9 @@ public abstract class FieldBuilder {
             } else {
                 y = lastY;
                 resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
+            }
+            if (isDgFlow(dataGroup)) {
+                lastX++;
             }
         }
         return y;
@@ -118,12 +125,12 @@ public abstract class FieldBuilder {
     private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
         if (isDgFlow(dataGroup)) {
             return resource.getFormGridColWidth() - resource.getPadding();
-        } else if (checkCol(field.getLayout()) && !isStretch(dataGroup)) {
-            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-        } else {
+        } else if (isDgLegacy(dataGroup)) {
             return (isStretch(dataGroup) ?
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
+        } else {
+            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
         }
     }
 
@@ -145,7 +152,11 @@ public abstract class FieldBuilder {
     }
 
     private boolean isDgFlow(DataGroup dataGroup) {
-        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("flow");
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(FLOW);
+    }
+
+    private boolean isDgLegacy(DataGroup dataGroup) {
+        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals(LEGACY);
     }
 
     private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {
