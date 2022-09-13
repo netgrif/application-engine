@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
+import com.netgrif.application.engine.auth.service.interfaces.IBaseAuthorizationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +19,13 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.ExpressionUtils;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -30,10 +34,12 @@ import java.util.List;
 @Slf4j
 @Aspect
 @Service
-public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationService {
+public class BaseAuthorizationServiceAspect implements IBaseAuthorizationService {
+
+    private final IUserService userService;
 
     public BaseAuthorizationServiceAspect(@Autowired IUserService userService) {
-        super(userService);
+        this.userService = userService;
     }
 
     /**
@@ -66,6 +72,19 @@ public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationSer
         } else {
             throw new AccessDeniedException("Access Denied. User does not have required authorization level.");
         }
+    }
+
+    /**
+     * Checks whether the currently logged user has all the input authorizing objects.
+     * @param authorizingObject to be checked for user
+     * @return boolean if user has all the authorizing objects.
+     * */
+    @Override
+    public final boolean hasAnyAuthority(String[] authorizingObject) {
+        if (authorizingObject == null || authorizingObject.length == 0)
+            return true;
+        Set<String> loggedUserAuthorities = this.userService.getLoggedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+        return loggedUserAuthorities.containsAll(Arrays.asList(authorizingObject));
     }
 
     /**
