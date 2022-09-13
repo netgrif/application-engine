@@ -3,7 +3,6 @@ package com.netgrif.application.engine.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,13 +20,9 @@ public class Authority implements GrantedAuthority {
     public static final List<String> defaultAnonymousAuthorities = Collections.emptyList();
 
     @Id
-    @Getter
-    private ObjectId _id;
-
     @NotNull
     @JsonIgnore
     @Getter
-    @Setter
     private String name;
 
     @JsonIgnore
@@ -57,7 +52,7 @@ public class Authority implements GrantedAuthority {
     }
 
     public String getStringId() {
-        return _id.toString();
+        return name;
     }
 
     @Override
@@ -82,7 +77,7 @@ public class Authority implements GrantedAuthority {
     @Override
     public String toString() {
         return "Authority{" +
-                "id=" + _id +
+                "id=" + name +
                 ", name='" + name + '\'' +
                 '}';
     }
