@@ -121,7 +121,8 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
-
+        configureFilters(http);
+        configureSession(http);
         setCsrf(http);
     }
 
