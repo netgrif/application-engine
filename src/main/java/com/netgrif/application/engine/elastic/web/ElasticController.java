@@ -60,7 +60,7 @@ public class ElasticController {
     })
     public MessageResource reindex(@RequestBody Map<String, Object> searchBody, Authentication auth, Locale locale) {
         try {
-            LoggedUser user = ((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated();
+            LoggedUser user = (LoggedUser) auth.getPrincipal();
             long count = workflowService.count(searchBody, user, locale);
 
             if (count == 0) {

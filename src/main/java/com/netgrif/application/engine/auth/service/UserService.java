@@ -178,8 +178,8 @@ public class UserService extends AbstractUserService {
     @Override
     public Page<IUser> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
-        Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
-        members.add(loggedUser.getId());
+        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
+        members.add(loggedUser.getSelfOrImpersonated().getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
 
@@ -187,8 +187,8 @@ public class UserService extends AbstractUserService {
 
     @Override
     public Page<IUser> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
-        members.add(loggedUser.getId());
+        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
+        members.add(loggedUser.getSelfOrImpersonated().getId());
 
         return changeType(userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
                 .collect(Collectors.toSet()), query), pageable), pageable);
@@ -205,8 +205,8 @@ public class UserService extends AbstractUserService {
         }
 
 
-        Set<String> members = groupService.getAllCoMembers(loggedUser.transformToUser());
-        members.add(loggedUser.getId());
+        Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
+        members.add(loggedUser.getSelfOrImpersonated().getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
             predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));

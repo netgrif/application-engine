@@ -160,7 +160,7 @@ public class TaskService implements ITaskService {
         AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
 
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
+        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "]");
         return outcome;
     }
 
@@ -170,7 +170,7 @@ public class TaskService implements ITaskService {
         useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[" + useCaseId + "]: Assigning task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
+        log.info("[" + useCaseId + "]: Assigning task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
 
         startExecution(transition, useCase);
         task.setUserId(user.getSelfOrImpersonated().getStringId());
@@ -213,7 +213,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
+        if (!task.getUserId().equals(user.getSelfOrImpersonated().getStringId()) && !loggedUser.isAnonymous()) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -227,7 +227,7 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
 
-        log.info("[" + useCase.getStringId() + "]: Finishing task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
+        log.info("[" + useCase.getStringId() + "]: Finishing task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
 
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase, task, transition));
@@ -250,7 +250,7 @@ public class TaskService implements ITaskService {
         FinishTaskEventOutcome outcome = new FinishTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.FINISH, outcome);
         historyService.save(new FinishTaskEventLog(task, useCase, EventPhase.POST, user));
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
+        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "] was finished");
 
         return outcome;
     }
@@ -282,7 +282,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        log.info("[" + useCase.getStringId() + "]: Canceling task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
+        log.info("[" + useCase.getStringId() + "]: Canceling task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase, task, transition));
         task = findOne(task.getStringId());
@@ -300,7 +300,7 @@ public class TaskService implements ITaskService {
         addMessageToOutcome(transition, EventType.CANCEL, outcome);
 
         historyService.save(new CancelTaskEventLog(task, useCase, EventPhase.POST, user));
-        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
+        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "] was cancelled");
         return outcome;
     }
 
@@ -373,7 +373,7 @@ public class TaskService implements ITaskService {
         DelegateTaskEventOutcome outcome = new DelegateTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.DELEGATE, outcome);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.POST, delegateUser, delegatedUser.getStringId()));
-        log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
+        log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getSelfOrImpersonated().getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
 
         return outcome;
     }
