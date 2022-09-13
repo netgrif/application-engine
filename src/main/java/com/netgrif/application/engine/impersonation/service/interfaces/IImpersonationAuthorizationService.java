@@ -21,7 +21,7 @@ public interface IImpersonationAuthorizationService {
 
     List<Case> searchConfigs(String impersonatorId, String impersonatedId);
 
-    List<Authority> getAuthorities(List<Case> configs);
+    List<Authority> getAuthorities(List<Case> configs, IUser impersonated);
 
-    List<ProcessRole> getRoles(List<Case> configs);
+    List<ProcessRole> getRoles(List<Case> configs, IUser impersonated);
 }

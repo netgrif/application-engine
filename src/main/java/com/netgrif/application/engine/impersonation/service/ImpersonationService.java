@@ -85,10 +85,12 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public IUser applyRolesAndAuthorities(IUser impersonated, String impersonatorId) {
-        // TODO 1678 if admin then ignore
+        if (userService.findById(impersonatorId, true).transformToLoggedUser().isAdmin()) {
+            return impersonated;
+        }
         List<Case> configs = impersonationAuthorizationService.searchConfigs(impersonatorId, impersonated.getStringId());
-        List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs);
-        List<ProcessRole> roles = impersonationAuthorizationService.getRoles(configs);
+        List<Authority> authorities = impersonationAuthorizationService.getAuthorities(configs, impersonated);
+        List<ProcessRole> roles = impersonationAuthorizationService.getRoles(configs, impersonated);
 
         impersonated.setAuthorities(new HashSet<>(authorities));
         impersonated.setProcessRoles(new HashSet<>(roles));

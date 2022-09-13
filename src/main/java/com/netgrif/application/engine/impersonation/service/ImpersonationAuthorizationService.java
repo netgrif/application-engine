@@ -81,23 +81,27 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public List<Authority> getAuthorities(List<Case> configs) {
+    public List<Authority> getAuthorities(List<Case> configs, IUser impersonated) {
         if (configs.isEmpty()) {
             return new ArrayList<>();
         }
         List<String> authIds = (List) configs.get(0).getDataSet().get("impersonated_authorities").getValue();
         authIds = authIds != null ? authIds : new ArrayList<>();
-        return authorityService.findAllByIds(authIds);
+        return authorityService.findAllByIds(authIds).stream()
+                .filter(configAuth -> impersonated.getAuthorities().stream().anyMatch(userAuth -> userAuth.getStringId().equals(configAuth.getStringId())))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProcessRole> getRoles(List<Case> configs) {
+    public List<ProcessRole> getRoles(List<Case> configs, IUser impersonated) {
         if (configs.isEmpty()) {
             return new ArrayList<>();
         }
         List<String> roleIds = (List) configs.get(0).getDataSet().get("impersonated_roles").getValue();
         roleIds = roleIds != null ? roleIds : new ArrayList<>();
-        return new ArrayList<>(processRoleService.findByIds(new HashSet<>(roleIds)));
+        return new ArrayList<>(processRoleService.findByIds(new HashSet<>(roleIds))).stream()
+                .filter(configRole -> impersonated.getProcessRoles().stream().anyMatch(userRole -> userRole.getStringId().equals(configRole.getStringId())))
+                .collect(Collectors.toList());
     }
 
     protected CaseSearchRequest request(String impersonatorId, String impersonatedId) {
