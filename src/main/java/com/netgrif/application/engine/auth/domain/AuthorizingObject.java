@@ -51,7 +51,8 @@ public enum AuthorizingObject {
     TASK_FINISH,
     TASK_CANCEL,
     TASK_DELEGATE,
-    TASK_SAVE_DATA;
+    TASK_SAVE_DATA,
+    ELASTIC_REINDEX;
 
     public static List<String> stringValues() {
         return Arrays.stream(AuthorizingObject.values()).map(Enum::name).collect(Collectors.toList());

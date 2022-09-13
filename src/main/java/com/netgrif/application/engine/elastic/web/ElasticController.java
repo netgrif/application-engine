@@ -52,9 +52,7 @@ public class ElasticController {
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/reindex", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    @Authorizations({
-            @Authorize(authority = Authority.defaultAdminAuthority)
-    })
+    @Authorize(authority = {"ELASTIC_REINDEX"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
