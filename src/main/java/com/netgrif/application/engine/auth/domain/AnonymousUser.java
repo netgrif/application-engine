@@ -2,7 +2,10 @@ package com.netgrif.application.engine.auth.domain;
 
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Set;
 
 @Document
 @Data
@@ -18,6 +21,12 @@ public class AnonymousUser extends User {
 
     public AnonymousUser(String email, String password, String name, String surname) {
         super(email, password, name, surname);
+    }
+
+    @Override
+    @Cacheable("authorities")
+    public Set<Authority> getAuthorities() {
+        return super.getAuthorities();
     }
 
     @Override
