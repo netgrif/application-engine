@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewAuthorityRequest;
+import com.netgrif.application.engine.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.application.engine.auth.web.responsebodies.AuthorityResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessage;
@@ -14,10 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -59,5 +63,32 @@ public class AuthorityController {
             log.error("Failed to create authority [" + request.name  + "].", e);
             return null;
         }
+    }
+
+    @Authorize(authority = "AUTHORITY_GET_ALL")
+    @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/all", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public CollectionModel<Authority> getAll() {
+        return new AuthoritiesResources(authorityService.findAll());
+    }
+
+    @Authorize(authority = "AUTHORITY_CREATE")
+    @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<Authority> getOne(@PathVariable("name") String name) {
+        Optional<Authority> authority = authorityService.findById(name);
+        if (authority.isPresent()) {
+            return AuthorityResource.of(authority.get());
+        } else {
+            log.error("Cannot find authority with name [" + name  + "].");
+            return null;
+        }
+    }
+
+    @Authorize(authority = "AUTHORITY_CREATE")
+    @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/scope/{scope}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public CollectionModel<Authority> getAllByScope(@PathVariable("scope") String scope) {
+        return new AuthoritiesResources(authorityService.findByScope(scope));
     }
 }

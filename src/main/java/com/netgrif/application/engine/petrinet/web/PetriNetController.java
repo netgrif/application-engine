@@ -12,7 +12,6 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -43,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -113,7 +111,7 @@ public class PetriNetController {
 
     @Operation(summary = "Get process by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
+    public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
