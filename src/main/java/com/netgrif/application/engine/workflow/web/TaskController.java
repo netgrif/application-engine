@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
@@ -85,10 +84,8 @@ public class TaskController extends AbstractTaskController {
         return super.getOne(taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_ASSIGN"),
-            @Authorize(expression = "@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_ASSIGN")
+    @Authorize(expression = "@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Assign task",
             description = "Caller must be able to perform the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -102,10 +99,8 @@ public class TaskController extends AbstractTaskController {
         return super.assign(loggedUser, taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_DELEGATE"),
-            @Authorize(expression = "@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_DELEGATE")
+    @Authorize(expression = "@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Delegate task",
             description = "Caller must be able to delegate the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -119,10 +114,8 @@ public class TaskController extends AbstractTaskController {
         return super.delegate(loggedUser, taskId, delegatedId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_FINISH"),
-            @Authorize(expression = "@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_FINISH")
+    @Authorize(expression = "@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Finish task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -136,10 +129,8 @@ public class TaskController extends AbstractTaskController {
         return super.finish(loggedUser, taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_CANCEL"),
-            @Authorize(expression = "@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_CANCEL")
+    @Authorize(expression = "@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Cancel task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -195,10 +186,8 @@ public class TaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_SAVE_DATA"),
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_SAVE_DATA")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Set task data",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -212,10 +201,8 @@ public class TaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_SAVE_DATA"),
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_SAVE_DATA")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -235,10 +222,8 @@ public class TaskController extends AbstractTaskController {
         return super.getFile(taskId, fieldId);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_SAVE_DATA"),
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_SAVE_DATA")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -251,10 +236,8 @@ public class TaskController extends AbstractTaskController {
         return super.deleteFile(taskId, fieldId);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_SAVE_DATA"),
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_SAVE_DATA")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -275,10 +258,8 @@ public class TaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, name);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_SAVE_DATA"),
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
-    })
+    @Authorize(authority = "TASK_SAVE_DATA")
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})

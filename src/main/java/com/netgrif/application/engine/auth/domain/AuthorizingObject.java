@@ -52,7 +52,9 @@ public enum AuthorizingObject {
     TASK_CANCEL,
     TASK_DELEGATE,
     TASK_SAVE_DATA,
-    ELASTIC_REINDEX;
+    ELASTIC_REINDEX,
+    LDAP_GROUP_GET_ALL,
+    LDAP_GROUP_ASSIGN_ROLES;
 
     public static List<String> stringValues() {
         return Arrays.stream(AuthorizingObject.values()).map(Enum::name).collect(Collectors.toList());

@@ -1,12 +1,10 @@
 package com.netgrif.application.engine.workflow.web;
 
-import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.workflow.domain.Filter;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
-import com.netgrif.application.engine.workflow.service.interfaces.IFilterAuthorizationService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterService;
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody;
 import com.netgrif.application.engine.workflow.web.responsebodies.FilterResourceAssembler;
@@ -50,7 +48,7 @@ public class FilterController {
 
     @Operation(summary = "Save new filter", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(required = false) MergeFilterOperation operation, Authentication auth, Locale locale) {
+    public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(required = false) MergeFilterOperation operation, Authentication auth) {
         Filter filter = filterService.saveFilter(newFilter, operation, (LoggedUser) auth.getPrincipal());
         if (filter != null)
             return MessageResource.successMessage("Filter " + newFilter.getTitle() + " successfully created");
@@ -59,10 +57,8 @@ public class FilterController {
 
     @Operation(summary = "Delete filter specified by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    @Authorizations(value = {
-            @Authorize(authority = "FILTER_DELETE_ALL"),
-            @Authorize(authority = "FILTER_DELETE_MY")
-    })
+    @Authorize(authority = "FILTER_DELETE_ALL")
+    @Authorize(authority = "FILTER_DELETE_MY")
     public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         boolean success = filterService.deleteFilter(filterId, loggedUser);

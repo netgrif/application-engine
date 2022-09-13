@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
 import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.web.requestbodies.NewAuthorityRequest;
@@ -34,9 +33,7 @@ public class AuthorityController {
     @Autowired
     private IAuthorityService authorityService;
 
-    @Authorizations(value = {
-            @Authorize(authority = "AUTHORITY_DELETE")
-    })
+    @Authorize(authority = "AUTHORITY_DELETE")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource delete(@PathVariable String name) {
@@ -50,9 +47,7 @@ public class AuthorityController {
         }
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "AUTHORITY_CREATE")
-    })
+    @Authorize(authority = "AUTHORITY_CREATE")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<Authority> create(@RequestBody NewAuthorityRequest request) {

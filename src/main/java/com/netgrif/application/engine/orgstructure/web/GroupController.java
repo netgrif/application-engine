@@ -38,9 +38,7 @@ public class GroupController {
         this.service = service;
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "GROUP_VIEW_ALL")
-    })
+    @Authorize(authority = "GROUP_VIEW_ALL")
     @Operation(summary = "Get all groups in the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -57,9 +55,7 @@ public class GroupController {
         return new GroupsResource(groupResponse);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "GROUP_VIEW_MY")
-    })
+    @Authorize(authority = "GROUP_VIEW_MY")
     @Operation(summary = "Get logged user's groups in the system",
             description = "Caller must have the GROUP_VIEW_MY authority",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -78,9 +74,7 @@ public class GroupController {
         return new GroupsResource(groupResponse);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "GROUP_MEMBERSHIP_MY")
-    })
+    @Authorize(authority = "GROUP_MEMBERSHIP_MY")
     @Operation(summary = "Get logged user's groups in the system",
             description = "Caller must have the GROUP_VIEW_MY authority",
             security = {@SecurityRequirement(name = "BasicAuth")})

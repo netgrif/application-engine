@@ -78,10 +78,8 @@ public class WorkflowController {
     private IDataService dataService;
 
 
-    @Authorizations(value = {
-            @Authorize(authority = "CASE_CREATE"),
-            @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
-    })
+    @Authorize(authority = "CASE_CREATE")
+    @Authorize(expression = "@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
@@ -96,9 +94,7 @@ public class WorkflowController {
         }
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "CASE_VIEW_ALL")
-    })
+    @Authorize(authority = "CASE_VIEW_ALL")
     @Operation(summary = "Get all cases of the system", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
@@ -174,9 +170,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "TASK_RELOAD")
-    })
+    @Authorize(authority = "TASK_RELOAD")
     @Operation(summary = "Reload tasks of case",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -187,7 +181,7 @@ public class WorkflowController {
     })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             Case aCase = workflowService.findOne(caseId);
             taskService.reloadTasks(aCase);
 
@@ -199,42 +193,28 @@ public class WorkflowController {
     }
 
     @Deprecated
-    @Authorizations(value = {
-            @Authorize(authority = "CASE_DATA_GET_ALL")
-    })
+    @Authorize(authority = "CASE_DATA_GET_ALL")
     @Operation(summary = "Get all case data", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId), locale);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting all case data of [" + caseId + "] failed:", e);
-            return new DataFieldsResource(new ArrayList<>(), locale);
-        }
+        caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
+        return new DataFieldsResource(workflowService.getData(caseId), locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "CASE_DELETE"),
-            @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
-    })
+    @Authorize(authority = "CASE_DELETE")
+    @Authorize(expression = "@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            DeleteCaseEventOutcome outcome;
-            if (deleteSubtree) {
-                outcome = workflowService.deleteSubtreeRootedAt(caseId);
-            } else {
-                outcome = workflowService.deleteCase(caseId);
-            }
-            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                    LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
-        } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
-            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+        caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
+        DeleteCaseEventOutcome outcome;
+        if (deleteSubtree) {
+            outcome = workflowService.deleteSubtreeRootedAt(caseId);
+        } else {
+            outcome = workflowService.deleteCase(caseId);
         }
+        return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
+                LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
     }
 
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})

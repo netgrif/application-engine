@@ -29,7 +29,7 @@ public class PetriNetReferenceResource extends EntityModel<PetriNetReference> {
                 .withRel("transaction"));
 
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null, null))
+                .methodOn(PetriNetController.class).getNetFile(getContent().getStringId(), getContent().getTitle(), null))
                 .withRel("file"));
     }
 }

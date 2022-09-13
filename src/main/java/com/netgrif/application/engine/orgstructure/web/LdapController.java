@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.orgstructure.web;
 
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.ldap.domain.LdapGroup;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +43,7 @@ public class LdapController {
     @Autowired
     protected ILdapGroupRefService service;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = "LDAP_GROUP_GET_ALL")
     @Operation(summary = "Get all ldap groups",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -52,7 +52,7 @@ public class LdapController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LdapGroupsResource getAllLdapGroups(@RequestBody LdapGroupSearchBody body, Authentication auth) {
+    public LdapGroupsResource getAllLdapGroups(@RequestBody LdapGroupSearchBody body) {
         List<LdapGroupRef> groups;
         if (body == null || body.getFulltext().equals("")) {
             groups = service.findAllGroups();
@@ -69,7 +69,7 @@ public class LdapController {
         return new LdapGroupsResource(ldapGroupResponse);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = "LDAP_GROUP_ASSIGN_ROLES")
     @Operation(summary = "Assign role to the ldap group",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
