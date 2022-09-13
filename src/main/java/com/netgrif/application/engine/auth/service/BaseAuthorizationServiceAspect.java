@@ -48,7 +48,7 @@ public class BaseAuthorizationServiceAspect implements IBaseAuthorizationService
      * @param authorizations the annotation with authorization requirements
      * */
     @Pointcut(value = "@annotation(authorizations))")
-    protected void authorizingMethod(Authorizations authorizations) {}
+    protected final void authorizingMethod(Authorizations authorizations) {}
 
 
     /**
@@ -58,7 +58,7 @@ public class BaseAuthorizationServiceAspect implements IBaseAuthorizationService
      * @param authorizations the incoming annotation with authorization parameters
      * */
     @Around(value = "authorizingMethod(authorizations)", argNames = "joinPoint,authorizations")
-    protected Object authorize(ProceedingJoinPoint joinPoint, Authorizations authorizations) throws Throwable {
+    protected final Object authorize(ProceedingJoinPoint joinPoint, Authorizations authorizations) throws Throwable {
         boolean result = false;
 
         if (authorizations.value() != null && authorizations.value().length > 0) {
