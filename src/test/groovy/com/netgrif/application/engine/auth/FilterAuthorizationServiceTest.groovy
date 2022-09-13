@@ -74,7 +74,7 @@ class FilterAuthorizationServiceTest {
                 .build()
 
         def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
-                                                             AuthorizingObject.FILTER_DELETE_MY.name()], "admin": AuthorizingObject.stringValues()])
+                                                             AuthorizingObject.FILTER_DELETE_OWN.name()], "admin": AuthorizingObject.stringValues()])
 
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[],

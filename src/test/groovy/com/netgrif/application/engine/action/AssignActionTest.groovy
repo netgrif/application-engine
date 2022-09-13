@@ -39,7 +39,6 @@ import org.springframework.web.context.WebApplicationContext
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 
 @ExtendWith(SpringExtension.class)
@@ -98,7 +97,7 @@ class AssignActionTest {
         createMainAndSecondaryNet()
 
         def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
-                                                             AuthorizingObject.FILTER_DELETE_MY.name()], "admin": AuthorizingObject.stringValues()])
+                                                             AuthorizingObject.FILTER_DELETE_OWN.name()], "admin": AuthorizingObject.stringValues()])
         def authorityList = Stream.concat(auths.get("user").stream(), auths.get("admin").stream()).collect(Collectors.toList()).toArray()
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),

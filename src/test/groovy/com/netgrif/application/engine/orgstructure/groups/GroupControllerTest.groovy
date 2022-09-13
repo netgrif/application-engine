@@ -63,8 +63,8 @@ class GroupControllerTest {
                 .build()
 
         def auths = importHelper.createAuthorities(["user": [
-                AuthorizingObject.GROUP_VIEW_MY.name(),
-                AuthorizingObject.GROUP_MEMBERSHIP_MY.name()
+                AuthorizingObject.GROUP_VIEW_OWN.name(),
+                AuthorizingObject.GROUP_MEMBERSHIP_SELF.name()
         ]])
 
         importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),

@@ -90,7 +90,7 @@ class PetriNetControllerTest {
 
 
         def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
-            AuthorizingObject.FILTER_DELETE_MY.name(), AuthorizingObject.PROCESS_DELETE_MY.name(), AuthorizingObject.PROCESS_VIEW_MY.name()],
+                                                             AuthorizingObject.FILTER_DELETE_OWN.name(), AuthorizingObject.PROCESS_DELETE_OWN.name(), AuthorizingObject.PROCESS_VIEW_OWN.name()],
                                                     "admin": AuthorizingObject.stringValues()])
 
         IUser basicUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
