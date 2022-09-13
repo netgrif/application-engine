@@ -57,7 +57,7 @@ public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationSer
 
         if (authorizations.value() != null && authorizations.value().length > 0) {
             for (Authorize authorize : authorizations.value()) {
-                result = result || (isAllowedByExpression(joinPoint, authorize.expression()) && hasAuthority(authorize.authority()));
+                result = result || (isAllowedByExpression(joinPoint, authorize.expression()) && hasAnyAuthority(authorize.authority()));
             }
         }
 

@@ -1,9 +1,12 @@
 package com.netgrif.application.engine.auth.service;
 
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IBaseAuthorizationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class AbstractBaseAuthorizationService implements IBaseAuthorizationService {
 
@@ -14,9 +17,10 @@ public abstract class AbstractBaseAuthorizationService implements IBaseAuthoriza
     }
 
     @Override
-    public final boolean hasAuthority(String authorizingObject) {
-        if (authorizingObject == null || authorizingObject.length() == 0)
+    public final boolean hasAnyAuthority(String[] authorizingObject) {
+        if (authorizingObject == null || authorizingObject.length == 0)
             return true;
-        return this.userService.getLoggedUser().getAuthorities().stream().anyMatch(a -> a.getName().equals(authorizingObject));
+        Set<String> loggedUserAuthorities = this.userService.getLoggedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+        return loggedUserAuthorities.containsAll(Arrays.asList(authorizingObject));
     }
 }
