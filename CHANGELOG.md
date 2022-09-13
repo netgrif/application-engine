@@ -21,6 +21,7 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.0](https:
 
 ### Changed
 
+- [NAE-1156] View Deprecation and All Data
 - [NAE-1606] Configuration of case creation button from menu item
 - [NAE-1646] Overridable data field render in PDF generator
 - [NAE-1663] Optional constructor
