@@ -3,7 +3,6 @@ package com.netgrif.application.engine.workflow.web;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
-import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
@@ -12,7 +11,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,14 +48,11 @@ public class PublicTaskController extends AbstractTaskController {
 
     private final ITaskService taskService;
 
-    private final IDataService dataService;
-
     final IUserService userService;
 
     public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
         super(taskService, dataService, null);
         this.taskService = taskService;
-        this.dataService = dataService;
         this.userService = userService;
     }
 
@@ -70,7 +65,6 @@ public class PublicTaskController extends AbstractTaskController {
     @Authorizations(value = {
             @Authorize(expression = "@taskAuthorizationService.canCallAssign(@userService.getAnonymousLogged(), #taskId)")
     })
-    @PreAuthorize("@taskAuthorizationService.canCallAssign(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/assign/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Assign task", description = "Caller must be able to perform the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -175,7 +169,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @Operation(summary = "Download preview for file field value")
     @GetMapping(value = "/{id}/file_preview/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
+    public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) throws FileNotFoundException {
         return super.getFilePreview(taskId, fieldId);
     }
 

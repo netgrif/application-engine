@@ -22,10 +22,6 @@ import com.netgrif.application.engine.settings.service.IPreferencesService;
 import com.netgrif.application.engine.settings.web.PreferencesResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -67,9 +63,6 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -162,7 +155,7 @@ public class UserController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         IUser user = userService.resolveById(userId, false);
         if (user == null || (!loggedUser.hasAuthority("USER_EDIT_ALL") && !Objects.equals(loggedUser.getId(), userId)))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + (user != null ? user.transformToLoggedUser().getUsername() : null));
 
         user = userService.update(user, updates);
         securityContextService.saveToken(userId);
@@ -217,7 +210,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public AuthoritiesResources getAllAuthorities(Authentication auth) {
+    public AuthoritiesResources getAllAuthorities() {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
@@ -253,13 +246,13 @@ public class UserController {
     @Authorizations(value = {
             @Authorize(authority = "USER_EDIT_ALL")
     })
-    @ApiOperation(value = "Assign authority to the user",
-            notes = "Caller must have the USER_EDIT authority",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Assign authority to the user",
+            description = "Caller must have the USER_EDIT authority",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/{id}/authority/remove", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public MessageResource removeAuthorityFromUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
         userService.removeAuthority(userId, authorityId);

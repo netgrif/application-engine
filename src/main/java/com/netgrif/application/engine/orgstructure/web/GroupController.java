@@ -5,9 +5,6 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.orgstructure.web.responsebodies.GroupsResource;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.QCase;
-import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,13 +60,13 @@ public class GroupController {
     @Authorizations(value = {
             @Authorize(authority = "GROUP_VIEW_MY")
     })
-    @Operation(value = "Get logged user's groups in the system",
-            notes = "Caller must have the GROUP_VIEW_MY authority",
-            authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get logged user's groups in the system",
+            description = "Caller must have the GROUP_VIEW_MY authority",
+            security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public GroupsResource getMyGroups(Authentication auth) {
         String loggedUserId = ((LoggedUser)auth.getPrincipal()).getId();
@@ -85,13 +81,13 @@ public class GroupController {
     @Authorizations(value = {
             @Authorize(authority = "GROUP_MEMBERSHIP_MY")
     })
-    @Operation(value = "Get logged user's groups in the system",
-            notes = "Caller must have the GROUP_VIEW_MY authority",
-            authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/membership", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Get logged user's groups in the system",
+            description = "Caller must have the GROUP_VIEW_MY authority",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/membership", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public GroupsResource getMembershipGroups(Authentication auth) {
         Set<Case> groups = service.getGroupCasesOfUser(((LoggedUser)auth.getPrincipal()).transformToUser());

@@ -2,7 +2,6 @@ package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.Authorizations;
 import com.netgrif.application.engine.auth.domain.Authorize;
-import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +77,7 @@ public class BaseAuthorizationServiceAspect extends AbstractBaseAuthorizationSer
      * @param expression the SpEL expression
      * @return the evaluated value, whether the SpEL expression returns true or not
      * */
-    private boolean isAllowedByExpression(ProceedingJoinPoint joinPoint, String expression) {
+    protected boolean isAllowedByExpression(ProceedingJoinPoint joinPoint, String expression) {
         if (expression == null || expression.equals("")) {
             return true;
         }

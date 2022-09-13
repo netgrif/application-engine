@@ -52,9 +52,6 @@ public class AuthenticationController {
     private IRegistrationService registrationService;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private IMailService mailService;
 
     @Autowired
@@ -96,15 +93,14 @@ public class AuthenticationController {
     @Authorizations(value = {
             @Authorize(authority = "USER_CREATE")
     })
-    @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
+    public MessageResource invite(@RequestBody NewUserRequest newUserRequest) {
         try {
             if (!serverAuthProperties.isOpenRegistration()) {
                 return MessageResource.errorMessage("Registration is disabled.");
             }
 
-            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8);
             if (mailAttemptService.isBlocked(newUserRequest.email)) {
                 return MessageResource.successMessage("Done");
             }
