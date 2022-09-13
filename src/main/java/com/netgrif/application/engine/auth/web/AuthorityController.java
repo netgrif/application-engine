@@ -8,9 +8,9 @@ import com.netgrif.application.engine.auth.web.requestbodies.NewAuthorityRequest
 import com.netgrif.application.engine.auth.web.responsebodies.AuthorityResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessage;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,10 +18,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Locale;
 
 @Slf4j
 @RestController
@@ -31,7 +28,7 @@ import java.util.Locale;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Authority"})
+@Tag(name = "Authority")
 public class AuthorityController {
 
     @Autowired
@@ -40,7 +37,7 @@ public class AuthorityController {
     @Authorizations(value = {
             @Authorize(authority = "AUTHORITY_DELETE")
     })
-    @ApiOperation(value = "Delete authority", authorizations = @Authorization("BasicAuth"))
+    @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource delete(@PathVariable String name) {
         try {
@@ -56,7 +53,7 @@ public class AuthorityController {
     @Authorizations(value = {
             @Authorize(authority = "AUTHORITY_CREATE")
     })
-    @ApiOperation(value = "Delete authority", authorizations = @Authorization("BasicAuth"))
+    @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<Authority> create(@RequestBody NewAuthorityRequest request) {
         try {

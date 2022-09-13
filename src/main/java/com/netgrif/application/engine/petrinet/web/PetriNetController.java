@@ -18,8 +18,6 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -131,7 +129,7 @@ public class PetriNetController {
     @Authorizations(value = {
             @Authorize(authority = "PROCESS_VIEW_MY")
     })
-    @Operation(value = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(description = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResources getMy(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
@@ -215,7 +213,6 @@ public class PetriNetController {
     @Authorizations(value = {
             @Authorize(authority = "PROCESS_DELETE_ALL")
     })
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -242,8 +239,8 @@ public class PetriNetController {
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements")
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
     })
     @RequestMapping(value = "/my/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deleteMyPetriNet(@PathVariable("id") String processId, Authentication auth) {
