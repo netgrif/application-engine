@@ -35,9 +35,13 @@ public class TextFieldBuilder extends FieldBuilder {
                 value = field.getValue() != null ? formatDateTime(field) : "";
                 break;
             case NUMBER:
-                double number = field.getValue() != null ? (double) field.getValue() : 0.0;
-                NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
-                value = nf2.format(number);
+                if (field.getValue() != null) {
+                    double number = (double) field.getValue();
+                    NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
+                    value = nf2.format(number);
+                } else {
+                    value = "";
+                }
                 break;
             case FILE:
                 value = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue()).getName()) : "";
