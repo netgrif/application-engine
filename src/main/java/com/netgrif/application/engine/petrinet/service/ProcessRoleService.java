@@ -44,16 +44,16 @@ public class ProcessRoleService implements IProcessRoleService {
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
 
-    public ProcessRoleService(IUserService userService, ProcessRoleRepository processRoleRepository,
+    public ProcessRoleService(ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
-                              @Lazy IPetriNetService petriNetService, ISecurityContextService securityContextService) {
-        this.userService = userService;
+                              @Lazy IPetriNetService petriNetService, @Lazy IUserService userService, ISecurityContextService securityContextService) {
         this.processRoleRepository = processRoleRepository;
         this.netRepository = netRepository;
         this.publisher = publisher;
         this.roleActionsRunner = roleActionsRunner;
         this.petriNetService = petriNetService;
+        this.userService = userService;
         this.securityContextService = securityContextService;
     }
 
