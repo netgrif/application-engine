@@ -2,6 +2,7 @@ package com.netgrif.application.engine.orgstructure.groups
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -43,10 +44,13 @@ class NextGroupServiceTest {
     @Autowired
     TestHelper testHelper
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     @Test
     void groupTest() {
         testHelper.truncateDbs()
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
+        def auths = importHelper.createAuthorities(["user": authorityProperties.defaultUserAuthorities, "admin": authorityProperties.defaultAdminAuthorities])
         importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: "password", state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[],
                 [] as ProcessRole[])

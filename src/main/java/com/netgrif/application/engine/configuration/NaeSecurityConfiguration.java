@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.AuthorityProperties;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
@@ -72,6 +73,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     protected NaeLdapProperties ldapProperties;
+
+    @Autowired
+    private AuthorityProperties authorityProperties;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
 
@@ -157,7 +161,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        List<Authority> authorities = authorityService.getOrCreate(Authority.defaultAnonymousAuthorities);
+        List<Authority> authorities = authorityService.getOrCreate(authorityProperties.getDefaultAnonymousAuthorities());
         authorities.forEach(a -> a.setUsers(new HashSet<>()));
         return new PublicAuthenticationFilter(
                 authenticationManager(),

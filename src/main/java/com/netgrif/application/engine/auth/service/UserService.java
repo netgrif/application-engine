@@ -121,17 +121,13 @@ public class UserService extends AbstractUserService {
 
     public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<>();
-            Authority.defaultUserAuthorities.forEach(a -> authorities.addAll(authorityService.findByScope(a)));
-            user.setAuthorities(authorities);
+            user.setAuthorities(authorityService.getDefaultUserAuthorities());
         }
     }
 
     public void addAnonymousAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<>();
-            Authority.defaultAnonymousAuthorities.forEach(a -> authorities.add(authorityService.findByName(a)));
-            user.setAuthorities(authorities);
+            user.setAuthorities(authorityService.getDefaultAnonymousAuthorities());
         }
     }
 
@@ -264,7 +260,7 @@ public class UserService extends AbstractUserService {
     @Override
     public void assignAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
-        Optional<Authority> authority = authorityService.findById(authorityId);
+        Optional<Authority> authority = authorityService.findOptionalByName(authorityId);
 
         if (user.isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
@@ -280,7 +276,7 @@ public class UserService extends AbstractUserService {
     @Override
     public void removeAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
-        Optional<Authority> authority = authorityService.findById(authorityId);
+        Optional<Authority> authority = authorityService.findOptionalByName(authorityId);
 
         if (user.isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -79,6 +80,9 @@ class RemoveActionTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private MockMvc mvc
     private PetriNet petriNet
     private Authentication auth
@@ -97,7 +101,7 @@ class RemoveActionTest {
 
         this.petriNet = net.getNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
+        def auths = importHelper.createAuthorities(["user": authorityProperties.defaultUserAuthorities, "admin": authorityProperties.defaultAdminAuthorities])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],

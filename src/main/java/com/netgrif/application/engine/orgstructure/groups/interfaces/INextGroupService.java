@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.orgstructure.groups.interfaces;
 
 import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -58,4 +59,5 @@ public interface INextGroupService {
 
     Set<String> getAllCoMembers(IUser user);
 
+    Set<Group> getGroupsOfUser(String userId);
 }

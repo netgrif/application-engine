@@ -24,12 +24,6 @@ public class AnonymousUser extends User {
     }
 
     @Override
-    @Cacheable("authorities")
-    public Set<Authority> getAuthorities() {
-        return super.getAuthorities();
-    }
-
-    @Override
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());

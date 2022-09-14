@@ -1,6 +1,7 @@
 package com.netgrif.application.engine;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.AuthorityProperties;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import org.bson.types.ObjectId;
@@ -18,8 +19,11 @@ public class MockService {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Autowired
+    private AuthorityProperties authorityProperties;
+
     public LoggedUser mockLoggedUser() {
-        List<Authority> authorityUser = authorityService.getOrCreate(Authority.defaultUserAuthorities);
+        List<Authority> authorityUser = authorityService.getOrCreate(authorityProperties.getDefaultUserAuthorities());
         return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", authorityUser);
     }
 }

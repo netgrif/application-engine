@@ -3,6 +3,7 @@ package com.netgrif.application.engine.elastic
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
@@ -86,6 +87,9 @@ class ElasticSearchTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private Authentication auth
     private MockMvc mvc
     private String netId, netId2
@@ -109,7 +113,7 @@ class ElasticSearchTest {
         netId2 = net2.getStringId()
 
 //        def org = importHelper.createGroup("Test")
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
+        def auths = importHelper.createAuthorities(["user": authorityProperties.defaultUserAuthorities, "admin": authorityProperties.defaultAdminAuthorities])
 //        def processRoles = importHelper.getProcessRoles(net.get())
         def testUser = importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[],

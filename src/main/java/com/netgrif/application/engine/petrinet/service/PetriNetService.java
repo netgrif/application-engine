@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.netgrif.application.engine.auth.domain.AuthorizingObject;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.CacheProperties;
@@ -412,7 +413,7 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query query_total = new Query();
 
-        if (user.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("PROCESS_VIEW_ALL")))
+        if (user.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(AuthorizingObject.PROCESS_VIEW_ALL.name())))
             query.addCriteria(getProcessRolesCriteria(user));
 
         criteria.forEach((key, value) -> {

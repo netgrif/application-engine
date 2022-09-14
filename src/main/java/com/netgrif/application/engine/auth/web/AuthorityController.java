@@ -77,7 +77,7 @@ public class AuthorityController {
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<Authority> getOne(@PathVariable("name") String name, Authentication auth) {
-        Optional<Authority> authority = authorityService.findById(name);
+        Optional<Authority> authority = authorityService.findOptionalByName(name);
         if (authority.isPresent()) {
             return AuthorityResource.of(authority.get());
         } else {

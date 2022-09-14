@@ -2,6 +2,7 @@ package com.netgrif.application.engine.event
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.domain.User
@@ -62,6 +63,9 @@ class GroovyShellFactoryTest {
     @Autowired
     private IUserService userService
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private PetriNet net
 
 
@@ -81,7 +85,7 @@ class GroovyShellFactoryTest {
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["systemAdmin": [Authority.defaultAdminAuthority]])
+        def auths = importHelper.createAuthorities(["systemAdmin": authorityProperties.defaultAdminAuthorities])
         importHelper.createUser(new User(name: "Admin", surname: "User", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
                 auths.get("systemAdmin").toArray() as Authority[],
                 [] as ProcessRole[])

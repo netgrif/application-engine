@@ -19,10 +19,17 @@ public class CacheProperties {
 
     private String petriNetCache = "petriNetCache";
 
+    private String defaultAdminAuthoritiesCache = "defaultAdminAuthoritiesCache";
+
+    private String defaultUserAuthoritiesCache = "defaultUserAuthoritiesCache";
+
+    private String defaultAnonymousAuthoritiesCache = "defaultAnonymousAuthoritiesCache";
+
     private List<String> additional = new ArrayList<>();
 
     public Set<String> getAllCaches() {
-        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetNewest, petriNetCache));
+        Set<String> caches = new LinkedHashSet<>(Arrays.asList(petriNetById, petriNetByIdentifier, petriNetNewest, petriNetCache,
+                defaultAdminAuthoritiesCache, defaultUserAuthoritiesCache, defaultAnonymousAuthoritiesCache));
         caches.addAll(additional);
         return caches;
     }

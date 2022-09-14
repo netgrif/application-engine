@@ -1,9 +1,6 @@
 package com.netgrif.application.engine.auth.web;
 
-import com.netgrif.application.engine.auth.domain.Authorizations;
-import com.netgrif.application.engine.auth.domain.Authorize;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
@@ -127,7 +124,7 @@ public class UserController {
     public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small != null && small;
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!loggedUser.hasAuthority("USER_VIEW_ALL") && !Objects.equals(loggedUser.getId(), userId)) {
+        if (!loggedUser.hasAuthority(AuthorizingObject.USER_VIEW_ALL.name()) && !Objects.equals(loggedUser.getId(), userId)) {
             log.info("User " + loggedUser.getUsername() + " trying to get another user with ID " + userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
@@ -152,7 +149,7 @@ public class UserController {
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         IUser user = userService.resolveById(userId, false);
-        if (user == null || (!loggedUser.hasAuthority("USER_EDIT_ALL") && !Objects.equals(loggedUser.getId(), userId)))
+        if (user == null || (!loggedUser.hasAuthority(AuthorizingObject.USER_EDIT_SELF.name()) && !Objects.equals(loggedUser.getId(), userId)))
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + (user != null ? user.transformToLoggedUser().getUsername() : null));
 
         user = userService.update(user, updates);

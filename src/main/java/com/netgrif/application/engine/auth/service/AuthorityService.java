@@ -1,18 +1,18 @@
 package com.netgrif.application.engine.auth.service;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.AuthorityProperties;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
-import org.bson.types.ObjectId;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service to manage authorities in NAE
@@ -25,6 +25,14 @@ public class AuthorityService implements IAuthorityService {
      * */
     @Autowired
     private AuthorityRepository repository;
+
+    /**
+     * Property class for authorities
+     * */
+    @Autowired
+    private AuthorityProperties authorityProperties;
+
+    private static final String SCOPE_SUFFIX = "*";
 
     /**
      * Retrieve all authorities from database
@@ -106,11 +114,13 @@ public class AuthorityService implements IAuthorityService {
     @Override
     public List<Authority> findByScope(String scope) {
         List<Authority> authorities;
-        if (scope.equals("*"))
+        if (scope.equals(SCOPE_SUFFIX))
             authorities = repository.findAll();
-        else {
-            String prefix = scope.replace("*", "");
+        else if (isScope(scope)) {
+            String prefix = scope.replace(SCOPE_SUFFIX, Strings.EMPTY);
             authorities = repository.findAllByNameStartsWith(prefix);
+        } else {
+            authorities = Collections.singletonList(repository.findByName(scope));
         }
         return authorities;
     }
@@ -138,21 +148,38 @@ public class AuthorityService implements IAuthorityService {
      * @return optional of authority
      * */
     @Override
-    public Optional<Authority> findById(String id) {
+    public Optional<Authority> findOptionalByName(String id) {
         return Optional.of(repository.findByName(id));
     }
 
     /**
-     * Returns authority from database based on provided ID if exists
-     * @param id of authority to be retrieved
-     * @return authority object
+     * Returns the default authorities for simple user
+     * @return list of authorities
      * */
     @Override
-    public Authority getOne(String id) {
-        Optional<Authority> authority = repository.findById(id);
-        if (authority.isEmpty())
-            throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
-        return authority.get();
+    @Cacheable("defaultUserAuthoritiesCache")
+    public Set<Authority> getDefaultUserAuthorities() {
+        return authorityProperties.getDefaultUserAuthorities().stream().map(this::findByScope).flatMap(Collection::stream).collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns the default authorities for anonymous user
+     * @return list of authorities
+     * */
+    @Override
+    @Cacheable("defaultAnonymousAuthoritiesCache")
+    public Set<Authority> getDefaultAnonymousAuthorities() {
+        return authorityProperties.getDefaultAnonymousAuthorities().stream().map(this::findByScope).flatMap(Collection::stream).collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns the default authorities for admin user
+     * @return list of authorities
+     * */
+    @Override
+    @Cacheable("defaultAdminAuthoritiesCache")
+    public Set<Authority> getDefaultAdminAuthorities() {
+        return authorityProperties.getDefaultAdminAuthorities().stream().map(this::findByScope).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     /**
@@ -161,11 +188,8 @@ public class AuthorityService implements IAuthorityService {
      * @return boolean whether the provided name is valid scope name
      * */
     private boolean isScope(String authorityName) {
-        if (authorityName.endsWith("*"))
-            return true;
-        else if (authorityName.contains("*"))
+        if (authorityName.contains(SCOPE_SUFFIX) && authorityName.indexOf(SCOPE_SUFFIX) != authorityName.length() - 1)
             throw new IllegalArgumentException("The authority name or scope is not valid.");
-        else
-            return false;
+        else return authorityName.endsWith(SCOPE_SUFFIX);
     }
 }

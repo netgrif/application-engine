@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.roles
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.importer.service.Importer
@@ -77,6 +78,9 @@ class ProcessRoleTest {
     @Autowired
     TestHelper testHelper
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -91,7 +95,7 @@ class ProcessRoleTest {
 
         String netId = net.getNet().getStringId()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities, "admin": [Authority.defaultAdminAuthority]])
+        def auths = importHelper.createAuthorities(["user": authorityProperties.defaultUserAuthorities, "admin": authorityProperties.defaultAdminAuthorities])
         def processRoles = userProcessRoleRepository.findAllByNetId(netId)
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],

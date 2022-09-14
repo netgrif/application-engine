@@ -73,6 +73,9 @@ public class TaskServiceTest {
     @Autowired
     private SuperCreator superCreator;
 
+    @Autowired
+    private AuthorityProperties authorityProperties;
+
     @BeforeEach
     public void setUp() throws Exception {
         mongoTemplate.getDb().drop();
@@ -130,7 +133,7 @@ public class TaskServiceTest {
     }
 
     public LoggedUser mockLoggedUser() {
-        List<Authority> authorityUser = authorityService.getOrCreate(Authority.defaultUserAuthorities);
+        List<Authority> authorityUser = authorityService.getOrCreate(authorityProperties.getDefaultUserAuthorities());
         return new LoggedUser(new ObjectId().toString(), "super@netgrif.com", "password", authorityUser);
     }
 }

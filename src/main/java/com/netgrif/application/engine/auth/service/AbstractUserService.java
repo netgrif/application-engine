@@ -47,16 +47,14 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<>();
-            Authority.defaultUserAuthorities.forEach(a -> authorities.addAll(authorityService.findByScope(a)));
-            user.setAuthorities(authorities);
+            user.setAuthorities(authorityService.getDefaultUserAuthorities());
         }
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
+    public void assignAuthority(String userId, String authorityName) {
         IUser user = resolveById(userId, true);
-        Authority authority = authorityService.getOne(authorityId);
+        Authority authority = authorityService.findByName(authorityName);
         user.addAuthority(authority);
         authority.addUser(user);
 
@@ -64,9 +62,9 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     @Override
-    public void removeAuthority(String userId, String authorityId) {
+    public void removeAuthority(String userId, String authorityName) {
         IUser user = resolveById(userId, true);
-        Authority authority = authorityService.getOne(authorityId);
+        Authority authority = authorityService.findByName(authorityName);
         user.removeAuthority(authority);
         authority.removeUser(user);
 

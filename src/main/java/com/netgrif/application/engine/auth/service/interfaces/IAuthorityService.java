@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.auth.service.interfaces;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Interface for managing authorities in NAE
@@ -35,7 +37,7 @@ public interface IAuthorityService {
      * @param id of authority
      * @return optional of authority object
      * */
-    Optional<Authority> findById(String id);
+    Optional<Authority> findOptionalByName(String name);
 
     /**
      * Returns or creates authority of given name if it does not exist.
@@ -64,10 +66,9 @@ public interface IAuthorityService {
      * */
     void delete(String name);
 
-    /**
-     * Returns authority based on ID
-     * @param id of authority to be retrieved
-     * @return authority object
-     * */
-    Authority getOne(String id);
+    Set<Authority> getDefaultUserAuthorities();
+
+    Set<Authority> getDefaultAnonymousAuthorities();
+
+    Set<Authority> getDefaultAdminAuthorities();
 }

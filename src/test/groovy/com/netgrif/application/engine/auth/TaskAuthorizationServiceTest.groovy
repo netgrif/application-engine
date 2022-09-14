@@ -2,6 +2,7 @@ package com.netgrif.application.engine.auth
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
@@ -104,6 +105,9 @@ class TaskAuthorizationServiceTest {
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private String taskId
     private String taskId2
 
@@ -167,7 +171,7 @@ class TaskAuthorizationServiceTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.defaultUserAuthorities])
+        def auths = importHelper.createAuthorities(["user": authorityProperties.defaultUserAuthorities])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 auths.get("user").toArray() as Authority[], [] as ProcessRole[])
     }

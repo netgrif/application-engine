@@ -66,12 +66,7 @@ public class GroupController {
     })
     public GroupsResource getMyGroups(Authentication auth) {
         String loggedUserId = ((LoggedUser)auth.getPrincipal()).getId();
-        List<Case> groups = service.findAllGroups();
-        Set<Group> groupResponse = groups.stream()
-                .filter(aCase -> aCase.getAuthor().getId().equals(loggedUserId))
-                .map(aCase -> new Group(aCase.getStringId(), aCase.getTitle()))
-                .collect(Collectors.toCollection(HashSet::new));
-        return new GroupsResource(groupResponse);
+        return new GroupsResource(service.getGroupsOfUser(loggedUserId));
     }
 
     @Authorize(authority = "GROUP_MEMBERSHIP_SELF")
