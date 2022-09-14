@@ -34,13 +34,13 @@ public abstract class AbstractUser implements IUser {
     }
 
     public void addAuthority(Authority authority) {
-        if (authorities.stream().anyMatch(it -> it.get_id().equals(authority.get_id())))
+        if (authorities.stream().anyMatch(it -> it.getName().equals(authority.getName())))
             return;
         authorities.add(authority);
     }
 
     public void removeAuthority(Authority authority) {
-        if (authorities.stream().noneMatch(it -> it.get_id().equals(authority.get_id())))
+        if (authorities.stream().noneMatch(it -> it.getName().equals(authority.getName())))
             return;
         authorities.remove(authority);
     }

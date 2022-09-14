@@ -58,7 +58,7 @@ public class FilterController {
     @Operation(summary = "Delete filter specified by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Authorize(authority = "FILTER_DELETE_ALL")
-    @Authorize(authority = "FILTER_DELETE_MY")
+    @Authorize(authority = "FILTER_DELETE_OWN")
     public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         boolean success = filterService.deleteFilter(filterId, loggedUser);

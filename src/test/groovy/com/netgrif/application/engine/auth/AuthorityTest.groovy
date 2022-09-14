@@ -18,9 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -90,6 +92,7 @@ class AuthorityTest {
     @Test
     void testCreateAuthority() {
         authentication = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSWORD)
+        authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         def content = JsonOutput.toJson(["name": "TEST_AUTHORITY"])
 
@@ -114,6 +117,7 @@ class AuthorityTest {
         assert a != null
 
         authentication = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSWORD)
+        authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         mvc.perform(MockMvcRequestBuilders.delete(AUTHORITY_DELETE_API.replace("{name}", "TEST_AUTHORITY"))
                 .accept(MediaTypes.HAL_JSON_VALUE)
@@ -133,6 +137,7 @@ class AuthorityTest {
     @Test
     void testAssignAuthorityToUser() {
         authentication = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, ADMIN_PASSWORD)
+        authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         IUser user = userService.findByEmail(USER_EMAIL, false)
         Authority testAuthority = authorityService.getOrCreate("CREATED_AUTHORITY")
@@ -156,6 +161,7 @@ class AuthorityTest {
     @Test
     void testRemoveAuthorityFromUser() {
         authentication = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, ADMIN_PASSWORD)
+        authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         IUser user = userService.findByEmail(USER_EMAIL, false)
         Authority testAuthority = authorityService.getOrCreate("TEST_AUTHORITY")

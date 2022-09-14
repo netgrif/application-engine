@@ -55,7 +55,7 @@ public class GroupController {
         return new GroupsResource(groupResponse);
     }
 
-    @Authorize(authority = "GROUP_VIEW_MY")
+    @Authorize(authority = "GROUP_VIEW_OWN")
     @Operation(summary = "Get logged user's groups in the system",
             description = "Caller must have the GROUP_VIEW_MY authority",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -74,7 +74,7 @@ public class GroupController {
         return new GroupsResource(groupResponse);
     }
 
-    @Authorize(authority = "GROUP_MEMBERSHIP_MY")
+    @Authorize(authority = "GROUP_MEMBERSHIP_SELF")
     @Operation(summary = "Get logged user's groups in the system",
             description = "Caller must have the GROUP_VIEW_MY authority",
             security = {@SecurityRequirement(name = "BasicAuth")})

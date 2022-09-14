@@ -139,7 +139,7 @@ public class AuthorityService implements IAuthorityService {
      * */
     @Override
     public Optional<Authority> findById(String id) {
-        return Optional.of(repository.findBy_id(new ObjectId(id)));
+        return Optional.of(repository.findByName(id));
     }
 
     /**

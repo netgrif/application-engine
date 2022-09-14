@@ -62,9 +62,7 @@ public class PublicTaskController extends AbstractTaskController {
         return this.taskService.findAllByCase(caseId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(expression = "@taskAuthorizationService.canCallAssign(@userService.getAnonymousLogged(), #taskId)")
-    })
+    @Authorize(expression = "@taskAuthorizationService.canCallAssign(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/assign/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Assign task", description = "Caller must be able to perform the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -79,9 +77,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.assign(loggedUser, taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(expression = "@taskAuthorizationService.canCallFinish(@userService.getAnonymousLogged(), #taskId)")
-    })
+    @Authorize(expression = "@taskAuthorizationService.canCallFinish(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/finish/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Finish task", description = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -96,9 +92,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.finish(loggedUser, taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(expression = "@taskAuthorizationService.canCallCancel(@userService.getAnonymousLogged(), #taskId)")
-    })
+    @Authorize(expression = "@taskAuthorizationService.canCallCancel(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/cancel/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Cancel task", description = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -119,9 +113,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")
-    })
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")
     @PostMapping(value = "/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
     @Operation(summary = "Set task data", description = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -135,9 +127,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody, locale);
     }
 
-    @Authorizations(value = {
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
-    })
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @PostMapping(value = "/{id}/file/{field}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -173,9 +163,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getFilePreview(taskId, fieldId);
     }
 
-    @Authorizations(value = {
-            @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
-    })
+    @Authorize(expression = "@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @PostMapping(value = "/{id}/files/{field}", produces = MediaTypes.HAL_JSON_VALUE)

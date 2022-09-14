@@ -12,8 +12,5 @@ import java.util.List;
 public interface AuthorityRepository extends MongoRepository<Authority, String>, QuerydslPredicateExecutor<Authority> {
 
     Authority findByName(String name);
-
-    Authority findBy_id(ObjectId id);
-
     List<Authority> findAllByNameStartsWith(String prefix);
 }

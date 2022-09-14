@@ -16,6 +16,6 @@ public class AuthorityResource extends EntityModel<Authority> {
 
     private void buildLinks() {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
-                .methodOn(AuthorityController.class).getAll()).withRel("getAll"));
+                .methodOn(AuthorityController.class).getAll(null)).withRel("getAll"));
     }
 }

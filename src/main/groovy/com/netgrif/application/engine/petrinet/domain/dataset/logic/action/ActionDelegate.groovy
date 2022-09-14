@@ -1256,7 +1256,7 @@ class ActionDelegate {
     }
 
     @Authorizations(value = [
-            @Authorize(authority = "USER_DELETE")
+            @Authorize(authority = "USER_DELETE_ALL")
     ])
     void deleteUser(String email) {
         IUser user = userService.findByEmail(email, false)
@@ -1266,7 +1266,7 @@ class ActionDelegate {
     }
 
     @Authorizations(value = [
-            @Authorize(authority = "USER_DELETE")
+            @Authorize(authority = "USER_DELETE_ALL")
     ])
     void deleteUser(IUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()

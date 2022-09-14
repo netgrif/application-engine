@@ -43,30 +43,36 @@ public class BaseAuthorizationServiceAspect implements IBaseAuthorizationService
     }
 
     /**
-     * Pointcut definition for {@link Authorizations} annotation to connect authorization requests from join points to the
-     * {@link #authorize(ProceedingJoinPoint, Authorizations)} advice.
-     * @param authorizations the annotation with authorization requirements
-     * */
-    @Pointcut(value = "@annotation(authorizations))")
-    protected final void authorizingMethod(Authorizations authorizations) {}
-
-
-    /**
-     * The advice that handles incoming authorization requests from join points from
-     * {@link #authorizingMethod(Authorizations)} pointcuts
+     * The advice that handles incoming authorization requests from join points defined with @annotation(authorization)
      * @param joinPoint the incoming method invocation join point
      * @param authorizations the incoming annotation with authorization parameters
      * */
-    @Around(value = "authorizingMethod(authorizations)", argNames = "joinPoint,authorizations")
+    @Around(value = "@annotation(authorizations)", argNames = "joinPoint,authorizations")
     protected final Object authorize(ProceedingJoinPoint joinPoint, Authorizations authorizations) throws Throwable {
         boolean result = false;
-
         if (authorizations.value() != null && authorizations.value().length > 0) {
             for (Authorize authorize : authorizations.value()) {
                 result = result || (isAllowedByExpression(joinPoint, authorize.expression()) && hasAnyAuthority(authorize.authority()));
             }
         }
+        if (result) {
+            return joinPoint.proceed();
+        } else {
+            throw new AccessDeniedException("Access Denied. User does not have required authorization level.");
+        }
+    }
 
+    /**
+     * The advice that handles incoming authorization requests from join points defined with @annotation(authorization)
+     * @param joinPoint the incoming method invocation join point
+     * @param authorize the incoming annotation with authorization parameter
+     * */
+    @Around(value = "@annotation(authorize)", argNames = "joinPoint,authorize")
+    protected final Object authorize(ProceedingJoinPoint joinPoint, Authorize authorize) throws Throwable {
+        boolean result = false;
+        if (authorize != null) {
+            result = isAllowedByExpression(joinPoint, authorize.expression()) && hasAnyAuthority(authorize.authority());
+        }
         if (result) {
             return joinPoint.proceed();
         } else {
@@ -81,7 +87,7 @@ public class BaseAuthorizationServiceAspect implements IBaseAuthorizationService
      * */
     @Override
     public final boolean hasAnyAuthority(String[] authorizingObject) {
-        if (authorizingObject == null || authorizingObject.length == 0)
+        if (authorizingObject == null || authorizingObject.length == 0 || Arrays.stream(authorizingObject).allMatch(s -> s.length() == 0))
             return true;
         Set<String> loggedUserAuthorities = this.userService.getLoggedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
         return loggedUserAuthorities.containsAll(Arrays.asList(authorizingObject));

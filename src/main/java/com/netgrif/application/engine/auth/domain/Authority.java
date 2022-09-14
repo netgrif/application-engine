@@ -16,7 +16,8 @@ public class Authority implements GrantedAuthority {
     public static final long serialVersionUID = 2839744057647464485L;
 
     public static final String defaultAdminAuthority = "*";
-    public static final List<String> defaultUserAuthorities = Arrays.asList("FILTER_*", "GROUP_VIEW_MY");
+    public static final List<String> defaultUserAuthorities = Arrays.asList("FILTER_*",
+            AuthorizingObject.GROUP_VIEW_OWN.name());
     public static final List<String> defaultAnonymousAuthorities = Collections.emptyList();
 
     @Id

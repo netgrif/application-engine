@@ -91,9 +91,7 @@ public class UserController {
         return result;
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "USER_VIEW_ALL")
-    })
+    @Authorize(authority = "USER_VIEW_ALL")
     @Operation(summary = "Get all users", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
@@ -179,9 +177,7 @@ public class UserController {
         return resources;
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "USER_EDIT_ALL", expression = "@userService.isLogged(#userId)")
-    })
+    @Authorize(authority = "USER_EDIT_ALL", expression = "@userService.isLogged(#userId)")
     @Operation(summary = "Assign role to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
@@ -199,9 +195,7 @@ public class UserController {
         }
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "AUTHORITY_VIEW_ALL")
-    })
+    @Authorize(authority = "AUTHORITY_VIEW_ALL")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -214,9 +208,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "USER_EDIT_ALL")
-    })
+    @Authorize(authority = "USER_EDIT_ALL")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -243,9 +235,7 @@ public class UserController {
         return new PreferencesResource(preferences);
     }
 
-    @Authorizations(value = {
-            @Authorize(authority = "USER_EDIT_ALL")
-    })
+    @Authorize(authority = "USER_EDIT_ALL")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the USER_EDIT authority",
             security = {@SecurityRequirement(name = "BasicAuth")})

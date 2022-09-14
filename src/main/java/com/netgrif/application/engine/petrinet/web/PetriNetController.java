@@ -115,7 +115,7 @@ public class PetriNetController {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
-    @Authorize(authority = "PROCESS_VIEW_MY")
+    @Authorize(authority = "PROCESS_VIEW_OWN")
     @Operation(description = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResources getMy(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
@@ -217,7 +217,7 @@ public class PetriNetController {
         return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
     }
 
-    @Authorize(authority = "PROCESS_DELETE_MY")
+    @Authorize(authority = "PROCESS_DELETE_OWN")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})

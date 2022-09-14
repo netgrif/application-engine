@@ -19,6 +19,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class AuthorityController {
     @Authorize(authority = "AUTHORITY_DELETE")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/delete/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource delete(@PathVariable String name) {
+    public MessageResource delete(@PathVariable String name, Authentication auth) {
         try {
             authorityService.delete(name);
             log.info("Authority [" + name + "] has been deleted successfully.");
@@ -54,7 +55,7 @@ public class AuthorityController {
     @Authorize(authority = "AUTHORITY_CREATE")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<Authority> create(@RequestBody NewAuthorityRequest request) {
+    public EntityModel<Authority> create(@RequestBody NewAuthorityRequest request, Authentication auth) {
         try {
             Authority authority = authorityService.getOrCreate(request.name);
             log.info("Authority [" + authority + "] has been created successfully.");
@@ -68,14 +69,14 @@ public class AuthorityController {
     @Authorize(authority = "AUTHORITY_GET_ALL")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/all", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CollectionModel<Authority> getAll() {
+    public CollectionModel<Authority> getAll(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @Authorize(authority = "AUTHORITY_CREATE")
+    @Authorize(authority = "AUTHORITY_VIEW")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{name}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public EntityModel<Authority> getOne(@PathVariable("name") String name) {
+    public EntityModel<Authority> getOne(@PathVariable("name") String name, Authentication auth) {
         Optional<Authority> authority = authorityService.findById(name);
         if (authority.isPresent()) {
             return AuthorityResource.of(authority.get());
@@ -85,10 +86,10 @@ public class AuthorityController {
         }
     }
 
-    @Authorize(authority = "AUTHORITY_CREATE")
+    @Authorize(authority = "AUTHORITY_VIEW")
     @Operation(description = "Delete authority", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/scope/{scope}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CollectionModel<Authority> getAllByScope(@PathVariable("scope") String scope) {
+    public CollectionModel<Authority> getAllByScope(@PathVariable("scope") String scope, Authentication auth) {
         return new AuthoritiesResources(authorityService.findByScope(scope));
     }
 }
