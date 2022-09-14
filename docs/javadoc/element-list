@@ -101,6 +101,7 @@ com.netgrif.application.engine.petrinet.domain.events
 com.netgrif.application.engine.petrinet.domain.layout
 com.netgrif.application.engine.petrinet.domain.policies
 com.netgrif.application.engine.petrinet.domain.repositories
+com.netgrif.application.engine.petrinet.domain.repository
 com.netgrif.application.engine.petrinet.domain.roles
 com.netgrif.application.engine.petrinet.domain.throwable
 com.netgrif.application.engine.petrinet.domain.version
