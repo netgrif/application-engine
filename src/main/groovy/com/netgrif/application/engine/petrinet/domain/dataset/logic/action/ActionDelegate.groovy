@@ -1140,9 +1140,8 @@ class ActionDelegate {
         mailService.sendMail(mailDraft)
     }
 
-    @Authorizations(value = [
-        @Authorize(authority = "USER_EDIT")
-    ])
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().email.equals(#email)")
     def changeUserByEmail(String email) {
         [email  : { cl ->
             changeUserByEmail(email, "email", cl)
@@ -1159,9 +1158,8 @@ class ActionDelegate {
         ]
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_EDIT")
-    ])
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().stringId.equals(#id)")
     def changeUser(String id) {
         [email  : { cl ->
             changeUser(id, "email", cl)
@@ -1178,9 +1176,8 @@ class ActionDelegate {
         ]
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_EDIT")
-    ])
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_OWN", expression = "@userService.getLoggedUser().stringId.equals(#user.getStringId())")
     def changeUser(IUser user) {
         [email  : { cl ->
             changeUser(user, "email", cl)
@@ -1197,25 +1194,22 @@ class ActionDelegate {
         ]
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_EDIT")
-    ])
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().email.equals(#email)")
     def changeUserByEmail(String email, String attribute, def cl) {
         IUser user = userService.findByEmail(email, false)
         changeUser(user, attribute, cl)
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_EDIT")
-    ])
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().stringId.equals(#id)")
     def changeUser(String id, String attribute, def cl) {
         IUser user = userService.findById(id, false)
         changeUser(user, attribute, cl)
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_EDIT")
-    ])
+    @Authorize(authority = "USER_EDIT_ALL")
+    @Authorize(authority = "USER_EDIT_SELF", expression = "@userService.getLoggedUser().stringId.equals(#user.getStringId())")
     def changeUser(IUser user, String attribute, def cl) {
         if (user == null) {
             log.error("Cannot find user.")
@@ -1231,9 +1225,7 @@ class ActionDelegate {
         userService.save(user)
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_CREATE")
-    ])
+    @Authorize(authority = "USER_CREATE")
     MessageResource inviteUser(String email) {
         NewUserRequest newUserRequest = new NewUserRequest()
         newUserRequest.email = email
@@ -1242,9 +1234,7 @@ class ActionDelegate {
         return inviteUser(newUserRequest)
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_CREATE")
-    ])
+    @Authorize(authority = "USER_CREATE")
     MessageResource inviteUser(NewUserRequest newUserRequest) {
         IUser user = registrationService.createNewUser(newUserRequest);
         if (user == null)
@@ -1255,9 +1245,7 @@ class ActionDelegate {
         return MessageResource.successMessage("Done");
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_DELETE_ALL")
-    ])
+    @Authorize(authority = "USER_DELETE")
     void deleteUser(String email) {
         IUser user = userService.findByEmail(email, false)
         if (user == null)
@@ -1265,9 +1253,7 @@ class ActionDelegate {
         deleteUser(user)
     }
 
-    @Authorizations(value = [
-            @Authorize(authority = "USER_DELETE_ALL")
-    ])
+    @Authorize(authority = "USER_DELETE")
     void deleteUser(IUser user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)

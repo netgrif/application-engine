@@ -177,7 +177,7 @@ public class UserController {
         return resources;
     }
 
-    @Authorize(authority = "USER_EDIT_ALL", expression = "@userService.isLogged(#userId)")
+    @Authorize(authority = "ROLE_ASSIGN_TO_USER")
     @Operation(summary = "Assign role to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
