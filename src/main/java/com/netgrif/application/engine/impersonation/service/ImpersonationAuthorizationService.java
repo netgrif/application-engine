@@ -71,12 +71,12 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public Page<Case> searchConfigs(String impersonatorId, Pageable pageable) {
-        return findCases(userService.getSystem().transformToLoggedUser(), request(impersonatorId, null), pageable);
+        return findCases(request(impersonatorId, null), pageable);
     }
 
     @Override
     public List<Case> searchConfigs(String impersonatorId, String impersonatedId) {
-        Page<Case> cases = findCases(userService.getSystem().transformToLoggedUser(), request(impersonatorId, impersonatedId), PageRequest.of(0, MAX_CONFIGS_PER_USER));
+        Page<Case> cases = findCases(request(impersonatorId, impersonatedId), PageRequest.of(0, MAX_CONFIGS_PER_USER));
         return cases.getContent();
     }
 
@@ -94,14 +94,17 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public List<ProcessRole> getRoles(List<Case> configs, IUser impersonated) {
+        List<ProcessRole> impersonatedRoles = new ArrayList<>();
+        impersonatedRoles.add(processRoleService.defaultRole());
         if (configs.isEmpty()) {
-            return new ArrayList<>();
+            return impersonatedRoles;
         }
         List<String> roleIds = (List) configs.get(0).getDataSet().get("impersonated_roles").getValue();
         roleIds = roleIds != null ? roleIds : new ArrayList<>();
-        return new ArrayList<>(processRoleService.findByIds(new HashSet<>(roleIds))).stream()
+        impersonatedRoles.addAll((processRoleService.findByIds(new HashSet<>(roleIds))).stream()
                 .filter(configRole -> impersonated.getProcessRoles().stream().anyMatch(userRole -> userRole.getStringId().equals(configRole.getStringId())))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+        return impersonatedRoles;
     }
 
     protected CaseSearchRequest request(String impersonatorId, String impersonatedId) {
@@ -129,7 +132,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         return "(" + String.join(" AND ", queries) + ")";
     }
 
-    protected Page<Case> findCases(LoggedUser impersonator, CaseSearchRequest request, Pageable pageable) {
-        return elasticCaseService.search(Collections.singletonList(request), impersonator, pageable, Locale.getDefault(), false);
+    protected Page<Case> findCases(CaseSearchRequest request, Pageable pageable) {
+        return elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), pageable, Locale.getDefault(), false);
     }
 }

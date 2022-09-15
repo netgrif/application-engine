@@ -7,6 +7,17 @@
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
+
+	<function scope="process" name="validateUser">
+		{ String ownerId ->
+			def user = userService.loggedOrSystem
+			def adminProcessRole = useCase.petriNet.roles.values().find { it.importId == "admin_imp" }
+			if (user.stringId != ownerId &amp;&amp; !user.getProcessRoles().any { it.stringId == adminProcessRole.stringId }) {
+				throw new IllegalArgumentException("User is not allowed to manipulate other users' impersonation configurations!")
+			}
+		}
+	</function>
+
 	<roleRef>
 		<id>admin_imp</id>
 		<caseLogic>
@@ -38,7 +49,7 @@
                     impersonated: f.impersonated,
                     config_owner: f.config_owner;
 
-					def user = userService.loggedUser
+					def user = userService.loggedOrSystem
 					change impersonated value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
 					change impersonated_email value { user.email }
 
@@ -146,7 +157,6 @@
 					user_select_taskRef: f.user_select_taskRef,
 					impersonators: f.impersonators;
 
-//					TODO 1678 validate logged user ID (cannot impersonate in this specific process)
 					def userSelectCase = workflowService.findOne(user_select_caseId.value)
 					def selectedUserField = userSelectCase.dataSet["select_impersonator"]
 
@@ -252,6 +262,12 @@
 				<id>impersonators</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="get">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -373,10 +389,33 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>finish</id>
 			<title>Publikovať</title>
+
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
 			<actions phase="post">
+				<action>
+					impersonated: f.impersonated;
+
+					impersonationService.endImpersonation(impersonated.value.id)
+				</action>
 				<action>
 					is_active: f.is_active;
 
@@ -413,8 +452,25 @@
 			</logic>
 		</userRef>
 
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
 			<actions phase="post">
 				<action>
 					is_active: f.is_active;
@@ -527,8 +583,26 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+
+		<event type="assign">
+			<id>assign</id>
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>finish</id>
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
 			<actions phase="post">
 				<action>
 					is_active: f.is_active;
