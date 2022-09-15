@@ -11,4 +11,6 @@ public interface AssignTaskEventLogRepository extends MongoRepository<AssignTask
     List<AssignTaskEventLog> findAllByTaskId(ObjectId taskId);
 
     List<AssignTaskEventLog> findAllByUserId(String id);
+
+    List<AssignTaskEventLog> findAllByCaseId(String caseId);
 }

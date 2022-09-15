@@ -7,7 +7,6 @@ import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
 public abstract class TaskEventLog extends CaseEventLog {
 
     @Getter
@@ -18,6 +17,10 @@ public abstract class TaskEventLog extends CaseEventLog {
 
     @Getter
     private String transitionId;
+
+    public TaskEventLog() {
+        super();
+    }
 
     protected TaskEventLog(Task task, Case useCase, EventPhase eventPhase) {
         super(task.getObjectId(), useCase, eventPhase);

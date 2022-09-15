@@ -11,11 +11,14 @@ public class DelegateTaskEventLog extends TaskEventLog{
     private String delegator;
 
     @Getter
-    private String delegatee;
+    private String delegate;
 
-    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String delegator, String delegatee) {
+    public DelegateTaskEventLog() {
+    }
+
+    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String delegator, String delegate) {
         super(task, useCase, eventPhase);
         this.delegator = delegator;
-        this.delegatee = delegatee;
+        this.delegate = delegate;
     }
 }

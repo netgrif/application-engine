@@ -12,5 +12,5 @@ public interface DelegateTaskEventLogRepository extends MongoRepository<Delegate
 
     List<DelegateTaskEventLog> findAllByTaskId(ObjectId taskId);
 
-    List<DelegateTaskEventLog> findAllByTaskIdAndDelegatee(ObjectId taskId, Long delegateeId);
+    List<DelegateTaskEventLog> findAllByTaskIdAndDelegate(ObjectId taskId, Long delegateId);
 }

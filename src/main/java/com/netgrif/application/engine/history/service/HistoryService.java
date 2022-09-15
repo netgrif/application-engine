@@ -124,6 +124,11 @@ public class HistoryService implements IHistoryService {
     }
 
     @Override
+    public List<AssignTaskEventLog> findAllAssignTaskEventLogsByCaseId(String caseId) {
+        return assignTaskEventLogRepository.findAllByCaseId(caseId);
+    }
+
+    @Override
     public List<CancelTaskEventLog> findAllCancelTaskEventLogsByTaskId(ObjectId taskId) {
         return cancelTaskEventLogRepository.findAllByTaskId(taskId);
     }
@@ -141,5 +146,10 @@ public class HistoryService implements IHistoryService {
     @Override
     public List<FinishTaskEventLog> findAllFinishTaskEventLogsByUserId(String userId) {
         return finishTaskEventLogRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public List<FinishTaskEventLog> findAllFinishTaskEventLogsByCaseId(String caseId) {
+        return finishTaskEventLogRepository.findAllByCaseId(caseId);
     }
 }

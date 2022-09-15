@@ -10,6 +10,10 @@ public class CancelTaskEventLog extends TaskEventLog {
     @Getter
     private String userId;
 
+    public CancelTaskEventLog() {
+        super();
+    }
+
     public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String userId) {
         super(task, useCase, eventPhase);
         this.userId = userId;

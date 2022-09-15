@@ -7,6 +7,10 @@ import com.netgrif.application.engine.workflow.domain.Task;
 
 public class GetDataEventLog extends TaskEventLog {
 
+    public GetDataEventLog() {
+        super();
+    }
+
     public GetDataEventLog(Task task, Case useCase, EventPhase eventPhase) {
         super(task, useCase, eventPhase);
     }

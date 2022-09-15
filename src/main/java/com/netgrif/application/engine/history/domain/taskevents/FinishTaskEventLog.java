@@ -10,6 +10,10 @@ public class FinishTaskEventLog extends TaskEventLog{
     @Getter
     private String userId;
 
+    public FinishTaskEventLog() {
+        super();
+    }
+
     public FinishTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String userId) {
         super(task, useCase, eventPhase);
         this.userId = userId;

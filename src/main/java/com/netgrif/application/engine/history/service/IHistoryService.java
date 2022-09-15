@@ -40,6 +40,8 @@ public interface IHistoryService {
 
     List<AssignTaskEventLog> findAllAssignTaskEventLogsByUserId(String userId);
 
+    List<AssignTaskEventLog> findAllAssignTaskEventLogsByCaseId(String caseId);
+
     List<CancelTaskEventLog> findAllCancelTaskEventLogsByTaskId(ObjectId taskId);
 
     List<CancelTaskEventLog> findAllCancelTaskEventLogsByUserId(String userId);
@@ -47,4 +49,6 @@ public interface IHistoryService {
     List<FinishTaskEventLog> findAllFinishTaskEventLogsByTaskId(ObjectId taskId);
 
     List<FinishTaskEventLog> findAllFinishTaskEventLogsByUserId(String userId);
+
+    List<FinishTaskEventLog> findAllFinishTaskEventLogsByCaseId(String caseId);
 }

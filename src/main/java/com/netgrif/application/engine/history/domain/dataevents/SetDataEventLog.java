@@ -16,6 +16,10 @@ public class SetDataEventLog extends TaskEventLog {
     @Getter
     private Map<String, ChangedField> changedFields;
 
+    public SetDataEventLog() {
+        super();
+    }
+
     public SetDataEventLog(Task task, Case useCase, EventPhase eventPhase, Map<String, ChangedField> changedFields) {
         super(task, useCase, eventPhase);
         this.changedFields = changedFields;
