@@ -7,6 +7,8 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
@@ -18,10 +20,12 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
+import groovy.json.JsonSlurper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,23 +33,31 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetails
+import org.springframework.session.web.http.SessionRepositoryFilter
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 class ImpersonationServiceTest {
+
+    public static final String X_AUTH_TOKEN = "x-auth-token"
 
     @Autowired
     private TestHelper testHelper
@@ -55,6 +67,9 @@ class ImpersonationServiceTest {
 
     @Autowired
     private IUserService userService
+
+    @Autowired
+    private IElasticCaseService elasticCaseService
 
     @Autowired
     private IWorkflowService workflowService
@@ -75,6 +90,9 @@ class ImpersonationServiceTest {
     private IImpersonationService impersonationService
 
     @Autowired
+    private ITaskAuthorizationService taskAuthorizationService
+
+    @Autowired
     private WebApplicationContext wac
 
     MockMvc mvc
@@ -88,10 +106,9 @@ class ImpersonationServiceTest {
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
-        mvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build()
+
+        SessionRepositoryFilter<?> filter = wac.getBean(SessionRepositoryFilter.class);
+        mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter).apply(springSecurity()).build()
 
         def testNet = helper.createNet("impersonation_test.xml").get()
         def authority = authorityService.getOrCreate(Authority.user)
@@ -127,17 +144,75 @@ class ImpersonationServiceTest {
         def testCase = createTestCase()
         def testTask1 = loadTask(testCase, "t1")
 
+        def caseReq = new CaseSearchRequest()
+        caseReq.process = [new CaseSearchRequest.PetriNet(testCase.processIdentifier)]
+        def cases = elasticCaseService.search([caseReq], userService.loggedUser.transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false)
+        assert !cases.content.isEmpty()
+
         def searchReq = new TaskSearchRequest()
         searchReq.transitionId = ["t1"]
         searchReq.useCase = [new TaskSearchCaseRequest(testCase.stringId, null)]
         def tasks = taskService.search([searchReq], PageRequest.of(0, 1), userService.loggedUser.transformToLoggedUser(), LocaleContextHolder.locale, false)
         assert tasks.content[0].stringId == testTask1.stringId
 
+        assert taskAuthorizationService.canCallAssign(userService.loggedUserFromContext, testTask1.stringId)
         taskService.assignTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
         testTask1 = reloadTask(testTask1)
         assert testTask1.userId == user2.stringId
 
+        assert taskAuthorizationService.canCallSaveData(userService.loggedUserFromContext, testTask1.stringId)
+        assert taskAuthorizationService.canCallSaveFile(userService.loggedUserFromContext, testTask1.stringId)
+
+        assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
         taskService.finishTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+    }
+
+    @Test
+    void testAuthMe() {
+        setup()
+        def result = mvc.perform(get("/api/auth/login")
+                .with(httpBasic(user1.email, "password"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn()
+        def token = result.response.getHeader(X_AUTH_TOKEN)
+
+        result = mvc.perform(post("/api/impersonate/" + user2.stringId)
+                .header(X_AUTH_TOKEN, token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn()
+
+        result = mvc.perform(get("/api/user/me")
+                .header(X_AUTH_TOKEN, token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn()
+
+        String string = result.getResponse().getContentAsString()
+        def json = new JsonSlurper().parse(string.getBytes())
+        assert json["impersonated"] != null
+
+        result = mvc.perform(post("/api/impersonate/clear")
+                .header(X_AUTH_TOKEN, token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn()
+
+        result = mvc.perform(get("/api/user/me")
+                .header(X_AUTH_TOKEN, token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn()
+
+        string = result.getResponse().getContentAsString()
+        json = new JsonSlurper().parse(string.getBytes())
+        assert json["impersonated"] == null
     }
 
     def setup(List<String> roles = null, List<String> auths = null) {
