@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public boolean canImpersonate(LoggedUser impersonator, String configId) {
         Case config = getConfig(configId);
-        return containsUser(config, impersonator.getId());
+        return isValidAndContainsUser(config, impersonator.getId());
     }
 
     @Override
@@ -153,12 +154,34 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         return elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), pageable, Locale.getDefault(), false);
     }
 
-    protected boolean containsUser(Case config, String id) {
-        Object value = config.getDataSet().get("impersonators").getValue();
+    protected boolean isValidAndContainsUser(Case config, String id) {
+        Object value = config.getFieldValue("impersonators");
         if (!(value instanceof Collection)) {
             return false;
         }
-        return ((Collection) value).contains(id);
+        LocalDateTime now = LocalDateTime.now();
+        return (((Collection) value).contains(id)) &&
+                ((Boolean) config.getFieldValue("is_active")) &&
+                validateTime(time(config, "valid_from"), now) &&
+                validateTime(now, time(config, "valid_to"));
 
+    }
+
+    protected boolean validateTime(LocalDateTime first, LocalDateTime second) {
+        if (first == null || second == null) {
+            return true;
+        }
+        return first.isBefore(second) || first.equals(second);
+    }
+
+    protected LocalDateTime time(Case config, String field) {
+        Object val = config.getFieldValue(field);
+        if (val == null) {
+            return null;
+        }
+        if (val instanceof Date) {
+            return LocalDateTime.ofInstant(((Date) val).toInstant(), ZoneId.systemDefault());
+        }
+        return (LocalDateTime) val;
     }
 }

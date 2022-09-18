@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
@@ -45,6 +46,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+
+import java.time.LocalDateTime
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
@@ -90,6 +93,9 @@ class ImpersonationServiceTest {
     private IImpersonationService impersonationService
 
     @Autowired
+    private IImpersonationAuthorizationService impersonationAuthorizationService
+
+    @Autowired
     private ITaskAuthorizationService taskAuthorizationService
 
     @Autowired
@@ -131,6 +137,7 @@ class ImpersonationServiceTest {
     @Test
     void testImpersonation() {
         def config = setup()
+        assert impersonationAuthorizationService.canImpersonate(userService.loggedUserFromContext, config.stringId)
         impersonationService.impersonateByConfig(config.stringId)
         assert userService.loggedUser.isImpersonating()
         assert userService.loggedUser.getSelfOrImpersonated().stringId == user2.stringId
@@ -230,6 +237,7 @@ class ImpersonationServiceTest {
         caze.dataSet["impersonators"].value = [impersonator]
         caze.dataSet["impersonated_roles"].value = roles ?: user.processRoles.stringId as List
         caze.dataSet["impersonated_authorities"].value = auths ?: user.authorities.stringId as List
+        caze.dataSet["valid_from"].value = LocalDateTime.now().minusDays(1)
 
         /* set options so elastic indexing works */
         caze.dataSet["impersonators"].options = [(impersonator): new I18nString(impersonator)]
