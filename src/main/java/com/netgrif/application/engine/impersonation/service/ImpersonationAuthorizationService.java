@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +42,9 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     private IAuthorityService authorityService;
 
     @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
     private IProcessRoleService processRoleService;
 
     @Override
@@ -60,13 +64,16 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     @Override
-    public boolean canImpersonate(LoggedUser impersonator, String userId) {
+    public boolean canImpersonate(LoggedUser impersonator, String configId) {
+        Case config = getConfig(configId);
+        return containsUser(config, impersonator.getId());
+    }
+
+    @Override
+    public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
         IUser impersonated = userService.findById(userId, true);
         List<Case> impersonationConfig = searchConfigs(impersonator.getId(), impersonated.getStringId());
-        if (impersonationConfig.isEmpty()) {
-            return false;
-        }
-        return impersonationConfig.stream().anyMatch(it -> ((Collection) it.getDataSet().get("impersonators").getValue()).contains(impersonator.getId()));
+        return !impersonationConfig.isEmpty();
     }
 
     @Override
@@ -107,6 +114,16 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         return impersonatedRoles;
     }
 
+    @Override
+    public Case getConfig(String configId) {
+        return workflowService.findOne(configId);
+    }
+
+    @Override
+    public String getImpersonatedUserId(Case config) {
+        return ((UserFieldValue) config.getDataSet().get("impersonated").getValue()).getId();
+    }
+
     protected CaseSearchRequest request(String impersonatorId, String impersonatedId) {
         CaseSearchRequest request = new CaseSearchRequest();
         List<String> queries = new ArrayList<>();
@@ -134,5 +151,14 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     protected Page<Case> findCases(CaseSearchRequest request, Pageable pageable) {
         return elasticCaseService.search(Collections.singletonList(request), userService.getSystem().transformToLoggedUser(), pageable, Locale.getDefault(), false);
+    }
+
+    protected boolean containsUser(Case config, String id) {
+        Object value = config.getDataSet().get("impersonators").getValue();
+        if (!(value instanceof Collection)) {
+            return false;
+        }
+        return ((Collection) value).contains(id);
+
     }
 }

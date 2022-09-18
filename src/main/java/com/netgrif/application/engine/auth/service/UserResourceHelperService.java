@@ -53,6 +53,6 @@ public class UserResourceHelperService implements IUserResourceHelperService {
 
     protected IUser getImpersonated(LoggedUser loggedUser, boolean small) {
         IUser impersonated = userService.findById(loggedUser.getImpersonated().getId(), small);
-        return impersonationService.applyRolesAndAuthorities(impersonated, loggedUser.getId());
+        return impersonationService.reloadImpersonatedUserRoles(impersonated, loggedUser.getId());
     }
 }

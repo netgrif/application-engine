@@ -3,7 +3,6 @@ package com.netgrif.application.engine.impersonation.service.interfaces;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.workflow.domain.Case;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,9 @@ public interface IImpersonationAuthorizationService {
 
     Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable);
 
-    boolean canImpersonate(LoggedUser impersonator, String userId);
+    boolean canImpersonate(LoggedUser loggedUser, String configId);
+
+    boolean canImpersonateUser(LoggedUser impersonator, String userId);
 
     Page<Case> searchConfigs(String impersonatorId, Pageable pageable);
 
@@ -24,4 +25,8 @@ public interface IImpersonationAuthorizationService {
     List<Authority> getAuthorities(List<Case> configs, IUser impersonated);
 
     List<ProcessRole> getRoles(List<Case> configs, IUser impersonated);
+
+    Case getConfig(String configId);
+
+    String getImpersonatedUserId(Case config);
 }

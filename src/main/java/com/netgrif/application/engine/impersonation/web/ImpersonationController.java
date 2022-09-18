@@ -63,13 +63,23 @@ public class ImpersonationController {
         return resources;
     }
 
-    @PostMapping("/{id}")
-    public UserResource impersonate(@PathVariable("id") String userId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
+    @PostMapping("/config/{id}")
+    public UserResource impersonateByConfig(@PathVariable("id") String configId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        if (!loggedUser.isAdmin() && !impersonationAuthorizationService.canImpersonate(loggedUser, userId)) {
+        if (!impersonationAuthorizationService.canImpersonate(loggedUser, configId)) {
+            throw new IllegalImpersonationAttemptException(loggedUser, configId);
+        }
+        loggedUser = impersonationService.impersonateByConfig(configId);
+        return userResourceHelperService.resource(loggedUser, locale, false);
+    }
+
+    @PostMapping("/user/{id}")
+    public UserResource impersonateUser(@PathVariable("id") String userId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
+        LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
+        if (!loggedUser.isAdmin() && !impersonationAuthorizationService.canImpersonateUser(loggedUser, userId)) {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }
-        loggedUser = impersonationService.impersonate(userId);
+        loggedUser = impersonationService.impersonateUser(userId);
         return userResourceHelperService.resource(loggedUser, locale, false);
     }
 

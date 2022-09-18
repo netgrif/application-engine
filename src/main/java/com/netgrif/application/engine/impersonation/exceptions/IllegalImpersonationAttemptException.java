@@ -4,8 +4,8 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 
 public class IllegalImpersonationAttemptException extends Exception {
 
-    public IllegalImpersonationAttemptException(LoggedUser loggedUser, String userId) {
-        super(loggedUser.getFullName() + " cannot impersonate user with ID " + userId);
+    public IllegalImpersonationAttemptException(LoggedUser loggedUser, String id) {
+        super(loggedUser.getFullName() + " cannot impersonate user or config with ID " + id);
     }
 
     public IllegalImpersonationAttemptException(String message) {

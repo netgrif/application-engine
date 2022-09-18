@@ -23,5 +23,8 @@ public class Impersonator implements Serializable {
     @Indexed
     private String impersonatedId;
 
+    @Indexed
+    private String configId;
+
     private LocalDateTime impersonatingSince;
 }

@@ -130,16 +130,16 @@ class ImpersonationServiceTest {
 
     @Test
     void testImpersonation() {
-        setup()
-        impersonationService.impersonate(user2.stringId)
+        def config = setup()
+        impersonationService.impersonateByConfig(config.stringId)
         assert userService.loggedUser.isImpersonating()
         assert userService.loggedUser.getSelfOrImpersonated().stringId == user2.stringId
     }
 
     @Test
     void testTaskSearchAssignFinish() {
-        setup()
-        impersonationService.impersonate(user2.stringId)
+        def config = setup()
+        impersonationService.impersonateByConfig(config.stringId)
 
         def testCase = createTestCase()
         def testTask1 = loadTask(testCase, "t1")
@@ -169,7 +169,7 @@ class ImpersonationServiceTest {
 
     @Test
     void testAuthMe() {
-        setup()
+        def config = setup()
         def result = mvc.perform(get("/api/auth/login")
                 .with(httpBasic(user1.email, "password"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -178,7 +178,7 @@ class ImpersonationServiceTest {
                 .andReturn()
         def token = result.response.getHeader(X_AUTH_TOKEN)
 
-        result = mvc.perform(post("/api/impersonate/" + user2.stringId)
+        result = mvc.perform(post("/api/impersonate/config/" + config.stringId)
                 .header(X_AUTH_TOKEN, token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("utf-8"))
@@ -216,8 +216,9 @@ class ImpersonationServiceTest {
     }
 
     def setup(List<String> roles = null, List<String> auths = null) {
-        createConfigCase(user2, user1.stringId, roles, auths)
+        def config = createConfigCase(user2, user1.stringId, roles, auths)
         SecurityContextHolder.getContext().setAuthentication(auth1)
+        return config
     }
 
     def createConfigCase(IUser user, String impersonator, List<String> roles = null, List<String> auths = null) {
