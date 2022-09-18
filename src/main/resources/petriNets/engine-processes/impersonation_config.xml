@@ -33,6 +33,12 @@
 			<view>true</view>
 		</caseLogic>
 	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
 	<userRef>
 		<id>config_owner</id>
 		<caseLogic>
@@ -263,7 +269,7 @@
 				<logic>
 					<behavior>editable</behavior>
 
-					<action trigger="get">
+					<action trigger="set">
 						impersonated: f.impersonated;
 
 						validateUser(impersonated.value.id)
@@ -282,6 +288,12 @@
 				<id>valid_from</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="set">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -296,6 +308,12 @@
 				<id>valid_to</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="set">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -310,6 +328,12 @@
 				<id>remove_impersonator</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="set">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -327,6 +351,12 @@
 				<id>add_selected</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="set">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -344,6 +374,12 @@
 				<id>impersonated_authorities</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="set">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -361,6 +397,12 @@
 				<id>impersonated_roles</id>
 				<logic>
 					<behavior>editable</behavior>
+
+					<action trigger="set">
+						impersonated: f.impersonated;
+
+						validateUser(impersonated.value.id)
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -389,16 +431,6 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
-		<event type="assign">
-			<id>assign</id>
-			<actions phase="pre">
-				<action>
-					impersonated: f.impersonated;
-
-					validateUser(impersonated.value.id)
-				</action>
-			</actions>
-		</event>
 		<event type="finish">
 			<id>finish</id>
 			<title>Publikovať</title>

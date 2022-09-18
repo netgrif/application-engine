@@ -15,6 +15,7 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class ImpersonationService implements IImpersonationService {
+
+    @Value("${nae.impersonation.enabled}")
+    private boolean enabled;
 
     @Autowired
     private IUserService userService;
@@ -42,6 +46,9 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public LoggedUser impersonate(String impersonatedId) throws ImpersonatedUserHasSessionException {
+        if (!enabled) {
+            throw new IllegalArgumentException("Impersonation is not enabled in app properties");
+        }
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
         IUser impersonated = userService.findById(impersonatedId, false);
 
