@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
 import java.io.IOException;
 import java.util.List;
 
-public class BooleanFieldRenderer extends FieldRenderer<BooleanField> {
+public class BooleanFieldRenderer extends FieldRenderer {
 
     private PdfBooleanFormat booleanFormat;
 

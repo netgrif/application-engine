@@ -14,6 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -132,7 +133,7 @@ class DataSearchRequestTest {
         _case.dataSet["multichoice_map"].value = ["alice", "bob"].toSet()
         _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet["userList"].value = [testUser1.id, testUser2.id]
+        _case.dataSet["userList"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
         _case.dataSet["i18n_text"].value.defaultValue = "Modified i18n text value"
         _case.dataSet["i18n_divider"].value.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
