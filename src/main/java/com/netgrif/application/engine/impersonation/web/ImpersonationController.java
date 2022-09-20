@@ -12,7 +12,11 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.impersonation.web.requestBodies.SearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -29,6 +33,12 @@ import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/impersonate")
+@ConditionalOnProperty(
+        value = "nae.impersonation.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
+@Tag(name = "Impersonation")
 public class ImpersonationController {
 
     @Autowired
@@ -52,6 +62,7 @@ public class ImpersonationController {
         return result;
     }
 
+    @Operation(summary = "Search impersonable users", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getImpersonationUserOptions(@RequestBody SearchRequest request, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -63,6 +74,7 @@ public class ImpersonationController {
         return resources;
     }
 
+    @Operation(summary = "Impersonate user through a specific configuration", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/config/{id}")
     public UserResource impersonateByConfig(@PathVariable("id") String configId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
@@ -73,16 +85,18 @@ public class ImpersonationController {
         return userResourceHelperService.resource(loggedUser, locale, false);
     }
 
+    @Operation(summary = "Impersonate user directly by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/user/{id}")
     public UserResource impersonateUser(@PathVariable("id") String userId, Locale locale) throws IllegalImpersonationAttemptException, ImpersonatedUserHasSessionException {
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
-        if (!loggedUser.isAdmin() && !impersonationAuthorizationService.canImpersonateUser(loggedUser, userId)) {
+        if (!impersonationAuthorizationService.canImpersonateUser(loggedUser, userId)) {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }
         loggedUser = impersonationService.impersonateUser(userId);
         return userResourceHelperService.resource(loggedUser, locale, false);
     }
 
+    @Operation(summary = "Stop impersonating currently impersonated user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/clear")
     public UserResource endImpersonation(Locale locale) {
         LoggedUser loggedUser = impersonationService.endImpersonation();

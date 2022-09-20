@@ -12,6 +12,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -23,6 +24,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
@@ -99,15 +101,22 @@ class ImpersonationServiceTest {
     private ITaskAuthorizationService taskAuthorizationService
 
     @Autowired
+    private IWorkflowAuthorizationService workflowAuthorizationService
+
+    @Autowired
     private WebApplicationContext wac
 
     MockMvc mvc
 
     Authentication auth1
     Authentication auth2
+    Authentication adminUserAuth
 
     IUser user1
     IUser user2
+    IUser adminUser
+
+    PetriNet testNet
 
     @BeforeEach
     void before() {
@@ -116,8 +125,10 @@ class ImpersonationServiceTest {
         SessionRepositoryFilter<?> filter = wac.getBean(SessionRepositoryFilter.class);
         mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter).apply(springSecurity()).build()
 
-        def testNet = helper.createNet("impersonation_test.xml").get()
+        testNet = helper.createNet("impersonation_test.xml").get()
         def authority = authorityService.getOrCreate(Authority.user)
+        def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
+        def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
         user1 = helper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
@@ -127,11 +138,30 @@ class ImpersonationServiceTest {
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         user2 = helper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
-                [authority] as Authority[],
+                [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(user2.transformToLoggedUser(), (user2 as User).password, user2.authorities)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+
+        adminUser = helper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+                [authority, authorityAdmin] as Authority[],
+                testNet.roles.values() as ProcessRole[])
+
+        adminUserAuth = new UsernamePasswordAuthenticationToken(adminUser.transformToLoggedUser(), (adminUser as User).password, adminUser.authorities)
+        adminUserAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
+    }
+
+    @Test
+    void testImpersonationAdmin() {
+        SecurityContextHolder.getContext().setAuthentication(adminUserAuth)
+        assert impersonationAuthorizationService.canImpersonateUser(userService.loggedUserFromContext, user2.stringId)
+        impersonationService.impersonateUser(user2.stringId)
+        def impersonated = userService.loggedUser.getSelfOrImpersonated()
+        assert userService.loggedUser.isImpersonating()
+        assert impersonated.stringId == user2.stringId
+        assert impersonated.authorities.collect { it.stringId }.sort() == user2.authorities.collect { it.stringId }.sort()
+        assert impersonated.processRoles.collect { it.stringId }.sort() == user2.processRoles.collect { it.stringId }.sort()
     }
 
     @Test
@@ -141,6 +171,28 @@ class ImpersonationServiceTest {
         impersonationService.impersonateByConfig(config.stringId)
         assert userService.loggedUser.isImpersonating()
         assert userService.loggedUser.getSelfOrImpersonated().stringId == user2.stringId
+
+        impersonationService.endImpersonation()
+        assert !userService.loggedUser.isImpersonating()
+    }
+
+    @Test
+    void testImpersonationRolesAndAuths() {
+        def role = user2.processRoles.find { it.importId == "test_role" }
+        def auth = user2.authorities.find { it.name == Authority.user }
+        def config = setup([role.stringId], [auth.stringId, authorityService.getOrCreate(Authority.admin).stringId])
+
+        impersonationService.impersonateByConfig(config.stringId)
+        def impersonatedRoles = userService.loggedUser.getImpersonated().getProcessRoles()
+        def impersonatedAuths = userService.loggedUser.getImpersonated().getAuthorities()
+        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId ==role.stringId }  // default role counts
+        assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
+
+        def transformedUser = userService.loggedUser.transformToLoggedUser()
+        def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
+        assert transformedUser.isImpersonating()
+        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }  // default role counts
+        assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as Authority).stringId == auth.stringId
     }
 
     @Test
@@ -148,7 +200,9 @@ class ImpersonationServiceTest {
         def config = setup()
         impersonationService.impersonateByConfig(config.stringId)
 
+        assert workflowAuthorizationService.canCallCreate(userService.loggedUserFromContext, testNet.stringId)
         def testCase = createTestCase()
+        assert workflowAuthorizationService.canCallDelete(userService.loggedUserFromContext, testCase.stringId)
         def testTask1 = loadTask(testCase, "t1")
 
         def caseReq = new CaseSearchRequest()
@@ -172,6 +226,20 @@ class ImpersonationServiceTest {
 
         assert taskAuthorizationService.canCallFinish(userService.loggedUserFromContext, testTask1.stringId)
         taskService.finishTask(userService.loggedUser.transformToLoggedUser(), testTask1.stringId)
+    }
+
+    @Test
+    void testAuthorization() {
+        def config = setup()
+        def logged = userService.loggedUser.transformToLoggedUser()
+        assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
+        assert impersonationAuthorizationService.canImpersonateUser(adminUser.transformToLoggedUser(), user2.stringId)
+
+        config.dataSet["valid_to"].value = LocalDateTime.now().minusMinutes(1)
+        workflowService.save(config)
+
+        assert !impersonationAuthorizationService.canImpersonate(logged, config.stringId)
+        assert !impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
     }
 
     @Test
@@ -249,7 +317,7 @@ class ImpersonationServiceTest {
     }
 
     def createTestCase() {
-        return helper.createCase("test", petriNetService.getNewestVersionByIdentifier("impersonation_test"))
+        return helper.createCase("test", testNet)
     }
 
     def setData(Case caze, String transition, Map<String, String> dataSet) {

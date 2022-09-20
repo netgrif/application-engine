@@ -54,7 +54,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
             return userService.searchAllCoMembers(query, null, null, impersonator, true, pageable);
 
         } else {
-            Page<Case> cases = searchConfigs(impersonator.getId(), pageable); // TODO 1678 fix paging somehow
+            Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
             List<IUser> users = cases.getContent().stream()
                     .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getValue()).getId())
                     .distinct()
@@ -74,7 +74,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
         IUser impersonated = userService.findById(userId, true);
         List<Case> impersonationConfig = searchConfigs(impersonator.getId(), impersonated.getStringId());
-        return !impersonationConfig.isEmpty();
+        return impersonator.isAdmin() || !impersonationConfig.isEmpty();
     }
 
     @Override
