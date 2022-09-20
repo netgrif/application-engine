@@ -231,12 +231,15 @@ class ImpersonationServiceTest {
     @Test
     void testAuthorization() {
         def config = setup()
+        sleep(4000) // elastic
+
         def logged = userService.loggedUser.transformToLoggedUser()
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
-        assert impersonationAuthorizationService.canImpersonateUser(adminUser.transformToLoggedUser(), user2.stringId)
+        assert impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
 
         config.dataSet["valid_to"].value = LocalDateTime.now().minusMinutes(1)
         workflowService.save(config)
+        sleep(4000)
 
         assert !impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert !impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
@@ -309,6 +312,8 @@ class ImpersonationServiceTest {
 
         /* set options so elastic indexing works */
         caze.dataSet["impersonators"].options = [(impersonator): new I18nString(impersonator)]
+        caze.dataSet["impersonated_roles"].options = (caze.dataSet["impersonated_roles"].value as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
+        caze.dataSet["impersonated_authorities"].options = (caze.dataSet["impersonated_authorities"].value as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
         def initTask = caze.tasks.find { it.transition == "t2" }.task
         taskService.assignTask(userService.system.transformToLoggedUser(), initTask)

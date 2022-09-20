@@ -98,6 +98,16 @@
 		<component>
 			<name>list</name>
 		</component>
+
+		<event type="set">
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="userList">
 		<id>config_owner</id>
@@ -106,20 +116,57 @@
 	<data type="dateTime" immediate="true">
 		<id>valid_from</id>
 		<title>Platnosť od</title>
+
+		<event type="set">
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="dateTime" immediate="true">
 		<id>valid_to</id>
 		<title>Platnosť do</title>
+
+		<event type="set">
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>is_active</id>
 		<title>Aktívna konfigurácia</title>
+
+		<event type="set">
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="user" immediate="true">
 		<id>impersonated</id>
 		<title>Používateľ na zastúpenie</title>
 		<event type="set">
 			<id>impersonated_set</id>
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
 			<actions phase="post">
 				<action id="action_1">
 					impersonated_email: f.impersonated_email,
@@ -137,6 +184,11 @@
 		<event type="set">
 			<id>remove_impersonator_set</id>
 			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
 				<action id="action_2">
 					impersonators: f.impersonators;
 
@@ -158,6 +210,11 @@
 		<event type="set">
 			<id>add_selected_set</id>
 			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
 				<action id="10">
 					user_select_caseId: f.user_select_caseId,
 					user_select_taskRef: f.user_select_taskRef,
@@ -183,10 +240,19 @@
 			</actions>
 		</event>
 	</data>
-	<data type="multichoice_map">
+	<data type="multichoice_map" immediate="true">
 		<id>impersonated_authorities</id>
 		<title>Zastúpené autority</title>
 
+		<event type="set">
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 		<event type="get">
 			<id>impersonated_authorities_get</id>
 
@@ -203,10 +269,19 @@
 			</actions>
 		</event>
 	</data>
-	<data type="multichoice_map">
+	<data type="multichoice_map" immediate="true">
 		<id>impersonated_roles</id>
 		<title>Zastúpené procesné roly</title>
 
+		<event type="set">
+			<actions phase="pre">
+				<action>
+					impersonated: f.impersonated;
+
+					validateUser(impersonated.value.id)
+				</action>
+			</actions>
+		</event>
 		<event type="get">
 			<id>impersonated_roles</id>
 
@@ -269,11 +344,6 @@
 				<logic>
 					<behavior>editable</behavior>
 
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -288,12 +358,6 @@
 				<id>valid_from</id>
 				<logic>
 					<behavior>editable</behavior>
-
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -308,12 +372,6 @@
 				<id>valid_to</id>
 				<logic>
 					<behavior>editable</behavior>
-
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -328,12 +386,6 @@
 				<id>remove_impersonator</id>
 				<logic>
 					<behavior>editable</behavior>
-
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -351,12 +403,6 @@
 				<id>add_selected</id>
 				<logic>
 					<behavior>editable</behavior>
-
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -374,12 +420,6 @@
 				<id>impersonated_authorities</id>
 				<logic>
 					<behavior>editable</behavior>
-
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -389,6 +429,7 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+
 				<component>
 					<name>list</name>
 				</component>
@@ -397,12 +438,6 @@
 				<id>impersonated_roles</id>
 				<logic>
 					<behavior>editable</behavior>
-
-					<action trigger="set">
-						impersonated: f.impersonated;
-
-						validateUser(impersonated.value.id)
-					</action>
 				</logic>
 				<layout>
 					<x>0</x>
