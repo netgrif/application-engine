@@ -231,7 +231,6 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-
     public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
         Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         return changeType(users, pageable);

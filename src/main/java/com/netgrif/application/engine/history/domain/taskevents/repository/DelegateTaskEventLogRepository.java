@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@Deprecated(since = "6.2.2")
 public interface DelegateTaskEventLogRepository extends MongoRepository<DelegateTaskEventLog, ObjectId> {
 
     List<DelegateTaskEventLog> findAllByTaskId(ObjectId taskId);
