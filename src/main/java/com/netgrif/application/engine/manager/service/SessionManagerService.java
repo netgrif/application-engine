@@ -42,7 +42,6 @@ public class SessionManagerService implements ISessionManagerService {
         keys.forEach(username -> {
             Session session = repository.findByPrincipalName(username).values().stream().findFirst().orElse(null);
             if (session != null) {
-                System.out.println(session.getId());
                 SecurityContextImpl impl = (SecurityContextImpl) session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
                 if (impl != null) {
                     LoggedUser user = (LoggedUser) impl.getAuthentication().getPrincipal();
@@ -57,17 +56,15 @@ public class SessionManagerService implements ISessionManagerService {
 
 
     @Override
-    public boolean logoutSession(String username) {
+    public void logoutSessionByUsername(String username) {
+        repository.findByPrincipalName(username).keySet().forEach(repository::deleteById);
 
-        sessionRegistry.removeSessionInformation(username);
-
-        return true;
     }
 
     @Override
-    public boolean logoutAllSession() {
-
-        return true;
+    public void logoutAllSession() {
+        List<LoggedUser> users = getAllLoggedUsers();
+        users.forEach(loggedUser -> repository.findByPrincipalName(loggedUser.getEmail()).keySet().forEach(repository::deleteById));
     }
 
 }

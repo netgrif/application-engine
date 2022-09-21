@@ -8,7 +8,7 @@ public interface ISessionManagerService {
 
     Collection<LoggedUser> getAllLoggedUsers();
 
-    boolean logoutSession(String username);
+    void logoutSessionByUsername(String username);
 
-    boolean logoutAllSession();
+    void logoutAllSession();
 }
