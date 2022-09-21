@@ -58,9 +58,7 @@ public class SessionManagerController {
     })
     public MessageLogoutResponse logoutCurrentSession(@RequestBody LogoutRequest requestBody) {
 
-        requestBody.getUsers().forEach( it -> {
-            sessionManagerService.logoutSessionByUsername(it);
-        });
+        requestBody.getUsers().forEach(user -> sessionManagerService.logoutSessionByUsername(user));
         return new MessageLogoutResponse(true);
     }
 
