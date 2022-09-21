@@ -5,6 +5,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.slf4j.Logger
@@ -83,6 +84,12 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
         ]
         workflowService.save(dashboardCase)
         taskService.assignTask(dashboardCase.tasks.first().task)
+        helper.setTaskData(dashboardCase.tasks.first().task, [
+                "name": [
+                        "value": "Demo Dashboard",
+                        "type": "text"
+                ]
+        ])
         taskService.finishTask(dashboardCase.tasks.first().task)
 
         taskService.assignTask(superCreator.loggedSuper, tile1Case.tasks.first().task)
