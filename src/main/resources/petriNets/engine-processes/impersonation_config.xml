@@ -3,7 +3,7 @@
 	<version>1.0.0</version>
 	<initials>IPC</initials>
 	<title>Konfigurácia zastupiteľov</title>
-	<icon>home</icon>
+	<icon>supervisor_account</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
