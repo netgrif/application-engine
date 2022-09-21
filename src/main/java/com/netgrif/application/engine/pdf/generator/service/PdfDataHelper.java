@@ -68,6 +68,8 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Setter
     private int originalCols;
 
+    private static final String DIVIDER = "divider";
+
     @Override
     public void setupDataHelper(PdfResource resource) {
         log.info("Setting up data helper for PDF generator...");
@@ -116,11 +118,12 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     private void generateFromDataGroup(DataGroup dataGroup) {
         Collection<LocalisedField> fields = dataGroup.getFields().getContent();
-        if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid"))
+        if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid")) {
             fields = fields.stream().sorted(Comparator.<LocalisedField, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
+        }
        fields.forEach(field -> {
                     if (field.getType().equals(FieldType.TASK_REF)) {
-                        Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> dg.getParentTaskRefId() != null && dg.getParentTaskRefId().equals(field.getStringId())).findFirst();
+                        Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> Objects.equals(dg.getParentTaskRefId(), field.getStringId())).findFirst();
                         taskRefGroup.ifPresent(this::generateFromDataGroup);
                     } else {
                         generateField(dataGroup, field);
@@ -174,7 +177,7 @@ public class PdfDataHelper implements IPdfDataHelper {
                     pdfFields.add(pdfField);
                     break;
                 case I18N:
-                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), "divider")) {
+                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), DIVIDER)) {
                         pdfField = createI18nDividerField(dataGroup, (LocalisedI18nStringField) field);
                         pdfFields.add(pdfField);
                     }
@@ -291,8 +294,10 @@ public class PdfDataHelper implements IPdfDataHelper {
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null) {
             Integer cols = dataGroup.getLayout().getCols();
             resource.setFormGridCols(cols == null ? this.originalCols : cols);
-            resource.updateProperties();
+        } else {
+            resource.setFormGridCols(this.originalCols);
         }
+        resource.updateProperties();
     }
 
     protected boolean isNotHidden(LocalisedField field) {

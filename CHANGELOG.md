@@ -6,27 +6,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
+Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.1](https://github.com/netgrif/application-engine/commits/v6.2.1)
 
-## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-08-18)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-09-21)
+
+
+## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 
 ### Fixed
 
+- [NAE-1720] PDF number field is not null value
+
+## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-09-12)
+
+### Fixed
+
+- [NAE-1626] Trigger of set event for fileList value deletion is not implemented
 - [NAE-1666] PDF Generator template file issue
-- [NAE-1702] LdapUser unique dn 
+- [NAE-1691] Default value number field after the change behavior
+- [NAE-1694] ProcessRoleService.findByImportId doesn't return list of process roles
 - [NAE-1699] Create/upload event action is loaded only from the cache
+- [NAE-1702] LdapUser unique dn 
 
 ### Changed
 
+- [NAE-1156] View Deprecation and All Data
+- [NAE-1606] Configuration of case creation button from menu item
+- [NAE-1646] Overridable data field render in PDF generator
 - [NAE-1663] Optional constructor
+- [NAE-1668] PDF Generator 2022 Summer Update
 - [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
+- [NAE-1696] PDF Generator - legacy and flow layout
 
 ### Added
 
+- [NAE-1625] PetriNetService cache
+- [NAE-1631] Process download in workflow view
 - [NAE-1647] Elastic mapping for I18N data field
 - [NAE-1665] Generated PDF colors properties
 - [NAE-1660] Filter action API
 - [NAE-1659] Process URI
+- [NAE-1679] User list frontend component
 - [NAE-1698] Springdoc OpenAPI 3 generation
 
 ## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)

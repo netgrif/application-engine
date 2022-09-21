@@ -689,6 +689,12 @@ public class DataService implements IDataService {
         return fields;
     }
 
+    @Override
+    public UserFieldValue makeUserFieldValue(String id) {
+        IUser user = userService.resolveById(id, true);
+        return new UserFieldValue(user);
+    }
+
     private void updateDataset(Case useCase) {
         Case actual = workflowService.findOne(useCase.getStringId());
         actual.getDataSet().forEach((id, dataField) -> {
@@ -777,7 +783,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = parseListStringValues(node);
+                value = makeUserListFieldValue(node);
                 break;
             case "button":
                 if (node.get("value") == null) {
@@ -809,16 +815,20 @@ public class DataService implements IDataService {
         else return value;
     }
 
-    protected UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
-        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-    }
-
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
         ArrayNode arrayNode = (ArrayNode) node.get("value");
         HashSet<String> set = new HashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
+    }
+
+    private UserListFieldValue makeUserListFieldValue(ObjectNode nodes) {
+        List<String> userIds = parseListStringValues(nodes);
+
+        if (userIds == null) {
+            return null;
+        }
+        return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toList()));
     }
 
     private List<String> parseListStringValues(ObjectNode node) {

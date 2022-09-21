@@ -43,7 +43,7 @@ public interface IPdfDrawer {
 
     boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException;
 
-    void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException;
+    void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth, Color color) throws IOException;
 
     void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException;
 
