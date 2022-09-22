@@ -1,5 +1,4 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>new_model</id>
     <initials>NEW</initials>
     <title>New Model</title>
@@ -249,7 +248,7 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    generatePDF("t1", "pdf")
+                    generatePdf("t1", "pdf")
                 </action>
             </actions>
         </event>
@@ -273,7 +272,7 @@
             <id>1</id>
             <actions phase="pre">
                 <action>
-                    generatePDF("t1", "pdf")
+                    generatePdf("t1", "pdf")
                 </action>
             </actions>
         </event>

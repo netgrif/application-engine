@@ -11,14 +11,15 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
+import com.netgrif.application.engine.petrinet.domain.UriNode;
+import com.netgrif.application.engine.petrinet.domain.UriContentType;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
@@ -113,6 +114,9 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IHistoryService historyService;
 
+    @Autowired
+    private IUriService uriService;
+
     protected IElasticCaseService elasticCaseService;
 
     @Autowired
@@ -173,6 +177,14 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public Page<Case> findAllByUri(String uri, Pageable pageable) {
+        Page<Case> page = repository.findAllByUriNodeId(uri, pageable);
+        page.getContent().forEach(this::setPetriNet);
+        decryptDataSets(page.getContent());
+        return setImmediateDataFields(page);
+    }
+
+    @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
         page.getContent().forEach(this::setPetriNet);
@@ -208,7 +220,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -219,11 +231,12 @@ public class WorkflowService implements IWorkflowService {
         return repository.save(useCase);
     }
 
-    private List<String> getExistingUsers(List<String> userIds) {
-        if (userIds == null)
+    private List<String> getExistingUsers(UserListFieldValue userListValue) {
+        if (userListValue == null)
             return null;
-        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
-    }
+        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
+                .filter(id -> userService.resolveById(id, false) != null)
+                .collect(Collectors.toList());    }
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
@@ -267,6 +280,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
+        UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
+        useCase.setUriNodeId(uriNode.getId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty() ));
@@ -320,7 +335,7 @@ public class WorkflowService implements IWorkflowService {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
+        log.info("[" + caseId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
@@ -333,7 +348,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteInstancesOfPetriNet(PetriNet net) {
-        log.info("[" + net.getStringId() + "]: Deleting all cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         repository.deleteAllByPetriNetObjectId(net.getObjectId());

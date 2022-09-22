@@ -6,7 +6,98 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
+Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.1](https://github.com/netgrif/application-engine/commits/v6.2.1)
+
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-09-21)
+
+
+## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
+
+### Fixed
+
+- [NAE-1720] PDF number field is not null value
+
+## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-09-12)
+
+### Fixed
+
+- [NAE-1626] Trigger of set event for fileList value deletion is not implemented
+- [NAE-1666] PDF Generator template file issue
+- [NAE-1691] Default value number field after the change behavior
+- [NAE-1694] ProcessRoleService.findByImportId doesn't return list of process roles
+- [NAE-1699] Create/upload event action is loaded only from the cache
+- [NAE-1702] LdapUser unique dn 
+
+### Changed
+
+- [NAE-1156] View Deprecation and All Data
+- [NAE-1606] Configuration of case creation button from menu item
+- [NAE-1646] Overridable data field render in PDF generator
+- [NAE-1663] Optional constructor
+- [NAE-1668] PDF Generator 2022 Summer Update
+- [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
+- [NAE-1696] PDF Generator - legacy and flow layout
+
+### Added
+
+- [NAE-1625] PetriNetService cache
+- [NAE-1631] Process download in workflow view
+- [NAE-1647] Elastic mapping for I18N data field
+- [NAE-1665] Generated PDF colors properties
+- [NAE-1660] Filter action API
+- [NAE-1659] Process URI
+- [NAE-1679] User list frontend component
+- [NAE-1698] Springdoc OpenAPI 3 generation
+
+## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)
+
+### Fixed
+
+- [NAE-1652] For some PDF documents the file preview is not generating
+- [NAE-1649] File field preview component bug
+- [NAE-1641] Generate PDF with special characters
+
+### Changed
+
+- [NAE-1655] Better Active Directory compatibility
+
+## [6.1.0](https://github.com/netgrif/application-engine/releases/tag/v6.1.0) (2022-06-01)
+
+### Fixed
+
+- [NAE-1585] Security update to resolve vulnerabilities
+- [NAE-1049] Case name doesn't change
+- [NAE-1637] PDF generator with template does not work
+- [NAE-1636] resolveTaskRefOrderOnGrid with forbidden dataField
+
+### Changed
+
+- [NAE-1440] setData on button without value
+- [NAE-1569] Update Groovy 3.0.10
+- [NAE-1624] Upgrade Elasticsearch Connector
+- [NAE-1562] Improved logging of deleting resources
+- [NAE-1521] Authentication Providers
+- [NAE-1623] Action API consolidation
+- [NAE-1622] Change behavior action improvements
+- [NAE-1640] Update spring boot 2.7.0
+- [NAE-1478] ActionDelegate functions overloading
+
+### Added
+
+- [NAE-1627] LDAP Groups resolving and mapping
+- [NAE-1468] i18n Data field
+- [NAE-1290] Export actions
+- [NAE-1477] New pdfGeneration action in actionDelegate
+
+### Removed
+
+- [NAE-1584] Remove petriflow schema
+
+## [6.0.5](https://github.com/netgrif/application-engine/releases/tag/v6.0.5) (2022-05-12)
+
+### Fixed
+
+- [NAE-1621] Required data group layout tag if layout type is “grid”
 
 ## [6.0.4](https://github.com/netgrif/application-engine/releases/tag/v6.0.4) (2022-04-12)
 

@@ -1,12 +1,13 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.configuration.properties.UriProperties
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticTask
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexOps
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
+import com.netgrif.application.engine.petrinet.domain.UriNode
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.stereotype.Component
 
 @Component
@@ -32,7 +33,10 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     private String taskIndex
 
     @Autowired
-    private IElasticIndexOps template
+    private UriProperties uriProperties
+
+    @Autowired
+    private IElasticIndexService template
 
     @Override
     void run(String... args) throws Exception {
@@ -40,6 +44,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
+            template.deleteIndex(UriNode.class)
         }
         if (!template.indexExists(caseIndex)) {
             log.info "Creating Elasticsearch case index [${caseIndex}]"
@@ -53,9 +58,17 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         } else {
             log.info "Elasticsearch task index exists [${taskIndex}]"
         }
+        if (!template.indexExists(uriProperties.index)) {
+            log.info "Creating Elasticsearch uri index [${uriProperties.index}]"
+            template.createIndex(UriNode.class)
+        } else {
+            log.info "Elasticsearch uri index exists [${uriProperties.index}]"
+        }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
+        log.info("Updating Elasticsearch uri mapping [${uriProperties.index}]")
+        template.putMapping(UriNode.class)
     }
 }

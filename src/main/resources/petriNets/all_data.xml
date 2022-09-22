@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
-	<id>all_data</id>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>data/all_data</id>
 	<title>All Data</title>
 	<initials>ALL</initials>
     <caseName>All data test default case name</caseName>
@@ -211,12 +211,6 @@
         <title>Text datafield z iného transitionu</title>
         <init>Field načítaný pomocou taskrefu</init>
     </data>
-    <usersRef>
-        <id>userList1</id>
-        <caseLogic>
-            <view>true</view>
-        </caseLogic>
-    </usersRef>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -224,12 +218,6 @@
         <y>273</y>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
-        <usersRef>
-            <id>userList1</id>
-            <logic>
-                <assigned>true</assigned>
-            </logic>
-        </usersRef>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
@@ -397,7 +385,7 @@
                 <logic>
                     <behavior>editable</behavior>
                     <action trigger="set">
-                        generatePDF("1","file")
+                        generatePdf("1","file")
                     </action>
                 </logic>
             </dataRef>

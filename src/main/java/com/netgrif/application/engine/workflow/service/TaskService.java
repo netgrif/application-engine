@@ -16,6 +16,8 @@ import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
@@ -147,6 +149,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreAssignActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.PRE);
         useCase = assignTaskToUser(user, task, useCase.getStringId());
         historyService.save(new AssignTaskEventLog(task, useCase, EventPhase.PRE, user.getStringId()));
@@ -228,6 +231,7 @@ public class TaskService implements ITaskService {
 
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.PRE);
 
         finishExecution(transition, useCase.getStringId());
@@ -281,6 +285,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCase.getStringId() + "]: Canceling task [" + task.getTitle() + "] to user [" + user.getEmail() + "]");
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreCancelActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.PRE);
         task = returnTokens(task, useCase.getStringId());
         useCase = workflowService.findOne(useCase.getStringId());
@@ -354,6 +359,7 @@ public class TaskService implements ITaskService {
         log.info("[" + useCase.getStringId() + "]: Delegating task [" + task.getTitle() + "] to user [" + delegatedUser.getEmail() + "]");
 
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreDelegateActions(), useCase, task, transition));
+        task = findOne(task.getStringId());
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
         delegate(delegatedUser, task, useCase);
         historyService.save(new DelegateTaskEventLog(task, useCase, EventPhase.PRE, delegateUser.getStringId(), delegatedUser.getStringId()));
@@ -683,10 +689,22 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public List<Task> findAllByCase(String caseId) {
+        return taskRepository.findAllByCaseId(caseId);
+    }
+
+    @Override
     public Task save(Task task) {
         task = taskRepository.save(task);
         elasticTaskService.index(this.taskMappingService.transform(task));
         return task;
+    }
+
+    @Override
+    public List<Task> save(List<Task>  tasks) {
+        tasks = taskRepository.saveAll(tasks);
+        tasks.forEach(task -> elasticTaskService.index(this.taskMappingService.transform(task)));
+        return tasks;
     }
 
     @Override
@@ -703,7 +721,7 @@ public class TaskService implements ITaskService {
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
@@ -714,10 +732,12 @@ public class TaskService implements ITaskService {
         return taskRepository.save(task);
     }
 
-    private List<String> getExistingUsers(List<String> userIds) {
-        if (userIds == null)
+    private List<String> getExistingUsers(UserListFieldValue userListValue) {
+        if (userListValue == null)
             return null;
-        return userIds.stream().filter(userId -> userService.resolveById(userId, false) != null).collect(Collectors.toList());
+        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
+                .filter(id -> userService.resolveById(id, false) != null)
+                .collect(Collectors.toList());
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
@@ -799,6 +819,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(Iterable<? extends Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
+        log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
@@ -806,6 +827,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(Iterable<? extends Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
+        log.info("[" + caseId + "]: Tasks of case are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }

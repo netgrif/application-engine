@@ -2,7 +2,6 @@ package com.netgrif.application.engine.petrinet.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.event.events.user.UserRoleChangeEvent;
 import com.netgrif.application.engine.importer.model.EventPhaseType;
@@ -21,45 +20,42 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
-    @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private ProcessRoleRepository processRoleRepository;
-
-    @Autowired
-    private PetriNetRepository netRepository;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private ApplicationEventPublisher publisher;
-
-    @Autowired
-    private RoleActionsRunner roleActionsRunner;
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private ISecurityContextService securityContextService;
+    private final IUserService userService;
+    private final ProcessRoleRepository processRoleRepository;
+    private final PetriNetRepository netRepository;
+    private final ApplicationEventPublisher publisher;
+    private final RoleActionsRunner roleActionsRunner;
+    private final IPetriNetService petriNetService;
+    private final ISecurityContextService securityContextService;
 
     private ProcessRole defaultRole;
-
     private ProcessRole anonymousRole;
+
+    public ProcessRoleService(ProcessRoleRepository processRoleRepository,
+                              PetriNetRepository netRepository,
+                              ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
+                              @Lazy IPetriNetService petriNetService, @Lazy IUserService userService, ISecurityContextService securityContextService) {
+        this.processRoleRepository = processRoleRepository;
+        this.netRepository = netRepository;
+        this.publisher = publisher;
+        this.roleActionsRunner = roleActionsRunner;
+        this.petriNetService = petriNetService;
+        this.userService = userService;
+        this.securityContextService = securityContextService;
+    }
 
     @Override
     public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
@@ -68,14 +64,14 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public Set<ProcessRole> findByIds(Set<String> ids) {
-        return processRoleRepository.findAllBy_idIn(ids);
+        return StreamSupport.stream(processRoleRepository.findAllById(ids).spliterator(), false).collect(Collectors.toSet());
     }
 
     @Override
     public void assignRolesToUser(String userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
         IUser user = userService.resolveById(userId, true);
-        Set<ProcessRole> requestedRoles = processRoleRepository.findAllBy_idIn(requestedRolesIds);
-        if (requestedRoles.isEmpty() && requestedRolesIds.size() != 0)
+        Set<ProcessRole> requestedRoles = this.findByIds(requestedRolesIds);
+        if (requestedRoles.isEmpty() && !requestedRolesIds.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
@@ -95,8 +91,8 @@ public class ProcessRoleService implements IProcessRoleService {
         Set<String> rolesNewToUserIds = mapUserRolesToIds(rolesNewToUser);
         Set<String> rolesRemovedFromUserIds = mapUserRolesToIds(rolesRemovedFromUser);
 
-        Set<ProcessRole> newRoles = processRoleRepository.findAllBy_idIn(rolesNewToUserIds);
-        Set<ProcessRole> removedRoles = processRoleRepository.findAllBy_idIn(rolesRemovedFromUserIds);
+        Set<ProcessRole> newRoles = this.findByIds(rolesNewToUserIds);
+        Set<ProcessRole> removedRoles = this.findByIds(rolesRemovedFromUserIds);
 
         runAllPreActions(newRoles, removedRoles, user, petriNet);
         requestedRoles = updateRequestedRoles(user, rolesNewToUser, rolesRemovedFromUser);
@@ -139,7 +135,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, IUser user, Set<ProcessRole> requestedRoles) {
         removeOldAndAssignNewRolesToUser(user, requestedRoles);
-        publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(requestedRolesIds)));
+        publisher.publishEvent(new UserRoleChangeEvent(user, this.findByIds(requestedRolesIds)));
     }
 
     private Set<ProcessRole> getRolesNewToUser(Set<ProcessRole> userOldRoles, Set<ProcessRole> newRequestedRoles) {
@@ -223,7 +219,7 @@ public class ProcessRoleService implements IProcessRoleService {
     @Override
     public List<ProcessRole> findAll(String netId) {
         Optional<PetriNet> netOptional = netRepository.findById(netId);
-        if (!netOptional.isPresent())
+        if (netOptional.isEmpty())
             throw new IllegalArgumentException("Could not find model with id [" + netId + "]");
         return findAll(netOptional.get());
     }
@@ -234,26 +230,54 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public ProcessRole defaultRole() {
-        if (defaultRole == null)
-            defaultRole = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+        if (defaultRole == null) {
+            Set<ProcessRole> roles = processRoleRepository.findAllByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+            if (roles.isEmpty())
+                throw new IllegalStateException("No default process role has been found!");
+            if (roles.size() > 1)
+                throw new IllegalStateException("More than 1 default process role exists!");
+            defaultRole = roles.stream().findFirst().orElse(null);
+        }
         return defaultRole;
     }
 
     @Override
     public ProcessRole anonymousRole() {
-        if (anonymousRole == null)
-            anonymousRole = processRoleRepository.findByName_DefaultValue(ProcessRole.ANONYMOUS_ROLE);
+        if (anonymousRole == null) {
+            Set<ProcessRole> roles = processRoleRepository.findAllByImportId(ProcessRole.ANONYMOUS_ROLE);
+            if (roles.isEmpty())
+                throw new IllegalStateException("No anonymous process role has been found!");
+            if (roles.size() > 1)
+                throw new IllegalStateException("More than 1 anonymous process role exists!");
+            anonymousRole = roles.stream().findFirst().orElse(null);
+        }
         return anonymousRole;
     }
 
+    /**
+     * @param importId id from a process of a role
+     * @return a process role object
+     * @deprecated use {@link ProcessRoleService#findAllByImportId(String)} instead
+     */
+    @Deprecated(forRemoval = true, since = "6.2.0")
     @Override
     public ProcessRole findByImportId(String importId) {
-        return processRoleRepository.findByImportId(importId);
+        return processRoleRepository.findAllByImportId(importId).stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public Set<ProcessRole> findAllByImportId(String importId) {
+        return processRoleRepository.findAllByImportId(importId);
+    }
+
+    @Override
+    public Set<ProcessRole> findAllByDefaultName(String name) {
+        return processRoleRepository.findAllByName_DefaultValue(name);
     }
 
     @Override
     public ProcessRole findById(String id) {
-        return processRoleRepository.findBy_id(id);
+        return processRoleRepository.findById(id).orElse(null);
     }
 
     @Override

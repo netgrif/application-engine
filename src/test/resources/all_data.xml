@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>all_data</id>
     <title>All Data</title>
     <initials>ALL</initials>
@@ -186,11 +186,30 @@
         <init>carol</init>
     </data>
 
+    <data type="i18n" immediate="true">
+        <id>i18n_text</id>
+        <title>Text I18n</title>
+        <placeholder>Text I18n field</placeholder>
+        <init name="i18n_text">Default i18n text value</init>
+    </data>
+
+    <data type="i18n" immediate="true">
+        <id>i18n_divider</id>
+        <title>Divider I18n</title>
+        <placeholder>Divider I18n field</placeholder>
+        <init name="i18n_divider">Default i18n divider value</init>
+        <component>
+            <name>divider</name>
+        </component>
+    </data>
+
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="alice">Alica</i18nString>
         <i18nString name="bob">Bobek</i18nString>
         <i18nString name="carol">Karla</i18nString>
+        <i18nString name="i18n_text">Default SK i18n text value</i18nString>
+        <i18nString name="i18n_divider">Default SK i18n divider value</i18nString>
     </i18n>
 
     <!-- TRANSITIONS -->
@@ -337,6 +356,23 @@
                 </logic>
             </dataRef>
         </dataGroup>
+        <dataGroup>
+            <id>i18n</id>
+            <title>I18n fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>i18n_text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>i18n_divider</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <transition>
         <id>2</id>
@@ -474,6 +510,23 @@
             <stretch>false</stretch>
             <dataRef>
                 <id>button</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>i18n</id>
+            <title>I18n fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>i18n_text</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>i18n_divider</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>

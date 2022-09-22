@@ -70,6 +70,7 @@ class ImporterTest {
     private static final String USER_FIELD = "user"
     private static final String DATETIME_FIELD = "datetime"
     private static final String BUTTON_FIELD = "button"
+    private static final String I18N_FIELD = "i18n"
 
     @BeforeEach
     void before() {
@@ -310,6 +311,7 @@ class ImporterTest {
         assert testCase.dataSet.get(FILE_LIST_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL] as Set<FieldBehavior>
         assert testCase.dataSet.get(USER_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
         assert testCase.dataSet.get(BUTTON_FIELD).behavior.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
+        assert testCase.dataSet.get(I18N_FIELD).behavior.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
     }
 
     @Test

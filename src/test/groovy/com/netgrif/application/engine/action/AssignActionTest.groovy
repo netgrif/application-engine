@@ -22,9 +22,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -33,6 +35,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 
 @ExtendWith(SpringExtension.class)
@@ -120,6 +123,7 @@ class AssignActionTest {
         User user = userRepository.findByEmail(USER_EMAIL)
 
         authentication = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSWORD)
+        authentication.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
 
         String roleIdInMainNet = mainNet.getRoles().find { it.value.name.defaultValue == "admin_main" }.key
 
@@ -138,8 +142,8 @@ class AssignActionTest {
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
         Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
-        String adminMainId = processRoleRepository.findByName_DefaultValue("admin_main").stringId
-        String adminSecondaryId = processRoleRepository.findByName_DefaultValue("admin_secondary").stringId
+        String adminMainId = processRoleRepository.findAllByName_DefaultValue("admin_main")?.first()?.stringId
+        String adminSecondaryId = processRoleRepository.findAllByName_DefaultValue("admin_secondary")?.first()?.stringId
 
         assert roles.find { it.stringId == adminMainId }
         assert roles.find { it.stringId == adminSecondaryId }

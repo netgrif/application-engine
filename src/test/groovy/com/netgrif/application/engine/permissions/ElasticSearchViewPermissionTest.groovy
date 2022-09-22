@@ -12,12 +12,14 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.junit.jupiter.api.BeforeEach
@@ -64,6 +66,9 @@ class ElasticSearchViewPermissionTest {
     private IElasticTaskService elasticTaskService
 
     @Autowired
+    private IDataService dataService
+
+    @Autowired
     private TestHelper testHelper
 
     private static final String USER_EMAIL = "user123987645@test.com"
@@ -75,6 +80,7 @@ class ElasticSearchViewPermissionTest {
 
     @BeforeEach
     void inti() {
+        testHelper.truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
@@ -109,9 +115,12 @@ class ElasticSearchViewPermissionTest {
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
         caseSearchRequest.process = [new CaseSearchRequest.PetriNet("vpt")] as List
+        sleep(4000)
         Page<Case> casePage = elasticCaseService.search([caseSearchRequest] as List, testUser.transformToLoggedUser(), PageRequest.of(0, 20), LocaleContextHolder.getLocale(), false)
 
-        assert casePage.getContent().size() == 1 && casePage.getContent()[0].stringId == case_.stringId
+        assert casePage.getContent() != null
+        assert casePage.getContent().size() == 1
+        assert casePage.getContent()[0].stringId == case_.stringId
         userService.removeRole(testUser, posViewRole.getStringId())
         workflowService.deleteCase(case_.getStringId())
     }
@@ -146,7 +155,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_pos"].value = [testUser.stringId]
+        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -161,7 +170,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_neg"].value = [testUser.stringId]
+        case_.dataSet["view_ul_neg"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -178,7 +187,7 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        case_.dataSet["view_ul_pos"].value = [testUser.stringId]
+        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 

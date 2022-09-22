@@ -3,7 +3,6 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
-import com.netgrif.application.engine.auth.service.interfaces.IAfterRegistrationAuthService;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.event.events.user.UserRegistrationEvent;
@@ -54,9 +53,6 @@ public class UserService extends AbstractUserService {
     @Autowired
     private IFilterImportExportService filterImportExportService;
 
-    @Autowired
-    private IAfterRegistrationAuthService authenticationService;
-
     @Override
     public IUser saveNewAndAuthenticate(IUser user) {
         return saveNew(user, true);
@@ -68,7 +64,6 @@ public class UserService extends AbstractUserService {
     }
 
     private IUser saveNew(IUser user, boolean login) {
-        String rawPassword = ((RegisteredUser) user).getPassword();
 
         registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
@@ -77,8 +72,6 @@ public class UserService extends AbstractUserService {
         User savedUser = userRepository.save((User) user);
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
-        if (login)
-            authenticationService.authenticateWithUsernameAndPassword(savedUser.getEmail(), rawPassword);
 
         if (groupProperties.isDefaultEnabled())
             groupService.createGroup(user);
@@ -87,8 +80,7 @@ public class UserService extends AbstractUserService {
             groupService.addUserToDefaultGroup(user);
 
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
-        if (login)
-            authenticationService.logoutAfterRegistrationFinished();
+
         return savedUser;
     }
 
@@ -260,9 +252,12 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getLoggedOrSystem() {
         try {
+            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
+                return getSystem();
+            }
             return getLoggedUser();
         } catch (NullPointerException e) {
-            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+            return getSystem();
         }
     }
 
@@ -284,7 +279,9 @@ public class UserService extends AbstractUserService {
 
     @Override
     public IUser getSystem() {
-        return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+        IUser system = userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+        system.setProcessRoles(new HashSet<>(processRoleService.findAll()));
+        return system;
     }
 
     @Override

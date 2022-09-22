@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.startup.GroupRunner
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.startup.SystemUserRunner
@@ -35,9 +34,6 @@ class FieldTest {
 
     @Autowired
     private UserRepository userRepository
-
-    @Autowired
-    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner systemUserRunner
@@ -81,12 +77,13 @@ class FieldTest {
         assertUserList()
         assertTaskRef()
         assertMultichoiceMap()
+        assertI18nField()
     }
 
     private void assertNet() {
         assert limitsNetOptional.isPresent()
         net = limitsNetOptional.get()
-        assert net.dataSet.size() == 14
+        assert net.dataSet.size() == 15
     }
 
     private void assertNumberField() {
@@ -195,8 +192,7 @@ class FieldTest {
         UserListField field = net.dataSet["emptyUserList"] as UserListField
         assert field.name.defaultValue == "Empty user list"
         assert field.description.defaultValue == "User list description"
-        assert field.defaultValue instanceof List
-        assert field.defaultValue.isEmpty()
+        assert field.defaultValue == null
     }
 
     private void assertTaskRef() {
@@ -213,5 +209,17 @@ class FieldTest {
         assert field.placeholder.defaultValue == "Multichoice map placeholder"
         assert field.defaultValue instanceof Set
         assert field.defaultValue.isEmpty()
+    }
+
+    private void assertI18nField() {
+        I18nField field = net.dataSet["i18n"] as I18nField
+        assert field.name.defaultValue == "Text I18n"
+        assert field.description.defaultValue == "This is I18n text field"
+        assert field.placeholder.defaultValue == "Text I18n field"
+        assert field.defaultValue.defaultValue == "Default i18n text value"
+        assert field.validations.get(0).validationRule == "translationRequired sk,en"
+        assert field.validations.get(0).validationMessage.defaultValue == "Slovak and English language required"
+        assert field.validations.get(1).validationRule == "translationOnly sk,en,cz,de"
+        assert field.validations.get(1).validationMessage.defaultValue == "Only Slovak, English, Czech and German languages allowed"
     }
 }

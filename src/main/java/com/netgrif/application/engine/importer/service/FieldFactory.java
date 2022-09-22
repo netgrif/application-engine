@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -40,6 +42,9 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
+
+    @Autowired
+    private IUserService userService;
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
@@ -136,8 +141,9 @@ public final class FieldFactory {
             field.setFormat(format);
         }
         if (data.getView() != null) {
+            log.warn("Data attribute [view] in field [" + field.getImportId()  + "] is deprecated.");
             View view = viewFactory.buildView(data);
-            field.setView(view);
+            field.setComponent(new Component(view.getValue()));
         }
 
         if (data.getComponent() != null) {
@@ -243,8 +249,8 @@ public final class FieldFactory {
         }
 
         List<I18nString> options = (data.getOptions() == null) ? new ArrayList<>() : data.getOptions().getOption().stream()
-                    .map(importer::toI18NString)
-                    .collect(Collectors.toList());
+                .map(importer::toI18NString)
+                .collect(Collectors.toList());
         field.getChoices().addAll(options);
     }
 
@@ -302,7 +308,11 @@ public final class FieldFactory {
 
     private ButtonField buildButtonField(Data data) {
         ButtonField field = new ButtonField();
-        setDefaultValue(field, data, field::setDefaultValue);
+        setDefaultValue(field, data, defaultValue -> {
+            if (defaultValue != null) {
+                field.setDefaultValue(Integer.parseInt(defaultValue));
+            }
+        });
         return field;
     }
 
@@ -338,7 +348,8 @@ public final class FieldFactory {
 
     private UserListField buildUserListField(Data data) {
         UserListField field = new UserListField();
-        setDefaultValues(field, data, inits -> {});
+        setDefaultValues(field, data, inits -> {
+        });
         return field;
     }
 
@@ -443,8 +454,8 @@ public final class FieldFactory {
 
         ((List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
                 .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
-            valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
-        });
+                    valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
+                });
     }
 
     private void resolveChoices(ChoiceField field, Case useCase) {
@@ -505,12 +516,19 @@ public final class FieldFactory {
                 break;
             case ENUMERATION:
                 field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
+                ((EnumerationField) field).setChoices(getFieldChoices((ChoiceField<?>) field, useCase));
+                break;
+            case ENUMERATION_MAP:
+                field.setValue(parseEnumerationMapValue(useCase, fieldId));
+                ((EnumerationMapField) field).setOptions(getFieldOptions((MapOptionsField<?, ?>) field, useCase));
                 break;
             case MULTICHOICE_MAP:
                 field.setValue(parseMultichoiceMapValue(useCase, fieldId));
+                ((MultichoiceMapField) field).setOptions(getFieldOptions((MapOptionsField<?, ?>) field, useCase));
                 break;
             case MULTICHOICE:
                 field.setValue(parseMultichoiceValue(useCase, fieldId));
+                ((MultichoiceField) field).setChoices(getFieldChoices((ChoiceField<?>) field, useCase));
                 break;
             case DATETIME:
                 parseDateTimeValue((DateTimeField) field, fieldId, useCase);
@@ -524,6 +542,9 @@ public final class FieldFactory {
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
+            case USERLIST:
+                parseUserListValues((UserListField) field, useCase, fieldId);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
@@ -536,6 +557,10 @@ public final class FieldFactory {
             field.setRoles(roles);
         }
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
+    }
+
+    private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
+        field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
@@ -682,6 +707,11 @@ public final class FieldFactory {
         }
     }
 
+    public static String parseEnumerationMapValue(Case useCase, String fieldId) {
+        Object value = useCase.getFieldValue(fieldId);
+        return value != null ? value.toString() : null;
+    }
+
     private void parseFileValue(FileField field, Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
         if (value == null)
@@ -762,6 +792,22 @@ public final class FieldFactory {
         }
         if (data.getInit() != null) return Arrays.asList(data.getInit().getValue().split(","));
         return Collections.emptyList();
+    }
+
+    private Set<I18nString> getFieldChoices(ChoiceField<?> field, Case useCase) {
+        if (useCase.getDataField(field.getImportId()).getChoices() == null) {
+            return field.getChoices();
+        } else {
+            return useCase.getDataField(field.getImportId()).getChoices();
+        }
+    }
+
+    private Map<String, I18nString> getFieldOptions(MapOptionsField<?, ?> field, Case useCase) {
+        if (useCase.getDataField(field.getImportId()).getOptions() == null) {
+            return (Map<String, I18nString>) field.getOptions();
+        } else {
+            return useCase.getDataField(field.getImportId()).getOptions();
+        }
     }
 
 }

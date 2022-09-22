@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>all_data</id>
 	<title>All Data</title>
 	<initials>ALL</initials>
@@ -112,6 +112,11 @@
             }
             <!-- @formatter:on -->
         </action>
+    </data>
+
+    <data type="fileList">
+        <id>fileList</id>
+        <title>File list</title>
     </data>
 
     <data type="user">
@@ -252,6 +257,17 @@
             <stretch>false</stretch>
             <dataRef>
                 <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>fileList</id>
+            <title>File list fields</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>fileList</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
