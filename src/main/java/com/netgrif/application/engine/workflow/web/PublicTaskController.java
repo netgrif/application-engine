@@ -186,6 +186,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getNamedFile(taskId, fieldId, name);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN")
     @DeleteMapping(value = "/{id}/file/{field}/{name}", produces = MediaTypes.HAL_JSON_VALUE)
