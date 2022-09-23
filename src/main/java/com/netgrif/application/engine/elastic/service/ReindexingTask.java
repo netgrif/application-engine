@@ -16,6 +16,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Page;
@@ -51,7 +52,9 @@ public class ReindexingTask {
             CaseRepository caseRepository,
             TaskRepository taskRepository,
             ElasticCaseRepository elasticCaseRepository,
+            @Qualifier("reindexingTaskElasticCaseService")
             IElasticCaseService elasticCaseService,
+            @Qualifier("reindexingTaskElasticTaskService")
             IElasticTaskService elasticTaskService,
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
