@@ -9,7 +9,6 @@ import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -33,17 +32,17 @@ public class ElasticServiceConfiguration {
     @Bean
     @Primary
     public Executor executor() {
-        return new Executor(elasticsearchProperties.getExecutors(), elasticsearchProperties.getExecutorsTimeout());
+        return new Executor(elasticsearchProperties.getExecutors().getSize(), elasticsearchProperties.getExecutors().getTimeout());
     }
 
     @Bean
     public Executor reindexingTaskCaseExecutor() {
-        return new Executor(elasticsearchProperties.getReindexSize(), elasticsearchProperties.getReindexTimeout());
+        return new Executor(elasticsearchProperties.getReindexExecutor().getSize(), elasticsearchProperties.getReindexExecutor().getTimeout());
     }
 
     @Bean
     public Executor reindexingTaskTaskExecutor() {
-        return new Executor(elasticsearchProperties.getReindexSize(), elasticsearchProperties.getReindexTimeout());
+        return new Executor(elasticsearchProperties.getReindexExecutor().getSize(), elasticsearchProperties.getReindexExecutor().getTimeout());
     }
 
 

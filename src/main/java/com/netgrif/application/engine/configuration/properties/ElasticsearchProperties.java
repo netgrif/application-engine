@@ -14,15 +14,11 @@ public class ElasticsearchProperties {
 
     private String reindex;
 
-    private int reindexSize = 20;
-
-    private int reindexTimeout = 60;
+    private ExecutorProperties reindexExecutor;
 
     private Duration reindexFrom;
 
-    private int executors = 500;
-
-    private int executorsTimeout = 5;
+    private ExecutorProperties executors;
 
     private boolean drop;
 
