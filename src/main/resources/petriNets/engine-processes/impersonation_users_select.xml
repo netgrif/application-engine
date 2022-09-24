@@ -15,17 +15,30 @@
 	<data type="enumeration_map">
 		<id>select_impersonator</id>
 		<title>Výber zastupiteľa</title>
-
-		<event type="get">
-			<id>select_impersonator_get</id>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<placeholder>Vyhľadajte podľa mena alebo emailovej adresy</placeholder>
+		<event type="set">
+			<id>select_impersonator_set</id>
 
 			<actions phase="post">
 				<action>
 					select_impersonator: f.select_impersonator;
 
-					def selectableUsers = userService.findAllCoMembers(userService.loggedUser.transformToLoggedUser(), false, new com.netgrif.application.engine.utils.FullPageRequest()).content
-					change select_impersonator value { null }
-					change select_impersonator options { selectableUsers.collectEntries { [(it.id): ("$it.fullName ($it.email)" as String)] } }
+					if (!select_impersonator.value) {
+						change select_impersonator options { [:] }
+
+					} else if (!select_impersonator.options.containsKey(select_impersonator.value)) {
+						def selectableUsers = userService.searchAllCoMembers(
+								select_impersonator.value,
+								userService.loggedUser.transformToLoggedUser(),
+								false,
+								new com.netgrif.application.engine.utils.FullPageRequest()).content
+						change select_impersonator options {
+							new java.util.ArrayList&lt;&gt;(selectableUsers).sort { it?.surname }.collectEntries { [(it.id): ("${it?.fullName} ($it.email)" as String)] }
+						}
+					}
 				</action>
 			</actions>
 		</event>

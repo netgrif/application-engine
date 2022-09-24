@@ -223,7 +223,7 @@
 					def userSelectCase = workflowService.findOne(user_select_caseId.value)
 					def selectedUserField = userSelectCase.dataSet["select_impersonator"]
 
-					if (selectedUserField.value == null) {
+					if (!selectedUserField.value || !selectedUserField.options[selectedUserField.value]) {
 						return
 					}
 
@@ -234,7 +234,7 @@
 					change impersonators value { options.keySet() }
 
 					setData((user_select_taskRef.value as List)[0], [
-					        "select_impersonator": ["type": "enumeration_map", "value": null]
+					        "select_impersonator": ["type": "enumeration_map", "value": ""]
 					])
 				</action>
 			</actions>
