@@ -270,6 +270,11 @@
             <type>pom</type>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+        </dependency>
+        <dependency>
             <groupId>de.rototor.pdfbox</groupId>
             <artifactId>graphics2d</artifactId>
             <version>0.32</version>
