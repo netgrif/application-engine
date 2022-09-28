@@ -12,8 +12,8 @@ Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.2](https:
 
 ### Fixed
 
-- [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
+- [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
 
 
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
