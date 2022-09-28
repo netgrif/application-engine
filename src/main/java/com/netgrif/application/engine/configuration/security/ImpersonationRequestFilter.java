@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class ImpersonationRequestFilter extends OncePerRequestFilter {
 
@@ -41,9 +43,14 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    void handleImpersonator(LoggedUser loggedUser, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    protected void handleImpersonator(LoggedUser loggedUser, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         try {
-            if (loggedUser.isImpersonating() && impersonatorRepository.findById(loggedUser.getId()).isEmpty()) {
+            if (!loggedUser.isImpersonating()) {
+                return;
+            }
+            Optional<Impersonator> imp = impersonatorRepository.findById(loggedUser.getId());
+            if (loggedUser.isImpersonating() && (imp.isEmpty() || !isValid(imp.get()))) {
+                imp.ifPresent(impersonatorRepository::delete);
                 logout(servletRequest, servletResponse);
             }
         } catch (Exception e) {
@@ -51,7 +58,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         }
     }
 
-    private void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
+    protected void handleImpersonated(LoggedUser loggedUser, HttpServletRequest servletRequest) {
         try {
             log.debug("Filtering request " + servletRequest.getRequestURI() + ", " + loggedUser.getUsername());
             impersonatorRepository.findByImpersonatedId(loggedUser.getId()).ifPresent(impersonatorRepository::delete);
@@ -61,7 +68,14 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         }
     }
 
-    private LoggedUser getPrincipal() {
+    private boolean isValid(Impersonator impersonator) {
+        if (impersonator.getImpersonatingUntil() == null) {
+            return true;
+        }
+        return !LocalDateTime.now().isAfter(impersonator.getImpersonatingUntil());
+    }
+
+    protected LoggedUser getPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
             return null;

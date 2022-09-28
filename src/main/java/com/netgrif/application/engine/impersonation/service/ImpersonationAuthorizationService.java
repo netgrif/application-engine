@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -73,8 +74,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public boolean canImpersonateUser(LoggedUser impersonator, String userId) {
         IUser impersonated = userService.findById(userId, true);
-        List<Case> impersonationConfig = searchConfigs(impersonator.getId(), impersonated.getStringId());
-        return impersonator.isAdmin() || !impersonationConfig.isEmpty();
+        return impersonator.isAdmin() || !searchConfigs(impersonator.getId(), impersonated.getStringId()).isEmpty();
     }
 
     @Override
@@ -93,9 +93,8 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         if (configs.isEmpty()) {
             return new ArrayList<>();
         }
-        List<String> authIds = (List) configs.get(0).getDataSet().get("impersonated_authorities").getValue();
-        authIds = authIds != null ? authIds : new ArrayList<>();
-        return authorityService.findAllByIds(authIds).stream()
+        Set<String> authIds = extractSetFromField(configs, "impersonated_authorities");
+        return authorityService.findAllByIds(new ArrayList<>(authIds)).stream()
                 .filter(configAuth -> impersonated.getAuthorities().stream().anyMatch(userAuth -> userAuth.getStringId().equals(configAuth.getStringId())))
                 .collect(Collectors.toList());
     }
@@ -107,9 +106,8 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         if (configs.isEmpty()) {
             return impersonatedRoles;
         }
-        List<String> roleIds = (List) configs.get(0).getDataSet().get("impersonated_roles").getValue();
-        roleIds = roleIds != null ? roleIds : new ArrayList<>();
-        impersonatedRoles.addAll((processRoleService.findByIds(new HashSet<>(roleIds))).stream()
+        Set<String> roleIds = extractSetFromField(configs, "impersonated_roles");
+        impersonatedRoles.addAll((processRoleService.findByIds(roleIds)).stream()
                 .filter(configRole -> impersonated.getProcessRoles().stream().anyMatch(userRole -> userRole.getStringId().equals(configRole.getStringId())))
                 .collect(Collectors.toList()));
         return impersonatedRoles;
@@ -123,6 +121,11 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     @Override
     public String getImpersonatedUserId(Case config) {
         return ((UserFieldValue) config.getDataSet().get("impersonated").getValue()).getId();
+    }
+
+    @Override
+    public LocalDateTime getValidUntil(Case config) {
+        return time(config, "valid_to");
     }
 
     protected CaseSearchRequest request(String impersonatorId, String impersonatedId) {
@@ -172,6 +175,20 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
             return true;
         }
         return first.isBefore(second) || first.equals(second);
+    }
+
+    protected Set<String> extractSetFromField(List<Case> cases, String fieldId) {
+        return cases.stream()
+                .map(caze -> multichoiceValue(caze.getDataField(fieldId)))
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
+    }
+
+    protected List<String> multichoiceValue(DataField field) {
+        if (field.getValue() == null || !(field.getValue() instanceof List)) {
+            return new ArrayList<>();
+        }
+        return (List<String>) field.getValue();
     }
 
     protected LocalDateTime time(Case config, String field) {

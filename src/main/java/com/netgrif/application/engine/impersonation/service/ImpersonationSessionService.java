@@ -25,7 +25,7 @@ public class ImpersonationSessionService implements IImpersonationSessionService
     @Override
     public boolean existsSession(String username) {
         Collection<? extends Session> usersSessions = this.sessions.findByPrincipalName(username).values();
-        return usersSessions.stream().anyMatch((session) -> !registry.getSessionInformation(session.getId()).isExpired());
+        return usersSessions.stream().anyMatch(session -> !registry.getSessionInformation(session.getId()).isExpired());
     }
 
     @Override

@@ -10,7 +10,7 @@ import com.netgrif.application.engine.impersonation.exceptions.IllegalImpersonat
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
-import com.netgrif.application.engine.impersonation.web.requestBodies.SearchRequest;
+import com.netgrif.application.engine.impersonation.web.requestbodies.SearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

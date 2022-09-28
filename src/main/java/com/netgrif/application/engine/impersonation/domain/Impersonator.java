@@ -27,4 +27,5 @@ public class Impersonator implements Serializable {
     private String configId;
 
     private LocalDateTime impersonatingSince;
+    private LocalDateTime impersonatingUntil;
 }

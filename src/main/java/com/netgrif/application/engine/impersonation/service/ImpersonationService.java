@@ -54,7 +54,7 @@ public class ImpersonationService implements IImpersonationService {
         List<Case> configs = impersonationAuthorizationService.searchConfigs(loggedUser.getId(), impersonated.getStringId());
         LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), configs).transformToLoggedUser();
 
-        return doImpersonate(loggedUser, impersonatedLogged, null);
+        return doImpersonate(loggedUser, impersonatedLogged, configs);
     }
 
     @Override
@@ -67,17 +67,17 @@ public class ImpersonationService implements IImpersonationService {
         IUser impersonated = userService.findById(impersonationAuthorizationService.getImpersonatedUserId(config), false);
 
         LoggedUser impersonatedLogged = applyRolesAndAuthorities(impersonated, loggedUser.getId(), Collections.singletonList(config)).transformToLoggedUser();
-        return doImpersonate(loggedUser, impersonatedLogged, configId);
+        return doImpersonate(loggedUser, impersonatedLogged, Collections.singletonList(config));
     }
 
-    protected LoggedUser doImpersonate(LoggedUser loggedUser, LoggedUser impersonatedLogged, String configId) throws ImpersonatedUserHasSessionException {
+    protected LoggedUser doImpersonate(LoggedUser loggedUser, LoggedUser impersonatedLogged, List<Case> configs) throws ImpersonatedUserHasSessionException {
         if (sessionService.existsSession(impersonatedLogged.getUsername())) {
             throw new ImpersonatedUserHasSessionException(impersonatedLogged, false);
 
         } else if (sessionService.isImpersonated(impersonatedLogged.getId())) {
             throw new ImpersonatedUserHasSessionException(impersonatedLogged, true);
         }
-        updateImpersonatedId(loggedUser, impersonatedLogged.getId(), configId);
+        updateImpersonatedId(loggedUser, impersonatedLogged.getId(), configs);
         loggedUser.impersonate(impersonatedLogged);
         securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
@@ -135,12 +135,35 @@ public class ImpersonationService implements IImpersonationService {
         return impersonated;
     }
 
-    protected void updateImpersonatedId(LoggedUser loggedUser, String id, String configId) {
+    protected void updateImpersonatedId(LoggedUser loggedUser, String id, List<Case> configs) {
+        Map<Case, LocalDateTime> configTimeMap = new HashMap<>();
+        configs.forEach((config) -> configTimeMap.put(config, getConfigValidToTime(config)));
+        Map.Entry<Case, LocalDateTime> earliestEndingConfig = configTimeMap
+                .entrySet().stream()
+                .filter(it -> it.getValue() != null)
+                .min(Map.Entry.comparingByValue())
+                .orElse(null);
+        if (earliestEndingConfig != null) {
+            updateImpersonatedId(loggedUser, id, earliestEndingConfig.getKey(), earliestEndingConfig.getValue());
+        } else {
+            updateImpersonatedId(loggedUser, id, null, null);
+        }
+    }
+
+    protected void updateImpersonatedId(LoggedUser loggedUser, String id, Case config, LocalDateTime validUntil) {
         removeImpersonatedId(loggedUser);
-        impersonatorRepository.save(new Impersonator(loggedUser.getId(), id, configId, LocalDateTime.now()));
+        impersonatorRepository.save(new Impersonator(loggedUser.getId(), id, config != null ? config.getStringId() : null, LocalDateTime.now(), validUntil));
     }
 
     protected void removeImpersonatedId(LoggedUser loggedUser) {
         impersonatorRepository.deleteById(loggedUser.getId());
+    }
+
+    protected LocalDateTime getConfigValidToTime(Case config) {
+        LocalDateTime limitTime = null;
+        if (config != null) {
+            limitTime = impersonationAuthorizationService.getValidUntil(config);
+        }
+        return limitTime;
     }
 }

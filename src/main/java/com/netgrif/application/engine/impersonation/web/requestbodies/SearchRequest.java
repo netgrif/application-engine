@@ -1,4 +1,4 @@
-package com.netgrif.application.engine.impersonation.web.requestBodies;
+package com.netgrif.application.engine.impersonation.web.requestbodies;
 
 import lombok.Getter;
 import lombok.Setter;
