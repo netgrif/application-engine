@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>6.2.1</version>
+    <version>6.2.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -268,6 +268,11 @@
             <artifactId>batik-all</artifactId>
             <version>1.14</version>
             <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>de.rototor.pdfbox</groupId>
