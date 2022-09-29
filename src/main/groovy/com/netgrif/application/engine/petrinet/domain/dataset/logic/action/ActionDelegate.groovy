@@ -23,11 +23,7 @@ import com.netgrif.application.engine.mail.interfaces.IMailService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
-import com.netgrif.application.engine.petrinet.domain.I18nString
-import com.netgrif.application.engine.petrinet.domain.PetriNet
-import com.netgrif.application.engine.petrinet.domain.Transition
-import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.UriNode
+import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
@@ -68,14 +64,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
-import org.springframework.core.io.FileUrlResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -676,6 +671,8 @@ class ActionDelegate {
         ChangedField changedField = new ChangedField(field.stringId)
         if (field instanceof I18nField) {
             changedField.attributes.put("value", value)
+        } else if (field instanceof DateTimeField) {
+            changedField.addAttribute("value", FieldFactory.parseDateTime(((LocalDateTime) value).toDate()))
         } else {
             changedField.addAttribute("value", value)
         }
