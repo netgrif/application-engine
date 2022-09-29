@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
@@ -32,7 +33,8 @@ import static com.netgrif.application.engine.startup.ImpersonationRunner.IMPERSO
 @Service
 public class ImpersonationAuthorizationService implements IImpersonationAuthorizationService {
 
-    public static final int MAX_CONFIGS_PER_USER = 1000;
+    @Autowired
+    private ImpersonationProperties properties;
 
     @Autowired
     private IUserService userService;
@@ -84,7 +86,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public List<Case> searchConfigs(String impersonatorId, String impersonatedId) {
-        Page<Case> cases = findCases(request(impersonatorId, impersonatedId), PageRequest.of(0, MAX_CONFIGS_PER_USER));
+        Page<Case> cases = findCases(request(impersonatorId, impersonatedId), PageRequest.of(0, properties.getConfigsPerUser()));
         return cases.getContent();
     }
 

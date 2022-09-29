@@ -4,6 +4,7 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
@@ -15,7 +16,6 @@ import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,8 +25,8 @@ import java.util.*;
 @Service
 public class ImpersonationService implements IImpersonationService {
 
-    @Value("${nae.impersonation.enabled}")
-    private boolean enabled;
+    @Autowired
+    private ImpersonationProperties properties;
 
     @Autowired
     private IUserService userService;
@@ -45,7 +45,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public LoggedUser impersonateUser(String impersonatedId) throws ImpersonatedUserHasSessionException {
-        if (!enabled) {
+        if (!properties.isEnabled()) {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
         LoggedUser loggedUser = userService.getLoggedUser().transformToLoggedUser();
@@ -59,7 +59,7 @@ public class ImpersonationService implements IImpersonationService {
 
     @Override
     public LoggedUser impersonateByConfig(String configId) throws ImpersonatedUserHasSessionException {
-        if (!enabled) {
+        if (!properties.isEnabled()) {
             throw new IllegalArgumentException("Impersonation is not enabled in app properties");
         }
         Case config = impersonationAuthorizationService.getConfig(configId);

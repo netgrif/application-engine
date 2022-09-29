@@ -8,13 +8,21 @@
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 
+
+	<i18n locale="sk">
+		<i18nString name="select_impersonator">Výber zastupiteľa</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="select_impersonator">Vertreter auswählen</i18nString>
+	</i18n>
+
 	<data type="text">
 		<id>parentId</id>
 		<title/>
 	</data>
 	<data type="enumeration_map">
 		<id>select_impersonator</id>
-		<title>Výber zastupiteľa</title>
+		<title name="select_impersonator">Select impersonator</title>
 		<component>
 			<name>autocomplete_dynamic</name>
 		</component>
