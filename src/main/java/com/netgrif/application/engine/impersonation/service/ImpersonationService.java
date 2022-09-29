@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -110,13 +111,10 @@ public class ImpersonationService implements IImpersonationService {
     public IUser reloadImpersonatedUserRoles(IUser impersonated, String impersonatorId) {
         Optional<Impersonator> context = impersonatorRepository.findByImpersonatedId(impersonated.getStringId());
         if (context.isPresent()) {
-            List<Case> config;
-            if (context.get().getConfigId() == null) {
-                config = new ArrayList<>();
-            } else {
-                config = Collections.singletonList(impersonationAuthorizationService.getConfig(context.get().getConfigId()));
-            }
-            return applyRolesAndAuthorities(impersonated, impersonatorId, config);
+            List<Case> configs = context.get().getConfigIds().stream()
+                    .map(id -> impersonationAuthorizationService.getConfig(id))
+                    .collect(Collectors.toList());
+            return applyRolesAndAuthorities(impersonated, impersonatorId, configs);
         }
         return impersonated;
     }
@@ -138,21 +136,18 @@ public class ImpersonationService implements IImpersonationService {
     protected void updateImpersonatedId(LoggedUser loggedUser, String id, List<Case> configs) {
         Map<Case, LocalDateTime> configTimeMap = new HashMap<>();
         configs.forEach((config) -> configTimeMap.put(config, getConfigValidToTime(config)));
-        Map.Entry<Case, LocalDateTime> earliestEndingConfig = configTimeMap
+        Optional<Map.Entry<Case, LocalDateTime>> earliestEndingConfig = configTimeMap
                 .entrySet().stream()
                 .filter(it -> it.getValue() != null)
-                .min(Map.Entry.comparingByValue())
-                .orElse(null);
-        if (earliestEndingConfig != null) {
-            updateImpersonatedId(loggedUser, id, earliestEndingConfig.getKey(), earliestEndingConfig.getValue());
-        } else {
-            updateImpersonatedId(loggedUser, id, null, null);
-        }
+                .min(Map.Entry.comparingByValue());
+            updateImpersonatedId(loggedUser, id, configs, earliestEndingConfig.map(Map.Entry::getValue).orElse(null));
     }
 
-    protected void updateImpersonatedId(LoggedUser loggedUser, String id, Case config, LocalDateTime validUntil) {
+    protected void updateImpersonatedId(LoggedUser loggedUser, String id, List<Case> configs, LocalDateTime validUntil) {
         removeImpersonatedId(loggedUser);
-        impersonatorRepository.save(new Impersonator(loggedUser.getId(), id, config != null ? config.getStringId() : null, LocalDateTime.now(), validUntil));
+        impersonatorRepository.save(new Impersonator(loggedUser.getId(), id,
+                configs.stream().map(Case::getStringId).collect(Collectors.toList()),
+                LocalDateTime.now(), validUntil));
     }
 
     protected void removeImpersonatedId(LoggedUser loggedUser) {

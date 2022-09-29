@@ -10,6 +10,8 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,7 +26,7 @@ public class Impersonator implements Serializable {
     private String impersonatedId;
 
     @Indexed
-    private String configId;
+    private List<String> configIds = new ArrayList<>();
 
     private LocalDateTime impersonatingSince;
     private LocalDateTime impersonatingUntil;
