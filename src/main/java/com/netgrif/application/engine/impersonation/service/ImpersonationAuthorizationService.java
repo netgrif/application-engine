@@ -34,22 +34,22 @@ import static com.netgrif.application.engine.startup.ImpersonationRunner.IMPERSO
 public class ImpersonationAuthorizationService implements IImpersonationAuthorizationService {
 
     @Autowired
-    private ImpersonationProperties properties;
+    protected ImpersonationProperties properties;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private IElasticCaseService elasticCaseService;
+    protected IElasticCaseService elasticCaseService;
 
     @Autowired
-    private IAuthorityService authorityService;
+    protected IAuthorityService authorityService;
 
     @Autowired
-    private IWorkflowService workflowService;
+    protected IWorkflowService workflowService;
 
     @Autowired
-    private IProcessRoleService processRoleService;
+    protected IProcessRoleService processRoleService;
 
     @Override
     public Page<IUser> getConfiguredImpersonationUsers(String query, LoggedUser impersonator, Pageable pageable) {

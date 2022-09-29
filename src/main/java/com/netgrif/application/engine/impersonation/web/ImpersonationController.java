@@ -42,19 +42,19 @@ import java.util.Locale;
 public class ImpersonationController {
 
     @Autowired
-    private IImpersonationService impersonationService;
+    protected IImpersonationService impersonationService;
 
     @Autowired
-    private IImpersonationAuthorizationService impersonationAuthorizationService;
+    protected IImpersonationAuthorizationService impersonationAuthorizationService;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private IUserResourceHelperService userResourceHelperService;
+    protected IUserResourceHelperService userResourceHelperService;
 
     @Autowired
-    private Provider<UserResourceAssembler> userResourceAssemblerProvider;
+    protected Provider<UserResourceAssembler> userResourceAssemblerProvider;
 
     protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
         UserResourceAssembler result = userResourceAssemblerProvider.get();

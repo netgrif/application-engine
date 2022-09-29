@@ -128,7 +128,7 @@ public class UserController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small != null && small;
-        LoggedUser actualUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LoggedUser actualUser = userService.getLoggedUserFromContext();
         LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
             log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);

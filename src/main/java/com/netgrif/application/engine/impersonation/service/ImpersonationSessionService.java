@@ -14,13 +14,13 @@ import java.util.Collection;
 public class ImpersonationSessionService implements IImpersonationSessionService {
 
     @Autowired
-    private FindByIndexNameSessionRepository<? extends Session> sessions;
+    protected FindByIndexNameSessionRepository<? extends Session> sessions;
 
     @Autowired
-    private SpringSessionBackedSessionRegistry<? extends Session> registry;
+    protected SpringSessionBackedSessionRegistry<? extends Session> registry;
 
     @Autowired
-    private ImpersonatorRepository impersonatorRepository;
+    protected ImpersonatorRepository impersonatorRepository;
 
     @Override
     public boolean existsSession(String username) {

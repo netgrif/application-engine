@@ -27,22 +27,22 @@ import java.util.stream.Collectors;
 public class ImpersonationService implements IImpersonationService {
 
     @Autowired
-    private ImpersonationProperties properties;
+    protected ImpersonationProperties properties;
 
     @Autowired
-    private IUserService userService;
+    protected IUserService userService;
 
     @Autowired
-    private IImpersonationSessionService sessionService;
+    protected IImpersonationSessionService sessionService;
 
     @Autowired
-    private ISecurityContextService securityContextService;
+    protected ISecurityContextService securityContextService;
 
     @Autowired
-    private ImpersonatorRepository impersonatorRepository;
+    protected ImpersonatorRepository impersonatorRepository;
 
     @Autowired
-    private IImpersonationAuthorizationService impersonationAuthorizationService;
+    protected IImpersonationAuthorizationService impersonationAuthorizationService;
 
     @Override
     public LoggedUser impersonateUser(String impersonatedId) throws ImpersonatedUserHasSessionException {

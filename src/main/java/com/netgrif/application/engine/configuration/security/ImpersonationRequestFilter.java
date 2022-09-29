@@ -68,7 +68,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isValid(Impersonator impersonator) {
+    protected boolean isValid(Impersonator impersonator) {
         if (impersonator.getImpersonatingUntil() == null) {
             return true;
         }
@@ -90,7 +90,7 @@ public class ImpersonationRequestFilter extends OncePerRequestFilter {
         return (LoggedUser) auth.getPrincipal();
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    protected void logout(HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, null);
     }
 

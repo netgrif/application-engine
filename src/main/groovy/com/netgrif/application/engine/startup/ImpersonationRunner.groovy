@@ -12,18 +12,18 @@ import org.springframework.stereotype.Component
 class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
-    private IPetriNetService petriNetService
+    protected IPetriNetService petriNetService
 
     @Autowired
-    private ImportHelper helper
+    protected ImportHelper helper
 
     @Autowired
-    private SystemUserRunner systemCreator
+    protected SystemUserRunner systemCreator
 
-    private static final String IMPERSONATION_CONFIG_FILE_NAME = "engine-processes/impersonation_config.xml"
+    protected static final String IMPERSONATION_CONFIG_FILE_NAME = "engine-processes/impersonation_config.xml"
     public static final String IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER = "impersonation_config"
 
-    private static final String IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME = "engine-processes/impersonation_users_select.xml"
+    protected static final String IMPERSONATION_CONFIG_USER_SELECT_FILE_NAME = "engine-processes/impersonation_users_select.xml"
     public static final String IMPERSONATION_CONFIG_USER_SELECT_PETRI_NET_IDENTIFIER = "impersonation_users_select"
 
     @Override
@@ -37,14 +37,13 @@ class ImpersonationRunner extends AbstractOrderedCommandLineRunner {
     }
 
     Optional<PetriNet> importProcess(String message, String netIdentifier, String netFileName) {
-        PetriNet filter = petriNetService.getNewestVersionByIdentifier(netIdentifier)
-        if (filter != null) {
+        PetriNet foundNet = petriNetService.getNewestVersionByIdentifier(netIdentifier)
+        if (foundNet != null) {
             log.info("${message} has already been imported.")
-            return new Optional<>(filter)
+            return Optional.of(foundNet)
         }
 
         Optional<PetriNet> net = helper.createNet(netFileName, VersionType.MAJOR, systemCreator.loggedSystem)
-
         if (!net.isPresent()) {
             log.error("Import of ${message} failed!")
         }

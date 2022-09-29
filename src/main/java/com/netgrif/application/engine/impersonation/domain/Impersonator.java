@@ -20,14 +20,14 @@ import java.util.List;
 public class Impersonator implements Serializable {
 
     @Id
-    private String impersonatorId;
+    protected String impersonatorId;
 
     @Indexed
-    private String impersonatedId;
+    protected String impersonatedId;
 
     @Indexed
-    private List<String> configIds = new ArrayList<>();
+    protected List<String> configIds = new ArrayList<>();
 
-    private LocalDateTime impersonatingSince;
-    private LocalDateTime impersonatingUntil;
+    protected LocalDateTime impersonatingSince;
+    protected LocalDateTime impersonatingUntil;
 }
