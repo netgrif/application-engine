@@ -6,7 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.1](https://github.com/netgrif/application-engine/commits/v6.2.1)
+Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.2](https://github.com/netgrif/application-engine/commits/v6.2.2)
+
+## [6.2.2](https://github.com/netgrif/application-engine/releases/tag/v6.2.2) (2022-09-28)
+
+### Fixed
+
+- [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
+- [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
+
 
 ## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-09-21)
 
