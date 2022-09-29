@@ -102,10 +102,6 @@
         <id>name</id>
         <title name="data_name_title">Name</title>
     </data>
-    <data type="text">
-        <id>configuration</id>
-        <title name="data_configuration_title">Configuration</title>
-    </data>
     <data type="number">
         <id>is_count</id>
         <title name="data_is_count_title">Count</title>
@@ -256,23 +252,6 @@
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
-            </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>4</y>
-                    <rows>2</rows>
-					<cols>3</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-                <component>
-                    <name>textarea</name>
-                </component>
             </dataRef>
 			<dataRef>
 				<id>save_btn</id>
@@ -433,20 +412,6 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
         </dataGroup>
     </transition>
     <transition>
@@ -556,33 +521,7 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
         </dataGroup>
-        <event type="assign">
-            <id>t4_assign</id>
-        </event>
-        <event type="finish">
-            <id>t4_finish</id>
-        </event>
-        <event type="cancel">
-            <id>t4_cancel</id>
-        </event>
-        <event type="delegate">
-            <id>t4_delegate</id>
-        </event>
     </transition>
     <transition>
         <id>t5</id>
@@ -684,20 +623,6 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
                     <y>3</y>
                     <rows>1</rows>
                     <cols>2</cols>
@@ -814,20 +739,6 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
         </dataGroup>
     </transition>
     <transition>
@@ -930,20 +841,6 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
                     <y>3</y>
                     <rows>1</rows>
                     <cols>2</cols>
@@ -1060,20 +957,6 @@
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
         </dataGroup>
     </transition>
     <transition>
@@ -1176,20 +1059,6 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>3</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>configuration</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
                     <y>3</y>
                     <rows>1</rows>
                     <cols>2</cols>

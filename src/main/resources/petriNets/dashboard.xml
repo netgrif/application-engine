@@ -6,11 +6,11 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>name</id>
 		<title>Name</title>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>description</id>
 		<title>Description</title>
 	</data>
