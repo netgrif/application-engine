@@ -2,7 +2,7 @@
 	<id>impersonation_users_select</id>
 	<version>1.0.0</version>
 	<initials>IPU</initials>
-	<title>Konfigurácia zastupiteľov - user select</title>
+	<title name="title">Impersonators configuration - user select</title>
 	<icon>home</icon>
 	<defaultRole>false</defaultRole>
 	<anonymousRole>false</anonymousRole>
@@ -11,9 +11,13 @@
 
 	<i18n locale="sk">
 		<i18nString name="select_impersonator">Výber zastupiteľa</i18nString>
+		<i18nString name="select_impersonator_placeholder">Vyhľadajte podľa mena alebo emailovej adresy</i18nString>
+		<i18nString name="title">Konfigurácia zastupiteľov - user select</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="select_impersonator">Vertreter auswählen</i18nString>
+		<i18nString name="select_impersonator_placeholder">Suche nach Name oder E-Mail-Adresse</i18nString>
+		<i18nString name="title">Vertreter Konfiguration - user select</i18nString>
 	</i18n>
 
 	<data type="text">
@@ -26,7 +30,7 @@
 		<component>
 			<name>autocomplete_dynamic</name>
 		</component>
-		<placeholder>Vyhľadajte podľa mena alebo emailovej adresy</placeholder>
+		<placeholder name="select_impersonator_placeholder">Search by name or email address</placeholder>
 		<event type="set">
 			<id>select_impersonator_set</id>
 

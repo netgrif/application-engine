@@ -51,7 +51,7 @@
 		<i18nString name="add_selected">Ausgewählte hinzufügen</i18nString>
 		<i18nString name="impersonated_authorities">Vertretene Berechtigungen</i18nString>
 		<i18nString name="impersonated_roles">Vertretene Rollen</i18nString>
-		<i18nString name="configure_impersonators">Vertreter wählen</i18nString>
+		<i18nString name="configure_impersonators">Vertreter auswählen</i18nString>
 		<i18nString name="deactivate">Deaktivieren</i18nString>
 		<i18nString name="reactivate">Reaktivieren</i18nString>
 		<i18nString name="publish">Veröffentlichen</i18nString>
