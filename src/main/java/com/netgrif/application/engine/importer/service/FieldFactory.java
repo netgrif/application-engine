@@ -663,15 +663,16 @@ public final class FieldFactory {
         if (value == null)
             return null;
 
-        if (value instanceof LocalDate)
+        if (value instanceof LocalDate) {
             return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
-        else if (value instanceof String) {
+        } else if (value instanceof String) {
             LocalDateTime localDateTime = parseDateTimeFromString((String) value);
             if (localDateTime == null)
                 return null;
             return localDateTime.atZone(getTimeZoneId()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        } else if (value instanceof Date)
+        } else if (value instanceof Date) {
             return LocalDateTime.ofInstant(((Date) value).toInstant(), getTimeZoneId());
+        }
         return (LocalDateTime) value;
     }
 
