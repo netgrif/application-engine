@@ -30,24 +30,24 @@ public class UserResourceHelperService implements IUserResourceHelperService {
     private IImpersonationService impersonationService;
 
     @Override
-    public UserResource resource(LoggedUser loggedUser, Locale locale, boolean small) {
+    public UserResource getResource(LoggedUser loggedUser, Locale locale, boolean small) {
         IUser user = userService.findById(loggedUser.getId(), small);
         User result = loggedUser.isImpersonating() ?
-                localisedUser(user, getImpersonated(loggedUser, small), locale) :
-                localisedUser(user, locale);
+                getLocalisedUser(user, getImpersonated(loggedUser, small), locale) :
+                getLocalisedUser(user, locale);
         return new UserResource(result, "profile");
     }
 
     @Override
-    public User localisedUser(IUser user, IUser impersonated, Locale locale) {
-        User localisedUser = localisedUser(user, locale);
+    public User getLocalisedUser(IUser user, IUser impersonated, Locale locale) {
+        User localisedUser = getLocalisedUser(user, locale);
         User impersonatedUser = userFactory.getUser(impersonated, locale);
         localisedUser.setImpersonated(impersonatedUser);
         return localisedUser;
     }
 
     @Override
-    public User localisedUser(IUser user, Locale locale) {
+    public User getLocalisedUser(IUser user, Locale locale) {
         return userFactory.getUser(user, locale);
     }
 

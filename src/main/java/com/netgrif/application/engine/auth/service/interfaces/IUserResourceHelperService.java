@@ -8,9 +8,9 @@ import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import java.util.Locale;
 
 public interface IUserResourceHelperService {
-    UserResource resource(LoggedUser loggedUser, Locale locale, boolean small);
+    UserResource getResource(LoggedUser loggedUser, Locale locale, boolean small);
 
-    User localisedUser(IUser user, IUser impersonated, Locale locale);
+    User getLocalisedUser(IUser user, IUser impersonated, Locale locale);
 
-    User localisedUser(IUser user, Locale locale);
+    User getLocalisedUser(IUser user, Locale locale);
 }

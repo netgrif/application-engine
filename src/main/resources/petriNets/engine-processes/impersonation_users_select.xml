@@ -48,7 +48,7 @@
 								false,
 								new com.netgrif.application.engine.utils.FullPageRequest()).content
 						change select_impersonator options {
-							new java.util.ArrayList&lt;&gt;(selectableUsers).sort { it?.surname }.collectEntries { [(it.id): ("${it?.fullName} ($it.email)" as String)] }
+							[*selectableUsers].sort { it?.surname }.collectEntries { [(it.id): ("${it?.fullName} ($it.email)" as String)] }
 						}
 					}
 				</action>

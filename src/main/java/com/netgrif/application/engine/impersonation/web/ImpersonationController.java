@@ -82,7 +82,7 @@ public class ImpersonationController {
             throw new IllegalImpersonationAttemptException(loggedUser, configId);
         }
         loggedUser = impersonationService.impersonateByConfig(configId);
-        return userResourceHelperService.resource(loggedUser, locale, false);
+        return userResourceHelperService.getResource(loggedUser, locale, false);
     }
 
     @Operation(summary = "Impersonate user directly by id", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -93,14 +93,14 @@ public class ImpersonationController {
             throw new IllegalImpersonationAttemptException(loggedUser, userId);
         }
         loggedUser = impersonationService.impersonateUser(userId);
-        return userResourceHelperService.resource(loggedUser, locale, false);
+        return userResourceHelperService.getResource(loggedUser, locale, false);
     }
 
     @Operation(summary = "Stop impersonating currently impersonated user", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping("/clear")
     public UserResource endImpersonation(Locale locale) {
         LoggedUser loggedUser = impersonationService.endImpersonation();
-        return userResourceHelperService.resource(loggedUser, locale, false);
+        return userResourceHelperService.getResource(loggedUser, locale, false);
     }
 
 }

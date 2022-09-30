@@ -81,12 +81,12 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public Page<Case> searchConfigs(String impersonatorId, Pageable pageable) {
-        return findCases(request(impersonatorId, null), pageable);
+        return findCases(makeRequest(impersonatorId, null), pageable);
     }
 
     @Override
     public List<Case> searchConfigs(String impersonatorId, String impersonatedId) {
-        Page<Case> cases = findCases(request(impersonatorId, impersonatedId), PageRequest.of(0, properties.getConfigsPerUser()));
+        Page<Case> cases = findCases(makeRequest(impersonatorId, impersonatedId), PageRequest.of(0, properties.getConfigsPerUser()));
         return cases.getContent();
     }
 
@@ -127,10 +127,10 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public LocalDateTime getValidUntil(Case config) {
-        return time(config, "valid_to");
+        return parseTime(config, "valid_to");
     }
 
-    protected CaseSearchRequest request(String impersonatorId, String impersonatedId) {
+    protected CaseSearchRequest makeRequest(String impersonatorId, String impersonatedId) {
         CaseSearchRequest request = new CaseSearchRequest();
         List<String> queries = new ArrayList<>();
         request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER));
@@ -167,8 +167,8 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         LocalDateTime now = LocalDateTime.now();
         return (((Collection) value).contains(id)) &&
                 ((Boolean) config.getFieldValue("is_active")) &&
-                validateTime(time(config, "valid_from"), now) &&
-                validateTime(now, time(config, "valid_to"));
+                validateTime(parseTime(config, "valid_from"), now) &&
+                validateTime(now, parseTime(config, "valid_to"));
 
     }
 
@@ -181,19 +181,19 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     protected Set<String> extractSetFromField(List<Case> cases, String fieldId) {
         return cases.stream()
-                .map(caze -> multichoiceValue(caze.getDataField(fieldId)))
+                .map(caze -> getMultichoiceValue(caze.getDataField(fieldId)))
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
     }
 
-    protected List<String> multichoiceValue(DataField field) {
+    protected List<String> getMultichoiceValue(DataField field) {
         if (field.getValue() == null || !(field.getValue() instanceof List)) {
             return new ArrayList<>();
         }
         return (List<String>) field.getValue();
     }
 
-    protected LocalDateTime time(Case config, String field) {
+    protected LocalDateTime parseTime(Case config, String field) {
         Object val = config.getFieldValue(field);
         if (val == null) {
             return null;
