@@ -12,11 +12,11 @@ import java.util.Locale;
  * A custom implementation of locale resolver to store the time zone offset in
  * request context
  * */
-public class CustomLocaleResolver implements LocaleContextResolver {
+public class LocaleResolver implements LocaleContextResolver {
     private final LocaleContextResolver localeContextResolver;
     private final AcceptHeaderLocaleResolver acceptHeaderLocaleResolver;
 
-    public CustomLocaleResolver(LocaleContextResolver localeContextResolver) {
+    public LocaleResolver(LocaleContextResolver localeContextResolver) {
         this.localeContextResolver = localeContextResolver;
         acceptHeaderLocaleResolver = new AcceptHeaderLocaleResolver();
         acceptHeaderLocaleResolver.setDefaultLocale(Locale.getDefault());
