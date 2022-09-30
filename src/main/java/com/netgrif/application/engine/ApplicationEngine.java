@@ -2,7 +2,6 @@ package com.netgrif.application.engine;
 
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.configuration.JsonRootRelProvider;
-import com.netgrif.application.engine.configuration.locale.CustomLocaleResolver;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,8 +19,6 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,12 +55,6 @@ public class ApplicationEngine {
     @Bean
     ApplicationContextProvider applicationContextProvider() {
         return new ApplicationContextProvider();
-    }
-
-    @Bean
-    LocaleResolver localeResolver() {
-        SessionLocaleResolver l = new SessionLocaleResolver();
-        return new CustomLocaleResolver(l);
     }
 
     public static void main(String[] args) {

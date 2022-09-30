@@ -1,9 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.locale.LocaleInterceptor;
 import com.netgrif.application.engine.configuration.properties.LocaleConfigurationProperties;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -17,11 +15,11 @@ import java.util.TimeZone;
  * and managing default time zone in system.
  * */
 @Configuration
-public class LocaleConfiguration implements WebMvcConfigurer {
+public class TimeZoneConfiguration implements WebMvcConfigurer {
 
     private final LocaleConfigurationProperties properties;
 
-    public LocaleConfiguration(@Autowired LocaleConfigurationProperties properties) {
+    public TimeZoneConfiguration(@Autowired LocaleConfigurationProperties properties) {
         this.properties = properties;
     }
 

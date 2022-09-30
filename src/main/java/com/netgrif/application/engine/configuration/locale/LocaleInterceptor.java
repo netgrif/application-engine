@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.configuration.locale;
 
-import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.security.service.ISecurityContextService;
+import com.netgrif.application.engine.configuration.TimeZoneConfiguration;
 import org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.LocaleContextResolver;
@@ -16,7 +14,7 @@ import java.util.TimeZone;
 
 /**
  * The interceptor that extracts time zone from request headers.
- * It's configuration can be found in {@link com.netgrif.application.engine.configuration.LocaleConfiguration}
+ * It's configuration can be found in {@link TimeZoneConfiguration}
  * */
 public class LocaleInterceptor implements HandlerInterceptor {
 
