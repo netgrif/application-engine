@@ -18,7 +18,7 @@ import java.util.TimeZone;
  * */
 public class LocaleInterceptor implements HandlerInterceptor {
 
-    private static final String TIMEZONE_OFFSET_HEADER_NAME = "X-Timezone-Offset";
+    public static final String TIMEZONE_OFFSET_HEADER_NAME = "X-Timezone-Offset";
 
     /**
      * The handle function that is being called to extract time zone offset from request header.
