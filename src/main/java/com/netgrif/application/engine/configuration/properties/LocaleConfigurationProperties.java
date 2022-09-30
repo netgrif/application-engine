@@ -18,7 +18,7 @@ public class LocaleConfigurationProperties {
     private String defaultTimeZone = "UTC";
 
     /**
-     * Defines the default server patters where {@link com.netgrif.application.engine.configuration.locale.LocaleInterceptor}
+     * Defines the default server patterns where {@link com.netgrif.application.engine.configuration.locale.LocaleInterceptor}
      * will execute {@link com.netgrif.application.engine.configuration.locale.LocaleInterceptor#preHandle(HttpServletRequest, HttpServletResponse, Object)}
      * function
      * */
