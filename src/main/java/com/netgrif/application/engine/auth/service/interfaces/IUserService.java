@@ -59,6 +59,8 @@ public interface IUserService {
 
     LoggedUser getAnonymousLogged();
 
+    LoggedUser getLoggedUserFromContext();
+
     IUser addRole(IUser user, String roleStringId);
 
     Page<IUser> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);

@@ -138,7 +138,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -160,7 +161,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
         } else {

@@ -24,7 +24,8 @@ public class TaskSearchService extends MongoSearchService<Task> {
     private IPetriNetService petriNetService;
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, user, locale)).collect(Collectors.toList());
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, loggedOrImpersonated, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
             // one of the queries evaluates to empty set => the entire result is an empty set
@@ -39,14 +40,14 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
-        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
-        constraints.or(buildUserRefQueryConstraint(user));
+        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(loggedOrImpersonated));
+        constraints.or(buildUserRefQueryConstraint(loggedOrImpersonated));
         builder.and(constraints);
 
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
-        permissionConstraints.or(buildViewUserQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
         builder.and(permissionConstraints);
         return builder;
     }
