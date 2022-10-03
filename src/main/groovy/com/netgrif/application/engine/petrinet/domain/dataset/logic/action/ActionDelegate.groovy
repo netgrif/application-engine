@@ -16,6 +16,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
+import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -183,6 +184,9 @@ class ActionDelegate {
     @Autowired
     IUriService uriService
 
+    @Autowired
+    IHistoryService historyService
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -333,7 +337,7 @@ class ActionDelegate {
                         }
                     } else if (transitionObject instanceof Closure) {
                         if (transitionObject == transitions) {
-                            useCase.petriNet.transitions.each {transitionEntry ->
+                            useCase.petriNet.transitions.each { transitionEntry ->
                                 Transition trans = transitionEntry.value
                                 if (trans.dataSet.containsKey(field.stringId)) {
                                     behaviorClosureResult = behavior(field, trans)
@@ -396,7 +400,7 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     if (transitionObject instanceof Transition) {
-                        fields.forEach  { field ->
+                        fields.forEach { field ->
                             behaviorClosureResult = behavior(field, transitionObject)
                             saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
                         }
@@ -415,7 +419,7 @@ class ActionDelegate {
                         }
                     } else if (transitionObject instanceof Closure) {
                         if (transitionObject == transitions) {
-                            useCase.petriNet.transitions.each {transitionEntry ->
+                            useCase.petriNet.transitions.each { transitionEntry ->
                                 Transition trans = transitionEntry.value
                                 fields.each { field ->
                                     if (trans.dataSet.containsKey(field.stringId)) {
@@ -1379,7 +1383,7 @@ class ActionDelegate {
         if (!createDefaultFilters) {
             return []
         }
-        return findCases({it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId))})
+        return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })
     }
 
     /**
@@ -1410,7 +1414,7 @@ class ActionDelegate {
      */
     @NamedVariant
     Case createTaskFilter(def title, String query, List<String> allowedNets,
-                          String icon = "",  String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
+                          String icon = "", String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE, def filterMetadata = null) {
         return createFilter(title, query, DefaultFiltersRunner.FILTER_TYPE_TASK, allowedNets, icon, visibility, filterMetadata)
     }
 
@@ -1445,9 +1449,9 @@ class ActionDelegate {
                         "value": visibility
                 ],
                 (DefaultFiltersRunner.FILTER_FIELD_ID)           : [
-                        "type"       : "filter",
-                        "value"      : query,
-                        "allowedNets": allowedNets,
+                        "type"          : "filter",
+                        "value"         : query,
+                        "allowedNets"   : allowedNets,
                         "filterMetadata": filterMetadata ?: [
                                 "searchCategories"       : [],
                                 "predicateMetadata"      : [],
@@ -1470,7 +1474,7 @@ class ActionDelegate {
      * @return
      */
     def changeFilter(Case filter) {
-        [query      : { cl ->
+        [query         : { cl ->
             updateFilter(filter, [
                     (DefaultFiltersRunner.FILTER_FIELD_ID): [
                             "type" : "enumeration_map",
@@ -1478,7 +1482,7 @@ class ActionDelegate {
                     ]
             ])
         },
-         visibility : { cl ->
+         visibility    : { cl ->
              updateFilter(filter, [
                      (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): [
                              "type" : "enumeration_map",
@@ -1486,7 +1490,7 @@ class ActionDelegate {
                      ]
              ])
          },
-         allowedNets: { cl ->
+         allowedNets   : { cl ->
              String currentQuery = workflowService.findOne(filter.stringId).dataSet[DefaultFiltersRunner.FILTER_FIELD_ID].value
              updateFilter(filter, [
                      (DefaultFiltersRunner.FILTER_FIELD_ID): [
@@ -1506,20 +1510,20 @@ class ActionDelegate {
                      ]
              ])
          },
-         title      : { cl ->
+         title         : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def value = cl()
              filter.setTitle(value as String)
              filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
              workflowService.save(filter)
          },
-         icon       : { cl ->
+         icon          : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def icon = cl() as String
              filter.setIcon(icon)
              workflowService.save(filter)
          },
-         uri        : { cl ->
+         uri           : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def uri = cl() as String
              filter.setUriNodeId(uriService.findByUri(uri).id)
@@ -1689,11 +1693,11 @@ class ActionDelegate {
      * @return
      */
     Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
-                             Map<String, String> allowedRoles = [:],
-                             Map<String, String> bannedRoles = [:],
-                             String icon = "",
-                             String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
-                             Case orgGroup = null) {
+                            Map<String, String> allowedRoles = [:],
+                            Map<String, String> bannedRoles = [:],
+                            String icon = "",
+                            String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
+                            Case orgGroup = null) {
         Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
         Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup)
         return menuItem
@@ -1716,11 +1720,11 @@ class ActionDelegate {
                         "type" : "caseRef",
                         "value": [filter.stringId]
                 ],
-                (PREFERENCE_ITEM_FIELD_PARENTID): [
+                (PREFERENCE_ITEM_FIELD_PARENTID)   : [
                         "type" : "text",
                         "value": orgGroup.stringId
                 ],
-                (PREFERENCE_ITEM_FIELD_IDENTIFIER): [
+                (PREFERENCE_ITEM_FIELD_IDENTIFIER) : [
                         "type" : "text",
                         "value": identifier
                 ],

@@ -6,11 +6,15 @@ import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.querydsl.core.annotations.QueryExclude;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Map;
 
 @QueryExclude
+@Document(collection = "eventLogs")
+@EqualsAndHashCode(callSuper = true)
 public class SetDataEventLog extends TaskEventLog {
 
     @Getter
