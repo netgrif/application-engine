@@ -1378,64 +1378,62 @@ class ActionDelegate {
      * Action API case search function using Elasticsearch database
      * @param requests the CaseSearchRequest list
      * @param loggedUser the user who is searching for the requests
+     * @param page the order of page to return. by default it returns the first page
      * @param pageable the page configuration that will contain the requests
      * @param locale the Locale to be used when searching for requests
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    List<Case> findCases(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
-                          int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
-        List<Case> cases = new ArrayList<>()
-        int numOfPages = (int) ((elasticCaseService.count(requests, loggedUser, locale, isIntersection) / pageSize) + 1)
-        (0..(numOfPages - 1)).each {cases.addAll(elasticCaseService.search(requests, loggedUser, PageRequest.of(it, pageSize), locale, isIntersection).toList())}
-        return cases
+    Page<Case> findCases(List<CaseSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                          int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        return elasticCaseService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
     /**
      * Action API case search function using Elasticsearch database
      * @param request case search request
+     * @param page the order of page to return
      * @param loggedUser the user who is searching for the requests
      * @param pageable the page configuration that will contain the requests
      * @param locale the Locale to be used when searching for requests
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    List<Case> findCases(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
-                          int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+    Page<Case> findCases(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<CaseSearchRequest> requests = Collections.singletonList(new CaseSearchRequest(request))
-        return findCases(requests, loggedUser, pageSize, locale, isIntersection)
+        return findCases(requests, loggedUser, page, pageSize, locale, isIntersection)
     }
 
     /**
      * Action API case search function using Elasticsearch database
      * @param requests the CaseSearchRequest list
      * @param loggedUser the user who is searching for the requests
+     * @param page the order of page to return. by default it returns the first page
      * @param pageable the page configuration that will contain the requests
      * @param locale the Locale to be used when searching for requests
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    List<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
-                         int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
-        List<Task> tasks = new ArrayList<>()
-        int numOfPages = (int) ((elasticTaskService.count(requests, loggedUser, locale, isIntersection) / pageSize) + 1)
-        (0..(numOfPages - 1)).each {tasks.addAll(elasticTaskService.search(requests, loggedUser, PageRequest.of(it, pageSize), locale, isIntersection).toList())}
-        return tasks
+    Page<Task> findTasks(List<ElasticTaskSearchRequest> requests, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+        return elasticTaskService.search(requests, loggedUser, PageRequest.of(page, pageSize), locale, isIntersection)
     }
 
     /**
      * Action API case search function using Elasticsearch database
      * @param request case search request
      * @param loggedUser the user who is searching for the requests
+     * @param page the order of page to return. by default it returns the first page
      * @param pageable the page configuration that will contain the requests
      * @param locale the Locale to be used when searching for requests
      * @param isIntersection to decide null query handling
      * @return page of cases
      * */
-    List<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
-                         int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
+    Page<Task> findTasks(Map<String, Object> request, LoggedUser loggedUser = userService.loggedOrSystem.transformToLoggedUser(),
+                         int page = 1, int pageSize = 25, Locale locale = Locale.default, boolean isIntersection = false) {
         List<ElasticTaskSearchRequest> requests = Collections.singletonList(new ElasticTaskSearchRequest(request))
-        return findTasks(requests, loggedUser, pageSize, locale, isIntersection)
+        return findTasks(requests, loggedUser, page, pageSize, locale, isIntersection)
     }
 
     List<Case> findDefaultFilters() {
