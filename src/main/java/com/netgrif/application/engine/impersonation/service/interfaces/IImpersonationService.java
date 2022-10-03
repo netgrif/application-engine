@@ -17,6 +17,8 @@ public interface IImpersonationService {
 
     void endImpersonation(String impersonatedId);
 
+    void endImpersonator(String impersonatorId);
+
     LoggedUser endImpersonation(LoggedUser loggedUser);
 
     IUser reloadImpersonatedUserRoles(IUser impersonated, String impersonatorId);

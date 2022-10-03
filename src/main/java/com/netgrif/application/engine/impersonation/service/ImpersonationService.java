@@ -97,6 +97,11 @@ public class ImpersonationService implements IImpersonationService {
     }
 
     @Override
+    public void endImpersonator(String impersonatorId) {
+        impersonatorRepository.deleteById(impersonatorId);
+    }
+
+    @Override
     public LoggedUser endImpersonation(LoggedUser impersonator) {
         LoggedUser impersonated = impersonator.getImpersonated();
         removeImpersonatedId(impersonator);

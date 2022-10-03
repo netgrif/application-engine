@@ -290,7 +290,11 @@ public class UserService extends AbstractUserService {
         if (!loggedUser.isAnonymous()) {
             IUser user = findByEmail(loggedUser.getEmail(), false);
             if (loggedUser.isImpersonating()) {
-                user.setImpersonated(loggedUser.getImpersonated().transformToUser());
+                // cannot be simply reloaded from DB, impersonated user holds a subset of roles and authorities.
+                // this reloads the impersonated user's roles as they are not complete (LoggedUser creates incomplete ProcessRole objects)
+                IUser impersonated = loggedUser.getImpersonated().transformToUser();
+                impersonated.setProcessRoles(processRoleService.findByIds(loggedUser.getProcessRoles()));
+                user.setImpersonated(impersonated);
             }
             return user;
         }
