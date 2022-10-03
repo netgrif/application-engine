@@ -5,8 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.2](https://github.com/netgrif/application-engine/commits/v6.2.2)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.3](https://github.com/netgrif/application-engine/commits/v6.2.3)
+
+## [6.2.3](https://github.com/netgrif/application-engine/releases/tag/v6.2.3) (2022-10-03)
+
+### Fixed
+
+- [NAE-1728] Simplify value for changing user list
+- [NAE-1730] PetriNetService cache fix upload bug
+- [NAE-1733] Organization group process has deprecated attributes and change import system user
+
 
 ## [6.2.2](https://github.com/netgrif/application-engine/releases/tag/v6.2.2) (2022-09-28)
 
