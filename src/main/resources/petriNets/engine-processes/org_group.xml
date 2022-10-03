@@ -93,9 +93,9 @@
 		<id>members</id>
 		<title>Members</title>
 		<desc>Members of current organization group</desc>
-		<view>
-			<list/>
-		</view>
+		<component>
+			<name>list</name>
+		</component>
 	</data>
 	<data type="enumeration_map">
 		<id>user_action_selection</id>
@@ -123,7 +123,11 @@
 		<title name="invite_by_mail">Add e-mail address</title>
 		<placeholder>example@example.com</placeholder>
 		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
-		<valid>email</valid>
+		<validations>
+			<validation>
+				<expression>email</expression>
+			</validation>
+		</validations>
 	</data>
 	<data type="taskRef">
 		<id>filter_tasks</id>
@@ -267,7 +271,9 @@
 	<data type="text">
 		<id>import_results</id>
 		<title name="import_results">Import results</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="button">
 		<id>export_menu_btn</id>
