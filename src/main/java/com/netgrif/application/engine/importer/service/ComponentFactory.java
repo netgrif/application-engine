@@ -84,13 +84,14 @@ public class ComponentFactory {
 
     private Component resolveComponent(com.netgrif.application.engine.importer.model.Component importComponent, Importer importer, Data data, Field field) throws MissingIconKeyException {
         if (data != null) {
-            if (data.getType() == DataType.ENUMERATION) {
+            if (data.getType() == DataType.ENUMERATION && data.getValues() != null && !data.getValues().isEmpty()) {
                 return new Component(importComponent.getName(), buildPropertyMap(importComponent.getProperties().getProperty()),
                         buildIconsListWithValues(importComponent.getProperties().getOptionIcons().getIcon(), data.getValues().stream().map(importer::toI18NString).collect(Collectors.toSet()), data.getId()));
+            } else if ((data.getType() == DataType.ENUMERATION || data.getType() == DataType.ENUMERATION_MAP) && data.getOptions() != null && !data.getOptions().getOption().isEmpty()) {
+                return new Component(importComponent.getName(), buildPropertyMap(importComponent.getProperties().getProperty()),
+                        buildIconsListWithOptions(importComponent.getProperties().getOptionIcons().getIcon(), data.getOptions().getOption().stream()
+                                .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new)), data.getId()));
             }
-            return new Component(importComponent.getName(), buildPropertyMap(importComponent.getProperties().getProperty()),
-                    buildIconsListWithOptions(importComponent.getProperties().getOptionIcons().getIcon(), data.getOptions().getOption().stream()
-                            .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new)), data.getId()));
         }
         if (field instanceof EnumerationField) {
             return new Component(importComponent.getName(), buildPropertyMap(importComponent.getProperties().getProperty()),
