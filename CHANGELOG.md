@@ -14,7 +14,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.3](h
 - [NAE-1728] Simplify value for changing user list
 - [NAE-1730] PetriNetService cache fix upload bug
 - [NAE-1733] Organization group process has deprecated attributes and change import system user
-
+- [NAE-1735] Enumeration parsing error when trying to use icons with option keys
 
 ## [6.2.2](https://github.com/netgrif/application-engine/releases/tag/v6.2.2) (2022-09-28)
 
