@@ -25,6 +25,10 @@ public abstract class TaskEventLog extends CaseEventLog {
     @Getter
     private String userId;
 
+    public TaskEventLog() {
+        super();
+    }
+
     protected TaskEventLog(Task task, Case useCase, EventPhase eventPhase, String userId, String impersonatorId) {
         super(task.getObjectId(), useCase, eventPhase);
         this.taskId = task.getStringId();

@@ -11,6 +11,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "eventLogs")
 public class CancelTaskEventLog extends TaskEventLog {
 
+    public CancelTaskEventLog() {
+        super();
+    }
+
     public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser user) {
         super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
     }

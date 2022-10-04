@@ -11,7 +11,7 @@ import com.netgrif.application.engine.configuration.security.PublicAuthenticatio
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
-import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     protected NaeLdapProperties ldapProperties;
 
     @Autowired
-    protected ImpersonatorRepository impersonatorRepository;
+    protected IImpersonationService impersonationService;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
 
@@ -181,6 +181,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private ImpersonationRequestFilter impersonationRequestFilter() {
-        return new ImpersonationRequestFilter(impersonatorRepository);
+        return new ImpersonationRequestFilter(impersonationService);
     }
 }

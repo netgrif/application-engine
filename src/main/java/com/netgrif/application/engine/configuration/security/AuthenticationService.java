@@ -35,10 +35,10 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
     @Value("${server.login.timeout:15}")
     private int loginTimeout;
 
+    private ConcurrentMap<String, Attempt> cache;
+
     @Autowired
     private IImpersonationService impersonationService;
-
-    private ConcurrentMap<String, Attempt> cache;
 
     public AuthenticationService() {
         super();
@@ -61,15 +61,13 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
     @EventListener
     public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {
         loginSucceeded(((WebAuthenticationDetails) event.getAuthentication().getDetails()).getRemoteAddress());
-        resolveImpersonator(event.getAuthentication().getPrincipal());
+        resolveImpersonatorOnLogin(event.getAuthentication().getPrincipal());
     }
 
     @Override
     public void onApplicationEvent(SessionDestroyedEvent event) {
         List<SecurityContext> contexts = event.getSecurityContexts();
-        contexts.forEach(context -> {
-            resolveImpersonator(context.getAuthentication().getPrincipal());
-        });
+        contexts.forEach(context -> resolveImpersonatorOnLogout(context.getAuthentication().getPrincipal()));
     }
 
     @Override
@@ -103,10 +101,20 @@ public class AuthenticationService implements IAuthenticationService, Applicatio
 
     }
 
-    protected void resolveImpersonator(Object principal) {
+    protected void resolveImpersonatorOnLogin(Object principal) {
         try {
             if (principal instanceof LoggedUser) {
-                impersonationService.endImpersonator(((LoggedUser) principal).getId());
+                impersonationService.removeImpersonator(((LoggedUser) principal).getId());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to resolve impersonator " + principal, e);
+        }
+    }
+
+    protected void resolveImpersonatorOnLogout(Object principal) {
+        try {
+            if (principal instanceof LoggedUser && ((LoggedUser) principal).isImpersonating()) {
+                impersonationService.onSessionDestroy((LoggedUser) principal);
             }
         } catch (Exception e) {
             log.warn("Failed to resolve impersonator " + principal, e);

@@ -16,11 +16,15 @@ public class DelegateTaskEventLog extends TaskEventLog {
     private String delegator;
 
     @Getter
-    private String delegatee;
+    private String delegate;
 
-    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser delegator, String delegatee) {
+    public DelegateTaskEventLog() {
+        super();
+    }
+
+    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser delegator, String delegate) {
         super(task, useCase, eventPhase, delegator.getStringId(), delegator.isImpersonating() ? delegator.getImpersonated().getStringId() : null);
         this.delegator = getUserId();
-        this.delegatee = delegatee;
+        this.delegate = delegate;
     }
 }

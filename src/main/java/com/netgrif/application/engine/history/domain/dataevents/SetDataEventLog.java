@@ -21,6 +21,10 @@ public class SetDataEventLog extends TaskEventLog {
     @Getter
     private Map<String, ChangedField> changedFields;
 
+    public SetDataEventLog() {
+        super();
+    }
+
     public SetDataEventLog(Task task, Case useCase, EventPhase eventPhase, Map<String, ChangedField> changedFields, IUser user) {
         super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
         this.changedFields = changedFields;

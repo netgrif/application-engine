@@ -12,6 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 public class GetDataEventLog extends TaskEventLog {
 
+    public GetDataEventLog() {
+        super();
+    }
+
     public GetDataEventLog(Task task, Case useCase, EventPhase eventPhase, IUser user) {
         super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
     }
