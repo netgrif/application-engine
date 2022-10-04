@@ -44,7 +44,7 @@ public class ProcessRoleService implements IProcessRoleService {
     private ProcessRole defaultRole;
     private ProcessRole anonymousRole;
 
-    public ProcessRoleService(IUserService userService, ProcessRoleRepository processRoleRepository,
+    public ProcessRoleService(@Lazy IUserService userService, ProcessRoleRepository processRoleRepository,
                               PetriNetRepository netRepository,
                               ApplicationEventPublisher publisher, RoleActionsRunner roleActionsRunner,
                               @Lazy IPetriNetService petriNetService, ISecurityContextService securityContextService) {
