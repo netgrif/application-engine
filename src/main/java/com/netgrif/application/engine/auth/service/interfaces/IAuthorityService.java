@@ -19,4 +19,6 @@ public interface IAuthorityService {
     List<Authority> getAllRoles();
 
     Authority getOne(String id);
+
+    List<Authority> findAllByIds(List<String> ids);
 }

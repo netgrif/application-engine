@@ -30,7 +30,7 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
     @Override
     public void customize(QuerydslBindings bindings, QCase qCase) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles((LoggedUser) auth.getPrincipal(), null);
+        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated(), null);
         Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
         Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
 

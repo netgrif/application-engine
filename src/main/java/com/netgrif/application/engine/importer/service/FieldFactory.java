@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -40,6 +42,9 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
+
+    @Autowired
+    private IUserService userService;
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
@@ -136,8 +141,9 @@ public final class FieldFactory {
             field.setFormat(format);
         }
         if (data.getView() != null) {
+            log.warn("Data attribute [view] in field [" + field.getImportId()  + "] is deprecated.");
             View view = viewFactory.buildView(data);
-            field.setView(view);
+            field.setComponent(new Component(view.getValue()));
         }
 
         if (data.getComponent() != null) {
@@ -536,6 +542,9 @@ public final class FieldFactory {
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
+            case USERLIST:
+                parseUserListValues((UserListField) field, useCase, fieldId);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
@@ -548,6 +557,10 @@ public final class FieldFactory {
             field.setRoles(roles);
         }
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
+    }
+
+    private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
+        field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {

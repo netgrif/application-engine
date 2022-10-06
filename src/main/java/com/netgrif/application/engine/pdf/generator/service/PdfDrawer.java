@@ -48,8 +48,6 @@ public class PdfDrawer implements IPdfDrawer {
     private int lineHeight, padding;
     private int boxSize;
 
-    private int titleFontSize;
-
     public void setupDrawer(PDDocument pdf, PdfResource pdfResource) {
         this.pdf = pdf;
         this.resource = pdfResource;
@@ -58,7 +56,6 @@ public class PdfDrawer implements IPdfDrawer {
         this.lineHeight = resource.getLineHeight();
         this.padding = resource.getPadding();
         this.boxSize = resource.getBoxSize();
-        this.titleFontSize = resource.getFontTitleSize();
     }
 
     @Override
@@ -247,8 +244,8 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
-    public void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException {
-        contentStream.setStrokingColor(Color.LIGHT_GRAY);
+    public void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth, Color color) throws IOException {
+        contentStream.setStrokingColor(color);
         contentStream.moveTo(x, y);
         contentStream.lineTo((float) (x + width), y);
         contentStream.stroke();
