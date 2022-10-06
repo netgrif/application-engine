@@ -180,6 +180,10 @@ class ImportHelper {
         return createCase(title, net, userService.getSystem().transformToLoggedUser())
     }
 
+    Case createCaseAsSuper(String title, PetriNet net) {
+        return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
+    }
+
     boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
         return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
     }
@@ -189,7 +193,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, userService.getSystem().transformToLoggedUser())
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
@@ -197,7 +201,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, userService.getSystem().transformToLoggedUser())
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
@@ -205,7 +209,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, userService.getSystem().transformToLoggedUser())
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     String getTaskId(String taskTitle, String caseId) {
