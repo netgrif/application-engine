@@ -674,6 +674,11 @@ class ActionDelegate {
             if (field instanceof NumberField) {
                 value = value as Double
             }
+            if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
+                List<UserFieldValue> users = [] as List
+                value.each {id -> users.add(new UserFieldValue(userService.findById(id as String, false)))}
+                value = new UserListFieldValue(users)
+            }
             field.value = value
             saveChangedValue(field)
         }
