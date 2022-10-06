@@ -202,6 +202,7 @@ public class PetriNetService implements IPetriNetService {
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
         save(net);
+        this.evictCache(net);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.POST);
