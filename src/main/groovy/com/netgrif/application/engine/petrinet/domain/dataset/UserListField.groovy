@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-class UserListField extends Field<List<String>> {
+class UserListField extends Field<UserListFieldValue> {
 
     UserListField() {
         super()
-        this.defaultValue = new ArrayList<>()
     }
 
     @Override

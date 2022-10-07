@@ -51,7 +51,6 @@ public class LdapLoggedUser extends LoggedUser {
         this.homeDirectory = homeDirectory;
     }
 
-
     public IUser transformToUser() {
         LdapUser user = new LdapUser(new ObjectId(this.id));
         user.setEmail(getUsername());
@@ -70,6 +69,10 @@ public class LdapLoggedUser extends LoggedUser {
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
     }
+
 }

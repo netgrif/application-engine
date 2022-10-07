@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     @Getter
     @Setter
     protected boolean anonymous;
+
+    @Getter
+    private LoggedUser impersonated;
 
     public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
@@ -70,7 +74,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
-
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
     }
 
@@ -91,6 +97,22 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return anonym;
     }
 
+    public void impersonate(LoggedUser toImpersonate) {
+        this.impersonated = toImpersonate;
+    }
+
+    public void clearImpersonated() {
+        this.impersonated = null;
+    }
+
+    public boolean isImpersonating() {
+        return this.impersonated != null;
+    }
+
+    public LoggedUser getSelfOrImpersonated() {
+        return this.isImpersonating() ? this.impersonated : this;
+    }
+
     @Override
     public String toString() {
         return "LoggedUser{" +
@@ -98,6 +120,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
                 ", fullName='" + fullName + '\'' +
                 ", groups=" + groups +
                 ", processRoles=" + processRoles +
+                ", impersonated=" + impersonated +
                 '}';
     }
 

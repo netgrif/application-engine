@@ -6,10 +6,12 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
+import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
+import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     protected NaeLdapProperties ldapProperties;
 
+    @Autowired
+    protected ImpersonatorRepository impersonatorRepository;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -106,6 +111,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .and()
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -172,5 +178,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
+    }
+
+    private ImpersonationRequestFilter impersonationRequestFilter() {
+        return new ImpersonationRequestFilter(impersonatorRepository);
     }
 }

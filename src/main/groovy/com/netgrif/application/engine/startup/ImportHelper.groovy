@@ -106,16 +106,16 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
         return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         return Optional.of(petriNetService.importPetriNet(netStream, release, author).getNet())
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
@@ -177,7 +177,11 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net) {
-        return createCase(title, net, superCreator.loggedSuper)
+        return createCase(title, net, userService.getSystem().transformToLoggedUser())
+    }
+
+    Case createCaseAsSuper(String title, PetriNet net) {
+        return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
@@ -189,7 +193,7 @@ class ImportHelper {
     }
 
     AssignTaskEventOutcome assignTaskToSuper(String taskTitle, String caseId) {
-        return assignTask(taskTitle, caseId, superCreator.loggedSuper)
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     FinishTaskEventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
@@ -197,7 +201,7 @@ class ImportHelper {
     }
 
     FinishTaskEventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
-        return finishTask(taskTitle, caseId, superCreator.loggedSuper)
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     CancelTaskEventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
@@ -205,7 +209,7 @@ class ImportHelper {
     }
 
     CancelTaskEventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
-        return cancelTask(taskTitle, caseId, superCreator.loggedSuper)
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
     String getTaskId(String taskTitle, String caseId) {
