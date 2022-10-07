@@ -75,6 +75,13 @@
             <name>dashboard_portal</name>
         </component>
     </data>
+    <data type="filter">
+        <id>dashboard_filter_case</id>
+        <title>Case view filter</title>
+        <component>
+            <name>tabbed-case-view</name>
+        </component>
+    </data>
     <data type="enumeration_map">
         <id>tile_type</id>
         <title name="data_tile_type_title">Type</title>
@@ -86,6 +93,7 @@
             <option key="line_chart" name="data_tile_type_option_line_chart">Line Chart</option>
             <option key="linear_gauge" name="data_tile_type_option_linear_gauge">Linear Gauge</option>
             <option key="portal" name="data_tile_type_option_portal">Portal</option>
+			<option key="filter_case">Case filter</option>
         </options>
         <event type="set">
             <id>tile_type_set</id>
@@ -137,6 +145,11 @@
         <title name="data_is_portal_title">Portal</title>
         <init>0</init>
     </data>
+    <data type="number">
+		<id>is_filter_case</id>
+		<title>Filter Case</title>
+		<init>0</init>
+	</data>
 	<data type="button">
 		<id>save_btn</id>
 		<title/>
@@ -157,6 +170,36 @@
                     }
                 </action>
 			</actions>
+        </event>
+	</data>
+	<data type="enumeration_map">
+		<id>dashboard_filter_case_select</id>
+		<title>Filter</title>
+        <event type="get">
+            <id>dashboard_filter_case_select_get</id>
+            <actions phase="pre">
+                <action>
+                    filterSelect: f.dashboard_filter_case_select;
+
+                    def cases = findAllFilters()
+                    change filterSelect options {
+                        cases.collectEntries { [it.stringId, new com.netgrif.application.engine.petrinet.domain.I18nString(it.title)] }
+                    }
+                </action>
+            </actions>
+        </event>
+        <event type="set">
+            <id>dashboard_filter_case_select_set</id>
+            <actions phase="post">
+                <action>
+                    caseFilterField: f.dashboard_filter_case,
+                    filterSelect: f.dashboard_filter_case_select;
+
+                    change caseFilterField value {
+                        filterSelect.value
+                    }
+                </action>
+            </actions>
         </event>
 	</data>
     <transition>
@@ -234,7 +277,7 @@
                     <x>0</x>
                     <y>3</y>
                     <rows>1</rows>
-                    <cols>4</cols>
+					<cols>3</cols>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
@@ -260,7 +303,7 @@
 				</logic>
 				<layout>
 					<x>3</x>
-					<y>4</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -274,7 +317,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>6</y>
+					<y>4</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -1067,6 +1110,129 @@
                 </layout>
             </dataRef>
         </dataGroup>
+	</transition>
+	<transition>
+		<id>t10</id>
+		<x>740</x>
+		<y>660</y>
+		<label>Case Filter</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_filter_case</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>dashboard_filter_case_select</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
     </transition>
     <place>
         <id>p1</id>
@@ -1124,6 +1290,13 @@
         <tokens>0</tokens>
         <static>false</static>
     </place>
+	<place>
+		<id>p9</id>
+		<x>620</x>
+		<y>660</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
     <arc>
         <id>a1</id>
         <type>regular</type>
@@ -1259,5 +1432,24 @@
         <sourceId>p8</sourceId>
         <destinationId>t9</destinationId>
         <multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a18</id>
+		<type>read</type>
+		<sourceId>p9</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a19</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p9</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>is_filter_case</reference>
+		<breakpoint>
+			<x>380</x>
+			<y>660</y>
+		</breakpoint>
     </arc>
 </document>
