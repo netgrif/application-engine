@@ -195,8 +195,12 @@
                     caseFilterField: f.dashboard_filter_case,
                     filterSelect: f.dashboard_filter_case_select;
 
+                    def caze = findCase { it._id.eq(filterSelect.value) }
+                    useCase.dataSet["dashboard_filter_case"].allowedNets = caze.dataSet["filter"].allowedNets
+                    useCase.dataSet["dashboard_filter_case"].filterMetadata = caze.dataSet["filter"].filterMetadata
+
                     change caseFilterField value {
-                        filterSelect.value
+                        caze.dataSet["filter"].value
                     }
                 </action>
             </actions>
