@@ -104,8 +104,8 @@ public class TextFieldBuilder extends FieldBuilder {
     }
 
     private String shortenFileName(String fileName) {
-        if (fileName.length() > 24) {
-            return fileName.substring(24, fileName.length() - 1);
+        if (fileName.length() > 32) {
+            return fileName.substring(0, 16) + "..." + fileName.substring(fileName.length() - 8);
         }
         return fileName;
     }
