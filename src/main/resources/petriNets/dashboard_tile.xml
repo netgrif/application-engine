@@ -79,7 +79,7 @@
         <id>dashboard_filter_case</id>
         <title>Case view filter</title>
         <component>
-            <name>tabbed-case-view</name>
+            <name>filter-tab-view</name>
         </component>
     </data>
     <data type="enumeration_map">
@@ -193,11 +193,13 @@
             <actions phase="post">
                 <action>
                     caseFilterField: f.dashboard_filter_case,
-                    filterSelect: f.dashboard_filter_case_select;
+                    filterSelect: f.dashboard_filter_case_select,
+                    name: f.name;
 
                     def caze = findCase { it._id.eq(filterSelect.value) }
                     useCase.dataSet["dashboard_filter_case"].allowedNets = caze.dataSet["filter"].allowedNets
                     useCase.dataSet["dashboard_filter_case"].filterMetadata = caze.dataSet["filter"].filterMetadata
+                    useCase.dataSet["dashboard_filter_case"].filterMetadata["tabTitle"] = name.value
 
                     change caseFilterField value {
                         caze.dataSet["filter"].value
