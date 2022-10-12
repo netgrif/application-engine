@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.3](https://github.com/netgrif/application-engine/commits/v6.2.3)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.4](https://github.com/netgrif/application-engine/commits/v6.2.4)
+
+## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
+
+### Fixed
+
+- [NAE-1747] PDF Generator: incorrect file name shortening
+- [NAE-1748] Incorrect handling for long lines in PDF generator
 
 ## [6.2.3](https://github.com/netgrif/application-engine/releases/tag/v6.2.3) (2022-10-06)
 
