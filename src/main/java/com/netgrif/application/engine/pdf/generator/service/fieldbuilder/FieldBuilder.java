@@ -111,6 +111,7 @@ public abstract class FieldBuilder {
 
                 if (word.length() > maxLineLength - lineLen && word.length() > maxLineLength) {
                     breakLongWordToMultipleLine(output, word, lineLen, (int) maxLineLength);
+                    lineLen = 0;
                 } else if (lineLen + word.length() > maxLineLength) {
                     output.append("\n");
                     lineLen = 0;
@@ -128,11 +129,14 @@ public abstract class FieldBuilder {
     }
 
     public static void breakLongWordToMultipleLine(StringBuilder output, String longWord, int lineLength, int maxLineLength) {
+        if (maxLineLength - lineLength <= 0) {
+            lineLength = 0;
+        }
         while (longWord.length() > maxLineLength - lineLength) {
             output.append(longWord, 0, maxLineLength - lineLength - 4);
             output.append("\n");
-            lineLength = 0;
             longWord = longWord.substring(maxLineLength - lineLength - 3);
+            lineLength = 0;
         }
     }
 
