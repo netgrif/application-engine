@@ -187,7 +187,13 @@ public final class FieldFactory {
         }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValues(init);
+                List<String> finalInits = init.stream().filter(i -> field.getChoices().stream().anyMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
+                List<String> unresolvedChoices = init.stream().filter(i -> field.getChoices().stream().noneMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
+                if (!unresolvedChoices.isEmpty()) {
+                    finalInits.addAll(unresolvedChoices.stream().map(uch -> data.getOptions().getOption().stream().filter(o -> o.getKey().equals(uch)).findFirst().orElse(new Option()).getValue()).collect(Collectors.toList()));
+                    finalInits.removeAll(Collections.singletonList(null));
+                }
+                field.setDefaultValues(finalInits);
             }
         });
         return field;
@@ -202,6 +208,10 @@ public final class FieldFactory {
         }
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
+                String tempInit = init;
+                if (field.getChoices().stream().filter(ch -> ch.getDefaultValue().equals(tempInit)).findAny().isEmpty()) {
+                    init = data.getOptions().getOption().stream().filter(o -> o.getKey().equals(tempInit)).findFirst().orElse(new Option()).getValue();
+                }
                 field.setDefaultValue(init);
             }
         });
