@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,6 +109,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return this.impersonated != null;
     }
 
+    @JsonIgnore
     public LoggedUser getSelfOrImpersonated() {
         return this.isImpersonating() ? this.impersonated : this;
     }
