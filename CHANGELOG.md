@@ -7,18 +7,23 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.4](https://github.com/netgrif/application-engine/commits/v6.2.4)
 
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-01)
+
+### Fixed
+
+- [NAE-1761] LoggedUser circular dependency
+- [NAE-1762] Public view URL encoding
+
+### Added
+
+- [NAE-1678] User impersonation
+
 ## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
 
 ### Fixed
 
 - [NAE-1747] PDF Generator: incorrect file name shortening
 - [NAE-1748] Incorrect handling for long lines in PDF generator
-
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-01)
-
-### Added
-
-- [NAE-1678] User impersonation
 
 ## [6.2.3](https://github.com/netgrif/application-engine/releases/tag/v6.2.3) (2022-10-06)
 
