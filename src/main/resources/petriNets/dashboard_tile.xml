@@ -6,6 +6,26 @@
     <defaultRole>true</defaultRole>
     <anonymousRole>true</anonymousRole>
     <transitionRole>false</transitionRole>
+    <caseName name="model_default_case_name">Dashboard Tile</caseName>
+    <function scope="process" name="mergeParentsFilter">
+        { String parentFilterId, String query ->
+            def parentFilterCase = workflowService.findOne(parentFilterId)
+            if (!parentFilterCase) {
+                return query
+            }
+            String parentQuery = parentFilterCase.dataSet["filter"].value
+            if (!parentQuery) {
+                return query
+            }
+            query = "(${query}) AND (${parentQuery})"
+            String grandparentCaseId = parentFilterCase.dataSet["parent_filter_id"].value
+            if (!grandparentCaseId) {
+                return query
+            } else {
+                return mergeParentsFilter(grandparentCaseId, query)
+            }
+        }
+    </function>
     <data type="text">
         <id>parent_dashboard_id</id>
         <title/>
@@ -77,7 +97,7 @@
     </data>
     <data type="filter">
         <id>dashboard_filter_case</id>
-        <title>Case view filter</title>
+		<title name="data_dashboard_filter_case_title">Case view filter</title>
         <component>
             <name>filter-tab-view</name>
         </component>
@@ -93,7 +113,7 @@
             <option key="line_chart" name="data_tile_type_option_line_chart">Line Chart</option>
             <option key="linear_gauge" name="data_tile_type_option_linear_gauge">Linear Gauge</option>
             <option key="portal" name="data_tile_type_option_portal">Portal</option>
-			<option key="filter_case">Case filter</option>
+			<option key="filter_case" name="data_tile_type_option_filter_case">Case filter</option>
         </options>
         <event type="set">
             <id>tile_type_set</id>
@@ -147,13 +167,13 @@
     </data>
     <data type="number">
 		<id>is_filter_case</id>
-		<title>Filter Case</title>
+		<title name="data_is_filter_case_title">Filter Case</title>
 		<init>0</init>
 	</data>
 	<data type="button">
 		<id>save_btn</id>
 		<title/>
-		<placeholder>Save</placeholder>
+		<placeholder name="data_save_btn_placeholder">Save</placeholder>
 		<component>
 			<name>flat</name>
 		</component>
@@ -174,7 +194,7 @@
 	</data>
 	<data type="enumeration_map">
 		<id>dashboard_filter_case_select</id>
-		<title>Filter</title>
+		<title name="data_dashboard_filter_case_select_title">Filter</title>
         <event type="get">
             <id>dashboard_filter_case_select_get</id>
             <actions phase="pre">
@@ -197,17 +217,80 @@
                     name: f.name;
 
                     def caze = findCase { it._id.eq(filterSelect.value) }
+
                     useCase.dataSet["dashboard_filter_case"].allowedNets = caze.dataSet["filter"].allowedNets
                     useCase.dataSet["dashboard_filter_case"].filterMetadata = caze.dataSet["filter"].filterMetadata
                     useCase.dataSet["dashboard_filter_case"].filterMetadata["tabTitle"] = name.value
 
+                    useCase.dataSet["dashboard_filter_case"].filterMetadata["tabTitle"] = name.value
+
                     change caseFilterField value {
-                        caze.dataSet["filter"].value
+                        mergeParentsFilter(caze.dataSet["parent_filter_id"].value, caze.dataSet["filter"].value)
                     }
                 </action>
             </actions>
         </event>
 	</data>
+    <i18n locale="sk">
+        <i18nString name="data_rows_title">Počet riadkov</i18nString>
+        <i18nString name="data_cols_title">Počet stĺpcov</i18nString>
+        <i18nString name="data_tile_type_title">Typ</i18nString>
+        <i18nString name="data_name_title">Názov</i18nString>
+        <i18nString name="data_save_btn_placeholder">Uložiť</i18nString>
+        <i18nString name="model_title">Dlaždica nástenky</i18nString>
+        <i18nString name="model_default_case_name">Dlaždica</i18nString>
+        <i18nString name="task_t1_title">Vytvoriť</i18nString>
+        <i18nString name="task_t3_title">iframe</i18nString>
+        <i18nString name="task_t4_title">Počítadlo</i18nString>
+        <i18nString name="task_t5_title">Stĺpcový graf</i18nString>
+        <i18nString name="task_t6_title">Koláčový graf</i18nString>
+        <i18nString name="task_t7_title">Spojnicový graf</i18nString>
+        <i18nString name="task_t8_title">Lineárne meradlo</i18nString>
+        <i18nString name="task_t9_title">Portál</i18nString>
+        <i18nString name="task_t10_title">Filter prípadov</i18nString>
+        <i18nString name="data_x_title">X</i18nString>
+        <i18nString name="data_y_title">Y</i18nString>
+        <i18nString name="data_dashboard_filter_case_title">Filter prípadov</i18nString>
+        <i18nString name="data_tile_type_option_count">Počítadlo</i18nString>
+        <i18nString name="data_tile_type_option_iframe">iframe</i18nString>
+        <i18nString name="data_tile_type_option_bar_chart">Stĺpcový graf</i18nString>
+        <i18nString name="data_tile_type_option_pie_chart">Koláčový graf</i18nString>
+        <i18nString name="data_tile_type_option_line_chart">Spojnicový graf</i18nString>
+        <i18nString name="data_tile_type_option_linear_gauge">Lineárne meradlo</i18nString>
+        <i18nString name="data_tile_type_option_portal">Portál</i18nString>
+        <i18nString name="data_tile_type_option_filter_case">Filter prípadov</i18nString>
+        <i18nString name="data_dashboard_filter_case_select_title">Filter</i18nString>
+    </i18n>
+	<i18n locale="de">
+        <i18nString name="data_rows_title"> Anzahl der Reihen</i18nString>
+        <i18nString name="data_cols_title">Anzahl der Spalten</i18nString>
+        <i18nString name="data_tile_type_title">Typ</i18nString>
+        <i18nString name="data_name_title">Titel</i18nString>
+        <i18nString name="data_save_btn_placeholder">Speichern</i18nString>
+        <i18nString name="model_title">Dashboard Kachel</i18nString>
+        <i18nString name="model_default_case_name">Kachel</i18nString>
+        <i18nString name="task_t1_title">Schaffen</i18nString>
+        <i18nString name="task_t3_title">iframe</i18nString>
+        <i18nString name="task_t4_title">Zähler</i18nString>
+        <i18nString name="task_t5_title">Säulendiagramm</i18nString>
+        <i18nString name="task_t6_title">Kreisdiagramm</i18nString>
+        <i18nString name="task_t7_title">Liniendiagramm</i18nString>
+        <i18nString name="task_t8_title">Tachometerdiagramm</i18nString>
+        <i18nString name="task_t9_title">Portal</i18nString>
+        <i18nString name="task_t10_title">Fallfilter</i18nString>
+        <i18nString name="data_x_title">X</i18nString>
+        <i18nString name="data_y_title">Y</i18nString>
+        <i18nString name="data_dashboard_filter_case_title">Fallfilter</i18nString>
+        <i18nString name="data_tile_type_option_count">Zähler</i18nString>
+        <i18nString name="data_tile_type_option_iframe">iframe</i18nString>
+        <i18nString name="data_tile_type_option_bar_chart">Säulendiagramm</i18nString>
+        <i18nString name="data_tile_type_option_pie_chart">Kreisdiagramm</i18nString>
+        <i18nString name="data_tile_type_option_line_chart">Liniendiagramm</i18nString>
+        <i18nString name="data_tile_type_option_linear_gauge">Tachometerdiagramm</i18nString>
+        <i18nString name="data_tile_type_option_portal">Portal</i18nString>
+        <i18nString name="data_tile_type_option_filter_case">Fallfilter</i18nString>
+        <i18nString name="data_dashboard_filter_case_select_title">Filter</i18nString>
+    </i18n>
     <transition>
         <id>t1</id>
         <x>380</x>
@@ -221,11 +304,11 @@
             <dataRef>
                 <id>x</id>
                 <logic>
-                    <behavior>visible</behavior>
+					<behavior>hidden</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+					<y>3</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -235,11 +318,11 @@
             <dataRef>
                 <id>y</id>
                 <logic>
-                    <behavior>visible</behavior>
+					<behavior>hidden</behavior>
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>1</y>
+					<y>3</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -253,7 +336,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>2</y>
+					<y>1</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -267,7 +350,7 @@
                 </logic>
                 <layout>
                     <x>2</x>
-                    <y>2</y>
+					<y>1</y>
                     <rows>1</rows>
                     <cols>2</cols>
                     <template>material</template>
@@ -281,7 +364,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>3</y>
+					<y>2</y>
                     <rows>1</rows>
 					<cols>3</cols>
                     <template>material</template>
@@ -309,7 +392,7 @@
 				</logic>
 				<layout>
 					<x>3</x>
-					<y>3</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -1121,7 +1204,7 @@
 		<id>t10</id>
 		<x>740</x>
 		<y>660</y>
-		<label>Case Filter</label>
+		<label name="task_t10_title">Case Filter</label>
         <dataGroup>
             <id>t3_0</id>
             <cols>4</cols>
@@ -1133,7 +1216,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>0</y>
+                    <y>1</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -1231,7 +1314,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>0</y>
 					<rows>1</rows>
 					<cols>4</cols>
                     <template>material</template>
