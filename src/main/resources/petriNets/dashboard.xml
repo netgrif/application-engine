@@ -7,33 +7,6 @@
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
 	<caseName name="model_default_case_name">Dashboard</caseName>
-	<roleRef>
-		<id>default</id>
-		<caseLogic>
-			<create>true</create>
-		</caseLogic>
-	</roleRef>
-	<userRef>
-		<id>users_share_ref</id>
-		<caseLogic>
-			<view>true</view>
-		</caseLogic>
-	</userRef>
-	<caseEvents>
-		<event type="create">
-			<id>create</id>
-			<actions phase="post">
-				<action>
-					users_share_ref: f.users_share_ref;
-
-					def userIds = [ userService.loggedUser.id ] as Set
-					change users_share_ref value {
-						userIds
-					}
-				</action>
-			</actions>
-		</event>
-	</caseEvents>
 	<data type="text" immediate="true">
 		<id>name</id>
 		<title name="data_name_title">Name</title>
@@ -58,10 +31,6 @@
 		<component>
 			<name>dashboard</name>
 		</component>
-	</data>
-	<data type="userList">
-		<id>users_share_ref</id>
-		<title/>
 	</data>
 	<i18n locale="sk">
 		<i18nString name="task_t1_title">Konfigurácia</i18nString>
