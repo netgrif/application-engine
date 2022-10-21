@@ -7,6 +7,7 @@ import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
@@ -117,17 +118,16 @@ public final class FieldFactory {
         }
     }
 
-    public Field buildFieldWithoutValidation(Case useCase, String fieldId, String transitionId) {
-        return buildField(useCase, fieldId, false, transitionId);
+    public DataRef buildDataRefWithoutValidation(Case useCase, String fieldId, String transitionId) {
+        return buildDataRef(useCase, fieldId, false, transitionId);
     }
 
-    public Field buildFieldWithValidation(Case useCase, String fieldId, String transitionId) {
-        return buildField(useCase, fieldId, true, transitionId);
+    public DataRef buildDataRefWithValidation(Case useCase, String fieldId, String transitionId) {
+        return buildDataRef(useCase, fieldId, true, transitionId);
     }
 
-    private Field buildField(Case useCase, String fieldId, boolean withValidation, String transitionId) {
+    private DataRef buildDataRef(Case useCase, String fieldId, boolean withValidation, String transitionId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-
         resolveDataValues(field, useCase, fieldId);
         resolveComponent(field, useCase, transitionId);
         if (field instanceof ChoiceField)

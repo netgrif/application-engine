@@ -20,20 +20,18 @@ public class DataRef {
 
     private FieldBehavior behavior;
 
+    private boolean required;
+
     private Map<DataEventType, DataEvent> events;
 
     private FieldLayout layout;
 
     private Component component;
 
-    public DataRef() {
-        this.events = new HashMap<>();
-        this.layout = new FieldLayout();
-    }
-
-    public DataRef(FieldBehavior behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
-        this();
+    public DataRef(Field field, FieldBehavior behavior, boolean required, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+        this.field = field;
         this.behavior = behavior;
+        this.required = required;
         this.events = events;
         this.layout = layout;
         if (component != null) {
@@ -41,9 +39,10 @@ public class DataRef {
         }
     }
 
-    public boolean isDisplayableForCase() {
-        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
-    }
+    // TODO: NAE-1645
+//    public boolean isDisplayableForCase() {
+//        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
+//    }
 
     public static List<Action> getEventAction(DataEvent event, EventPhase phase){
         if(phase == null) phase = event.getDefaultPhase();
@@ -54,17 +53,25 @@ public class DataRef {
         }
     }
 
+    // TODO: NAE-1645
+    @Deprecated
     public boolean isRequired() {
-        return behavior.contains(FieldBehavior.REQUIRED);
+        return this.required;
     }
 
+    // TODO: NAE-1645
     @Override
     public String toString() {
-        return behavior.stream().map(FieldBehavior::toString).collect(Collectors.joining(", "));
+        if (behavior == null) {
+            return "";
+        }
+        return behavior.toString();
     }
 
+    // TODO: NAE-1645
+    @Deprecated
     public boolean isForbidden() {
-        return behavior.contains(FieldBehavior.FORBIDDEN);
+        return behavior == FieldBehavior.FORBIDDEN;
     }
 
     public boolean layoutExist() {
@@ -72,5 +79,6 @@ public class DataRef {
     }
 
     public boolean isImmediate() {
+        return field.isImmediate();
     }
 }

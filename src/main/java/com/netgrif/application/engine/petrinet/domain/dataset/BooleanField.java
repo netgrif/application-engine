@@ -17,14 +17,6 @@ public class BooleanField extends Field<Boolean> {
         return DataType.BOOLEAN;
     }
 
-    public Boolean or(final BooleanField field) {
-        return this.getValue() || field.getValue();
-    }
-
-    public Boolean and(final BooleanField field) {
-        return this.getValue() && field.getValue();
-    }
-
     @Override
     public BooleanField clone() {
         BooleanField clone = new BooleanField();

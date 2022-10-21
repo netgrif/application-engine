@@ -31,7 +31,7 @@ public class Transition extends Node {
     @Field("dataSet")
     @Getter
     @Setter
-    private LinkedHashMap<String, DataFieldLogic> dataSet;
+    private LinkedHashMap<String, DataRef> dataSet;
 
     @Field("roles")
     @Getter
@@ -103,19 +103,20 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component){
-        if(dataSet.containsKey(field) && dataSet.get(field) != null){
-            if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if(events != null) dataSet.get(field).setEvents(events);
-            if(layout != null) dataSet.get(field).setLayout(layout);
-            if(component != null) dataSet.get(field).setComponent(component);
+    public void addDataSet(String field, FieldBehavior behavior, Boolean required, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+        if (dataSet.containsKey(field) && dataSet.get(field) != null) {
+            if (behavior != null) dataSet.get(field).setBehavior(behavior);
+            if (required != null) dataSet.get(field).setRequired(required);
+            if (events != null) dataSet.get(field).setEvents(events);
+            if (layout != null) dataSet.get(field).setLayout(layout);
+            if (component != null) dataSet.get(field).setComponent(component);
         } else {
-            dataSet.put(field, new DataFieldLogic(behavior, events, layout, component));
+            dataSet.put(field, new DataRef(behavior, required, events, layout, component));
         }
     }
 
-    public void setDataEvents(String field, Map<DataEventType, DataEvent> events){
-        if(dataSet.containsKey(field)){
+    public void setDataEvents(String field, Map<DataEventType, DataEvent> events) {
+        if (dataSet.containsKey(field)) {
             dataSet.get(field).setEvents(events);
         }
     }
@@ -149,7 +150,7 @@ public class Transition extends Node {
     }
 
     public boolean isDisplayable(String fieldId) {
-        DataFieldLogic logic = dataSet.get(fieldId);
+        DataRef logic = dataSet.get(fieldId);
         if (logic == null) {
             return false;
         }
@@ -157,10 +158,11 @@ public class Transition extends Node {
         return behavior != null && behavior.isDisplayable();
     }
 
-    public List<String> getImmediateData() {
-        return dataSet.entrySet().stream().filter(entry -> entry.getValue().isImmediate())
-                .map(Map.Entry::getKey).collect(Collectors.toList());
-    }
+    // TODO: NAE-1645
+//    public List<String> getImmediateData() {
+//        return dataSet.entrySet().stream().filter(entry -> entry.getValue().isImmediate())
+//                .map(Map.Entry::getKey).collect(Collectors.toList());
+//    }
 
     public List<Action> getPreFinishActions() {
         return getPreActions(EventType.FINISH);

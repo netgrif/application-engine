@@ -511,7 +511,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     void validateData(Transition transition, Case useCase) {
-        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
+        for (Map.Entry<String, DataRef> entry : transition.getDataSet().entrySet()) {
             if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
                 continue;
             if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())

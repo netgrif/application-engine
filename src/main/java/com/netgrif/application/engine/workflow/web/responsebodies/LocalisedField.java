@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.web.responsebodies;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.Component;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
@@ -15,7 +16,6 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -31,7 +31,7 @@ public class LocalisedField {
 
     private String placeholder;
 
-    private Set<FieldBehavior> behavior;
+    private FieldBehavior behavior;
 
     private FieldLayout layout;
 
@@ -53,23 +53,23 @@ public class LocalisedField {
 
     private String parentCaseId;
 
-    public LocalisedField(Field field, Locale locale) {
+    public LocalisedField(DataRef dataRef, Locale locale) {
+        Field field = dataRef.getField();
         stringId = field.getStringId();
         type = field.getType();
         name = field.getTranslatedName(locale);
         description = field.getTranslatedDescription(locale);
         placeholder = field.getTranslatedPlaceholder(locale);
-        behavior = field.getBehaviors();
-        layout = field.getLayout();
+        behavior = dataRef.getBehavior();
+        layout = dataRef.getLayout();
         value = field.getValue();
         order = field.getOrder();
-        formatFilter = field.getFormat();
-        view = field.getView();
         length = field.getLength();
-        component = field.getComponent();
+        component = field.getComponent() != null ? field.getComponent() : dataRef.getComponent();
         validations = loadValidations(field, locale);
-        parentTaskId = field.getParentTaskId();
-        parentCaseId = field.getParentCaseId();
+        // TODO: NAE-1645
+//        parentTaskId = field.getParentTaskId();
+//        parentCaseId = field.getParentCaseId();
     }
 
     private List<LocalizedValidation> loadValidations(Field field, Locale locale) {

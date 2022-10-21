@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
-import com.netgrif.application.engine.petrinet.domain.DataFieldLogic;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -85,12 +85,12 @@ public class EventService implements IEventService {
     public List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task) {
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
-            fieldActions.addAll(DataFieldLogic.getEventAction((DataEvent) field.getEvents().get(actionTrigger), phase));
+            fieldActions.addAll(DataRef.getEventAction((DataEvent) field.getEvents().get(actionTrigger), phase));
         }
         if (task != null) {
             Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
             if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty())
-                fieldActions.addAll(DataFieldLogic.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
+                fieldActions.addAll(DataRef.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
         }
 
         if (fieldActions.isEmpty()) return Collections.emptyList();

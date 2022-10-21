@@ -172,6 +172,11 @@ public abstract class Field<T> extends Imported implements Referencable {
 
     public abstract Field<T> clone();
 
+    @Override
+    public int getMultiplicity() {
+        throw new UnsupportedOperationException(this.getClass().toString() + " can not be used as arc multiplicity");
+    }
+
     public boolean isForbidden(String transitionId) {
         return isBehavior(transitionId, dataFieldBehavior -> dataFieldBehavior.getBehavior() == FieldBehavior.FORBIDDEN);
     }

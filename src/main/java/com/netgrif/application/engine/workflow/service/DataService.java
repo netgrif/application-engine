@@ -116,7 +116,7 @@ public class DataService implements IDataService {
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    DataRef validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehaviors(useCase.getDataSet().get(fieldId).getBehaviors().get(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
@@ -126,7 +126,7 @@ public class DataService implements IDataService {
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    DataRef validationField = fieldFactory.buildFieldWithValidation(useCase, fieldId, transition.getStringId());
+                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
                     validationField.setBehaviors(transition.getDataSet().get(fieldId).getBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
                         validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
@@ -217,7 +217,7 @@ public class DataService implements IDataService {
     }
 
     private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field field, DataEventType type) {
-        Map<String, DataFieldLogic> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
+        Map<String, DataRef> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
         I18nString message = null;
         if (field.getEvents().containsKey(type)) {
             message = ((DataEvent) field.getEvents().get(type)).getMessage();
@@ -669,7 +669,7 @@ public class DataService implements IDataService {
     public List<Field> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildDataRefWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
 
         return fields;

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.importer.model.*;
+import com.netgrif.application.engine.importer.model.DataRef;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.importer.service.validation.IActionValidator;
 import com.netgrif.application.engine.importer.service.validation.IDocumentValidator;
