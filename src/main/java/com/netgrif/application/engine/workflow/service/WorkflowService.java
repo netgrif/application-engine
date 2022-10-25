@@ -6,6 +6,7 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -358,16 +359,17 @@ public class WorkflowService implements IWorkflowService {
         log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
-        asyncRunner.execute(() -> deleteAllCasesOfNet(net));
-    }
+        CaseSearchRequest request = new CaseSearchRequest();
+        request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(net.getIdentifier(), net.getStringId()));
 
-    @Override
-    public void deleteAllCasesOfNet(PetriNet net) {
-        List<Case> cases = repository.findAllByPetriNetObjectId(net.getObjectId());
-        cases.forEach(c -> {
-            c.setPetriNet(net);
-            deleteCase(c);
-        });
+        long pageCount = (elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false) / 100) + 1;
+        LongStream.range(0, pageCount)
+                .forEach(i -> elasticCaseService.search(
+                        Collections.singletonList(request),
+                        userService.getLoggedOrSystem().transformToLoggedUser(),
+                        PageRequest.of((int) i, 100),
+                        Locale.getDefault(),
+                        false).getContent().forEach(this::deleteCase));
     }
 
     @Override

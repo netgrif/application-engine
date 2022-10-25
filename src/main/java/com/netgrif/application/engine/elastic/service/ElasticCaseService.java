@@ -226,6 +226,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             if (process.identifier != null) {
                 petriNetQuery.should(termQuery("processIdentifier", process.identifier));
             }
+            if (process.processId != null) {
+                petriNetQuery.should(termQuery("processId", process.processId));
+            }
         }
 
         query.filter(petriNetQuery);
