@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
@@ -56,9 +57,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 @Service
 public class WorkflowService implements IWorkflowService {
@@ -116,6 +115,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IUriService uriService;
+
+    @Autowired
+    private AsyncRunner asyncRunner;
 
     protected IElasticCaseService elasticCaseService;
 
@@ -332,16 +334,21 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public DeleteCaseEventOutcome deleteCase(String caseId) {
         Case useCase = findOne(caseId);
+        return deleteCase(useCase);
+    }
+
+    @Override
+    public DeleteCaseEventOutcome deleteCase(Case useCase) {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[" + caseId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
+        log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
-        taskService.deleteTasksByCase(caseId);
+        taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty()));
-        addMessageToOutcome(petriNetService.clone(useCase.getPetriNetObjectId()), CaseEventType.DELETE, outcome);
+        addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
         return outcome;
     }
@@ -351,7 +358,16 @@ public class WorkflowService implements IWorkflowService {
         log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
-        repository.deleteAllByPetriNetObjectId(net.getObjectId());
+        asyncRunner.execute(() -> deleteAllCasesOfNet(net));
+    }
+
+    @Override
+    public void deleteAllCasesOfNet(PetriNet net) {
+        List<Case> cases = repository.findAllByPetriNetObjectId(net.getObjectId());
+        cases.forEach(c -> {
+            c.setPetriNet(net);
+            deleteCase(c);
+        });
     }
 
     @Override
