@@ -42,7 +42,7 @@ enum FieldBehavior {
             case "visible":
                 return (FieldBehavior[]) [REQUIRED, EDITABLE, HIDDEN, FORBIDDEN].toArray()
             case "editable":
-                return (FieldBehavior[]) [VISIBLE, HIDDEN, FORBIDDEN].toArray()
+                return (FieldBehavior[]) [VISIBLE, HIDDEN, FORBIDDEN, REQUIRED].toArray()
             case "hidden":
                 return (FieldBehavior[]) [EDITABLE, VISIBLE, REQUIRED, FORBIDDEN].toArray()
             case "forbidden":
