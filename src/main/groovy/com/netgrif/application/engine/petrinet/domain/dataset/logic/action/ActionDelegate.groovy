@@ -231,6 +231,12 @@ class ActionDelegate {
         useCase.dataSet.get(field.stringId).makeEditable(trans.stringId)
     }
 
+    def editableOptional = { Field field, Transition trans ->
+        copyBehavior(field, trans)
+        useCase.dataSet.get(field.stringId).makeEditableOptional(trans.stringId)
+    }
+
+
     def required = { Field field, Transition trans ->
         copyBehavior(field, trans)
         useCase.dataSet.get(field.stringId).makeRequired(trans.stringId)

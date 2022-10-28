@@ -152,6 +152,11 @@ public class DataField implements Referencable {
         changeBehavior(FieldBehavior.EDITABLE, transition);
     }
 
+    public void makeEditableOptional(String transition) {
+        makeOptional(transition);
+        changeBehavior(FieldBehavior.EDITABLE, transition);
+    }
+
     public void makeRequired(String transition) {
         changeBehavior(FieldBehavior.REQUIRED, transition);
     }
