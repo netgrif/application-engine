@@ -93,14 +93,9 @@ public class TextFieldBuilder extends FieldBuilder {
     }
 
     private String resolveFileListNames(FileListFieldValue files) {
-        StringBuilder builder = new StringBuilder();
-
-        files.getNamesPaths().forEach(value -> {
-            builder.append(shortenFileName(value.getName()));
-            builder.append(", ");
-        });
-
-        return builder.toString();
+        return files.getNamesPaths().stream()
+                .map(it -> shortenFileName(it.getName()))
+                .collect(Collectors.joining(", "));
     }
 
     private String shortenFileName(String fileName) {
