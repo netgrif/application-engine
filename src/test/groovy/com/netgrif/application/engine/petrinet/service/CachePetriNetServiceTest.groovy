@@ -67,11 +67,11 @@ class CachePetriNetServiceTest {
 
     @Test
     void cacheTest() {
+        assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get("processDeleteTest") == null
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         PetriNet testNet = testNetOptional.getNet()
 
-        assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get(testNet.getIdentifier()) == null
         PetriNet test = petriNetService.getNewestVersionByIdentifier(testNet.getIdentifier())
         assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get(testNet.getIdentifier()).get().equals(test)
     }

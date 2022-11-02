@@ -143,7 +143,7 @@ public class PetriNetService implements IPetriNetService {
      * Get read only Petri net.
      */
     @Override
-    @Cacheable(value="petriNetCache", unless="#result != null")
+    @Cacheable(value="petriNetCache", unless="#result == null")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
         if (!optional.isPresent()) {
@@ -240,7 +240,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value="petriNetById", unless="#result != null")
+    @Cacheable(value="petriNetById", unless="#result == null")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (!net.isPresent())
@@ -251,7 +251,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless="#result != null")
+    @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless="#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null)
@@ -275,7 +275,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value="petriNetNewest", unless="#result != null")
+    @Cacheable(value="petriNetNewest", unless="#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty())
