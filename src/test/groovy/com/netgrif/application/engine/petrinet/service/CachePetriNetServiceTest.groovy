@@ -72,6 +72,7 @@ class CachePetriNetServiceTest {
         assert testNetOptional.getNet() != null
         PetriNet testNet = testNetOptional.getNet()
 
+        assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get(testNet.getIdentifier()) == null
         PetriNet test = petriNetService.getNewestVersionByIdentifier(testNet.getIdentifier())
         assert cacheManager.getCache(cacheProperties.getPetriNetNewest()).get(testNet.getIdentifier()).get().equals(test)
     }
