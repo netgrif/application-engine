@@ -6,6 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
@@ -15,10 +18,9 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 public class DataField {
 
     @Field(type = Text)
-    public String[] fulltextValue;
+    public List<String> fulltextValue = new ArrayList<>();
 
     DataField(String fulltextValue) {
-        this.fulltextValue = new String[1];
-        this.fulltextValue[0] = fulltextValue;
+        this.fulltextValue = List.of(fulltextValue);
     }
 }

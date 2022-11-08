@@ -1,11 +1,9 @@
 package com.netgrif.application.engine.startup
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
+
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.importer.model.Data
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -29,7 +27,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
-import groovy.json.JsonOutput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -230,14 +227,5 @@ class ImportHelper {
 
     void updateSuperUser() {
         superCreator.setAllToSuperUser();
-    }
-
-    static DataSet populateDataset(Map<String, Map<String, String>> data) {
-        DataSet dataSet = new DataSet()
-        data.each {fieldId, config ->
-//            TODO: NAE-1645
-//            dataSet.fields[fieldId] = new DataField(config["value"])
-        }
-        return dataSet
     }
 }

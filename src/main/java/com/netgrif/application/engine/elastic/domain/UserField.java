@@ -6,6 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 
@@ -16,35 +19,29 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 public class UserField extends DataField {
 
     @Field(type = Text)
-    private String[] emailValue;
+    private List<String> emailValue = new ArrayList<>();
 
     @Field(type = Text)
-    private String[] fullNameValue;
+    private List<String> fullNameValue = new ArrayList<>();
 
     @Field(type = Text)
-    private String[] userIdValue;
+    private List<String> userIdValue = new ArrayList<>();
 
     public UserField(UserMappingData value) {
-        super(String.format("%s %s", value.fullName, value.email));
-        this.emailValue = new String[1];
-        this.fullNameValue = new String[1];
-        this.userIdValue = new String[1];
-        this.emailValue[0] = value.email;
-        this.fullNameValue[0] = value.fullName;
-        this.userIdValue[0] = value.userId;
+        super();
+        this.addValue(value);
     }
 
-    public UserField(UserMappingData[] values) {
-        super(new String[values.length]);
-        this.emailValue = new String[values.length];
-        this.fullNameValue = new String[values.length];
-        this.userIdValue = new String[values.length];
-        for (int i = 0; i < values.length; i++) {
-            this.emailValue[i] = values[i].email;
-            this.fullNameValue[i] = values[i].fullName;
-            this.userIdValue[i] = values[i].userId;
-            super.fulltextValue[i] = String.format("%s %s", values[i].fullName, values[i].email);
-        }
+    public UserField(List<UserMappingData> values) {
+        super();
+        values.forEach(this::addValue);
+    }
+
+    private void addValue(UserMappingData value) {
+        this.emailValue.add(value.email);
+        this.fullNameValue.add(value.fullName);
+        this.userIdValue.add(value.userId);
+        super.fulltextValue.add(String.format("%s %s", value.fullName, value.email));
     }
 
     @AllArgsConstructor

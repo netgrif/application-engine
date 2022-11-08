@@ -7,6 +7,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
@@ -16,30 +20,26 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 public class FileField extends DataField {
 
     @Field(type = Text)
-    public String[] fileNameValue;
+    public List<String> fileNameValue = new ArrayList<>();
 
     @Field(type = Keyword)
-    public String[] fileExtensionValue;
+    public List<String> fileExtensionValue = new ArrayList<>();
 
     public FileField(FileFieldValue value) {
-        super(value.getName());
-        this.fileNameValue = new String[1];
-        this.fileExtensionValue = new String[1];
-        FileNameAndExtension extracted = this.extractFileExtensionFromName(value.getName());
-        this.fileNameValue[0] = extracted.name;
-        this.fileExtensionValue[0] = extracted.extension;
+        super();
+        this.addValue(value);
     }
 
-    public FileField(FileFieldValue[] values) {
-        super(new String[values.length]);
-        this.fileNameValue = new String[values.length];
-        this.fileExtensionValue = new String[values.length];
-        for (int i = 0; i < values.length; i++) {
-            FileNameAndExtension extracted = this.extractFileExtensionFromName(values[i].getName());
-            this.fileNameValue[i] = extracted.name;
-            this.fileExtensionValue[i] = extracted.extension;
-            super.fulltextValue[i] = values[i].getName();
-        }
+    public FileField(Collection<FileFieldValue> values) {
+        super();
+        values.forEach(this::addValue);
+    }
+
+    private void addValue(FileFieldValue value) {
+        FileNameAndExtension extracted = this.extractFileExtensionFromName(value.getName());
+        this.fileNameValue.add(extracted.name);
+        this.fileExtensionValue.add(extracted.extension);
+        super.fulltextValue.add(extracted.name);
     }
 
     private FileNameAndExtension extractFileExtensionFromName(String filename) {

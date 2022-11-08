@@ -5,6 +5,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
@@ -13,15 +17,14 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 public class TextField extends DataField {
 
     @Field(type = Text)
-    public String[] textValue;
+    public List<String> textValue = new ArrayList<>();
 
     public TextField(String value) {
         super(value);
-        this.textValue = new String[1];
-        this.textValue[0] = value;
+        this.textValue.add(value);
     }
 
-    public TextField(String[] values) {
+    public TextField(List<String> values) {
         super(values);
         this.textValue = values;
     }

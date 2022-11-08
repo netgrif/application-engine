@@ -2,9 +2,7 @@ package com.netgrif.application.engine.petrinet.domain;
 
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class I18nString {
@@ -76,6 +74,13 @@ public class I18nString {
                 return true;
         }
         return false;
+    }
+
+    public List<String> collectTranslations() {
+        List<String> translations = new ArrayList<>();
+        translations.add(defaultValue);
+        translations.addAll(getTranslations().values());
+        return translations;
     }
 
     @Override

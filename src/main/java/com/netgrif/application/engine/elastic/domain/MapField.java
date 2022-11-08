@@ -18,23 +18,19 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 public class MapField extends TextField {
 
     @Field(type = Keyword)
-    public String[] keyValue;
+    public List<String> keyValue = new ArrayList<>();
 
-    public MapField(Map.Entry<String, Collection<String>> valuePair) {
-        super(valuePair.getValue().toArray(new String[0]));
-        this.keyValue = new String[1];
-        this.keyValue[0] = valuePair.getKey();
+    public MapField(String key, List<String> values) {
+        super(values);
+        this.keyValue.add(key);
     }
 
-    public MapField(List<Map.Entry<String, Collection<String>>> valuePairs) {
-        super(new String[0]);
-        this.keyValue = new String[valuePairs.size()];
-        List<String> values = new ArrayList<>();
-        for (int i = 0; i < valuePairs.size(); i++) {
-            keyValue[i] = valuePairs.get(i).getKey();
-            values.addAll(valuePairs.get(i).getValue());
-        }
-        this.textValue = values.toArray(new String[0]);
-        this.fulltextValue = values.toArray(new String[0]);
+    public MapField(Map<String, List<String>> valuePairs) {
+        super();
+        valuePairs.forEach((key, value) -> {
+            this.keyValue.add(key);
+            this.textValue.addAll(value);
+            this.textValue.addAll(value);
+        });
     }
 }

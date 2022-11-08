@@ -181,7 +181,8 @@ class ActionDelegate {
 
     def initFieldsMap(Map<String, String> fieldIds) {
         fieldIds.each { name, id ->
-            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id, null))
+//            TODO: NAE-1645
+//            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id, null))
         }
     }
 
