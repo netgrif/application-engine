@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FileListFieldBuilder extends FieldBuilder<FileListField> {
+
     @Override
     public FileListField build(Data data, Importer importer) {
         FileListField fileListField = new FileListField();

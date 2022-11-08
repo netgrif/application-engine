@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EnumerationFieldBuilder extends FieldBuilder<EnumerationField> {
+
     @Override
     public EnumerationField build(Data data, Importer importer) {
         EnumerationField field = new EnumerationField();

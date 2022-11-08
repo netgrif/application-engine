@@ -13,6 +13,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class TaskRefFieldBuilder extends FieldBuilder<TaskField> {
+
     @Override
     public TaskField build(Data data, Importer importer) {
         TaskField field = new TaskField();

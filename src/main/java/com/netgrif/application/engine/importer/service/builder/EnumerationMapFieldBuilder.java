@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EnumerationMapFieldBuilder extends FieldBuilder<EnumerationMapField> {
+
     @Override
     public EnumerationMapField build(Data data, Importer importer) {
         EnumerationMapField field = new EnumerationMapField();

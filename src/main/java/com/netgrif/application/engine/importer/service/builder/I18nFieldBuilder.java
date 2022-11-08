@@ -9,7 +9,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runne
 import org.springframework.stereotype.Component;
 
 @Component
-public class I18bFieldBuilder extends FieldBuilder<I18nField> {
+public class I18nFieldBuilder extends FieldBuilder<I18nField> {
+
     @Override
     public I18nField build(Data data, Importer importer) {
         I18nField i18nField = new I18nField();

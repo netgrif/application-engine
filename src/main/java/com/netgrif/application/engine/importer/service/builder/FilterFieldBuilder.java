@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 @Component
 public class FilterFieldBuilder extends FieldBuilder<FilterField> {
+
     @Override
     public FilterField build(Data data, Importer importer) {
         AllowedNets nets = data.getAllowedNets();

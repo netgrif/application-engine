@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 @Component
 public class CaseRefFieldBuilder extends FieldBuilder<CaseField> {
+
     @Override
     public CaseField build(Data data, Importer importer) {
         AllowedNets nets = data.getAllowedNets();

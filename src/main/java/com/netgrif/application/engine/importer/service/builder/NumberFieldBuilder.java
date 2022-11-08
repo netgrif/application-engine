@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NumberFieldBuilder extends FieldBuilder<NumberField> {
+
     @Override
     public NumberField build(Data data, Importer importer) {
         NumberField field = new NumberField();

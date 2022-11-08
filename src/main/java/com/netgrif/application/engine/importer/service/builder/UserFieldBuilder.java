@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserFieldBuilder extends FieldBuilder<UserField> {
+
     @Override
     public UserField build(Data data, Importer importer) {
         // TODO: NAE-1645 values or options?
