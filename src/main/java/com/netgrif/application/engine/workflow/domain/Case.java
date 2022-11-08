@@ -154,7 +154,7 @@ public class Case {
     @Setter
     private List<String> negativeViewUsers;
 
-    public Case(PetriNet petriNet) {
+    public Case() {
         _id = new ObjectId();
         dataSet = new DataSet();
         consumedTokens = new HashMap<>();
@@ -164,7 +164,11 @@ public class Case {
         viewUserRefs = new LinkedList<>();
         viewUsers = new LinkedList<>();
         negativeViewUsers = new ArrayList<>();
+        negativeViewRoles = new ArrayList<>();
+    }
 
+    public Case(PetriNet petriNet) {
+        this();
         this.petriNet = petriNet;
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();

@@ -517,16 +517,15 @@ public class TaskService implements ITaskService {
 //                continue;
 //            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
 //                continue;
-
-            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
-            if (value == null) {
-                Field field = useCase.getField(entry.getKey());
-                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
-            }
-            if (value instanceof String && ((String) value).isEmpty()) {
-                Field field = useCase.getField(entry.getKey());
-                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
-            }
+//            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
+//            if (value == null) {
+//                Field field = useCase.getField(entry.getKey());
+//                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
+//            }
+//            if (value instanceof String && ((String) value).isEmpty()) {
+//                Field field = useCase.getField(entry.getKey());
+//                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
+//            }
         }
     }
 

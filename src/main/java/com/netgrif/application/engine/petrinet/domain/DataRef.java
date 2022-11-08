@@ -28,15 +28,9 @@ public class DataRef {
 
     private Component component;
 
-    public DataRef(Field field, FieldBehavior behavior, boolean required, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+    public DataRef(Field field) {
         this.field = field;
-        this.behavior = behavior;
-        this.required = required;
-        this.events = events;
-        this.layout = layout;
-        if (component != null) {
-            this.component = component;
-        }
+        this.behavior = FieldBehavior.defaultValue();
     }
 
     // TODO: NAE-1645

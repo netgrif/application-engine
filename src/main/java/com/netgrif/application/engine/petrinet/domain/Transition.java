@@ -18,6 +18,7 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @Document
 public class Transition extends Node {
@@ -102,18 +103,25 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    // TODO: NAE-1645 fix usage of this with mostly null values
-    public void addDataSet(Field field, FieldBehavior behavior, Boolean required, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+    public void setDataRefBehavior(Field<?> field, FieldBehavior behavior) {
+        setDataRefAttribute(field, dataRef -> dataRef.setBehavior(behavior));
+    }
+
+    public void setDataRefComponent(Field<?> field, Component component) {
+        setDataRefAttribute(field, dataRef -> dataRef.setComponent(component));
+    }
+
+    public void setDataRefLayout(Field<?> field, FieldLayout fieldLayout) {
+        setDataRefAttribute(field, dataRef -> dataRef.setLayout(fieldLayout));
+    }
+
+    private void setDataRefAttribute(Field<?> field, Consumer<DataRef> attributeChange) {
         String fieldId = field.getStringId();
-        if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {
-            if (behavior != null) dataSet.get(fieldId).setBehavior(behavior);
-            if (required != null) dataSet.get(fieldId).setRequired(required);
-            if (events != null) dataSet.get(fieldId).setEvents(events);
-            if (layout != null) dataSet.get(fieldId).setLayout(layout);
-            if (component != null) dataSet.get(fieldId).setComponent(component);
-        } else {
-            dataSet.put(fieldId, new DataRef(field, behavior, required, events, layout, component));
+        if (!dataSet.containsKey(fieldId)) {
+            dataSet.put(fieldId, new DataRef(field));
         }
+        DataRef dataRef = dataSet.get(fieldId);
+        attributeChange.accept(dataRef);
     }
 
     public void setDataEvents(String field, Map<DataEventType, DataEvent> events) {
@@ -158,11 +166,11 @@ public class Transition extends Node {
         FieldBehavior behavior = logic.getBehavior();
         return behavior != null && behavior.isDisplayable();
     }
-
     // TODO: NAE-1645
 //    public List<String> getImmediateData() {
 //        return dataSet.entrySet().stream().filter(entry -> entry.getValue().isImmediate())
 //                .map(Map.Entry::getKey).collect(Collectors.toList());
+
 //    }
 
     public List<Action> getPreFinishActions() {
