@@ -17,7 +17,7 @@ public class LocalisedChoiceField extends LocalisedField {
     protected List<String> choices;
 
     public LocalisedChoiceField(ChoiceField field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO: NAE-1645
         this.choices = new LinkedList<>();
         Set<I18nString> choices = field.getChoices();
         for (I18nString choice : choices) {

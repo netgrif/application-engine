@@ -191,6 +191,8 @@ public class Case {
 
         resolveViewRoles();
         resolveViewUserRefs();
+
+
     }
 
     public String getStringId() {

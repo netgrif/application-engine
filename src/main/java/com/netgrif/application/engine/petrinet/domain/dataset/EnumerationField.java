@@ -28,7 +28,7 @@ public class EnumerationField extends ChoiceField<I18nString> {
         if (this.getValue() == null) {
             return null;
         }
-        return getValue().getTranslation(locale);
+        return getValue().getValue().getTranslation(locale);
     }
 
     @Override

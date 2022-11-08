@@ -224,7 +224,8 @@ class ExportService implements IExportService {
     private List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
-            if (exportCase.getDataSet().containsKey(dataFieldId)) {
+//            TODO: NAE-1645 refactor hasField
+            if (exportCase.getDataSet().getFields().containsKey(dataFieldId)) {
                 recordStringList.add(StringEscapeUtils.escapeCsv(resolveFieldValue(exportCase, dataFieldId)));
             } else
                 recordStringList.add("");
@@ -239,39 +240,41 @@ class ExportService implements IExportService {
             return "";
         }
         switch (field.getType()) {
-            case MULTICHOICE_MAP:
-                fieldValue = ((MultichoiceMapField) field).getValue().stream()
-                        .filter(value -> ((MultichoiceMapField) field).getOptions().containsKey(value.trim()))
-                        .map(value -> ((MultichoiceMapField) field).getOptions().get(value.trim()).getDefaultValue())
-                        .collect(Collectors.joining(","));
-                break;
-            case ENUMERATION_MAP:
-                fieldValue = ((EnumerationMapField) field).getOptions().get(field.getValue()).getDefaultValue();
-                break;
-            case MULTICHOICE:
-                fieldValue = String.join(",", ((MultichoiceField) field).getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet()));
-                break;
-            case FILE:
-                fieldValue = ((FileField) field).getValue().toString();
-                break;
-            case FILE_LIST:
-                fieldValue = String.join(",", ((FileListField) field).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
-                break;
-            case TASK_REF:
-                fieldValue = String.join(";", ((TaskField) field).getValue());
-                break;
-            case USER:
-                fieldValue = ((UserField) field).getValue().getEmail();
-                break;
-            case USER_LIST:
-                fieldValue = String.join(";", ((UserListField) field).getValue());
-                break;
-            case NUMBER:
-                fieldValue = field.getValue().toString();
-                break;
+//            TODO: NAE-1645
+//            case MULTICHOICE_MAP:
+//                fieldValue = ((MultichoiceMapField) field).getValue().stream()
+//                        .filter(value -> ((MultichoiceMapField) field).getOptions().containsKey(value.trim()))
+//                        .map(value -> ((MultichoiceMapField) field).getOptions().get(value.trim()).getDefaultValue())
+//                        .collect(Collectors.joining(","));
+//                break;
+//            case ENUMERATION_MAP:
+//                fieldValue = ((EnumerationMapField) field).getOptions().get(field.getValue()).getDefaultValue();
+//                break;
+//            case MULTICHOICE:
+//                fieldValue = String.join(",", ((MultichoiceField) field).getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet()));
+//                break;
+//            case FILE:
+//                fieldValue = ((FileField) field).getValue().toString();
+//                break;
+//            case FILE_LIST:
+//                fieldValue = String.join(",", ((FileListField) field).getValue().getNamesPaths().stream().map(FileFieldValue::toString).collect(Collectors.toSet()));
+//                break;
+//            case TASK_REF:
+//                fieldValue = String.join(";", ((TaskField) field).getValue());
+//                break;
+//            case USER:
+//                fieldValue = ((UserField) field).getValue().getEmail();
+//                break;
+//            case USER_LIST:
+//                fieldValue = String.join(";", ((UserListField) field).getValue());
+//                break;
+//            case NUMBER:
+//                fieldValue = field.getValue().toString();
+//                break;
             default:
-                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
-                break;
+                fieldValue= ""; // TODO: NAE-1645
+//                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
+//                break;
         }
         return fieldValue;
     }

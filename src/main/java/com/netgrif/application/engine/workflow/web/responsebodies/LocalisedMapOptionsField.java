@@ -15,7 +15,7 @@ public class LocalisedMapOptionsField<DV> extends LocalisedField {
     private Map<String, String> options;
 
     public LocalisedMapOptionsField(MapOptionsField<I18nString, DV> field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO: NAE-1645
         this.options = field.getOptions()
                 .entrySet()
                 .stream()

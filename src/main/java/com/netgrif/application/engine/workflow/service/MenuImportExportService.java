@@ -8,10 +8,7 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -146,9 +143,10 @@ public class MenuImportExportService implements IMenuImportExportService {
         //Change remove_option button value to trigger its SET action
         if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
             DataSet caseToRemoveData = new DataSet();
-            DataField removeBtnData = new DataField();
-            removeBtnData.setValue("removed");
-            caseToRemoveData.getFields().put("remove_option", removeBtnData);
+//            TODO: NAE-1645
+//            DataField removeBtnData = new DataField();
+//            removeBtnData.setValue("removed");
+//            caseToRemoveData.getFields().put("remove_option", removeBtnData);
 
             Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
@@ -171,9 +169,10 @@ public class MenuImportExportService implements IMenuImportExportService {
             Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(parentId)));
 
             DataSet groupData = new DataSet();
-            DataField groupImportResultMessage = new DataField();
-            groupImportResultMessage.setValue(resultMessage.toString());
-            groupData.getFields().put("import_results", groupImportResultMessage);
+//            TODO: NAE-1645
+//            DataField groupImportResultMessage = new DataField();
+//            groupImportResultMessage.setValue(resultMessage.toString());
+//            groupData.getFields().put("import_results", groupImportResultMessage);
             dataService.setData(task, groupData);
         });
 
@@ -260,10 +259,11 @@ public class MenuImportExportService implements IMenuImportExportService {
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
         try {
             taskService.assignTask(task, userService.getLoggedUser());
-            menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
-            menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
-            menuItemCase.getDataSet().get(ALLOWED_ROLES).setOptions(allowedRoles);
-            menuItemCase.getDataSet().get(BANNED_ROLES).setOptions(bannedRoles);
+//            TODO: NAE-1645
+//            menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
+//            menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
+//            menuItemCase.getDataSet().get(ALLOWED_ROLES).setOptions(allowedRoles);
+//            menuItemCase.getDataSet().get(BANNED_ROLES).setOptions(bannedRoles);
             workflowService.save(menuItemCase);
         } catch (TransitionNotExecutableException e) {
             log.error("Failed to execute \"init\" task on preference filter item case with id: " + menuItemCase.getStringId(), e);
@@ -308,8 +308,8 @@ public class MenuImportExportService implements IMenuImportExportService {
     }
 
     private MenuEntry createMenuEntryExportClass(Case menuItemCase, String filterCaseId) {
-        Map<String, I18nString> allowedRoles = menuItemCase.getDataSet().get(ALLOWED_ROLES).getOptions();
-        Map<String, I18nString> bannedRoles = menuItemCase.getDataSet().get(BANNED_ROLES).getOptions();
+        Map<String, I18nString> allowedRoles = ((EnumerationMapField)menuItemCase.getDataSet().get(ALLOWED_ROLES)).getOptions();
+        Map<String, I18nString> bannedRoles = ((EnumerationMapField)menuItemCase.getDataSet().get(BANNED_ROLES)).getOptions();
 
         List<MenuEntryRole> menuEntryRoleList = new ArrayList<>();
 
@@ -336,7 +336,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         MenuEntry exportMenuItem = new MenuEntry();
         exportMenuItem.setEntryName(menuItemCase.getDataSet().get(MENU_ITEM_NAME).toString());
         exportMenuItem.setFilterCaseId(filterCaseId);
-        exportMenuItem.setUseIcon((Boolean) menuItemCase.getDataSet().get(USE_ICON).getValue());
+        exportMenuItem.setUseIcon(((BooleanField)menuItemCase.getDataSet().get(USE_ICON)).getValue().getValue());
         if (!menuEntryRoleList.isEmpty()) exportMenuItem.setMenuEntryRoleList(menuEntryRoleList);
 
         return exportMenuItem;
@@ -346,7 +346,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     public Map<String, I18nString> createAvailableEntriesChoices(List<Case> menuItemCases) {
         Map<String, I18nString> availableItems;
         availableItems = menuItemCases.stream()
-                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString((String) v.getDataSet().get(ENTRY_DEFAULT_NAME).getValue())));
+                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString(((TextField)v.getDataSet().get(ENTRY_DEFAULT_NAME)).getValue().getValue())));
 
         return availableItems;
     }
@@ -356,7 +356,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         Map<String, I18nString> updatedOptions = new LinkedHashMap<>(menusForExport.getOptions());
         String menuCaseIds = "";
         if (availableEntries.getOptions().size() != 0) {
-            for (String id : availableEntries.getValue()) {
+            for (String id : availableEntries.getValue().getValue()) {
                 menuCaseIds = menuCaseIds.concat(id + ",");
             }
             updatedOptions.put(menuCaseIds, new I18nString(menuIdentifier));

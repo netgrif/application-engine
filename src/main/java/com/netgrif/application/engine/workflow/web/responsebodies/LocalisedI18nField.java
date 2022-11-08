@@ -9,6 +9,6 @@ import java.util.Locale;
 public class LocalisedI18nField extends LocalisedField {
 
     public LocalisedI18nField(I18nField field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO: NAE-1645
     }
 }

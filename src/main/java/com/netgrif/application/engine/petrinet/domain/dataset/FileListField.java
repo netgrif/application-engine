@@ -41,15 +41,15 @@ public class FileListField extends Field<FileListFieldValue> {
     }
 
     public void addValue(String fileName, String path) {
-        if (this.getValue() == null || this.getValue().getNamesPaths() == null) {
+        if (this.getValue() == null || this.getValue().getValue().getNamesPaths() == null) {
             this.setValue(new FileListFieldValue());
         }
-        this.getValue().getNamesPaths().add(new FileFieldValue(fileName, path));
+        this.getValue().getValue().getNamesPaths().add(new FileFieldValue(fileName, path));
     }
 
     /**
      * Get complete file path to the file
-     * Path is generated as follow:
+     * Path is generated as follows:
      * - if file is remote, path is field value / remote URI
      * - if file is local
      * - saved file path consists of Case id, slash field import id, slash original file name
@@ -60,7 +60,7 @@ public class FileListField extends Field<FileListFieldValue> {
      */
     public String getFilePath(String caseId, String name) {
         if (this.remote) {
-            Optional<FileFieldValue> first = this.getValue().getNamesPaths().stream().filter(fileFieldValue -> fileFieldValue.getName().equals(name)).findFirst();
+            Optional<FileFieldValue> first = this.getValue().getValue().getNamesPaths().stream().filter(fileFieldValue -> fileFieldValue.getName().equals(name)).findFirst();
             if (first.isEmpty()) {
                 return null;
             }

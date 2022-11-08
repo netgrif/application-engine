@@ -117,23 +117,25 @@ public class DataService implements IDataService {
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
                     DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehaviors(useCase.getDataSet().get(fieldId).getBehaviors().get(transition.getStringId()));
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
-                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
-                    }
-                    resolveComponents(validationField, transition);
+//                    TODO: NAE-1645
+//                    validationField.setBehaviors(useCase.getDataSet().get(fieldId).getBehaviors().get(transition.getStringId()));
+//                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
+//                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
+//                    }
+//                    resolveComponents(validationField, transition);
                     dataSetFields.add(validationField);
                 }
             } else {
-                if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
-                    validationField.setBehaviors(transition.getDataSet().get(fieldId).getBehavior());
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
-                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
-                    }
-                    resolveComponents(validationField, transition);
-                    dataSetFields.add(validationField);
-                }
+//                TODO: NAE-1645
+//                if (transition.getDataSet().get(fieldId).isDisplayable()) {
+//                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
+//                    validationField.setBehaviors(transition.getDataSet().get(fieldId).getBehavior());
+//                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
+//                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
+//                    }
+//                    resolveComponents(validationField, transition);
+//                    dataSetFields.add(validationField);
+//                }
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST));
@@ -240,94 +242,97 @@ public class DataService implements IDataService {
         GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
-
-        List<Field> data = getData(task, useCase).getData();
-        Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
-        for (DataGroup dataGroup : dataGroups) {
-            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
-            resultDataGroups.add(dataGroup);
-            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
-
-            List<Field> resources = new LinkedList<>();
-            for (String dataFieldId : dataGroup.getData()) {
-                Field field = net.getDataSet().get(dataFieldId);
-                if (dataFieldMap.containsKey(dataFieldId)) {
-                    Field resource = dataFieldMap.get(dataFieldId);
-                    if (level != 0) {
-                        dataGroup.setParentCaseId(useCase.getStringId());
-                        resource.setParentCaseId(useCase.getStringId());
-                        dataGroup.setParentTaskId(taskId);
-                        dataGroup.setParentTransitionId(task.getTransitionId());
-                        dataGroup.setParentTaskRefId(parentTaskRefId);
-                        dataGroup.setNestingLevel(level);
-                        resource.setParentTaskId(taskId);
-                    }
-                    resources.add(resource);
-                    if (field.getType() == DataType.TASK_REF) {
-                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
-                    }
-                }
-            }
-            dataGroup.setFields(new DataFieldsResource(resources, locale));
-        }
+//      TODO: NAE-1645
+//        List<Field> data = getData(task, useCase).getData();
+//        Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+//        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
+//        for (DataGroup dataGroup : dataGroups) {
+//            resolveTaskRefOrderOnGrid(dataGroup, dataFieldMap);
+//            resultDataGroups.add(dataGroup);
+//            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
+//
+//            List<Field> resources = new LinkedList<>();
+//            for (String dataFieldId : dataGroup.getData()) {
+//                Field field = net.getDataSet().get(dataFieldId);
+//                if (dataFieldMap.containsKey(dataFieldId)) {
+//                    Field resource = dataFieldMap.get(dataFieldId);
+//                    if (level != 0) {
+//                        dataGroup.setParentCaseId(useCase.getStringId());
+//                        resource.setParentCaseId(useCase.getStringId());
+//                        dataGroup.setParentTaskId(taskId);
+//                        dataGroup.setParentTransitionId(task.getTransitionId());
+//                        dataGroup.setParentTaskRefId(parentTaskRefId);
+//                        dataGroup.setNestingLevel(level);
+//                        resource.setParentTaskId(taskId);
+//                    }
+//                    resources.add(resource);
+//                    if (field.getType() == DataType.TASK_REF) {
+//                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
+//                    }
+//                }
+//            }
+//            dataGroup.setFields(new DataFieldsResource(resources, locale));
+//        }
         outcome.setData(resultDataGroups);
         return outcome;
     }
 
     private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
-        List<String> taskIds = taskRefField.getValue();
         List<DataGroup> groups = new ArrayList<>();
-
-        if (taskIds != null) {
-            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
-            taskIds.forEach(id -> {
-                collectedTaskIds.add(id);
-                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getStringId()).getData();
-                resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
-                groups.addAll(taskRefDataGroups);
-            });
-        }
+//TODO: NAE-1645
+//        List<String> taskIds = taskRefField.getValue();
+//        if (taskIds != null) {
+//            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
+//            taskIds.forEach(id -> {
+//                collectedTaskIds.add(id);
+//                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getStringId()).getData();
+//                resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
+//                groups.addAll(taskRefDataGroups);
+//            });
+//        }
 
         return groups;
     }
 
     private void resolveTaskRefOrderOnGrid(DataGroup dataGroup, Map<String, Field> dataFieldMap) {
-        if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
-            dataGroup.setData(
-                    dataGroup.getData().stream()
-                            .filter(dataFieldMap::containsKey)
-                            .map(dataFieldMap::get)
-                            .sorted(Comparator.comparingInt(a -> a.getLayout().getY()))
-                            .map(Field::getStringId)
-                            .collect(Collectors.toCollection(LinkedHashSet::new))
-            );
-        }
+//        TODO: NAE-1645
+//        if (dataGroup.getLayout() != null && Objects.equals(dataGroup.getLayout().getType(), "grid")) {
+//            dataGroup.setData(
+//                    dataGroup.getData().stream()
+//                            .filter(dataFieldMap::containsKey)
+//                            .map(dataFieldMap::get)
+//                            .sorted(Comparator.comparingInt(a -> a.getLayout().getY()))
+//                            .map(Field::getStringId)
+//                            .collect(Collectors.toCollection(LinkedHashSet::new))
+//            );
+//        }
     }
 
     private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups) {
-        if (taskRefField.getBehaviors().contains(FieldBehavior.VISIBLE)) {
-            taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getFields().getContent().forEach(field -> {
-                    if (field.getBehavior().contains(FieldBehavior.EDITABLE)) {
-                        changeTaskRefBehavior(field, FieldBehavior.VISIBLE);
-                    }
-                });
-            });
-        } else if (taskRefField.getBehaviors().contains(FieldBehavior.HIDDEN)) {
-            taskRefDataGroups.forEach(dataGroup -> {
-                dataGroup.getFields().getContent().forEach(field -> {
-                    if (!field.getBehavior().contains(FieldBehavior.FORBIDDEN))
-                        changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
-                });
-            });
-        }
+//        TODO: NAE-1645
+//        if (taskRefField.getBehaviors().contains(FieldBehavior.VISIBLE)) {
+//            taskRefDataGroups.forEach(dataGroup -> {
+//                dataGroup.getFields().getContent().forEach(field -> {
+//                    if (field.getBehavior().contains(FieldBehavior.EDITABLE)) {
+//                        changeTaskRefBehavior(field, FieldBehavior.VISIBLE);
+//                    }
+//                });
+//            });
+//        } else if (taskRefField.getBehaviors().contains(FieldBehavior.HIDDEN)) {
+//            taskRefDataGroups.forEach(dataGroup -> {
+//                dataGroup.getFields().getContent().forEach(field -> {
+//                    if (!field.getBehavior().contains(FieldBehavior.FORBIDDEN))
+//                        changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
+//                });
+//            });
+//        }
     }
 
     private void changeTaskRefBehavior(LocalisedField field, FieldBehavior behavior) {
-        List<FieldBehavior> antonymBehaviors = behavior.getAntonyms();
-        antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));
-        field.setBehavior(Collections.singleton(behavior));
+//        TODO: NAE-1645
+//        List<FieldBehavior> antonymBehaviors = behavior.getAntonyms();
+//        antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));
+//        field.setBehavior(Collections.singleton(behavior));
     }
 
     @Override
@@ -371,7 +376,7 @@ public class DataService implements IDataService {
         workflowService.save(useCase);
         field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
 
-        Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
+        Optional<FileFieldValue> fileField = field.getValue().getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (!fileField.isPresent() || fileField.get().getPath() == null) {
             log.error("File " + name + " not found!");
             return null;
@@ -399,8 +404,8 @@ public class DataService implements IDataService {
             if (forPreview) {
                 return getFilePreview(field, useCase);
             } else {
-                return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getPath()) :
-                        new FileInputStream(field.getValue().getPath()));
+                return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getValue().getPath()) :
+                        new FileInputStream(field.getValue().getValue().getPath()));
             }
         } catch (IOException e) {
             log.error("Getting file failed: ", e);
@@ -425,7 +430,7 @@ public class DataService implements IDataService {
         if (field.isRemote()) {
             file = getRemoteFile(field);
         } else {
-            file = new File(field.getValue().getPath());
+            file = new File(field.getValue().getValue().getPath());
         }
         int dot = file.getName().lastIndexOf(".");
         PreviewExtension fileType = PreviewExtension.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
@@ -472,7 +477,7 @@ public class DataService implements IDataService {
 
     private File getRemoteFile(FileField field) throws IOException {
         File file;
-        InputStream is = download(field.getValue().getPath());
+        InputStream is = download(field.getValue().getValue().getPath());
         file = File.createTempFile(field.getStringId(), "pdf");
         file.deleteOnExit();
         FileOutputStream fos = new FileOutputStream(file);
@@ -528,11 +533,11 @@ public class DataService implements IDataService {
 
     private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
         for (MultipartFile oneFile : multipartFiles) {
-            if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
-                Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
+            if (field.getValue() != null && field.getValue().getValue().getNamesPaths() != null) {
+                Optional<FileFieldValue> fileField = field.getValue().getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
                 if (fileField.isPresent()) {
                     new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename())).delete();
-                    field.getValue().getNamesPaths().remove(fileField.get());
+                    field.getValue().getValue().getNamesPaths().remove(fileField.get());
                 }
             }
 
@@ -546,7 +551,7 @@ public class DataService implements IDataService {
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
         }
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        ((FileListField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
         return true;
     }
 
@@ -557,7 +562,7 @@ public class DataService implements IDataService {
         }
 
         field.setValue(multipartFile.getOriginalFilename());
-        field.getValue().setPath(field.getFilePath(useCase.getStringId()));
+        field.getValue().getValue().setPath(field.getFilePath(useCase.getStringId()));
         File file = new File(field.getFilePath(useCase.getStringId()));
         try {
             writeFile(multipartFile, file);
@@ -566,7 +571,7 @@ public class DataService implements IDataService {
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
 
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        ((FileField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
         return true;
     }
 
@@ -608,7 +613,7 @@ public class DataService implements IDataService {
             if (field.isRemote()) {
                 deleteRemote(useCase, field);
             } else {
-                new File(field.getValue().getPath()).delete();
+                new File(field.getValue().getValue().getPath()).delete();
                 new File(field.getFilePreviewPath(useCase.getStringId())).delete();
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
@@ -623,7 +628,7 @@ public class DataService implements IDataService {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
+        field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue());
 
         return new ImmutablePair<>(useCase, field);
     }
@@ -634,16 +639,16 @@ public class DataService implements IDataService {
         FileListField field = pair.getRight();
         Case useCase = pair.getLeft();
 
-        Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
+        Optional<FileFieldValue> fileField = field.getValue().getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
 
         if (fileField.isPresent()) {
             if (field.isRemote()) {
                 deleteRemote(useCase, field, name);
             } else {
                 new File(fileField.get().getPath()).delete();
-                field.getValue().getNamesPaths().remove(fileField.get());
+                field.getValue().getValue().getNamesPaths().remove(fileField.get());
             }
-            useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+            ((FileListField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
         }
 
         updateDataset(useCase);
@@ -669,10 +674,12 @@ public class DataService implements IDataService {
     public List<Field> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildDataRefWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
-        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
-
-        return fields;
+        // TODO: NAE-1645
+//        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildDataRefWithoutValidation(useCase, id, task.getTransitionId())).collect(Collectors.toList());
+//        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
+//
+//        return fields;
+        return null;
     }
 
     private void updateDataset(Case useCase) {

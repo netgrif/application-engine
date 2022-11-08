@@ -12,7 +12,7 @@ public class LocalisedUserField extends LocalisedField {
     private Set<String> roles;
 
     public LocalisedUserField(UserField field, Locale locale) {
-        super(field, locale);
-        this.roles = field.getRoles();
+//        super(field, locale); TODO: NAE-1645
+//        this.roles = field.getRoles();
     }
 }

@@ -53,6 +53,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         Field netField = useCase.getField(fieldId);
         Field caseField = useCase.getDataField(fieldId);
 
+//        TODO: NAE-1645 refactor using registry
         if (caseField.getValue() == null) {
             return Optional.empty();
         } else if (netField instanceof EnumerationMapField) {
@@ -64,25 +65,25 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.NumberField) {
             return this.transformNumberField((com.netgrif.application.engine.petrinet.domain.dataset.NumberField) caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.ButtonField) {
-            return this.transformButtonField(caseField);
+            return this.transformButtonField((com.netgrif.application.engine.petrinet.domain.dataset.ButtonField) caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.UserField) {
-            return this.transformUserField(caseField);
+            return this.transformUserField((com.netgrif.application.engine.petrinet.domain.dataset.UserField) caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.DateField) {
-            return this.transformDateField(caseField, (com.netgrif.application.engine.petrinet.domain.dataset.DateField) netField);
+            return this.transformDateField((com.netgrif.application.engine.petrinet.domain.dataset.DateField) caseField, (com.netgrif.application.engine.petrinet.domain.dataset.DateField) netField);
         } else if (netField instanceof DateTimeField) {
-            return this.transformDateTimeField(caseField, (DateTimeField) netField);
+            return this.transformDateTimeField((DateTimeField) caseField, (DateTimeField) netField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.BooleanField) {
-            return this.transformBooleanField(caseField);
+            return this.transformBooleanField((com.netgrif.application.engine.petrinet.domain.dataset.BooleanField) caseField);
         } else if (netField instanceof EnumerationField) {
             return this.transformEnumerationField(caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.TextField) {
-            return this.transformTextField(caseField);
+            return this.transformTextField((com.netgrif.application.engine.petrinet.domain.dataset.TextField) caseField);
         } else if (netField instanceof com.netgrif.application.engine.petrinet.domain.dataset.FileField) {
-            return this.transformFileField(caseField);
+            return this.transformFileField((com.netgrif.application.engine.petrinet.domain.dataset.FileField) caseField);
         } else if (netField instanceof FileListField) {
-            return this.transformFileListField(caseField);
+            return this.transformFileListField((FileListField) caseField);
         } else if (netField instanceof UserListField) {
-            return this.transformUserListField(caseField);
+            return this.transformUserListField((UserListField) caseField);
         } else {
             String string = caseField.getValue().toString();
             if (string == null)
@@ -176,18 +177,19 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformNumberField(com.netgrif.application.engine.petrinet.domain.dataset.NumberField numberField) {
-        if (numberField.getValue() instanceof Integer) { //TODO: Refactor
+//        TODO: NAE-1645 fix
+        if (numberField.getValue().getValue() instanceof Double) { //TODO: Refactor
             return Optional.of(new NumberField(Double.parseDouble(numberField.getValue().toString())));
         }
-        return Optional.of(new NumberField((Double) numberField.getValue()));
+        return Optional.of(new NumberField(numberField.getValue().getValue()));
     }
 
     protected Optional<DataField> transformButtonField(com.netgrif.application.engine.petrinet.domain.dataset.ButtonField buttonField) {
-        return Optional.of(new ButtonField((Integer) buttonField.getValue()));
+        return Optional.of(new ButtonField(buttonField.getValue().getValue()));
     }
 
     protected Optional<DataField> transformUserField(com.netgrif.application.engine.petrinet.domain.dataset.UserField userField) {
-        UserFieldValue user = (UserFieldValue) userField.getValue();
+        UserFieldValue user = userField.getValue().getValue();
         if (user == null)
             return Optional.empty();
         return Optional.of(new UserField(this.transformUserValue(user)));
@@ -220,13 +222,13 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformDateField(com.netgrif.application.engine.petrinet.domain.dataset.DateField dateField, com.netgrif.application.engine.petrinet.domain.dataset.DateField netField) {
-        if (dateField.getValue() instanceof LocalDate) {
-            LocalDate date = (LocalDate) dateField.getValue();
+        if (dateField.getValue().getValue() instanceof LocalDate) {
+            LocalDate date = dateField.getValue().getValue();
             return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
-        } else if (dateField.getValue() instanceof Date) {
-            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
-            LocalDateTime transformed = this.transformDateValueField(dateField);
-            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
+//        } else if (dateField.getValue().getValue() instanceof Date) {
+//            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            LocalDateTime transformed = this.transformDateValueField(dateField);
+//            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
         } else {
             // TODO throw error?
             log.error(String.format("Unsupported DateField value type (%s)! Skipping indexation...", dateField.getValue().getClass().getCanonicalName()));
@@ -235,20 +237,20 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformDateTimeField(DateTimeField dateTimeField, DateTimeField netField) {
-        if (dateTimeField.getValue() instanceof LocalDateTime) {
-            return formatDateField((LocalDateTime) dateTimeField.getValue());
-        } else if (dateTimeField.getValue() instanceof Date) {
-            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
-            return formatDateField(this.transformDateValueField(dateTimeField));
+        if (dateTimeField.getValue().getValue() instanceof LocalDateTime) {
+            return formatDateField(dateTimeField.getValue().getValue());
+//        } else if (dateTimeField.getValue() instanceof Date) {
+//            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            return formatDateField(this.transformDateValueField(dateTimeField));
         } else {
-            // TODO throw error?
+//             TODO throw error?
             log.error(String.format("Unsupported DateTimeField value type (%s)! Skipping indexation...", dateTimeField.getValue().getClass().getCanonicalName()));
             return Optional.empty();
         }
     }
 
     private LocalDateTime transformDateValueField(Field dateValueField) {
-        return ((Date) dateValueField.getValue()).toInstant()
+        return ((Date) dateValueField.getValue().getValue()).toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
@@ -260,22 +262,22 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformBooleanField(com.netgrif.application.engine.petrinet.domain.dataset.BooleanField booleanField) {
-        return Optional.of(new BooleanField((Boolean) booleanField.getValue()));
+        return Optional.of(new BooleanField(booleanField.getValue().getValue()));
     }
 
     protected Optional<DataField> transformTextField(com.netgrif.application.engine.petrinet.domain.dataset.TextField textField) {
         if (textField.getValue() == null) {
             return Optional.empty();
         }
-        return Optional.of(new TextField((String) textField.getValue()));
+        return Optional.of(new TextField(textField.getValue().getValue()));
     }
 
     protected Optional<DataField> transformFileField(com.netgrif.application.engine.petrinet.domain.dataset.FileField fileField) {
-        return Optional.of(new FileField((FileFieldValue) fileField.getValue()));
+        return Optional.of(new FileField(fileField.getValue().getValue()));
     }
 
     protected Optional<DataField> transformFileListField(FileListField fileListField) {
-        return Optional.of(new FileField(((FileListFieldValue) fileListField.getValue()).getNamesPaths().toArray(new FileFieldValue[0])));
+        return Optional.of(new FileField(fileListField.getValue().getValue().getNamesPaths().toArray(new FileFieldValue[0])));
     }
 
     protected Optional<DataField> transformOtherFields(Field otherField, Field netField) {

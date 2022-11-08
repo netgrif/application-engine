@@ -42,13 +42,13 @@ public class FileField extends Field<FileFieldValue> {
      */
     public String getFilePath(String caseId) {
         if (this.remote) {
-            return this.getValue().getPath();
+            return this.getValue().getValue().getPath();
         }
-        return FileStorageConfiguration.getPath(caseId, getStringId(), this.getValue().getName());
+        return FileStorageConfiguration.getPath(caseId, getStringId(), this.getValue().getValue().getName());
     }
 
     public String getFilePreviewPath(String caseId) {
-        return FileStorageConfiguration.getPreviewPath(caseId, getStringId(), this.getValue().getName());
+        return FileStorageConfiguration.getPreviewPath(caseId, getStringId(), this.getValue().getValue().getName());
     }
 
     @Override

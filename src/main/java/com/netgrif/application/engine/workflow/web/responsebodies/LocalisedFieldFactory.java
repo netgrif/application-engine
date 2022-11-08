@@ -43,7 +43,8 @@ public class LocalisedFieldFactory {
     }
 
     private static LocalisedField fromGeneral(Field field, Locale locale) {
-        return new LocalisedField(field, locale);
+//        return new LocalisedField(field, locale); TODO: NAE-1645
+        return new LocalisedField(null, locale);
     }
 
     private static LocalisedField fromNumber(NumberField field, Locale locale) {

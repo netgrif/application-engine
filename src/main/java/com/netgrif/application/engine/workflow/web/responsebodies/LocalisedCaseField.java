@@ -12,8 +12,8 @@ public class LocalisedCaseField extends LocalisedField {
     private List<String> allowedNets;
 
     public LocalisedCaseField(CaseField field, Locale locale) {
-        super(field, locale);
-        this.allowedNets = field.getAllowedNets();
+//        super(field, locale); TODO: NAE-1645
+//        this.allowedNets = field.getAllowedNets();
     }
 
 }

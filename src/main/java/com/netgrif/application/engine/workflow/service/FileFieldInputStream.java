@@ -19,6 +19,6 @@ public class FileFieldInputStream {
 
     public FileFieldInputStream(FileField field, InputStream inputStream) {
         this.inputStream = inputStream;
-        this.fileName = field.getValue().getName();
+        this.fileName = field.getValue().getValue().getName();
     }
 }

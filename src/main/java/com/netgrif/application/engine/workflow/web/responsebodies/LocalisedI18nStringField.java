@@ -9,7 +9,8 @@ import java.util.Locale;
 public class LocalisedI18nStringField extends LocalisedField {
 
     public LocalisedI18nStringField(I18nField field, Locale locale) {
-        super(field, locale);
-        this.setValue(field.getValue().getTranslation(locale));
+//        TODO: NAE-1645
+//        super(field, locale);
+//        this.setValue(field.getValue().getTranslation(locale));
     }
 }

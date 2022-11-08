@@ -10,6 +10,7 @@ import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -243,13 +244,15 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllCoMembers(IUser user) {
-        Set<String> users = workflowService.searchAll(
-                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
-                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
-                .collect(HashSet::new, Set::addAll, Set::addAll);
-        users.remove(user.getStringId());
-        users.remove(userService.getSystem().getStringId());
-        return users;
+//        TODO: NAE-1645
+//        Set<String> users = workflowService.searchAll(
+//                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
+//                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
+//                .collect(HashSet::new, Set::addAll, Set::addAll);
+//        users.remove(user.getStringId());
+//        users.remove(userService.getSystem().getStringId());
+//        return users;
+        return new HashSet<>();
     }
 
 
@@ -258,7 +261,8 @@ public class NextGroupService implements INextGroupService {
         if (!isGroupCase(groupCase)) {
             return null;
         }
-        Set<String> userIds = groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet();
+//        TODO: NAE-1645 check field type is enummap
+        Set<String> userIds = ((EnumerationMapField)groupCase.getDataSet().get(GROUP_MEMBERS_FIELD)).getOptions().keySet();
         List<IUser> resultList = new ArrayList<>();
         userIds.forEach(id -> resultList.add(userService.resolveById(id, true)));
         return resultList;
@@ -266,9 +270,11 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllGroupsOfUser(IUser groupUser) {
-        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
-                .map(aCase -> aCase.get_id().toString()).getContent();
-        return new HashSet<>(groupList);
+//        TODO: NAE-1645
+//        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
+//                .map(aCase -> aCase.get_id().toString()).getContent();
+//        return new HashSet<>(groupList);
+        return new HashSet<>();
     }
 
     @Override
@@ -342,16 +348,17 @@ public class NextGroupService implements INextGroupService {
     protected DataSet getInitialGroupData(IUser author, String title, Case groupCase) {
         DataSet dataSet = new DataSet();
 
-        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
-        workflowService.save(groupCase);
-
-        DataField authorData = new DataField();
-        authorData.setValue(author.getStringId());
-        DataField titleData = new DataField();
-        titleData.setValue(title);
-
-        dataSet.getFields().put(GROUP_TITLE_FIELD, titleData);
-        dataSet.getFields().put(GROUP_AUTHOR_FIELD, authorData);
+//        TODO: NAE-1645
+//        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
+//        workflowService.save(groupCase);
+//
+//        DataField authorData = new DataField();
+//        authorData.setValue(author.getStringId());
+//        DataField titleData = new DataField();
+//        titleData.setValue(title);
+//
+//        dataSet.getFields().put(GROUP_TITLE_FIELD, titleData);
+//        dataSet.getFields().put(GROUP_AUTHOR_FIELD, authorData);
         return dataSet;
     }
 

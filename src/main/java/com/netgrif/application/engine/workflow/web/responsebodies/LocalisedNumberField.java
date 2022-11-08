@@ -13,7 +13,7 @@ public class LocalisedNumberField extends LocalisedField {
     private Double maxValue;
 
     public LocalisedNumberField(NumberField field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO NAE-1645
 //        TODO: NAE-1645: unused?
 //        this.minValue = field.getMinValue();
 //        this.maxValue = field.getMaxValue();

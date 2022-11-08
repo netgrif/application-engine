@@ -15,11 +15,11 @@ public class LocalisedMultichoiceField extends LocalisedChoiceField {
     public LocalisedMultichoiceField(MultichoiceField field, Locale locale) {
         super(field, locale);
         this.setValue(new LinkedList<>());
-        Collection<I18nString> values = field.getValue();
-        if (values != null) {
-            for (I18nString value : values) {
-                ((List) this.getValue()).add(value.getTranslation(locale));
-            }
-        }
+//        Collection<I18nString> values = field.getValue(); TODO: NAE-1645
+//        if (values != null) {
+//            for (I18nString value : values) {
+//                ((List) this.getValue()).add(value.getTranslation(locale));
+//            }
+//        }
     }
 }

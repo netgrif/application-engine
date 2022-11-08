@@ -210,19 +210,21 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 try {
                     DataType type = DataType.fromValue(entry.getKey());
 
-                    switch (type) {
-                        case USER:
-                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
-                            Path idPath = Expressions.stringPath(valuePath, "id");
-                            Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
-                            predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
-                            break;
-                    }
+//                    TODO: NAE-1645
+//                    switch (type) {
+//                        case USER:
+//                            Path valuePath = Expressions.simplePath(UserFieldValue.class, QCase.case$.dataSet.get((String) k), "value");
+//                            Path idPath = Expressions.stringPath(valuePath, "id");
+//                            Expression<Long> constant = Expressions.constant(Long.valueOf("" + fieldValue));
+//                            predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
+//                            break;
+//                    }
                 } catch (IllegalArgumentException e) {
                     log.error("Unrecognized Field type " + entry.getKey());
                 }
             } else {
-                predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
+//                TODO: NAE-1645
+//                predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
             }
         });
         BooleanBuilder builder = new BooleanBuilder();
@@ -264,37 +266,38 @@ public class CaseSearchService extends MongoSearchService<Case> {
             //ignore
         }
 
-        petriNets.forEach(net -> {
-            net.getImmediateFields().forEach(field -> {
-                try {
-                    if (field.getType() == DataType.TEXT) {
-                        Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
-                        Expression<String> constant = Expressions.constant(searchPhrase);
-                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
-                    } else if (field.getType() == DataType.NUMBER) {
-                        Double value = FieldFactory.parseDouble(searchPhrase);
-                        if (value != null)
-                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if (field.getType() == DataType.DATE) {
-                        LocalDate value = FieldFactory.parseDate(searchPhrase);
-                        if (value != null)
-                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if (field.getType() == DataType.DATE_TIME) {
-                        LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
-                        if (value != null)
-                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
-                    } else if (field.getType() == DataType.ENUMERATION) {
-                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
-                        Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");
-                        Expression<String> constant = Expressions.constant(searchPhrase);
-                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    //Skip this field in search
-                }
-            });
-        });
+//        TODO: NAE-1645
+//        petriNets.forEach(net -> {
+//            net.getImmediateFields().forEach(field -> {
+//                try {
+//                    if (field.getType() == DataType.TEXT) {
+//                        Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
+//                        Expression<String> constant = Expressions.constant(searchPhrase);
+//                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
+//                    } else if (field.getType() == DataType.NUMBER) {
+//                        Double value = FieldFactory.parseDouble(searchPhrase);
+//                        if (value != null)
+//                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+//                    } else if (field.getType() == DataType.DATE) {
+//                        LocalDate value = FieldFactory.parseDate(searchPhrase);
+//                        if (value != null)
+//                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+//                    } else if (field.getType() == DataType.DATE_TIME) {
+//                        LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
+//                        if (value != null)
+//                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+//                    } else if (field.getType() == DataType.ENUMERATION) {
+//                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()), "value");
+//                        Path defaultValuePath = Expressions.stringPath(valuePath, "defaultValue");
+//                        Expression<String> constant = Expressions.constant(searchPhrase);
+//                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
+//                    }
+//                } catch (Exception e) {
+//                    log.error(e.getMessage());
+//                    //Skip this field in search
+//                }
+//            });
+//        });
 
         BooleanBuilder builder = new BooleanBuilder();
         predicates.forEach(builder::or);

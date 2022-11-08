@@ -259,7 +259,8 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet);
-        useCase.populateDataSet(initValueExpressionEvaluator);
+//        TODO: NAE-1645
+//        useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());

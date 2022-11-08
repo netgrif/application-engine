@@ -10,7 +10,7 @@ import java.util.List;
 public class CaseField extends FieldWithAllowedNets<List<String>> {
 
     public CaseField() {
-        this();
+//        this();
     }
 
     public CaseField(List<String> allowedNets) {

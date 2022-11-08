@@ -15,7 +15,6 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
@@ -236,7 +235,8 @@ class ImportHelper {
     static DataSet populateDataset(Map<String, Map<String, String>> data) {
         DataSet dataSet = new DataSet()
         data.each {fieldId, config ->
-            dataSet.fields[fieldId] = new DataField(config["value"])
+//            TODO: NAE-1645
+//            dataSet.fields[fieldId] = new DataField(config["value"])
         }
         return dataSet
     }

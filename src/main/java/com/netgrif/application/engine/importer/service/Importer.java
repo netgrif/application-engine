@@ -778,17 +778,20 @@ public class Importer {
     protected void addDataLogic(Transition transition, DataRef dataRef) {
         Logic logic = dataRef.getLogic();
         try {
-            String fieldId = getField(dataRef.getId()).getStringId();
+            Field field = getField(dataRef.getId());
+            String fieldId = field.getStringId();
             if (logic == null || fieldId == null) {
                 return;
             }
 
-            Set<FieldBehavior> behavior = new HashSet<>();
+            FieldBehavior behavior = null;
             if (logic.getBehavior() != null) {
-                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+//                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+                Optional<Behavior> first = logic.getBehavior().stream().filter(b -> !Behavior.REQUIRED.equals(b)).findFirst();
+                behavior = FieldBehavior.fromString(first.orElseGet(() -> Behavior.EDITABLE));
             }
-
-            transition.addDataSet(fieldId, behavior, null, null, null);
+            // TODO: NAE-1645
+            transition.addDataSet(field, behavior, null, null, null, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -798,7 +801,8 @@ public class Importer {
     protected void addDataLayout(Transition transition, DataRef dataRef) {
         Layout layout = dataRef.getLayout();
         try {
-            String fieldId = getField(dataRef.getId()).getStringId();
+            Field field = getField(dataRef.getId());
+            String fieldId = field.getStringId();
             if (layout == null || fieldId == null) {
                 return;
             }
@@ -819,7 +823,7 @@ public class Importer {
             }
 
             FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), template, appearance, alignment);
-            transition.addDataSet(fieldId, null, null, fieldLayout, null);
+            transition.addDataSet(field, null, null, null, fieldLayout, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -827,13 +831,14 @@ public class Importer {
 
     @Transactional
     protected void addDataComponent(Transition transition, DataRef dataRef) throws MissingIconKeyException {
-        String fieldId = getField(dataRef.getId()).getStringId();
+        Field<?> field = getField(dataRef.getId());
+        String fieldId = field.getStringId();
         Component component;
         if ((dataRef.getComponent()) == null)
-            component = getField(dataRef.getId()).getComponent();
+            component = field.getComponent();
         else
-            component = componentFactory.buildComponent(dataRef.getComponent(), this, getField(dataRef.getId()));
-        transition.addDataSet(fieldId, null, null, null, component);
+            component = componentFactory.buildComponent(dataRef.getComponent(), this, field);
+        transition.addDataSet(field, null, null, null, null, component);
     }
 
     @Transactional

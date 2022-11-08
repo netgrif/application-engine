@@ -40,7 +40,7 @@ public class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>
         if (this.getValue() == null || this.getOptions() == null) {
             return null;
         }
-        return this.getValue().stream().map(v -> this.getOptions().get(v)).collect(Collectors.toList());
+        return this.getValue().getValue().stream().map(v -> this.getOptions().get(v)).collect(Collectors.toList());
     }
 
     @Override

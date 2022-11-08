@@ -30,6 +30,6 @@ public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
 
     @Override
     public DataType getType() {
-        return DataType.MULTICHOICE_MAP;
+        return DataType.MULTICHOICE;
     }
 }

@@ -512,10 +512,11 @@ public class TaskService implements ITaskService {
     @Transactional
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataRef> entry : transition.getDataSet().entrySet()) {
-            if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
-                continue;
-            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
-                continue;
+            // TODO: NAE-1645 fix validation
+//            if (!useCase.getDataField(entry.getKey()).req(transition.getImportId()))
+//                continue;
+//            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
+//                continue;
 
             Object value = useCase.getDataSet().get(entry.getKey()).getValue();
             if (value == null) {
@@ -742,7 +743,7 @@ public class TaskService implements ITaskService {
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())
                 .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
-                .immediateDataFields(new LinkedHashSet<>(transition.getImmediateData()))
+//                .immediateDataFields(new LinkedHashSet<>(transition.getImmediateData())) TODO: NAE-1645 fix
                 .assignPolicy(transition.getAssignPolicy())
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())

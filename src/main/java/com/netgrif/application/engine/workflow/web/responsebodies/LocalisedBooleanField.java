@@ -9,6 +9,6 @@ import java.util.Locale;
 public class LocalisedBooleanField extends LocalisedField {
 
     public LocalisedBooleanField(BooleanField field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO NAE-1645
     }
 }

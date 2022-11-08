@@ -13,7 +13,7 @@ public class LocalisedFilterField extends LocalisedField {
     private Object filterMetadata;
 
     public LocalisedFilterField(FilterField field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO: NAE-1645
         this.allowedNets = field.getAllowedNets();
         this.filterMetadata = field.getFilterMetadata();
     }

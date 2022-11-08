@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
@@ -15,25 +16,23 @@ import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Document
 public class Transition extends Node {
 
-    @Field("dataGroups")
+    @org.springframework.data.mongodb.core.mapping.Field("dataGroups")
     @Getter
     @Setter
     private Map<String, DataGroup> dataGroups;
 
-    @Field("dataSet")
+    @org.springframework.data.mongodb.core.mapping.Field("dataSet")
     @Getter
     @Setter
     private LinkedHashMap<String, DataRef> dataSet;
 
-    @Field("roles")
+    @org.springframework.data.mongodb.core.mapping.Field("roles")
     @Getter
     @Setter
     private Map<String, Map<String, Boolean>> roles;
@@ -42,12 +41,12 @@ public class Transition extends Node {
     @Setter
     private List<String> negativeViewRoles;
 
-    @Field("users")
+    @org.springframework.data.mongodb.core.mapping.Field("users")
     @Getter
     @Setter
     private Map<String, Map<String, Boolean>> userRefs;
 
-    @Field("triggers")
+    @org.springframework.data.mongodb.core.mapping.Field("triggers")
     @Getter
     @Setter
     private List<Trigger> triggers;
@@ -103,15 +102,17 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void addDataSet(String field, FieldBehavior behavior, Boolean required, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
-        if (dataSet.containsKey(field) && dataSet.get(field) != null) {
-            if (behavior != null) dataSet.get(field).setBehavior(behavior);
-            if (required != null) dataSet.get(field).setRequired(required);
-            if (events != null) dataSet.get(field).setEvents(events);
-            if (layout != null) dataSet.get(field).setLayout(layout);
-            if (component != null) dataSet.get(field).setComponent(component);
+    // TODO: NAE-1645 fix usage of this with mostly null values
+    public void addDataSet(Field field, FieldBehavior behavior, Boolean required, Map<DataEventType, DataEvent> events, FieldLayout layout, Component component) {
+        String fieldId = field.getStringId();
+        if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {
+            if (behavior != null) dataSet.get(fieldId).setBehavior(behavior);
+            if (required != null) dataSet.get(fieldId).setRequired(required);
+            if (events != null) dataSet.get(fieldId).setEvents(events);
+            if (layout != null) dataSet.get(fieldId).setLayout(layout);
+            if (component != null) dataSet.get(fieldId).setComponent(component);
         } else {
-            dataSet.put(field, new DataRef(behavior, required, events, layout, component));
+            dataSet.put(fieldId, new DataRef(field, behavior, required, events, layout, component));
         }
     }
 

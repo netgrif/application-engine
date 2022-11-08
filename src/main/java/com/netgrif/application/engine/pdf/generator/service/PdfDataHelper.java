@@ -263,7 +263,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private boolean isNotHidden(LocalisedField field) {
-        return !field.getBehavior().contains(FieldBehavior.HIDDEN);
+        return !FieldBehavior.HIDDEN.equals(field.getBehavior());
     }
 
     private boolean isNotExcluded(String fieldId) {

@@ -37,7 +37,6 @@ import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.DataField
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
@@ -430,40 +429,42 @@ class ActionDelegate {
         if (initialBehavior != null) {
             fieldBehavior.put(trans.stringId, initialBehavior)
         }
-
-        DataField changedField = new DataField(field.stringId)
-        changedField.setBehavior(fieldBehavior)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, changedField)
-        this.outcomes.add(outcome)
+//        TODO: NAE-1645
+//        DataField changedField = new DataField(field.stringId)
+//        changedField.setBehavior(fieldBehavior)
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, changedField)
+//        this.outcomes.add(outcome)
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
         // TODO: NAE-1645 locale?
-        DataField changedField = new DataField()
-        changedField.setChoices(field.choices)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, changedField)
-        this.outcomes.add(outcome)
+//        DataField changedField = new DataField()
+//        changedField.setChoices(field.choices)
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, changedField)
+//        this.outcomes.add(outcome)
     }
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        DataField changedField = new DataField()
-        changedField.setAllowedNets(field.allowedNets)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, changedField)
-        this.outcomes.add(outcome)
+//        TODO: NAE-1645
+//        DataField changedField = new DataField()
+//        changedField.setAllowedNets(field.allowedNets)
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, changedField)
+//        this.outcomes.add(outcome)
     }
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        DataField changedField = new DataField()
-        changedField.setOptions(field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, changedField)
-        this.outcomes.add(outcome)
+//        TODO: NAE-1645
+//        DataField changedField = new DataField()
+//        changedField.setOptions(field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, changedField)
+//        this.outcomes.add(outcome)
     }
 
     def saveChangedValidation(Field field) {
@@ -472,11 +473,12 @@ class ActionDelegate {
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
             it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
         }
-        DataField changedField = new DataField()
-        changedField.setValidations(compiled)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, changedField)
-        this.outcomes.add(outcome)
+//        TODO: NAE-1645
+//        DataField changedField = new DataField()
+//        changedField.setValidations(compiled)
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, changedField)
+//        this.outcomes.add(outcome)
     }
 
     def close = { Transition[] transitions ->
@@ -661,11 +663,11 @@ class ActionDelegate {
             saveChangedValue(field)
         }
         // TODO: NAE-1645
-        DataField changedField = new DataField(field.stringId)
-        changedField.value = value
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, changedField)
-        this.outcomes.add(outcome)
+//        DataField changedField = new DataField(field.stringId)
+//        changedField.value = value
+//        SetDataEventOutcome outcome = createSetDataEventOutcome()
+//        outcome.addChangedField(field.stringId, changedField)
+//        this.outcomes.add(outcome)
     }
 
     def saveChangedValue(Field field) {

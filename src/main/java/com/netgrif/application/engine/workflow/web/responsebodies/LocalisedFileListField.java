@@ -9,6 +9,6 @@ import java.util.Locale;
 public class LocalisedFileListField extends LocalisedField {
 
     public LocalisedFileListField(FileListField field, Locale locale) {
-        super(field, locale);
+//        super(field, locale); TODO: NAE-1645
     }
 }

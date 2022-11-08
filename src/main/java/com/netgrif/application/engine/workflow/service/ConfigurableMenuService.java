@@ -75,12 +75,10 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      */
     @Override
     public Map<String, I18nString> getAvailableRolesFromNet (EnumerationMapField processField, MultichoiceMapField permittedRoles, MultichoiceMapField bannedRoles) {
-
-        String netImportId = processField.getValue().split(":")[0];
-        String versionString = processField.getValue().split(":")[1].replace("-", ".");
+        String netImportId = processField.getValue().getValue().split(":")[0];
+        String versionString = processField.getValue().getValue().split(":")[1].replace("-", ".");
         Version version = converter.convert(versionString);
         PetriNet net = petriNetService.getPetriNet(netImportId, version);
-
         return net.getRoles().values().stream()
                 .filter(role -> (!permittedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)
                 && !bannedRoles.getOptions().containsKey(role.getImportId() + ":" + netImportId)))
@@ -99,7 +97,8 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
     public Map<String, I18nString> removeSelectedRoles(MultichoiceMapField mapField) {
 
         Map<String, I18nString> updatedRoles = new LinkedHashMap<>(mapField.getOptions());
-        updatedRoles.keySet().removeAll(mapField.getValue());
+//        TODO: NAE-1645
+//        updatedRoles.keySet().removeAll(mapField.getValue());
         return updatedRoles;
     }
 
@@ -124,7 +123,7 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
         String netName = " (" + processField.getOptions().get(processField.getValue()).toString().split(":")[0] + ")";
         Map<String, I18nString> updatedRoles = new LinkedHashMap<>(addedRoles.getOptions());
 
-        updatedRoles.putAll(rolesAvailable.getValue().stream()
+        updatedRoles.putAll(rolesAvailable.getValue().getValue().stream()
                 .collect(Collectors.toMap(x -> x, v -> new I18nString(rolesAvailable.getOptions().get(v).toString() + netName))));
 
         return updatedRoles;

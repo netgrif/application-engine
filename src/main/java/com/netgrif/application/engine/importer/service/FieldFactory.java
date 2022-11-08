@@ -12,8 +12,11 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataValidationExpressionEvaluator;
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class FieldFactory {
 
+    private final ITaskService taskService;
+
     private final ComponentFactory componentFactory;
 
     private final IDataValidator dataValidator;
@@ -37,7 +42,8 @@ public final class FieldFactory {
 
     private final Map<DataType, FieldBuilder<?>> builders;
 
-    public FieldFactory(List<FieldBuilder<?>> builders, ComponentFactory componentFactory, IDataValidator dataValidator, IDataValidationExpressionEvaluator dataValidationExpressionEvaluator) {
+    public FieldFactory(ITaskService taskService, List<FieldBuilder<?>> builders, ComponentFactory componentFactory, IDataValidator dataValidator, IDataValidationExpressionEvaluator dataValidationExpressionEvaluator) {
+        this.taskService = taskService;
         this.builders = builders.stream().collect(Collectors.toMap(FieldBuilder::getType, Function.identity()));
         this.componentFactory = componentFactory;
         this.dataValidator = dataValidator;
@@ -126,21 +132,23 @@ public final class FieldFactory {
         return buildDataRef(useCase, fieldId, true, transitionId);
     }
 
+    // TODO: NAE-1645 probably redundant, dataref should not need to be build anymore
     private DataRef buildDataRef(Case useCase, String fieldId, boolean withValidation, String transitionId) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-        resolveDataValues(field, useCase, fieldId);
-        resolveComponent(field, useCase, transitionId);
-        if (field instanceof ChoiceField)
-            resolveChoices((ChoiceField) field, useCase);
-        if (field instanceof MapOptionsField)
-            resolveMapOptions((MapOptionsField) field, useCase);
-        if (field instanceof FieldWithAllowedNets)
-            resolveAllowedNets((FieldWithAllowedNets) field, useCase);
-        if (field instanceof FilterField)
-            resolveFilterMetadata((FilterField) field, useCase);
-        if (withValidation)
-            resolveValidations(field, useCase);
-        return field;
+//        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+//        resolveDataValues(field, useCase, fieldId);
+//        resolveComponent(field, useCase, transitionId);
+//        if (field instanceof ChoiceField)
+//            resolveChoices((ChoiceField) field, useCase);
+//        if (field instanceof MapOptionsField)
+//            resolveMapOptions((MapOptionsField) field, useCase);
+//        if (field instanceof FieldWithAllowedNets)
+//            resolveAllowedNets((FieldWithAllowedNets) field, useCase);
+//        if (field instanceof FilterField)
+//            resolveFilterMetadata((FilterField) field, useCase);
+//        if (withValidation)
+//            resolveValidations(field, useCase);
+//        return field;
+        return null;
     }
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
@@ -156,45 +164,45 @@ public final class FieldFactory {
                     valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
                 });
     }
-
-    private void resolveChoices(ChoiceField field, Case useCase) {
-        Set<I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
-        if (choices == null)
-            return;
-        field.setChoices(choices);
-    }
-
-    private void resolveComponent(Field field, Case useCase, String transitionId) {
-        if (transitionId == null) {
-            return;
-        }
-        com.netgrif.application.engine.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
-        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if (transitionComponent != null) {
-            field.setComponent(transitionComponent);
-        }
-    }
-
-    private void resolveMapOptions(MapOptionsField<I18nString, ?> field, Case useCase) {
-        Map<String, I18nString> options = useCase.getDataField(field.getImportId()).getOptions();
-        if (options == null)
-            return;
-        field.setOptions(options);
-    }
-
-    private void resolveAllowedNets(FieldWithAllowedNets<?> field, Case useCase) {
-        List<String> allowedNets = useCase.getDataField(field.getImportId()).getAllowedNets();
-        if (allowedNets == null)
-            return;
-        field.setAllowedNets(allowedNets);
-    }
-
-    private void resolveFilterMetadata(FilterField field, Case useCase) {
-        Map<String, Object> metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
-        if (metadata == null)
-            return;
-        field.setFilterMetadata(metadata);
-    }
+    // TODO: NAE-1645
+//    private void resolveChoices(ChoiceField field, Case useCase) {
+//        Set<I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
+//        if (choices == null)
+//            return;
+//        field.setChoices(choices);
+//    }
+//
+//    private void resolveComponent(Field field, Case useCase, String transitionId) {
+//        if (transitionId == null) {
+//            return;
+//        }
+//        com.netgrif.application.engine.petrinet.domain.Transition transition = useCase.getPetriNet().getTransition(transitionId);
+//        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
+//        if (transitionComponent != null) {
+//            field.setComponent(transitionComponent);
+//        }
+//    }
+//
+//    private void resolveMapOptions(MapOptionsField<I18nString, ?> field, Case useCase) {
+//        Map<String, I18nString> options = useCase.getDataField(field.getImportId()).getOptions();
+//        if (options == null)
+//            return;
+//        field.setOptions(options);
+//    }
+//
+//    private void resolveAllowedNets(FieldWithAllowedNets<?> field, Case useCase) {
+//        List<String> allowedNets = useCase.getDataField(field.getImportId()).getAllowedNets();
+//        if (allowedNets == null)
+//            return;
+//        field.setAllowedNets(allowedNets);
+//    }
+//
+//    private void resolveFilterMetadata(FilterField field, Case useCase) {
+//        Map<String, Object> metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
+//        if (metadata == null)
+//            return;
+//        field.setFilterMetadata(metadata);
+//    }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
@@ -255,11 +263,12 @@ public final class FieldFactory {
     }
 
     private void parseUserValues(UserField field, Case useCase, String fieldId) {
-        DataField userField = useCase.getDataField(fieldId);
-        if (userField.getChoices() != null) {
-            Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
-            field.setRoles(roles);
-        }
+        UserField userField = (UserField) useCase.getDataField(fieldId);
+        // TODO: NAE-1645 resolve missing choices
+//        if (userField.getChoices() != null) {
+//            Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+//            field.setRoles(roles);
+//        }
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
     }
 
@@ -433,13 +442,13 @@ public final class FieldFactory {
     }
 
     private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
-        DataField dataField = useCase.getDataSet().get(fieldId);
+        Field dataField = useCase.getDataSet().get(fieldId);
         if (field.getType().equals(DataType.CASE_REF) || field.getType().equals(DataType.FILTER)) {
-            List<String> allowedNets = new ArrayList<>(dataField.getAllowedNets());
+            List<String> allowedNets = new ArrayList<>(((CaseField)dataField).getAllowedNets());
             ((FieldWithAllowedNets<?>) field).setAllowedNets(allowedNets);
         }
         if (field.getType().equals(DataType.FILTER)) {
-            Map<String, Object> filterMetadata = new HashMap<>(dataField.getFilterMetadata());
+            Map<String, Object> filterMetadata = new HashMap<>(((FilterField)dataField).getFilterMetadata());
             ((FilterField) field).setFilterMetadata(filterMetadata);
         }
     }

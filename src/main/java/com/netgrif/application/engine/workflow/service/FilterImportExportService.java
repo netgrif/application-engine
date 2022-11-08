@@ -12,6 +12,7 @@ import com.netgrif.application.engine.configuration.properties.FilterProperties;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -241,8 +242,9 @@ public class FilterImportExportService implements IFilterImportExportService {
             importedFilterTaskIds.put(filter.getCaseId(), importedFilterTask.getStringId());
 
             // TODO: delete after fixed issue: https://netgrif.atlassian.net/jira/servicedesk/projects/NGSD/issues/
-            filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
-            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
+//            TODO: NAE-1645
+//            filterCase.get().getDataSet().get(FIELD_MISSING_ALLOWED_NETS).setBehaviors(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.HIDDEN));
+//            filterCase.get().getDataSet().get(FIELD_FILTER).addBehavior(IMPORT_FILTER_TRANSITION, Collections.singleton(FieldBehavior.VISIBLE));
             workflowService.save(filterCase.get());
         });
         taskService.assignTasks(taskService.findAllById(new ArrayList<>(importedFilterTaskIds.values())), userService.getLoggedUser());
@@ -262,35 +264,37 @@ public class FilterImportExportService implements IFilterImportExportService {
             Task importedFilterTask = taskService.findOne(f);
             Case filterCase = workflowService.findOne(importedFilterTask.getCaseId());
             PetriNet filterNet = petriNetService.getNewestVersionByIdentifier(FILTER_NET_IDENTIFIER);
-            List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
-            List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
-            if (currentNets.size() < requiredNets.size()) {
-                requiredNets.removeAll(currentNets);
-                StringBuilder htmlTextAreaValue = new StringBuilder(
-                        ((EnumerationMapField) filterNet.getDataSet().get(FIELD_MISSING_NETS_TRANSLATION)).getOptions().get(
-                                LocaleContextHolder.getLocale().getLanguage()
-                        ).getDefaultValue()
-                );
-                htmlTextAreaValue.append("<ul style=\"color: red\">");
-                requiredNets.forEach(net -> htmlTextAreaValue.append("<li>").append(net).append("</li>"));
-                htmlTextAreaValue.append("</ul>");
-                DataSet taskData = new DataSet();
-                DataField missingNets = new DataField();
-                missingNets.setValue(htmlTextAreaValue.toString());
-                taskData.getFields().put(FIELD_MISSING_ALLOWED_NETS, missingNets);
-                this.dataService.setData(importedFilterTask, taskData);
-                filterCase = workflowService.findOne(filterCase.getStringId());
-                changeVisibilityByAllowedNets(true, filterCase);
-            } else {
-                changeVisibilityByAllowedNets(false, filterCase);
-            }
+//            TODO: NAE-1645
+//            List<String> requiredNets = filterCase.getDataSet().get(FIELD_FILTER).getAllowedNets();
+//            List<String> currentNets = petriNetService.getExistingPetriNetIdentifiersFromIdentifiersList(requiredNets);
+//            if (currentNets.size() < requiredNets.size()) {
+//                requiredNets.removeAll(currentNets);
+//                StringBuilder htmlTextAreaValue = new StringBuilder(
+//                        ((EnumerationMapField) filterNet.getDataSet().get(FIELD_MISSING_NETS_TRANSLATION)).getOptions().get(
+//                                LocaleContextHolder.getLocale().getLanguage()
+//                        ).getDefaultValue()
+//                );
+//                htmlTextAreaValue.append("<ul style=\"color: red\">");
+//                requiredNets.forEach(net -> htmlTextAreaValue.append("<li>").append(net).append("</li>"));
+//                htmlTextAreaValue.append("</ul>");
+//                DataSet taskData = new DataSet();
+//                DataField missingNets = new DataField();
+//                missingNets.setValue(htmlTextAreaValue.toString());
+//                taskData.getFields().put(FIELD_MISSING_ALLOWED_NETS, missingNets);
+//                this.dataService.setData(importedFilterTask, taskData);
+//                filterCase = workflowService.findOne(filterCase.getStringId());
+//                changeVisibilityByAllowedNets(true, filterCase);
+//            } else {
+//                changeVisibilityByAllowedNets(false, filterCase);
+//            }
             workflowService.save(filterCase);
         });
     }
 
     private void changeVisibilityByAllowedNets(boolean allowedNetsMissing, Case filterCase) {
-        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_MISSING_ALLOWED_NETS : FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
-        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_FILTER : FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
+//        TODO: NAE-1645
+//        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_MISSING_ALLOWED_NETS : FIELD_FILTER).makeVisible(IMPORT_FILTER_TRANSITION);
+//        filterCase.getDataSet().get(allowedNetsMissing ? FIELD_FILTER : FIELD_MISSING_ALLOWED_NETS).makeHidden(IMPORT_FILTER_TRANSITION);
     }
 
     @Transactional
@@ -300,7 +304,7 @@ public class FilterImportExportService implements IFilterImportExportService {
                         .and(QCase.case$.author.id.eq(userService.getLoggedUser().getStringId()))
         );
 
-        FileFieldValue ffv = (FileFieldValue) exportCase.getDataSet().get(UPLOAD_FILE_FIELD).getValue();
+        FileFieldValue ffv = ((FileField) exportCase.getDataSet().get(UPLOAD_FILE_FIELD)).getValue().getValue();
         if (ffv == null) {
             throw new FileNotFoundException();
         }
@@ -336,30 +340,30 @@ public class FilterImportExportService implements IFilterImportExportService {
         FilterImportExport exportFilter = new FilterImportExport();
         exportFilter.setCaseId(filter.getStringId());
         exportFilter.setIcon(filter.getIcon());
-
-        DataField parentCaseId = filter.getDataField(FIELD_PARENT_CASE_ID);
-        if (parentCaseId.getValue() != null && !parentCaseId.getValue().equals("")) {
-            exportFilter.setParentCaseId((String) parentCaseId.getValue());
-        }
-
-        DataField parentViewId = filter.getDataField(FIELD_PARENT_VIEW_ID);
-        if (parentViewId.getValue() != null && !parentViewId.getValue().equals("")) {
-            exportFilter.setParentViewId((String) parentViewId.getValue());
-        }
-
-        DataField filterField = filter.getDataField(FIELD_FILTER);
-        exportFilter.setFilterValue((String) filterField.getValue());
-        exportFilter.setAllowedNets(filterField.getAllowedNets());
-        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
-
-        DataField visibility = filter.getDataField(FIELD_VISIBILITY);
-        exportFilter.setVisibility(visibility.getValue().toString());
-
-        DataField type = filter.getDataField(FIELD_FILTER_TYPE);
-        exportFilter.setType(type.getValue().toString());
-
-        DataField name = filter.getDataField(FIELD_NAME);
-        exportFilter.setFilterName((I18nString) name.getValue());
+//        TODO: NAE-1645
+//        DataField parentCaseId = filter.getDataField(FIELD_PARENT_CASE_ID);
+//        if (parentCaseId.getValue() != null && !parentCaseId.getValue().equals("")) {
+//            exportFilter.setParentCaseId((String) parentCaseId.getValue());
+//        }
+//
+//        DataField parentViewId = filter.getDataField(FIELD_PARENT_VIEW_ID);
+//        if (parentViewId.getValue() != null && !parentViewId.getValue().equals("")) {
+//            exportFilter.setParentViewId((String) parentViewId.getValue());
+//        }
+//
+//        DataField filterField = filter.getDataField(FIELD_FILTER);
+//        exportFilter.setFilterValue((String) filterField.getValue());
+//        exportFilter.setAllowedNets(filterField.getAllowedNets());
+//        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
+//
+//        DataField visibility = filter.getDataField(FIELD_VISIBILITY);
+//        exportFilter.setVisibility(visibility.getValue().toString());
+//
+//        DataField type = filter.getDataField(FIELD_FILTER_TYPE);
+//        exportFilter.setType(type.getValue().toString());
+//
+//        DataField name = filter.getDataField(FIELD_NAME);
+//        exportFilter.setFilterName((I18nString) name.getValue());
 
         return exportFilter;
     }
