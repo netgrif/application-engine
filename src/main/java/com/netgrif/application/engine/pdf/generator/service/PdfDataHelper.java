@@ -116,7 +116,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generateFromDataGroup(DataGroup dataGroup) {
-        Collection<Field> fields = dataGroup.getFields().getContent();
+        Collection<Field<?>> fields = dataGroup.getFields().getContent();
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid")) {
             fields = fields.stream().sorted(Comparator.<Field, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }
