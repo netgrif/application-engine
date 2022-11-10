@@ -10,10 +10,6 @@ import java.io.IOException;
 
 public class I18nStringSerializer extends StdSerializer<I18nString> {
 
-    public I18nStringSerializer() {
-        this(null);
-    }
-
     public I18nStringSerializer(Class<I18nString> t) {
         super(t);
     }
@@ -21,10 +17,6 @@ public class I18nStringSerializer extends StdSerializer<I18nString> {
     @Override
     public void serialize(I18nString value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         String translation = value.getTranslation(LocaleContextHolder.getLocale());
-        if (translation != null) {
-            gen.writeString(translation);
-            return;
-        }
-        gen.writeString(value.getDefaultValue());
+        gen.writeString(translation);
     }
 }

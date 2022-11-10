@@ -4,10 +4,10 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedMultichoiceMapField;
+import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,19 +17,19 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedMultichoiceMapField field, int lastX, int lastY) {
+    public PdfField buildField(DataGroup dataGroup, MultichoiceMapField field, int lastX, int lastY) {
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
 
         if (field.getOptions() != null)
-            choices = new ArrayList<>(field.getOptions().values());
+            choices = field.getOptions().values().stream().map(s -> s.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toList());
         if (field.getValue() != null)
-            values.addAll(((Collection<? extends String>) field.getValue()).stream().map(value ->
-                    field.getOptions().get(value)).collect(Collectors.toList()));
+            values.addAll((field.getValue()).stream().map(value ->
+                    field.getOptions().get(value).getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toList()));
 
-        String translatedTitle = field.getName();
+        String translatedTitle = field.getName().getTranslation(LocaleContextHolder.getLocale());
         PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());

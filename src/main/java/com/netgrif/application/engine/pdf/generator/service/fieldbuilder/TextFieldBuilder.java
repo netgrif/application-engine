@@ -8,8 +8,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.utils.DateUtils;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import org.jsoup.Jsoup;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -24,7 +24,7 @@ public class TextFieldBuilder extends FieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedField field, int lastX, int lastY) {
+    public PdfField buildField(DataGroup dataGroup, Field field, int lastX, int lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
         String value;
@@ -53,14 +53,14 @@ public class TextFieldBuilder extends FieldBuilder {
                 value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
                 break;
         }
-        String translatedTitle = field.getName();
+        String translatedTitle = field.getName().getTranslation(LocaleContextHolder.getLocale());
         PdfField pdfField = new PdfTextField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
     }
 
-    private String formatDate(LocalisedField field) {
+    private String formatDate(Field field) {
         ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
             if (field.getValue() instanceof LocalDate)
@@ -73,7 +73,7 @@ public class TextFieldBuilder extends FieldBuilder {
         }
     }
 
-    private String formatDateTime(LocalisedField field) {
+    private String formatDateTime(Field field) {
         ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
             if (field.getValue() instanceof LocalDateTime)
