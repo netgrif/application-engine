@@ -27,6 +27,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,18 +36,9 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 class ImportHelper {
-
-    public static final String PATCH = "patch"
-
-    public static final String FIELD_BOOLEAN = "boolean"
-    public static final String FIELD_ENUMERATION = "enumeration"
-    public static final String FIELD_TEXT = "text"
-    public static final String FIELD_NUMBER = "number"
-    public static final String FIELD_DATE = "date"
-
-    private static final Logger log = LoggerFactory.getLogger(ImportHelper.class.name)
 
     @Autowired
     private PetriNetRepository petriNetRepository
@@ -86,9 +79,6 @@ class ImportHelper {
     @Autowired
     private ProcessRoleRepository processRoleRepository
 
-    private final ClassLoader loader = ImportHelper.getClassLoader()
-
-
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {
         HashMap<String, Authority> authoritities = new HashMap<>()
@@ -121,24 +111,6 @@ class ImportHelper {
         }
         return Optional.of(petriNet)
     }
-
-//    ProcessRole createUserProcessRole(PetriNet net, String name) {
-//        ProcessRole role = processRoleRepository.save(new ProcessRole(roleId:
-//                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
-//        log.info("Created user process role $name")
-//        return role
-//    }
-//
-//    Map<String, ProcessRole> createUserProcessRoles(Map<String, String> roles, PetriNet net) {
-//        HashMap<String, ProcessRole> userRoles = new HashMap<>()
-//        roles.each { it ->
-//            userRoles.put(it.key, createUserProcessRole(net, it.value))
-//        }
-//
-//        log.info("Created ${userRoles.size()} process roles")
-//        return userRoles
-//    }
-
 
     ProcessRole getProcessRoleByImportId(PetriNet net, String roleId) {
         ProcessRole role = net.roles.values().find { it -> it.importId == roleId }

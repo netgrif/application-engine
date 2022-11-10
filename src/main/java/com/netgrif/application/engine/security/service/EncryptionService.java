@@ -1,9 +1,8 @@
 package com.netgrif.application.engine.security.service;
 
+import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -11,18 +10,15 @@ import java.util.HashMap;
 @Service
 public class EncryptionService implements IEncryptionService {
 
-    @Autowired
-    private StandardPBEStringEncryptor standardEncryptor;
+    private final StandardPBEStringEncryptor standardEncryptor;
+    private final DatabaseProperties properties;
 
-    @Value("${nae.database.password}")
-    private String PASSWORD;
+    private final HashMap<String, StandardPBEStringEncryptor> encryptors = new HashMap<>();
 
-    @Value("${nae.database.algorithm}")
-    private String STANDARD_ALGORITHM;
-
-    private final String PREFIX = "#encrypted";
-
-    private HashMap<String, StandardPBEStringEncryptor> encryptors = new HashMap<>();
+    public EncryptionService(StandardPBEStringEncryptor standardEncryptor, DatabaseProperties properties) {
+        this.standardEncryptor = standardEncryptor;
+        this.properties = properties;
+    }
 
     @Override
     public String encrypt(String value) {
@@ -47,15 +43,15 @@ public class EncryptionService implements IEncryptionService {
     }
 
     private String encrypt(String value, StandardPBEStringEncryptor encryptor) {
-        if (value != null && !value.contains(PREFIX)) {
-            return PREFIX + encryptor.encrypt(value);
+        if (value != null && !value.contains(properties.getEncryptionPrefix())) {
+            return properties.getEncryptionPrefix() + encryptor.encrypt(value);
         }
         return value;
     }
 
     private String decrypt(String value, StandardPBEStringEncryptor encryptor) {
-        if (value != null && value.contains(PREFIX)) {
-            return encryptor.decrypt(value.substring(PREFIX.length()));
+        if (value != null && value.contains(properties.getEncryptionPrefix())) {
+            return encryptor.decrypt(value.substring(properties.getEncryptionPrefix().length()));
         }
         return value;
     }
@@ -73,7 +69,7 @@ public class EncryptionService implements IEncryptionService {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 
         encryptor.setAlgorithm(algorithm);
-        encryptor.setPassword(PASSWORD);
+        encryptor.setPassword(properties.getPassword());
         encryptor.setProvider(new BouncyCastleProvider());
 
         encryptors.put(algorithm, encryptor);

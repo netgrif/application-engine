@@ -116,14 +116,14 @@ public class DataService implements IDataService {
             }
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
 //                    TODO: NAE-1645
+//                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
 //                    validationField.setBehaviors(useCase.getDataSet().get(fieldId).getBehaviors().get(transition.getStringId()));
 //                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
 //                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
 //                    }
 //                    resolveComponents(validationField, transition);
-                    dataSetFields.add(validationField);
+//                    dataSetFields.add(validationField);
                 }
             } else {
 //                TODO: NAE-1645

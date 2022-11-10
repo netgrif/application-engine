@@ -6,8 +6,6 @@ import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateField;
 import org.springframework.stereotype.Component;
 
-import static com.netgrif.application.engine.importer.service.FieldFactory.parseDate;
-
 @Component
 public class DateFieldBuilder extends FieldBuilder<DateField> {
 
@@ -16,7 +14,8 @@ public class DateFieldBuilder extends FieldBuilder<DateField> {
         DateField field = new DateField();
         setDefaultValue(field, data, defaultValue -> {
             if (defaultValue != null) {
-                field.setDefaultValue(parseDate(defaultValue));
+//                TODO: NAE-1645 dafault format
+//                field.setDefaultValue(parseDate(defaultValue));
             }
         });
         return field;

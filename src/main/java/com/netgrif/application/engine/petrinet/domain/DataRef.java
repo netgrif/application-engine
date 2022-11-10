@@ -8,24 +8,24 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Transient;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Data
+@NoArgsConstructor
 public class DataRef {
 
+    private String fieldId;
+    @Transient
     private Field field;
-
     private FieldBehavior behavior;
-
     private boolean required;
-
     private Map<DataEventType, DataEvent> events;
-
     private FieldLayout layout;
-
     private Component component;
 
     public DataRef(Field field) {

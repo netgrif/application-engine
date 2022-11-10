@@ -62,17 +62,17 @@ public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
 
-    @Autowired
-    private IWorkflowService workflowService;
+    private final IWorkflowService workflowService;
+    private final ITaskService taskService;
+    private final IElasticCaseService elasticCaseService;
+    private final IDataService dataService;
 
-    @Autowired
-    private ITaskService taskService;
-
-    @Autowired
-    private IElasticCaseService elasticCaseService;
-
-    @Autowired
-    private IDataService dataService;
+    public WorkflowController(IWorkflowService workflowService, ITaskService taskService, IElasticCaseService elasticCaseService, IDataService dataService) {
+        this.workflowService = workflowService;
+        this.taskService = taskService;
+        this.elasticCaseService = elasticCaseService;
+        this.dataService = dataService;
+    }
 
 
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
@@ -101,6 +101,7 @@ public class WorkflowController {
         return resources;
     }
 
+    // TODO:  NAE-1645 search by ObjectId[] for tree-case.service {stringId: (childCaseRef.value as Array<string>)}
     @ApiOperation(value = "Generic case search with QueryDSL predicate", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
@@ -125,18 +126,6 @@ public class WorkflowController {
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel().toString());
         return resources;
     }
-
-    @ApiOperation(value = "Generic case search on Mongo database", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/case/search_mongo", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
-        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WorkflowController.class)
-                .searchMongo(searchBody, pageable, assembler, auth, locale)).withRel("search");
-        PagedModel<CaseResource> resources = assembler.toModel(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel().toString());
-        return resources;
-    }
-
 
     @ApiOperation(value = "Get count of the cases", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

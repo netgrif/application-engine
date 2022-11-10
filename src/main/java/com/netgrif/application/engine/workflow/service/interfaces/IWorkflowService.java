@@ -46,23 +46,19 @@ public interface IWorkflowService {
 
     void updateMarking(Case useCase);
 
+    Page<Case> search(Predicate predicate, Pageable pageable);
+
     Page<Case> searchAll(Predicate predicate);
+
+    long count(Predicate predicate);
 
     Case searchOne(Predicate predicate);
 
     Map<String, I18nString> listToMap(List<Case> cases);
-
-    Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
-
-    long count(Map<String, Object> request, LoggedUser user, Locale locale);
-
-//    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
-
-    Page<Case> search(Predicate predicate, Pageable pageable);
 }

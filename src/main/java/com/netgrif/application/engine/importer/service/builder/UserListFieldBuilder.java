@@ -14,6 +14,7 @@ public class UserListFieldBuilder extends FieldBuilder<UserListField> {
     public UserListField build(Data data, Importer importer) {
         UserListField field = new UserListField();
         setDefaultValues(field, data, inits -> {
+//            TODO: NAE-1645
         });
         return field;
     }

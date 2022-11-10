@@ -78,9 +78,6 @@ public class WorkflowService implements IWorkflowService {
     protected ITaskService taskService;
 
     @Autowired
-    protected CaseSearchService searchService;
-
-    @Autowired
     protected ApplicationEventPublisher publisher;
 
     @Autowired
@@ -128,7 +125,8 @@ public class WorkflowService implements IWorkflowService {
         resolveUserRef(useCase);
         taskService.resolveUserRef(useCase);
         try {
-            setImmediateDataFields(useCase);
+//            TODO: NAE-1645 not needed?
+//            setImmediateDataFields(useCase);
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
@@ -144,7 +142,8 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
-        this.setImmediateDataFieldsReadOnly(useCase);
+//        TODO: NAE-1645
+//        this.setImmediateDataFieldsReadOnly(useCase);
         return useCase;
     }
 
@@ -156,7 +155,8 @@ public class WorkflowService implements IWorkflowService {
                 .peek(caze -> {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);
-                    setImmediateDataFieldsReadOnly(caze);
+//                    TODO: NAE-1645
+//                    setImmediateDataFieldsReadOnly(caze);
                 })
                 .collect(Collectors.toList());
     }
@@ -166,38 +166,18 @@ public class WorkflowService implements IWorkflowService {
         Page<Case> page = repository.findAll(pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
-        return setImmediateDataFields(page);
+//        TODO: NAE-1645
+//        return setImmediateDataFields(page);
+        return page;
     }
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
         page.getContent().forEach(this::setPetriNet);
-        return setImmediateDataFields(page);
-    }
-
-    @Override
-    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
-        Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        Page<Case> page;
-        if (searchPredicate != null) {
-            page = repository.findAll(searchPredicate, pageable);
-        } else {
-            page = Page.empty();
-        }
-        page.getContent().forEach(this::setPetriNet);
-        decryptDataSets(page.getContent());
-        return setImmediateDataFields(page);
-    }
-
-    @Override
-    public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
-        Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        if (searchPredicate != null) {
-            return repository.count(searchPredicate);
-        } else {
-            return 0;
-        }
+//        TODO: NAE-1645
+//        return setImmediateDataFields(page);
+        return page;
     }
 
     @Override
@@ -286,7 +266,8 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
-        outcome.setCase(setImmediateDataFields(useCase));
+//        TODO: NAE-1645
+//        outcome.setCase(setImmediateDataFields(useCase));
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
     }
@@ -307,9 +288,12 @@ public class WorkflowService implements IWorkflowService {
         String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
+//        TODO: NAE-1645 remove mongoTemplates from project
         List<Case> cases = mongoTemplate.find(query, Case.class);
         decryptDataSets(cases);
-        return setImmediateDataFields(new PageImpl<Case>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
+//        TODO: NAE-1645
+//        return setImmediateDataFields(new PageImpl<Case>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
+        return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class));
     }
 
     @Override
@@ -383,6 +367,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public long count(Predicate predicate) {
+        return repository.count(predicate);
+    }
+
+    @Override
     public Case searchOne(Predicate predicate) {
         Page<Case> page = search(predicate, PageRequest.of(0, 1));
         if (page.getContent().isEmpty())
@@ -410,49 +399,6 @@ public class WorkflowService implements IWorkflowService {
             }
         });
         save(useCase);
-    }
-
-    private void setImmediateDataFieldsReadOnly(Case useCase) {
-        List<Field> immediateData = new ArrayList<>();
-
-        useCase.getImmediateDataFields().forEach(fieldId -> {
-            try {
-                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
-                Field clone = field.clone();
-                if (field.getValue() != null) {
-                    if (field.getType() == DataType.TEXT) {
-                        clone.setValue(field.getValue().toString());
-                    } else {
-                        clone.setValue(field.getValue());
-                    }
-                } else {
-                    clone.setValue(null);
-                }
-                immediateData.add(clone);
-            } catch (Exception e) {
-                log.error("Could not built immediate field [" + fieldId + "]");
-            }
-        });
-        LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
-
-        useCase.setImmediateData(immediateData);
-    }
-
-    protected Page<Case> setImmediateDataFields(Page<Case> cases) {
-        cases.getContent().forEach(this::setImmediateDataFields);
-        return cases;
-    }
-
-    protected Case setImmediateDataFields(Case useCase) {
-        List<Field> immediateData = new ArrayList<>();
-
-        useCase.getImmediateDataFields().forEach(fieldId ->
-                immediateData.add(fieldFactory.buildImmediateField(useCase, fieldId))
-        );
-        LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
-
-        useCase.setImmediateData(immediateData);
-        return useCase;
     }
 
     private void encryptDataSet(Case useCase) {

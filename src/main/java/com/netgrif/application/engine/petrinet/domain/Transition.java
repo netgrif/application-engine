@@ -21,71 +21,29 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @Document
+@Getter
+@Setter
 public class Transition extends Node {
 
     @org.springframework.data.mongodb.core.mapping.Field("dataGroups")
-    @Getter
-    @Setter
     private Map<String, DataGroup> dataGroups;
-
     @org.springframework.data.mongodb.core.mapping.Field("dataSet")
-    @Getter
-    @Setter
     private LinkedHashMap<String, DataRef> dataSet;
-
     @org.springframework.data.mongodb.core.mapping.Field("roles")
-    @Getter
-    @Setter
     private Map<String, Map<String, Boolean>> roles;
-
-    @Getter
-    @Setter
     private List<String> negativeViewRoles;
-
     @org.springframework.data.mongodb.core.mapping.Field("users")
-    @Getter
-    @Setter
     private Map<String, Map<String, Boolean>> userRefs;
-
     @org.springframework.data.mongodb.core.mapping.Field("triggers")
-    @Getter
-    @Setter
     private List<Trigger> triggers;
-
-    @Getter
-    @Setter
     private TaskLayout layout;
-
-    @Getter
-    @Setter
     private Integer priority;
-
-    @Getter
-    @Setter
     private AssignPolicy assignPolicy;
-
-    @Getter
-    @Setter
     private String icon;
-
-    @Getter
-    @Setter
     private DataFocusPolicy dataFocusPolicy;
-
-    @Getter
-    @Setter
     private FinishPolicy finishPolicy;
-
-    @Getter
-    @Setter
     private Map<EventType, Event> events;
-
-    @Getter
-    @Setter
     private Map<String, Boolean> assignedUserPolicy;
-
-    @Getter
-    @Setter
     private String defaultRoleId;
 
     public Transition() {
