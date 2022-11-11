@@ -2,17 +2,20 @@ package com.netgrif.application.engine.configuration.security;
 
 import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.authentication.providers.basic.NetgrifAnonymousAuthenticationProvider;
+import com.netgrif.application.engine.configuration.authentication.tokens.NetgrifAnonymousAuthenticationToken;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -20,13 +23,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
+
+    private final SecurityContextRepository securityContextRepository = new NullSecurityContextRepository();
+
     private final Authority anonymousAuthority;
 
     private final static String JWT_HEADER_NAME = "X-Jwt-Token";
@@ -37,7 +46,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final IJwtService jwtService;
     private final IUserService userService;
 
-    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
+    public PublicAuthenticationFilter(ProviderManager authenticationManager, NetgrifAnonymousAuthenticationProvider provider,
                                       Authority anonymousAuthority, String[] urls, String[] exceptions, IJwtService jwtService,
                                       IUserService userService) {
         this.authenticationManager = authenticationManager;
@@ -51,24 +60,27 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (isPublicApi(request.getRequestURI())) {
+        if (isPublicApi(request.getRequestURI()) && SecurityContextHolder.getContext().getAuthentication() == null) {
             String jwtToken = resolveValidToken(request, response);
-            authenticate(request, jwtToken);
+            authenticate(request, response, jwtToken);
             response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
             log.info("Anonymous user was authenticated.");
         }
         filterChain.doFilter(request, response);
     }
 
-    private void authenticate(HttpServletRequest request, String jwtToken) {
-        AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
+    private void authenticate(HttpServletRequest request, HttpServletResponse response, String jwtToken) {
+        NetgrifAnonymousAuthenticationToken authRequest = new NetgrifAnonymousAuthenticationToken(
                 UserProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousAuthority),
                 Collections.singleton(this.anonymousAuthority)
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         Authentication authResult = this.authenticationManager.authenticate(authRequest);
-        SecurityContextHolder.getContext().setAuthentication(authResult);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authResult);
+        SecurityContextHolder.setContext(context);
+        this.securityContextRepository.saveContext(context, request, response);
     }
 
     private String resolveValidToken(HttpServletRequest request, HttpServletResponse response) {

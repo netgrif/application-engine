@@ -36,7 +36,7 @@ public class LocalisedTaskResource extends EntityModel<Task> {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId(), null)).withRel("data"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .setData(task.getStringId(), null, null)).withRel("data-edit"));
+                .setData(null, task.getStringId(), null, null)).withRel("data-edit"));
         try {
             add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                     .getFile(task.getStringId(), "", null)).withRel("file"));

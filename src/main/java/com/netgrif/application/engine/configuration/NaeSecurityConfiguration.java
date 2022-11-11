@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.UserProperties;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
+import com.netgrif.application.engine.configuration.authentication.providers.basic.NetgrifAnonymousAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
@@ -21,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -76,8 +77,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     protected ImpersonatorRepository impersonatorRepository;
-
-    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
@@ -167,7 +166,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                 authenticationManager(),
-                new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                new NetgrifAnonymousAuthenticationProvider(UserProperties.ANONYMOUS_AUTH_KEY),
                 authority,
                 this.naeAuthProperties.getServerPatterns(),
                 this.naeAuthProperties.getAnonymousExceptions(),
