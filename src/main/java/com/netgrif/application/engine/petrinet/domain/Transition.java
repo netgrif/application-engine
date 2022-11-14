@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Document
 @Getter
@@ -61,8 +63,8 @@ public class Transition extends Node {
         assignedUserPolicy = new HashMap<>();
     }
 
-    public void setDataRefBehavior(Field<?> field, FieldBehavior behavior) {
-        setDataRefAttribute(field, dataRef -> dataRef.setBehavior(behavior));
+    public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
+        setDataRefAttribute(field, dataRef -> field.setBehavior(this.importId, behavior));
     }
 
     public void setDataRefComponent(Field<?> field, Component component) {
@@ -115,21 +117,6 @@ public class Transition extends Node {
     public void addTrigger(Trigger trigger) {
         this.triggers.add(trigger);
     }
-
-    public boolean isDisplayable(String fieldId) {
-        DataRef logic = dataSet.get(fieldId);
-        if (logic == null) {
-            return false;
-        }
-        FieldBehavior behavior = logic.getBehavior();
-        return behavior != null && behavior.isDisplayable();
-    }
-    // TODO: NAE-1645
-//    public List<String> getImmediateData() {
-//        return dataSet.entrySet().stream().filter(entry -> entry.getValue().isImmediate())
-//                .map(Map.Entry::getKey).collect(Collectors.toList());
-
-//    }
 
     public List<Action> getPreFinishActions() {
         return getPreActions(EventType.FINISH);

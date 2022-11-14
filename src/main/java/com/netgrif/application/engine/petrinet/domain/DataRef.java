@@ -7,12 +7,17 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Transient;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
 
 
 @Data
@@ -21,58 +26,55 @@ public class DataRef {
 
     private String fieldId;
     @Transient
-    private Field field;
-    private FieldBehavior behavior;
-    private boolean required;
+    private Field<?> field;
+    @Transient
+    private DataFieldBehavior behavior;
     private Map<DataEventType, DataEvent> events;
     private FieldLayout layout;
     private Component component;
 
-    public DataRef(Field field) {
+    public DataRef(Field<?> field, DataFieldBehavior behavior) {
         this.field = field;
-        this.behavior = FieldBehavior.defaultValue();
+        this.behavior = behavior;
     }
 
-    // TODO: NAE-1645
-//    public boolean isDisplayableForCase() {
-//        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
-//    }
+    public DataRef(Field<?> field) {
+        this(field, new DataFieldBehavior());
+    }
 
-    public static List<Action> getEventAction(DataEvent event, EventPhase phase){
-        if(phase == null) phase = event.getDefaultPhase();
-        if(phase.equals(EventPhase.PRE)){
+    public static List<Action> getEventAction(DataEvent event, EventPhase phase) {
+        if (phase == null) {
+            phase = event.getDefaultPhase();
+        }
+        if (phase.equals(EventPhase.PRE)) {
             return event.getPreActions();
         } else {
             return event.getPostActions();
         }
     }
 
-    // TODO: NAE-1645
-    @Deprecated
-    public boolean isRequired() {
-        return this.required;
-    }
-
-    // TODO: NAE-1645
     @Override
     public String toString() {
-        if (behavior == null) {
-            return "";
-        }
-        return behavior.toString();
+        return fieldId;
     }
 
-    // TODO: NAE-1645
-    @Deprecated
     public boolean isForbidden() {
-        return behavior == FieldBehavior.FORBIDDEN;
+        return isBehaviorSet(FORBIDDEN);
     }
 
-    public boolean layoutExist() {
-        return this.layout != null;
+    public boolean isEditable() {
+        return isBehaviorSet(EDITABLE);
     }
 
-    public boolean isImmediate() {
-        return field.isImmediate();
+    public boolean isHidden() {
+        return isBehaviorSet(HIDDEN);
+    }
+
+    public boolean isVisible() {
+        return isBehaviorSet(VISIBLE);
+    }
+
+    private boolean isBehaviorSet(FieldBehavior behavior) {
+        return behavior.equals(this.behavior.getBehavior());
     }
 }

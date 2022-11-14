@@ -42,6 +42,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
@@ -743,18 +744,18 @@ public class Importer {
     protected void addDataLogic(Transition transition, DataRef dataRef) {
         Logic logic = dataRef.getLogic();
         try {
-            Field field = getField(dataRef.getId());
+            Field<?> field = getField(dataRef.getId());
             String fieldId = field.getStringId();
             if (logic == null || fieldId == null) {
                 return;
             }
 
-            FieldBehavior behavior = null;
+            DataFieldBehavior behavior = new DataFieldBehavior();
             if (logic.getBehavior() != null) {
-                // TODO: NAE-1645 ?
-//                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
                 Optional<Behavior> first = logic.getBehavior().stream().filter(b -> !Behavior.REQUIRED.equals(b)).findFirst();
-                behavior = FieldBehavior.fromString(first.orElseGet(() -> Behavior.EDITABLE));
+                behavior.setBehavior(FieldBehavior.fromString(first.orElse(Behavior.EDITABLE)));
+                behavior.setRequired(logic.getBehavior().stream().anyMatch(Behavior.REQUIRED::equals));
+                behavior.setImmediate(logic.getBehavior().stream().anyMatch(Behavior.IMMEDIATE::equals));
             }
             transition.setDataRefBehavior(field, behavior);
         } catch (NullPointerException e) {
@@ -765,7 +766,7 @@ public class Importer {
     protected void addDataLayout(Transition transition, DataRef dataRef) {
         Layout layout = dataRef.getLayout();
         try {
-            Field field = getField(dataRef.getId());
+            Field<?> field = getField(dataRef.getId());
             String fieldId = field.getStringId();
             if (layout == null || fieldId == null) {
                 return;

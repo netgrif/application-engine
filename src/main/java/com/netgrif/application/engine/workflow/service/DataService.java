@@ -16,6 +16,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
@@ -97,62 +98,33 @@ public class DataService implements IDataService {
     public GetDataEventOutcome getData(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-
-        Set<String> fieldsIds = transition.getDataSet().keySet();
+        Map<String, DataRef> dataRefs = transition.getDataSet();
         List<DataRef> dataSetFields = new ArrayList<>();
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), false));
         }
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
-        fieldsIds.forEach(fieldId -> {
-            if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
+
+        dataRefs.forEach((fieldId, dataRef) -> {
+            Field<?> field = useCase.getField(fieldId);
+            DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
+            if (behavior.isForbidden()) {
                 return;
-            Field field = useCase.getPetriNet().getField(fieldId).get();
+            }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
             if (outcome.getMessage() == null) {
                 setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.GET);
             }
-            if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
-                if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-//                    TODO: NAE-1645
-//                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
-//                    validationField.setBehaviors(useCase.getDataSet().get(fieldId).getBehaviors().get(transition.getStringId()));
-//                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
-//                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
-//                    }
-//                    resolveComponents(validationField, transition);
-//                    dataSetFields.add(validationField);
-                }
-            } else {
-//                TODO: NAE-1645
-//                if (transition.getDataSet().get(fieldId).isDisplayable()) {
-//                    DataRef validationField = fieldFactory.buildDataRefWithValidation(useCase, fieldId, transition.getStringId());
-//                    validationField.setBehaviors(transition.getDataSet().get(fieldId).getBehavior());
-//                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().isLayoutFilled()) {
-//                        validationField.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
-//                    }
-//                    resolveComponents(validationField, transition);
-//                    dataSetFields.add(validationField);
-//                }
-            }
+            dataRef.setField(field);
+            dataRef.setBehavior(behavior);
+            dataSetFields.add(dataRef);
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST));
         });
 
         workflowService.save(useCase);
-
-        // TODO: NAE-1645 should be ok with field value object
-//        dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
-//            Field dataField = useCase.getDataSet().get(field.getImportId());
-//            if (dataField.getVersion().equals(0L) && dataField.getValue().equals(0.0)) {
-//                field.setValue(null);
-//            }
-//        });
-        // TODO: NAE-1645 wut?
-//        LongStream.range(0L, dataSetFields.size())
-//                .forEach(index -> dataSetFields.get((int) index).setOrder(index));
         outcome.setData(dataSetFields);
         return outcome;
     }
@@ -163,9 +135,9 @@ public class DataService implements IDataService {
             field.setComponent(transitionComponent);
     }
 
-    private boolean isForbidden(String fieldId, Transition transition, Field dataField) {
+    private boolean isForbidden(String fieldId, Transition transition, Field<?> dataField) {
         if (dataField.getBehaviors().contains(transition.getImportId())) {
-            return dataField.isForbidden(transition.getImportId());
+            return dataField.isForbiddenOn(transition.getImportId());
         } else {
             return transition.getDataSet().get(fieldId).isForbidden();
         }

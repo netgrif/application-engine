@@ -54,20 +54,20 @@ public class LocalisedField {
     private String parentCaseId;
 
     public LocalisedField(DataRef dataRef, Locale locale) {
-        Field field = dataRef.getField();
-        stringId = field.getStringId();
-        type = field.getType();
-        name = field.getTranslatedName(locale);
-        description = field.getTranslatedDescription(locale);
-        placeholder = field.getTranslatedPlaceholder(locale);
-        behavior = dataRef.getBehavior();
-        layout = dataRef.getLayout();
-        value = field.getValue();
-        order = field.getOrder();
-        length = field.getLength();
-        component = field.getComponent() != null ? field.getComponent() : dataRef.getComponent();
-        validations = loadValidations(field, locale);
-        // TODO: NAE-1645
+//        TODO: NAE-1645 remove
+//        Field field = dataRef.getField();
+//        stringId = field.getStringId();
+//        type = field.getType();
+//        name = field.getTranslatedName(locale);
+//        description = field.getTranslatedDescription(locale);
+//        placeholder = field.getTranslatedPlaceholder(locale);
+//        behavior = dataRef.getBehavior();
+//        layout = dataRef.getLayout();
+//        value = field.getValue();
+//        order = field.getOrder();
+//        length = field.getLength();
+//        component = field.getComponent() != null ? field.getComponent() : dataRef.getComponent();
+//        validations = loadValidations(field, locale);
 //        parentTaskId = field.getParentTaskId();
 //        parentCaseId = field.getParentCaseId();
     }

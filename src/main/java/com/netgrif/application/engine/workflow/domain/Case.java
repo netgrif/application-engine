@@ -8,7 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -25,133 +25,71 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Document
+@Getter
+@Setter
 public class Case {
 
     @Id
-    @Getter
+    @Setter(AccessLevel.NONE)
     private ObjectId _id;
-
     @LastModifiedDate
-    @Getter
-    @Setter
     private LocalDateTime lastModified;
-
-    @Getter
     @Indexed
+    @Setter(AccessLevel.NONE)
     private String visualId;
-
     @NotNull
-    @Getter
-    @Setter
     private ObjectId petriNetObjectId;
-
     @JsonIgnore
     @Transient
-    @Getter
-    @Setter
+    @QueryType(PropertyType.NONE)
     private PetriNet petriNet;
-
     @NotNull
-    @Getter
-    @Setter
     @Indexed
     private String processIdentifier;
-
     @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
-    @Getter
-    @Setter
     @JsonIgnore
     private Map<String, Integer> activePlaces;
-
     @NotNull
-    @Getter
-    @Setter
     private String title;
-
-    @Getter
     private String color;
-
-    @Getter
-    @Setter
     private String icon;
-
-    @Getter
-    @Setter
     private LocalDateTime creationDate;
-
-    @Getter
-    @Setter
     @JsonIgnore
     @QueryType(PropertyType.NONE)
     private DataSet dataSet;
-
     /**
      * List of data fields importIds
      */
-    @Getter
-    @Setter
     @JsonIgnore
     private LinkedHashSet<String> immediateDataFields;
-
-    @Getter
-    @Setter
     @Transient
-    private List<Field> immediateData;
-
-    @Getter
-    @Setter
+    @QueryType(PropertyType.NONE)
+    private List<Field<?>> immediateData;
     @Indexed
     private Author author;
-
-    @Getter
-    @Setter
     @JsonIgnore
+    @QueryType(PropertyType.NONE)
     private Map<String, Integer> consumedTokens;
-
-    @Getter
-    @Setter
     @Indexed
     private Set<TaskPair> tasks;
-
-    @Getter
-    @Setter
+    // TODO: NAE-1645 review json ignore and refactor to objects
     @JsonIgnore
     private Set<String> enabledRoles;
-
-    @Getter
-    @Setter
+    @JsonIgnore
     private Map<String, Map<String, Boolean>> permissions;
-
-    @Getter
-    @Setter
-    @Builder.Default
+    @JsonIgnore
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
-
-    @Getter
-    @Setter
-    @Builder.Default
+    @JsonIgnore
     private Map<String, Map<String, Boolean>> users = new HashMap<>();
-
-    @Getter
-    @Setter
+    @JsonIgnore
     private List<String> viewRoles;
-
-    @Getter
-    @Setter
     @JsonIgnore
     private List<String> viewUserRefs;
-
-    @Getter
-    @Setter
     @JsonIgnore
     private List<String> viewUsers;
-
-    @Getter
-    @Setter
+    @JsonIgnore
     private List<String> negativeViewRoles;
-
-    @Getter
-    @Setter
+    @JsonIgnore
     private List<String> negativeViewUsers;
 
     public Case() {
@@ -180,6 +118,7 @@ public class Case {
         icon = petriNet.getIcon();
         userRefs = petriNet.getUserRefs();
 
+        // TODO: NAE-1645 replace strings with enum constants, if possible use jaxb generated source
         permissions = petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
                 .map(role -> {
@@ -204,11 +143,8 @@ public class Case {
     }
 
     public void setColor(String color) {
+        // TODO: NAE-1645
         this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
-    }
-
-    public boolean hasFieldBehavior(String field, String transition) {
-        return this.dataSet.get(field).getBehaviors().get(transition) != null;
     }
 
     private String generateVisualId() {
@@ -242,11 +178,11 @@ public class Case {
         return this.tasks.size() != sizeBeforeChange;
     }
 
-    public Field getField(String id) {
+    public Field<?> getField(String id) {
         return petriNet.getDataSet().get(id);
     }
 
-    public Field getDataField(String id) {
+    public Field<?> getDataField(String id) {
         return dataSet.get(id);
     }
 
@@ -265,6 +201,7 @@ public class Case {
     }
 
     public void resolveViewRoles() {
+        // TODO: NAE-1645 why is getViewRoles() called?
         getViewRoles();
         this.viewRoles.clear();
         this.permissions.forEach((role, perms) -> {

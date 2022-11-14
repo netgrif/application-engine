@@ -173,6 +173,7 @@ public class TaskController extends AbstractTaskController {
     @ApiOperation(value = "Get all task data", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
+        // TODO: NAE-1645 set order?
         return super.getData(taskId, locale);
     }
 

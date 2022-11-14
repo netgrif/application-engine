@@ -25,9 +25,6 @@ public class SetDataEventOutcome extends TaskEventOutcome {
     }
 
     public void addChangedField(String fieldId, Field<?> field) {
-        // TODO: NAE-1645 check
-//        field.wasChangedOn(this.getTask() == null ? "all_data" : this.getTask().getStringId(),
-//                this.getTask() == null ? "all_data_transition" : this.getTask().getTransitionId());
         if (!changedFields.getFields().containsKey(fieldId)) {
             changedFields.getFields().put(fieldId, field);
         } else {

@@ -3,7 +3,7 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.configuration.SuperAdminConfiguration
+import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService

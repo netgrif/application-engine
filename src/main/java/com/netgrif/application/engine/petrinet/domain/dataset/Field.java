@@ -17,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,13 +26,18 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE;
+
 @Document
 @Data
 public abstract class Field<T> extends Imported implements Referencable {
 
     @Id
     protected ObjectId _id;
+    @JsonIgnore
     protected T defaultValue;
+    @JsonIgnore
     protected Expression initExpression;
     protected List<Validation> validations;
     private I18nString name;
@@ -39,13 +45,15 @@ public abstract class Field<T> extends Imported implements Referencable {
     private I18nString placeholder;
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
-    private Long order;
-    //TODO: NAE-1645 jsonignore?
+    @JsonIgnore
     private boolean immediate;
+    @JsonIgnore
     private Map<DataEventType, DataEvent> events;
+    @JsonIgnore
     private String encryption;
     private Integer length;
     private Component component;
+    @JsonIgnore
     private Long version = 0L;
 
     public Field() {
@@ -100,14 +108,6 @@ public abstract class Field<T> extends Imported implements Referencable {
         this.validations.add(validation);
     }
 
-    public List<Validation> getValidations() {
-        return validations;
-    }
-
-    public void setValidations(List<Validation> validations) {
-        this.validations = validations;
-    }
-
     public void clearValue() {
         this.value = null;
     }
@@ -116,34 +116,12 @@ public abstract class Field<T> extends Imported implements Referencable {
         return defaultValue != null || initExpression != null;
     }
 
-    public String getTranslatedName(Locale locale) {
-        if (name == null) {
-            return null;
-        }
-        return name.getTranslation(locale);
-    }
-
-    public String getTranslatedPlaceholder(Locale locale) {
-        if (placeholder == null) {
-            return null;
-        }
-        return placeholder.getTranslation(locale);
-    }
-
-    public String getTranslatedDescription(Locale locale) {
-        if (description == null) {
-            return null;
-        }
-        return description.getTranslation(locale);
-    }
-
     public void applyChanges(Field<?> field) {
         // TODO: NAE-1645
     }
 
     public boolean isNewerThen(Field<?> field) {
-        // TODO: NAE-1645
-        return true;
+        return version > field.version;
     }
 
     @Override
@@ -152,12 +130,12 @@ public abstract class Field<T> extends Imported implements Referencable {
     }
 
     public void clone(Field<T> clone) {
+        // TODO: NAE-1645 deep copy? check all domain classes
         clone._id = this._id;
         clone.importId = this.importId;
         clone.name = this.name;
         clone.description = this.description;
         clone.placeholder = this.placeholder;
-        clone.order = this.order;
         clone.immediate = this.immediate;
         clone.events = this.events;
         clone.encryption = this.encryption;
@@ -177,22 +155,38 @@ public abstract class Field<T> extends Imported implements Referencable {
         throw new UnsupportedOperationException(this.getClass().toString() + " can not be used as arc multiplicity");
     }
 
-    public boolean isForbidden(String transitionId) {
-        return isBehavior(transitionId, dataFieldBehavior -> dataFieldBehavior.getBehavior() == FieldBehavior.FORBIDDEN);
+    public void setBehavior(String transitionId, DataFieldBehavior behavior) {
+        behaviors.put(transitionId, behavior);
     }
 
-    public boolean isDisplayable(String transitionId) {
-        return isBehavior(transitionId, dataFieldBehavior -> dataFieldBehavior.getBehavior() == FieldBehavior.VISIBLE || dataFieldBehavior.getBehavior() == FieldBehavior.EDITABLE);
+    public boolean isForbiddenOn(String transitionId) {
+        return isBehaviorSetOn(transitionId, FORBIDDEN);
     }
 
-    private boolean isBehavior(String transitionId, Function<DataFieldBehavior, Boolean> compare) {
-        if (behaviors == null) {
+    public boolean isEditableOn(String transitionId) {
+        return isBehaviorSetOn(transitionId, EDITABLE);
+    }
+
+    public boolean isHiddenOn(String transitionId) {
+        return isBehaviorSetOn(transitionId, HIDDEN);
+    }
+
+    public boolean isVisibleOn(String transitionId) {
+        return isBehaviorSetOn(transitionId, VISIBLE);
+    }
+
+    private boolean isBehaviorSetOn(String transitionId, FieldBehavior behavior) {
+        DataFieldBehavior dataRefBehavior = behaviors.get(transitionId);
+        if (dataRefBehavior == null) {
             return false;
         }
-        DataFieldBehavior fieldBehavior = behaviors.get(transitionId);
-        if (fieldBehavior == null) {
-            return false;
+        return behavior.equals(dataRefBehavior.getBehavior());
+    }
+
+    public String getTranslatedName(Locale locale) {
+        if (name == null) {
+            return null;
         }
-        return compare.apply(fieldBehavior);
+        return name.getTranslation(locale);
     }
 }
