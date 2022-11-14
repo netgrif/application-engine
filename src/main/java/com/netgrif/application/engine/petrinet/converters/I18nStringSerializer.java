@@ -1,0 +1,26 @@
+package com.netgrif.application.engine.petrinet.converters;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.netgrif.application.engine.petrinet.domain.I18nString;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.io.IOException;
+
+public class I18nStringSerializer extends StdSerializer<I18nString> {
+
+    public I18nStringSerializer() {
+        this(null);
+    }
+
+    public I18nStringSerializer(Class<I18nString> t) {
+        super(t);
+    }
+
+    @Override
+    public void serialize(I18nString value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        String translation = value.getTranslation(LocaleContextHolder.getLocale());
+        gen.writeString(translation);
+    }
+}

@@ -1,10 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.netgrif.application.engine.petrinet.converters.I18nStringSerializer;
 import lombok.Data;
 
 import java.util.*;
 
 @Data
+@JsonSerialize(using = I18nStringSerializer.class)
 public class I18nString {
 
     private String defaultValue;

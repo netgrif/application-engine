@@ -27,10 +27,10 @@ public class ResourceLinkAssembler {
                     .getAllByCases(null, null, null, null)).withRel("case"));
         if (!selfRel.equalsIgnoreCase("my"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .getMy(null, null, null, null)).withRel("my"));
+                    .getMy(null, null, null)).withRel("my"));
         if (!selfRel.equalsIgnoreCase("finished"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .getMyFinished(null, null, null, null)).withRel("finished"));
+                    .getMyFinished(null, null, null)).withRel("finished"));
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                     .search(null, null, null, null, null, null)).withRel("search"));
