@@ -117,9 +117,6 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IUriService uriService;
 
-    @Autowired
-    private AsyncRunner asyncRunner;
-
     protected IElasticCaseService elasticCaseService;
 
     @Autowired
