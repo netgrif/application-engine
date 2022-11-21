@@ -21,6 +21,10 @@ public class SecurityConfigProperties {
      */
     private boolean cors = true;
 
+    /**
+     * List of Origins for CORS
+     * Example: nae.server.security.allowed-origins=http://localhost:4200
+     */
     private List<String> allowedOrigins;
 
 }
