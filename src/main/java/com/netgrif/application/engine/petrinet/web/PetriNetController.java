@@ -196,7 +196,7 @@ public class PetriNetController {
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
-        return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+        return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 
     public static String decodeUrl(String s1) {
