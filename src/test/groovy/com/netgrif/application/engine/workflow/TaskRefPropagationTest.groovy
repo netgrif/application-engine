@@ -4,13 +4,14 @@ import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -108,18 +109,18 @@ class TaskRefPropagationTest {
 
         /* validate getDataGroups object and taskRef field ids */
         List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK")).data
-        Field parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
-        Field parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)
-        Field parentMultichoiceSetter = findField(parentData, PARENT_FIELD_MULTICHOICE_SETTER_TITLE)
+        LocalisedField parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
+        LocalisedField parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)
+        LocalisedField parentMultichoiceSetter = findField(parentData, PARENT_FIELD_MULTICHOICE_SETTER_TITLE)
 
         assert parentText.stringId == PARENT_FIELD_TEXT_ID
 
-        Field childText1 = findField(parentData, CHILD_FIELD_TEXT1_TITLE)
-        Field childText2 = findField(parentData, CHILD_FIELD_TEXT2_TITLE)
-        Field childText3 = findField(parentData, CHILD_FIELD_TEXT3_TITLE)
-        Field childText4 = findField(parentData, CHILD_FIELD_TEXT4_TITLE)
-        Field childText5 = findField(parentData, CHILD_FIELD_TEXT5_TITLE)
-        Field childText6 = findField(parentData, CHILD_FIELD_TEXT6_TITLE)
+        LocalisedField childText1 = findField(parentData, CHILD_FIELD_TEXT1_TITLE)
+        LocalisedField childText2 = findField(parentData, CHILD_FIELD_TEXT2_TITLE)
+        LocalisedField childText3 = findField(parentData, CHILD_FIELD_TEXT3_TITLE)
+        LocalisedField childText4 = findField(parentData, CHILD_FIELD_TEXT4_TITLE)
+        LocalisedField childText5 = findField(parentData, CHILD_FIELD_TEXT5_TITLE)
+        LocalisedField childText6 = findField(parentData, CHILD_FIELD_TEXT6_TITLE)
         assert childText1.stringId == CHILD_FIELD_TEXT1_ID
         assert childText1.parentTaskId == childTaskId
 
@@ -192,10 +193,10 @@ class TaskRefPropagationTest {
 //
 //    }
 //
-    Field findField(List<DataGroup> dataGroups, String fieldTitle) {
-        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ field -> (field.name == fieldTitle) }) != null }
+    LocalisedField findField(List<DataGroup> dataGroups, String fieldTitle) {
+        def fieldDataGroup = dataGroups.find { it -> it.fields.find({ LocalisedField field -> (field.name == fieldTitle) }) != null }
         assert fieldDataGroup != null
-        Field field = fieldDataGroup.fields.find({ field -> (field.name == fieldTitle) }) as Field
+        LocalisedField field = fieldDataGroup.fields.find({LocalisedField field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
     }

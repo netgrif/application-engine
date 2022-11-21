@@ -7,8 +7,6 @@ import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -33,9 +31,9 @@ import java.lang.reflect.Method
 @CompileStatic
 class DataServiceTest {
 
-    private static final String TASK_TITLE = "Transition"
-    private static final String FILE_FIELD_TITLE = "File"
-    private static final String TEXT_FIELD_TITLE = "Result"
+    private static final String TASK_TITLE = "Transition";
+    private static final String FILE_FIELD_TITLE = "File";
+    private static final String TEXT_FIELD_TITLE = "Result";
 
     @Autowired
     private ImportHelper importHelper
@@ -83,21 +81,21 @@ class DataServiceTest {
 
         List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH).getData()
         assert datagroups.stream().filter({ it -> it.fields.size() > 0 }).count() == 3
-        Field fileField = findField(datagroups, FILE_FIELD_TITLE)
+        LocalisedField fileField = findField(datagroups, FILE_FIELD_TITLE)
 
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "hello world".getBytes())
 
         def changes = dataService.saveFile(taskId, fileField.stringId, file)
         assert changes.changedFields.fields.size() == 1
-        Field textField = findField(datagroups, TEXT_FIELD_TITLE)
+        LocalisedField textField = findField(datagroups, TEXT_FIELD_TITLE)
         assert changes.changedFields.fields.containsKey(textField.stringId)
         assert changes.changedFields.fields.get(textField.stringId).value == "OK"
     }
 
-    Field findField(List<DataGroup> datagroups, String fieldTitle) {
-        def fieldDataGroup = datagroups.find { it -> it.fields.find({Field field -> (field.name == fieldTitle) }) != null }
+    LocalisedField findField(List<DataGroup> datagroups, String fieldTitle) {
+        def fieldDataGroup = datagroups.find { it -> it.fields.find({ LocalisedField field -> (field.name == fieldTitle) }) != null }
         assert fieldDataGroup != null
-        Field field = fieldDataGroup.fields.find({Field field -> (field.name == fieldTitle) }) as Field
+        LocalisedField field = fieldDataGroup.fields.find({ LocalisedField field -> (field.name == fieldTitle) }) as LocalisedField
         assert field != null
         return field
     }

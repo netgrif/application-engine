@@ -2,7 +2,6 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
@@ -22,6 +21,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -190,15 +190,6 @@ public class Task {
     private Map<String, Integer> consumedTokens = new HashMap<>();
 
     public Task() {
-    }
-
-    public Task(ElasticTask entity) {
-        _id = new ObjectId(entity.getStringId());
-        caseId = entity.getCaseId();
-        transitionId = entity.getTransitionId();
-        title = new I18nString(entity.getTitle());
-        caseTitle = entity.getCaseTitle();
-        priority = entity.getPriority();
     }
 
     @JsonIgnore

@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/elastic")
 @ConditionalOnProperty(
-        value = "nae.elastic.web.enabled",
+        value = "",
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Elasticsearch"}, authorizations = @Authorization("BasicAuth"))
+//@Api(tags = {"Elasticsearch"}, authorizations = @Authorization("BasicAuth"))
 public class ElasticController {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticController.class.getName());
