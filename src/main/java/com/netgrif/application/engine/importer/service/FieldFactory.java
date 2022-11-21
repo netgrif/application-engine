@@ -187,6 +187,7 @@ public final class FieldFactory {
         }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
+                init = init.stream().map(String::trim).collect(Collectors.toList());
                 List<String> finalInits = init.stream().filter(i -> field.getChoices().stream().anyMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
                 List<String> unresolvedChoices = init.stream().filter(i -> field.getChoices().stream().noneMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
                 if (!unresolvedChoices.isEmpty()) {
