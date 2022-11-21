@@ -93,24 +93,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Override
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
-            try {
                 repository.deleteAllByStringId(caseId);
                 log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
-            } catch (RuntimeException e) {
-                log.error("Elastic executor was killed before finish: " + e.getMessage());
-            }
         });
     }
 
     @Override
     public void removeByPetriNetId(String processId) {
         executors.execute(processId, () -> {
-            try {
                 repository.deleteAllByProcessId(processId);
                 log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
-            } catch (RuntimeException e) {
-                log.error("Elastic executor was killed before finish: " + e.getMessage());
-            }
         });
     }
 
@@ -131,8 +123,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 repository.deleteAllByStringId(useCase.getStringId());
                 repository.save(useCase);
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
-            } catch (RuntimeException e) {
-                log.error("Elastic executor was killed before finish: " + e.getMessage());
             }
         });
     }
