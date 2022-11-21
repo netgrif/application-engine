@@ -3,8 +3,9 @@ package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
+import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -18,16 +19,11 @@ public abstract class FieldBuilder {
     @Getter
     protected int lastX, lastY;
 
-    private static final String LEGACY = "legacy";
-    private static final String FLOW = "flow";
-
-    private static final String GRID = "grid";
-
     public FieldBuilder(PdfResource resource) {
         this.resource = resource;
     }
 
-    protected void setFieldParams(DataGroup dg, Field field, PdfField pdfField) {
+    protected void setFieldParams(DataGroup dg, LocalisedField field, PdfField pdfField) {
         pdfField.setLayoutX(countFieldLayoutX(dg, field));
         pdfField.setLayoutY(countFieldLayoutY(dg, field));
         pdfField.setWidth(countFieldWidth(dg, field));
@@ -43,46 +39,42 @@ public abstract class FieldBuilder {
         pdfField.countMultiLineHeight(fontSize, resource);
     }
 
-    private int countFieldLayoutX(DataGroup dataGroup, Field field) {
+    private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
         if (isDgFlow(dataGroup)) {
-            if (!isStretch(dataGroup)) {
-                x = lastX < resource.getFormGridCols() ? lastX : 0;
-            }
+            x = lastX < resource.getFormGridCols() ? lastX : 0;
+            lastX = x + 1;
+        } else if (field.getLayout() != null && !isStretch(dataGroup)) {
+            x = field.getLayout().getX();
             lastX = x;
-        } else if (isDgLegacy(dataGroup)) {
-            if (isStretch(dataGroup)) {
-                lastX = 0;
-            } else {
-                lastX = lastX == 0 ? 2 : 0;
-            }
+        } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
+            lastX = (lastX == 0 ? 2 : 0);
             x = lastX;
-//            TODO: NAE-1645
-//        } else if (field.getLayout() != null) {
-//            x = field.getLayout().getX();
-//            lastX = x;
         }
         return x;
     }
 
-    private int countFieldLayoutY(DataGroup dataGroup, Field field) {
-        int y = 0;
-//        TODO: NAE-1645
-//        if (checkFullRow(dataGroup, field)) {
-//            y = ++lastY;
-//            resolveRowGridFree(dataGroup, field.getLayout());
-//        } else {
-//            if (lastX == 0) {
-//                y = ++lastY;
-//                resolveRowGridFree(dataGroup, field.getLayout());
-//            } else {
-//                y = lastY;
-//                resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
-//            }
-//            if (isDgFlow(dataGroup)) {
-//                lastX++;
-//            }
-//        }
+    private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
+        int y;
+        if (isDgFlow(dataGroup)) {
+            if (resource.getRowGridFree() - 1 > 0) {
+                resource.setRowGridFree(resource.getRowGridFree() - 1);
+                y = lastY;
+            } else {
+                y = lastY++;
+            }
+        } else if (checkFullRow(dataGroup, field)) {
+            y = ++lastY;
+            resolveRowGridFree(dataGroup, field.getLayout());
+        } else {
+            if (lastX == 0) {
+                y = ++lastY;
+                resolveRowGridFree(dataGroup, field.getLayout());
+            } else {
+                y = lastY;
+                resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
+            }
+        }
         return y;
     }
 
@@ -110,18 +102,12 @@ public abstract class FieldBuilder {
             while (tokenizer.hasMoreTokens()) {
                 String word = tokenizer.nextToken();
 
-                if (word.length() > maxLineLength - lineLen && word.length() > maxLineLength) {
-                    breakLongWordToMultipleLine(output, word, lineLen, (int) maxLineLength);
-                    lineLen = 0;
-                } else if (lineLen + word.length() > maxLineLength) {
+                if (lineLen + word.length() > maxLineLength) {
                     output.append("\n");
                     lineLen = 0;
-                    output.append(word).append(" ");
-                    lineLen += word.length() + 1;
-                } else {
-                    output.append(word).append(" ");
-                    lineLen += word.length() + 1;
                 }
+                output.append(word).append(" ");
+                lineLen += word.length() + 1;
             }
             lineLen = 0;
             result.addAll(Arrays.asList(output.toString().split("\n")));
@@ -129,29 +115,15 @@ public abstract class FieldBuilder {
         return result;
     }
 
-    public static void breakLongWordToMultipleLine(StringBuilder output, String longWord, int lineLength, int maxLineLength) {
-        if (maxLineLength - lineLength <= 0) {
-            lineLength = 0;
-        }
-        while (longWord.length() > maxLineLength - lineLength) {
-            output.append(longWord, 0, maxLineLength - lineLength - 4);
-            output.append("\n");
-            longWord = longWord.substring(maxLineLength - lineLength - 3);
-            lineLength = 0;
-        }
-    }
-
-    private int countFieldWidth(DataGroup dataGroup, Field field) {
+    private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
         if (isDgFlow(dataGroup)) {
             return resource.getFormGridColWidth() - resource.getPadding();
-        } else if (isDgLegacy(dataGroup)) {
+        } else if (checkCol(field.getLayout()) && !isStretch(dataGroup)) {
+            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
+        } else {
             return (isStretch(dataGroup) ?
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
-        } else {
-//            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-//            TODO: NAE-1645
-            return 0;
         }
     }
 
@@ -159,11 +131,9 @@ public abstract class FieldBuilder {
         return resource.getFormGridRowHeight() - resource.getPadding();
     }
 
-    private boolean checkFullRow(DataGroup dataGroup, Field field) {
-//        TODO: NAE-1645
-//        return (isStretch(dataGroup)) ||
-//                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
-        return false;
+    private boolean checkFullRow(DataGroup dataGroup, LocalisedField field) {
+        return (isStretch(dataGroup)) ||
+                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
     }
 
     private boolean checkCol(FieldLayout layout) {
@@ -175,11 +145,7 @@ public abstract class FieldBuilder {
     }
 
     private boolean isDgFlow(DataGroup dataGroup) {
-        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(FLOW);
-    }
-
-    private boolean isDgLegacy(DataGroup dataGroup) {
-        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals(LEGACY);
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("flow");
     }
 
     private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {
