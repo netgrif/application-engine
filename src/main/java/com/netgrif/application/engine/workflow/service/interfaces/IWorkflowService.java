@@ -61,6 +61,6 @@ public interface IWorkflowService {
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
-
-    Page<Case> findAllByUri(String uri, Pageable pageable);
+// TODO: NAE-1645
+//    Page<Case> findAllByUri(String uri, Pageable pageable);
 }

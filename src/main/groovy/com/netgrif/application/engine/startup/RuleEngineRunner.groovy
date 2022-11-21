@@ -8,6 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
@@ -26,7 +27,7 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
     @Value('${drools.template.generate:#{true}}')
     private boolean generate
 
-    @Value('${drools.template.path:#{"rules/templates/template.drl"}}')
+    @Value( value = '${drools.template.path:#{"rules/templates/template.drl"}}')
     private String generatedTemplatePath
 
     @Value('${drools.template-resource.classpath:#{"rules/templates/template.drl"}}')
