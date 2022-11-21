@@ -300,7 +300,7 @@ public class DataService implements IDataService {
 //        }
     }
 
-    private void changeTaskRefBehavior(Field field, FieldBehavior behavior) {
+    private void changeTaskRefBehavior(LocalisedField field, FieldBehavior behavior) {
 //        TODO: NAE-1645
 //        List<FieldBehavior> antonymBehaviors = behavior.getAntonyms();
 //        antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));
