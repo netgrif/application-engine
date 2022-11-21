@@ -17,6 +17,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.5](h
 - [NAE-1777] JWT Token user detail not show password
 
 ### Added
+
 - [NAE-1753] Currency code in PDF
 - [NAE-1756] Delete PetriNet does not call case delete events
 - [NAE-1780] Configurable CORS security settings
