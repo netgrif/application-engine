@@ -175,10 +175,11 @@ class FilterImportExportTest {
             }
         }
         for (int i = 0; i < FILTERS_TO_EXPORT.size(); i++) {
-            Case filterCase1 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))
-            DataField filterField1 = filterCase1.dataSet.get(FILTER_FIELD)
-            Case filterCase2 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT_NEW[i]))
-            DataField filterField2 = filterCase2.dataSet.get(FILTER_FIELD)
+//            TODO: NAE-1645
+//            Case filterCase1 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))
+//            DataField filterField1 = filterCase1.dataSet.get(FILTER_FIELD)
+//            Case filterCase2 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT_NEW[i]))
+//            DataField filterField2 = filterCase2.dataSet.get(FILTER_FIELD)
             assert filterCase1.icon == filterCase2.icon
             assert filterField1.value == filterField2.value
             assert filterField1.allowedNets == filterField2.allowedNets

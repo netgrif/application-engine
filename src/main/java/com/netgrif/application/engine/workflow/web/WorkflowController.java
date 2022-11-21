@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -54,7 +55,7 @@ import java.util.Map;
 @RestController()
 @RequestMapping("/api/workflow")
 @ConditionalOnProperty(
-        value = "nae.case.web.enabled",
+        value = "#{actionsProperties.}",
         havingValue = "true",
         matchIfMissing = true
 )

@@ -57,30 +57,32 @@ public abstract class FieldBuilder {
                 lastX = lastX == 0 ? 2 : 0;
             }
             x = lastX;
-        } else if (field.getLayout() != null) {
-            x = field.getLayout().getX();
-            lastX = x;
+//            TODO: NAE-1645
+//        } else if (field.getLayout() != null) {
+//            x = field.getLayout().getX();
+//            lastX = x;
         }
         return x;
     }
 
     private int countFieldLayoutY(DataGroup dataGroup, Field field) {
-        int y;
-        if (checkFullRow(dataGroup, field)) {
-            y = ++lastY;
-            resolveRowGridFree(dataGroup, field.getLayout());
-        } else {
-            if (lastX == 0) {
-                y = ++lastY;
-                resolveRowGridFree(dataGroup, field.getLayout());
-            } else {
-                y = lastY;
-                resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
-            }
-            if (isDgFlow(dataGroup)) {
-                lastX++;
-            }
-        }
+        int y = 0;
+//        TODO: NAE-1645
+//        if (checkFullRow(dataGroup, field)) {
+//            y = ++lastY;
+//            resolveRowGridFree(dataGroup, field.getLayout());
+//        } else {
+//            if (lastX == 0) {
+//                y = ++lastY;
+//                resolveRowGridFree(dataGroup, field.getLayout());
+//            } else {
+//                y = lastY;
+//                resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
+//            }
+//            if (isDgFlow(dataGroup)) {
+//                lastX++;
+//            }
+//        }
         return y;
     }
 
@@ -147,7 +149,9 @@ public abstract class FieldBuilder {
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
         } else {
-            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
+//            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
+//            TODO: NAE-1645
+            return 0;
         }
     }
 
@@ -156,8 +160,10 @@ public abstract class FieldBuilder {
     }
 
     private boolean checkFullRow(DataGroup dataGroup, Field field) {
-        return (isStretch(dataGroup)) ||
-                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
+//        TODO: NAE-1645
+//        return (isStretch(dataGroup)) ||
+//                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
+        return false;
     }
 
     private boolean checkCol(FieldLayout layout) {

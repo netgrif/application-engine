@@ -255,7 +255,8 @@ public class VariableArcsTest {
             }
             if (task.getTitle().getDefaultValue().contains("var")) {
                 dataRefMultiplicityBeforeChange = (int) Double.parseDouble(cancelCase.getDataSet().get(arcType + "_var").getValue().toString());
-                cancelCase.getDataSet().get(arcType + "_var").setValue("800");
+//                TODO: NAE-1645
+//                cancelCase.getDataSet().get(arcType + "_var").setValue("800");
                 workflowService.save(cancelCase);
             }
             if (task.getTitle().getDefaultValue().contains("ref")) {
@@ -279,7 +280,8 @@ public class VariableArcsTest {
             }
 
             if (task.getTitle().getDefaultValue().contains("var")) {
-                cancelCase.getDataSet().get(arcType + "_var").setValue(dataRefMultiplicityBeforeChange);
+//                TODO: NAE-1645
+//                cancelCase.getDataSet().get(arcType + "_var").setValue(dataRefMultiplicityBeforeChange);
                 workflowService.save(cancelCase);
             }
             if (task.getTitle().getDefaultValue().contains("ref")) {

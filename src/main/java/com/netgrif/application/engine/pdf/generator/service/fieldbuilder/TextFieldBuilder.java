@@ -24,67 +24,68 @@ public class TextFieldBuilder extends FieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, Field field, int lastX, int lastY) {
-        this.lastX = lastX;
-        this.lastY = lastY;
-        String value;
-        switch (field.getType()) {
-            case DATE:
-                value = field.getValue() != null ? formatDate(field) : "";
-                break;
-            case DATE_TIME:
-                value = field.getValue() != null ? formatDateTime(field) : "";
-                break;
-            case NUMBER:
-                double number = field.getValue() != null ? (double) field.getValue() : 0.0;
-                NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
-                value = nf2.format(number);
-                break;
-            case FILE:
-                value = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue()).getName()) : "";
-                break;
-            case FILE_LIST:
-                value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
-                break;
-            case USER:
-                value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
-                break;
-            default:
-                value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
-                break;
-        }
-        String translatedTitle = field.getName().getTranslation(LocaleContextHolder.getLocale());
-        PdfField pdfField = new PdfTextField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
-        setFieldParams(dataGroup, field, pdfField);
-        setFieldPositions(pdfField, resource.getFontLabelSize());
-        return pdfField;
-    }
+//    TODO: NAE-1645
+//    public PdfField buildField(DataGroup dataGroup, Field field, int lastX, int lastY) {
+//        this.lastX = lastX;
+//        this.lastY = lastY;
+//        String value;
+//        switch (field.getType()) {
+//            case DATE:
+//                value = field.getValue() != null ? formatDate(field) : "";
+//                break;
+//            case DATE_TIME:
+//                value = field.getValue() != null ? formatDateTime(field) : "";
+//                break;
+//            case NUMBER:
+//                double number = field.getValue() != null ? (double) field.getValue() : 0.0;
+//                NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
+//                value = nf2.format(number);
+//                break;
+//            case FILE:
+//                value = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue()).getName()) : "";
+//                break;
+//            case FILE_LIST:
+//                value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
+//                break;
+//            case USER:
+//                value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
+//                break;
+//            default:
+//                value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
+//                break;
+//        }
+//        String translatedTitle = field.getName().getTranslation(LocaleContextHolder.getLocale());
+//        PdfField pdfField = new PdfTextField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
+//        setFieldParams(dataGroup, field, pdfField);
+//        setFieldPositions(pdfField, resource.getFontLabelSize());
+//        return pdfField;
+//    }
 
-    private String formatDate(Field field) {
-        ZonedDateTime value = ZonedDateTime.now();
-        if (field.getValue() != null) {
-            if (field.getValue() instanceof LocalDate)
-                value = DateUtils.localDateToZonedDate((LocalDate) field.getValue(), resource.getDateZoneId());
-            else if (field.getValue() instanceof Date)
-                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
-            return DateTimeFormatter.ofPattern(resource.getDateFormat().getValue()).format(value);
-        } else {
-            return "";
-        }
-    }
+//    private String formatDate(Field field) {
+//        ZonedDateTime value = ZonedDateTime.now();
+//        if (field.getValue() != null) {
+//            if (field.getValue() instanceof LocalDate)
+//                value = DateUtils.localDateToZonedDate((LocalDate) field.getValue(), resource.getDateZoneId());
+//            else if (field.getValue() instanceof Date)
+//                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
+//            return DateTimeFormatter.ofPattern(resource.getDateFormat().getValue()).format(value);
+//        } else {
+//            return "";
+//        }
+//    }
 
-    private String formatDateTime(Field field) {
-        ZonedDateTime value = ZonedDateTime.now();
-        if (field.getValue() != null) {
-            if (field.getValue() instanceof LocalDateTime)
-                value = DateUtils.localDateTimeToZonedDateTime((LocalDateTime) field.getValue(), resource.getDateZoneId());
-            else if (field.getValue() instanceof Date)
-                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
-            return DateTimeFormatter.ofPattern(resource.getDateTimeFormat().getValue()).format(value);
-        } else {
-            return "";
-        }
-    }
+//    private String formatDateTime(Field field) {
+//        ZonedDateTime value = ZonedDateTime.now();
+//        if (field.getValue() != null) {
+//            if (field.getValue() instanceof LocalDateTime)
+//                value = DateUtils.localDateTimeToZonedDateTime((LocalDateTime) field.getValue(), resource.getDateZoneId());
+//            else if (field.getValue() instanceof Date)
+//                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
+//            return DateTimeFormatter.ofPattern(resource.getDateTimeFormat().getValue()).format(value);
+//        } else {
+//            return "";
+//        }
+//    }
 
     private String resolveFileListNames(FileListFieldValue files) {
         StringBuilder builder = new StringBuilder();

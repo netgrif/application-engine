@@ -25,9 +25,10 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
 
         if (field.getOptions() != null)
             choices = field.getOptions().values().stream().map(s -> s.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toList());
-        if (field.getValue() != null)
-            values.addAll((field.getValue()).stream().map(value ->
-                    field.getOptions().get(value).getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toList()));
+//        TODO: NAE-1645
+//        if (field.getValue() != null)
+//            values.addAll((field.getValue()).stream().map(value ->
+//                    field.getOptions().get(value).getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toList()));
 
         String translatedTitle = field.getName().getTranslation(LocaleContextHolder.getLocale());
         PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);

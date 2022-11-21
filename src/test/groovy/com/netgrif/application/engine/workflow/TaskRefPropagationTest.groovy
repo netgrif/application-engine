@@ -99,8 +99,9 @@ class TaskRefPropagationTest {
 
         String parentTaskId = parent.tasks.find { it.transition == "4" }.task
         String childTaskId = child.tasks.find { it.transition == "4" }.task
-        parent.dataSet["children_tasks"].value = [childTaskId]
-        child.dataSet["parentId"].value = parent.stringId
+//        TODO: NAE-1645
+//        parent.dataSet["children_tasks"].value = [childTaskId]
+//        child.dataSet["parentId"].value = parent.stringId
 
         workflowService.save(parent)
         workflowService.save(child)

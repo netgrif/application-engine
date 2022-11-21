@@ -156,12 +156,13 @@ class TaskControllerTest {
         assert task != null
         List<String> userIds = [] as List
         userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId())
-        dataService.setData(task.stringId, ImportHelper.populateDataset([
-                "performable_users": [
-                        "value": userIds,
-                        "type" : "userList"
-                ]
-        ] as Map<String, Map<String, String>>))
+//        TODO: NAE-1645
+//        dataService.setData(task.stringId, ImportHelper.populateDataset([
+//                "performable_users": [
+//                        "value": userIds,
+//                        "type" : "userList"
+//                ]
+//        ] as Map<String, Map<String, String>>))
     }
 
     void setUserRole() {

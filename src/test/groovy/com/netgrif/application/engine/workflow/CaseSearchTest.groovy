@@ -10,7 +10,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.service.CaseSearchService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -180,14 +179,14 @@ class CaseSearchTest {
     }
 
     String buildRequestBody(String fullText) {
-        def map = [
-                (CaseSearchService.PETRINET): [
-                        (CaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
-                ],
-                (CaseSearchService.FULLTEXT): fullText
-        ]
-
-        ObjectMapper mapper = new ObjectMapper()
-        return mapper.writeValueAsString(map)
+//        TODO: NAE-1645
+//        def map = [
+//                (CaseSearchService.PETRINET): [
+//                        (CaseSearchService.PETRINET_IDENTIFIER): "case_search_test.xml"
+//                ],
+//                (CaseSearchService.FULLTEXT): fullText
+//        ]
+//        ObjectMapper mapper = new ObjectMapper()
+//        return mapper.writeValueAsString(map)
     }
 }

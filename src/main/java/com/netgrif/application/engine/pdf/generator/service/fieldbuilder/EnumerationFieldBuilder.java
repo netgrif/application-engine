@@ -27,7 +27,8 @@ public class EnumerationFieldBuilder extends SelectionFieldBuilder {
         if (field.getChoices() != null)
             choices = field.getChoices().stream().map(s -> s.getTranslation(LocaleContextHolder.getLocale())).collect(Collectors.toList());
         if (field.getValue() != null) {
-            values.add(field.getValue().getTranslation(LocaleContextHolder.getLocale()));
+//            TODO: NAE-1645
+//            values.add(field.getValue().getTranslation(LocaleContextHolder.getLocale()));
         }
 
         String translatedTitle = field.getName().getTranslation(LocaleContextHolder.getLocale());
