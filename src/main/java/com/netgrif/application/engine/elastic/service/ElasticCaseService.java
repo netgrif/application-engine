@@ -93,16 +93,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Override
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
-                repository.deleteAllByStringId(caseId);
-                log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
+            repository.deleteAllByStringId(caseId);
+            log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
     }
 
     @Override
     public void removeByPetriNetId(String processId) {
         executors.execute(processId, () -> {
-                repository.deleteAllByProcessId(processId);
-                log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
+            repository.deleteAllByProcessId(processId);
+            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
         });
     }
 
