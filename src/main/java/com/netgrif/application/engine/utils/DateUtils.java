@@ -1,11 +1,15 @@
 package com.netgrif.application.engine.utils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
+import com.netgrif.application.engine.workflow.domain.Case;
+
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public class DateUtils {
 
@@ -47,5 +51,36 @@ public class DateUtils {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+    }
+
+    public static final DateTimeFormatter[] DATE_PATTERNS = {
+            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+            DateTimeFormatter.BASIC_ISO_DATE,
+            DateTimeFormatter.ISO_DATE
+    };
+    public static final DateTimeFormatter[] DATE_TIME_PATTERNS = {
+            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"),
+            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"),
+            DateTimeFormatter.ISO_DATE_TIME,
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+            DateTimeFormatter.ISO_INSTANT
+    };
+
+    public static Optional<LocalDate> parseDate(String defaultValueString) {
+        for (DateTimeFormatter pattern : DATE_PATTERNS) {
+            try {
+                return Optional.of(LocalDate.parse(defaultValueString, pattern));
+            } catch (DateTimeParseException ignored) {}
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<LocalDateTime> parseDateTime(String defaultValueString) {
+        for (DateTimeFormatter pattern : DATE_TIME_PATTERNS) {
+            try {
+                return Optional.of(LocalDateTime.parse(defaultValueString, pattern));
+            } catch (DateTimeParseException ignored) {}
+        }
+        return Optional.empty();
     }
 }

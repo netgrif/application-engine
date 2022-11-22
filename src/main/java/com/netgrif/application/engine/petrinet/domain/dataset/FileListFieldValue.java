@@ -33,7 +33,6 @@ public class FileListFieldValue {
     private static FileListFieldValue buildValueFromParts(List<String> parts) {
         FileListFieldValue newVal = new FileListFieldValue();
         for (String part : parts) {
-            // TODO: NAE-1645 double check
             newVal.getNamesPaths().add(FileFieldValue.fromString(part));
         }
         return newVal;

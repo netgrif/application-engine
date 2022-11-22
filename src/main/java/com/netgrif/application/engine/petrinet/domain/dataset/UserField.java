@@ -16,14 +16,13 @@ public class UserField extends Field<UserFieldValue> {
     private Set<String> roles;
 
     public UserField() {
-        super();
-        this.roles = new HashSet<>();
+        this(new HashSet<>());
     }
 
-    public UserField(String[] values) {
-        this();
+    public UserField(Set<String> values) {
+        super();
         if (values != null) {
-            this.roles.addAll(Arrays.asList(values));
+            this.roles = values;
         }
     }
 
