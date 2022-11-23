@@ -10,6 +10,7 @@ import com.netgrif.application.engine.configuration.security.ImpersonationReques
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
+import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
@@ -109,6 +110,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .and()
                 .cors()
                 .and()
+                .addFilterBefore(new HostValidationRequestFilter(properties), BasicAuthenticationFilter.class)
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
