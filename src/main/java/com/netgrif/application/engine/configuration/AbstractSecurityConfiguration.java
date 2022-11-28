@@ -90,30 +90,29 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
             mode = XXSSProtection.ENABLE;
         } else {
             mode = getSecurityConfigProperties().getHeaders().getXxSsProtection();
+            switch (mode) {
+                case DISABLE:
+                    http
+                            .headers()
+                            .xssProtection().disable();
+                    break;
+                case DISABLE_XSS:
+                    http
+                            .headers()
+                            .xssProtection();
+                    break;
+                case ENABLE:
+                    http
+                            .headers()
+                            .xssProtection().xssProtectionEnabled(false);
+                    break;
+                case ENABLE_MODE:
+                    http
+                            .headers()
+                            .xssProtection().xssProtectionEnabled(true);
+                    break;
+            }
         }
-        switch (mode) {
-            case DISABLE:
-                http
-                        .headers()
-                        .xssProtection().disable();
-                break;
-            case DISABLE_XSS:
-                http
-                        .headers()
-                        .xssProtection();
-                break;
-            case ENABLE:
-                http
-                        .headers()
-                        .xssProtection().xssProtectionEnabled(false);
-                break;
-            case ENABLE_MODE:
-                http
-                        .headers()
-                        .xssProtection().xssProtectionEnabled(true);
-                break;
-        }
-
     }
 
     protected void setContentSecurityPolicy(HttpSecurity http) throws Exception {
