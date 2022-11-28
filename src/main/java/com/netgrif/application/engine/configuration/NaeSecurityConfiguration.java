@@ -28,7 +28,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
@@ -122,14 +121,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
-                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-                .and()
-                .headers()
-                .frameOptions().disable()
-                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
-                .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
 
+        setHeaders(http);
         setCsrf(http);
     }
 
@@ -162,6 +156,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Override
     protected Environment getEnvironment() {
         return env;
+    }
+
+    @Override
+    protected SecurityConfigProperties getSecurityConfigProperties() {
+        return properties;
     }
 
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
