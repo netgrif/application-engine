@@ -59,13 +59,15 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
                         .includeSubDomains(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
                         .preload(getSecurityConfigProperties().getHeaders().getHsts().isPreload());
 
-            } else if (Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains()) && Objects.isNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
+            } else if (Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
+                    && Objects.isNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
                 http
                         .headers()
                         .httpStrictTransportSecurity()
                         .maxAgeInSeconds(getSecurityConfigProperties().getHeaders().getHsts().getMaxAge())
                         .includeSubDomains(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains());
-            } else if (Objects.isNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains()) && Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
+            } else if (Objects.isNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
+                    && Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
                 http
                         .headers()
                         .httpStrictTransportSecurity()
@@ -86,37 +88,40 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
 
     protected void setXXSSProtection(HttpSecurity http) throws Exception {
         XXSSProtection mode;
-        if (!existConfigurationHeaders() || getSecurityConfigProperties().getHeaders().getXxSsProtection() == null) {
+        if (!existConfigurationHeaders()
+                || getSecurityConfigProperties().getHeaders().getXxSsProtection() == null) {
             mode = XXSSProtection.ENABLE;
         } else {
             mode = getSecurityConfigProperties().getHeaders().getXxSsProtection();
-            switch (mode) {
-                case DISABLE:
-                    http
-                            .headers()
-                            .xssProtection().disable();
-                    break;
-                case DISABLE_XSS:
-                    http
-                            .headers()
-                            .xssProtection();
-                    break;
-                case ENABLE:
-                    http
-                            .headers()
-                            .xssProtection().xssProtectionEnabled(false);
-                    break;
-                case ENABLE_MODE:
-                    http
-                            .headers()
-                            .xssProtection().xssProtectionEnabled(true);
-                    break;
-            }
+        }
+        switch (mode) {
+            case DISABLE:
+                http
+                        .headers()
+                        .xssProtection().disable();
+                break;
+            case DISABLE_XSS:
+                http
+                        .headers()
+                        .xssProtection();
+                break;
+            case ENABLE:
+                http
+                        .headers()
+                        .xssProtection().xssProtectionEnabled(false);
+                break;
+            case ENABLE_MODE:
+                http
+                        .headers()
+                        .xssProtection().xssProtectionEnabled(true);
+                break;
         }
     }
 
     protected void setContentSecurityPolicy(HttpSecurity http) throws Exception {
-        if (!existConfigurationHeaders() || getSecurityConfigProperties().getHeaders().getContentSecurityPolicy() == null || getSecurityConfigProperties().getHeaders().getContentSecurityPolicy().isEmpty()) {
+        if (!existConfigurationHeaders()
+                || getSecurityConfigProperties().getHeaders().getContentSecurityPolicy() == null
+                || getSecurityConfigProperties().getHeaders().getContentSecurityPolicy().isEmpty()) {
             http
                     .headers()
                     .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
