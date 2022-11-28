@@ -27,10 +27,8 @@ public class HSTS {
 
     /**
      * If this optional parameter is specified, this rule applies to all of the site's subdomains as well.
-     * <p>
-     * Default value: true
      */
-    private boolean includeSubDomains = true;
+    private boolean includeSubDomains;
 
     /**
      * See Preloading Strict Transport Security for details.
