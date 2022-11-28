@@ -206,7 +206,6 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
         }
     }
 
-
     protected void configureFilters(HttpSecurity http) {
         if (sessionUtilsProperties.isEnabledFilter()) {
             http.addFilterBefore(new LoginAttemptsFilter(), ChannelProcessingFilter.class);

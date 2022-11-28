@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.configuration.properties.enumeration;
 
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * The HTTP Strict-Transport-Security response header (often abbreviated as HSTS)
@@ -16,10 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "nae.server.security.headers.hsts")
 public class HSTS {
 
-    /**
-     * Default value: true
-     */
-    private boolean enable = true;
+    private boolean enable;
 
     /**
      * The time, in seconds, that the browser should remember that a site is only to be accessed using HTTPS.
