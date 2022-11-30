@@ -174,15 +174,15 @@ class ActionDelegate {
         this.useCase = useCase
         this.task = task
         this.actionsRunner = actionsRunner
-        this.initFieldsMap(action.fieldIds)
+        this.initFieldsMap(action.fieldIds, useCase)
         this.initTransitionsMap(action.transitionIds)
         this.outcomes = new ArrayList<>()
     }
 
-    def initFieldsMap(Map<String, String> fieldIds) {
+    def initFieldsMap(Map<String, String> fieldIds, Case useCase) {
         fieldIds.each { name, id ->
 //            TODO: NAE-1645
-//            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id, null))
+            set(name, useCase.getDataField(id))
         }
     }
 
@@ -642,7 +642,7 @@ class ActionDelegate {
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
             if (field instanceof FileListField && task.isPresent()) {
-                field.value.namesPaths.forEach(namePath -> {
+                field.value.value.namesPaths.forEach(namePath -> {
                     dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
                 })
             }
@@ -650,7 +650,6 @@ class ActionDelegate {
                 dataService.deleteFile(task.get().stringId, field.stringId)
             }
             field.clearValue()
-            saveChangedValue(field)
         }
         if (value != null) {
             if (field instanceof CaseField) {
@@ -660,19 +659,14 @@ class ActionDelegate {
             if (field instanceof NumberField) {
                 value = value as Double
             }
-            field.value = value
-            saveChangedValue(field)
+            field.setValue(value)
         }
         // TODO: NAE-1645
 //        DataField changedField = new DataField(field.stringId)
 //        changedField.value = value
-//        SetDataEventOutcome outcome = createSetDataEventOutcome()
-//        outcome.addChangedField(field.stringId, changedField)
-//        this.outcomes.add(outcome)
-    }
-
-    def saveChangedValue(Field field) {
-        useCase.dataSet.get(field.stringId).value = field.value
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, field)
+        this.outcomes.add(outcome)
     }
 
     void changeFieldValidations(Field field, def cl) {
