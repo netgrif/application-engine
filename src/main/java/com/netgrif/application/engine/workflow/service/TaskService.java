@@ -434,7 +434,7 @@ public class TaskService implements ITaskService {
                 executeTransition(task, workflowService.findOne(useCase.getStringId()));
                 return;
             }
-            resolveUserRef(task, useCase);
+            //resolveUserRef(task, useCase);
         }
     }
 
