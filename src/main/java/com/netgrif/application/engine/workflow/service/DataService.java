@@ -704,6 +704,16 @@ public class DataService implements IDataService {
         });
     }
 
+    private void applyFieldConnectedChanges(Case useCase, Field field) {
+        switch (field.getType()) {
+            case USERLIST:
+                workflowService.resolveUserRef(useCase);
+                break;
+            default:
+                break;
+        }
+    }
+
     private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task) {
         return eventService.processDataEvents(field, trigger, phase, useCase, task);
     }

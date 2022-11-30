@@ -791,10 +791,10 @@ public class TaskService implements ITaskService {
             task.setTransactionId(transaction.getStringId());
         }
 
-        resolveUserRef(task, useCase);
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
+        workflowService.resolveUserRef(useCase);
         useCase = workflowService.save(useCase);
 
         return savedTask;

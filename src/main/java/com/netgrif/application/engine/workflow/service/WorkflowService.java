@@ -223,6 +223,7 @@ public class WorkflowService implements IWorkflowService {
             resolveUserRefPermissions(useCase, id, permission);
         });
         useCase.resolveViewUsers();
+        taskService.resolveUserRef(useCase);
         return repository.save(useCase);
     }
 
