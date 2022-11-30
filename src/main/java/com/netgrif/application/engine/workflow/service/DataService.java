@@ -238,6 +238,7 @@ public class DataService implements IDataService {
                         DataEventType.SET, EventPhase.POST, useCase, task));
 
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
+                applyFieldConnectedChanges(useCase, field);
             }
         });
         updateDataset(useCase);
@@ -704,6 +705,16 @@ public class DataService implements IDataService {
                 useCase.getDataSet().put(id, dataField);
             }
         });
+    }
+
+    private void applyFieldConnectedChanges(Case useCase, Field field) {
+        switch (field.getType()) {
+            case USERLIST:
+                workflowService.resolveUserRef(useCase);
+                break;
+            default:
+                break;
+        }
     }
 
     private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task) {
