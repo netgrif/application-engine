@@ -11,13 +11,16 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runne
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
+import com.netgrif.application.engine.utils.FieldUtils;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.annotate.JsonIgnore;
+import org.apache.commons.beanutils.BeanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE;
 
+@Slf4j
 @Document
 @Data
 public abstract class Field<T> extends Imported implements Referencable {
@@ -59,6 +63,7 @@ public abstract class Field<T> extends Imported implements Referencable {
     public Field() {
         _id = new ObjectId();
         this.events = new HashMap<>();
+        this.behaviors = new DataFieldBehaviors();
     }
 
     public String getStringId() {
@@ -114,10 +119,6 @@ public abstract class Field<T> extends Imported implements Referencable {
 
     public boolean hasDefault() {
         return defaultValue != null || initExpression != null;
-    }
-
-    public void applyChanges(Field<?> field) {
-        // TODO: NAE-1645
     }
 
     public boolean isNewerThen(Field<?> field) {
@@ -188,5 +189,22 @@ public abstract class Field<T> extends Imported implements Referencable {
             return null;
         }
         return name.getTranslation(locale);
+    }
+
+    /**
+     * Replace all attributes with non-null
+     */
+    public void applyChanges(Field<?> changes) {
+        if (changes == null) {
+            return;
+        }
+        try {
+            FieldUtils utils = new FieldUtils();
+            utils.copyProperties(this, changes);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return;
+        }
+        version++;
     }
 }

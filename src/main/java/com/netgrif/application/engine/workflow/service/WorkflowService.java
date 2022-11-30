@@ -8,7 +8,6 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseSer
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
-import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
@@ -31,6 +30,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
+import com.netgrif.application.engine.workflow.service.initializer.FieldInitializer;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -55,7 +55,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
 @Slf4j
@@ -109,6 +108,9 @@ public class WorkflowService implements IWorkflowService {
     private IHistoryService historyService;
 
     protected IElasticCaseService elasticCaseService;
+
+    @Autowired
+    private FieldInitializer fieldInitializer;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -239,8 +241,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet);
-//        TODO: NAE-1645
-//        useCase.populateDataSet(initValueExpressionEvaluator);
+        populateDataSet(useCase);
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
@@ -268,8 +269,15 @@ public class WorkflowService implements IWorkflowService {
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
 //        TODO: NAE-1645
 //        outcome.setCase(setImmediateDataFields(useCase));
+        outcome.setCase(useCase);
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
+    }
+
+    public void populateDataSet(Case useCase) {
+        useCase.getPetriNet().getDataSet().forEach((fieldId, field) -> {
+            useCase.getDataSet().put(fieldId, fieldInitializer.initialize(useCase, field));
+        });
     }
 
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {

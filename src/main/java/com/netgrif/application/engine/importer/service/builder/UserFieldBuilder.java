@@ -27,6 +27,7 @@ public class UserFieldBuilder extends FieldBuilder<UserField> {
                     .collect(Collectors.toSet());
             field.setRoles(roles);
         }
+        // TODO:NAE-1645 user datafield had roles as choices in 6.x
         return field;
     }
 
