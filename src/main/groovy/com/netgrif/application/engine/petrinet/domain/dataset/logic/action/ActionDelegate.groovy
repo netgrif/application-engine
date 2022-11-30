@@ -682,6 +682,11 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
+
+        if (field instanceof UserListField) {
+            useCase = workflowService.resolveUserRef(useCase)
+        }
+
         ChangedField changedField = new ChangedField(field.stringId)
         if (field instanceof I18nField) {
             changedField.attributes.put("value", value)
