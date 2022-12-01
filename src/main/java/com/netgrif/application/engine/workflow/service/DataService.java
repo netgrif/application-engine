@@ -240,6 +240,7 @@ public class DataService implements IDataService {
                         DataEventType.SET, EventPhase.POST, useCase, task));
 
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null));
+                applyFieldConnectedChanges(useCase, field);
             }
         });
         updateDataset(useCase);
