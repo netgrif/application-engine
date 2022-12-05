@@ -33,6 +33,9 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     private String taskIndex
 
     @Autowired
+    private UriProperties uriProperties
+
+    @Autowired
     private IElasticIndexService template
 
     @Override
@@ -41,6 +44,8 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
+            // TODO: NAE-1645 6.2.5
+            template.deleteIndex(UriNode.class)
         }
         if (!template.indexExists(caseIndex)) {
             log.info "Creating Elasticsearch case index [${caseIndex}]"
@@ -54,9 +59,17 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         } else {
             log.info "Elasticsearch task index exists [${taskIndex}]"
         }
+        if (!template.indexExists(uriProperties.index)) {
+            log.info "Creating Elasticsearch uri index [${uriProperties.index}]"
+            template.createIndex(UriNode.class)
+        } else {
+            log.info "Elasticsearch uri index exists [${uriProperties.index}]"
+        }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
+        log.info("Updating Elasticsearch uri mapping [${uriProperties.index}]")
+        template.putMapping(UriNode.class)
     }
 }

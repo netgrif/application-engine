@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service.interfaces;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
@@ -47,15 +48,17 @@ public interface IDataService {
 
     SetDataEventOutcome saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile);
 
-    boolean deleteFile(String taskId, String fieldId);
+    SetDataEventOutcome deleteFile(String taskId, String fieldId);
 
-    boolean deleteFileByName(String taskId, String fieldId, String name);
+    SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name);
 
     GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale);
 
     Page<Task> setImmediateFields(Page<Task> tasks);
 
     List<Field> getImmediateFields(Task task);
+
+    UserFieldValue makeUserFieldValue(String id);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 

@@ -576,10 +576,11 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public boolean deleteFile(String taskId, String fieldId) {
+    public SetDataEventOutcome deleteFile(String taskId, String fieldId) {
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
         Case useCase = pair.getLeft();
+        Task task = taskService.findById(taskId);
 
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
             if (field.isRemote()) {
@@ -590,10 +591,8 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
-
-        updateDataset(useCase);
-        workflowService.save(useCase);
-        return true;
+        // TODO: NAE-1645 6.2.5
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
     private ImmutablePair<Case, FileField> getCaseAndFileField(String taskId, String fieldId) {
@@ -606,10 +605,11 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public boolean deleteFileByName(String taskId, String fieldId, String name) {
+    public SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name) {
         ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
         FileListField field = pair.getRight();
         Case useCase = pair.getLeft();
+        Task task = taskService.findOne(taskId);
 
         Optional<FileFieldValue> fileField = field.getValue().getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
 
@@ -622,10 +622,8 @@ public class DataService implements IDataService {
             }
             ((FileListField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
         }
-
-        updateDataset(useCase);
-        workflowService.save(useCase);
-        return true;
+        // TODO: NAE-1645 6.2.5
+        return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
     private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
@@ -652,6 +650,13 @@ public class DataService implements IDataService {
 //
 //        return fields;
         return null;
+    }
+
+    @Override
+    public UserFieldValue makeUserFieldValue(String id) {
+        // TODO: NAE-1645 6.2.5
+        IUser user = userService.resolveById(id, true);
+        return new UserFieldValue(user);
     }
 
     private void updateDataset(Case useCase) {

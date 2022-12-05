@@ -42,6 +42,8 @@ public interface IWorkflowService {
 
     DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
 
+    DeleteCaseEventOutcome deleteCase(Case useCase);
+
     void deleteInstancesOfPetriNet(PetriNet net);
 
     void updateMarking(Case useCase);
@@ -61,6 +63,6 @@ public interface IWorkflowService {
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
-// TODO: NAE-1645
-//    Page<Case> findAllByUri(String uri, Pageable pageable);
+
+    Page<Case> findAllByUri(String uri, Pageable pageable);
 }

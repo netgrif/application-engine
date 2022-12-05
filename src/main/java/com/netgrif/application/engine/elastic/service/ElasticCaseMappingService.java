@@ -48,6 +48,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return Optional.empty();
         }
 
+        // TODO: NAE-1645 6.2.5 i18n, userlist
         ElasticDataFieldTransformer<Field<?>, DataField> transformer = transformers.get(netField.getType());
         if (transformer == null) {
             log.error("Field " + netField.getImportId() + " has unsupported type " + netField.getType());

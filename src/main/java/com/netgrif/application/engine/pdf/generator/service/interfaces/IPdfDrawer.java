@@ -6,6 +6,7 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,6 +30,8 @@ public interface IPdfDrawer {
 
     void drawTextField(PdfField field) throws IOException;
 
+    void drawI18nDividerField(PdfField field) throws IOException;
+
     void drawBooleanField(PdfField field) throws IOException;
 
     void drawEnumerationField(PdfField field) throws IOException;
@@ -41,7 +44,11 @@ public interface IPdfDrawer {
 
     boolean drawSelectionButton(List<String> values, String choice, int x, int y, DataType fieldType) throws IOException;
 
-    void writeString(PDType0Font font, int fontSize, int x, int y, String text) throws IOException;
+    void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth, Color color) throws IOException;
+
+    void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException;
+
+    void writeLabel(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException;
 
     void drawStroke(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException;
 

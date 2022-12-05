@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
@@ -65,7 +68,7 @@ public final class FieldFactory {
                 field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
             }
         }
-
+// TODO: NAE-1645 6.2.5 format, view -> component
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);

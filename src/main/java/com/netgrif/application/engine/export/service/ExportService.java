@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -136,7 +137,7 @@ class ExportService implements IExportService {
         return buildCaseCsv(exportCases, config, outFile);
     }
 
-    private OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    protected OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(exportCases) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
         PrintWriter writer = new PrintWriter(outStream, true);
@@ -208,7 +209,7 @@ class ExportService implements IExportService {
         return buildTaskCsv(exportTasks, config, outFile);
     }
 
-    private OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    protected OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvTaskHeader(exportTasks) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
         PrintWriter writer = new PrintWriter(outStream, true);
@@ -221,7 +222,7 @@ class ExportService implements IExportService {
         return outStream;
     }
 
-    private List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
+    protected List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
 //            TODO: NAE-1645 refactor hasField
@@ -233,13 +234,15 @@ class ExportService implements IExportService {
         return recordStringList;
     }
 
-    private String resolveFieldValue(Case exportCase, String exportFieldId) {
+    protected String resolveFieldValue(Case exportCase, String exportFieldId) {
         String fieldValue;
         Field field = exportCase.getField(exportFieldId);
+        Object fieldData = exportCase.getDataField(exportFieldId).getValue();
         if (field.getValue() == null && exportCase.getDataSet().get(exportFieldId).getValue() == null) {
             return "";
         }
         switch (field.getType()) {
+            // TODO: NAE-1645 6.2.5
 //            TODO: NAE-1645
 //            case MULTICHOICE_MAP:
 //                fieldValue = ((MultichoiceMapField) field).getValue().stream()

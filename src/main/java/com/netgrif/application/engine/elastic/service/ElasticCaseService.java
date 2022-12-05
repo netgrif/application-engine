@@ -204,6 +204,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         buildFullTextQuery(request, query);
         buildStringQuery(request, query, user);
         buildCaseIdQuery(request, query);
+        buildUriNodeIdQuery(request, query);
         boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
@@ -224,6 +225,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         for (CaseSearchRequest.PetriNet process : request.process) {
             if (process.identifier != null) {
                 petriNetQuery.should(termQuery("processIdentifier", process.identifier));
+            }
+            if (process.processId != null) {
+                petriNetQuery.should(termQuery("processId", process.processId));
             }
         }
 
@@ -415,6 +419,16 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
         BoolQueryBuilder caseIdQuery = boolQuery();
         request.stringId.forEach(caseId -> caseIdQuery.should(termQuery("stringId", caseId)));
+        query.filter(caseIdQuery);
+    }
+
+    private void buildUriNodeIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.uriNodeId == null || request.uriNodeId.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder caseIdQuery = boolQuery();
+        caseIdQuery.should(termQuery("uriNodeId", request.uriNodeId));
         query.filter(caseIdQuery);
     }
 

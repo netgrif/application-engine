@@ -39,17 +39,21 @@ public class Executor {
     }
 
     public void execute(String id, Runnable task) {
-        ExecutorService executorService = executors.get(id);
+        try {
+            ExecutorService executorService = executors.get(id);
 
-        if (executorService == null) {
-            executorService = Executors.newSingleThreadExecutor();
-            ExecutorService absent = executors.putIfAbsent(id, executorService);
+            if (executorService == null) {
+                executorService = Executors.newSingleThreadExecutor();
+                ExecutorService absent = executors.putIfAbsent(id, executorService);
 
-            if (absent != null) {
-                absent.execute(task);
-                return;
+                if (absent != null) {
+                    absent.execute(task);
+                    return;
+                }
             }
+            executorService.execute(task);
+        } catch (RuntimeException e) {
+            log.error("Elastic executor was killed before finish: " + e.getMessage());
         }
-        executorService.execute(task);
     }
 }

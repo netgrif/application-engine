@@ -90,7 +90,7 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> assign(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName(),
-                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.assignTask(loggedUser, taskId), locale));
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -99,7 +99,7 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> delegate(LoggedUser loggedUser, String taskId, String delegatedId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]",
-                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.delegateTask(loggedUser, delegatedId, taskId), locale));
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -110,7 +110,7 @@ public abstract class AbstractTaskController {
 
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished",
-                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.finishTask(loggedUser, taskId), locale));
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -124,7 +124,7 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> cancel(LoggedUser loggedUser, String taskId, Locale locale) {
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " canceled",
-                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId),locale));
+                    LocalisedEventOutcomeFactory.from(taskService.cancelTask(loggedUser, taskId), locale));
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
             if (e instanceof IllegalArgumentWithChangedFieldsException) {
@@ -189,25 +189,52 @@ public abstract class AbstractTaskController {
 
 
     public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
-        GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
-        return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
-                LocalisedEventOutcomeFactory.from(outcome,locale));
+        try {
+            GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
+            return EventOutcomeWithMessageResource.successMessage("Get data groups successful",
+                    LocalisedEventOutcomeFactory.from(outcome, locale));
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Get data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
+        } catch (Exception e) {
+            log.error("Get data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+        }
     }
 
-    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody) {
-        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.getTasks().entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue()))); // TODO: NAE-1645: value.deepCopy
-        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
+        try {
+            Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+            //dataBody.getTasks().entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue()))); // TODO: NAE-1645: value.deepCopy
+            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+            SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
+                    LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
+        } catch (Exception e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+
+        }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) { // TODO: NAE-1645: dataBody?
-        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
-        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
-        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
-                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody, Locale locale) {// TODO: NAE-1645: dataBody?
+        try {
+            Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+            dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
+            SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+            return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
+                    LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
+        } catch (IllegalArgumentWithChangedFieldsException e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage(), LocalisedEventOutcomeFactory.from(e.getOutcome(), locale));
+        } catch (Exception e) {
+            log.error("Set data on task [" + taskId + "] failed: ", e);
+            return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
+
+        }
     }
 
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
@@ -226,14 +253,15 @@ public abstract class AbstractTaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    public MessageResource deleteFile(String taskId, String fieldId) {
-        if (dataService.deleteFile(taskId, fieldId))
-            return MessageResource.successMessage("File in field " + fieldId + " within task " + taskId + " was successfully deleted");
-        return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
-    }
+    public EntityModel<EventOutcomeWithMessage> deleteFile(String taskId, String fieldId) {
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+        outcomes.put(taskId, dataService.deleteFile(taskId, fieldId));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));    }
 
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
-        Map<String,SetDataEventOutcome> outcomes = new HashMap<>();
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFiles(it.getKey(), fieldId, multipartFiles)));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
@@ -256,10 +284,12 @@ public abstract class AbstractTaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    public MessageResource deleteNamedFile(String taskId, String fieldId, String name) {
-        if (dataService.deleteFileByName(taskId, fieldId, name))
-            return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
-        return MessageResource.errorMessage("File with name " + name + " in field " + fieldId + " within task" + taskId + " has failed to delete");
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(String taskId, String fieldId, String name) {
+        Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
+        outcomes.put(taskId, dataService.deleteFileByName(taskId, fieldId, name));
+        SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
+        return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set",
+                LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
     }
 
     public ResponseEntity<Resource> getFilePreview(String taskId, String fieldId) throws FileNotFoundException {

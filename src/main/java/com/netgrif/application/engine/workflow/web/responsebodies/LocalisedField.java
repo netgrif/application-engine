@@ -9,7 +9,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavio
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.LocalizedValidation;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
-import com.netgrif.application.engine.petrinet.domain.views.View;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -41,8 +40,6 @@ public class LocalisedField {
 
     private Format formatFilter;
 
-    private View view;
-
     private Integer length;
 
     private Component component;
@@ -59,6 +56,7 @@ public class LocalisedField {
         type = field.getType();
         name = field.getTranslatedName(locale);
         // TODO: NAE-1645
+        // TODO: NAE-1645 6.2.5
 //        description = field.getTranslatedDescription(locale);
 //        placeholder = field.getTranslatedPlaceholder(locale);
 //        behavior = dataRef.getBehavior();

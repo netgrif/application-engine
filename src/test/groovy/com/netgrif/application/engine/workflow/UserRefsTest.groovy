@@ -5,9 +5,11 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -45,6 +47,9 @@ class UserRefsTest {
     private SuperAdminConfiguration configuration
 
     @Autowired
+    private IDataService dataService
+
+    @Autowired
     private TestHelper helper
 
     List<Case> newCases
@@ -65,8 +70,8 @@ class UserRefsTest {
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
-//            TODO: NAE-1645
-//            _case.dataSet["user_list_1"].value = [id]
+            // TODO: NAE-1645 6.2.5
+//            _case.dataSet["user_list_1"].value = new UserListFieldValue([dataService.makeUserFieldValue(id)])
             newCases.add(workflowService.save(_case))
             userIds.add(id)
         }

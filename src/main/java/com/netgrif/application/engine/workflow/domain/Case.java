@@ -32,6 +32,12 @@ public class Case {
     @Id
     @Setter(AccessLevel.NONE)
     private ObjectId _id;
+
+    // TODO: NAE-1645 6.2.5
+    @Getter
+    @Setter
+    private String uriNodeId;
+
     @LastModifiedDate
     private LocalDateTime lastModified;
     @Indexed

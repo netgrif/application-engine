@@ -100,8 +100,9 @@ public class EventService implements IEventService {
 
     @Override
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
-        outcome.getChangedFields().getFields().forEach((s, changedField) -> {
-            if ((changedField.getValue() != null) && trigger == DataEventType.SET) {
+        // TODO: NAE-1645 6.2.5
+        outcome.getChangedFields().forEach((s, changedField) -> {
+            if (changedField.getAttributes().containsKey("value") && trigger == DataEventType.SET) {
                 Field field = outcome.getCase().getField(s);
                 log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
