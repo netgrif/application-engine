@@ -5,7 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.4](https://github.com/netgrif/application-engine/commits/v6.2.4)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.5](https://github.com/netgrif/application-engine/commits/v6.2.5)
+
+## [6.2.5](https://github.com/netgrif/application-engine/releases/tag/v6.2.5) (2022-11-22)
+
+### Fixed
+
+- [NAE-1755] PetriNetService cache no caching "null"
+- [NAE-1773] Action that sets null value to field does not trigger next actions
+- [NAE-1776] UncaughtExceptionHandler
+- [NAE-1777] JWT Token user detail not show password
+
+### Added
+
+- [NAE-1753] Currency code in PDF
+- [NAE-1756] Delete PetriNet does not call case delete events
+- [NAE-1780] Configurable CORS security settings
 
 ## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
 
