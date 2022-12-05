@@ -7,11 +7,10 @@ import com.querydsl.core.annotations.QueryType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserListField extends Field<List<String>> {
+public class UserListField extends Field<UserListFieldValue> {
 
     public UserListField() {
         super();
-        this.defaultValue = new ArrayList<>();
     }
 
     @Override

@@ -59,6 +59,7 @@ public abstract class Field<T> extends Imported implements Referencable {
     private Component component;
     @JsonIgnore
     private Long version = 0L;
+    // TODO: NAE-1645 6.2.5: parentTaskId, parentCaseId
 
     public Field() {
         _id = new ObjectId();

@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
@@ -206,7 +207,7 @@ public abstract class AbstractTaskController {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             //dataBody.getTasks().entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue()))); // TODO: NAE-1645: value.deepCopy
-            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+//            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set",
                     LocalisedEventOutcomeFactory.from(mainOutcome, LocaleContextHolder.getLocale()));
