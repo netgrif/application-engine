@@ -10,4 +10,9 @@ class AsyncRunner {
     void run(Closure closure) {
         closure()
     }
+
+    @Async
+    void execute(final Runnable runnable) {
+        runnable.run()
+    }
 }
