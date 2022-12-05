@@ -41,6 +41,12 @@ public final class FieldFactory {
         if (builder == null) {
             throw new IllegalArgumentException("Field " + data.getId() + " has unsupported type " + data.getType());
         }
+//        TODO: NAE-1645 6.2.5
+//        Field Factory
+//        enum, enum_map,multichoice,multi_map,user,userlist
+//        parseEnumerationMapValue()
+//        getFieldChoices
+//        getFieldOúptions
         Field<?> field = builder.build(data, importer);
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
