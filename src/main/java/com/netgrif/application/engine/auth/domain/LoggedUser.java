@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
