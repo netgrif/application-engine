@@ -123,8 +123,10 @@ class FilterApiTest {
         List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
         assert !taskIds
 
-        assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
+        Thread.sleep(2000);
+
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(item.stringId))) == null
+        assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
     }
 
 

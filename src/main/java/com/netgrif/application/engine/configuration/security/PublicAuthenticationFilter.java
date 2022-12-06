@@ -103,7 +103,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
             if (user != null)
                 loggedUser = user.transformToLoggedUser();
         }
-
+        loggedUser.eraseCredentials();
         claims.put("user", loggedUser);
     }
 
@@ -114,7 +114,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
         if (anonymousUser == null) {
             anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
-                    "",
+                    "n/a",
                     "User",
                     "Anonymous"
             );
@@ -127,7 +127,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private boolean isPublicApi(String path) {
         for (String url : this.anonymousAccessUrls) {
             if (path.matches(url.replace("*", ".*?"))) {
-                for(String ex : this.exceptions) {
+                for (String ex : this.exceptions) {
                     if (path.matches(ex.replace("*", ".*?"))) {
                         return false;
                     }
