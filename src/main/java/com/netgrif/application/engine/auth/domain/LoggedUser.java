@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoggedUser extends org.springframework.security.core.userdetails.User {
 
     public static final long serialVersionUID = 3031325636490953409L;

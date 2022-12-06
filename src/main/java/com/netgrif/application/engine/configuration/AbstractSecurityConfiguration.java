@@ -19,7 +19,9 @@ import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractSecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -174,6 +176,13 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
         }
     }
 
+    protected void corsEnable(HttpSecurity http) throws Exception {
+        if (isCorsEnabled()) {
+            http
+                    .cors();
+        }
+    }
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         List<String> properties = Arrays.stream(naeAuthProperties.getProviders()).map(String::toLowerCase).collect(Collectors.toList());
@@ -219,6 +228,8 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     protected abstract boolean isOpenRegistration();
 
     protected abstract boolean isCsrfEnabled();
+
+    protected abstract boolean isCorsEnabled();
 
     protected abstract String[] getStaticPatterns();
 
