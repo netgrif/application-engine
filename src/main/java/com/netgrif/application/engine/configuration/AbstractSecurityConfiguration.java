@@ -22,6 +22,7 @@ import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class AbstractSecurityConfiguration extends WebSecurityConfigurerAdapter {
