@@ -62,7 +62,7 @@ public class TextFieldBuilder extends FieldBuilder {
             case USER:
                 value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
                 break;
-            case USERLIST:
+            case USER_LIST:
                 value = field.getValue() != null ? ((UserListFieldValue) field.getValue()).getUserValues().stream().map(UserFieldValue::getFullName).collect(Collectors.joining(", ")) : "";
                 break;
             default:

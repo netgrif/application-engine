@@ -108,7 +108,6 @@ public class WorkflowController {
 
     @Operation(summary = "Generic case search with QueryDSL predicate", security = {@SecurityRequirement(name = "BasicAuth")})
     // TODO:  NAE-1645 search by ObjectId[] for tree-case.service {stringId: (childCaseRef.value as Array<string>)}
-    @ApiOperation(value = "Generic case search with QueryDSL predicate", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.search(predicate, pageable);
@@ -133,7 +132,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @ApiOperation(value = "Get count of the cases", authorizations = @Authorization("BasicAuth"))
+    @Operation(summary = "Get count of the cases", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
         long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);

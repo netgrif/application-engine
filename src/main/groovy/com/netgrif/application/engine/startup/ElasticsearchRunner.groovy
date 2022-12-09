@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.configuration.properties.UriProperties
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
+import com.netgrif.application.engine.petrinet.domain.UriNode
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired

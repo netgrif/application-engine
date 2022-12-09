@@ -127,7 +127,8 @@ public class PublicTaskController extends AbstractTaskController {
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
     public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody TaskDataSets dataBody) {
-        return super.setData(taskId, dataBody);
+        // TODO: NAE-1645 6.2.5
+        return super.setData(taskId, dataBody, null);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")

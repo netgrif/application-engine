@@ -13,5 +13,11 @@ public class UserListFieldValue {
         this.userValues = userValues;
     }
 
-    // TODO: NAE-1645 6.2.5 toString
+    @Override
+    public String toString() {
+        if (userValues == null) {
+            return "";
+        }
+        return userValues.toString();
+    }
 }

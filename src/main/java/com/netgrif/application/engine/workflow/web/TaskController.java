@@ -190,7 +190,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody TaskDataSets dataBody) {
-        return super.setData(taskId, dataBody);
+        // TODO: NAE-1645 6.2.5
+        return super.setData(taskId, dataBody, null);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
@@ -204,7 +205,8 @@ public class TaskController extends AbstractTaskController {
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                          @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile) {
-        return super.saveFile(taskId, fieldId, multipartFile, dataBody);
+        // TODO: NAE-1645 6.2.5
+        return super.saveFile(taskId, fieldId, multipartFile, dataBody,null);
     }
 
     @Operation(summary = "Download task file field value", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -256,7 +258,8 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
+    // TODO: NAE-1645 6.2.5 return
+    public EntityModel<EventOutcomeWithMessage> deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
         return super.deleteNamedFile(taskId, fieldId, name);
     }
 

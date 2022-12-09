@@ -61,6 +61,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
 @Slf4j
@@ -188,7 +189,8 @@ public class WorkflowService implements IWorkflowService {
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         // TODO: NAE-1645 6.2.5
-        return setImmediateDataFields(page);
+//        return setImmediateDataFields(page);
+        return page;
     }
 
     @Override
@@ -205,7 +207,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue().getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {

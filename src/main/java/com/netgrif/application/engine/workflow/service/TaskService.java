@@ -716,7 +716,7 @@ public class TaskService implements ITaskService {
         task.getUsers().clear();
         task.getNegativeViewUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue().getValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
                 task.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {

@@ -203,7 +203,7 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> setData(String taskId, ObjectNode dataBody, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Locale locale) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             //dataBody.getTasks().entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue()))); // TODO: NAE-1645: value.deepCopy

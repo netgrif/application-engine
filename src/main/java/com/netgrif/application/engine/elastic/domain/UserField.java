@@ -37,7 +37,7 @@ public class UserField extends DataField {
         values.forEach(this::addValue);
     }
 
-    private void addValue(UserMappingData value) {
+    protected void addValue(UserMappingData value) {
         this.emailValue.add(value.email);
         this.fullNameValue.add(value.fullName);
         this.userIdValue.add(value.userId);

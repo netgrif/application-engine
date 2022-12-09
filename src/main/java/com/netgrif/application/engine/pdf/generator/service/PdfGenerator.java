@@ -173,7 +173,7 @@ public class PdfGenerator implements IPdfGenerator {
                     case BOOLEAN:
                         pdfDrawer.drawBooleanField(pdfField);
                         break;
-                    case I18N:
+                    case I_18_N:
                         pdfDrawer.drawI18nDividerField(pdfField);
                         break;
                     default:

@@ -1,35 +1,29 @@
 package com.netgrif.application.engine.elastic.service.transform;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.domain.UserField;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class UserListFieldTransformer extends ElasticDataFieldTransformer<UserListField, UserField> {
 
-    private final IUserService userService;
-
-    public UserListFieldTransformer(IUserService userService) {
-        this.userService = userService;
+    public UserListFieldTransformer() {
     }
 
     @Override
     public UserField transform(UserListField caseField, UserListField petriNetField) {
-        List<String> value = caseField.getValue().getValue();
-        if (value == null || value.isEmpty()) {
+        UserListFieldValue value = caseField.getValue().getValue();
+        if (value == null || value.getUserValues() == null || value.getUserValues().isEmpty()) {
             return null;
         }
-        List<IUser> users = this.userService.findAllByIds(new HashSet<>(value), true);
-        List<UserField.UserMappingData> userData = users.stream()
+        List<UserField.UserMappingData> userData = value.getUserValues().stream()
                 .map(user -> new UserField.UserMappingData(
-                        user.getStringId(),
+                        user.getId(),
                         user.getEmail(),
                         user.getFullName()
                 ))

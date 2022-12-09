@@ -1,15 +1,15 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PdfI18nDividerField extends PdfField {
 
-    public PdfI18nDividerField(String id, DataGroup dataGroup, FieldType type, String label, String value, PdfResource resource) {
+    public PdfI18nDividerField(String id, DataGroup dataGroup, DataType type, String label, String value, PdfResource resource) {
         super(resource);
         this.fieldId = id;
         this.dataGroup = dataGroup;
@@ -19,8 +19,8 @@ public class PdfI18nDividerField extends PdfField {
         this.values.add(value);
     }
 
-    public PdfI18nDividerField(String fieldId, DataGroup dataGroup, String label, FieldType type,
-                        int x, int bottomY, int width, int height, PdfResource resource) {
+    public PdfI18nDividerField(String fieldId, DataGroup dataGroup, String label, DataType type,
+                               int x, int bottomY, int width, int height, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;
         this.dataGroup = dataGroup;
@@ -36,8 +36,8 @@ public class PdfI18nDividerField extends PdfField {
         this.height = height;
     }
 
-    public PdfI18nDividerField(String fieldId, String label, List<String> values, FieldType type,
-                        int x, int bottomY, int width, int height, PdfResource resource) {
+    public PdfI18nDividerField(String fieldId, String label, List<String> values, DataType type,
+                               int x, int bottomY, int width, int height, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;
         this.label = label;

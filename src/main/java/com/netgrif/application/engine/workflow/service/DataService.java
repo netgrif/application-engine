@@ -652,13 +652,6 @@ public class DataService implements IDataService {
         return null;
     }
 
-    @Override
-    public UserFieldValue makeUserFieldValue(String id) {
-        // TODO: NAE-1645 6.2.5
-        IUser user = userService.resolveById(id, true);
-        return new UserFieldValue(user);
-    }
-
     private void updateDataset(Case useCase) {
         Case actual = workflowService.findOne(useCase.getStringId());
         actual.getDataSet().getFields().forEach((id, dataField) -> {
@@ -672,7 +665,8 @@ public class DataService implements IDataService {
         return eventService.processDataEvents(field, trigger, phase, useCase, task);
     }
 
-    protected UserFieldValue makeUserFieldValue(String id) {
+    @Override
+    public UserFieldValue makeUserFieldValue(String id) {
         IUser user = userService.resolveById(id, true);
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
     }

@@ -9,21 +9,19 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.TaskSearchService
-import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
+import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.web.PublicTaskController
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
@@ -48,7 +46,7 @@ class TaskControllerTest {
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
 
     @Autowired
-    private TaskService taskService
+    private ITaskService taskService
 
     @Autowired
     private TaskSearchService taskSearchService
@@ -60,7 +58,7 @@ class TaskControllerTest {
     private WorkflowController workflowController
 
     @Autowired
-    private ProcessRoleService processRoleService
+    private IProcessRoleService processRoleService
 
     @Autowired
     private IDataService dataService
@@ -121,31 +119,31 @@ class TaskControllerTest {
     @Test
     void testDeleteFile() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.tasks.find {it.transition == "1"}.task
+        String taskId = testCase.tasks.find { it.transition == "1" }.task
 
-        dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[] {}))
+        dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[]{}))
         testCase = workflowService.findOne(testCase.stringId)
-        assert testCase.dataSet["file"].value != null
+        assert testCase.dataSet.get("file").value.value != null
 
         taskController.deleteFile(taskId, "file")
         testCase = workflowService.findOne(testCase.stringId)
-        assert testCase.dataSet["file"].value == null
+        assert testCase.dataSet.get("file").value.value == null
     }
 
     @Test
     void testDeleteFileByName() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.tasks.find {it.transition == "1"}.task
+        String taskId = testCase.tasks.find { it.transition == "1" }.task
 
-        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[] {new MockMultipartFile("test", "test", null, new byte[] {})})
+        dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)
-        assert testCase.dataSet["fileList"].value != null
+        assert testCase.dataSet.get("fileList").value.value != null
 
         taskController.deleteNamedFile(taskId, "fileList", "test")
         testCase = workflowService.findOne(testCase.stringId)
-        assert ((FileListFieldValue) testCase.dataSet["fileList"].value).namesPaths == null || ((FileListFieldValue) testCase.dataSet["fileList"].value).namesPaths.size() == 0
+        assert ((FileListFieldValue) testCase.dataSet.get("fileList").value.value).namesPaths == null ||
+                ((FileListFieldValue) testCase.dataSet.get("fileList").value.value).namesPaths.size() == 0
     }
-
 
     void testWithRoleAndUserref() {
         createCase()

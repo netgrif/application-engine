@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 
 import com.netgrif.application.engine.importer.model.Behavior;
-import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 
 public enum FieldBehavior {
     VISIBLE("visible"),

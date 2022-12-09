@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
@@ -7,7 +8,7 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataH
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.dataset.FieldType;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
@@ -122,7 +123,7 @@ public class PdfDataHelper implements IPdfDataHelper {
             fields = fields.stream().sorted(Comparator.<LocalisedField, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }
        fields.forEach(field -> {
-                    if (field.getType().equals(FieldType.TASK_REF)) {
+                    if (field.getType().equals(DataType.TASK_REF)) {
                         Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> Objects.equals(dg.getParentTaskRefId(), field.getStringId())).findFirst();
                         taskRefGroup.ifPresent(this::generateFromDataGroup);
                     } else {
@@ -176,7 +177,7 @@ public class PdfDataHelper implements IPdfDataHelper {
                     pdfField = createMultiChoiceField(dataGroup, (LocalisedMultichoiceField) field);
                     pdfFields.add(pdfField);
                     break;
-                case I18N:
+                case I_18_N:
                     if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), DIVIDER)) {
                         pdfField = createI18nDividerField(dataGroup, (LocalisedI18nStringField) field);
                         pdfFields.add(pdfField);
