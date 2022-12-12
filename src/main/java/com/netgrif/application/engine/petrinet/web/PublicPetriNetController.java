@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +63,8 @@ public class PublicPetriNetController {
     @GetMapping(value = "/{identifier}/{version}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
-        return new PetriNetReferenceResource(this.petriNetService.getReference(identifier, this.converter.convert(version), userService.getAnonymousLogged(), locale));
+        String resolvedIdentifier = Base64.isBase64(identifier) ? new String(Base64.decodeBase64(identifier)) : identifier;
+        return new PetriNetReferenceResource(this.petriNetService.getReference(resolvedIdentifier, this.converter.convert(version), userService.getAnonymousLogged(), locale));
     }
 
     @Operation(summary = "Search processes")
