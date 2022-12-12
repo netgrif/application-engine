@@ -600,19 +600,19 @@ public class DataService implements IDataService {
         fout.close();
     }
 
-    private boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+    protected boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
         throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
     }
 
-    private boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
+    protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
         throw new UnsupportedOperationException("Upload new files to the remote storage is not implemented yet.");
     }
 
-    private boolean deleteRemote(Case useCase, FileField field) {
+    protected boolean deleteRemote(Case useCase, FileField field) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
-    private boolean deleteRemote(Case useCase, FileListField field, String name) {
+    protected boolean deleteRemote(Case useCase, FileListField field, String name) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
