@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.5](https://github.com/netgrif/application-engine/commits/v6.2.5)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.6](https://github.com/netgrif/application-engine/commits/v6.2.6)
+
+## [6.2.6](https://github.com/netgrif/application-engine/releases/tag/v6.2.6) (2022-12-12)
+
+### Fixed
+
+- [NAE-1799] Multilevel process identifier handling in 6.2.x for public view
+- [NAE-1801] Change DataService
 
 ## [6.2.5](https://github.com/netgrif/application-engine/releases/tag/v6.2.5) (2022-12-05)
 
