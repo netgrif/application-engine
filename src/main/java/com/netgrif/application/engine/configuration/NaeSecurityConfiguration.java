@@ -36,13 +36,14 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.HashSet;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 
 @Slf4j
-@Configuration
 @Controller
+@Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
@@ -86,13 +87,19 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowedOrigins = properties.getAllowedOrigins();
+
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
+        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
+            config.addAllowedOriginPattern("*");
+        } else {
+            config.setAllowedOrigins(allowedOrigins);
+        }
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -106,8 +113,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         http
                 .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
-                .cors()
                 .and()
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
@@ -129,8 +134,8 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
 
         setCsrf(http);
+        corsEnable(http);
     }
-
 
     @Override
     protected ProviderManager authenticationManager() throws Exception {
@@ -145,6 +150,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Override
     protected boolean isCsrfEnabled() {
         return properties.isCsrf();
+    }
+
+    @Override
+    protected boolean isCorsEnabled() {
+        return properties.isCors();
     }
 
     @Override
