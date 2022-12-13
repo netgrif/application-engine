@@ -797,7 +797,7 @@ public class TaskService implements ITaskService {
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
-        workflowService.resolveUserRef(useCase);
+        useCase = workflowService.resolveUserRef(useCase);
         useCase = workflowService.save(useCase);
 
         return savedTask;
