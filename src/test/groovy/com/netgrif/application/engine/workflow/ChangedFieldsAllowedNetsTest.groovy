@@ -30,7 +30,7 @@ class ChangedFieldsAllowedNetsTest {
     private ImportHelper importHelper
 
     @Autowired
-    private TestHelper testHelper
+    private TestHelper helper
 
     @Autowired
     private IDataService dataService
@@ -39,7 +39,7 @@ class ChangedFieldsAllowedNetsTest {
 
     @BeforeEach
     void beforeAll() {
-        testHelper.truncateDbs()
+        helper.truncateDbs()
         def netOptional = importHelper.createNet("changed_fields_allowed_nets.xml")
         assert netOptional.isPresent()
         net = netOptional.get()
