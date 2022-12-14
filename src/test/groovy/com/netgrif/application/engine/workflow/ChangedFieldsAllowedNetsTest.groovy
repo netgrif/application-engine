@@ -30,10 +30,10 @@ class ChangedFieldsAllowedNetsTest {
     private ImportHelper importHelper
 
     @Autowired
-    private IDataService dataService
+    private TestHelper testHelper
 
     @Autowired
-    private TestHelper testHelper
+    private IDataService dataService
 
     private PetriNet net
 
