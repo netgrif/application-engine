@@ -117,6 +117,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -188,6 +189,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
+    }
+
+    private HostValidationRequestFilter hostValidationRequestFilter() {
+        return new HostValidationRequestFilter(properties);
     }
 
     private ImpersonationRequestFilter impersonationRequestFilter() {

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.configuration.authentication.providers.Nae
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
 import com.netgrif.application.engine.configuration.properties.ServerAuthProperties;
+import com.netgrif.application.engine.configuration.properties.enumeration.HSTS;
 import com.netgrif.application.engine.configuration.properties.enumeration.XFrameOptionsMode;
 import com.netgrif.application.engine.configuration.properties.enumeration.XXSSProtection;
 import com.netgrif.application.engine.configuration.security.SessionUtilsProperties;
@@ -52,35 +53,35 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
                 && getSecurityConfigProperties().getHeaders().getHsts() != null
                 && getSecurityConfigProperties().getHeaders().getHsts().isEnable()
                 && getSecurityConfigProperties().getHeaders().getHsts().getMaxAge() >= 0) {
+            HSTS headers = getSecurityConfigProperties().getHeaders().getHsts();
+            if (Objects.nonNull(headers.isIncludeSubDomains())
+                    && Objects.nonNull(headers.isPreload())) {
+                http
+                        .headers()
+                        .httpStrictTransportSecurity()
+                        .maxAgeInSeconds(headers.getMaxAge())
+                        .includeSubDomains(headers.isIncludeSubDomains())
+                        .preload(headers.isPreload());
 
-            if (Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
-                    && Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
+            } else if (Objects.nonNull(headers.isIncludeSubDomains())
+                    && Objects.isNull(headers.isPreload())) {
                 http
                         .headers()
                         .httpStrictTransportSecurity()
-                        .maxAgeInSeconds(getSecurityConfigProperties().getHeaders().getHsts().getMaxAge())
-                        .includeSubDomains(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
-                        .preload(getSecurityConfigProperties().getHeaders().getHsts().isPreload());
-
-            } else if (Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
-                    && Objects.isNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
+                        .maxAgeInSeconds(headers.getMaxAge())
+                        .includeSubDomains(headers.isIncludeSubDomains());
+            } else if (Objects.isNull(headers.isIncludeSubDomains())
+                    && Objects.nonNull(headers.isPreload())) {
                 http
                         .headers()
                         .httpStrictTransportSecurity()
-                        .maxAgeInSeconds(getSecurityConfigProperties().getHeaders().getHsts().getMaxAge())
-                        .includeSubDomains(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains());
-            } else if (Objects.isNull(getSecurityConfigProperties().getHeaders().getHsts().isIncludeSubDomains())
-                    && Objects.nonNull(getSecurityConfigProperties().getHeaders().getHsts().isPreload())) {
-                http
-                        .headers()
-                        .httpStrictTransportSecurity()
-                        .maxAgeInSeconds(getSecurityConfigProperties().getHeaders().getHsts().getMaxAge())
-                        .preload(getSecurityConfigProperties().getHeaders().getHsts().isPreload());
+                        .maxAgeInSeconds(headers.getMaxAge())
+                        .preload(headers.isPreload());
             } else {
                 http
                         .headers()
                         .httpStrictTransportSecurity()
-                        .maxAgeInSeconds(getSecurityConfigProperties().getHeaders().getHsts().getMaxAge());
+                        .maxAgeInSeconds(headers.getMaxAge());
             }
         } else {
             http
