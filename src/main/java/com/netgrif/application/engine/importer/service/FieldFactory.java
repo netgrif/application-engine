@@ -1,8 +1,5 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
@@ -12,11 +9,12 @@ import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyE
 import com.netgrif.application.engine.importer.service.validation.IDataValidator;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,12 +39,6 @@ public final class FieldFactory {
         if (builder == null) {
             throw new IllegalArgumentException("Field " + data.getId() + " has unsupported type " + data.getType());
         }
-//        TODO: NAE-1645 6.2.5
-//        Field Factory
-//        enum, enum_map,multichoice,multi_map,user,userlist
-//        parseEnumerationMapValue()
-//        getFieldChoices
-//        getFieldOúptions
         Field<?> field = builder.build(data, importer);
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
@@ -74,10 +66,15 @@ public final class FieldFactory {
                 field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
             }
         }
-// TODO: NAE-1645 6.2.5 format, view -> component
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);
+        }
+        if (data.getView() != null) {
+            log.warn("Data attribute [view] in field [" + field.getImportId() + "] is deprecated.");
+        }
+        if (data.getFormat() != null) {
+            log.warn("Data attribute [format] in field [" + field.getImportId() + "] is deprecated.");
         }
 
         setEncryption(field, data);
