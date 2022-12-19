@@ -27,10 +27,10 @@ class ChangedFieldsAllowedNetsTest {
     private static final String NET_IDENTIFIER2 = "org_group"
 
     @Autowired
-    private TestHelper testHelper
+    private ImportHelper importHelper
 
     @Autowired
-    private ImportHelper importHelper
+    private TestHelper helper
 
     @Autowired
     private IDataService dataService
@@ -42,7 +42,7 @@ class ChangedFieldsAllowedNetsTest {
 
     @BeforeEach
     void beforeAll() {
-        testHelper.truncateDbs()
+        helper.truncateDbs()
         def netOptional = importHelper.createNet("changed_fields_allowed_nets.xml")
         assert netOptional.isPresent()
         net = netOptional.get()
