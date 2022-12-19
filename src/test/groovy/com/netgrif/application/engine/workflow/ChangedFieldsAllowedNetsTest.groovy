@@ -35,6 +35,9 @@ class ChangedFieldsAllowedNetsTest {
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private TestHelper testHelper
+
     private PetriNet net
 
     @BeforeEach
