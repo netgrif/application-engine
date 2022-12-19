@@ -123,7 +123,7 @@ public class ProcessRole extends Imported {
     public ProcessRole clone() {
         ProcessRole clone = new ProcessRole();
         clone.setImportId(this.importId);
-        clone.setName(this.name.clone());
+        clone.setName(this.name == null ? null : this.name.clone());
         clone.setNetId(this.netId);
         clone.setDescription(this.description);
         return clone;

@@ -245,20 +245,23 @@ public class Transition extends Node {
     @Override
     public Transition clone() {
         Transition clone = new Transition();
-        clone.setDataGroups(dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
-        clone.setDataSet(dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
-        clone.setRoles(roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
+        clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
+        clone.setImportId(this.importId);
+        clone.setDataGroups(this.dataGroups == null ? null : dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setDataSet(this.dataSet == null ? null : dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
+        clone.setRoles(this.roles == null ? null : roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         clone.setNegativeViewRoles(new ArrayList<>(negativeViewRoles));
-        clone.setUserRefs(userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
-        clone.setTriggers(triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
-        clone.setLayout(layout.clone());
+        clone.setUserRefs(this.userRefs == null ? null : userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setTriggers(this.triggers == null ? null : triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
+        clone.setLayout(this.layout == null ? null : layout.clone());
         clone.setPriority(priority);
         clone.setAssignPolicy(assignPolicy);
         clone.setAssignedUserPolicy(assignedUserPolicy);
         clone.setIcon(icon);
         clone.setDataFocusPolicy(dataFocusPolicy);
         clone.setFinishPolicy(finishPolicy);
-        clone.setEvents(events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setEvents(this.events == null ? null : events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
         clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
         clone.setDefaultRoleId(defaultRoleId);
         return clone;

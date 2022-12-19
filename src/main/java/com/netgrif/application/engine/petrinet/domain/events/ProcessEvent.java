@@ -14,10 +14,10 @@ public class ProcessEvent extends BaseEvent {
     public ProcessEvent clone() {
         ProcessEvent clone = new ProcessEvent();
         clone.setId(this.getId());
-        clone.setTitle(this.getTitle().clone());
-        clone.setMessage(this.getMessage().clone());
-        clone.setPreActions(getPreActions().stream().map(Action::clone).collect(Collectors.toList()));
-        clone.setPreActions(getPostActions().stream().map(Action::clone).collect(Collectors.toList()));
+        clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
+        clone.setMessage(this.getMessage() == null ? null : this.getMessage().clone());
+        clone.setPreActions(this.getPreActions() == null ? null : getPreActions().stream().map(Action::clone).collect(Collectors.toList()));
+        clone.setPostActions(this.getPostActions() == null ? null : getPostActions().stream().map(Action::clone).collect(Collectors.toList()));
         clone.setType(this.type);
         return clone;
     }

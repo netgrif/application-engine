@@ -114,7 +114,7 @@ public class Arc extends PetriNetObject {
         clone.setMultiplicity(this.multiplicity);
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.importId);
-        clone.setReference(this.reference.clone());
+        clone.setReference(this.reference == null ? null : this.reference.clone());
         return clone;
     }
 }

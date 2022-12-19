@@ -90,6 +90,14 @@ class Action {
         this.importId = importId
     }
 
+    void setFieldIds(Map<String, String> fieldIds) {
+        this.fieldIds = fieldIds
+    }
+
+    void setTransitionIds(Map<String, String> transitionIds) {
+        this.transitionIds = transitionIds
+    }
+
     @Override
     String toString() {
         return "[$trigger] $definition"
@@ -114,8 +122,12 @@ class Action {
 
     @Override
     Action clone() {
-        Action clone = new Action(new HashMap<String, String>(this.fieldIds), new HashMap<String, String>(this.transitionIds), this.definition, this.trigger)
+        Action clone = new Action()
+        clone.setTrigger(this.trigger)
+        clone.setDefinition(this.definition)
         clone.setImportId(this.importId)
+        clone.setTransitionIds(new HashMap<String, String>(this.transitionIds))
+        clone.setFieldIds(new HashMap<String, String>(this.fieldIds))
         return clone
     }
 }

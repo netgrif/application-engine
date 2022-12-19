@@ -54,7 +54,7 @@ public class Transaction extends PetriNetObject {
     public Transaction clone() {
         Transaction clone = new Transaction();
         clone.setTransitions(new ArrayList<>(transitions));
-        clone.setTitle(title.clone());
+        clone.setTitle(this.title == null ? null : title.clone());
         return clone;
     }
 }
