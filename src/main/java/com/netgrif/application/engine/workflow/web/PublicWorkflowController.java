@@ -2,7 +2,6 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -49,8 +48,7 @@ public class PublicWorkflowController {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
             CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case created successfully",
-                    LocalisedEventOutcomeFactory.from(outcome, locale));
+            return EventOutcomeWithMessageResource.successMessage("Case created successfully", outcome);
         } catch (Exception e) {
             log.error("Creating case failed:" + e.getMessage(), e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed: " + e.getMessage());

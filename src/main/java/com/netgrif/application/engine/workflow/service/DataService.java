@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
-import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
@@ -28,9 +27,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -50,8 +47,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Slf4j
 @Service
@@ -243,7 +238,7 @@ public class DataService implements IDataService {
 //                    }
 //                }
 //            }
-//            dataGroup.setFields(new DataFieldsResource(resources, locale));
+//            dataGroup.setFields(new DataFieldsResource(resources)); // TODO: NAE-1645 locale
 //        }
         outcome.setData(resultDataGroups);
         return outcome;
@@ -300,7 +295,7 @@ public class DataService implements IDataService {
 //        }
     }
 
-    private void changeTaskRefBehavior(LocalisedField field, FieldBehavior behavior) {
+    private void changeTaskRefBehavior(Field<?> field, FieldBehavior behavior) {
 //        TODO: NAE-1645
 //        List<FieldBehavior> antonymBehaviors = behavior.getAntonyms();
 //        antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));

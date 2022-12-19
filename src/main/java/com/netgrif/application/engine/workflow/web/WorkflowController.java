@@ -4,7 +4,6 @@ import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
-import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
@@ -25,10 +24,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -51,9 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map;
 
 @RestController()
 @RequestMapping("/api/workflow")
@@ -79,7 +73,6 @@ public class WorkflowController {
         this.dataService = dataService;
     }
 
-
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @Operation(summary = "Create new case", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/case", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -87,8 +80,7 @@ public class WorkflowController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             CreateCaseEventOutcome outcome = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully",
-                    LocalisedEventOutcomeFactory.from(outcome, locale));
+            return EventOutcomeWithMessageResource.successMessage("Case with id " + outcome.getCase().getStringId() + " was created succesfully", outcome);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Creating case failed" + e.getMessage());
@@ -193,8 +185,7 @@ public class WorkflowController {
             } else {
                 outcome = workflowService.deleteCase(caseId);
             }
-            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted",
-                    LocalisedEventOutcomeFactory.from(outcome, LocaleContextHolder.getLocale()));
+            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted", outcome);
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case [" + caseId + "] failed:", e);
             return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");

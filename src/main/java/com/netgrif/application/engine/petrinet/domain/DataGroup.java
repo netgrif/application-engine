@@ -25,7 +25,7 @@ public class DataGroup extends PetriNetObject {
     @Transient
     @Getter
     @Setter
-    private DataFieldsResource fields;
+    private DataFieldsResource fields; // TODO: NAE-1645 datarefs
 
     @Getter
     @Setter
@@ -37,7 +37,7 @@ public class DataGroup extends PetriNetObject {
 
     @Getter
     @Setter
-    private String alignment;
+    private String alignment; // TODO: NAE-1645 enum?
 
     @Getter
     @Setter
@@ -45,23 +45,23 @@ public class DataGroup extends PetriNetObject {
 
     @Transient
     @Getter @Setter
-    private String parentTaskId;
+    private String parentTaskId; // TODO: NAE-1645 remove?
 
     @Transient
     @Getter @Setter
-    private String parentTransitionId;
+    private String parentTransitionId; // TODO: NAE-1645 remove?
 
     @Transient
     @Getter @Setter
-    private String parentCaseId;
+    private String parentCaseId; // TODO: NAE-1645 remove?
 
     @Transient
     @Getter @Setter
-    private String parentTaskRefId;
+    private String parentTaskRefId; // TODO: NAE-1645 remove?
 
     @Transient
     @Getter @Setter
-    private int nestingLevel;
+    private int nestingLevel; // TODO: NAE-1645 remove?
 
     public DataGroup() {
         this._id = new ObjectId();

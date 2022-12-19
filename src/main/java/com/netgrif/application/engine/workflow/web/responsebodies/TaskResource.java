@@ -1,10 +1,9 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
+import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.web.TaskController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.core.Authentication;
 
@@ -12,12 +11,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
-public class LocalisedTaskResource extends EntityModel<Task> {
+@Slf4j
+public class TaskResource extends EntityModel<Task> {
 
-    public static final Logger log = LoggerFactory.getLogger(LocalisedTaskResource.class);
-
-    public LocalisedTaskResource(Task content) {
-        super(content, new ArrayList<Link>());
+    public TaskResource(Task content) {
+        super(content, new ArrayList<>());
         buildLinks();
     }
 
@@ -26,17 +24,17 @@ public class LocalisedTaskResource extends EntityModel<Task> {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getOne(task.getStringId(), null)).withSelfRel());
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .assign((Authentication) null, task.getStringId(), null)).withRel("assign"));
+                .assign((Authentication) null, task.getStringId())).withRel("assign"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .delegate((Authentication) null, task.getStringId(), null, null)).withRel("delegate"));
+                .delegate((Authentication) null, task.getStringId(), null)).withRel("delegate"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .finish((Authentication) null, task.getStringId(), null)).withRel("finish"));
+                .finish((Authentication) null, task.getStringId())).withRel("finish"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .cancel((Authentication) null, task.getStringId(), null)).withRel("cancel"));
+                .cancel((Authentication) null, task.getStringId())).withRel("cancel"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId(), null)).withRel("data"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .setData(task.getStringId(), null, null)).withRel("data-edit"));
+                .setData((Authentication) null, task.getStringId(), null)).withRel("data-edit"));
         try {
             add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                     .getFile(task.getStringId(), "", null)).withRel("file"));

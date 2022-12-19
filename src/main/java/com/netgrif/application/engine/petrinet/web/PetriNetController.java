@@ -2,7 +2,6 @@ package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
@@ -92,8 +91,7 @@ public class PetriNetController {
         try {
             VersionType release = releaseType == null ? VersionType.MAJOR : VersionType.valueOf(releaseType.trim().toUpperCase());
             ImportPetriNetEventOutcome importPetriNetOutcome = service.importPetriNet(multipartFile.getInputStream(), release, (LoggedUser) auth.getPrincipal());
-            return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully",
-                    LocalisedEventOutcomeFactory.from(importPetriNetOutcome, locale));
+            return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", importPetriNetOutcome);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");

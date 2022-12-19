@@ -7,10 +7,9 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -48,14 +47,11 @@ public class PublicTaskController extends AbstractTaskController {
 
     private final ITaskService taskService;
 
-    private final IDataService dataService;
-
     final IUserService userService;
 
     public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
         super(taskService, dataService, null);
         this.taskService = taskService;
-        this.dataService = dataService;
         this.userService = userService;
     }
 
@@ -75,9 +71,9 @@ public class PublicTaskController extends AbstractTaskController {
             responseCode = "403",
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> assign(@PathVariable("id") String taskId) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
-        return super.assign(loggedUser, taskId, locale);
+        return super.assign(loggedUser, taskId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallFinish(@userService.getAnonymousLogged(), #taskId)")
@@ -90,9 +86,9 @@ public class PublicTaskController extends AbstractTaskController {
             responseCode = "403",
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> finish(@PathVariable("id") String taskId) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
-        return super.finish(loggedUser, taskId, locale);
+        return super.finish(loggedUser, taskId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallCancel(@userService.getAnonymousLogged(), #taskId)")
@@ -105,9 +101,9 @@ public class PublicTaskController extends AbstractTaskController {
             responseCode = "403",
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> cancel(@PathVariable("id") String taskId) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
-        return super.cancel(loggedUser, taskId, locale);
+        return super.cancel(loggedUser, taskId);
     }
 
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
@@ -202,7 +198,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     @Operation(summary = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedModel<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
+    public PagedModel<TaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.application.engine.workflow.domain.Task> assembler, Locale locale) {
         return super.searchPublic(userService.getAnonymousLogged(), pageable, searchBody, operation, assembler, locale);
     }
 }

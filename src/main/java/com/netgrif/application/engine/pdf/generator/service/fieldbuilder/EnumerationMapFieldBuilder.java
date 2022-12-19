@@ -5,10 +5,13 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedEnumerationMapField;
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class EnumerationMapFieldBuilder extends SelectionFieldBuilder {
 
@@ -16,21 +19,25 @@ public class EnumerationMapFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationMapField field, int lastX, int lastY) {
+    public PdfField buildField(DataGroup dataGroup, EnumerationMapField field, int lastX, int lastY, Locale locale) {
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
-
-        if (field.getOptions() != null)
-            choices = new ArrayList<>(field.getOptions().values());
-        if (field.getValue() != null)
-            values.add(field.getOptions().get(field.getValue()));
-
-        String translatedTitle = field.getName();
+        if (field.getOptions() != null) {
+            choices = field.getOptions().values().stream().map(option -> option.getTranslation(locale)).collect(Collectors.toList());
+        }
+        if (field.getValue() != null) {
+            values.add(field.getOptions().get(field.getValue().getValue()).getTranslation(locale));
+        }
+        String translatedTitle = field.getName().getTranslation(locale);
         PdfSelectionField pdfField = new PdfEnumerationField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
+    }
+
+    public PdfField buildField(DataGroup dataGroup, EnumerationMapField field, int lastX, int lastY) {
+        return buildField(dataGroup, field, lastX, lastY, LocaleContextHolder.getLocale());
     }
 }

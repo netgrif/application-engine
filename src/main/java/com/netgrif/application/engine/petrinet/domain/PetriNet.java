@@ -90,6 +90,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
+    // TODO: NAE-1645 save sorted by execution priority
     private Map<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")

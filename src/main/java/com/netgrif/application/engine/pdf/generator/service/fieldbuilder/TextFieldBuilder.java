@@ -4,13 +4,10 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.utils.DateUtils;
-import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedField;
 import org.jsoup.Jsoup;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -26,7 +23,7 @@ public class TextFieldBuilder extends FieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedField field, int lastX, int lastY) {
+    public PdfField buildField(DataGroup dataGroup, Field<?> field, int lastX, int lastY, Locale locale) {
         this.lastX = lastX;
         this.lastY = lastY;
         String value;
@@ -38,15 +35,14 @@ public class TextFieldBuilder extends FieldBuilder {
                 value = field.getValue() != null ? formatDateTime(field) : "";
                 break;
             case NUMBER:
+                double number = field.getValue() != null ? (double) field.getValue().getValue() : 0.0;
                 if (field.getValue() != null && isCurrencyField(field)) {
-                    double number = (double) field.getValue();
                     Map<String, String> properties = field.getComponent().getProperties();
                     NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale(properties.get("locale")));
                     currencyFormat.setCurrency(Currency.getInstance(properties.get("code")));
                     currencyFormat.setMaximumFractionDigits(Integer.parseInt(properties.get("fractionSize")));
                     value = currencyFormat.format(number);
                 } else if (field.getValue() != null) {
-                    double number = (double) field.getValue();
                     NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
                     value = nf2.format(number);
                 } else {
@@ -54,48 +50,53 @@ public class TextFieldBuilder extends FieldBuilder {
                 }
                 break;
             case FILE:
-                value = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue()).getName()) : "";
+                value = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue().getValue()).getName()) : "";
                 break;
             case FILE_LIST:
-                value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue()) : "";
+                value = field.getValue() != null ? resolveFileListNames((FileListFieldValue) field.getValue().getValue()) : "";
                 break;
             case USER:
-                value = field.getValue() != null ? ((UserFieldValue) field.getValue()).getFullName() : "";
+                value = field.getValue() != null ? ((UserFieldValue) field.getValue().getValue()).getFullName() : "";
                 break;
             case USER_LIST:
-                value = field.getValue() != null ? ((UserListFieldValue) field.getValue()).getUserValues().stream().map(UserFieldValue::getFullName).collect(Collectors.joining(", ")) : "";
+                value = field.getValue() != null ? ((UserListFieldValue) field.getValue().getValue()).getUserValues().stream().map(UserFieldValue::getFullName).collect(Collectors.joining(", ")) : "";
                 break;
             default:
                 value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
                 break;
         }
-        String translatedTitle = field.getName();
+        String translatedTitle = field.getName().getTranslation(locale);
         PdfField pdfField = new PdfTextField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
     }
 
-    private String formatDate(LocalisedField field) {
+    public PdfField buildField(DataGroup dataGroup, Field<?> field, int lastX, int lastY) {
+        return buildField(dataGroup, field, lastX, lastY, LocaleContextHolder.getLocale());
+    }
+
+    private String formatDate(Field<?> field) {
         ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
-            if (field.getValue() instanceof LocalDate)
-                value = DateUtils.localDateToZonedDate((LocalDate) field.getValue(), resource.getDateZoneId());
-            else if (field.getValue() instanceof Date)
-                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
+            // TODO: NAE-1645 not needed anymore, fixed class of value
+            if (field.getValue().getValue() instanceof LocalDate)
+                value = DateUtils.localDateToZonedDate((LocalDate) field.getValue().getValue(), resource.getDateZoneId());
+            else if (field.getValue().getValue() instanceof Date)
+                value = ((Date) field.getValue().getValue()).toInstant().atZone(resource.getDateZoneId());
             return DateTimeFormatter.ofPattern(resource.getDateFormat().getValue()).format(value);
         } else {
             return "";
         }
     }
 
-    private String formatDateTime(LocalisedField field) {
+    private String formatDateTime(Field<?> field) {
         ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
-            if (field.getValue() instanceof LocalDateTime)
-                value = DateUtils.localDateTimeToZonedDateTime((LocalDateTime) field.getValue(), resource.getDateZoneId());
-            else if (field.getValue() instanceof Date)
-                value = ((Date) field.getValue()).toInstant().atZone(resource.getDateZoneId());
+            if (field.getValue().getValue() instanceof LocalDateTime)
+                value = DateUtils.localDateTimeToZonedDateTime((LocalDateTime) field.getValue().getValue(), resource.getDateZoneId());
+            else if (field.getValue().getValue() instanceof Date)
+                value = ((Date) field.getValue().getValue()).toInstant().atZone(resource.getDateZoneId());
             return DateTimeFormatter.ofPattern(resource.getDateTimeFormat().getValue()).format(value);
         } else {
             return "";
@@ -115,7 +116,7 @@ public class TextFieldBuilder extends FieldBuilder {
         return fileName;
     }
 
-    private boolean isCurrencyField(LocalisedField field) {
+    private boolean isCurrencyField(Field<?> field) {
         return field.getComponent() != null &&
                 Objects.equals(field.getComponent().getName(), "currency") &&
                 field.getComponent().getProperties() != null &&
