@@ -111,4 +111,11 @@ class Action {
     MetaClass getMetaClass() {
         return this.metaClass
     }
+
+    @Override
+    Action clone() {
+        Action clone = new Action(new HashMap<String, String>(this.fieldIds), new HashMap<String, String>(this.transitionIds), this.definition, this.trigger)
+        clone.setImportId(this.importId)
+        return clone
+    }
 }

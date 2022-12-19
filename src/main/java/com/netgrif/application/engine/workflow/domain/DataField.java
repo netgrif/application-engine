@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DataField implements Referencable {
 
@@ -205,5 +206,20 @@ public class DataField implements Referencable {
         } else {
             throw new IllegalArgumentException("Variable arc must be an non negative integer");
         }
+    }
+
+    @Override
+    public Referencable clone() {
+        DataField clone = new DataField();
+        clone.setBehavior(this.behavior);
+        clone.setValue(this.value);
+        clone.setChoices(this.choices);
+        clone.setAllowedNets(this.allowedNets);
+        clone.setOptions(this.options);
+        clone.setValidations(this.validations.stream().map(Validation::clone).collect(Collectors.toList()));
+        clone.setFilterMetadata(this.filterMetadata);
+        clone.setEncryption(this.encryption);
+        clone.setVersion(this.version);
+        return clone;
     }
 }

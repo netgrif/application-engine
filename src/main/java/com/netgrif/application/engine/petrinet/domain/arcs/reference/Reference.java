@@ -30,4 +30,11 @@ public class Reference {
         }
         return multiplicity;
     }
+
+    public Reference clone() {
+        Reference clone = new Reference(this.reference, this.type);
+        clone.setReferencable(this.referencable.clone());
+        return clone;
+    }
+
 }

@@ -14,6 +14,7 @@ import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.lucene.analysis.CharArrayMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -239,5 +240,27 @@ public class Transition extends Node {
 
     public void addEvent(Event event) {
         events.put(event.getType(), event);
+    }
+
+    @Override
+    public Transition clone() {
+        Transition clone = new Transition();
+        clone.setDataGroups(dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setDataSet(dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
+        clone.setRoles(roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setNegativeViewRoles(new ArrayList<>(negativeViewRoles));
+        clone.setUserRefs(userRefs.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
+        clone.setTriggers(triggers.stream().map(Trigger::clone).collect(Collectors.toList()));
+        clone.setLayout(layout.clone());
+        clone.setPriority(priority);
+        clone.setAssignPolicy(assignPolicy);
+        clone.setAssignedUserPolicy(assignedUserPolicy);
+        clone.setIcon(icon);
+        clone.setDataFocusPolicy(dataFocusPolicy);
+        clone.setFinishPolicy(finishPolicy);
+        clone.setEvents(events.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setAssignedUserPolicy(new HashMap<>(assignedUserPolicy));
+        clone.setDefaultRoleId(defaultRoleId);
+        return clone;
     }
 }
