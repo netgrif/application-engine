@@ -13,9 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles(["test"])
 @SpringBootTest
+@ActiveProfiles(["test"])
+@ExtendWith(SpringExtension.class)
 class ChangedFieldsAllowedNetsTest {
 
     private static final String TASK_TITLE = "Task"
@@ -34,6 +34,9 @@ class ChangedFieldsAllowedNetsTest {
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    private TestHelper testHelper
 
     private PetriNet net
 
