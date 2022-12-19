@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
+import com.netgrif.application.engine.importer.model.FieldAlignment;
 import com.netgrif.application.engine.importer.model.Transition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class TaskLayout extends FormLayout {
 
     private Integer offset;
-    private String fieldAlignment;
+    private FieldAlignment fieldAlignment;
 
     public TaskLayout(Transition data) {
         super(
@@ -22,6 +23,6 @@ public class TaskLayout extends FormLayout {
                 data.getLayout().getCompactDirection() != null ? data.getLayout().getCompactDirection() : null
         );
         this.offset = data.getLayout().getOffset();
-        this.fieldAlignment = data.getLayout().getFieldAlignment() != null ? data.getLayout().getFieldAlignment().value() : null;
+        this.fieldAlignment = data.getLayout().getFieldAlignment() != null ? data.getLayout().getFieldAlignment() : null;
     }
 }

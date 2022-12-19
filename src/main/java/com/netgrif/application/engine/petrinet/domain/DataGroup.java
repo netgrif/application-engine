@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.application.engine.importer.model.DataGroupAlignment;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
 import lombok.AccessLevel;
@@ -30,7 +31,7 @@ public class DataGroup extends PetriNetObject {
 
     private I18nString title;
 
-    private String alignment; // TODO: NAE-1645 enum?
+    private DataGroupAlignment alignment; // TODO: NAE-1645 enum?
 
     private Boolean stretch;
 

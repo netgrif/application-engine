@@ -7,13 +7,12 @@ import com.netgrif.application.engine.importer.service.validation.IActionValidat
 import com.netgrif.application.engine.importer.service.validation.IDocumentValidator;
 import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
 import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Transaction;
 import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
@@ -23,14 +22,10 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.events.*;
-import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
-import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
-import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
@@ -78,7 +73,7 @@ public class Importer {
     protected ProcessRole anonymousRole;
     @Getter
     protected Map<String, ProcessRole> roles;
-    protected Map<String, Field> fields;
+    protected Map<String, Field<?>> fields;
     protected Map<String, Transition> transitions;
     protected Map<String, Place> places;
     protected Map<String, Transaction> transactions;
@@ -175,7 +170,7 @@ public class Importer {
 
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
-        savedFile.getParentFile().mkdirs();
+        savedFile.getParentFile().mkdirs(); // TODO: NAE-1645 return false? storage should be created so maybe delete this line?
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
         return savedFile.toPath();
@@ -459,7 +454,7 @@ public class Importer {
     }
 
     protected void createDataSet(Data importData) throws MissingIconKeyException {
-        Field field = fieldFactory.getField(importData, this);
+        Field<?> field = fieldFactory.getField(importData, this);
 
         net.addDataSetField(field);
         fields.put(importData.getId(), field);
@@ -664,7 +659,7 @@ public class Importer {
         if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
             dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null, null, null));
         }
-        dataGroup.setAlignment("start");
+        dataGroup.setAlignment(DataGroupAlignment.START);
         dataGroup.setStretch(true);
         dataGroup.addData(getField(dataRef.getId()).getStringId());
         transition.addDataGroup(dataGroup);
@@ -675,7 +670,6 @@ public class Importer {
     }
 
     protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
-        String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
 
         if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
@@ -686,14 +680,14 @@ public class Importer {
         dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
-        dataGroup.setAlignment(alignment);
+        dataGroup.setAlignment(importDataGroup.getAlignment() != null ? importDataGroup.getAlignment() : null);
         dataGroup.setStretch(importDataGroup.isStretch());
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
         DataGroupLayout dataGroupLayout = dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null ? dataGroup.getLayout() : null;
 
         for (DataRef dataRef : importDataGroup.getDataRef()) {
-            if (dataGroupLayout != null && dataGroupLayout.getType().equals(LayoutType.GRID.value()) && dataRef.getLayout() == null) {
+            if (dataGroupLayout != null && dataGroupLayout.getType().equals(LayoutType.GRID) && dataRef.getLayout() == null) {
                 throw new IllegalArgumentException("Data ref [" + dataRef.getId() + "] of data group [" + dataGroup.getStringId() + "] in transition [" + transition.getStringId() + "] doesn't have a layout.");
             }
             addDataLogic(transition, dataRef);
@@ -1130,7 +1124,7 @@ public class Importer {
 
     protected PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
-        if (!net.isPresent()) {
+        if (net.isEmpty()) {
             throw new IllegalArgumentException();
         }
         return net.get();
@@ -1192,8 +1186,8 @@ public class Importer {
         return role;
     }
 
-    public Field getField(String id) {
-        Field field = fields.get(id);
+    public Field<?> getField(String id) {
+        Field<?> field = fields.get(id);
         if (field == null) {
             throw new IllegalArgumentException("Field " + id + " not found");
         }
