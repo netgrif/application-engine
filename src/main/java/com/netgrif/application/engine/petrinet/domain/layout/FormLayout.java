@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
+import com.netgrif.application.engine.importer.model.CompactDirection;
+import com.netgrif.application.engine.importer.model.HideEmptyRows;
+import com.netgrif.application.engine.importer.model.LayoutType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,12 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class FormLayout extends Layout {
 
-    // TODO: NAE-1645 enumerations, https://engine.netgrif.com/#/views/form_layout
-    private String type;
-    private String hideEmptyRows;
-    private String compactDirection;
+    private LayoutType type;
+    private HideEmptyRows hideEmptyRows;
+    private CompactDirection compactDirection;
 
-    public FormLayout(Integer rows, Integer cols, String type, String hideEmptyRows, String compactDirection) {
+    public FormLayout(Integer rows, Integer cols, LayoutType type, HideEmptyRows hideEmptyRows, CompactDirection compactDirection) {
         super(rows, cols);
         this.type = type;
         this.hideEmptyRows = hideEmptyRows;

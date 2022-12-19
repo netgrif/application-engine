@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
 import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
@@ -137,7 +138,7 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     private boolean isGridLayout(DataGroup dataGroup) {
         // TODO: NAE-1645 constant/enum for "grid"
-        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid");
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(LayoutType.GRID);
     }
 
     @Override

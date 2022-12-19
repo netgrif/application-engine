@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.layout;
 
+import com.netgrif.application.engine.importer.model.CompactDirection;
+import com.netgrif.application.engine.importer.model.HideEmptyRows;
+import com.netgrif.application.engine.importer.model.LayoutType;
 import lombok.Data;
 import com.netgrif.application.engine.importer.model.DataGroup;
 import lombok.NoArgsConstructor;
@@ -8,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DataGroupLayout extends FormLayout {
 
-    public DataGroupLayout(Integer rows, Integer cols, String type, String hideEmptyRows, String compactDirection) {
+    public DataGroupLayout(Integer rows, Integer cols, LayoutType type, HideEmptyRows hideEmptyRows, CompactDirection compactDirection) {
         super(rows, cols, type, hideEmptyRows, compactDirection);
     }
 
@@ -16,9 +19,9 @@ public class DataGroupLayout extends FormLayout {
         super(
                 data.getRows(),
                 data.getCols(),
-                data.getLayout() != null ? data.getLayout().value() : null,
-                data.getHideEmptyRows() != null ? data.getHideEmptyRows().value() : null,
-                data.getCompactDirection() != null ? data.getCompactDirection().value() : null
+                data.getLayout() != null ? data.getLayout() : null,
+                data.getHideEmptyRows() != null ? data.getHideEmptyRows() : null,
+                data.getCompactDirection() != null ? data.getCompactDirection() : null
         );
     }
 }
