@@ -222,7 +222,7 @@ public class WorkflowService implements IWorkflowService {
         });
         useCase.resolveViewUsers();
         taskService.resolveUserRef(useCase);
-        return repository.save(useCase);
+        return save(useCase);
     }
 
     private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
