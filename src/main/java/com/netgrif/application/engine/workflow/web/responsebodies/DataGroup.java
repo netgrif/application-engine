@@ -1,12 +1,16 @@
 package com.netgrif.application.engine.workflow.web.responsebodies;
 
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import lombok.Data;
+
+import java.util.LinkedHashMap;
 
 @Data
 public class DataGroup {
 
-    private DataFieldsResource fields;
+    // TODO: NAE-1645 check frontend compatibility
+    private LinkedHashMap<String, DataRef> fields;
 
     private DataGroupLayout layout;
 
@@ -29,7 +33,7 @@ public class DataGroup {
     private DataGroup() {
     }
 
-    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId, String parentCaseId, String parentTaskRefId, int nestingLevel) {
+    public DataGroup(LinkedHashMap<String, DataRef> fields, String title, String alignment, Boolean stretch, DataGroupLayout layout, String parentTaskId, String parentCaseId, String parentTaskRefId, int nestingLevel) {
         this();
         this.fields = fields;
         this.title = title;

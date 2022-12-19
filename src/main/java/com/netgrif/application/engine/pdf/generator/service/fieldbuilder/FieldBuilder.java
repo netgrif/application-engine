@@ -3,6 +3,7 @@ package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import lombok.Getter;
@@ -28,10 +29,10 @@ public abstract class FieldBuilder {
         this.resource = resource;
     }
 
-    protected void setFieldParams(DataGroup dg, Field<?> field, PdfField pdfField) {
-        pdfField.setLayoutX(countFieldLayoutX(dg, field));
-        pdfField.setLayoutY(countFieldLayoutY(dg, field));
-        pdfField.setWidth(countFieldWidth(dg, field));
+    protected void setFieldParams(DataGroup dg, DataRef dataRef, PdfField pdfField) {
+        pdfField.setLayoutX(countFieldLayoutX(dg, dataRef));
+        pdfField.setLayoutY(countFieldLayoutY(dg, dataRef));
+        pdfField.setWidth(countFieldWidth(dg, dataRef));
         pdfField.setHeight(countFieldHeight());
     }
 
@@ -44,7 +45,7 @@ public abstract class FieldBuilder {
         pdfField.countMultiLineHeight(fontSize, resource);
     }
 
-    private int countFieldLayoutX(DataGroup dataGroup, Field<?> field) {
+    private int countFieldLayoutX(DataGroup dataGroup, DataRef field) {
         int x = 0;
         if (isDgFlow(dataGroup)) {
             if (!isStretch(dataGroup)) {
@@ -58,34 +59,31 @@ public abstract class FieldBuilder {
                 lastX = lastX == 0 ? 2 : 0;
             }
             x = lastX;
-//            TODO: NAE-1645 dataref layout
-//        } else if (field.getLayout() != null) {
-//            x = field.getLayout().getX();
-//            lastX = x;
+        } else if (field.getLayout() != null) {
+            x = field.getLayout().getX();
+            lastX = x;
         }
         return x;
     }
 
-    private int countFieldLayoutY(DataGroup dataGroup, Field<?> field) {
-//        TODO: NAE-1645 dataref layout
-//        int y;
-//        if (checkFullRow(dataGroup, field)) {
-//            y = ++lastY;
-//            resolveRowGridFree(dataGroup, field.getLayout());
-//        } else {
-//            if (lastX == 0) {
-//                y = ++lastY;
-//                resolveRowGridFree(dataGroup, field.getLayout());
-//            } else {
-//                y = lastY;
-//                resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
-//            }
-//            if (isDgFlow(dataGroup)) {
-//                lastX++;
-//            }
-//        }
-//        return y;
-        return 0;
+    private int countFieldLayoutY(DataGroup dataGroup, DataRef field) {
+        int y;
+        if (checkFullRow(dataGroup, field)) {
+            y = ++lastY;
+            resolveRowGridFree(dataGroup, field.getLayout());
+        } else {
+            if (lastX == 0) {
+                y = ++lastY;
+                resolveRowGridFree(dataGroup, field.getLayout());
+            } else {
+                y = lastY;
+                resource.setRowGridFree(!checkCol(field.getLayout()) ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
+            }
+            if (isDgFlow(dataGroup)) {
+                lastX++;
+            }
+        }
+        return y;
     }
 
     public int countPosX(PdfField field) {
@@ -143,7 +141,7 @@ public abstract class FieldBuilder {
         }
     }
 
-    private int countFieldWidth(DataGroup dataGroup, Field<?> field) {
+    private int countFieldWidth(DataGroup dataGroup, DataRef field) {
         if (isDgFlow(dataGroup)) {
             return resource.getFormGridColWidth() - resource.getPadding();
         } else if (isDgLegacy(dataGroup)) {
@@ -151,20 +149,16 @@ public abstract class FieldBuilder {
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
         }
-//            TODO: NAE-1645 dataref layout
-//            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-        return 0;
+        return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
     }
 
     private int countFieldHeight() {
         return resource.getFormGridRowHeight() - resource.getPadding();
     }
 
-    private boolean checkFullRow(DataGroup dataGroup, Field<?> field) {
-//        TODO: NAE-1645 dataref layout
-//        return (isStretch(dataGroup)) ||
-//                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
-        return true;
+    private boolean checkFullRow(DataGroup dataGroup, DataRef field) {
+        return (isStretch(dataGroup)) ||
+                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
     }
 
     private boolean checkCol(FieldLayout layout) {

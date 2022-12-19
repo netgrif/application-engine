@@ -4,6 +4,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.utils.DateUtils;
 import org.jsoup.Jsoup;
@@ -23,10 +24,11 @@ public class TextFieldBuilder extends FieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, Field<?> field, int lastX, int lastY, Locale locale) {
+    public PdfField buildField(DataGroup dataGroup, DataRef dataRef, int lastX, int lastY, Locale locale) {
         this.lastX = lastX;
         this.lastY = lastY;
         String value;
+        Field<?> field = dataRef.getField();
         switch (field.getType()) {
             case DATE:
                 value = field.getValue() != null ? formatDate(field) : "";
@@ -67,12 +69,12 @@ public class TextFieldBuilder extends FieldBuilder {
         }
         String translatedTitle = field.getName().getTranslation(locale);
         PdfField pdfField = new PdfTextField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, resource);
-        setFieldParams(dataGroup, field, pdfField);
+        setFieldParams(dataGroup, dataRef, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
     }
 
-    public PdfField buildField(DataGroup dataGroup, Field<?> field, int lastX, int lastY) {
+    public PdfField buildField(DataGroup dataGroup, DataRef field, int lastX, int lastY) {
         return buildField(dataGroup, field, lastX, lastY, LocaleContextHolder.getLocale());
     }
 

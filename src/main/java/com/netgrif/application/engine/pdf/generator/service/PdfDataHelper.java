@@ -6,6 +6,7 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
@@ -14,12 +15,10 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
-import com.netgrif.application.engine.workflow.web.responsebodies.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -71,6 +70,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Setter
     private int originalCols;
 
+    // TODO: NAE-1645 remove
     private static final String DIVIDER = "divider";
 
     @Override
@@ -120,20 +120,24 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generateFromDataGroup(DataGroup dataGroup) {
-        Collection<Field<?>> fields = dataGroup.getFields().getContent();
-        if (dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid")) {
-            // TODO: NAE-1645 datarefs
-//            fields = fields.stream().sorted(Comparator.<Field<?>, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
+        Collection<DataRef> dataRefs = dataGroup.getFields().values();
+        if (isGridLayout(dataGroup)) {
+            dataRefs = dataRefs.stream().sorted(Comparator.<DataRef, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }
-       fields.forEach(field -> {
-                    if (field.getType().equals(DataType.TASK_REF)) {
-                        Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> Objects.equals(dg.getParentTaskRefId(), field.getStringId())).findFirst();
-                        taskRefGroup.ifPresent(this::generateFromDataGroup);
-                    } else {
-                        generateField(dataGroup, field);
-                    }
-                }
-        );
+        dataRefs.forEach(dataRef -> {
+            Field<?> field = dataRef.getField();
+            if (field.getType().equals(DataType.TASK_REF)) {
+                Optional<DataGroup> taskRefGroup = this.dataGroups.stream().filter(dg -> Objects.equals(dg.getParentTaskRefId(), field.getStringId())).findFirst();
+                taskRefGroup.ifPresent(this::generateFromDataGroup);
+            } else {
+                generateField(dataGroup, dataRef);
+            }
+        });
+    }
+
+    private boolean isGridLayout(DataGroup dataGroup) {
+        // TODO: NAE-1645 constant/enum for "grid"
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals("grid");
     }
 
     @Override
@@ -157,82 +161,85 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    protected void generateField(DataGroup dataGroup, Field<?> field) {
+    protected void generateField(DataGroup dataGroup, DataRef dataRef) {
+        Field<?> field = dataRef.getField();
         if (isNotHidden(field, dataGroup.getParentTransitionId()) && isNotExcluded(field.getStringId())) {
             PdfField pdfField = null;
-//            TODO: NAE-1645 fix
-//            switch (field.getType()) {
-//                case BUTTON:
-//                case TASK_REF:
-//                    break;
-//                case ENUMERATION_MAP:
-//                    pdfField = createEnumMapField(dataGroup, (EnumerationMapField) field);
-//                    pdfFields.add(pdfField);
-//                    break;
-//                case ENUMERATION:
-//                    pdfField = createEnumField(dataGroup, (LocalisedEnumerationField) field);
-//                    pdfFields.add(pdfField);
-//                    break;
-//                case MULTICHOICE_MAP:
-//                    pdfField = createMultiChoiceMapField(dataGroup, (LocalisedMultichoiceMapField) field);
-//                    pdfFields.add(pdfField);
-//                    break;
-//                case MULTICHOICE:
-//                    pdfField = createMultiChoiceField(dataGroup, (LocalisedMultichoiceField) field);
-//                    pdfFields.add(pdfField);
-//                    break;
-//                case I_18_N:
-//                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), DIVIDER)) {
-//                        pdfField = createI18nDividerField(dataGroup, (LocalisedI18nStringField) field);
-//                        pdfFields.add(pdfField);
-//                    }
-//                    break;
-//                default:
-//                    pdfField = createPdfTextField(dataGroup, field);
-//                    pdfFields.add(pdfField);
-//                    break;
-//            }
-            if (pdfField != null)
+//            TODO: NAE-1645 fix, builder and registry for each type
+            switch (field.getType()) {
+                case BUTTON:
+                case TASK_REF:
+                    break;
+                case ENUMERATION_MAP:
+                    pdfField = createEnumMapField(dataGroup, dataRef);
+                    pdfFields.add(pdfField);
+                    break;
+                case ENUMERATION:
+                    pdfField = createEnumField(dataGroup, dataRef);
+                    pdfFields.add(pdfField);
+                    break;
+                case MULTICHOICE_MAP:
+                    pdfField = createMultiChoiceMapField(dataGroup, dataRef);
+                    pdfFields.add(pdfField);
+                    break;
+                case MULTICHOICE:
+                    pdfField = createMultiChoiceField(dataGroup, dataRef);
+                    pdfFields.add(pdfField);
+                    break;
+                case I_18_N:
+                    // TODO: NAE-1645 dataRef component?
+                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), DIVIDER)) {
+                        pdfField = createI18nDividerField(dataGroup, dataRef);
+                        pdfFields.add(pdfField);
+                    }
+                    break;
+                default:
+                    pdfField = createPdfTextField(dataGroup, dataRef);
+                    pdfFields.add(pdfField);
+                    break;
+            }
+            if (pdfField != null) {
                 generatePdfDataGroup(dataGroup, pdfField);
+            }
         }
     }
 
-    protected PdfField createPdfTextField(DataGroup dataGroup, Field<?> field) {
+    protected PdfField createPdfTextField(DataGroup dataGroup, DataRef field) {
         TextFieldBuilder builder = new TextFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createEnumField(DataGroup dataGroup, EnumerationField field) {
+    protected PdfField createEnumField(DataGroup dataGroup, DataRef field) {
         EnumerationFieldBuilder builder = new EnumerationFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createMultiChoiceField(DataGroup dataGroup, MultichoiceField field) {
+    protected PdfField createMultiChoiceField(DataGroup dataGroup, DataRef field) {
         MultiChoiceFieldBuilder builder = new MultiChoiceFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createEnumMapField(DataGroup dataGroup, EnumerationMapField field) {
+    protected PdfField createEnumMapField(DataGroup dataGroup, DataRef field) {
         EnumerationMapFieldBuilder builder = new EnumerationMapFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createMultiChoiceMapField(DataGroup dataGroup, MultichoiceMapField field) {
+    protected PdfField createMultiChoiceMapField(DataGroup dataGroup, DataRef field) {
         MultiChoiceMapFieldBuilder builder = new MultiChoiceMapFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createI18nDividerField(DataGroup dataGroup, I18nField field) {
+    protected PdfField createI18nDividerField(DataGroup dataGroup, DataRef field) {
         I18nDividerFieldBuilder builder = new I18nDividerFieldBuilder(resource);
         PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());

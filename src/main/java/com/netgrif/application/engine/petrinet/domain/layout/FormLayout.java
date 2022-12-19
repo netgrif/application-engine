@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class FormLayout extends Layout {
 
+    // TODO: NAE-1645 enumerations, https://engine.netgrif.com/#/views/form_layout
     private String type;
     private String hideEmptyRows;
     private String compactDirection;

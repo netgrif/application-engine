@@ -4,6 +4,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.dataset.I18nField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -19,7 +20,8 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, MultichoiceMapField field, int lastX, int lastY, Locale locale) {
+    public PdfField buildField(DataGroup dataGroup, DataRef dataRef, int lastX, int lastY, Locale locale) {
+        MultichoiceMapField field = (MultichoiceMapField) dataRef.getField();
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
@@ -33,12 +35,12 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
         }
         String translatedTitle = field.getName().getTranslation(locale);
         PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
-        setFieldParams(dataGroup, field, pdfField);
+        setFieldParams(dataGroup, dataRef, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
     }
 
-    public PdfField buildField(DataGroup dataGroup, MultichoiceMapField field, int lastX, int lastY) {
-        return buildField(dataGroup, field, lastX, lastY, LocaleContextHolder.getLocale());
+    public PdfField buildField(DataGroup dataGroup, DataRef dataRef, int lastX, int lastY) {
+        return buildField(dataGroup, dataRef, lastX, lastY, LocaleContextHolder.getLocale());
     }
 }
