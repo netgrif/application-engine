@@ -21,6 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Field
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
@@ -86,6 +87,9 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IHistoryService historyService;
+
+    @Autowired
+    protected IPetriNetService petriNetService;
 
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
@@ -238,6 +242,7 @@ public class DataService implements IDataService {
                         DataEventType.SET, EventPhase.POST, useCase, task));
 
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
+                applyFieldConnectedChanges(useCase, field);
             }
         });
         updateDataset(useCase);
@@ -704,6 +709,26 @@ public class DataService implements IDataService {
                 useCase.getDataSet().put(id, dataField);
             }
         });
+    }
+
+    @Override
+    public Case applyFieldConnectedChanges(Case useCase, String fieldId) {
+        PetriNet petriNet = petriNetService.getPetriNet(useCase.getPetriNetId());
+        Optional<Field> field = petriNet.getField(fieldId);
+        if (field.isEmpty()) {
+            throw new IllegalArgumentException("Field with given id [" + fieldId + "] does not exists on Petri net [" + petriNet.getStringId() + " " + petriNet.getIdentifier() + "]");
+        }
+        return applyFieldConnectedChanges(useCase, field.get());
+    }
+
+    @Override
+    public Case applyFieldConnectedChanges(Case useCase, Field field) {
+        switch (field.getType()) {
+            case USERLIST:
+                return workflowService.resolveUserRef(useCase);
+            default:
+                return useCase;
+        }
     }
 
     private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task) {
