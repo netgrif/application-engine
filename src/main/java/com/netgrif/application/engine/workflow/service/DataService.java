@@ -713,7 +713,7 @@ public class DataService implements IDataService {
         PetriNet petriNet = petriNetService.getPetriNet(useCase.getPetriNetId());
         Optional<Field> field = petriNet.getField(fieldId);
         if (field.isEmpty()) {
-            throw new IllegalArgumentException("Field with given id [" + fieldId + "] does not exists on Petri net [" + petriNet.getTitle().getDefaultValue() + "]");
+            throw new IllegalArgumentException("Field with given id [" + fieldId + "] does not exists on Petri net [" + petriNet.getStringId() + " " + petriNet.getIdentifier() + "]");
         }
         return applyFieldConnectedChanges(useCase, field.get());
     }
