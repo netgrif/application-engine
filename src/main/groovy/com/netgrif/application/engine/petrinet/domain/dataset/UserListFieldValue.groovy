@@ -2,22 +2,22 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 class UserListFieldValue {
 
-    private List<UserFieldValue> userValues;
+    private LinkedHashSet<UserFieldValue> userValues
 
-    UserListFieldValue(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    UserListFieldValue(LinkedHashSet<UserFieldValue> userValues) {
+        this.userValues = userValues
     }
 
-    List<UserFieldValue> getUserValues() {
-        return userValues;
+    LinkedHashSet<UserFieldValue> getUserValues() {
+        return userValues
     }
 
-    void setUserValues(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    void setUserValues(LinkedHashSet<UserFieldValue> userValues) {
+        this.userValues = userValues
     }
 
     @Override
     String toString() {
-        return userValues.toString();
+        return userValues.toString()
     }
 }
