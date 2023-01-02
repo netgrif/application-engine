@@ -13,9 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles(["test"])
 @SpringBootTest
+@ActiveProfiles(["test"])
+@ExtendWith(SpringExtension.class)
 class ChangedFieldsAllowedNetsTest {
 
     private static final String TASK_TITLE = "Task"
@@ -27,19 +27,22 @@ class ChangedFieldsAllowedNetsTest {
     private static final String NET_IDENTIFIER2 = "org_group"
 
     @Autowired
-    private TestHelper testHelper
-
-    @Autowired
     private ImportHelper importHelper
 
     @Autowired
+    private TestHelper helper
+
+    @Autowired
     private IDataService dataService
+
+    @Autowired
+    private TestHelper testHelper
 
     private PetriNet net
 
     @BeforeEach
     void beforeAll() {
-        testHelper.truncateDbs()
+        helper.truncateDbs()
         def netOptional = importHelper.createNet("changed_fields_allowed_nets.xml")
         assert netOptional.isPresent()
         net = netOptional.get()

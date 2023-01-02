@@ -5,7 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.6](https://github.com/netgrif/application-engine/commits/v6.2.6)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
+
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-20)
+
+### Fixed
+
+- [NAE-1761] LoggedUser circular dependency
+- [NAE-1798] UserRefs resolves everytime when case is saved
+
+### Changed
+
+- [NAE-1762] Public view URL encoding
+
+### Added
+
+- [NAE-1678] User impersonation
+- [NAE-1793] Security filter for HTTP headers validation
+- [NAE-1794] Configurable security headers
+
+## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
+
+### Fixed
+
+- [NAE-1806] Anonymous user password might not be 'null'
 
 ## [6.2.6](https://github.com/netgrif/application-engine/releases/tag/v6.2.6) (2022-12-12)
 
@@ -28,17 +51,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.6](h
 - [NAE-1753] Currency code in PDF
 - [NAE-1756] Delete PetriNet does not call case delete events
 - [NAE-1780] Configurable CORS security settings
-
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-01)
-
-### Fixed
-
-- [NAE-1761] LoggedUser circular dependency
-- [NAE-1762] Public view URL encoding
-
-### Added
-
-- [NAE-1678] User impersonation
 
 ## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
 

@@ -10,6 +10,7 @@ import com.netgrif.application.engine.configuration.security.ImpersonationReques
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
+import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
@@ -27,7 +28,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
@@ -117,6 +117,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -125,14 +126,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
-                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-                .and()
-                .headers()
-                .frameOptions().disable()
-                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
-                .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
 
+        setHeaders(http);
         setCsrf(http);
         corsEnable(http);
     }
@@ -172,6 +168,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return env;
     }
 
+    @Override
+    protected SecurityConfigProperties getSecurityConfigProperties() {
+        return properties;
+    }
+
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
@@ -188,6 +189,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
+    }
+
+    private HostValidationRequestFilter hostValidationRequestFilter() {
+        return new HostValidationRequestFilter(properties);
     }
 
     private ImpersonationRequestFilter impersonationRequestFilter() {

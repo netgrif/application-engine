@@ -27,4 +27,10 @@ public class SecurityConfigProperties {
      */
     private List<String> allowedOrigins;
 
+
+    /**
+     * Headers settings
+     */
+    private Headers headers;
+
 }

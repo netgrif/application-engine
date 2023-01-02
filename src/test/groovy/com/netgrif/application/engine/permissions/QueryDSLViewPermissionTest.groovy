@@ -139,7 +139,13 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -153,7 +159,13 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchTaskQueryDSLViewWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -185,7 +197,13 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithNegUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_neg"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_neg": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -199,9 +217,16 @@ class QueryDSLViewPermissionTest {
     @Test
     void testSearchQueryDSLViewWithNegRoleAndPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
+
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 
