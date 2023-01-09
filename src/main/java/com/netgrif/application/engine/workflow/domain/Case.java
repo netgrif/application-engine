@@ -58,7 +58,7 @@ public class Case {
     private LocalDateTime creationDate;
     @JsonIgnore
     @QueryType(PropertyType.NONE)
-    private DataSet dataSet;
+    private DataSet dataSet = new DataSet();
     /**
      * List of data fields importIds
      */
