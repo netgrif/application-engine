@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
@@ -13,11 +12,8 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.FieldFactory;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.TaskField;
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField;
-import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.UriContentType;
+import com.netgrif.application.engine.petrinet.domain.UriNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
@@ -223,7 +219,8 @@ public class WorkflowService implements IWorkflowService {
             return null;
         return userListValue.getUserValues().stream().map(UserFieldValue::getId)
                 .filter(id -> userService.resolveById(id, false) != null)
-                .collect(Collectors.toList());    }
+                .collect(Collectors.toList());
+    }
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
@@ -437,7 +434,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataField(field.getStringId()).getValue() != null &&
                     useCase.getDataField(field.getStringId()).getValue().equals(field.getDefaultValue())) {
-                ((TaskField)useCase.getDataField(field.getStringId())).setValue(new ArrayList<>());
+                ((TaskField) useCase.getDataField(field.getStringId())).setValue(new ArrayList<>());
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
                         (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
@@ -463,15 +460,15 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void applyCryptoMethodOnDataSet(Case useCase, Function<Pair<String, String>, String> method) {
-        Map<Field, String> dataFields = getEncryptedDataSet(useCase);
+        Map<Field<?>, String> dataFields = getEncryptedDataSet(useCase);
 
-        for (Map.Entry<Field, String> entry : dataFields.entrySet()) {
-            Field dataField = entry.getKey();
-            if (!(dataField instanceof TextField)) {
+        for (Map.Entry<Field<?>, String> entry : dataFields.entrySet()) {
+            if (!(entry.getKey() instanceof TextField)) {
                 continue;
             }
+            TextField dataField = (TextField) entry.getKey();
             String encryption = entry.getValue();
-            String value = ((TextField) dataField).getValue().getValue();
+            String value = dataField.getValue().getValue();
             if (value == null) {
                 continue;
             }
@@ -479,11 +476,11 @@ public class WorkflowService implements IWorkflowService {
         }
     }
 
-    private Map<Field, String> getEncryptedDataSet(Case useCase) {
+    private Map<Field<?>, String> getEncryptedDataSet(Case useCase) {
         PetriNet net = useCase.getPetriNet();
-        Map<Field, String> encryptedDataSet = new HashMap<>();
+        Map<Field<?>, String> encryptedDataSet = new HashMap<>();
 
-        for (Map.Entry<String, Field> entry : net.getDataSet().entrySet()) {
+        for (Map.Entry<String, Field<?>> entry : net.getDataSet().entrySet()) {
             String encryption = entry.getValue().getEncryption();
             if (encryption != null) {
                 encryptedDataSet.put(useCase.getDataSet().get(entry.getKey()), encryption);

@@ -12,6 +12,7 @@ import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.Getter;
@@ -96,7 +97,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     @Getter
     @Setter
-    private Map<String, Field> dataSet;
+    private Map<String, Field<?>> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
@@ -119,7 +120,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private Map<String, Map<String, Boolean>> permissions;
+    private Map<String, Map<ProcessRolePermission, Boolean>> permissions;
 
     @Getter
     @Setter
@@ -127,14 +128,11 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<ProcessRolePermission, Boolean>> userRefs;
 
     @Getter
     @Setter
     private List<Function> functions;
-
-    @Transient
-    private boolean initialized;
 
     @Getter
     @Setter
@@ -148,7 +146,6 @@ public class PetriNet extends PetriNetObject {
         this.importId = "";
         this.version = new Version();
         defaultCaseName = new I18nString("");
-        initialized = false;
         creationDate = LocalDateTime.now();
         places = new HashMap<>();
         transitions = new HashMap<>();
@@ -176,7 +173,7 @@ public class PetriNet extends PetriNetObject {
         this.roles.put(role.getStringId(), role);
     }
 
-    public void addPermission(String roleId, Map<String, Boolean> permissions) {
+    public void addPermission(String roleId, Map<ProcessRolePermission, Boolean> permissions) {
         if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
             this.permissions.get(roleId).putAll(permissions);
         } else {
@@ -190,7 +187,7 @@ public class PetriNet extends PetriNetObject {
 
     public void addFunction(Function function) { functions.add(function); }
 
-    public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
+    public void addUserPermission(String usersRefId, Map<ProcessRolePermission, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
             this.userRefs.get(usersRefId).putAll(permissions);
         } else {
@@ -209,12 +206,8 @@ public class PetriNet extends PetriNetObject {
         return new LinkedList<>();
     }
 
-    public void addDataSetField(Field field) {
+    public void addDataSetField(Field<?> field) {
         this.dataSet.put(field.getStringId(), field);
-    }
-
-    public boolean isNotInitialized() {
-        return !initialized;
     }
 
     public void addArc(Arc arc) {
@@ -238,7 +231,7 @@ public class PetriNet extends PetriNetObject {
         return null;
     }
 
-    public Optional<Field> getField(String id) {
+    public Optional<Field<?>> getField(String id) {
         return Optional.ofNullable(dataSet.get(id));
     }
 
@@ -255,7 +248,6 @@ public class PetriNet extends PetriNetObject {
             arc.setSource(getNode(arc.getSourceId()));
             arc.setDestination(getNode(arc.getDestinationId()));
         }));
-        initialized = true;
     }
 
     public void initializeTokens(Map<String, Integer> activePlaces) {
@@ -302,7 +294,7 @@ public class PetriNet extends PetriNetObject {
                 ).findAny().orElse(null);
     }
 
-    public List<Field> getImmediateFields() {
+    public List<Field<?>> getImmediateFields() {
         return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
     }
 
@@ -328,13 +320,6 @@ public class PetriNet extends PetriNetObject {
             return "";
         }
         return defaultCaseName.getTranslation(locale);
-    }
-
-    public String getTranslatedTitle(Locale locale) {
-        if (title == null) {
-            return "";
-        }
-        return title.getTranslation(locale);
     }
 
     public List<Function> getFunctions(FunctionScope scope) {
@@ -428,7 +413,7 @@ public class PetriNet extends PetriNetObject {
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                        .map(arc -> arc.clone())
+                        .map(Arc::clone)
                         .collect(Collectors.toList())))
         );
         clone.initializeArcs();

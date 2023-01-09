@@ -3,18 +3,13 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.importer.model.DataGroupAlignment;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataFieldsResource;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Locale;
 import java.util.Set;
 
 @Data
@@ -25,30 +20,30 @@ public class DataGroup extends PetriNetObject {
     private Set<String> data;
 
     @Transient
-    private LinkedHashMap<String, DataRef> fields; // TODO: NAE-1645 datarefs
+    private LinkedHashMap<String, DataRef> dataRefs;
 
     private DataGroupLayout layout;
 
     private I18nString title;
 
-    private DataGroupAlignment alignment; // TODO: NAE-1645 enum?
+    private DataGroupAlignment alignment;
 
     private Boolean stretch;
 
     @Transient
-    private String parentTaskId; // TODO: NAE-1645 remove?
+    private String parentTaskId;
 
     @Transient
-    private String parentTransitionId; // TODO: NAE-1645 remove?
+    private String parentTransitionId;
 
     @Transient
-    private String parentCaseId; // TODO: NAE-1645 remove?
+    private String parentCaseId;
 
     @Transient
-    private String parentTaskRefId; // TODO: NAE-1645 remove?
+    private String parentTaskRefId;
 
     @Transient
-    private int nestingLevel; // TODO: NAE-1645 remove?
+    private int nestingLevel;
 
     public DataGroup() {
         this._id = new ObjectId();
@@ -57,12 +52,6 @@ public class DataGroup extends PetriNetObject {
 
     public void addData(String dataId) {
         data.add(dataId);
-    }
-
-    public String getTranslatedTitle(Locale locale) {
-        if (title == null)
-            return null;
-        return title.getTranslation(locale);
     }
 
     public DataGroup clone() {

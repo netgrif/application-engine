@@ -199,11 +199,10 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            //dataBody.getTasks().entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue()))); // TODO: NAE-1645: value.deepCopy
-//            dataBody.fields().forEachRemaining(it -> outcomes.put(it.getKey(), dataService.setData(it.getKey(), it.getValue().deepCopy())));
+            dataBody.getTasks().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet)));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -216,10 +215,10 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody, Locale locale) {// TODO: NAE-1645: dataBody?
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {// TODO: NAE-1645: dataBody?
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFile(it.getKey(), fieldId, multipartFile)));
+            dataBody.forEach((task, value) -> outcomes.put(task, dataService.saveFile(task, fieldId, multipartFile)));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -255,9 +254,10 @@ public abstract class AbstractTaskController {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
     }
 
+    // TODO: NAE-1645 remove fieldId and use dataBody (taskStringId: fieldImportId)
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-        dataBody.entrySet().forEach(it -> outcomes.put(it.getKey(), dataService.saveFiles(it.getKey(), fieldId, multipartFiles)));
+        dataBody.forEach((task, ignored) -> outcomes.put(task, dataService.saveFiles(task, fieldId, multipartFiles)));
         SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
     }

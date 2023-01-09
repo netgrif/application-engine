@@ -39,33 +39,35 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
 
     @Override
     public Boolean userHasAtLeastOneRolePermission(IUser user, PetriNet net, ProcessRolePermission... permissions) {
-        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net.getPermissions());
+        Map<ProcessRolePermission, Boolean> aggregatePermissions = getAggregateProcessRolePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {
-            if (hasRestrictedPermission(aggregatePermissions.get(permission.toString()))) {
+            if (hasRestrictedPermission(aggregatePermissions.get(permission))) {
                 return false;
             }
         }
 
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
+        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission)));
     }
 
     @Override
     public Boolean userHasUserListPermission(IUser user, Case useCase, ProcessRolePermission... permissions) {
-        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
+        if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty()) {
             return null;
+        }
 
-        if (!useCase.getUsers().containsKey(user.getStringId()))
+        if (!useCase.getUsers().containsKey(user.getStringId())) {
             return null;
+        }
 
-        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
+        Map<ProcessRolePermission, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
 
         for (ProcessRolePermission permission : permissions) {
-            Boolean perm = userPermissions.get(permission.toString());
+            Boolean perm = userPermissions.get(permission);
             if (hasRestrictedPermission(perm)) {
                 return false;
             }
         }
-        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission.toString())));
+        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(userPermissions.get(permission)));
     }
 }

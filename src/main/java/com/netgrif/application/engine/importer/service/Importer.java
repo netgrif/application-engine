@@ -32,6 +32,7 @@ import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.ArcFactory;
@@ -530,10 +531,10 @@ public class Importer {
 
     protected void addAssignedUserPolicy(com.netgrif.application.engine.importer.model.Transition importTransition, Transition transition) {
         if (importTransition.getAssignedUser().isCancel() != null) {
-            transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
+            transition.getAssignedUserPolicy().put(AssignedUserPermission.CANCEL, importTransition.getAssignedUser().isCancel());
         }
         if (importTransition.getAssignedUser().isReassign() != null) {
-            transition.getAssignedUserPolicy().put("reassign", importTransition.getAssignedUser().isReassign());
+            transition.getAssignedUserPolicy().put(AssignedUserPermission.REASSIGN, importTransition.getAssignedUser().isReassign());
         }
     }
 
@@ -843,16 +844,6 @@ public class Importer {
         return dataEvent;
     }
 
-    protected com.netgrif.application.engine.petrinet.domain.events.DataEvent createDataEvent(Action action) {
-        com.netgrif.application.engine.petrinet.domain.events.DataEvent dataEvent;
-        if (action.getId() != null) {
-            dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
-        } else {
-            dataEvent = new com.netgrif.application.engine.petrinet.domain.events.DataEvent(new ObjectId().toString(), action.getTrigger().toString());
-        }
-        return dataEvent;
-    }
-
     protected List<Action> buildActions(List<com.netgrif.application.engine.importer.model.Action> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> parseAction(fieldId, transitionId, action))
@@ -1120,14 +1111,6 @@ public class Importer {
 
         addDefaultPermissions();
         addAnonymousPermissions();
-    }
-
-    protected PetriNet getNetByImportId(String id) {
-        Optional<PetriNet> net = service.findByImportId(id);
-        if (net.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        return net.get();
     }
 
     protected boolean isDefaultRoleReferenced(Transition transition) {

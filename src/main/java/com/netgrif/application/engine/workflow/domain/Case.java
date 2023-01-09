@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
@@ -32,12 +33,7 @@ public class Case {
     @Id
     @Setter(AccessLevel.NONE)
     private ObjectId _id;
-
-    // TODO: NAE-1645 6.2.5
-    @Getter
-    @Setter
     private String uriNodeId;
-
     @LastModifiedDate
     private LocalDateTime lastModified;
     @Indexed
@@ -54,7 +50,7 @@ public class Case {
     private String processIdentifier;
     @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
     @JsonIgnore
-    private Map<String, Integer> activePlaces;
+    private Map<String, Integer> activePlaces = new HashMap<>();
     @NotNull
     private String title;
     private String color;
@@ -67,48 +63,39 @@ public class Case {
      * List of data fields importIds
      */
     @JsonIgnore
-    private LinkedHashSet<String> immediateDataFields;
+    private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
     @Transient
     @QueryType(PropertyType.NONE)
-    private List<Field<?>> immediateData;
+    private List<Field<?>> immediateData = new ArrayList<>();
     @Indexed
     private Author author;
     @JsonIgnore
     @QueryType(PropertyType.NONE)
-    private Map<String, Integer> consumedTokens;
+    private Map<String, Integer> consumedTokens = new HashMap<>();
     @Indexed
-    private Set<TaskPair> tasks;
-    // TODO: NAE-1645 review json ignore and refactor to objects
+    private Set<TaskPair> tasks = new HashSet<>();
+    // TODO: NAE-1645 review json ignore and refactor to common Permission class
     @JsonIgnore
-    private Set<String> enabledRoles;
+    private Set<String> enabledRoles = new HashSet<>();
     @JsonIgnore
-    private Map<String, Map<String, Boolean>> permissions;
+    private Map<String, Map<ProcessRolePermission, Boolean>> permissions = new HashMap<>();
     @JsonIgnore
-    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+    private Map<String, Map<ProcessRolePermission, Boolean>> userRefs = new HashMap<>();
     @JsonIgnore
-    private Map<String, Map<String, Boolean>> users = new HashMap<>();
+    private Map<String, Map<ProcessRolePermission, Boolean>> users = new HashMap<>();
     @JsonIgnore
-    private List<String> viewRoles;
+    private List<String> viewRoles = new ArrayList<>();
     @JsonIgnore
-    private List<String> viewUserRefs;
+    private List<String> viewUserRefs = new ArrayList<>();
     @JsonIgnore
-    private List<String> viewUsers;
+    private List<String> viewUsers = new ArrayList<>();
     @JsonIgnore
-    private List<String> negativeViewRoles;
+    private List<String> negativeViewRoles = new ArrayList<>();
     @JsonIgnore
-    private List<String> negativeViewUsers;
+    private List<String> negativeViewUsers = new ArrayList<>();
 
     public Case() {
         _id = new ObjectId();
-        dataSet = new DataSet();
-        consumedTokens = new HashMap<>();
-        tasks = new HashSet<>();
-        users = new HashMap<>();
-        viewRoles = new LinkedList<>();
-        viewUserRefs = new LinkedList<>();
-        viewUsers = new LinkedList<>();
-        negativeViewUsers = new ArrayList<>();
-        negativeViewRoles = new ArrayList<>();
     }
 
     public Case(PetriNet petriNet) {
@@ -124,24 +111,20 @@ public class Case {
         icon = petriNet.getIcon();
         userRefs = petriNet.getUserRefs();
 
-        // TODO: NAE-1645 replace strings with enum constants, if possible use jaxb generated source
         permissions = petriNet.getPermissions().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete") || role.getValue().containsKey("view"))
+                .filter(role -> role.getValue().containsKey(ProcessRolePermission.DELETE) || role.getValue().containsKey(ProcessRolePermission.VIEW))
                 .map(role -> {
-                    Map<String, Boolean> permissionMap = new HashMap<>();
-                    if (role.getValue().containsKey("delete"))
-                        permissionMap.put("delete", role.getValue().get("delete"));
-                    if (role.getValue().containsKey("view")) {
-                        permissionMap.put("view", role.getValue().get("view"));
+                    Map<ProcessRolePermission, Boolean> permissionMap = new HashMap<>();
+                    if (role.getValue().containsKey(ProcessRolePermission.DELETE))
+                        permissionMap.put(ProcessRolePermission.DELETE, role.getValue().get(ProcessRolePermission.DELETE));
+                    if (role.getValue().containsKey(ProcessRolePermission.VIEW)) {
+                        permissionMap.put(ProcessRolePermission.VIEW, role.getValue().get(ProcessRolePermission.VIEW));
                     }
                     return new AbstractMap.SimpleEntry<>(role.getKey(), permissionMap);
                 })
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-
         resolveViewRoles();
         resolveViewUserRefs();
-
-
     }
 
     public String getStringId() {
@@ -196,7 +179,7 @@ public class Case {
         return petriNetObjectId.toString();
     }
 
-    public void addUsers(Set<String> userIds, Map<String, Boolean> permissions) {
+    public void addUsers(Set<String> userIds, Map<ProcessRolePermission, Boolean> permissions) {
         userIds.forEach(userId -> {
             if (users.containsKey(userId) && users.get(userId) != null) {
                 compareExistingUserPermissions(userId, new HashMap<>(permissions));
@@ -207,37 +190,33 @@ public class Case {
     }
 
     public void resolveViewRoles() {
-        // TODO: NAE-1645 why is getViewRoles() called?
-        getViewRoles();
         this.viewRoles.clear();
         this.permissions.forEach((role, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+            if (perms.containsKey(ProcessRolePermission.VIEW) && perms.get(ProcessRolePermission.VIEW)) {
                 viewRoles.add(role);
             }
         });
     }
 
     public void resolveViewUserRefs() {
-        getViewUserRefs();
         this.viewUserRefs.clear();
         this.userRefs.forEach((userRef, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+            if (perms.containsKey(ProcessRolePermission.VIEW) && perms.get(ProcessRolePermission.VIEW)) {
                 viewUserRefs.add(userRef);
             }
         });
     }
 
     public void resolveViewUsers() {
-        getViewUsers();
         this.viewUsers.clear();
         this.users.forEach((user, perms) -> {
-            if (perms.containsKey(RolePermission.VIEW.getValue()) && perms.get(RolePermission.VIEW.getValue())) {
+            if (perms.containsKey(ProcessRolePermission.VIEW) && perms.get(ProcessRolePermission.VIEW)) {
                 viewUsers.add(user);
             }
         });
     }
 
-    private void compareExistingUserPermissions(String userId, Map<String, Boolean> permissions) {
+    private void compareExistingUserPermissions(String userId, Map<ProcessRolePermission, Boolean> permissions) {
         permissions.forEach((id, perm) -> {
             if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
                 users.get(userId).put(id, perm);

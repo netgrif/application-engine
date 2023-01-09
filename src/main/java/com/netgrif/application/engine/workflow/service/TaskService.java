@@ -21,6 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
@@ -766,7 +767,7 @@ public class TaskService implements ITaskService {
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
         ProcessRole anonymousRole = processRoleService.anonymousRole();
-        for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
+        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getRoles().entrySet()) {
             if (useCase.getEnabledRoles().contains(entry.getKey())
                     || defaultRole.getStringId().equals(entry.getKey())
                     || anonymousRole.getStringId().equals(entry.getKey())) {
@@ -775,7 +776,7 @@ public class TaskService implements ITaskService {
         }
         transition.getNegativeViewRoles().forEach(task::addNegativeViewRole);
 
-        for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
+        for (Map.Entry<String, Map<RolePermission, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
         }
         task.resolveViewRoles();
@@ -849,6 +850,7 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
+    // TODO: NAE-1645 refactor, not needed here, should be possible to create main outcome when setting data
     @Override
     public SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId) {
         SetDataEventOutcome mainOutcome;

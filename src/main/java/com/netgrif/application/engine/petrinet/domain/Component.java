@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Component {
+
+    public static final String DIVIDER = "divider";
+
     @Getter
     @Setter
     private String name;

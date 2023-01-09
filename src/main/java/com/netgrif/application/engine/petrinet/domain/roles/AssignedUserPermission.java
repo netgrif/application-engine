@@ -1,13 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.roles;
 
-public enum ProcessRolePermission {
-    CREATE("CREATE"),
-    DELETE("DELETE"),
-    VIEW("VIEW");
+public enum AssignedUserPermission {
+    CANCEL("CANCEL"),
+    REASSIGN("REASSIGN");
 
     private final String value;
 
-    ProcessRolePermission(String value) {
+    AssignedUserPermission(String value) {
         this.value = value;
     }
 
@@ -18,9 +17,5 @@ public enum ProcessRolePermission {
     @Override
     public String toString() {
         return getValue();
-    }
-
-    public boolean equal(String str) {
-        return this.value.equalsIgnoreCase(str);
     }
 }

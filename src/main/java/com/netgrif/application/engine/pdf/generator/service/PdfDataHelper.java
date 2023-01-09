@@ -6,10 +6,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
-import com.netgrif.application.engine.petrinet.domain.DataGroup;
-import com.netgrif.application.engine.petrinet.domain.DataRef;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.Transition;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -71,9 +68,6 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Setter
     private int originalCols;
 
-    // TODO: NAE-1645 remove
-    private static final String DIVIDER = "divider";
-
     @Override
     public void setupDataHelper(PdfResource resource) {
         log.info("Setting up data helper for PDF generator...");
@@ -121,7 +115,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void generateFromDataGroup(DataGroup dataGroup) {
-        Collection<DataRef> dataRefs = dataGroup.getFields().values();
+        Collection<DataRef> dataRefs = dataGroup.getDataRefs().values();
         if (isGridLayout(dataGroup)) {
             dataRefs = dataRefs.stream().sorted(Comparator.<DataRef, Integer>comparing(f -> f.getLayout().getY()).thenComparing(f -> f.getLayout().getX())).collect(Collectors.toList());
         }
@@ -166,7 +160,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         Field<?> field = dataRef.getField();
         if (isNotHidden(field, dataGroup.getParentTransitionId()) && isNotExcluded(field.getStringId())) {
             PdfField pdfField = null;
-//            TODO: NAE-1645 fix, builder and registry for each type
+//            TODO: NAE-1645 fix, builder and registry for each type and component
             switch (field.getType()) {
                 case BUTTON:
                 case TASK_REF:
@@ -189,7 +183,7 @@ public class PdfDataHelper implements IPdfDataHelper {
                     break;
                 case I_18_N:
                     // TODO: NAE-1645 dataRef component?
-                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), DIVIDER)) {
+                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), Component.DIVIDER)) {
                         pdfField = createI18nDividerField(dataGroup, dataRef);
                         pdfFields.add(pdfField);
                     }
@@ -304,12 +298,11 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     protected void refreshGrid(DataGroup dataGroup) {
         log.info("Refreshing grid for data group in PDF...");
+        int cols = this.originalCols;
         if (dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null) {
-            Integer cols = dataGroup.getLayout().getCols();
-            resource.setFormGridCols(cols == null ? this.originalCols : cols);
-        } else {
-            resource.setFormGridCols(this.originalCols);
+            cols = dataGroup.getLayout().getCols();
         }
+        resource.setFormGridCols(cols);
         resource.updateProperties();
     }
 

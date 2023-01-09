@@ -95,10 +95,8 @@ public class ConfigurableMenuService implements IConfigurableMenuService {
      */
     @Override
     public Map<String, I18nString> removeSelectedRoles(MultichoiceMapField mapField) {
-
         Map<String, I18nString> updatedRoles = new LinkedHashMap<>(mapField.getOptions());
-//        TODO: NAE-1645
-//        updatedRoles.keySet().removeAll(mapField.getValue());
+        updatedRoles.keySet().removeAll(mapField.getValue().getValue());
         return updatedRoles;
     }
 

@@ -12,6 +12,8 @@ import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
 import com.netgrif.application.engine.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
+import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
 import lombok.Getter;
@@ -32,10 +34,10 @@ public class Transition extends Node {
     @org.springframework.data.mongodb.core.mapping.Field("dataSet")
     private LinkedHashMap<String, DataRef> dataSet;
     @org.springframework.data.mongodb.core.mapping.Field("roles")
-    private Map<String, Map<String, Boolean>> roles;
+    private Map<String, Map<RolePermission, Boolean>> roles;
     private List<String> negativeViewRoles;
     @org.springframework.data.mongodb.core.mapping.Field("users")
-    private Map<String, Map<String, Boolean>> userRefs;
+    private Map<String, Map<RolePermission, Boolean>> userRefs;
     @org.springframework.data.mongodb.core.mapping.Field("triggers")
     private List<Trigger> triggers;
     private TaskLayout layout;
@@ -45,7 +47,7 @@ public class Transition extends Node {
     private DataFocusPolicy dataFocusPolicy;
     private FinishPolicy finishPolicy;
     private Map<EventType, Event> events;
-    private Map<String, Boolean> assignedUserPolicy;
+    private Map<AssignedUserPermission, Boolean> assignedUserPolicy;
     private String defaultRoleId;
 
     public Transition() {
@@ -90,7 +92,7 @@ public class Transition extends Node {
         }
     }
 
-    public void addRole(String roleId, Map<String, Boolean> permissions) {
+    public void addRole(String roleId, Map<RolePermission, Boolean> permissions) {
         if (roles.containsKey(roleId) && roles.get(roleId) != null) {
             roles.get(roleId).putAll(permissions);
         } else {
@@ -102,7 +104,7 @@ public class Transition extends Node {
         negativeViewRoles.add(roleId);
     }
 
-    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
+    public void addUserRef(String userRefId, Map<RolePermission, Boolean> permissions) {
         if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
             userRefs.get(userRefId).putAll(permissions);
         } else {

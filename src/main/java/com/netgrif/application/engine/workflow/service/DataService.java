@@ -47,6 +47,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -159,12 +160,12 @@ public class DataService implements IDataService {
         }
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         dataSet.getFields().forEach((fieldId, newDataField) -> {
-            Optional<Field> fieldOptional = useCase.getPetriNet().getField(fieldId);
+            Optional<Field<?>> fieldOptional = useCase.getPetriNet().getField(fieldId);
             if (fieldOptional.isEmpty()) {
                 return;
             }
-            Field dataField = useCase.getDataSet().get(fieldId);
-            Field field = fieldOptional.get();
+            Field<?> dataField = useCase.getDataSet().get(fieldId);
+            Field<?> field = fieldOptional.get();
             // PRE
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
             historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
@@ -185,7 +186,7 @@ public class DataService implements IDataService {
         return outcome;
     }
 
-    private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field field, DataEventType type) {
+    private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field<?> field, DataEventType type) {
         Map<String, DataRef> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
         I18nString message = null;
         if (field.getEvents().containsKey(type)) {
@@ -636,7 +637,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public List<Field> getImmediateFields(Task task) {
+    public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
         // TODO: NAE-1645

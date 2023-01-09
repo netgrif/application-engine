@@ -190,8 +190,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody TaskDataSets dataBody) {
-        // TODO: NAE-1645 6.2.5
-        return super.setData(taskId, dataBody, null);
+        return super.setData(taskId, dataBody);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
@@ -205,8 +204,7 @@ public class TaskController extends AbstractTaskController {
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                          @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile) {
-        // TODO: NAE-1645 6.2.5
-        return super.saveFile(taskId, fieldId, multipartFile, dataBody,null);
+        return super.saveFile(taskId, fieldId, multipartFile, dataBody);
     }
 
     @Operation(summary = "Download task file field value", security = {@SecurityRequirement(name = "BasicAuth")})

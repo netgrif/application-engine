@@ -1,6 +1,8 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
+import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,27 +19,53 @@ public abstract class AbstractAuthorizationService {
         return hasPermission != null && !hasPermission;
     }
 
-    protected Map<String, Boolean> getAggregatePermissions(IUser user, Map<String, Map<String, Boolean>> permissions) {
-        Map<String, Boolean> aggregatePermissions = new HashMap<>();
+    protected Map<ProcessRolePermission, Boolean> getAggregateProcessRolePermissions(IUser user, Map<String, Map<ProcessRolePermission, Boolean>> permissions) {
+        Map<ProcessRolePermission, Boolean> aggregatePermissions = new HashMap<>();
 
         Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role -> role.get_id().toString()).collect(Collectors.toSet());
 
-        for (Map.Entry<String, Map<String, Boolean>> role : permissions.entrySet()) {
-            aggregatePermission(userProcessRoleIDs, role, aggregatePermissions);
+        for (Map.Entry<String, Map<ProcessRolePermission, Boolean>> role : permissions.entrySet()) {
+            aggregateProcessRolePermission(userProcessRoleIDs, role, aggregatePermissions);
         }
 
         return aggregatePermissions;
     }
 
-    private void aggregatePermission(Set userProcessRoleIDs, Map.Entry<String, Map<String, Boolean>> role, Map<String, Boolean> aggregatePermissions) {
-        if (userProcessRoleIDs.contains(role.getKey())) {
-            for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
-                if (aggregatePermissions.containsKey(permission.getKey())) {
-                    aggregatePermissions.put(permission.getKey(), aggregatePermissions.get(permission.getKey()) || permission.getValue());
-                } else {
-                    aggregatePermissions.put(permission.getKey(), permission.getValue());
-                }
+    private void aggregateProcessRolePermission(Set<String> userProcessRoleIDs, Map.Entry<String, Map<ProcessRolePermission, Boolean>> role, Map<ProcessRolePermission, Boolean> aggregatePermissions) {
+        if (!userProcessRoleIDs.contains(role.getKey())) {
+            return;
+        }
+        for (Map.Entry<ProcessRolePermission, Boolean> permission : role.getValue().entrySet()) {
+            Boolean permissionValue = permission.getValue();
+            if (aggregatePermissions.containsKey(permission.getKey())) {
+                permissionValue = aggregatePermissions.get(permission.getKey()) || permissionValue;
             }
+            aggregatePermissions.put(permission.getKey(), permissionValue);
+        }
+    }
+
+    protected Map<RolePermission, Boolean> getAggregateRolePermissions(IUser user, Map<String, Map<RolePermission, Boolean>> permissions) {
+        Map<RolePermission, Boolean> aggregatePermissions = new HashMap<>();
+
+        Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role -> role.get_id().toString()).collect(Collectors.toSet());
+
+        for (Map.Entry<String, Map<RolePermission, Boolean>> role : permissions.entrySet()) {
+            aggregateRolePermission(userProcessRoleIDs, role, aggregatePermissions);
+        }
+
+        return aggregatePermissions;
+    }
+
+    private void aggregateRolePermission(Set<String> userProcessRoleIDs, Map.Entry<String, Map<RolePermission, Boolean>> role, Map<RolePermission, Boolean> aggregatePermissions) {
+        if (!userProcessRoleIDs.contains(role.getKey())) {
+            return;
+        }
+        for (Map.Entry<RolePermission, Boolean> permission : role.getValue().entrySet()) {
+            Boolean permissionValue = permission.getValue();
+            if (aggregatePermissions.containsKey(permission.getKey())) {
+                permissionValue = aggregatePermissions.get(permission.getKey()) || permissionValue;
+            }
+            aggregatePermissions.put(permission.getKey(), permissionValue);
         }
     }
 }

@@ -56,7 +56,7 @@ public interface IDataService {
 
     Page<Task> setImmediateFields(Page<Task> tasks);
 
-    List<Field> getImmediateFields(Task task);
+    List<Field<?>> getImmediateFields(Task task);
 
     UserFieldValue makeUserFieldValue(String id);
 

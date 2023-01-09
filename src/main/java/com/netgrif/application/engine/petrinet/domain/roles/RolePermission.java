@@ -2,14 +2,14 @@ package com.netgrif.application.engine.petrinet.domain.roles;
 
 
 public enum RolePermission {
-    DELEGATE("delegate"),
-    CANCEL("cancel"),
-    ASSIGN("assign"),
-    FINISH("finish"),
-    SET("set"),
-    VIEW("view");
+    DELEGATE("DELEGATE"),
+    CANCEL("CANCEL"),
+    ASSIGN("ASSIGN"),
+    FINISH("FINISH"),
+    SET("SET"),
+    VIEW("VIEW");
 
-    private String value;
+    private final String value;
 
     RolePermission(String value) {
         this.value = value;
@@ -25,6 +25,6 @@ public enum RolePermission {
     }
 
     public boolean equal(String str) {
-        return str != null && this.value.equalsIgnoreCase(str);
+        return this.value.equalsIgnoreCase(str);
     }
 }

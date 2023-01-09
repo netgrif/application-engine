@@ -28,7 +28,6 @@ public class SetDataEventOutcome extends TaskEventOutcome {
         if (!changedFields.getFields().containsKey(fieldId)) {
             changedFields.getFields().put(fieldId, field);
         } else {
-            // TODO: NAE-1645
             changedFields.getFields().get(fieldId).applyChanges(field);
         }
     }
