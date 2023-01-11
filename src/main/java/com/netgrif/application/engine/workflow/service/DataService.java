@@ -851,7 +851,7 @@ public class DataService implements IDataService {
 
     private UserListFieldValue makeUserListFieldValue(ObjectNode nodes) {
         Set<String> userIds = new LinkedHashSet<>(parseListStringValues(nodes));
-        return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toCollection(LinkedHashSet::new)));
+        return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toSet()));
     }
 
     private List<String> parseListStringValues(ObjectNode node) {
