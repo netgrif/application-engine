@@ -64,7 +64,13 @@ class UserRefsTest {
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
-            _case.dataSet["user_list_1"].value = new UserListFieldValue([dataService.makeUserFieldValue(id)])
+            String taskId = (new ArrayList<>(_case.getTasks())).get(0).task
+            _case = dataService.setData(taskId, ImportHelper.populateDataset([
+                    "user_list_1": [
+                            "value": [id],
+                            "type": "userList"
+                    ]
+            ] as Map)).getCase()
             newCases.add(workflowService.save(_case))
             userIds.add(id)
         }

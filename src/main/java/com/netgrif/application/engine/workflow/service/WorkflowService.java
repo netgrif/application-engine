@@ -131,8 +131,6 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-        resolveUserRef(useCase);
-        taskService.resolveUserRef(useCase);
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
@@ -220,15 +218,22 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
-                useCase.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && userIds.size() != 0) {
-                useCase.addUsers(new HashSet<>(userIds), permission);
-            }
+            resolveUserRefPermissions(useCase, id, permission);
         });
         useCase.resolveViewUsers();
-        return repository.save(useCase);
+        taskService.resolveUserRef(useCase);
+        return save(useCase);
+    }
+
+    private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
+        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
+        if (userIds != null && userIds.size() != 0) {
+            if (permission.containsKey("view") && !permission.get("view")) {
+                useCase.getNegativeViewUsers().addAll(userIds);
+            } else {
+                useCase.addUsers(new HashSet<>(userIds), permission);
+            }
+        }
     }
 
     private List<String> getExistingUsers(UserListFieldValue userListValue) {

@@ -86,7 +86,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setEmail(getUsername());
         anonym.setName("Anonymous");
         anonym.setSurname("User");
-        anonym.setPassword(null);
+        anonym.setPassword("n/a");
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
