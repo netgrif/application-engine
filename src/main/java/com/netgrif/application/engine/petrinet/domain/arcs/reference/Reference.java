@@ -33,7 +33,7 @@ public class Reference {
 
     public Reference clone() {
         Reference clone = new Reference(this.reference, this.type);
-        clone.setReferencable(this.referencable.clone());
+        clone.setReferencable(this.referencable == null ? null : this.referencable.clone());
         return clone;
     }
 

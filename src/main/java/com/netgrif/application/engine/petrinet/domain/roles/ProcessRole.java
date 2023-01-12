@@ -122,6 +122,7 @@ public class ProcessRole extends Imported {
     @Override
     public ProcessRole clone() {
         ProcessRole clone = new ProcessRole();
+        clone.set_id(this._id);
         clone.setImportId(this.importId);
         clone.setName(this.name == null ? null : this.name.clone());
         clone.setNetId(this.netId);
