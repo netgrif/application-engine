@@ -183,6 +183,10 @@
         <id>my_full_filter</id>
         <title></title>
     </data>
+    <data type="multichoice_map">
+        <id>allowed_nets</id>
+        <title name="allowed_nets">Allowed nets</title>
+    </data>
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="process_title">Filter</i18nString>
@@ -206,6 +210,7 @@
         <i18nString name="missing_allowed_nets">Chýbajúce procesy</i18nString>
         <i18nString name="missing_allowed_nets_desc">Zoznam chýbajúcich procesov pre aktuálny filter</i18nString>
         <i18nString name="parent_filter_id">ID rodičovského filtra</i18nString>
+        <i18nString name="allowed_nets">Povolené siete</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="process_title">Filter</i18nString>
@@ -291,6 +296,21 @@
                 <layout>
                     <x>0</x>
                     <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>
@@ -435,6 +455,21 @@
                 <layout>
                     <x>0</x>
                     <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>allowed_nets</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>
