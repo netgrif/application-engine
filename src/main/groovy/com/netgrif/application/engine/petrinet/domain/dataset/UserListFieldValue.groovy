@@ -8,17 +8,7 @@ class UserListFieldValue {
         this.userValues = new LinkedHashSet<>()
     }
 
-    UserListFieldValue(LinkedHashSet<UserFieldValue> userValues) {
-        this()
-        this.userValues = userValues
-    }
-
-    UserListFieldValue(Set<UserFieldValue> userValues) {
-        this()
-        this.userValues = new LinkedHashSet<>(userValues)
-    }
-
-    UserListFieldValue(List<UserFieldValue> userValues) {
+    UserListFieldValue(Collection<UserFieldValue> userValues) {
         this()
         this.userValues = new LinkedHashSet<>(userValues)
     }
