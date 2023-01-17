@@ -4,5 +4,4 @@ public interface Referencable {
 
     int getMultiplicity();
 
-    Referencable clone();
 }
