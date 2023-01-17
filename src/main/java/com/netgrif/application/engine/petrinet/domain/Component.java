@@ -47,7 +47,7 @@ public class Component {
         Component clone = new Component();
         clone.setName(this.name);
         clone.setProperties(new HashMap<>(this.properties));
-        clone.setOptionIcons(this.optionIcons.stream().map(Icon::clone).collect(Collectors.toList()));
+        clone.setOptionIcons(this.optionIcons == null ? new ArrayList<>() : this.optionIcons.stream().map(Icon::clone).collect(Collectors.toList()));
         return clone;
     }
 }
