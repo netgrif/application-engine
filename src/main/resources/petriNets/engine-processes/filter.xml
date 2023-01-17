@@ -234,6 +234,7 @@
         <i18nString name="missing_allowed_nets">Fehlende Prozesse</i18nString>
         <i18nString name="missing_allowed_nets_desc">Liste der fehlenden Prozesse für den aktuellen Filter</i18nString>
         <i18nString name="parent_filter_id">Elternfilter-ID</i18nString>
+        <i18nString name="allowed_nets">Erlaubte Netze</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
