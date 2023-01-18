@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -140,12 +141,14 @@ public class PublicTaskController extends AbstractTaskController {
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                          @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale) {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.saveFile(taskId, fieldId, multipartFile, dataBody, locale);
     }
 
     @Operation(summary = "Download task file field value")
     @GetMapping(value = "/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) throws FileNotFoundException {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.getFile(taskId, fieldId);
     }
 
@@ -158,12 +161,14 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam("parentTaskId") String parentTaskId) {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.deleteFile(parentTaskId, fieldId);
     }
 
     @Operation(summary = "Download preview for file field value")
     @GetMapping(value = "/{id}/file_preview/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.getFilePreview(taskId, fieldId);
     }
 
@@ -177,6 +182,7 @@ public class PublicTaskController extends AbstractTaskController {
     })
     public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                           @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.saveFiles(taskId, fieldId, multipartFiles, dataBody);
     }
 
@@ -184,6 +190,7 @@ public class PublicTaskController extends AbstractTaskController {
     @Operation(summary = "Download one file from tasks file list field value")
     @GetMapping(value = "/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.getNamedFile(taskId, fieldId, name);
     }
 
@@ -196,6 +203,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name, @RequestParam("parentTaskId") String parentTaskId) {
+        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
         return super.deleteNamedFile(parentTaskId, fieldId, name);
     }
 
