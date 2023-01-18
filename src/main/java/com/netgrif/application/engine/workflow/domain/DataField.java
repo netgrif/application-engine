@@ -120,6 +120,7 @@ public class DataField implements Referencable {
     public boolean isDisplayable(String transition) {
         return behavior.containsKey(transition) && (behavior.get(transition).contains(FieldBehavior.VISIBLE) ||
                 behavior.get(transition).contains(FieldBehavior.EDITABLE) ||
+                behavior.get(transition).contains(FieldBehavior.REQUIRED) ||
                 behavior.get(transition).contains(FieldBehavior.HIDDEN));
     }
 
@@ -137,7 +138,7 @@ public class DataField implements Referencable {
 
     public boolean isDisplayable() {
         return behavior.values().stream().parallel()
-                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
+                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.REQUIRED) || bs.contains(FieldBehavior.HIDDEN));
     }
 
     public boolean isForbidden(String transitionId) {
