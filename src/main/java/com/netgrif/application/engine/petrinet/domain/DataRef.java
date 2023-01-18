@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
@@ -35,11 +36,18 @@ public class DataRef {
 
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
         this.field = field;
-        this.behavior = behavior;
+        this.setBehavior(behavior);
     }
 
     public DataRef(Field<?> field) {
         this(field, new DataFieldBehavior());
+    }
+
+    public void setBehavior(DataFieldBehavior behavior) {
+        if (behavior == null) {
+            behavior = new DataFieldBehavior();
+        }
+        this.behavior = behavior;
     }
 
     public static List<Action> getEventAction(DataEvent event, EventPhase phase) {
@@ -58,18 +66,19 @@ public class DataRef {
         return fieldId;
     }
 
+    @JsonIgnore
     public boolean isForbidden() {
         return isBehaviorSet(FORBIDDEN);
     }
-
+    @JsonIgnore
     public boolean isEditable() {
         return isBehaviorSet(EDITABLE);
     }
-
+    @JsonIgnore
     public boolean isHidden() {
         return isBehaviorSet(HIDDEN);
     }
-
+    @JsonIgnore
     public boolean isVisible() {
         return isBehaviorSet(VISIBLE);
     }

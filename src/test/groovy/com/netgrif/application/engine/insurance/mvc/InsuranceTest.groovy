@@ -256,11 +256,11 @@ class InsuranceTest {
                 .with(csrf().asHeader())
                 .with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.outcome.aCase.title', CoreMatchers.is(CASE_NAME)))
-//                .andExpect(jsonPath('$.outcome.aCase.petriNetId', CoreMatchers.is(netId)))
+                .andExpect(jsonPath('$.outcome.case.title', CoreMatchers.is(CASE_NAME)))
+                .andExpect(jsonPath('$.outcome.case.petriNetId', CoreMatchers.is(netId)))
                 .andReturn()
         def response = parseResult(result)
-        caseId = response.outcome.aCase.stringId
+        caseId = response.outcome.case.stringId
     }
 
     def searchTasks(String title, int expected) {

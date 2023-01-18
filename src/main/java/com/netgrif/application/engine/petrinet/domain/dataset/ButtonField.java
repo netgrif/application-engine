@@ -8,7 +8,7 @@ public class ButtonField extends Field<Integer> {
 
     public ButtonField() {
         super();
-        this.setValue(0);
+        this.setRawValue(0);
     }
 
     @Override

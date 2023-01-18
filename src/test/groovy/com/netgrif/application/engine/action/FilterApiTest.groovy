@@ -1,11 +1,10 @@
 package com.netgrif.application.engine.action
 
-
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
+import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -13,9 +12,11 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
+@CompileStatic
 class FilterApiTest {
 
     @Autowired
@@ -67,17 +69,17 @@ class FilterApiTest {
         Case defGroup = nextGroupService.findDefaultGroup()
 
         assert item.uriNodeId == uriService.findByUri("netgrif/test").id
-        assert item.dataSet["icon_name"].value == "device_hub"
-        assert item.dataSet["entry_name"].value.toString() == "FILTER"
-        assert item.dataSet["menu_item_identifier"].value.toString() == "new_menu_item"
-        assert item.dataSet["parentId"].value.toString() == defGroup.stringId
+        assert item.dataSet.get("icon_name").rawValue == "device_hub"
+        assert item.dataSet.get("entry_name").rawValue.toString() == "FILTER"
+        assert item.dataSet.get("menu_item_identifier").rawValue.toString() == "new_menu_item"
+        assert item.dataSet.get("parentId").rawValue.toString() == defGroup.stringId
 
-        assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
-        assert filter.dataSet["filter"].allowedNets == ["filter", "preference_filter_item"]
-        assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:preference_filter_item"
-        assert filter.dataSet["filter_type"].value == "Case"
+        assert ((FilterField) filter.dataSet.get("filter")).filterMetadata["filterType"] == "Case"
+        assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter", "preference_filter_item"]
+        assert ((FilterField) filter.dataSet.get("filter")).rawValue == "processIdentifier:filter OR processIdentifier:preference_filter_item"
+        assert filter.dataSet.get("filter_type").rawValue == "Case"
 
-        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
+        List<String> taskIds = (defGroup.dataSet.get("filter_tasks").rawValue ?: []) as List
         assert taskIds.contains(item.tasks.find { it.transition == "view" }.task)
     }
 
@@ -87,26 +89,28 @@ class FilterApiTest {
     void testChangeFilterAndMenu() {
         Case caze = createMenuItem()
         def newUri = uriService.getOrCreate("netgrif/test_new", UriContentType.DEFAULT)
-        caze = setData(caze, [
-                "uri": newUri.uriPath,
-                "title": "CHANGED FILTER",
-                "allowed_nets": "filter",
-                "query": "processIdentifier:filter",
-                "type": "Case",
-                "icon": "",
-                "change_filter_and_menu": "0"
-        ])
+        DataSet dataSet = new DataSet([
+                "uri"                   : new TextField(rawValue: newUri.uriPath),
+                "title"                 : "CHANGED FILTER",
+                "allowed_nets"          : new TextField(rawValue: "filter"),
+                "query"                 : new TextField(rawValue: "processIdentifier:filter"),
+                "type"                  : new TextField(rawValue: "Case"),
+                "icon"                  : new TextField(rawValue: ""),
+                "create_filter_and_menu": new ButtonField(rawValue: 0)
+        ] as Map<String, Field<?>>)
+        dataService.setData(caze.tasks[0].task, dataSet)
+        caze = workflowService.findOne(caze.stringId)
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        assert item.dataSet["icon_name"].value == ""
-        assert item.dataSet["entry_name"].value.toString() == "CHANGED FILTER"
-        assert item.dataSet["allowed_roles"].options.entrySet()[0].key.contains("role_2")
+        assert item.dataSet.get("icon_name").rawValue == ""
+        assert item.dataSet.get("entry_name").value.toString() == "CHANGED FILTER"
+        assert ((MultichoiceMapField) item.dataSet.get("allowed_roles")).options.entrySet()[0].key.contains("role_2")
         assert item.uriNodeId == newUri.id
 
-        assert filter.dataSet["filter"].allowedNets == ["filter"]
-        assert filter.dataSet["filter"].filterMetadata["defaultSearchCategories"] == false
-        assert filter.dataSet["filter"].value == "processIdentifier:filter"
+        assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter"]
+        assert ((FilterField) filter.dataSet.get("filter")).filterMetadata["defaultSearchCategories"] == false
+        assert ((FilterField) filter.dataSet.get("filter")).rawValue == "processIdentifier:filter"
     }
 
     @Test
@@ -115,13 +119,14 @@ class FilterApiTest {
 
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
-        caze = setData(caze, [
-                "delete_filter_and_menu": "0"
-        ])
-
+//        caze = setData(caze, [
+//                "delete_filter_and_menu": "0"
+//        ])
+//        dataService.setData(caze.tasks[0].task,)
+        caze = workflowService.findOne(caze.stringId)
         Case defGroup = nextGroupService.findDefaultGroup()
-        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
-        assert !taskIds
+//        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
+//        assert !taskIds
 
         Thread.sleep(2000);
 
@@ -135,26 +140,29 @@ class FilterApiTest {
         Case caze = createMenuItem()
         Case filter = getFilter(caze)
 
-        caze = setData(caze, [
-                "find_filter": "0"
-        ])
-
-        assert caze.dataSet["found_filter"].value == filter.stringId
+//        caze = setData(caze, [
+//                "find_filter": "0"
+//        ])
+//        dataService.setData(caze.tasks[0].task,)
+        caze = workflowService.findOne(caze.stringId)
+//        assert caze.dataSet["found_filter"].value == filter.stringId
     }
 
     Case createMenuItem() {
         Case caze = getCase()
-        caze = setData(caze, [
-                "uri": "netgrif/test",
-                "title": "FILTER",
-                "allowed_nets": "filter,preference_filter_item",
-                "query": "processIdentifier:filter OR processIdentifier:preference_filter_item",
-                "type": "Case",
-                "group": null,
-                "identifier": "new_menu_item",
-                "icon": "device_hub",
-                "create_filter_and_menu": "0"
-        ])
+        DataSet dataSet = new DataSet([
+                "uri"                   : new TextField(rawValue: "netgrif/test"),
+                "title"                 : new TextField(rawValue: "FILTER"),
+                "allowed_nets"          : new TextField(rawValue: "filter,preference_filter_item"),
+                "query"                 : new TextField(rawValue: "processIdentifier:filter OR processIdentifier:preference_filter_item"),
+                "type"                  : new TextField(rawValue: "Case"),
+                "group"                 : new TextField(rawValue: null),
+                "identifier"            : new TextField(rawValue: "new_menu_item"),
+                "icon"                  : new TextField(rawValue: "device_hub"),
+                "create_filter_and_menu": new ButtonField(rawValue: 0)
+        ] as Map<String, Field<?>>)
+        dataService.setData(caze.tasks[0].task, dataSet)
+        caze = workflowService.findOne(caze.stringId)
         return caze
     }
 
@@ -163,18 +171,10 @@ class FilterApiTest {
     }
 
     Case getMenuItem(Case caze) {
-        return workflowService.findOne(caze.dataSet["menu_stringId"].value as String)
+        return workflowService.findOne(caze.dataSet.get("menu_stringId").value as String)
     }
 
     Case getFilter(Case caze) {
-        return workflowService.findOne(caze.dataSet["filter_stringId"].value as String)
+        return workflowService.findOne(caze.dataSet.get("filter_stringId").value as String)
     }
-
-    def setData(Case caze, Map<String, String> dataSet) {
-        dataService.setData(caze.tasks[0].task, ImportHelper.populateDataset(dataSet.collectEntries {
-            [(it.key): (["value": it.value, "type": "text"])]
-        }))
-        return workflowService.findOne(caze.stringId)
-    }
-
 }

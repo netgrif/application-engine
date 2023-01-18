@@ -1,0 +1,198 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>new_model</id>
+    <initials>NEW</initials>
+    <title>New Model</title>
+    <icon>device_hub</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+	<data type="text">
+		<id>text_0</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_1</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title/>
+	</data>
+    <transition>
+        <id>t1</id>
+        <x>340</x>
+        <y>140</y>
+        <label/>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+        <event type="finish">
+            <id>t1_finish</id>
+            <actions phase="pre">
+                <action id="1">
+					field0: f.text_0,
+					field1: f.text_1;
+					change field0 value { "A" }
+                    assignTask("t2")
+                    finishTask("t2")
+					change field1 value { "B" }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>660</x>
+        <y>140</y>
+        <label/>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+			<actions phase="pre">
+				<action>
+					field1: f.text_1,
+					field2: f.text_2;
+					change field1 value { "D" }
+					change field2 value { "E" }
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action>
+					field1: f.text_1,
+					field2: f.text_2;
+					change field1 value { "G" }
+					change field2 value { "H" }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					field1: f.text_1,
+					field2: f.text_2;
+					change field1 value { "J" }
+					change field2 value { "K" }
+				</action>
+			</actions>
+		</event>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>580</x>
+        <y>140</y>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>740</x>
+        <y>140</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>260</x>
+        <y>140</y>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>420</x>
+        <y>140</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>t2</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>regular</type>
+        <sourceId>p3</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

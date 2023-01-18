@@ -18,6 +18,7 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
         if (initExpression != null) {
             i18nField.setInitExpression(new Expression(initExpression));
         } else {
+            // TODO: NAE-1645 simplify
             if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
                 i18nField.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
             } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {

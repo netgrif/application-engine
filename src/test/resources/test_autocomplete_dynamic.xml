@@ -15,7 +15,8 @@
             <!-- @formatter:off -->
             field: f.autocomplete;
             change field choices {
-            return findCases { it.title.contains(field.value.toString()) }.collect({it.title})
+                def value = field.value.value.toString()
+                return findCases { it.title.contains(value) }.collect({it.title})
             }
             <!-- @formatter:on -->
         </action>

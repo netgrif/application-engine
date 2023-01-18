@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -10,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -64,12 +66,10 @@ class DynamicEnumerationTest {
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(aCase.getStringId())).stream().collect(Collectors.toList()).get(0);
         importHelper.assignTask("Autocomplete", aCase.getStringId(), superCreator.getLoggedSuper())
 
-        dataService.setData(task.stringId, ImportHelper.populateDataset([
-                "autocomplete": [
-                        "value": "Case",
-                        "type" : "enumeration"
-                ]
-        ]))
+        def dataSet = new DataSet([
+                "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))
+        ])
+        dataService.setData(task.stringId, dataSet)
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()

@@ -16,7 +16,7 @@ public class I18nField extends Field<I18nString> {
 
     @Override
     public void clearValue() {
-        setValue(new I18nString());
+        setRawValue(new I18nString());
     }
 
     @Override

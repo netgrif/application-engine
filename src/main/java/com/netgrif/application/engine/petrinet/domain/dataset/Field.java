@@ -18,6 +18,7 @@ import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.annotate.JsonIgnore;
 import org.apache.commons.beanutils.BeanUtils;
@@ -35,7 +36,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @Slf4j
 @Document
 @Data
-public abstract class Field<T> extends Imported implements Referencable {
+public abstract class Field<T> extends Imported {
 
     @Id
     protected ObjectId _id;
@@ -74,12 +75,19 @@ public abstract class Field<T> extends Imported implements Referencable {
     @QueryType(PropertyType.NONE)
     public abstract DataType getType();
 
-    public void setValue(T value) {
+    public void setRawValue(T value) {
         if (this.value == null) {
             this.value = new DataFieldValue<>();
         }
         this.value.setValue(value);
     }
+
+//    public T getValue() {
+//        if (this.value == null) {
+//            return null;
+//        }
+//        return this.value.getValue();
+//    }
 
     public void addActions(Collection<Action> dataEvents, DataEventType type) {
         dataEvents.forEach(action -> addAction(action, type));
@@ -152,11 +160,6 @@ public abstract class Field<T> extends Imported implements Referencable {
 
     public abstract Field<T> clone();
 
-    @Override
-    public int getMultiplicity() {
-        throw new UnsupportedOperationException(this.getClass().toString() + " can not be used as arc multiplicity");
-    }
-
     public void setBehavior(String transitionId, DataFieldBehavior behavior) {
         behaviors.put(transitionId, behavior);
     }
@@ -185,6 +188,7 @@ public abstract class Field<T> extends Imported implements Referencable {
         return behavior.equals(dataRefBehavior.getBehavior());
     }
 
+    @JsonIgnore
     public String getTranslatedName(Locale locale) {
         if (name == null) {
             return null;
@@ -206,6 +210,30 @@ public abstract class Field<T> extends Imported implements Referencable {
             log.error(e.getMessage(), e);
             return;
         }
+//        if (changes.defaultValue != null) {
+//            this.defaultValue = (T) changes.defaultValue;
+//        }
+//        if (changes.initExpression != null) {
+//            this.initExpression = changes.initExpression;
+//        }
+//        if (changes.validations != null) {
+//            this.validations = changes.validations;
+//        }
+//        if (changes.name != null) {
+//            this.name = changes.name;
+//        }
+//        if (changes.description != null) {
+//            this.description = changes.description;
+//        }
+//        if (changes.placeholder != null) {
+//            this.placeholder = changes.placeholder;
+//        }
+//        if (changes.behaviors != null) {
+//            this.behaviors = changes.behaviors;
+//        }
+//        if (changes.value != null) {
+//            this.value = (DataFieldValue<T>) changes.value;
+//        }
         version++;
     }
 }

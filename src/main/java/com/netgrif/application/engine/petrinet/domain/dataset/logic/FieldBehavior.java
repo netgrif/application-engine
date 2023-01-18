@@ -3,6 +3,9 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 import com.netgrif.application.engine.importer.model.Behavior;
 
 public enum FieldBehavior {
+    // TODO: NAE-1645
+    //  com.netgrif.application.engine.petrinet.domain.ImporterTest#initialBehaviorTest
+    //  No enum constant com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.IMMEDIATE
     VISIBLE("visible"),
     EDITABLE("editable"),
     HIDDEN("hidden"),
@@ -19,8 +22,9 @@ public enum FieldBehavior {
     }
 
     public static FieldBehavior fromString(Behavior string) {
-        if (string == null)
+        if (string == null) {
             throw new IllegalArgumentException("Behavior can not be null");
+        }
         return valueOf(string.value().toUpperCase());
     }
 

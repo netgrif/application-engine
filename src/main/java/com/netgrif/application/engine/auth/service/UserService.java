@@ -63,8 +63,7 @@ public class UserService extends AbstractUserService {
         return saveNew(user, false);
     }
 
-    private IUser saveNew(IUser user, boolean login) {
-
+    private IUser saveNew(IUser user, boolean ignored) {
         registrationService.encodeUserPassword((RegisteredUser) user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
@@ -73,12 +72,12 @@ public class UserService extends AbstractUserService {
         filterImportExportService.createFilterImport(user);
         filterImportExportService.createFilterExport(user);
 
-        if (groupProperties.isDefaultEnabled())
+        if (groupProperties.isDefaultEnabled()) {
             groupService.createGroup(user);
-
-        if (groupProperties.isSystemEnabled())
+        }
+        if (groupProperties.isSystemEnabled()) {
             groupService.addUserToDefaultGroup(user);
-
+        }
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
 
         return savedUser;
@@ -120,19 +119,21 @@ public class UserService extends AbstractUserService {
     }
 
     public void addDefaultAuthorities(User user) {
-        if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<Authority>();
-            authorities.add(authorityRepository.findByName(Authority.user));
-            user.setAuthorities(authorities);
+        if (!user.getAuthorities().isEmpty()) {
+            return;
         }
+        HashSet<Authority> authorities = new HashSet<>();
+        authorities.add(authorityRepository.findByName(Authority.user));
+        user.setAuthorities(authorities);
     }
 
     public void addAnonymousAuthorities(User user) {
-        if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<Authority>();
-            authorities.add(authorityRepository.findByName(Authority.anonymous));
-            user.setAuthorities(authorities);
+        if (!user.getAuthorities().isEmpty()) {
+            return;
         }
+        HashSet<Authority> authorities = new HashSet<>();
+        authorities.add(authorityRepository.findByName(Authority.anonymous));
+        user.setAuthorities(authorities);
     }
 
     @Override
@@ -148,8 +149,9 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser findById(String id, boolean small) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty())
+        if (user.isEmpty()) {
             throw new IllegalArgumentException("Could not find user with id [" + id + "]");
+        }
         return user.get();
     }
 
@@ -182,7 +184,6 @@ public class UserService extends AbstractUserService {
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
-
     }
 
     @Override
@@ -240,8 +241,8 @@ public class UserService extends AbstractUserService {
     @Override
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
         List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
-            return changeType(users);
-        }
+        return changeType(users);
+    }
 
     @Override
     public List<IUser> findAllByIds(Set<String> ids, boolean small) {
@@ -252,7 +253,7 @@ public class UserService extends AbstractUserService {
     @Override
     public IUser getLoggedOrSystem() {
         try {
-            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String){
+            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
                 return getSystem();
             }
             return getLoggedUser();
@@ -266,10 +267,12 @@ public class UserService extends AbstractUserService {
         Optional<User> user = userRepository.findById(userId);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
-        if (!user.isPresent())
+        if (user.isEmpty()) {
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
-        if (!authority.isPresent())
+        }
+        if (authority.isEmpty()) {
             throw new IllegalArgumentException("Could not find authority with id [" + authorityId + "]");
+        }
 
         user.get().addAuthority(authority.get());
         authority.get().addUser(user.get());
@@ -318,8 +321,9 @@ public class UserService extends AbstractUserService {
     @Override
     public void deleteUser(IUser user) {
         User dbUser = (User) user;
-        if (!userRepository.findById(dbUser.getStringId()).isPresent())
+        if (userRepository.findById(dbUser.getStringId()).isEmpty()) {
             throw new IllegalArgumentException("Could not find user with id [" + dbUser.get_id() + "]");
+        }
         userRepository.delete(dbUser);
     }
 
@@ -338,5 +342,4 @@ public class UserService extends AbstractUserService {
         user.setNextGroups(this.groupService.getAllGroupsOfUser(user));
         return user;
     }
-
 }

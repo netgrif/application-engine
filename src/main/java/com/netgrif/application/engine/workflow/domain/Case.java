@@ -104,7 +104,6 @@ public class Case {
         petriNetObjectId = petriNet.getObjectId();
         processIdentifier = petriNet.getIdentifier();
         activePlaces = petriNet.getActivePlaces();
-        immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         enabledRoles = petriNet.getRoles().keySet();
         negativeViewRoles.addAll(petriNet.getNegativeViewRoles());
@@ -129,6 +128,11 @@ public class Case {
 
     public String getStringId() {
         return _id.toString();
+    }
+
+    public void resolveImmediateDataFields() {
+        immediateData = dataSet.getFields().values().stream().filter(Field::isImmediate).collect(Collectors.toList());
+        immediateDataFields = immediateData.stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void setColor(String color) {

@@ -19,7 +19,7 @@ public class TextFieldBuilder extends FieldBuilder<TextField> {
         if (values != null && !values.isEmpty())
             value = values.get(0).getValue();
         TextField field = new TextField();
-        field.setValue(value);
+        field.setRawValue(value);
         setDefaultValue(field, data, field::setDefaultValue);
         return field;
     }

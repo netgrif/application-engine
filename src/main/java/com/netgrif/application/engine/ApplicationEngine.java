@@ -2,6 +2,8 @@ package com.netgrif.application.engine;
 
 import com.netgrif.application.engine.configuration.ApplicationContextProvider;
 import com.netgrif.application.engine.configuration.JsonRootRelProvider;
+import com.netgrif.application.engine.petrinet.domain.DataGroupAlignmentConverter;
+import com.netgrif.application.engine.petrinet.domain.layout.LayoutTypeConverter;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -27,7 +29,7 @@ import java.util.List;
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableAspectJAutoProxy
-@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableMongoAuditing
 @Aspect
 @Slf4j
@@ -44,6 +46,8 @@ public class ApplicationEngine {
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(new StringToVersionConverter());
+        converters.add(new LayoutTypeConverter());
+        converters.add(new DataGroupAlignmentConverter());
         return new MongoCustomConversions(converters);
     }
 

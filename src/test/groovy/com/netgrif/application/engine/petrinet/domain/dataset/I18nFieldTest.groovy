@@ -30,7 +30,7 @@ class I18nFieldTest {
 
         field.clearValue()
 
-        assert field.value.defaultValue == null
-        assert field.value.translations.size() == 0
+        assert field.value.value.defaultValue == null
+        assert field.value.value.translations.size() == 0
     }
 }

@@ -13,7 +13,7 @@ public class DateTimeFieldTransformer extends ElasticDataFieldTransformer<DateTi
 
     @Override
     public DateField transform(DateTimeField caseField, DateTimeField petriNetField) {
-        LocalDateTime dateTime = caseField.getValue().getValue();
+        LocalDateTime dateTime = caseField.getValue();
         if (dateTime == null) {
             return null;
         }

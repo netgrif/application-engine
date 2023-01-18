@@ -134,6 +134,8 @@ class DataSearchRequestTest {
         _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
         _case.dataSet["userList"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
+        //TODO: NAE-1645
+        // Cannot set property 'defaultValue' on null object
         _case.dataSet["i18n_text"].value.defaultValue = "Modified i18n text value"
         _case.dataSet["i18n_divider"].value.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
@@ -225,7 +227,7 @@ class DataSearchRequestTest {
     }
 
     @Test
-    void testDatSearchRequests() {
+    void testDataSearchRequests() {
         testCases.each { testCase ->
             CaseSearchRequest request = new CaseSearchRequest()
             request.data = new HashMap<>()

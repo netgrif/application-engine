@@ -215,8 +215,10 @@ public class WorkflowController {
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
 
-        if (fileFieldInputStream.getInputStream() == null)
+        // TODO: NAE-1645 FileListFieldTest#downloadFileByCaseAndName - "fileFieldInputStream" is null
+        if (fileFieldInputStream.getInputStream() == null) {
             throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within case " + caseId + " was not found!");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);

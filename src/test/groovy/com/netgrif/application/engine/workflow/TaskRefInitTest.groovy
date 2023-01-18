@@ -57,6 +57,9 @@ class TaskRefInitTest {
         Task task1 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t1"))
         Task task2 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t3"))
 
+        //TODO: NAE-1645
+        // com.netgrif.application.engine.workflow.TaskRefInitTest#testInitValue
+        // Cannot invoke "java.util.List.containsAll(java.util.Collection)" because the return value of "org.codehaus.groovy.runtime.ScriptBytecodeAdapter.castToType(Object, java.lang.Class)" is null
         assert ((List<String>) aCase.dataSet.get("taskRef_0").value).containsAll(Arrays.asList(task1.stringId, task2.stringId))
         assert ((List<String>) aCase.dataSet.get("taskRef_1").value).isEmpty()
         assert ((List<String>) aCase.dataSet.get("taskRef_2").value).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").value).size() == 1

@@ -20,10 +20,10 @@ public abstract class ChoiceField<T> extends Field<T> {
         choices = new LinkedHashSet<>();
     }
 
-    public ChoiceField(List<I18nString> values) {
+    public ChoiceField(List<I18nString> choices) {
         this();
-        if (values != null) {
-            this.choices.addAll(values);
+        if (choices != null) {
+            this.choices.addAll(choices);
         }
     }
 

@@ -53,8 +53,6 @@ import java.util.stream.Collectors;
 @Service
 public class DataService implements IDataService {
 
-    public static final int MONGO_ID_LENGTH = 24;
-
     @Autowired
     protected ApplicationEventPublisher publisher;
 
@@ -342,10 +340,10 @@ public class DataService implements IDataService {
             return null;
 
         workflowService.save(useCase);
-        field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
+        field.setRawValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
 
         Optional<FileFieldValue> fileField = field.getValue().getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
-        if (!fileField.isPresent() || fileField.get().getPath() == null) {
+        if (fileField.isEmpty() || fileField.get().getPath() == null) {
             log.error("File " + name + " not found!");
             return null;
         }
@@ -362,11 +360,11 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
         runGetActionsFromFileField(field.getEvents(), useCase);
-        if (useCase.getFieldValue(field.getStringId()) == null)
+        if (useCase.getFieldValue(field.getStringId()) == null) {
             return null;
-
+        }
         workflowService.save(useCase);
-        field.setValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
+        field.setRawValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
 
         try {
             if (forPreview) {
@@ -519,7 +517,7 @@ public class DataService implements IDataService {
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
         }
-        ((FileListField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
+        ((FileListField)useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         return true;
     }
 
@@ -539,7 +537,7 @@ public class DataService implements IDataService {
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
 
-        ((FileField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
+        ((FileField)useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         return true;
     }
 
@@ -595,7 +593,7 @@ public class DataService implements IDataService {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue());
+        field.setRawValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue());
 
         return new ImmutablePair<>(useCase, field);
     }
@@ -616,7 +614,7 @@ public class DataService implements IDataService {
                 new File(fileField.get().getPath()).delete();
                 field.getValue().getValue().getNamesPaths().remove(fileField.get());
             }
-            ((FileListField)useCase.getDataSet().get(field.getStringId())).setValue(field.getValue().getValue());
+            ((FileListField)useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         }
         // TODO: NAE-1645 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
@@ -626,7 +624,7 @@ public class DataService implements IDataService {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setValue(((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue()));
+        field.setRawValue(((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue()));
         return new ImmutablePair<>(useCase, field);
     }
 

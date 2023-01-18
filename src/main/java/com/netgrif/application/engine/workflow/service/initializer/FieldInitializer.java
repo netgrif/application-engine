@@ -12,14 +12,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class FieldInitializer {
 
-    @Autowired
-    protected IInitValueExpressionEvaluator initValueExpressionEvaluator;
+    protected final IInitValueExpressionEvaluator initValueExpressionEvaluator;
+
+    public FieldInitializer(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        this.initValueExpressionEvaluator = initValueExpressionEvaluator;
+    }
 
     public <T> Field<T> initialize(Case useCase, Field<T> original) {
         Field<T> field = original.clone();
 
         if (field.isDynamicDefaultValue()) {
-            field.setValue(initValueExpressionEvaluator.evaluate(useCase, field));
+            field.setRawValue(initValueExpressionEvaluator.evaluate(useCase, field));
         }
         // TODO NAE-1645: refactor?
         if (field instanceof ChoiceField) {

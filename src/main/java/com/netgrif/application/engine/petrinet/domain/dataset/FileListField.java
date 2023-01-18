@@ -24,7 +24,7 @@ public class FileListField extends Field<FileListFieldValue> {
     }
 
     public void setValue(String value) {
-        this.setValue(FileListFieldValue.fromString(value));
+        this.setRawValue(FileListFieldValue.fromString(value));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class FileListField extends Field<FileListFieldValue> {
 
     public void addValue(String fileName, String path) {
         if (this.getValue() == null || this.getValue().getValue().getNamesPaths() == null) {
-            this.setValue(new FileListFieldValue());
+            this.setRawValue(new FileListFieldValue());
         }
         this.getValue().getValue().getNamesPaths().add(new FileFieldValue(fileName, path));
     }

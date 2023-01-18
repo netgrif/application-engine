@@ -558,6 +558,7 @@ class ActionDelegate {
 
     private addTaskOutcomes(Task task, Map dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
+        // TODO: NAE-1645 com.netgrif.application.engine.ipc.CaseApiTest#testSearch
         this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
         this.outcomes.add(taskService.finishTask(task.stringId))
     }
@@ -693,7 +694,7 @@ class ActionDelegate {
                 value.each {id -> users.add(new UserFieldValue(userService.findById(id as String, false)))}
                 value = new UserListFieldValue(users)
             }
-            field.setValue(value)
+            field.setRawValue(value)
         }
         // TODO: NAE-1645
 //        DataField changedField = new DataField(field.stringId)
@@ -954,6 +955,9 @@ class ActionDelegate {
     SetDataEventOutcome setData(String transitionId, Case useCase, Map dataSet) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
+        //TODO: NAE-1645
+        // com.netgrif.application.engine.ipc.TaskApiTest#testSetData
+        // No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[data_text:[value:some text, type:text], data_number:[value:10, ...]]]
         return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet)))
     }
 

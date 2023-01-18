@@ -19,6 +19,8 @@ public class FilterFieldBuilder extends FieldBuilder<FilterField> {
         if (nets != null) {
             field.setAllowedNets(new ArrayList<>(nets.getAllowedNet()));
         }
+        // TODO: NAE-1645 setDefaultValue?
+        setDefaultValue(field, data, ignored -> {});
         return field;
     }
 

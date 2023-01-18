@@ -73,6 +73,7 @@ class MapFieldTest {
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
 
         assert aCase.dataSet["enumeration"] != null
+        // TODO: NAE-1645 value == null
         assert aCase.dataSet["enumeration"].value == "second"
 
         Field field = aCase.immediateData.find { f -> f.stringId == "enumeration" }
@@ -134,6 +135,7 @@ class MapFieldTest {
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
 
         assert aCase.dataSet["multichoice"] != null
+        // TODO: NAE-1645 fix test, dataSet.get("multichoice")
         assert aCase.dataSet["multichoice"].value.size() == 2
         assert aCase.dataSet["multichoice"].value.find { v -> v == "second" }
         assert aCase.dataSet["multichoice"].value.find { v -> v == "first" }

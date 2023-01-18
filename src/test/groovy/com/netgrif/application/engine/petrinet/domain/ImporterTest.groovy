@@ -286,6 +286,10 @@ class ImporterTest {
 
         assert net != null
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
+        //TODO: NAE-1645
+        // com.netgrif.application.engine.petrinet.domain.ImporterTest#thisKeywordInDataEventsTest
+        // WorkflowService.save(WorkflowService.java:133):
+        // Couldn't find PersistentEntity for type T!
         taskService.assignTask(testCase.getTasks().toList().get(0).getTask())
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataField("tester_text_field").getValue().equals("Hello world!")

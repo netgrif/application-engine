@@ -269,7 +269,8 @@ public class PetriNet extends PetriNetObject {
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {
-            return dataSet.get(referenceId);
+            // TODO: NAE-1645 check if number field?
+            return (Referencable) dataSet.get(referenceId);
         }
     }
 

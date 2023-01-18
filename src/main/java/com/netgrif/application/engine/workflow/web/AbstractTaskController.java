@@ -234,8 +234,9 @@ public abstract class AbstractTaskController {
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId, false);
 
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null) {
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -265,8 +266,10 @@ public abstract class AbstractTaskController {
     public ResponseEntity<Resource> getNamedFile(String taskId, String fieldId, String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTaskAndName(taskId, fieldId, name);
 
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+        // TODO: NAE-1645 FileListFieldTest#downloadFileByTask - File with name test-file-list.txt in field fileList within task 63beb45a86bb3f1ca09d412b was not found!
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null) {
             throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within task " + taskId + " was not found!");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);

@@ -15,7 +15,7 @@ public class MultichoiceField extends ChoiceField<Set<I18nString>> {
 
     public MultichoiceField() {
         super();
-        super.setValue(new HashSet<>());
+        super.setRawValue(new HashSet<>());
         super.setDefaultValue(new HashSet<>());
     }
 

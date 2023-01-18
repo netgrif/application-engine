@@ -11,6 +11,10 @@ import java.util.Locale;
 
 public class I18nStringSerializer extends StdSerializer<I18nString> {
 
+    public I18nStringSerializer() {
+        this(null);
+    }
+
     public I18nStringSerializer(Class<I18nString> t) {
         super(t);
     }

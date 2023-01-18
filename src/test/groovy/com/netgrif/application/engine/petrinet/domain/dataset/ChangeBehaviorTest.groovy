@@ -77,6 +77,9 @@ class ChangeBehaviorTest {
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
 
+        // TODO: NAE-1645
+        //  com.netgrif.application.engine.petrinet.domain.dataset.ChangeBehaviorTest#changeBehaviorOfSingleFieldOnSingleTransition
+        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[boolean_0:[value:true, type:boolean]]]
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_0": [
                         "value": true,
@@ -103,6 +106,7 @@ class ChangeBehaviorTest {
         Task otherTask2 = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_2) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask2
 
+        // TODO: NAE-1645
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_1": [
                         "value": true,
@@ -132,6 +136,7 @@ class ChangeBehaviorTest {
         Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask
 
+        // TODO: NAE-1645
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_2": [
                         "value": true,
@@ -156,6 +161,9 @@ class ChangeBehaviorTest {
         Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask
 
+        // TODO: NAE-1645
+        //  com.netgrif.application.engine.petrinet.domain.dataset.ChangeBehaviorTest#changeBehaviorOfMultipleFieldsOnMultipleTransitions
+        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[boolean_3:[value:true, type:boolean]]]
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_3": [
                         "value": true,
@@ -180,6 +188,7 @@ class ChangeBehaviorTest {
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
 
+        //TODO: NAE-1645
         dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
                 "boolean_0": [
                         "value": true,

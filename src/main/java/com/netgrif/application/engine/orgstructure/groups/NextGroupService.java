@@ -208,6 +208,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void addUser(IUser user, Case groupCase) {
+        // TODO: NAE-1645: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
         MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataField(GROUP_MEMBERS_FIELD);
         Map<String, I18nString> existingUsers = field.getOptions();
         if (existingUsers == null) {

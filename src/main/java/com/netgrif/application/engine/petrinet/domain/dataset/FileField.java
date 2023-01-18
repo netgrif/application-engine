@@ -23,7 +23,7 @@ public class FileField extends Field<FileFieldValue> {
     }
 
     public void setValue(String value) {
-        this.setValue(FileFieldValue.fromString(value));
+        this.setRawValue(FileFieldValue.fromString(value));
     }
 
     public void setDefaultValue(String defaultValue) {

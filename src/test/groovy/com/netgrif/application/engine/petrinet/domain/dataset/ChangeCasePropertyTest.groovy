@@ -89,6 +89,7 @@ class ChangeCasePropertyTest {
         assert testCaseTask
 
         taskService.assignTask(testCaseTask.getStringId())
+        // TODO: NAE-1645
         dataService.setData(testCaseTask.stringId, ImportHelper.populateDataset([
                 "bln": [
                         "value": "true",

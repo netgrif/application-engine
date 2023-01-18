@@ -18,6 +18,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
@@ -26,6 +27,7 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.security.service.EncryptionService;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
@@ -133,8 +135,7 @@ public class WorkflowService implements IWorkflowService {
         resolveUserRef(useCase);
         taskService.resolveUserRef(useCase);
         try {
-//            TODO: NAE-1645 not needed?
-//            setImmediateDataFields(useCase);
+            useCase.resolveImmediateDataFields();
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
@@ -145,14 +146,18 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case findOne(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
-        if (caseOptional.isEmpty())
+        if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
+        }
         Case useCase = caseOptional.get();
+        initialize(useCase);
+        return useCase;
+    }
+
+    protected void initialize(Case useCase) {
         setPetriNet(useCase);
         decryptDataSet(useCase);
-//        TODO: NAE-1645
-//        this.setImmediateDataFieldsReadOnly(useCase);
-        return useCase;
+        useCase.resolveImmediateDataFields();
     }
 
     @Override
@@ -160,41 +165,29 @@ public class WorkflowService implements IWorkflowService {
         return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
-                .peek(caze -> {
-                    caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
-                    decryptDataSet(caze);
-//                    TODO: NAE-1645
-//                    setImmediateDataFieldsReadOnly(caze);
-                })
+                .peek(this::initialize)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Page<Case> getAll(Pageable pageable) {
         Page<Case> page = repository.findAll(pageable);
-        page.getContent().forEach(this::setPetriNet);
-        decryptDataSets(page.getContent());
-//        TODO: NAE-1645
-//        return setImmediateDataFields(page);
+        page.getContent().forEach(this::initialize);
         return page;
     }
 
     @Override
     public Page<Case> findAllByUri(String uri, Pageable pageable) {
         Page<Case> page = repository.findAllByUriNodeId(uri, pageable);
-        page.getContent().forEach(this::setPetriNet);
-        decryptDataSets(page.getContent());
-        // TODO: NAE-1645 6.2.5
-//        return setImmediateDataFields(page);
+        page.getContent().forEach(this::initialize);
         return page;
     }
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
-        page.getContent().forEach(this::setPetriNet);
-//        TODO: NAE-1645
-//        return setImmediateDataFields(page);
+        // TODO: NAE-1645: decrypt data set was not called before
+        page.getContent().forEach(this::initialize);
         return page;
     }
 
@@ -203,8 +196,9 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
+            // TODO: NAE-1645: UserRefsTest#testCases - Field.getValue() is null
             List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue().getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey(ProcessRolePermission.VIEW) && !permission.get(ProcessRolePermission.VIEW)) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
@@ -288,8 +282,6 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
-//        TODO: NAE-1645
-//        outcome.setCase(setImmediateDataFields(useCase));
         outcome.setCase(useCase);
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
@@ -297,7 +289,12 @@ public class WorkflowService implements IWorkflowService {
 
     public void populateDataSet(Case useCase) {
         useCase.getPetriNet().getDataSet().forEach((fieldId, field) -> {
-            useCase.getDataSet().put(fieldId, fieldInitializer.initialize(useCase, field));
+            Field<?> useCaseField = fieldInitializer.initialize(useCase, field);
+            useCase.getDataSet().put(fieldId, useCaseField);
+            if (field.isImmediate()) {
+                useCase.getImmediateDataFields().add(field.getStringId());
+                useCase.getImmediateData().add(useCaseField);
+            }
         });
     }
 
@@ -319,9 +316,7 @@ public class WorkflowService implements IWorkflowService {
         query = (BasicQuery) query.with(pageable);
 //        TODO: NAE-1645 remove mongoTemplates from project
         List<Case> cases = mongoTemplate.find(query, Case.class);
-        decryptDataSets(cases);
-//        TODO: NAE-1645
-//        return setImmediateDataFields(new PageImpl<Case>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
+        cases.forEach(this::initialize);
         return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class));
     }
 
@@ -333,7 +328,6 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public DeleteCaseEventOutcome deleteCase(Case useCase) {
-
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
@@ -383,15 +377,16 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
+        if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
+        }
         Case useCase = caseOptional.get();
         return removeTasksFromCase(tasks, useCase);
     }
 
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
-        if (StreamSupport.stream(tasks.spliterator(), false).count() == 0) {
+        if (StreamSupport.stream(tasks.spliterator(), false).findAny().isEmpty()) {
             return true;
         }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
@@ -434,7 +429,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataField(field.getStringId()).getValue() != null &&
                     useCase.getDataField(field.getStringId()).getValue().equals(field.getDefaultValue())) {
-                ((TaskField) useCase.getDataField(field.getStringId())).setValue(new ArrayList<>());
+                ((TaskField)useCase.getDataField(field.getStringId())).setRawValue(new ArrayList<>());
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
                         (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
@@ -453,12 +448,6 @@ public class WorkflowService implements IWorkflowService {
         applyCryptoMethodOnDataSet(useCase, entry -> encryptionService.decrypt(entry.getFirst(), entry.getSecond()));
     }
 
-    private void decryptDataSets(Collection<Case> cases) {
-        for (Case aCase : cases) {
-            decryptDataSet(aCase);
-        }
-    }
-
     private void applyCryptoMethodOnDataSet(Case useCase, Function<Pair<String, String>, String> method) {
         Map<Field<?>, String> dataFields = getEncryptedDataSet(useCase);
 
@@ -472,7 +461,7 @@ public class WorkflowService implements IWorkflowService {
             if (value == null) {
                 continue;
             }
-            dataField.setValue(method.apply(Pair.of(value, encryption)));
+            dataField.setValue(new DataFieldValue<>(method.apply(Pair.of(value, encryption))));
         }
     }
 

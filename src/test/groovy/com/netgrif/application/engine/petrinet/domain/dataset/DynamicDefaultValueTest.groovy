@@ -7,6 +7,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+@CompileStatic
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
@@ -42,12 +44,12 @@ class DynamicDefaultValueTest {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         Case useCase = importHelper.createCase("test", optNet.getNet())
 
-        assert useCase.dataSet["text"].value == superCreator.superUser.name
-        assert useCase.dataSet["number"].value as Integer == superCreator.superUser.name.length()
-        assert useCase.dataSet["date"].value != null
-        assert useCase.dataSet["dateTime"].value != null
-        assert (useCase.dataSet["user"].value as UserFieldValue) != null
-        assert (useCase.dataSet["multichoice"].value as List) == ["ABC", "DEF"]
-        assert (useCase.dataSet["multichoice_map"].value as List) == ["ABC", "DEF"]
+        assert useCase.dataSet.get("text").rawValue == superCreator.superUser.name
+        assert useCase.dataSet.get("number").rawValue as Integer == superCreator.superUser.name.length()
+        assert useCase.dataSet.get("date").rawValue != null
+        assert useCase.dataSet.get("dateTime").rawValue != null
+        assert (useCase.dataSet.get("user").rawValue as UserFieldValue) != null
+        assert (useCase.dataSet.get("multichoice").rawValue as List) == ["ABC", "DEF"]
+        assert (useCase.dataSet.get("multichoice_map").rawValue as List) == ["ABC", "DEF"]
     }
 }
