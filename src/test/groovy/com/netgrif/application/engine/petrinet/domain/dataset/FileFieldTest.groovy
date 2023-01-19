@@ -127,7 +127,7 @@ class FileFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID).
+        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + new String(Base64.getEncoder().encode(FIELD_ID.getBytes()))).
                 with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())

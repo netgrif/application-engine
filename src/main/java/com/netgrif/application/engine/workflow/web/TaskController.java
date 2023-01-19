@@ -209,14 +209,14 @@ public class TaskController extends AbstractTaskController {
     })
     public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                          @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile,  Locale locale){
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.saveFile(taskId, fieldId, multipartFile, dataBody, locale);
     }
 
     @Operation(summary = "Download task file field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.getFile(taskId, fieldId);
     }
 
@@ -230,7 +230,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam("parentTaskId") String parentTaskId) {
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.deleteFile(parentTaskId, fieldId);
     }
 
@@ -245,7 +245,7 @@ public class TaskController extends AbstractTaskController {
     })
     public EntityModel<EventOutcomeWithMessage> saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                           @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.saveFiles(taskId, fieldId, multipartFiles, dataBody);
     }
 
@@ -253,7 +253,7 @@ public class TaskController extends AbstractTaskController {
     @GetMapping(value = "/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name,
                                                  HttpServletResponse response) throws FileNotFoundException {
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.getNamedFile(taskId, fieldId, name);
     }
 
@@ -267,14 +267,14 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name, @RequestParam("parentTaskId") String parentTaskId) {
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.deleteNamedFile(parentTaskId, fieldId, name);
     }
 
     @Operation(summary = "Download preview for file field value", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}/file_preview/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
-        fieldId = Base64.isBase64(fieldId) ? new String(Base64.decodeBase64(fieldId)) : fieldId;
+        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.getFilePreview(taskId, fieldId);
     }
 }
