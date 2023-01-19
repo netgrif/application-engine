@@ -17,11 +17,7 @@ class UserListFieldValue {
         return userValues
     }
 
-    void setUserValues(Set<UserFieldValue> userValues) {
-        this.userValues = new LinkedHashSet<>(userValues)
-    }
-
-    void setUserValues(List<UserFieldValue> userValues) {
+    void setUserValues(Collection<UserFieldValue> userValues) {
         this.userValues = new LinkedHashSet<>(userValues)
     }
 
