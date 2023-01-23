@@ -1,17 +1,16 @@
 package com.netgrif.application.engine.rules.domain.scheduled;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@Slf4j
 public abstract class RuleJob implements Job {
 
     public static final String RULE_IDENTIFIER = "ruleIdentifier";
-
-    private static final Logger log = LoggerFactory.getLogger(RuleJob.class);
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
         String instanceId = getInstanceId(context);

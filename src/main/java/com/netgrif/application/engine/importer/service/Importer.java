@@ -1233,7 +1233,9 @@ public class Importer {
         } else {
             missingMetaData.add("<initials>");
         }
-        if (!missingMetaData.isEmpty())
+
+        if (!missingMetaData.isEmpty()) {
             throw new MissingPetriNetMetaDataException(missingMetaData);
+        }
     }
 }

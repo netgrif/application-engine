@@ -169,7 +169,7 @@ class RuleEngineTest {
         StoredRule rule2 = StoredRule.builder()
                 ._id(new ObjectId())
                 .when("$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_1 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
-                .then("insert(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, 0));    \n $case.dataSet[\"text_data\"].value = \"" + TEXT_VALUE + "\";    \n log.info(\"rule 2 matched\");")
+                .then("insert(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, 0));    \n $case.dataSet.get(\"text_data\").setRawValue(\"" + TEXT_VALUE + "\");    \n log.info(\"rule 2 matched\");")
                 .identifier("rule2")
                 .lastUpdate(LocalDateTime.now())
                 .enabled(true)
@@ -184,7 +184,7 @@ class RuleEngineTest {
                 .build();
         StoredRule rule4 = StoredRule.builder()
                 ._id(new ObjectId())
-                .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet[\"text_data\"].value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
+                .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet.get(\"text_data\").value.value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
                 .then("$case.title = \"" + NEW_CASE_TITLE_2 + "\";    \n log.info(\"rule 4 matched\");")
                 .identifier("rule4")
                 .lastUpdate(LocalDateTime.now())
@@ -196,6 +196,7 @@ class RuleEngineTest {
         ruleRepository.save(rule4);
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superUser);
+//        TODO: NAE-1645 assertion error
         assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
         Task task = findTask(caseOutcome.getCase(), TRANS_1);
@@ -219,8 +220,8 @@ class RuleEngineTest {
 
     @Test
     void assignRuleTest() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre(TRANS_1, "com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
-        StoredRule rule2 = transitionRulePost(TRANS_1, "com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
+        StoredRule rule = transitionRulePre("com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
+        StoredRule rule2 = transitionRulePost("com.netgrif.application.engine.petrinet.domain.events.EventType.ASSIGN");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -234,14 +235,14 @@ class RuleEngineTest {
         caze = workflowService.findOne(caze.getStringId());
 
         assert caze != null;
-        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
-        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+        assert caze.getDataSet().get("text_data").getValue().getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().getValue().equals(NUM_VALUE);
     }
 
     @Test
     void testDelegate() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre(TRANS_1, "EventType.DELEGATE");
-        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.DELEGATE");
+        StoredRule rule = transitionRulePre("EventType.DELEGATE");
+        StoredRule rule2 = transitionRulePost("EventType.DELEGATE");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -255,14 +256,14 @@ class RuleEngineTest {
         taskService.delegateTask(user.transformToLoggedUser(), user.getStringId(), task.getStringId());
         caze = workflowService.findOne(caze.getStringId());
 
-        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
-        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+        assert caze.getDataSet().get("text_data").getValue().getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().getValue().equals(NUM_VALUE);
     }
 
     @Test
     void testFinish() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre(TRANS_1, "EventType.FINISH");
-        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.FINISH");
+        StoredRule rule = transitionRulePre("EventType.FINISH");
+        StoredRule rule2 = transitionRulePost("EventType.FINISH");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -276,14 +277,14 @@ class RuleEngineTest {
         taskService.finishTask(task, user);
         caze = workflowService.findOne(caze.getStringId());
 
-        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
-        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+        assert caze.getDataSet().get("text_data").getValue().getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().getValue().equals(NUM_VALUE);
     }
 
     @Test
     void testCancel() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
-        StoredRule rule = transitionRulePre(TRANS_1, "EventType.CANCEL");
-        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.CANCEL");
+        StoredRule rule = transitionRulePre("EventType.CANCEL");
+        StoredRule rule2 = transitionRulePost("EventType.CANCEL");
 
         ruleRepository.save(rule);
         ruleRepository.save(rule2);
@@ -298,8 +299,8 @@ class RuleEngineTest {
         taskService.cancelTask(task, user);
         caze = workflowService.findOne(caze.getStringId());
 
-        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
-        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+        assert caze.getDataSet().get("text_data").getValue().getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().getValue().equals(NUM_VALUE);
     }
 
     @Test
@@ -309,7 +310,7 @@ class RuleEngineTest {
         StoredRule rule0 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", title == \"FAKE_TITLE\")", String.format(then, -2));
         StoredRule rule1 = rule(predicate + " $case: Case(processIdentifier == \"FAKE_NET\")", String.format(then, -1));
         StoredRule rule2 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\")", String.format(then, 1));
-        StoredRule rule3 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", dataSet[\"text_data\"].value == \"VALUE\")", String.format(then, 2));
+        StoredRule rule3 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", dataSet.get(\"text_data\").value.value == \"VALUE\")", String.format(then, 2));
 
         ruleRepository.save(rule0);
         ruleRepository.save(rule1);
@@ -322,6 +323,7 @@ class RuleEngineTest {
         List<Fact> facts = factRepository.findAll(QCaseFact.caseFact.caseId.eq(caze.getStringId()), PageRequest.of(0, 100)).getContent();
         assert facts.stream().noneMatch(it -> ((TestFact) it).number == -2);
         assert facts.stream().noneMatch(it -> ((TestFact) it).number == -1);
+//        TODO: NAE-1645 assertion error
         assert facts.stream().filter(it -> ((TestFact) it).number == 1).count() == 1;
         assert facts.stream().filter(it -> ((TestFact) it).number == 2).count() == 1;
 
@@ -344,16 +346,16 @@ class RuleEngineTest {
         assert caze.getTitle().equals("NEW_TITLE");
     }
 
-    private StoredRule transitionRulePre(String trans, String type) {
-        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + trans + "\", type == " + type + ", phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)";
-        String then = "$case.dataSet[\"text_data\"].value = \"" + TEXT_VALUE + "\";";
+    private StoredRule transitionRulePre(String type) {
+        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + RuleEngineTest.TRANS_1 + "\", type == " + type + ", phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.PRE)";
+        String then = "$case.dataSet.get(\"text_data\").setRawValue(\"" + TEXT_VALUE + "\");";
 
         return rule(when, then);
     }
 
-    private StoredRule transitionRulePost(String trans, String type) {
-        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + trans + "\", type == " + type + ", phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)";
-        String then = "$case.dataSet[\"number_data\"].value = " + NUM_VALUE + ";";
+    private StoredRule transitionRulePost(String type) {
+        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + RuleEngineTest.TRANS_1 + "\", type == " + type + ", phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)";
+        String then = "$case.dataSet.get(\"number_data\").setRawValue(" + NUM_VALUE + ");";
 
         return rule(when, then);
     }
@@ -396,6 +398,4 @@ class RuleEngineTest {
             return ++number;
         }
     }
-
-
 }

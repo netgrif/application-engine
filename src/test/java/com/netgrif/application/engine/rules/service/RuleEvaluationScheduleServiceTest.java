@@ -68,7 +68,7 @@ class RuleEvaluationScheduleServiceTest {
 
         StoredRule rule = StoredRule.builder()
                 .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
-                .then("log.info(\"matched rule\"); \n $case.dataSet[\"number_data\"].value += " + 1.0 + "; \n workflowService.save($case);")
+                .then("log.info(\"matched rule\"); \n $case.dataSet.get(\"number_data\").value.value += " + 1.0 + "; \n workflowService.save($case);")
                 .identifier("rule2")
                 .lastUpdate(LocalDateTime.now())
                 .enabled(true)
@@ -86,8 +86,7 @@ class RuleEvaluationScheduleServiceTest {
         assert id != null;
         Case caze = workflowService.findOne(id);
         assert caze != null;
-        assert caze.getDataSet().get("number_data").getValue().equals(5561.0);
-
+        assert caze.getDataSet().get("number_data").getValue().getValue().equals(5561.0);
     }
 
     @AfterEach

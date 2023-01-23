@@ -51,6 +51,6 @@ public class ConstructorAndDestructorTest {
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Construct"));
 
         assert caseOpt.isPresent();
-        assert "Its working...".equals(caseOpt.get().getDataSet().get("text").getValue());
+        assert "Its working...".equals(caseOpt.get().getDataSet().get("text").getValue().getValue());
     }
 }

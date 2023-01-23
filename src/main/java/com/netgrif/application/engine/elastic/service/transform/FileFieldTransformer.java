@@ -10,7 +10,7 @@ public class FileFieldTransformer extends ElasticDataFieldTransformer<FileField,
 
     @Override
     public com.netgrif.application.engine.elastic.domain.FileField transform(FileField caseField, FileField petriNetField) {
-        FileFieldValue value = caseField.getValue();
+        FileFieldValue value = caseField.getValue().getValue();
         if (value == null) {
             return null;
         }

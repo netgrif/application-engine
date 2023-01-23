@@ -36,12 +36,12 @@
 			parentId: f.parentId;
 
 			if (!task.isPresent()) {
-				return;
+				return
 			}
 
-			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value.value))});
 
-			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
 
 			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
@@ -49,11 +49,11 @@
 				previousTaskRefValue.remove(currentIndex)
 				previousTaskRefValue.add(currentIndex - 1, task.get().stringId)
 
-				def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
-
-				setDataWithPropagation(parentTask, [
-					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
+				def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+						"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
 				])
+				setDataWithPropagation(parentTask, dataSet)
 			}
 		</action>
 	</data>
@@ -68,9 +68,9 @@
 				return;
 			}
 
-			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value.value))});
 
-			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
+			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
 
 			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
 
@@ -78,11 +78,11 @@
 				previousTaskRefValue.remove(currentIndex)
 				previousTaskRefValue.add(currentIndex + 1, task.get().stringId)
 
-				def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
-
-				setDataWithPropagation(parentTask, [
-					"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue]
+				def parentTask = findTask({it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig"))})
+				def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+						"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
 				])
+				setDataWithPropagation(parentTask, dataSet)
 			}
 		</action>
 	</data>
@@ -90,40 +90,35 @@
 		<id>remove_option</id>
 		<title></title>
 		<placeholder name="remove">Remove</placeholder>
+
 		<action trigger="set">
-			parentId: f.parentId,
-			filterCase: f.filter_case;
+			<!--@formatter:off-->
+		parentId: f.parentId,
+		filterCase: f.filter_case;
 
-			if (!task.isPresent()) {
-				return;
-			}
+		if (!task.isPresent()) {
+			return;
+		}
+		def parentCase = findCase({ it._id.eq(new org.bson.types.ObjectId(parentId.value.value)) });
+		def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value.value
+		def currentIndex = previousTaskRefValue.findIndexOf({ id -> id == task.get().stringId })
 
-			def parentCase = findCase({it._id.eq(new org.bson.types.ObjectId(parentId.value))});
+		previousTaskRefValue.remove(currentIndex)
 
+		def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value.value
+		currentIndex = previousCaseRefValue.findIndexOf({ id -> id == filterCase.value.value[0] })
+		previousCaseRefValue.remove(currentIndex)
 
-			def previousTaskRefValue = parentCase.dataSet.get("filter_tasks").value
-
-			def currentIndex = previousTaskRefValue.findIndexOf({ id -&gt; id == task.get().stringId})
-
-			previousTaskRefValue.remove(currentIndex)
-
-
-			def previousCaseRefValue = parentCase.dataSet.get("referenced_filters").value
-
-			currentIndex = previousCaseRefValue.findIndexOf({id -&gt; id == filterCase.value[0]})
-
-			previousCaseRefValue.remove(currentIndex)
-
-
-			def parentTask = findTask({it.caseId.eq(parentId.value).and(it.transitionId.eq("navigationMenuConfig"))})
-
-			setDataWithPropagation(parentTask, [
-				"filter_tasks": ["type": "taskRef", "value": previousTaskRefValue],
-				"referenced_filters": ["type": "caseRef", "value": previousCaseRefValue],
-			])
-			async.run {
-				workflowService.deleteCase(useCase.stringId)
-			}
+		def parentTask = findTask({ it.caseId.eq(parentId.value.value).and(it.transitionId.eq("navigationMenuConfig")) })
+		def dataSet = new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+				"filter_tasks"      : new com.netgrif.application.engine.petrinet.domain.dataset.TaskField(rawValue: previousTaskRefValue),
+				"referenced_filters": new com.netgrif.application.engine.petrinet.domain.dataset.CaseField(rawValue: previousCaseRefValue),
+		])
+		setDataWithPropagation(parentTask, dataSet)
+		async.run {
+			workflowService.deleteCase(useCase.stringId)
+		}
+			<!--@formatter:on-->
 		</action>
 	</data>
 	<data type="taskRef">
@@ -162,13 +157,13 @@
 			iconIdentifier: f.this,
 			iconPreview: f.icon_preview;
 
-			if (iconIdentifier.value == "") {
+			if (iconIdentifier.value.value == "") {
 				change iconPreview value {<![CDATA["""<span></span>"""]]>}
 				return;
 			}
 
 			change iconPreview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value + <![CDATA["""</span>"""]]>
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + iconIdentifier.value.value + <![CDATA["""</span>"""]]>
 			}
 		</action>
 	</data>
@@ -298,13 +293,13 @@
 			create_case_button_icon: f.create_case_button_icon;
 
 
-			if (create_case_button_icon.value == "") {
+			if (create_case_button_icon.value.value == "") {
 				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
 				return;
 			}
 
 			change create_case_button_icon_preview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value.value + <![CDATA["""</span>"""]]>
 			}
 		</action>
  	</data>
@@ -404,11 +399,11 @@
 					entryName: f.entry_name,
 					icon: f.icon_name;
 
-					def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+					def filterCase = findCase({it._id.eq(filterCaseRef.value.value[0])})
 
 					change entryDefaultName value {return filterCase.title}
 
-					change entryName value {return filterCase.dataSet["i18n_filter_name"].value}
+					change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
 
 					change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 
@@ -452,15 +447,15 @@
 						filterCaseRef: f.filter_case,
 						entryDefaultName: f.entry_default_name;
 
-						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseRef.value[0]))})
-						filterCase.setTitle(entryDefaultName.value)
+						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseRef.value.value[0]))})
+						filterCase.setTitle(entryDefaultName.value.value)
 						workflowService.save(filterCase)
-						def filterTask = findTask({ it._id.eq(filterTask.value[0])})
+						def filterTask = findTask({ it._id.eq(filterTask.value.value[0])})
 						setData(filterTask, [
-						"new_title": ["type":"text", "value": entryDefaultName.value]
+							"new_title": ["type":"text", "value": entryDefaultName.value.value]
 						])
 
-						change entryName value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entryDefaultName.value)}
+						change entryName value {return new com.netgrif.application.engine.petrinet.domain.I18nString(entryDefaultName.value.value)}
 					</action>
 				</logic>
 				<layout>
@@ -654,11 +649,11 @@
 							iconName: f.icon_name,
 							useIcon: f.use_icon;
 
-							make iconPreview,visible on trans when {useIcon.value}
-							make iconName,editable on trans when {useIcon.value}
+							make iconPreview,visible on trans when {useIcon.value.value}
+							make iconName,editable on trans when {useIcon.value.value}
 
-							make iconPreview,hidden on trans when {!useIcon.value}
-							make iconName,hidden on trans when {!useIcon.value}
+							make iconPreview,hidden on trans when {!useIcon.value.value}
+							make iconName,hidden on trans when {!useIcon.value.value}
 						</action>
 					</actions>
 				</event>
@@ -684,8 +679,8 @@
 						iconIdentifier: f.icon_name,
 						filterCaseId: f.filter_case;
 
-						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseId.value[0]))})
-						filterCase.setIcon(iconIdentifier.value)
+						def filterCase = findCase({it._id.eq(new org.bson.types.ObjectId(filterCaseId.value.value[0]))})
+						filterCase.setIcon(iconIdentifier.value.value)
 						workflowService.save(filterCase)
 					</action>
 				</logic>
@@ -892,12 +887,12 @@
 						entryName: f.entry_name,
 						icon: f.icon_name;
 
-						change filterCaseRef value { [new_filter_id.value] }
-						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+						change filterCaseRef value { [new_filter_id.value.value] }
+						def filterCase = findCase({it._id.eq(filterCaseRef.value.value[0])})
 
 						change entryDefaultName value {return filterCase.title}
 
-						change entryName value {return filterCase.dataSet["i18n_filter_name"].value}
+						change entryName value {return filterCase.dataSet["i18n_filter_name"].value.value}
 
 						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 

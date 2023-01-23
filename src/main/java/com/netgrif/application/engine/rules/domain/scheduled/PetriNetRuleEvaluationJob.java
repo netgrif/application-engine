@@ -4,6 +4,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,18 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
+@Slf4j
 @Component
 public class PetriNetRuleEvaluationJob extends RuleJob {
 
     public static final String NET_ID = "netId";
 
-    private static final Logger log = LoggerFactory.getLogger(PetriNetRuleEvaluationJob.class);
+    private final IRuleEngine ruleEngine;
 
-    @Autowired
-    private IRuleEngine ruleEngine;
+    private final IPetriNetService petriNetService;
 
-    @Autowired
-    private IPetriNetService petriNetService;
+    public PetriNetRuleEvaluationJob(IRuleEngine ruleEngine, IPetriNetService petriNetService) {
+        this.ruleEngine = ruleEngine;
+        this.petriNetService = petriNetService;
+    }
 
     @Override
     public void doExecute(JobExecutionContext context) {
@@ -36,5 +39,4 @@ public class PetriNetRuleEvaluationJob extends RuleJob {
     public String getInstanceId(JobExecutionContext context) {
         return (String) context.getJobDetail().getJobDataMap().get(NET_ID);
     }
-
 }

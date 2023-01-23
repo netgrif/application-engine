@@ -9,7 +9,9 @@ import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField;
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -103,7 +105,7 @@ public class VariableArcsTest {
         repository.deleteAll();
         assertNotNull(processRoleService.defaultRole());
         testHelper.truncateDbs();
-        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet();
@@ -186,6 +188,7 @@ public class VariableArcsTest {
             taskService.assignTask(task, testUser);
             finishCase = workflowService.findOne(task.getCaseId());
 
+            // TODO: NAE-1645
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
 
             taskService.finishTask(task, testUser);
@@ -236,7 +239,7 @@ public class VariableArcsTest {
             } else {
                 task = taskService.findOne(taskRef.getStringId());
             }
-            int dataRefMultiplicityBeforeChange = 0;
+            double dataRefMultiplicityBeforeChange = 0d;
             int tokensBeforeAssign = 0;
             if (!arcType.equals("inhib")) {
                 tokensBeforeAssign = cancelCase.getActivePlaces().get(task.getTitle().getDefaultValue() + "_start");
@@ -247,12 +250,13 @@ public class VariableArcsTest {
             if (arcType.equals("read")) {
                 assert cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
             } else {
+//                TODO: NAE-1645
                 assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
             }
             if (task.getTitle().getDefaultValue().contains("var")) {
-                dataRefMultiplicityBeforeChange = (int) Double.parseDouble(cancelCase.getDataSet().get(arcType + "_var").getValue().toString());
-//                TODO: NAE-1645
-//                cancelCase.getDataSet().get(arcType + "_var").setValue("800");
+                dataRefMultiplicityBeforeChange = Double.parseDouble(cancelCase.getDataSet().get(arcType + "_var").getValue().toString());
+                NumberField varArcReference = (NumberField) cancelCase.getDataSet().get(arcType + "_var");
+                varArcReference.setRawValue(800d);
                 workflowService.save(cancelCase);
             }
             if (task.getTitle().getDefaultValue().contains("ref")) {
@@ -276,8 +280,8 @@ public class VariableArcsTest {
             }
 
             if (task.getTitle().getDefaultValue().contains("var")) {
-//                TODO: NAE-1645
-//                cancelCase.getDataSet().get(arcType + "_var").setValue(dataRefMultiplicityBeforeChange);
+                NumberField varArcReference = (NumberField) cancelCase.getDataSet().get(arcType + "_var");
+                varArcReference.setRawValue(dataRefMultiplicityBeforeChange);
                 workflowService.save(cancelCase);
             }
             if (task.getTitle().getDefaultValue().contains("ref")) {

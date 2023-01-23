@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.dataset.*
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -119,16 +120,16 @@ class FilterApiTest {
 
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
-//        caze = setData(caze, [
-//                "delete_filter_and_menu": "0"
-//        ])
-//        dataService.setData(caze.tasks[0].task,)
-        caze = workflowService.findOne(caze.stringId)
+        DataSet dataSet = new DataSet([
+                "delete_filter_and_menu": new ButtonField(rawValue: 0)
+        ] as Map<String, Field<?>>)
+        dataService.setData(caze.tasks[0].task, dataSet)
+        workflowService.findOne(caze.stringId)
         Case defGroup = nextGroupService.findDefaultGroup()
-//        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
-//        assert !taskIds
+        List<String> taskIds = (defGroup.dataSet.get(ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS).value.value ?: []) as List
+        assert !taskIds
 
-        Thread.sleep(2000);
+        Thread.sleep(2000)
 
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(item.stringId))) == null
         assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
@@ -140,12 +141,12 @@ class FilterApiTest {
         Case caze = createMenuItem()
         Case filter = getFilter(caze)
 
-//        caze = setData(caze, [
-//                "find_filter": "0"
-//        ])
-//        dataService.setData(caze.tasks[0].task,)
+        DataSet dataSet = new DataSet([
+                "find_filter": new ButtonField(rawValue: 0)
+        ] as Map<String, Field<?>>)
+        dataService.setData(caze.tasks[0].task, dataSet)
         caze = workflowService.findOne(caze.stringId)
-//        assert caze.dataSet["found_filter"].value == filter.stringId
+        assert caze.dataSet.get("found_filter").rawValue == filter.stringId
     }
 
     Case createMenuItem() {

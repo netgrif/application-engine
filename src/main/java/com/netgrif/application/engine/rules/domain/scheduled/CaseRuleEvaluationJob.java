@@ -4,25 +4,24 @@ import com.netgrif.application.engine.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
+@Slf4j
 @Component
 public class CaseRuleEvaluationJob extends RuleJob {
 
     public static final String CASE_ID = "caseId";
 
-    private static final Logger log = LoggerFactory.getLogger(CaseRuleEvaluationJob.class);
+    private final IRuleEngine ruleEngine;
 
-    @Autowired
-    private IRuleEngine ruleEngine;
+    private final IWorkflowService workflowService;
 
-    @Autowired
-    private IWorkflowService workflowService;
+    public CaseRuleEvaluationJob(IRuleEngine ruleEngine, IWorkflowService workflowService) {
+        this.ruleEngine = ruleEngine;
+        this.workflowService = workflowService;
+    }
 
     @Override
     public void doExecute(JobExecutionContext context) {

@@ -86,19 +86,21 @@
 					identifier: f.identifier,
 					icon: f.icon;
 
-					def filter = createCaseFilter(title.value, query.value, allowed_nets.value.split(",") as List, icon.value)
+					def filter = createCaseFilter(title.value.value, query.value.value, allowed_nets.value.value.split(",") as List, icon.value.value)
 					def item
 
 					if (group.value) {
-						item = createMenuItem(uri.value, identifier.value,
+						item = createMenuItem(uri.value.value, identifier.value.value,
 								filter,
-								group.value,
-								["role_1": "netgrif/test/filter_api_test"]
+								group.value.value,
+								["role_1": "netgrif/test/filter_api_test"],
+								[:]
 						)
 					} else {
-						item = createMenuItem(uri.value, identifier.value,
+						item = createMenuItem(uri.value.value, identifier.value.value,
 								filter,
-								["role_1": "netgrif/test/filter_api_test"]
+								["role_1": "netgrif/test/filter_api_test"],
+								[:]
 						)
 					}
 					change menu_stringId value { item.stringId }
@@ -122,13 +124,13 @@
 					identifier: f.identifier,
 					icon: f.icon;
 
-					def item = findMenuItem(identifier.value)
+					def item = findMenuItem(identifier.value.value)
 					def filter = getFilterFromMenuItem(item)
 
-					changeFilter filter query { query.value }
-					changeFilter filter allowedNets { allowed_nets.value.split(",") as List }
-					changeFilter filter icon { icon.value }
-					changeFilter filter title { title.value }
+					changeFilter filter query { query.value.value }
+					changeFilter filter allowedNets { allowed_nets.value.value.split(",") as List }
+					changeFilter filter icon { icon.value.value }
+					changeFilter filter title { title.value.value }
 					changeFilter filter filterMetadata { [
 							"searchCategories"       : [],
 							"predicateMetadata"      : [],
@@ -139,7 +141,7 @@
 
 					changeMenuItem item filter { filter }
 					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
-					changeMenuItem item uri { uri.value }
+					changeMenuItem item uri { uri.value.value }
 				</action>
 			</actions>
 		</event>
@@ -154,7 +156,7 @@
 					menu_stringId: f.menu_stringId,
 					identifier: f.identifier;
 
-					def item = workflowService.findOne(menu_stringId.value)
+					def item = workflowService.findOne(menu_stringId.value.value)
 					def filter = getFilterFromMenuItem(item)
 
 					deleteMenuItem(item)
@@ -181,15 +183,15 @@
 					icon: f.icon;
 
 					def item = createFilterInMenu(
-							uri.value,
-							identifier.value,
-							title.value,
-							query.value,
-							type.value,
-							allowed_nets.value.split(",") as List,
+							uri.value.value,
+							identifier.value.value,
+							title.value.value,
+							query.value.value,
+							type.value.value,
+							allowed_nets.value.value.split(",") as List,
 							["role_1": "netgrif/test/filter_api_test"],
 							[:],
-							icon.value
+							icon.value.value
 					)
 					def filter = getFilterFromMenuItem(item)
 
@@ -210,7 +212,7 @@
 					title: f.title,
 					found_filter: f.found_filter;
 
-					def filter = findFilter(title.value)
+					def filter = findFilter(title.value.value)
 					change found_filter value { filter.stringId }
 				</action>
 			</actions>

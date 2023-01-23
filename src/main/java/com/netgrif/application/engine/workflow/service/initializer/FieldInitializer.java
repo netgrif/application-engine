@@ -19,11 +19,33 @@ public class FieldInitializer {
     }
 
     public <T> Field<T> initialize(Case useCase, Field<T> original) {
+//        TODO: NAE-1645
+//        petriNet.getDataSet().forEach((key, field) -> {
+//            if (field instanceof UserField) {
+//                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+//            }
+//            if (field instanceof FieldWithAllowedNets) {
+//                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+//            }
+//            if (field instanceof FilterField) {
+//                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
+//            }
+//            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
+//                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+//            }
+//            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
+//                dynamicChoicesFields.add((ChoiceField<?>) field);
+//            }
+//        });
+
         Field<T> field = original.clone();
 
         if (field.isDynamicDefaultValue()) {
             field.setRawValue(initValueExpressionEvaluator.evaluate(useCase, field));
+        } else if (field.getDefaultValue() != null) {
+            field.setRawValue(field.getDefaultValue());
         }
+
         // TODO NAE-1645: refactor?
         if (field instanceof ChoiceField) {
             ChoiceField<?> choiceField = (ChoiceField<?>) field;
@@ -38,7 +60,7 @@ public class FieldInitializer {
                 optionsField.setOptions(initValueExpressionEvaluator.evaluateOptions(useCase, optionsField));
             }
         }
-
+//        populateDataSetBehavior();
         return field;
     }
 }

@@ -62,13 +62,13 @@ public class ImporterTest {
 
     @Test
     public void importPetriNet() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), "major", superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assertNetProperlyImported();
     }
 
     @Test
     public void priorityTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         assert outcome.getNet() != null;
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), outcome.getNet().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
@@ -78,19 +78,19 @@ public class ImporterTest {
 
     @Test
     public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
     }
 
     @Test
     public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), "major", superCreator.getLoggedSuper());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
     }
 
     @Test
     public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assertExternalMappingImport(outcome.getNet());
     }
@@ -105,7 +105,6 @@ public class ImporterTest {
         assertThatThrownBy(() -> petriNetService.importPetriNet(fileInputStream, VersionType.MAJOR, loggedUser))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("doesn't have a layout");
-
     }
 
     private void assertExternalMappingImport(PetriNet imported) {
@@ -116,8 +115,8 @@ public class ImporterTest {
         assert imported.getPlaces().size() == 11;
         assert imported.getTransitions().size() == 11;
         assert imported.getArcs().values().stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList()).size() == 34;
+                .mapToLong(List::size)
+                .sum() == 34;
         assert imported.getDataSet().size() == 14;
         assert imported.getRoles().size() == 2;
 
@@ -135,6 +134,7 @@ public class ImporterTest {
         assert repository.count() > 0;
         Page<PetriNet> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
         PetriNet net = nets.getContent().get(0);
+//        TODO: NAE-1645 assertion error
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
         assert net.getInitials().equals(NET_INITIALS);
         assert net.getPlaces().size() == NET_PLACES;

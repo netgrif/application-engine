@@ -5,9 +5,13 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+@Data
 public class EnumerationMapField extends MapOptionsField<I18nString, String> {
 
     public EnumerationMapField() {
@@ -33,7 +37,7 @@ public class EnumerationMapField extends MapOptionsField<I18nString, String> {
         if (this.getOptions() == null) {
             return null;
         }
-        return this.getOptions().get(this.getValue());
+        return this.getOptions().get(this.getValue().getValue());
     }
 
     @Override

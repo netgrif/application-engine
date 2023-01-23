@@ -82,12 +82,12 @@ public abstract class Field<T> extends Imported {
         this.value.setValue(value);
     }
 
-//    public T getValue() {
-//        if (this.value == null) {
-//            return null;
-//        }
-//        return this.value.getValue();
-//    }
+    public T getRawValue() {
+        if (this.value == null) {
+            return null;
+        }
+        return this.value.getValue();
+    }
 
     public void addActions(Collection<Action> dataEvents, DataEventType type) {
         dataEvents.forEach(action -> addAction(action, type));

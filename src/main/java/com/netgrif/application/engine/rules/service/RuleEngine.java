@@ -8,6 +8,7 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
+import lombok.extern.slf4j.Slf4j;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +19,9 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service
 public abstract class RuleEngine implements IRuleEngine {
-
-    private static final Logger log = LoggerFactory.getLogger(RuleEngine.class);
 
     @Value("${rule-engine.rethrow-exceptions:#{false}}")
     protected boolean rethrowExceptions;

@@ -10,6 +10,7 @@ import com.netgrif.application.engine.rules.domain.scheduled.ScheduleOutcome;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.application.engine.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.application.engine.workflow.domain.Case;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +19,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleService {
 
-    private static final Logger log = LoggerFactory.getLogger(RuleEvaluationScheduleService.class);
+    private final Scheduler scheduler;
 
-    @Autowired
-    private Scheduler scheduler;
+    private final RuleRepository ruleRepository;
 
-    @Autowired
-    private RuleRepository ruleRepository;
+    public RuleEvaluationScheduleService(Scheduler scheduler, RuleRepository ruleRepository) {
+        this.scheduler = scheduler;
+        this.ruleRepository = ruleRepository;
+    }
 
     @Override
     public ScheduleOutcome scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
