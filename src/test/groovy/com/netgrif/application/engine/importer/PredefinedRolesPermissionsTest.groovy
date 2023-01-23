@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class PredefinedRolesPermissionsTest {
 
     @Autowired
@@ -421,8 +423,8 @@ class PredefinedRolesPermissionsTest {
         NetCaseTask instances = importAndCreate(model)
         String netRoleId = instances.net.getRoles().keySet().find({ it -> it != DEFAULT_ROLE_ID && it != ANONYMOUS_ROLE_ID })
 
-        Map<String, Map<String, Boolean>> processPerms = transformPermissionMap(processPermissions, netRoleId);
-        Map<String, Map<String, Boolean>> taskPerms = transformPermissionMap(taskPermissions, netRoleId);
+        Map<String, Map<ProcessRolePermission, Boolean>> processPerms = transformProcessRolePermissionMap(processPermissions, netRoleId);
+        Map<String, Map<RolePermission, Boolean>> taskPerms = transformRolePermissionMap(taskPermissions, netRoleId);
 
         def negativeProcessView = processPerms.findAll { it -> it.value.containsKey("view") && !it.value.get("view") }.collect { it -> it.key }
         def negativeTaskView = taskPerms.findAll { it -> it.value.containsKey("view") && !it.value.get("view") }.collect { it -> it.key }
@@ -467,8 +469,16 @@ class PredefinedRolesPermissionsTest {
         return new NetCaseTask(net, aCase, task)
     }
 
-    private Map<String, Map<String, Boolean>> transformPermissionMap(Map<String, Map<Object, Boolean>> input, String netRoleId) {
-        return input.collectEntries { it -> [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key.toString(), ti.value] }] } as Map<String, Map<String, Boolean>>
+    private Map<String, Map<ProcessRolePermission, Boolean>> transformProcessRolePermissionMap(Map<String, Map<ProcessRolePermission, Boolean>> input, String netRoleId) {
+        return input.collectEntries { it ->
+            [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key, ti.value] }]
+        } as Map<String, Map<ProcessRolePermission, Boolean>>
+    }
+
+    private Map<String, Map<RolePermission, Boolean>> transformRolePermissionMap(Map<String, Map<RolePermission, Boolean>> input, String netRoleId) {
+        return input.collectEntries { it ->
+            [it.key == DEFAULT_ROLE_ID || it.key == ANONYMOUS_ROLE_ID ? it.key : netRoleId, it.value.collectEntries { ti -> [ti.key, ti.value] }]
+        } as Map<String, Map<RolePermission, Boolean>>
     }
 
     private class NetCaseTask {

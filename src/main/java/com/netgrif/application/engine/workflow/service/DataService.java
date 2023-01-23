@@ -47,7 +47,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -364,7 +363,7 @@ public class DataService implements IDataService {
             return null;
         }
         workflowService.save(useCase);
-        field.setRawValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
+        field.setRawValue(((FileField) useCase.getDataSet().get(field.getStringId())).getRawValue());
 
         try {
             if (forPreview) {
@@ -517,7 +516,7 @@ public class DataService implements IDataService {
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
         }
-        ((FileListField)useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
+        ((FileListField) useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         return true;
     }
 
@@ -537,7 +536,7 @@ public class DataService implements IDataService {
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
 
-        ((FileField)useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
+        ((FileField) useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         return true;
     }
 
@@ -614,7 +613,7 @@ public class DataService implements IDataService {
                 new File(fileField.get().getPath()).delete();
                 field.getValue().getValue().getNamesPaths().remove(fileField.get());
             }
-            ((FileListField)useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
+            ((FileListField) useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         }
         // TODO: NAE-1645 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));

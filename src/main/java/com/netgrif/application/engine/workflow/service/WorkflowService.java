@@ -196,8 +196,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            // TODO: NAE-1645: UserRefsTest#testCases - Field.getValue() is null
-            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue().getValue());
+            UserListField userListField = (UserListField) useCase.getDataSet().get(id);
+            List<String> userIds = getExistingUsers(userListField.getRawValue());
             if (userIds != null && userIds.size() != 0 && permission.containsKey(ProcessRolePermission.VIEW) && !permission.get(ProcessRolePermission.VIEW)) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else if (userIds != null && userIds.size() != 0) {

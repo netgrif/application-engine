@@ -76,8 +76,8 @@ class FilterApiTest {
         assert item.dataSet.get("parentId").rawValue.toString() == defGroup.stringId
 
         assert ((FilterField) filter.dataSet.get("filter")).filterMetadata["filterType"] == "Case"
-        assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter", "preference_filter_item"]
         assert ((FilterField) filter.dataSet.get("filter")).rawValue == "processIdentifier:filter OR processIdentifier:preference_filter_item"
+        assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter", "preference_filter_item"]
         assert filter.dataSet.get("filter_type").rawValue == "Case"
 
         List<String> taskIds = (defGroup.dataSet.get("filter_tasks").rawValue ?: []) as List
