@@ -479,8 +479,9 @@ public class TaskService implements ITaskService {
     protected void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
         Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
 
-        if (!filteredSupplier.get().allMatch(Arc::isExecutable))
+        if (!filteredSupplier.get().allMatch(Arc::isExecutable)) {
             throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
+        }
 
         filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
             if (arc instanceof ResetArc) {

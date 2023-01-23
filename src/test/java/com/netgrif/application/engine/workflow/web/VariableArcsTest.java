@@ -29,6 +29,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,12 +47,12 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
 public class VariableArcsTest {
 
-    public static final Logger log = LoggerFactory.getLogger(VariableArcsTest.class);
     private static final String NET_PATH = "src/test/resources/variable_arc_test.xml";
 
     @Autowired
@@ -68,9 +69,6 @@ public class VariableArcsTest {
 
     @Autowired
     private MockService mock;
-
-    @Autowired
-    private DefaultRoleRunner defaultRoleRunner;
 
     @Autowired
     private IProcessRoleService processRoleService;

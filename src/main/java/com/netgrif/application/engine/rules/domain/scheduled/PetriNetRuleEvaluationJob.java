@@ -14,18 +14,17 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+// RuleJobs need autowired fields otherwise AutowiringSpringBeanJobFactory::createJobInstance will fail
+@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 public class PetriNetRuleEvaluationJob extends RuleJob {
 
     public static final String NET_ID = "netId";
 
-    private final IRuleEngine ruleEngine;
+    @Autowired
+    private IRuleEngine ruleEngine;
 
-    private final IPetriNetService petriNetService;
-
-    public PetriNetRuleEvaluationJob(IRuleEngine ruleEngine, IPetriNetService petriNetService) {
-        this.ruleEngine = ruleEngine;
-        this.petriNetService = petriNetService;
-    }
+    @Autowired
+    private IPetriNetService petriNetService;
 
     @Override
     public void doExecute(JobExecutionContext context) {

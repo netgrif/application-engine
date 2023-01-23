@@ -3,6 +3,7 @@ package com.netgrif.application.engine.workflow.service.initializer;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.FilterField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
@@ -29,12 +30,6 @@ public class FieldInitializer {
 //            }
 //            if (field instanceof FilterField) {
 //                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
-//            }
-//            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
-//                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
-//            }
-//            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
-//                dynamicChoicesFields.add((ChoiceField<?>) field);
 //            }
 //        });
 

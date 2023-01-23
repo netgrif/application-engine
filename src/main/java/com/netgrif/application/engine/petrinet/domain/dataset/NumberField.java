@@ -30,6 +30,10 @@ public class NumberField extends Field<Double> implements Referencable {
 
     @Override
     public int getMultiplicity() {
-        return 0; // TODO: NAE-+1645
+        Double value = this.getRawValue();
+        if (value == null) {
+            return -1;
+        }
+        return value.intValue();
     }
 }
