@@ -126,6 +126,7 @@
 		<validations>
 			<validation>
 				<expression>email</expression>
+				<message/>
 			</validation>
 		</validations>
 	</data>

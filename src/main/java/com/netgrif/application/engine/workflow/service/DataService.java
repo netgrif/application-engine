@@ -22,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.validation.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
@@ -53,6 +54,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,6 +92,9 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IPetriNetService petriNetService;
+
+    @Autowired
+    protected IValidationService validation;
 
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
@@ -222,6 +227,7 @@ public class DataService implements IDataService {
                 }
                 Object newValue = parseFieldsValues(entry.getValue(), dataField);
                 dataField.setValue(newValue);
+                dataField.setLastModified(LocalDateTime.now());
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
                 changedField.addAttribute("value", newValue);
@@ -235,6 +241,7 @@ public class DataService implements IDataService {
                     dataField.setFilterMetadata(filterMetadata);
                     changedField.addAttribute("filterMetadata", filterMetadata);
                 }
+                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
