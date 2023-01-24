@@ -39,7 +39,7 @@ public class LocalisedTaskResource extends EntityModel<Task> {
                 .setData(task.getStringId(), null, null)).withRel("data-edit"));
         try {
             add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                    .getFile(task.getStringId(), "", null)).withRel("file"));
+                    .getFile(task.getStringId(), "")).withRel("file"));
         } catch (FileNotFoundException e) {
             log.error("Building links failed: ", e);
         }

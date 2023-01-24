@@ -7,16 +7,15 @@ import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
+import com.netgrif.application.engine.workflow.web.requestbodies.file.FileFieldRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.LocalisedTaskResource;
-import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -27,14 +26,13 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -134,76 +132,67 @@ public class PublicTaskController extends AbstractTaskController {
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
-    @PostMapping(value = "/{id}/file/{field}", produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{id}/file", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                         @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale) {
-        fieldId = new String(Base64.decodeBase64(fieldId));
-        return super.saveFile(taskId, fieldId, multipartFile, dataBody, locale);
+    public EntityModel<EventOutcomeWithMessage> saveFile(Authentication auth, @PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest dataBody, @RequestPart(value = "file") MultipartFile multipartFile, Locale locale){
+        return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
     @Operation(summary = "Download task file field value")
-    @GetMapping(value = "/{id}/file/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) throws FileNotFoundException {
-        fieldId = new String(Base64.decodeBase64(fieldId));
+    @GetMapping(value = "/{id}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
         return super.getFile(taskId, fieldId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Remove file from the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
-    @DeleteMapping(value = "/{id}/file/{field}", produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/{id}/file", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam("parentTaskId") String parentTaskId) {
-        fieldId = new String(Base64.decodeBase64(fieldId));
-        return super.deleteFile(parentTaskId, fieldId);
+    public EntityModel<EventOutcomeWithMessage> deleteFile(@PathVariable("id") String taskId, @RequestBody FileFieldRequest requestBody) {
+        return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
     @Operation(summary = "Download preview for file field value")
     @GetMapping(value = "/{id}/file_preview/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
-        fieldId = new String(Base64.decodeBase64(fieldId));
+    public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
         return super.getFilePreview(taskId, fieldId);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
-    @PostMapping(value = "/{id}/files/{field}", produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{id}/files", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                          @RequestPart(value = "data") Map<String, String> dataBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
-        fieldId = new String(Base64.decodeBase64(fieldId));
-        return super.saveFiles(taskId, fieldId, multipartFiles, dataBody);
+    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest requestBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
+        return super.saveFiles(taskId, multipartFiles, requestBody);
     }
 
     @Override
     @Operation(summary = "Download one file from tasks file list field value")
-    @GetMapping(value = "/{id}/file/{field}/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
-        fieldId = new String(Base64.decodeBase64(fieldId));
-        return super.getNamedFile(taskId, fieldId, name);
+    @GetMapping(value = "/{id}/file/named", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId, @RequestParam("fileName") String fileName) throws FileNotFoundException {
+        return super.getNamedFile(taskId, fieldId, fileName);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Remove file from tasks file list field value",
             description = "Caller must be assigned to the task, or must be an ADMIN")
-    @DeleteMapping(value = "/{id}/file/{field}/{name}", produces = MediaTypes.HAL_JSON_VALUE)
+    @DeleteMapping(value = "/{id}/file/named", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
     public EntityModel<EventOutcomeWithMessage> deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name, @RequestParam("parentTaskId") String parentTaskId) {
-        fieldId = new String(Base64.decodeBase64(fieldId));
         return super.deleteNamedFile(parentTaskId, fieldId, name);
     }
 
