@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.util.MultiValueMap
 import org.springframework.web.context.WebApplicationContext
 
 import static org.hamcrest.core.StringContains.containsString
@@ -108,7 +109,9 @@ class FileListFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID + '/test-file.txt')
+        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/named")
+                .param("fieldId", FIELD_ID)
+                .param("fileName", "test-file.txt")
                 .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -127,8 +130,10 @@ class FileListFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file from file list download", "black", user.transformToLoggedUser()).getCase()
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + new String(Base64.getEncoder().encode(FIELD_ID.getBytes())) + '/test-file-list.txt').
-                with(httpBasic(USER_EMAIL, userPassword)))
+        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/named")
+                .param("fieldId", FIELD_ID)
+                .param("fileName", "test-file.txt")
+                .with(httpBasic(USER_EMAIL, userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
