@@ -20,7 +20,7 @@
                 <action>
                     tester_text_field: f.tester_text_field,
                     tf: f.this;
-                    change tester_text_field value { tf.value }
+                    change tester_text_field value { tf.rawValue }
                 </action>
             </actions>
         </event>

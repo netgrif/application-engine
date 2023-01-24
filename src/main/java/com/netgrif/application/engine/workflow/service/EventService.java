@@ -103,7 +103,7 @@ public class EventService implements IEventService {
         // TODO: NAE-1645 6.2.5
         outcome.getChangedFields().getFields().forEach((s, changedField) -> {
             if (changedField.getValue() != null && trigger == DataEventType.SET) {
-                Field<?> field = outcome.getCase().getField(s);
+                Field<?> field = outcome.getCase().getDataSet().get(s);
                 log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask()));

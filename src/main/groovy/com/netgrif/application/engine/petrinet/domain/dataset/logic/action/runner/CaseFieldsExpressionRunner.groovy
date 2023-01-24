@@ -32,14 +32,10 @@ abstract class CaseFieldsExpressionRunner {
     }
 
     def run(Case useCase, Expression expression) {
-        return run(useCase, useCase.dataSet.fields.keySet().collectEntries { [(it): (it)] } as Map<String, String>, expression)
-    }
-
-    def run(Case useCase, Map<String, String> fields, Expression expression) {
         log.debug("Expression: $expression")
         def code = getExpressionCode(expression)
         try {
-            initCode(code.delegate, useCase, fields)
+            initCode(code.delegate, useCase)
             code()
         } catch (Exception e) {
             log.error("Action: $expression.definition")
@@ -58,9 +54,9 @@ abstract class CaseFieldsExpressionRunner {
         return code.rehydrate(getActionDelegate(), code.owner, code.thisObject)
     }
 
-    protected void initCode(Object delegate, Case useCase, Map<String, String> fields) {
+    protected void initCode(Object delegate, Case useCase) {
         ActionDelegate ad = ((ActionDelegate) delegate)
         ad.useCase = useCase
-        ad.initFieldsMap(fields, useCase)
+        ad.initFieldsMap(useCase.dataSet.fields.collectEntries {[(it): (it)]}, useCase)
     }
 }

@@ -155,7 +155,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -170,7 +170,7 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["view_ul_neg"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        case_.dataSet.get("view_ul_neg").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -187,7 +187,7 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        case_.dataSet["view_ul_pos"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         case_ = workflowService.save(case_)
         sleep(4000)
 

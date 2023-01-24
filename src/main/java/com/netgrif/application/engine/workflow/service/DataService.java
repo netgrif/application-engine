@@ -47,6 +47,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 @Slf4j
 @Service
@@ -99,8 +101,9 @@ public class DataService implements IDataService {
         GetDataEventOutcome outcome = new GetDataEventOutcome(useCase, task);
 
         dataRefs.forEach((fieldId, dataRef) -> {
-            Field<?> field = useCase.getField(fieldId);
+            Field<?> field = useCase.getDataSet().get(fieldId);
             DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
+            // TODO: NAE-1645 behavior is null
             if (behavior.isForbidden()) {
                 return;
             }
@@ -335,13 +338,15 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
         runGetActionsFromFileField(field.getEvents(), useCase);
-        if (useCase.getFieldValue(field.getStringId()) == null)
+        FileListField caseField = (FileListField) useCase.getDataSet().get(field.getStringId());
+        if (caseField.getRawValue() == null) {
             return null;
+        }
 
         workflowService.save(useCase);
-        field.setRawValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
+        field.setRawValue(caseField.getRawValue());
 
-        Optional<FileFieldValue> fileField = field.getValue().getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
+        Optional<FileFieldValue> fileField = field.getRawValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (fileField.isEmpty() || fileField.get().getPath() == null) {
             log.error("File " + name + " not found!");
             return null;
@@ -359,11 +364,13 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
         runGetActionsFromFileField(field.getEvents(), useCase);
-        if (useCase.getFieldValue(field.getStringId()) == null) {
+        FileField caseField = (FileField) useCase.getDataSet().get(field.getStringId());
+        if (caseField.getRawValue() == null) {
             return null;
         }
+
         workflowService.save(useCase);
-        field.setRawValue(((FileField) useCase.getDataSet().get(field.getStringId())).getRawValue());
+        field.setRawValue(caseField.getRawValue());
 
         try {
             if (forPreview) {
@@ -592,7 +599,7 @@ public class DataService implements IDataService {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setRawValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue());
+        field.setRawValue((FileFieldValue) useCase.getDataSet().get(field.getStringId()).getRawValue());
 
         return new ImmutablePair<>(useCase, field);
     }
@@ -623,7 +630,7 @@ public class DataService implements IDataService {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setRawValue(((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue().getValue()));
+        field.setRawValue(((FileListFieldValue) useCase.getDataSet().get(field.getStringId()).getRawValue()));
         return new ImmutablePair<>(useCase, field);
     }
 
@@ -648,7 +655,7 @@ public class DataService implements IDataService {
     private void updateDataset(Case useCase) {
         Case actual = workflowService.findOne(useCase.getStringId());
         actual.getDataSet().getFields().forEach((id, dataField) -> {
-            if (dataField.isNewerThen(useCase.getDataField(id))) {
+            if (dataField.isNewerThen(useCase.getDataSet().get(id))) {
                 useCase.getDataSet().put(id, dataField);
             }
         });

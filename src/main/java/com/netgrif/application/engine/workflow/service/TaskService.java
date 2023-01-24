@@ -518,9 +518,9 @@ public class TaskService implements ITaskService {
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataRef> entry : transition.getDataSet().entrySet()) {
             // TODO: NAE-1645 fix validation
-//            if (!useCase.getDataField(entry.getKey()).req(transition.getImportId()))
+//            if (!useCase.getDataSet().get(entry.getKey()).req(transition.getImportId()))
 //                continue;
-//            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
+//            if (useCase.getDataSet().get(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
 //                continue;
 //            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
 //            if (value == null) {

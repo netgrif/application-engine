@@ -199,8 +199,7 @@ class ActionDelegate {
 
     def initFieldsMap(Map<String, String> fieldIds, Case useCase) {
         fieldIds.each { name, id ->
-//            TODO: NAE-1645
-            set(name, useCase.getDataField(id))
+            set(name, useCase.getDataSet().get(id))
         }
     }
 
@@ -211,39 +210,40 @@ class ActionDelegate {
     }
 
     def copyBehavior(Field field, Transition transition) {
-        if (!useCase.hasFieldBehavior(field.stringId, transition.stringId)) {
-            useCase.dataSet.get(field.stringId).addBehavior(transition.stringId, transition.dataSet.get(field.stringId).behavior)
+        Field<?> caseField = useCase.dataSet.get(field.stringId)
+        if (caseField.behaviors.get(transition.stringId) == null) {
+            caseField.behaviors.put(transition.stringId, transition.dataSet.get(field.stringId).behavior)
         }
     }
 
     def visible = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeVisible(trans.stringId)
+        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.VISIBLE
     }
 
     def editable = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeEditable(trans.stringId)
+        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.EDITABLE
     }
 
     def required = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeRequired(trans.stringId)
+        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).required = true
     }
 
     def optional = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeOptional(trans.stringId)
+        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).required = false
     }
 
     def hidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeHidden(trans.stringId)
+        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.HIDDEN
     }
 
     def forbidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeForbidden(trans.stringId)
+        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.FORBIDDEN
     }
 
     def initial = { Field field, Transition trans ->

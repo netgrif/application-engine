@@ -1,8 +1,14 @@
 package com.netgrif.application.engine.petrinet.domain
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -10,6 +16,8 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -21,11 +29,13 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
 import static org.junit.jupiter.api.Assertions.assertThrows
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class FunctionsTest {
 
     @Autowired
@@ -46,11 +56,9 @@ class FunctionsTest {
     @Autowired
     private TestHelper testHelper
 
-    private static final FUNCTION_RES_IDENTIFIER = "function_res"
+    private static final String FUNCTION_RES_IDENTIFIER = "function_res"
 
-    private static final FUNCTION_TEST_IDENTIFIER = "function_test"
-
-    private static final FUNCTION_OVERLOADING_IDENTIFIER = "function_overloading"
+    private static final String FUNCTION_TEST_IDENTIFIER = "function_test"
 
     @Value("classpath:petriNets/function_res.xml")
     private Resource functionResNetResource
@@ -82,7 +90,6 @@ class FunctionsTest {
     }
 
     @Test
-    @Disabled("MissingMethod No signature of method")
     void testNamespaceFunction() {
         assert userService.findByEmail("test@test.com", true) == null
 
@@ -92,10 +99,10 @@ class FunctionsTest {
         assert functionResNet
         assert functionTestNet
 
-        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["createUser": ["value": "true", "type": "boolean"]]))
+        Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        dataService.setData(aCase.tasks.first().task, new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>))
 
-        User user = userService.findByEmail("test@test.com", true)
+        IUser user = userService.findByEmail("test@test.com", true)
         assert user
 
         userService.deleteUser(user)
@@ -109,14 +116,13 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        // TODO: NAE-1645
-        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[enum:[value:ano, type:enumeration]]]
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["enum": ["value": "ano", "type": "enumeration"]]))
+        dataService.setData(aCase.tasks.first().task, new DataSet((["enum": new EnumerationField (rawValue: new I18nString("ano"))] as Map<String, Field<?>>)))
         aCase = workflowService.findOne(aCase.getStringId())
 
-        assert aCase.getDataField("number").isRequired(aCase.tasks.first().transition)
-        def fieldBehavior = aCase.getDataField("number").behaviors
-        assert fieldBehavior.containsKey(aCase.tasks.first().transition) && fieldBehavior.get(aCase.tasks.first().transition).contains(FieldBehavior.EDITABLE)
+        NumberField field = aCase.getDataSet().get("number") as NumberField
+        assert field.getBehaviors().get(aCase.tasks.first().transition).required
+        def fieldBehavior = field.behaviors
+        assert fieldBehavior.get(aCase.tasks.first().transition).behavior == EDITABLE
 
         petriNetService.deletePetriNet(functionTestNet.stringId, userService.getLoggedOrSystem().transformToLoggedUser())
     }
@@ -134,10 +140,8 @@ class FunctionsTest {
             def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
             assert functionTestNet
 
-            // TODO: NAE-1645
-            //  Unexpected exception type thrown ==> expected: <java.lang.NullPointerException> but was: <groovy.lang.MissingMethodException>
-            Case aCase = workflowService.createCase(functionTestNet.get().stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser())
-            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+            Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+            dataService.setData(aCase.tasks.first().task, new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)))
         })
     }
 
@@ -155,12 +159,12 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+            dataService.setData(aCase.tasks.first().task, new DataSet((["text": new TextField(rawValue:  "20")] as Map<String, Field<?>>)))
 
             functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
             assert functionTestNet
 
-            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["text": ["value": "20", "type": "text"]]))
+            dataService.setData(aCase.tasks.first().task, new DataSet((["text": new TextField(rawValue:  "20")] as Map<String, Field<?>>)))
         })
     }
 
@@ -171,7 +175,7 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-            dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number3": ["value": "20", "type": "number"]]))
+            dataService.setData(aCase.tasks.first().task, new DataSet((["number3": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
         })
     }
 
@@ -184,22 +188,18 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        // TODO: NAE-1645
-        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[number:[value:20, type:number]]]
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+        dataService.setData(aCase.tasks.first().task, new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
         aCase = workflowService.findOne(aCase.getStringId())
 
-        assert aCase.getFieldValue("number2") == 20 + 20
+        assert aCase.getDataSet().get("number2").rawValue == 20 + 20
 
         functionResNet = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         assert functionResNet
 
-        // TODO: NAE-1645
-        // No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[number:[value:20, type:number]]]
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+        dataService.setData(aCase.tasks.first().task, new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
         aCase = workflowService.findOne(aCase.getStringId())
 
-        assert aCase.getFieldValue("number2") == 20 * 20
+        assert aCase.getDataSet().get("number2").rawValue == 20 * 20
     }
 
     @Test
@@ -228,16 +228,15 @@ class FunctionsTest {
 
     private void testMethodOverloading(Resource resource) {
         def petriNet = petriNetService.importPetriNet(resource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
-
         assert petriNet
 
         Case aCase = workflowService.createCase(petriNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        // TODO: NAE-1645
-        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[number:[value:20, type:number]]]
-        dataService.setData(aCase.tasks.first().task, ImportHelper.populateDataset(["number": ["value": "20", "type": "number"]]))
+        dataService.setData(aCase.tasks.first().task, new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
         aCase = workflowService.findOne(aCase.getStringId())
+        NumberField numberField2 = aCase.dataSet.get("number2") as NumberField
+        TextField textField = aCase.dataSet.get("text") as TextField
 
-        assert aCase.getFieldValue("number2") == 20 * 20
-        assert aCase.getFieldValue("text") == "20.0 20.0"
+        assert numberField2.rawValue == 20 * 20
+        assert textField.rawValue == "20.0 20.0"
     }
 }

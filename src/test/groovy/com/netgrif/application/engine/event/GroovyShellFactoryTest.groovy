@@ -104,7 +104,7 @@ class GroovyShellFactoryTest {
     @Test
     void caseFieldsExpressionTest() {
         def _case = importHelper.createCase("case", net)
-        assert _case.dataSet["newVariable_1"].value == "value"
+        assert _case.dataSet.get("newVariable_1").rawValue == "value"
     }
 
     @Test

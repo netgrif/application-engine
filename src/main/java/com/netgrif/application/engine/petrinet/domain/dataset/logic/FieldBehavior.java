@@ -3,9 +3,6 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic;
 import com.netgrif.application.engine.importer.model.Behavior;
 
 public enum FieldBehavior {
-    // TODO: NAE-1645
-    //  com.netgrif.application.engine.petrinet.domain.ImporterTest#initialBehaviorTest
-    //  No enum constant com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.IMMEDIATE
     VISIBLE("visible"),
     EDITABLE("editable"),
     HIDDEN("hidden"),

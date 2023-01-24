@@ -9,6 +9,8 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -20,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class ChoiceFieldTest {
 
     public static final String LIMITS_NET_FILE = "case_choices_test.xml"
@@ -42,7 +45,7 @@ class ChoiceFieldTest {
     @Autowired
     private SuperCreator superCreator;
 
-    private def stream = { String name ->
+    private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
@@ -65,12 +68,9 @@ class ChoiceFieldTest {
 
         Case choiceCase = helper.createCase("Choices", net)
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, [
-                "bool": [
-                        value: true,
-                        type : helper.FIELD_BOOLEAN
-                ]
-        ])
+        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
+                "bool": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
         List<Field> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
 
@@ -79,12 +79,9 @@ class ChoiceFieldTest {
         assert choices.find { it.defaultValue == "Choice 2" }
         assert choices.find { it.defaultValue == "Choice 3" }
 
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, [
-                "bool": [
-                        value: false,
-                        type : helper.FIELD_BOOLEAN
-                ]
-        ])
+        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
+                "bool": new BooleanField(rawValue: false)
+        ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
@@ -94,12 +91,9 @@ class ChoiceFieldTest {
         assert choices.find { it.defaultValue == "Choice B" }
         assert choices.find { it.defaultValue == "Choice C" }
 
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, [
-                "bool": [
-                        value: true,
-                        type : helper.FIELD_BOOLEAN
-                ]
-        ])
+        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
+                "bool": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices

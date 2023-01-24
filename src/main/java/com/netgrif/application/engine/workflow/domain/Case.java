@@ -152,10 +152,6 @@ public class Case {
         return n + "";
     }
 
-    public Object getFieldValue(String fieldId) {
-        return dataSet.get(fieldId).getValue();
-    }
-
     public boolean addTask(Task task) {
         return this.tasks.add(new TaskPair(task.getStringId(), task.getTransitionId()));
     }
@@ -169,14 +165,6 @@ public class Case {
         Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
         this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());
         return this.tasks.size() != sizeBeforeChange;
-    }
-
-    public Field<?> getField(String id) {
-        return petriNet.getDataSet().get(id);
-    }
-
-    public Field<?> getDataField(String id) {
-        return dataSet.get(id);
     }
 
     public String getPetriNetId() {

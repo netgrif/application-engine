@@ -2,6 +2,10 @@ package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -14,6 +18,8 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,6 +33,7 @@ import java.util.stream.Collectors
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
+@CompileStatic
 class UserListTest {
 
     @Autowired
@@ -60,16 +67,13 @@ class UserListTest {
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("User List"));
 
         assert caseOpt.isPresent();
-        assert caseOpt.get().getDataSet().get("text").getValue() == "Its working...";
+        assert caseOpt.get().getDataSet().get("text").getRawValue() == "Its working...";
 
         Task task = taskService.findByCases(new FullPageRequest(), Collections.singletonList(caseOpt.get().getStringId())).stream().collect(Collectors.toList()).get(0)
 
-        dataService.setData(task.stringId, ImportHelper.populateDataset([
-                "users_1": [
-                        "value": [superCreator.getSuperUser().getStringId()],
-                        "type" : "userList"
-                ]
-        ]))
+        dataService.setData(task.stringId, new DataSet([
+                "users_1": new UserListField(rawValue: new UserListFieldValue(new UserFieldValue(superCreator.getSuperUser())))
+        ] as Map<String, Field<?>>))
 
         assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getStringId())
         assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getStringId())

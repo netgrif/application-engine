@@ -66,7 +66,7 @@ class ConcurrencyTest {
         cases.each {
             Optional<Case> caseOptional = caseRepository.findById(it.stringId)
             assert caseOptional.isPresent()
-            assert caseOptional.get().stringId == (caseOptional.get().getFieldValue("text") as String)
+            assert caseOptional.get().stringId == (caseOptional.get().getDataSet().get("text").getRawValue() as String)
         }
     }
 }

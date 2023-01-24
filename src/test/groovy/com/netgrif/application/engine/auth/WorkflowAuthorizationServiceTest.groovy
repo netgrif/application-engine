@@ -87,35 +87,6 @@ class WorkflowAuthorizationServiceTest {
     private Authentication adminAuth
     private IUser testUser
 
-////    @BeforeEach
-//    void before() {
-//        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authentication_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
-//        assert net.getNet() != null
-//
-//        this.net = net.getNet()
-//
-//        mvc = MockMvcBuilders
-//                .webAppContextSetup(wac)
-//                .apply(springSecurity())
-//                .build()
-//
-//        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-//
-//        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-//                [auths.get("user")] as Authority[],
-////                [] as Group[],
-//                [] as ProcessRole[])
-//
-//        userAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
-//
-//        importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-//                [auths.get("admin")] as Authority[],
-////                [] as Group[],
-//                [] as ProcessRole[])
-//
-//        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
-//    }
-
     @BeforeEach
     void init() {
         testHelper.truncateDbs()
@@ -130,7 +101,6 @@ class WorkflowAuthorizationServiceTest {
         def auths = importHelper.createAuthorities(["user": Authority.user])
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")]as Authority[],
-//                [org] as Group[],
                 [] as ProcessRole[])
     }
 
@@ -228,7 +198,7 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["pos_user_list"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        case_.dataSet.get("pos_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
         workflowService.save(case_)
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -246,8 +216,8 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet["pos_user_list"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-        case_.dataSet["neg_user_list"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        case_.dataSet.get("pos_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        case_.dataSet.get("neg_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
 
         workflowService.save(case_)
 

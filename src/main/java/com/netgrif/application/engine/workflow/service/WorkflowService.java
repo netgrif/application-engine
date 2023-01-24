@@ -427,13 +427,13 @@ public class WorkflowService implements IWorkflowService {
 
     private void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
-            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataField(field.getStringId()).getValue() != null &&
-                    useCase.getDataField(field.getStringId()).getValue().equals(field.getDefaultValue())) {
-                ((TaskField)useCase.getDataField(field.getStringId())).setRawValue(new ArrayList<>());
+            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataSet().get(field.getStringId()).getValue() != null &&
+                    useCase.getDataSet().get(field.getStringId()).getValue().equals(field.getDefaultValue())) {
+                ((TaskField)useCase.getDataSet().get(field.getStringId())).setRawValue(new ArrayList<>());
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
                         (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
-                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(field.getStringId()).getValue()).add(pair.getTask()));
+                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataSet().get(field.getStringId()).getValue()).add(pair.getTask()));
                 }
             }
         });
@@ -457,7 +457,7 @@ public class WorkflowService implements IWorkflowService {
             }
             TextField dataField = (TextField) entry.getKey();
             String encryption = entry.getValue();
-            String value = dataField.getValue().getValue();
+            String value = dataField.getRawValue();
             if (value == null) {
                 continue;
             }

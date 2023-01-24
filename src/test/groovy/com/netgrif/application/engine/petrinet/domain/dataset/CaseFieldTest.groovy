@@ -10,6 +10,8 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -22,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class CaseFieldTest {
 
     public static final String ALLOWED_NETS_NET_FILE = "change_allowed_nets_action_test.xml"
@@ -29,6 +32,7 @@ class CaseFieldTest {
 
     public static final String CHANGE_VALUE_NET_FILE = "change_caseref_value_action_test.xml"
     public static final String CHANGE_VALUE_TASK_TITLE = "Tran"
+    public static final String CASE_FIELD_ID = "caseref"
 
     @Autowired
     private ImportHelper importHelper
@@ -64,20 +68,20 @@ class CaseFieldTest {
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
-        assert aCase.getField("caseref") instanceof CaseField
-        assert ((CaseField) aCase.getField("caseref")).allowedNets.size() == 1
-        assert ((CaseField) aCase.getField("caseref")).allowedNets.get(0) == "lorem"
+        Field<?> field = aCase.getDataSet().get(CASE_FIELD_ID)
+        assert field instanceof CaseField
+        CaseField caseField = field as CaseField
+        assert caseField.allowedNets.size() == 1
+        assert caseField.allowedNets.get(0) == "lorem"
 
         importHelper.assignTaskToSuper(ALLOWED_NETS_TASK_TITLE, aCase.stringId)
-        SetDataEventOutcome changed1 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
-                "setVal": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        SetDataEventOutcome changed1 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
+                "setVal": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
 
-        assert (changed1.outcomes[0] as SetDataEventOutcome).changedFields.fields.containsKey("caseref")
-        List<String> list1 = (changed1.outcomes[0] as SetDataEventOutcome).changedFields.fields["caseref"].allowedNets
+        SetDataEventOutcome setDataEventOutcome1 = changed1.outcomes.first() as SetDataEventOutcome
+        assert setDataEventOutcome1.changedFields.fields.containsKey(CASE_FIELD_ID)
+        List<String> list1 = ((CaseField)setDataEventOutcome1.changedFields.fields[CASE_FIELD_ID]).allowedNets
         assert list1.size() == 2
         assert list1.get(0) == "hello"
         assert list1.get(1) == "world"
@@ -85,26 +89,26 @@ class CaseFieldTest {
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
-        assert aCase.getDataSet().get("caseref").allowedNets.size() == 2
-        assert aCase.getDataSet().get("caseref").allowedNets.get(0) == "hello"
-        assert aCase.getDataSet().get("caseref").allowedNets.get(1) == "world"
 
-        SetDataEventOutcome changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
-                "setNull": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        CaseField caseField1 = aCase.getDataSet().get(CASE_FIELD_ID) as CaseField
+        assert caseField1.allowedNets.size() == 2
+        assert caseField1.allowedNets.get(0) == "hello"
+        assert caseField1.allowedNets.get(1) == "world"
 
-        assert (changed2.outcomes[0] as SetDataEventOutcome).changedFields.fields.containsKey("caseref")
-        List<String> list2 = (changed2.outcomes[0] as SetDataEventOutcome).changedFields.fields["caseref"].allowedNets
+        SetDataEventOutcome changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
+                "setNull": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
+
+        SetDataEventOutcome setDataEventOutcome2 = changed2.outcomes.first() as SetDataEventOutcome
+        assert setDataEventOutcome2.changedFields.fields.containsKey(CASE_FIELD_ID)
+        List<String> list2 = ((CaseField)setDataEventOutcome2.changedFields.fields[CASE_FIELD_ID]).allowedNets
         assert list2.size() == 0
 
         caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
-        assert aCase.getDataSet().get("caseref").allowedNets.size() == 0
-
+        CaseField caseField2 = aCase.getDataSet().get(CASE_FIELD_ID) as CaseField
+        assert caseField2.allowedNets.size() == 0
     }
 
     @Test
@@ -117,7 +121,7 @@ class CaseFieldTest {
         assert aCase.getImmediateData().size() == 1
         CaseField caseRef = (CaseField) aCase.getImmediateData().get(0)
         assert caseRef.allowedNets.size() == 1
-        assert caseRef.allowedNets.get(0).equals("lorem")
+        assert caseRef.allowedNets.get(0) == "lorem"
 
         aCase = workflowService.findAllById([aCase.stringId]).get(0)
 
@@ -125,15 +129,12 @@ class CaseFieldTest {
         assert aCase.getImmediateData().size() == 1
         caseRef = (CaseField) aCase.getImmediateData().get(0)
         assert caseRef.allowedNets.size() == 1
-        assert caseRef.allowedNets.get(0).equals("lorem")
+        assert caseRef.allowedNets.get(0) == "lorem"
 
         importHelper.assignTaskToSuper(ALLOWED_NETS_TASK_TITLE, aCase.stringId)
-        importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
-                "setVal": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
+                "setVal": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
 
         aCase = workflowService.findAllById([aCase.stringId]).get(0)
 
@@ -141,15 +142,12 @@ class CaseFieldTest {
         assert aCase.getImmediateData().size() == 1
         caseRef = (CaseField) aCase.getImmediateData().get(0)
         assert caseRef.allowedNets.size() == 2
-        assert caseRef.allowedNets.get(0).equals("hello")
-        assert caseRef.allowedNets.get(1).equals("world")
+        assert caseRef.allowedNets.get(0) == "hello"
+        assert caseRef.allowedNets.get(1) == "world"
 
-        SetDataEventOutcome changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
-                "setNull": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        SetDataEventOutcome changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, new DataSet([
+                "setNull": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
 
         aCase = workflowService.findAllById([aCase.stringId]).get(0)
 
@@ -157,7 +155,6 @@ class CaseFieldTest {
         assert aCase.getImmediateData().size() == 1
         caseRef = (CaseField) aCase.getImmediateData().get(0)
         assert caseRef.allowedNets.size() == 0
-
     }
 
     @Test
@@ -171,52 +168,47 @@ class CaseFieldTest {
 
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
-        assert aCase.getDataSet().get("caseref").value == null
+        assert aCase.getDataSet().get(CASE_FIELD_ID).value == null
 
         importHelper.assignTaskToSuper(CHANGE_VALUE_TASK_TITLE, aCase.stringId)
 
-        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
-                "addExisting": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, new DataSet([
+                "addExisting": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
-        assert aCase.getDataSet().get("caseref").value.size() == 1
-        assert aCase.getDataSet().get("caseref").value.get(0).equals(aCase.getStringId())
+        CaseField caseField1 = aCase.getDataSet().get(CASE_FIELD_ID) as CaseField
+        assert caseField1.rawValue.size() == 1
+        assert caseField1.rawValue.get(0) == aCase.getStringId()
 
-        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
-                "addNew": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, new DataSet([
+                "addNew": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
 
         caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
-        assert aCase.getDataSet().get("caseref").value.size() == 2
-        assert aCase.getDataSet().get("caseref").value.get(0).equals(aCase.getStringId())
-        String secondCaseId = aCase.getDataSet().get("caseref").value.get(1)
+
+        CaseField caseField2 = aCase.getDataSet().get(CASE_FIELD_ID) as CaseField
+        assert caseField2.rawValue.size() == 2
+        assert caseField2.rawValue.get(0) == aCase.getStringId()
+        String secondCaseId = caseField2.rawValue.get(1)
 
         caseOpt = caseRepository.findById(secondCaseId)
         assert caseOpt.isPresent()
 
-        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
-                "addInvalidNet": [
-                        "value": true,
-                        "type" : importHelper.FIELD_BOOLEAN
-                ]
-        ])
+        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, new DataSet([
+                "addInvalidNet": new BooleanField(rawValue: true)
+        ] as Map<String,Field<?>>))
 
         caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
-        assert aCase.getDataSet().get("caseref").value.size() == 2
-        assert aCase.getDataSet().get("caseref").value.get(0).equals(aCase.getStringId())
-        assert aCase.getDataSet().get("caseref").value.get(1).equals(secondCaseId)
+        CaseField caseField3 = aCase.getDataSet().get(CASE_FIELD_ID) as CaseField
+        assert caseField3.rawValue.size() == 2
+        assert caseField3.rawValue.get(0) == aCase.getStringId()
+        assert caseField3.rawValue.get(1) == secondCaseId
     }
 }

@@ -26,7 +26,7 @@ class I18nFieldTest {
     @Test
     void testClearValue() {
         I18nField field = new I18nField()
-        field.value = new I18nString("This is default value", ["sk": "SK: This is default value", "de": "DE: This is default value"])
+        field.rawValue = new I18nString("This is default value", ["sk": "SK: This is default value", "de": "DE: This is default value"])
 
         field.clearValue()
 

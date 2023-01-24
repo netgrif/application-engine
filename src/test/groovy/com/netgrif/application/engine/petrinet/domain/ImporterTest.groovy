@@ -10,8 +10,10 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -24,9 +26,15 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.FORBIDDEN
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.HIDDEN
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class ImporterTest {
 
     @Autowired
@@ -79,7 +87,7 @@ class ImporterTest {
 
     @Test
     void importTest() {
-        int beforeImportNet = processRoleRepository.count()
+        long beforeImportNet = processRoleRepository.count()
         def netOptional = petriNetService.importPetriNet(
                 firstVersionResource.inputStream,
                 VersionType.MAJOR,
@@ -87,7 +95,7 @@ class ImporterTest {
         )
         assert netOptional.getNet() != null
         assert processRoleRepository.count() == beforeImportNet + 2
-        int statusImportRole = processRoleRepository.count()
+        long statusImportRole = processRoleRepository.count()
         def net = netOptional.getNet()
 
         // ASSERT IMPORTED NET
@@ -286,13 +294,9 @@ class ImporterTest {
 
         assert net != null
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
-        //TODO: NAE-1645
-        // com.netgrif.application.engine.petrinet.domain.ImporterTest#thisKeywordInDataEventsTest
-        // WorkflowService.save(WorkflowService.java:133):
-        // Couldn't find PersistentEntity for type T!
         taskService.assignTask(testCase.getTasks().toList().get(0).getTask())
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.getDataField("tester_text_field").getValue().equals("Hello world!")
+        assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"
     }
 
     @Test
@@ -302,20 +306,27 @@ class ImporterTest {
         assert net
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
 
-        assert testCase.dataSet.get(NUMBER_FIELD).behaviors.get("1") == [FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
-        assert testCase.dataSet.get(TEXT_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN] as Set<FieldBehavior>
-        assert testCase.dataSet.get(ENUMERATION_FIELD).behaviors.get("1") == [FieldBehavior.VISIBLE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(ENUMERATION_MAP_FIELD).behaviors.get("1") == [FieldBehavior.EDITABLE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(MULTICHOICE_FIELD).behaviors.get("1") == [FieldBehavior.REQUIRED] as Set<FieldBehavior>
-        assert testCase.dataSet.get(MULTICHOICE_MAP_FIELD).behaviors.get("1") == [FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(BOOLEAN_FIELD).behaviors.get("1") == [FieldBehavior.OPTIONAL] as Set<FieldBehavior>
-        assert testCase.dataSet.get(DATE_FIELD).behaviors.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED] as Set<FieldBehavior>
-        assert testCase.dataSet.get(DATETIME_FIELD).behaviors.get("1") == [FieldBehavior.IMMEDIATE, FieldBehavior.REQUIRED] as Set<FieldBehavior>
-        assert testCase.dataSet.get(FILE_FIELD).behaviors.get("1") == [FieldBehavior.IMMEDIATE, FieldBehavior.FORBIDDEN] as Set<FieldBehavior>
-        assert testCase.dataSet.get(FILE_LIST_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL] as Set<FieldBehavior>
-        assert testCase.dataSet.get(USER_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(BUTTON_FIELD).behaviors.get("1") == [FieldBehavior.EDITABLE, FieldBehavior.REQUIRED, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
-        assert testCase.dataSet.get(I18N_FIELD).behaviors.get("1") == [FieldBehavior.HIDDEN, FieldBehavior.OPTIONAL, FieldBehavior.IMMEDIATE] as Set<FieldBehavior>
+        assertBehaviors(testCase.dataSet.get(NUMBER_FIELD).behaviors.get("1"), FORBIDDEN)
+        assertBehaviors(testCase.dataSet.get(TEXT_FIELD).behaviors.get("1"), HIDDEN)
+        assertBehaviors(testCase.dataSet.get(ENUMERATION_FIELD).behaviors.get("1"), VISIBLE)
+        assertBehaviors(testCase.dataSet.get(ENUMERATION_MAP_FIELD).behaviors.get("1"), EDITABLE)
+        assertBehaviors(testCase.dataSet.get(MULTICHOICE_FIELD).behaviors.get("1"), EDITABLE, true)
+        assertBehaviors(testCase.dataSet.get(MULTICHOICE_MAP_FIELD).behaviors.get("1"), EDITABLE, false, true)
+        assertBehaviors(testCase.dataSet.get(BOOLEAN_FIELD).behaviors.get("1"), EDITABLE)
+        assertBehaviors(testCase.dataSet.get(DATE_FIELD).behaviors.get("1"), EDITABLE, true)
+        assertBehaviors(testCase.dataSet.get(DATETIME_FIELD).behaviors.get("1"), EDITABLE, true, true)
+        assertBehaviors(testCase.dataSet.get(FILE_FIELD).behaviors.get("1"), FORBIDDEN, false, true)
+        assertBehaviors(testCase.dataSet.get(FILE_LIST_FIELD).behaviors.get("1"), HIDDEN)
+        assertBehaviors(testCase.dataSet.get(USER_FIELD).behaviors.get("1"), HIDDEN, false, true)
+        assertBehaviors(testCase.dataSet.get(BUTTON_FIELD).behaviors.get("1"), EDITABLE, true, true)
+        assertBehaviors(testCase.dataSet.get(I18N_FIELD).behaviors.get("1"), HIDDEN, false ,true)
+    }
+
+    @SuppressWarnings('GrMethodMayBeStatic')
+    private void assertBehaviors(DataFieldBehavior dataFieldBehavior, FieldBehavior behavior, boolean required = false, boolean immediate = false) {
+        assert dataFieldBehavior.behavior == behavior
+        assert dataFieldBehavior.required == required
+        assert dataFieldBehavior.immediate == immediate
     }
 
     @Test
@@ -363,8 +374,6 @@ class ImporterTest {
         assert importNet
         assert importNet.getTransition("1").getTitle()
         assert importNet.getTransition("layout").getTitle()
-        assert importNet.getTransition("layout").getTitle().equals("")
-
+        assert importNet.getTransition("layout").getTitle().defaultValue == ""
     }
-
 }

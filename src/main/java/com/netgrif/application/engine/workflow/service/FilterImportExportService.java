@@ -340,28 +340,28 @@ public class FilterImportExportService implements IFilterImportExportService {
         exportFilter.setCaseId(filter.getStringId());
         exportFilter.setIcon(filter.getIcon());
 //        TODO: NAE-1645
-//        DataField parentCaseId = filter.getDataField(FIELD_PARENT_CASE_ID);
+//        DataField parentCaseId = filter.getDataSet().get(FIELD_PARENT_CASE_ID);
 //        if (parentCaseId.getValue() != null && !parentCaseId.getValue().equals("")) {
 //            exportFilter.setParentCaseId((String) parentCaseId.getValue());
 //        }
 //
-//        DataField parentViewId = filter.getDataField(FIELD_PARENT_VIEW_ID);
+//        DataField parentViewId = filter.getDataSet().get(FIELD_PARENT_VIEW_ID);
 //        if (parentViewId.getValue() != null && !parentViewId.getValue().equals("")) {
 //            exportFilter.setParentViewId((String) parentViewId.getValue());
 //        }
 //
-//        DataField filterField = filter.getDataField(FIELD_FILTER);
+//        DataField filterField = filter.getDataSet().get(FIELD_FILTER);
 //        exportFilter.setFilterValue((String) filterField.getValue());
 //        exportFilter.setAllowedNets(filterField.getAllowedNets());
 //        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
 //
-//        DataField visibility = filter.getDataField(FIELD_VISIBILITY);
+//        DataField visibility = filter.getDataSet().get(FIELD_VISIBILITY);
 //        exportFilter.setVisibility(visibility.getValue().toString());
 //
-//        DataField type = filter.getDataField(FIELD_FILTER_TYPE);
+//        DataField type = filter.getDataSet().get(FIELD_FILTER_TYPE);
 //        exportFilter.setType(type.getValue().toString());
 //
-//        DataField name = filter.getDataField(FIELD_NAME);
+//        DataField name = filter.getDataSet().get(FIELD_NAME);
 //        exportFilter.setFilterName((I18nString) name.getValue());
 
         return exportFilter;

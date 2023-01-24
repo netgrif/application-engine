@@ -209,7 +209,7 @@ public class NextGroupService implements INextGroupService {
     @Override
     public void addUser(IUser user, Case groupCase) {
         // TODO: NAE-1645: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
-        MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataField(GROUP_MEMBERS_FIELD);
+        MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataSet().get(GROUP_MEMBERS_FIELD);
         Map<String, I18nString> existingUsers = field.getOptions();
         if (existingUsers == null) {
             existingUsers = new HashMap<>();
@@ -230,7 +230,7 @@ public class NextGroupService implements INextGroupService {
     @Override
     public void removeUser(IUser user, Case groupCase) {
         HashSet<String> userIds = new HashSet<>();
-        MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataField(GROUP_MEMBERS_FIELD);
+        MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataSet().get(GROUP_MEMBERS_FIELD);
         Map<String, I18nString> existingUsers = field.getOptions();
         userIds.add(user.getStringId());
         field.setOptions(removeUser(userIds, existingUsers, groupCase));
@@ -364,7 +364,7 @@ public class NextGroupService implements INextGroupService {
         DataSet dataSet = new DataSet();
 
 //        TODO: NAE-1645
-//        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
+//        groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
 //        workflowService.save(groupCase);
 //
 //        DataField authorData = new DataField();

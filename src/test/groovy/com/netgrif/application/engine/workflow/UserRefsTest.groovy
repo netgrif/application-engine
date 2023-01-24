@@ -5,6 +5,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
@@ -68,10 +69,9 @@ class UserRefsTest {
         newCases = new ArrayList<>()
         userIds = new ArrayList<>()
         10.times {
-            def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net)
+            def _case = importHelper.createCase("$it" as String, net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
-            // TODO: NAE-1645 6.2.5
-//            _case.dataSet["user_list_1"].value = new UserListFieldValue([dataService.makeUserFieldValue(id)])
+            (_case.dataSet.get("user_list_1") as UserListField).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(id)])
             newCases.add(workflowService.save(_case))
             userIds.add(id)
         }

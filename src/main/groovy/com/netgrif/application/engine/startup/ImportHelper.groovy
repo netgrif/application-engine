@@ -188,15 +188,11 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    SetDataEventOutcome setTaskData(String taskId, Map<String, Map<String, String>> data) {
-        //TODO: NAE-1645
-        // com.netgrif.application.engine.ipc.TaskApiTest#testGetData
-        // No signature of method: com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[data_text:[value:text, type:text], data_number:[value:13, type:number]]]
-        DataSet dataSet = populateDataset(data)
+    SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
         dataService.setData(taskId, dataSet)
     }
 
-    SetDataEventOutcome setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
+    SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 

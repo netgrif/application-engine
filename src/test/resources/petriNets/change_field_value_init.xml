@@ -15,7 +15,7 @@
         <id>text_dynamic</id>
         <title>text_dynamic</title>
         <init dynamic="true">
-            text_static.value + " DYNAMIC"
+            text_static.rawValue + " DYNAMIC"
         </init>
     </data>
 

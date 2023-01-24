@@ -236,8 +236,8 @@ class ExportService implements IExportService {
 
     protected String resolveFieldValue(Case exportCase, String exportFieldId) {
         String fieldValue;
-        Field field = exportCase.getField(exportFieldId);
-        Object fieldData = exportCase.getDataField(exportFieldId).getValue();
+        Field<?> field = exportCase.getDataSet().get(exportFieldId);
+        Object fieldData = exportCase.getDataSet().get(exportFieldId).getRawValue();
         if (field.getValue() == null && exportCase.getDataSet().get(exportFieldId).getValue() == null) {
             return "";
         }

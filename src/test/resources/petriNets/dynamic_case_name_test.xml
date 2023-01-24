@@ -6,7 +6,7 @@
     <initials>DVT</initials>
 
     <caseName dynamic="true">
-        new I18nString("SK $text.value" as String, ["en": "EN $text.value" as String])
+        new I18nString("SK $text.rawValue" as String, ["en": "EN $text.rawValue" as String])
     </caseName>
     <!-- ROLES -->
     <data type="number">
@@ -18,7 +18,7 @@
         <id>text</id>
         <title>text</title>
         <init dynamic="true">
-            "text value ${number.value as Integer}" as String
+            "text value ${number.rawValue as Integer}" as String
         </init>
     </data>
 

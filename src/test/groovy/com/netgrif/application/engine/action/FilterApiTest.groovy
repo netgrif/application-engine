@@ -77,6 +77,7 @@ class FilterApiTest {
 
         assert ((FilterField) filter.dataSet.get("filter")).filterMetadata["filterType"] == "Case"
         assert ((FilterField) filter.dataSet.get("filter")).rawValue == "processIdentifier:filter OR processIdentifier:preference_filter_item"
+        // TODO: NAE-1645 allowed nets empty
         assert ((FilterField) filter.dataSet.get("filter")).allowedNets == ["filter", "preference_filter_item"]
         assert filter.dataSet.get("filter_type").rawValue == "Case"
 

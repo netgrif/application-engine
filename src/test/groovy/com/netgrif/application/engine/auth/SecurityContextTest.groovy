@@ -86,6 +86,6 @@ class SecurityContextTest {
 
         securityContextService.reloadSecurityContext(updatedUser.transformToLoggedUser())
         updatedUserRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUser
+        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUserRoles
     }
 }

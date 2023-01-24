@@ -90,12 +90,6 @@ public class User extends AbstractUser implements RegisteredUser {
         this.nextGroups = new HashSet<>();
     }
 
-    public User(ObjectNode json) {
-        this(json.get("email").asText(), null, json.get("name").asText(), json.get("surname").asText());
-        ((ArrayNode) json.get("processRoles"))
-                .forEach(node -> processRoles.add(new ProcessRole(node.get("_id").asText())));
-    }
-
     public String getFullName() {
         return name + " " + surname;
     }
@@ -114,10 +108,9 @@ public class User extends AbstractUser implements RegisteredUser {
         LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
-        if (!this.getProcessRoles().isEmpty())
+        if (!this.getProcessRoles().isEmpty()) {
             loggedUser.parseProcessRoles(this.getProcessRoles());
-        if (!this.getNextGroups().isEmpty())
-            loggedUser.getGroups();
+        }
 
         return loggedUser;
     }

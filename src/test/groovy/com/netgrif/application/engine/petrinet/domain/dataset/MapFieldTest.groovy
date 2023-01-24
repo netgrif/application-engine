@@ -7,6 +7,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -20,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class MapFieldTest {
 
     @Autowired
@@ -72,9 +74,8 @@ class MapFieldTest {
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
 
-        assert aCase.dataSet["enumeration"] != null
-        // TODO: NAE-1645 value == null
-        assert aCase.dataSet["enumeration"].value == "second"
+        assert aCase.dataSet.get("enumeration") != null
+        assert aCase.dataSet.get("enumeration").rawValue == "second"
 
         Field field = aCase.immediateData.find { f -> f.stringId == "enumeration" }
 
@@ -82,7 +83,7 @@ class MapFieldTest {
 
         EnumerationMapField enumMap = (EnumerationMapField) field
 
-        assert enumMap.value == "second"
+        assert enumMap.rawValue == "second"
 
         List<Case> cases = workflowService.findAllById([aCase.stringId])
 
@@ -96,7 +97,7 @@ class MapFieldTest {
 
         enumMap = (EnumerationMapField) field
 
-        assert enumMap.value == "second"
+        assert enumMap.rawValue == "second"
     }
 
 
@@ -111,7 +112,7 @@ class MapFieldTest {
         def net = netOptional.getNet()
         assert net.dataSet.size() == 1
 
-        MultichoiceMapField field = net.dataSet["multichoice"] as MultichoiceMapField
+        MultichoiceMapField field = net.dataSet.get("multichoice") as MultichoiceMapField
         assert field.name.defaultValue == "Multichoice map"
         assert field.options.size() == 3
         assert field.options["first"].defaultValue == "First option"
@@ -133,12 +134,11 @@ class MapFieldTest {
         assert netOptional.getNet() != null
 
         Case aCase = importHelper.createCase("Case", netOptional.getNet())
-
-        assert aCase.dataSet["multichoice"] != null
-        // TODO: NAE-1645 fix test, dataSet.get("multichoice")
-        assert aCase.dataSet["multichoice"].value.size() == 2
-        assert aCase.dataSet["multichoice"].value.find { v -> v == "second" }
-        assert aCase.dataSet["multichoice"].value.find { v -> v == "first" }
+        MultichoiceMapField multichoiceMapField = aCase.dataSet.get("multichoice") as MultichoiceMapField
+        assert multichoiceMapField != null
+        assert multichoiceMapField.rawValue.size() == 2
+        assert multichoiceMapField.rawValue.find { v -> v == "second" }
+        assert multichoiceMapField.rawValue.find { v -> v == "first" }
 
         Field field = aCase.immediateData.find { f -> f.stringId == "multichoice" }
 
@@ -146,9 +146,9 @@ class MapFieldTest {
 
         MultichoiceMapField enumMap = (MultichoiceMapField) field
 
-        assert enumMap.value.size() == 2
-        assert enumMap.value.find { v -> v == "second" }
-        assert enumMap.value.find { v -> v == "first" }
+        assert enumMap.rawValue.size() == 2
+        assert enumMap.rawValue.find { v -> v == "second" }
+        assert enumMap.rawValue.find { v -> v == "first" }
 
         List<Case> cases = workflowService.findAllById([aCase.stringId])
 
@@ -162,8 +162,8 @@ class MapFieldTest {
 
         enumMap = (MultichoiceMapField) field
 
-        assert enumMap.value.size() == 2
-        assert enumMap.value.find { v -> v == "second" }
-        assert enumMap.value.find { v -> v == "first" }
+        assert enumMap.rawValue.size() == 2
+        assert enumMap.rawValue.find { v -> v == "second" }
+        assert enumMap.rawValue.find { v -> v == "first" }
     }
 }

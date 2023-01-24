@@ -158,7 +158,7 @@ class MenuImportExportTest {
         assert caseOpt.isPresent()
         groupCase = caseOpt.get()
 
-        String importResults = groupCase.getDataField(IMPORT_RESULTS_FIELD).getValue().toString()
+        String importResults = groupCase.getDataSet().get(IMPORT_RESULTS_FIELD).getValue().toString()
         assert importResults <=> EXPECTED_RESULTS
 
         ArrayList<String> imported_ids_list = groupCase.getDataSet().get(IMPORTED_IDS_FIELD).getValue() as ArrayList<String>
@@ -188,7 +188,7 @@ class MenuImportExportTest {
         assert caseOpt.isPresent()
         groupCase = caseOpt.get()
 
-        FileFieldValue exportFileField = groupCase.getDataField(EXPORT_FILE_FIELD).getValue() as FileFieldValue
+        FileFieldValue exportFileField = groupCase.getDataSet().get(EXPORT_FILE_FIELD).getValue() as FileFieldValue
         File exportedFiltersFile = new File(exportFileField.getPath())
         assert exportedFiltersFile.exists()
 

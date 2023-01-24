@@ -13,7 +13,8 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import org.dmg.pmml.time_series.MA
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -22,9 +23,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
+@CompileStatic
 class ChangeBehaviorTest {
 
     @Autowired
@@ -77,22 +81,16 @@ class ChangeBehaviorTest {
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
 
-        // TODO: NAE-1645
-        //  com.netgrif.application.engine.petrinet.domain.dataset.ChangeBehaviorTest#changeBehaviorOfSingleFieldOnSingleTransition
-        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[boolean_0:[value:true, type:boolean]]]
-        dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
-                "boolean_0": [
-                        "value": true,
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(mainTask.stringId, new DataSet([
+                "boolean_0": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.dataSet[BOOLEAN_0_FIELD_ID].value == true
+        assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.REQUIRED.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.REQUIRED.toString() } == null
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
     }
 
     @Test
@@ -106,25 +104,21 @@ class ChangeBehaviorTest {
         Task otherTask2 = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_2) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask2
 
-        // TODO: NAE-1645
-        dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
-                "boolean_1": [
-                        "value": true,
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(mainTask.stringId, new DataSet([
+                "boolean_1": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.dataSet[BOOLEAN_1_FIELD_ID].value == true
+        assert testCase.dataSet.get(BOOLEAN_1_FIELD_ID).rawValue == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_3).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.REQUIRED.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.REQUIRED.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.REQUIRED.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_3).find { it.toString() == FieldBehavior.REQUIRED.toString() }
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_3).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_1).required
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_2).required
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_3).required
     }
 
     @Test
@@ -137,19 +131,16 @@ class ChangeBehaviorTest {
         assert otherTask
 
         // TODO: NAE-1645
-        dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
-                "boolean_2": [
-                        "value": true,
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(mainTask.stringId, new DataSet([
+                "boolean_2": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.dataSet[BOOLEAN_2_FIELD_ID].value == true
+        assert testCase.dataSet.get(BOOLEAN_2_FIELD_ID).rawValue == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find {it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find {it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_2).find {it.toString() == FieldBehavior.EDITABLE.toString() } == null
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == EDITABLE
     }
 
     @Test
@@ -161,24 +152,18 @@ class ChangeBehaviorTest {
         Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask
 
-        // TODO: NAE-1645
-        //  com.netgrif.application.engine.petrinet.domain.dataset.ChangeBehaviorTest#changeBehaviorOfMultipleFieldsOnMultipleTransitions
-        //  No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[boolean_3:[value:true, type:boolean]]]
-        dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
-                "boolean_3": [
-                        "value": true,
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(mainTask.stringId, new DataSet([
+                "boolean_3": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.dataSet[BOOLEAN_3_FIELD_ID].value == true
+        assert testCase.dataSet.get(BOOLEAN_3_FIELD_ID).rawValue == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_1).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_1_FIELD_ID].behavior.get(TEST_TRANSITION_2).find { it.toString() == FieldBehavior.EDITABLE.toString() } == null
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == EDITABLE
     }
 
     @Test
@@ -188,30 +173,23 @@ class ChangeBehaviorTest {
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
 
-        //TODO: NAE-1645
-        dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
-                "boolean_0": [
-                        "value": true,
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(mainTask.stringId, new DataSet([
+                "boolean_0": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.dataSet[BOOLEAN_0_FIELD_ID].value == true
+        assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.EDITABLE.toString() }
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION).find { it.toString() == FieldBehavior.REQUIRED.toString() }
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
 
-        dataService.setData(mainTask.stringId, ImportHelper.populateDataset([
-                "boolean_0": [
-                        "value": false,
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(mainTask.stringId, new DataSet([
+                "boolean_0": new BooleanField(rawValue: false)
+        ] as Map<String, Field<?>>))
 
         testCase = workflowService.findOne(testCase.getStringId())
-        assert testCase.dataSet[BOOLEAN_0_FIELD_ID].value == false
+        assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == false
 
-        assert testCase.dataSet[TEXT_0_FIELD_ID].behavior.get(MAIN_TRANSITION) == testCase.petriNet.transitions[MAIN_TRANSITION].dataSet[TEXT_0_FIELD_ID].behavior
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION) == testCase.petriNet.transitions[MAIN_TRANSITION].dataSet[TEXT_0_FIELD_ID].behavior
     }
 }

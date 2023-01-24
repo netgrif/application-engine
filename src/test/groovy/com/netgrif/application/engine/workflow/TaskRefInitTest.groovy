@@ -57,19 +57,19 @@ class TaskRefInitTest {
         Task task1 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t1"))
         Task task2 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t3"))
 
-        //TODO: NAE-1645
-        // com.netgrif.application.engine.workflow.TaskRefInitTest#testInitValue
-        // Cannot invoke "java.util.List.containsAll(java.util.Collection)" because the return value of "org.codehaus.groovy.runtime.ScriptBytecodeAdapter.castToType(Object, java.lang.Class)" is null
-        assert ((List<String>) aCase.dataSet.get("taskRef_0").value).containsAll(Arrays.asList(task1.stringId, task2.stringId))
-        assert ((List<String>) aCase.dataSet.get("taskRef_1").value).isEmpty()
-        assert ((List<String>) aCase.dataSet.get("taskRef_2").value).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").value).size() == 1
-        assert ((List<String>) aCase.dataSet.get("taskRef_3").value).isEmpty()
+        assert ((List<String>) aCase.dataSet.get("taskRef_0").rawValue).containsAll(Arrays.asList(task1.stringId, task2.stringId))
+        assert ((List<String>) aCase.dataSet.get("taskRef_1").rawValue).isEmpty()
+        assert ((List<String>) aCase.dataSet.get("taskRef_2").rawValue).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").value).size() == 1
+        assert ((List<String>) aCase.dataSet.get("taskRef_3").rawValue).isEmpty()
     }
 
     @Test
     void autoTriggerTaskRef() {
         Case bCase = helper.createCase("Task ref init with auto trigger", autoTrigger)
-//        TODO: NAE-1645
-//        assert ((List<String>) bCase.dataSet["tema"].value).contains(bCase.tasks.stream().filter({ t -> t.transition == "t1" }).findFirst().get().task) && ((List<String>) bCase.dataSet["tema"].value).size() == 1
+
+        String taskId = bCase.tasks.stream().filter({ t -> t.transition == "t1" }).findFirst().get().task
+        List<String> value = bCase.dataSet.get("tema").rawValue as List<String>
+        assert value.contains(taskId) &&
+                value.size() == 1
     }
 }

@@ -118,19 +118,20 @@ class FilterAuthorizationServiceTest {
 
 
         def filters = filterRepository.findAll()
-        Filter otherFilter = filters.find { f -> f.title.defaultValue.equals("other filter") }
+        // TODO: NAE-1645 filters empty? otherFilter == null
+        Filter otherFilter = filters.find { f -> (f.title.defaultValue == "other filter") }
         assert otherFilter != null
         mvc.perform(delete(DELETE_FILTER_URL + otherFilter.stringId)
                 .with(authentication(this.userAuth)))
                 .andExpect(status().isForbidden())
 
-        Filter filter1 = filters.find { f -> f.title.defaultValue.equals("user filter 1") }
+        Filter filter1 = filters.find { f -> (f.title.defaultValue == "user filter 1") }
         assert filter1 != null
         mvc.perform(delete(DELETE_FILTER_URL + filter1.stringId)
                 .with(authentication(this.userAuth)))
                 .andExpect(status().isOk())
 
-        Filter filter2 = filters.find { f -> f.title.defaultValue.equals("user filter 2") }
+        Filter filter2 = filters.find { f -> (f.title.defaultValue == "user filter 2") }
         assert filter2 != null
         mvc.perform(delete(DELETE_FILTER_URL + filter2.stringId)
                 .with(authentication(this.adminAuth)))
