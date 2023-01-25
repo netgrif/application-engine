@@ -205,6 +205,8 @@ class ImpersonationServiceTest {
         assert workflowAuthorizationService.canCallDelete(userService.loggedUserFromContext, testCase.stringId)
         def testTask1 = loadTask(testCase, "t1")
 
+        sleep(8000) // elastic
+
         def caseReq = new CaseSearchRequest()
         caseReq.process = [new CaseSearchRequest.PetriNet(testCase.processIdentifier)]
         def cases = elasticCaseService.search([caseReq], userService.loggedUser.transformToLoggedUser(), PageRequest.of(0, 1), LocaleContextHolder.locale, false)
