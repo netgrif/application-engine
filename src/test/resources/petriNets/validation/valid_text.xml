@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
     <id>valid_text</id>
-    <initials>VB1</initials>
+    <initials>VT1</initials>
     <title>Validacia TextFieldu</title>
     <icon>check_circle</icon>
     <defaultRole>true</defaultRole>
@@ -105,7 +105,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -119,7 +119,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>
@@ -133,7 +133,7 @@
                 </logic>
                 <layout>
                     <x>0</x>
-                    <y>1</y>
+                    <y>4</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <template>material</template>

@@ -27,7 +27,7 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.validation.IValidationService;
+import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
