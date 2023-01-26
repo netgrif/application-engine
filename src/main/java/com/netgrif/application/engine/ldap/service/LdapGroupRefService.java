@@ -87,11 +87,13 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Override
     public void deleteProcessRole(LdapGroup ldapGroup, String petriNet) {
-        ldapGroup.getProcessesRoles().forEach(it -> {
+        Set<ProcessRole> processRoles = ldapGroup.getProcessesRoles();
+        processRoles.forEach(it -> {
             if (it.getNetId().equals(petriNet)) {
-                ldapGroup.getProcessesRoles().remove(it);
+                processRoles.remove(it);
             }
         });
+        ldapGroup.setProcessesRoles(processRoles);
         ldapGroupRoleRepository.save(ldapGroup);
     }
 
