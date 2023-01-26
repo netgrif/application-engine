@@ -22,13 +22,13 @@ class NumberFieldValidation extends AbstractFieldValidation {
 
 
     void odd(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() % 2 == 0) { //TODO: PREHODIT na ==
+        if (validationData.getData().getValue() % 2 == 0) {
             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
         }
     }
 
     void even(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() % 2 != 0) {   //TODO: PREHODIT na !=
+        if (validationData.getData().getValue() % 2 != 0) {
             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
         }
     }
