@@ -35,7 +35,7 @@ class TextFieldValidationTest {
     void minlength_Exception() {
         TextFieldValidation textFieldValidation = new TextFieldValidation()
         DataField dataField = new DataField()
-        dataField.setValue("totok")
+        dataField.setValue("totok"  as String)
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = ["6"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -50,7 +50,7 @@ class TextFieldValidationTest {
     void maxlength_Exception() {
         TextFieldValidation textFieldValidation = new TextFieldValidation()
         DataField dataField = new DataField()
-        dataField.setValue("totok")
+        dataField.setValue("totok" as String)
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = ["4"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
