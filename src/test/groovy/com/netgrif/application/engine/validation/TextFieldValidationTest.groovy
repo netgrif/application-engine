@@ -37,7 +37,7 @@ class TextFieldValidationTest {
         DataField dataField = new DataField()
         dataField.setValue("totok"  as String)
         I18nString validMessage = new I18nString(ErrorMessage)
-        List<String> rules = ["6"]
+        List<String> rules = ["minlength","6"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -52,7 +52,7 @@ class TextFieldValidationTest {
         DataField dataField = new DataField()
         dataField.setValue("totok" as String)
         I18nString validMessage = new I18nString(ErrorMessage)
-        List<String> rules = ["4"]
+        List<String> rules = ["maxlength","6"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
