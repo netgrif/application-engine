@@ -63,7 +63,7 @@ class TestHelper {
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
-
+        sleep(2000)
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
