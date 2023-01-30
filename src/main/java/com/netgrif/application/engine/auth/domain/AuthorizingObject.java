@@ -11,6 +11,16 @@ import java.util.stream.Collectors;
  * */
 public enum AuthorizingObject {
     DEFAULT,
+    /**
+     * Deprecated as of version 6.3.0
+     * */
+    @Deprecated
+    ADMIN,
+    /**
+     * Deprecated as of version 6.3.0
+     * */
+    @Deprecated
+    USER,
     PROCESS_UPLOAD,
     PROCESS_VIEW_ALL,
     PROCESS_VIEW_OWN,
