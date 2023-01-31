@@ -45,8 +45,6 @@ class TestHelper {
     @Autowired
     private ElasticsearchRunner elasticsearchRunner
     @Autowired
-    private MongoDbRunner mongoDbRunner
-    @Autowired
     private FilterRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
@@ -69,7 +67,6 @@ class TestHelper {
         petriNetService.evictAllCaches()
 
         elasticsearchRunner.run()
-        mongoDbRunner.run()
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
