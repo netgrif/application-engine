@@ -22,55 +22,71 @@ class NumberFieldValidation extends AbstractFieldValidation {
 
 
     void odd(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() % 2 == 0) {
-            throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
-        }
-    }
-
-    void even(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() % 2 != 0) {
-            throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
-        }
-    }
-
-    void positive(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() < 0) {
-            throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
-        }
-    }
-
-    void negative(ValidationDataInput validationData) {
-        if (validationData.getData() != null) {
-            if (validationData.getData().getValue() > 0) {
+        if (!(validationData.getData().getValue() == 0 || validationData.getData().getValue() == null)) {
+            if (validationData.getData().getValue() % 2 == 0) {
                 throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
             }
         }
     }
 
+    void even(ValidationDataInput validationData) {
+        if (!(validationData.getData().getValue() == 0 || validationData.getData().getValue() == null)) {
+            if (validationData.getData().getValue() % 2 != 0) {
+                throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+            }
+        }
+    }
+
+    void positive(ValidationDataInput validationData) {
+        if (!(validationData.getData().getValue() == 0 || validationData.getData().getValue() == null)) {
+            if (validationData.getData().getValue() < 0) {
+                throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+            }
+        }
+    }
+
+    void negative(ValidationDataInput validationData) {
+        if (!(validationData.getData().getValue() == 0 || validationData.getData().getValue() == null)) {
+
+
+            if (validationData.getData() != null) {
+                if (validationData.getData().getValue() > 0) {
+                    throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+                }
+            }
+        }
+    }
+
     void decimal(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() % 1 != 0) {
-            throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+        if (!(validationData.getData().getValue() == 0 || validationData.getData().getValue() == null)) {
+
+            if (validationData.getData().getValue() % 1 != 0) {
+                throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+            }
         }
     }
 
     void inrange(ValidationDataInput validationData) {
-        String[] ranges = validationData.getValidationRegex().split(",")
-        if (ranges.size() == 2) {
-            if (ranges.any { it.toLowerCase().equals(INF) }) {
-                if (ranges.first().toLowerCase() != INF) {
-                    if (validationData.getData().getValue() < ranges[0] as Double) {
-                        throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
-                    }
-                } else {
-                    if (ranges[1].toLowerCase() != INF) {
-                        if (validationData.getData().getValue() > ranges[1] as Double) {
+        if (!(validationData.getData().getValue() == 0 || validationData.getData().getValue() == null)) {
+
+            String[] ranges = validationData.getValidationRegex().split(",")
+            if (ranges.size() == 2) {
+                if (ranges.any { it.toLowerCase().equals(INF) }) {
+                    if (ranges.first().toLowerCase() != INF) {
+                        if (validationData.getData().getValue() < ranges[0] as Double) {
                             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                         }
+                    } else {
+                        if (ranges[1].toLowerCase() != INF) {
+                            if (validationData.getData().getValue() > ranges[1] as Double) {
+                                throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+                            }
+                        }
                     }
-                }
-            } else {
-                if (validationData.getData().getValue() < ranges[0] as Double || validationData.getData().getValue() > ranges[1] as Double) {
-                    throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+                } else {
+                    if (validationData.getData().getValue() < ranges[0] as Double || validationData.getData().getValue() > ranges[1] as Double) {
+                        throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
+                    }
                 }
             }
         }

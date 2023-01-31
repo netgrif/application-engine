@@ -523,11 +523,10 @@ public class TaskService implements ITaskService {
     @Transactional
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
-// TODO:
-//            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
-//                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
-//                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
-//            }
+            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
+                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
+                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
+            }
             if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
                 continue;
             if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
