@@ -43,8 +43,6 @@ class TestHelper {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
-    private ElasticsearchRunner elasticsearchRunner
-    @Autowired
     private FilterRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
@@ -66,7 +64,6 @@ class TestHelper {
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
 
-        elasticsearchRunner.run()
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
