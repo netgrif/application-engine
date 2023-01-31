@@ -43,6 +43,10 @@ class TestHelper {
     @Autowired
     private IFieldActionsCacheService actionsCacheService
     @Autowired
+    private ElasticsearchRunner elasticsearchRunner
+    @Autowired
+    private MongoDbRunner mongoDbRunner
+    @Autowired
     private FilterRunner filterRunner
     @Autowired
     private FinisherRunner finisherRunner
@@ -64,6 +68,8 @@ class TestHelper {
         actionsCacheService.clearNamespaceFunctionCache()
         petriNetService.evictAllCaches()
 
+        elasticsearchRunner.run()
+        mongoDbRunner.run()
         defaultRoleRunner.run()
         anonymousRoleRunner.run()
         systemUserRunner.run()
