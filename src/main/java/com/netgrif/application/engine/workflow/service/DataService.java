@@ -99,6 +99,9 @@ public class DataService implements IDataService {
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
 
+    @Value("${nae.validation.setData.enable:false}")
+    protected boolean validationEnable;
+
     @Override
     public GetDataEventOutcome getData(String taskId) {
         Task task = taskService.findOne(taskId);
@@ -241,7 +244,9 @@ public class DataService implements IDataService {
                     dataField.setFilterMetadata(filterMetadata);
                     changedField.addAttribute("filterMetadata", filterMetadata);
                 }
-                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
+                if (validationEnable) {
+                    validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
+                }
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
                 historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
@@ -440,7 +445,7 @@ public class DataService implements IDataService {
         }
     }
 
-    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase){
+    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase) {
         if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
             DataEvent event = events.get(DataEventType.GET);
             event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
@@ -519,7 +524,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile){
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
@@ -573,7 +578,7 @@ public class DataService implements IDataService {
 
             try {
                 writeFile(oneFile, file);
-            } catch (IOException e){
+            } catch (IOException e) {
                 log.error(e.getMessage());
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
@@ -593,7 +598,7 @@ public class DataService implements IDataService {
         File file = new File(field.getFilePath(useCase.getStringId()));
         try {
             writeFile(multipartFile, file);
-        } catch (IOException e){
+        } catch (IOException e) {
             log.error(e.getMessage());
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
@@ -923,7 +928,7 @@ public class DataService implements IDataService {
         Map<String, String> translations = new HashMap<>();
         if (node.get("value").get("translations") != null) {
             node.get("value").get("translations").fields().forEachRemaining(entry ->
-                translations.put(entry.getKey(), entry.getValue().asText())
+                    translations.put(entry.getKey(), entry.getValue().asText())
             );
         }
         return new I18nString(defaultValue, translations);
