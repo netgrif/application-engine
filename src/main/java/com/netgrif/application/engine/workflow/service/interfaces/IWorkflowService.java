@@ -42,6 +42,8 @@ public interface IWorkflowService {
 
     DeleteCaseEventOutcome deleteSubtreeRootedAt(String caseId);
 
+    DeleteCaseEventOutcome deleteCase(Case useCase);
+
     void deleteInstancesOfPetriNet(PetriNet net);
 
     void updateMarking(Case useCase);

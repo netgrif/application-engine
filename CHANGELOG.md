@@ -5,11 +5,75 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.1](https://github.com/netgrif/application-engine/commits/v6.2.1)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-09-21)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-20)
 
+### Fixed
+
+- [NAE-1761] LoggedUser circular dependency
+- [NAE-1798] UserRefs resolves everytime when case is saved
+
+### Changed
+
+- [NAE-1762] Public view URL encoding
+
+### Added
+
+- [NAE-1678] User impersonation
+- [NAE-1793] Security filter for HTTP headers validation
+- [NAE-1794] Configurable security headers
+
+## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
+
+### Fixed
+
+- [NAE-1806] Anonymous user password might not be 'null'
+
+## [6.2.6](https://github.com/netgrif/application-engine/releases/tag/v6.2.6) (2022-12-12)
+
+### Fixed
+
+- [NAE-1799] Multilevel process identifier handling in 6.2.x for public view
+- [NAE-1801] Change DataService
+
+## [6.2.5](https://github.com/netgrif/application-engine/releases/tag/v6.2.5) (2022-12-05)
+
+### Fixed
+
+- [NAE-1755] PetriNetService cache no caching "null"
+- [NAE-1773] Action that sets null value to field does not trigger next actions
+- [NAE-1776] UncaughtExceptionHandler
+- [NAE-1777] JWT Token user detail not show password
+
+### Added
+
+- [NAE-1753] Currency code in PDF
+- [NAE-1756] Delete PetriNet does not call case delete events
+- [NAE-1780] Configurable CORS security settings
+
+## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
+
+### Fixed
+
+- [NAE-1747] PDF Generator: incorrect file name shortening
+- [NAE-1748] Incorrect handling for long lines in PDF generator
+
+## [6.2.3](https://github.com/netgrif/application-engine/releases/tag/v6.2.3) (2022-10-06)
+
+### Fixed
+
+- [NAE-1728] Simplify value for changing user list
+- [NAE-1730] PetriNetService cache fix upload bug
+- [NAE-1733] Organization group process has deprecated attributes and change import system user
+- [NAE-1735] Enumeration parsing error when trying to use icons with option keys
+
+## [6.2.2](https://github.com/netgrif/application-engine/releases/tag/v6.2.2) (2022-09-28)
+
+### Fixed
+
+- [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
+- [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
 
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 

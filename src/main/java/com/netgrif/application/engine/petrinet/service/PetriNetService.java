@@ -10,6 +10,7 @@ import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriN
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
@@ -98,6 +99,9 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
+    @Autowired(required = false)
+    private ILdapGroupRefService ldapGroupService;
+
     @Autowired
     private IFieldActionsCacheService functionCacheService;
 
@@ -143,7 +147,7 @@ public class PetriNetService implements IPetriNetService {
      * Get read only Petri net.
      */
     @Override
-    @Cacheable("petriNetCache")
+    @Cacheable(value = "petriNetCache", unless = "#result == null")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
         if (!optional.isPresent()) {
@@ -194,14 +198,15 @@ public class PetriNetService implements IPetriNetService {
         processRoleService.saveAll(net.getRoles().values());
         net.setAuthor(author.transformToAuthor());
         functionCacheService.cachePetriNetFunctions(net);
-        Path savedPath = getImporter().saveNetFile(net,  new ByteArrayInputStream(xmlCopy.toByteArray()));
+        Path savedPath = getImporter().saveNetFile(net, new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") was saved in a folder: " +savedPath.toString());
+        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") was saved in a folder: " + savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
         save(net);
+        this.evictCache(net);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.POST);
@@ -239,7 +244,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable("petriNetById")
+    @Cacheable(value = "petriNetById", unless = "#result == null")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
         if (!net.isPresent())
@@ -250,7 +255,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()")
+    @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless = "#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null)
@@ -274,7 +279,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable("petriNetNewest")
+    @Cacheable(value = "petriNetNewest", unless = "#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty())
@@ -412,8 +417,8 @@ public class PetriNetService implements IPetriNetService {
         Query query = new Query();
         Query query_total = new Query();
 
-        if (!user.isAdmin())
-            query.addCriteria(getProcessRolesCriteria(user));
+        if (!user.getSelfOrImpersonated().isAdmin())
+            query.addCriteria(getProcessRolesCriteria(user.getSelfOrImpersonated()));
 
         criteria.forEach((key, value) -> {
             Criteria valueCriteria;
@@ -453,6 +458,14 @@ public class PetriNetService implements IPetriNetService {
         this.userService.removeRoleOfDeletedPetriNet(petriNet);
         this.workflowService.deleteInstancesOfPetriNet(petriNet);
         this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
+        try {
+            ldapGroupService.deleteProcessRoleByPetrinet(petriNet.getStringId());
+        } catch (NullPointerException e) {
+            log.info("LdapGroup and ProcessRole mapping are not activated...");
+        } catch (Exception ex) {
+            log.error("LdapGroup", ex);
+        }
+
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
         this.repository.deleteBy_id(petriNet.getObjectId());

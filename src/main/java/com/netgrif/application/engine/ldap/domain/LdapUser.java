@@ -65,6 +65,9 @@ public class LdapUser extends User {
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());
         loggedUser.setGroups(this.getNextGroups());
+        if (this.isImpersonating()) {
+            loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
+        }
 
         return loggedUser;
     }
