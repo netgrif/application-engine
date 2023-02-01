@@ -2,13 +2,13 @@
 
 ## UserList
 
-UserList is a type of data field. Values of this field represent ID of users in the system. Some basic information about
+UserList is a type of data field. Values of this field represent users in system. Some basic information about
 this field:
 
-- this field currently does not have frontend representation
 - this field does not have any init value, because when the process is created or imported, the given user may not exist
-- we can add values to this field via actions
+- we can add values to this field via actions and using frontend component
 - it can serve as definition of permissions for volume of users
+- value type of this field is ``UserListFieldValue``
 
 ```xml
 <data type="userList">
@@ -17,12 +17,42 @@ this field:
 </data>
 ```
 
-## UsersRef
+Example action to change value of this field:
+```xml
+<action trigger="set">
+    userList: f.userList1;
+    
+    <!-- Setting with list of user IDs -->
+    change userList value { ["userId1", "userId2"] }
+    
+    <!-- Setting with UserListFieldValue -->
+    change userList value {
+        new com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue(
+            [
+                new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(
+                    "userId1",
+                    "John",
+                    "Doe",
+                    "john@doe.com"
+                ),
+                new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(
+                    "userId2",
+                    "Alice",
+                    "Doe",
+                    "alice@doe.com"
+                )
+            ]
+        )
+    }
+</action>
+```
+
+## UserRef
 
 It is a new property of process and transition in PetriNet. It serves as a roleRef with a difference from it: the
 content of the userList can be changed at runtime.
 
-- usersRef references userList defined with its ID
+- userRef references userList defined with its ID
 - we define permissions for usersRef in a same way as for roleRef
 
 ```xml
@@ -33,13 +63,13 @@ content of the userList can be changed at runtime.
     <title/>
   </data>
   ...
-  <usersRef>
+  <userRef>
     <id>userList1</id>
     <caseLogic>
       <view>true</view>
       <delete>true</delete>
     </caseLogic>
-  </usersRef>
+  </userRef>
   ...
   <transition>
     <id>1</id>

@@ -170,6 +170,51 @@ PdfGenerator.generatePdf(Case, String, PdfResource) function takes three argumen
 Finally, based on the path or FileFieldValue in the first part of function, you can change a file fields value to the
 final PDF file.
 
+If you do not want to define your own implementation of PDF generation action, you still can use the default actions for
+generating PDF, which are the followings:
+
+```groovy
+@NamedVariant
+void generatePDF(String sourceTransitionId, String targetFileFieldId,
+                 Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
+                 String template = null, List<String> excludedFields = [], Locale locale = null,
+                 ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 20) {
+    if (!sourceTransitionId || !targetFileFieldId)
+        throw new IllegalArgumentException("Source transition or target file field is null")
+    targetTransitionId = targetTransitionId ?: sourceTransitionId
+    generatePdf(sourceTransitionId, targetFileFieldId, sourceCase, targetCase, targetTransitionId,
+            template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+}
+
+void generatePDF(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
+                 Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
+                 ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
+    if (!sourceTransition || !targetFileField)
+        throw new IllegalArgumentException("Source transition or target file field is null")
+    targetTransition = targetTransition ?: sourceTransition
+    generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
+            template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
+}
+
+void generatePdf(String transitionId, FileField fileField, List<String> excludedFields = []) {
+    generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileField, excludedFields: excludedFields)
+}
+
+void generatePdf(String transitionId, String fileFieldId, List<String> excludedFields, Case fromCase = useCase, Case saveToCase = useCase) {
+    generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, excludedFields: excludedFields, sourceCase: fromCase, targetCase: useCase)
+}
+
+void generatePdfWithTemplate(String transitionId, String fileFieldId, String template, Case fromCase = useCase, Case saveToCase = useCase) {
+    generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, template: template, sourceCase: fromCase, targetCase: saveToCase)
+}
+
+void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale, Case fromCase = useCase, Case saveToCase = useCase) {
+    generatePdf(sourceTransitionId: transitionId, targetFileFieldId: fileFieldId, locale: locale, sourceCase: fromCase, targetCase: saveToCase)
+}
+```
+
+These actions can be simply called in your PetriNet action definitions.
+
 ## Supported layouts
 
 PDF generator supports standard legacy layout, grid layout and flow layout. You have nothing to do with layout
