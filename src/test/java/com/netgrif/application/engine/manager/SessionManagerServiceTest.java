@@ -36,6 +36,11 @@ public class SessionManagerServiceTest {
     }
 
     @Test
+    void logoutSessionByUsernameTest() {
+        managerService.logoutSessionByUsername("test@netgrif.com");
+    }
+
+    @Test
     void logoutAllSessionTest() {
         managerService.logoutAllSession();
     }
