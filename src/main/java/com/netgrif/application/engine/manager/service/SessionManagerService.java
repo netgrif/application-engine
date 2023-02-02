@@ -37,11 +37,11 @@ public class SessionManagerService implements ISessionManagerService {
         }
         List<LoggedUser> activeUsers = new ArrayList<>();
         Set<Object> keys = redisOps.keys(redisUsernameKey + "*");
-        if(keys == null || keys.isEmpty()){
+        if (keys == null || keys.isEmpty()) {
             return activeUsers;
         }
         keys.forEach(username -> {
-            Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey,"")).values().stream().findFirst().orElse(null);
+            Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey, "")).values().stream().findFirst().orElse(null);
             if (session != null) {
                 SecurityContextImpl impl = (SecurityContextImpl) session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
                 if (impl != null) {
