@@ -11,9 +11,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
-import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -142,11 +140,10 @@ public class FilterImportExportService implements IFilterImportExportService {
                 exportedFilterIds.add(currentCase.getStringId());
                 FilterImportExport currentFilter = createExportClass(currentCase);
                 chain.push(currentFilter);
-                if (currentFilter.getParentCaseId() != null) {
-                    currentCase = this.workflowService.findOne(currentFilter.getParentCaseId());
-                } else {
+                if (currentFilter.getParentCaseId() == null) {
                     break;
                 }
+                currentCase = this.workflowService.findOne(currentFilter.getParentCaseId());
             }
             filterList.getFilters().addAll(chain);
         }
@@ -339,32 +336,29 @@ public class FilterImportExportService implements IFilterImportExportService {
         FilterImportExport exportFilter = new FilterImportExport();
         exportFilter.setCaseId(filter.getStringId());
         exportFilter.setIcon(filter.getIcon());
-//        TODO: NAE-1645
-//        DataField parentCaseId = filter.getDataSet().get(FIELD_PARENT_CASE_ID);
-//        if (parentCaseId.getValue() != null && !parentCaseId.getValue().equals("")) {
-//            exportFilter.setParentCaseId((String) parentCaseId.getValue());
-//        }
-//
-//        DataField parentViewId = filter.getDataSet().get(FIELD_PARENT_VIEW_ID);
-//        if (parentViewId.getValue() != null && !parentViewId.getValue().equals("")) {
-//            exportFilter.setParentViewId((String) parentViewId.getValue());
-//        }
-//
-//        DataField filterField = filter.getDataSet().get(FIELD_FILTER);
-//        exportFilter.setFilterValue((String) filterField.getValue());
-//        exportFilter.setAllowedNets(filterField.getAllowedNets());
-//        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
-//
-//        DataField visibility = filter.getDataSet().get(FIELD_VISIBILITY);
-//        exportFilter.setVisibility(visibility.getValue().toString());
-//
-//        DataField type = filter.getDataSet().get(FIELD_FILTER_TYPE);
-//        exportFilter.setType(type.getValue().toString());
-//
-//        DataField name = filter.getDataSet().get(FIELD_NAME);
-//        exportFilter.setFilterName((I18nString) name.getValue());
-
+        TextField parentCaseId = (TextField) filter.getDataSet().get(FIELD_PARENT_CASE_ID);
+        if (isNotEmpty(parentCaseId)) {
+            exportFilter.setParentCaseId(parentCaseId.getRawValue());
+        }
+        TextField parentViewId = (TextField) filter.getDataSet().get(FIELD_PARENT_VIEW_ID);
+        if (isNotEmpty(parentViewId)) {
+            exportFilter.setParentViewId(parentViewId.getRawValue());
+        }
+        FilterField filterField = (FilterField) filter.getDataSet().get(FIELD_FILTER);
+        exportFilter.setFilterValue(filterField.getRawValue());
+        exportFilter.setAllowedNets(filterField.getAllowedNets());
+        exportFilter.setFilterMetadataExport(filterField.getFilterMetadata());
+        EnumerationMapField visibility = (EnumerationMapField) filter.getDataSet().get(FIELD_VISIBILITY);
+        exportFilter.setVisibility(visibility.getRawValue());
+        EnumerationMapField type = (EnumerationMapField) filter.getDataSet().get(FIELD_FILTER_TYPE);
+        exportFilter.setType(type.getRawValue());
+        EnumerationField name = (EnumerationField) filter.getDataSet().get(FIELD_NAME);
+        exportFilter.setFilterName(name.getRawValue());
         return exportFilter;
+    }
+
+    private boolean isNotEmpty(TextField field) {
+        return field.getRawValue() != null && !field.getRawValue().isBlank();
     }
 
     private static void validateFilterXML(InputStream xml) throws IllegalFilterFileException {
