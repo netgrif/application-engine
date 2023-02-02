@@ -36,11 +36,13 @@ public class SessionManagerService implements ISessionManagerService {
         if (redisOps == null) {
             throw new IllegalStateException("Redis session management is not configured!");
         }
-        Set<String> keys = redisOps.keys(redisUsernameKey + "*")
-                .stream().map(key -> ((String) key).replace(redisUsernameKey, "")).collect(Collectors.toSet());
         List<LoggedUser> activeUsers = new ArrayList<>();
+        Set<Object> keys = redisOps.keys(redisUsernameKey + "*");
+        if(keys == null || keys.isEmpty()){
+            return activeUsers;
+        }
         keys.forEach(username -> {
-            Session session = repository.findByPrincipalName(username).values().stream().findFirst().orElse(null);
+            Session session = repository.findByPrincipalName(username.toString().replace(redisUsernameKey,"")).values().stream().findFirst().orElse(null);
             if (session != null) {
                 SecurityContextImpl impl = (SecurityContextImpl) session.getAttribute(WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME);
                 if (impl != null) {
