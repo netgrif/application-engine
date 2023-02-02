@@ -165,6 +165,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getFilePreview(taskId, fieldId);
     }
 
+    @Override
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @Operation(summary = "Upload multiple files into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN")
@@ -173,7 +174,7 @@ public class PublicTaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @RequestPart(value = "data") FileFieldRequest requestBody, @RequestPart(value = "files") MultipartFile[] multipartFiles) {
+    public EntityModel<EventOutcomeWithMessage> saveFiles(@PathVariable("id") String taskId, @RequestPart(value = "files") MultipartFile[] multipartFiles, @RequestPart(value = "data") FileFieldRequest requestBody) {
         return super.saveFiles(taskId, multipartFiles, requestBody);
     }
 
