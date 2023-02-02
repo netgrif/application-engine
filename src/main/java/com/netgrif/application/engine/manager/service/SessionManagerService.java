@@ -58,7 +58,6 @@ public class SessionManagerService implements ISessionManagerService {
     @Override
     public void logoutSessionByUsername(String username) {
         repository.findByPrincipalName(username).keySet().forEach(repository::deleteById);
-
     }
 
     @Override
