@@ -58,6 +58,7 @@ public class PublicTaskController extends AbstractTaskController {
         this.userService = userService;
     }
 
+    @Override
     @GetMapping(value = "/case/{id}", produces = "application/json;charset=UTF-8")
     @Operation(summary = "Get tasks of the case")
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
@@ -109,12 +110,14 @@ public class PublicTaskController extends AbstractTaskController {
         return super.cancel(loggedUser, taskId, locale);
     }
 
+    @Override
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Get all task data")
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
         return super.getData(taskId, locale);
     }
 
+    @Override
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")
     @PostMapping(value = "/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
     @Operation(summary = "Set task data", description = "Caller must be assigned to the task, or must be an ADMIN")
@@ -141,6 +144,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.saveFile(taskId, multipartFile, dataBody, locale);
     }
 
+    @Override
     @Operation(summary = "Download task file field value")
     @GetMapping(value = "/{id}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
@@ -159,6 +163,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.deleteFile(requestBody.getParentTaskId(), requestBody.getFieldId());
     }
 
+    @Override
     @Operation(summary = "Download preview for file field value")
     @GetMapping(value = "/{id}/file_preview/{field}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @RequestParam("fieldId") String fieldId) throws FileNotFoundException {
