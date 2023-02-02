@@ -3,6 +3,7 @@ package com.netgrif.application.engine.insurance
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.business.orsr.OrsrReference
 import groovy.util.logging.Slf4j
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,15 +21,11 @@ class OrsrTest {
     private IOrsrService service
 
     @Test
+    @Disabled
     void parseTest() {
         def ICO = 50_903_403 as String
-
-        try {
-            OrsrReference info = service.findByIco(ICO)
-            assertCorrectValidOrsrInfo(info)
-        } catch (SocketTimeoutException e) {
-            log.error("HTTP timout during fetching URL", e)
-        }
+        OrsrReference info = service.findByIco(ICO)
+        assertCorrectValidOrsrInfo(info)
     }
 
     @SuppressWarnings("GrMethodMayBeStatic")
