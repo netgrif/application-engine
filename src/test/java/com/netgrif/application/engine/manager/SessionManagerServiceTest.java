@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.manager;
 
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Collection;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -31,7 +29,7 @@ public class SessionManagerServiceTest {
 
     @Test
     void getAllLoggedUsersTest() {
-        Collection<LoggedUser> user = managerService.getAllLoggedUsers();
+        assert managerService.getAllLoggedUsers() != null;
     }
 
     @Test

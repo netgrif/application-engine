@@ -19,7 +19,7 @@ import java.util.Collection;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class ResponseTest {
+class ResponseTest {
 
     @Autowired
     private TestHelper testHelper;
