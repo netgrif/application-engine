@@ -1,8 +1,10 @@
-package com.netgrif.application.engine.manager;
+package com.netgrif.application.engine.manager.responseclass;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
+import com.netgrif.application.engine.auth.domain.User;
+import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
+import com.netgrif.application.engine.startup.SuperCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,18 +13,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class SessionManagerServiceTest {
-
-    @Autowired
-    private ISessionManagerService managerService;
+public class ResponseTest {
 
     @Autowired
     private TestHelper testHelper;
+
+    @Autowired
+    private SuperCreator superCreator;
 
     @BeforeEach
     public void before() {
@@ -30,18 +33,12 @@ public class SessionManagerServiceTest {
     }
 
     @Test
-    void getAllLoggedUsersTest() {
-        Collection<LoggedUser> user = managerService.getAllLoggedUsers();
-    }
-
-    @Test
-    void logoutSessionByUsernameTest() {
-        managerService.logoutSessionByUsername("test@netgrif.com");
-    }
-
-    @Test
-    void logoutAllSessionTest() {
-        managerService.logoutAllSession();
+    void allLoggedUsersResponseTest() {
+        Collection<LoggedUser> content = new ArrayList<>();
+        content.add(superCreator.getLoggedSuper());
+        AllLoggedUsersResponse response = new AllLoggedUsersResponse(content);
+        assert response != null;
+        assert response.getContent().size() == 1;
     }
 
 }
