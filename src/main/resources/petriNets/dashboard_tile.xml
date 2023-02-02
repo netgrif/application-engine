@@ -9,9 +9,12 @@
     <caseName name="model_default_case_name">Dashboard Tile</caseName>
     <function scope="process" name="mergeParentsFilter">
         { String parentFilterId, String query ->
-            def parentFilterCase = workflowService.findOne(parentFilterId)
-            if (!parentFilterCase) {
-                return query
+            try {
+                def parentFilterCase = workflowService.findOne(parentFilterId)
+            } catch (IllegalArgumentException ex) {
+                if (!parentFilterCase) {
+                    return query
+                }
             }
             String parentQuery = parentFilterCase.dataSet["filter"].value
             if (!parentQuery) {
