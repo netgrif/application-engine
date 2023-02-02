@@ -14,7 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-public class SessionManagerServiceTest {
+class SessionManagerServiceTest {
 
     @Autowired
     private ISessionManagerService managerService;
