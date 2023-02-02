@@ -12,6 +12,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -89,13 +90,9 @@ class ChangeCasePropertyTest {
         assert testCaseTask
 
         taskService.assignTask(testCaseTask.getStringId())
-        // TODO: NAE-1645
-        dataService.setData(testCaseTask.stringId, ImportHelper.populateDataset([
-                "bln": [
-                        "value": "true",
-                        "type" : "boolean"
-                ]
-        ]))
+        dataService.setData(testCaseTask.stringId, new DataSet([
+                "bln": new BooleanField(rawValue: true)
+        ] as Map<String, Field<?>>))
         taskService.finishTask(testCaseTask.getStringId())
 
         testCase = workflowService.findOne(testCase.getStringId())

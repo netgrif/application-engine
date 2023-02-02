@@ -25,9 +25,9 @@
             txt0: f.text_0,
             trans: t.t1;
 
-            make txt0, editable on trans when { bln.value }
-            make txt0, required on trans when { bln.value }
-            make txt0, initial on trans when { !bln.value }
+            make txt0, editable on trans when { bln.rawValue }
+            make txt0, required on trans when { bln.rawValue }
+            make txt0, initial on trans when { !bln.rawValue }
 		</action>
 	</data>
 	<data type="boolean">
@@ -38,11 +38,11 @@
 			bln: f.this,
 			txt0: f.text_0;
 
-			make txt0, editable on transitions when { bln.value }
-			make txt0, required on transitions when { bln.value }
+			make txt0, editable on transitions when { bln.rawValue }
+			make txt0, required on transitions when { bln.rawValue }
 
-			make txt0, visible on transitions when { !bln.value }
-			make txt0, optional on transitions when { !bln.value }
+			make txt0, visible on transitions when { !bln.rawValue }
+			make txt0, optional on transitions when { !bln.rawValue }
 		</action>
 	</data>
 	<data type="boolean">
@@ -56,8 +56,8 @@
             trans: t.t1,
             trans2: t.t3;
 
-			make txt0, editable on ([trans, trans2]) when { bln.value }
-			make txt0, visible on ([trans, trans2]) when { !bln.value }
+			make txt0, editable on ([trans, trans2]) when { bln.rawValue }
+			make txt0, visible on ([trans, trans2]) when { !bln.rawValue }
 		</action>
 	</data>
 	<data type="boolean">
@@ -71,8 +71,8 @@
 			trans: t.t1,
 			trans2: t.t3;
 
-			make [txt0, txt1], editable on ([trans, trans2]) when { bln.value }
-			make [txt0, txt1], visible on ([trans, trans2]) when { !bln.value }
+			make [txt0, txt1], editable on ([trans, trans2]) when { bln.rawValue }
+			make [txt0, txt1], visible on ([trans, trans2]) when { !bln.rawValue }
 		</action>
 	</data>
 	<transition>

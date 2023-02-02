@@ -34,7 +34,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.DeleteCaseEventOutcome;
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository;
-import com.netgrif.application.engine.workflow.service.initializer.FieldInitializer;
+import com.netgrif.application.engine.workflow.service.initializer.DataSetInitializer;
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -118,7 +118,7 @@ public class WorkflowService implements IWorkflowService {
     protected IElasticCaseService elasticCaseService;
 
     @Autowired
-    private FieldInitializer fieldInitializer;
+    private DataSetInitializer dataSetInitializer;
 
     @Autowired
     public void setElasticCaseService(IElasticCaseService elasticCaseService) {
@@ -253,7 +253,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(petriNet);
-        populateDataSet(useCase);
+        dataSetInitializer.populateDataSet(useCase);
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
@@ -285,17 +285,6 @@ public class WorkflowService implements IWorkflowService {
         outcome.setCase(useCase);
         addMessageToOutcome(petriNet, CaseEventType.CREATE, outcome);
         return outcome;
-    }
-
-    public void populateDataSet(Case useCase) {
-        useCase.getPetriNet().getDataSet().forEach((fieldId, field) -> {
-            Field<?> useCaseField = fieldInitializer.initialize(useCase, field);
-            useCase.getDataSet().put(fieldId, useCaseField);
-            if (field.isImmediate()) {
-                useCase.getImmediateDataFields().add(field.getStringId());
-                useCase.getImmediateData().add(useCaseField);
-            }
-        });
     }
 
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {
@@ -428,12 +417,12 @@ public class WorkflowService implements IWorkflowService {
     private void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataSet().get(field.getStringId()).getValue() != null &&
-                    useCase.getDataSet().get(field.getStringId()).getValue().equals(field.getDefaultValue())) {
+                    useCase.getDataSet().get(field.getStringId()).getRawValue().equals(field.getDefaultValue())) {
                 ((TaskField)useCase.getDataSet().get(field.getStringId())).setRawValue(new ArrayList<>());
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
                         (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
-                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataSet().get(field.getStringId()).getValue()).add(pair.getTask()));
+                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataSet().get(field.getStringId()).getRawValue()).add(pair.getTask()));
                 }
             }
         });

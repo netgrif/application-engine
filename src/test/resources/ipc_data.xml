@@ -41,10 +41,10 @@
                     def usecase = findCase({ it.title.eq("Case 1") })
                     def data = getData("2", usecase)
                     change text value {
-                    data["data_text"].value
+                        data["data_text"].rawValue
                     }
                     change number value {
-                    data["data_number"].value
+                        data["data_number"].rawValue
                     }
                     <!-- @formatter:on  -->
                 </action>

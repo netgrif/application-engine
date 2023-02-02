@@ -16,6 +16,7 @@ public class FilterFieldBuilder extends FieldBuilder<FilterField> {
     public FilterField build(Data data, Importer importer) {
         AllowedNets nets = data.getAllowedNets();
         FilterField field = new FilterField();
+        initialize(field);
         if (nets != null) {
             field.setAllowedNets(new ArrayList<>(nets.getAllowedNet()));
         }

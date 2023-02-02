@@ -1,12 +1,12 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
 
-import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
+import com.netgrif.application.engine.event.IGroovyShellFactory
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.beans.factory.annotation.Value
@@ -57,6 +57,6 @@ abstract class CaseFieldsExpressionRunner {
     protected void initCode(Object delegate, Case useCase) {
         ActionDelegate ad = ((ActionDelegate) delegate)
         ad.useCase = useCase
-        ad.initFieldsMap(useCase.dataSet.fields.collectEntries {[(it): (it)]}, useCase)
+        ad.initFieldsMap(useCase.dataSet.fields.collectEntries {[(it.key): (it.key)]}, useCase)
     }
 }

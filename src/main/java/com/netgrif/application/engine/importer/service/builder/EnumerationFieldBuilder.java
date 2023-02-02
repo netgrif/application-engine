@@ -13,6 +13,7 @@ public class EnumerationFieldBuilder extends FieldBuilder<EnumerationField> {
     @Override
     public EnumerationField build(Data data, Importer importer) {
         EnumerationField field = new EnumerationField();
+        initialize(field);
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
         } else {

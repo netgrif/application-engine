@@ -9,6 +9,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
-    private final Map<DataType, ElasticDataFieldTransformer<Field<?>, DataField>> transformers;
+    private final Map<DataType, ElasticDataFieldTransformer<? extends Field<?>, ? extends DataField>> transformers;
 
-    public ElasticCaseMappingService(List<ElasticDataFieldTransformer<Field<?>, DataField>> transformers) {
+    public ElasticCaseMappingService(@Autowired List<ElasticDataFieldTransformer<? extends Field<?>, ? extends DataField>> transformers) {
         this.transformers = transformers.stream().collect(Collectors.toMap(ElasticDataFieldTransformer::getType, Function.identity()));
     }
 
@@ -48,7 +49,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return Optional.empty();
         }
 
-        ElasticDataFieldTransformer<Field<?>, DataField> transformer = transformers.get(netField.getType());
+        ElasticDataFieldTransformer<Field<?>, ?> transformer = (ElasticDataFieldTransformer<Field<?>, ?>) transformers.get(netField.getType());
         if (transformer == null) {
             log.error("Field " + netField.getImportId() + " has unsupported type " + netField.getType());
             return Optional.empty();

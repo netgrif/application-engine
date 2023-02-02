@@ -10,6 +10,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
+import org.bson.types.ObjectId;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -20,6 +22,12 @@ public abstract class FieldBuilder<T extends Field<?>> {
     public abstract T build(Data data, Importer importer);
 
     public abstract DataType getType();
+
+    public void initialize(Field<?> field) {
+        field.setId(new ObjectId());
+        field.setEvents(new HashMap<>());
+        field.setBehaviors(new DataFieldBehaviors());
+    }
 
     public String getInitExpression(Data data) {
         if (data.getInit() != null) {
@@ -42,7 +50,9 @@ public abstract class FieldBuilder<T extends Field<?>> {
         if (data.getInits() != null && data.getInits().getInit() != null) {
             return data.getInits().getInit().stream().map(Init::getValue).collect(Collectors.toList());
         }
-        if (data.getInit() != null) return Arrays.asList(data.getInit().getValue().split(","));
+        if (data.getInit() != null) {
+            return List.of(data.getInit().getValue().trim().split("\\s*,\\s*"));
+        }
         return Collections.emptyList();
     }
 

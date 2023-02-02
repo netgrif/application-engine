@@ -32,13 +32,10 @@
                     <!-- @formatter:off -->
                     field: f.field;
                     execute "synchronized" where {
-                    it.title.eq("Case 1")
-                    } with ([
-                    "field": [
-                    value: 69.0,
-                    type: "number"
-                    ]
-                    ] as Map)
+                        it.title.eq("Case 1")
+                    } with (new DataSet([
+                        "field": new NumberField(rawValue: 69.0)
+                    ]))
                     <!-- @formatter:on -->
                 </action>
                 <action>

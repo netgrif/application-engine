@@ -4,7 +4,6 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
-import com.netgrif.application.engine.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
@@ -18,28 +17,26 @@ import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.annotate.JsonIgnore;
-import org.apache.commons.beanutils.BeanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE;
 
 @Slf4j
 @Document
 @Data
+@NoArgsConstructor
 public abstract class Field<T> extends Imported {
 
     @Id
-    protected ObjectId _id;
+    protected ObjectId id;
     @JsonIgnore
     protected T defaultValue;
     @JsonIgnore
@@ -61,12 +58,6 @@ public abstract class Field<T> extends Imported {
     @JsonIgnore
     private Long version = 0L;
     // TODO: NAE-1645 6.2.5: parentTaskId, parentCaseId
-
-    public Field() {
-        _id = new ObjectId();
-        this.events = new HashMap<>();
-        this.behaviors = new DataFieldBehaviors();
-    }
 
     public String getStringId() {
         return importId;
@@ -140,22 +131,34 @@ public abstract class Field<T> extends Imported {
     }
 
     public void clone(Field<T> clone) {
-        // TODO: NAE-1645 deep copy? check all domain classes
-        clone._id = this._id;
         clone.importId = this.importId;
-        clone.name = this.name;
-        clone.description = this.description;
-        clone.placeholder = this.placeholder;
-        clone.immediate = this.immediate;
-        clone.events = this.events;
-        clone.encryption = this.encryption;
-        clone.length = this.length;
-        clone.component = this.component;
+        clone.id = this.id;
+        clone.defaultValue = this.defaultValue;
+        if (this.initExpression != null) {
+            clone.initExpression = this.initExpression.clone();
+        }
         if (this.validations != null) {
             clone.validations = this.validations.stream().map(Validation::clone).collect(Collectors.toList());
         }
-        clone.defaultValue = this.defaultValue;
-        clone.initExpression = this.initExpression;
+        clone.name = this.name;
+        clone.description = this.description;
+        clone.placeholder = this.placeholder;
+        if (this.behaviors != null) {
+            clone.behaviors = this.behaviors.clone();
+        }
+//        TODO: NAE-1645 clone value? events
+//        if (this.value != null) {
+//            clone.value = this.value.clone();
+//        }
+        clone.immediate = this.immediate;
+        if (this.events != null ) {
+            clone.events = this.events.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        }
+        clone.encryption = this.encryption;
+        clone.length = this.length;
+        clone.component = this.component;
     }
 
     public abstract Field<T> clone();
@@ -205,35 +208,16 @@ public abstract class Field<T> extends Imported {
         }
         try {
             FieldUtils utils = new FieldUtils();
+            // TODO: NAE-1645 write test on each type of field to check if all properties are cloned
             utils.copyProperties(this, changes);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return;
         }
-//        if (changes.defaultValue != null) {
-//            this.defaultValue = (T) changes.defaultValue;
-//        }
-//        if (changes.initExpression != null) {
-//            this.initExpression = changes.initExpression;
-//        }
-//        if (changes.validations != null) {
-//            this.validations = changes.validations;
-//        }
-//        if (changes.name != null) {
-//            this.name = changes.name;
-//        }
-//        if (changes.description != null) {
-//            this.description = changes.description;
-//        }
-//        if (changes.placeholder != null) {
-//            this.placeholder = changes.placeholder;
-//        }
-//        if (changes.behaviors != null) {
-//            this.behaviors = changes.behaviors;
-//        }
-//        if (changes.value != null) {
-//            this.value = (DataFieldValue<T>) changes.value;
-//        }
         version++;
+    }
+
+    public void applyDefaultValue() {
+        this.setRawValue(this.getDefaultValue());
     }
 }

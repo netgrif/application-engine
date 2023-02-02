@@ -101,8 +101,9 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public void encodeUserPassword(RegisteredUser user) {
         String pass = user.getPassword();
-        if (pass == null)
+        if (pass == null) {
             throw new IllegalArgumentException("User has no password");
+        }
         user.setPassword(bCryptPasswordEncoder.encode(pass));
     }
 

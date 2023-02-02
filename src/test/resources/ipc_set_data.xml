@@ -39,16 +39,10 @@
                     text: f.data_text,
                     number: f.data_number;
                     def usecase = findCase({ it.title.eq("Case 1") })
-                    setData("2", usecase, [
-                    "data_text": [
-                    "value": "some text",
-                    "type" : "text"
-                    ],
-                    "data_number": [
-                    "value": "10",
-                    "type" : "number"
-                    ]
-                    ])
+                    setData("2", usecase, new DataSet([
+                        "data_text": new TextField(rawValue: "some text"),
+                        "data_number": new NumberField(rawValue: 10)
+                    ]))
                     <!-- @formatter:on  -->
                 </action>
             </actions>

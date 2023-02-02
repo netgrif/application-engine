@@ -7,6 +7,9 @@ import com.netgrif.application.engine.history.domain.baseevent.repository.EventL
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -14,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -91,9 +95,9 @@ class TaskApiTest {
         assert caseOpt.isPresent()
         useCase = caseOpt.get()
 
-        assert useCase.dataSet["field"].value == 6
-        assert useCase.dataSet["task_one"].value == net.stringId
-        assert useCase.dataSet["paged"].value == 2
+        assert useCase.dataSet.get("field").rawValue == 6
+        assert useCase.dataSet.get("task_one").rawValue == net.stringId
+        assert useCase.dataSet.get("paged").rawValue == 2
     }
 
     public static final String TASK_EVENTS_NET_FILE = "task_events.xml"
@@ -171,11 +175,11 @@ class TaskApiTest {
         leasing2 = leasing2Opt.get()
 
 //@formatter:off
-        assert limits.dataSet["limit"].value as Double == 970_000 as Double
-        assert leasing1.dataSet["2"].value as Double == 970_000 as Double
-        assert leasing1.dataSet["1"].value as Double == 30_000 as Double
-        assert leasing2.dataSet["2"].value as Double == 970_000 as Double
-        assert leasing2.dataSet["1"].value as Double == 0 as Double
+        assert limits.dataSet.get("limit").rawValue as Double == 970_000 as Double
+        assert leasing1.dataSet.get("2").rawValue as Double == 970_000 as Double
+        assert leasing1.dataSet.get("1").rawValue as Double == 30_000 as Double
+        assert leasing2.dataSet.get("2").rawValue as Double == 970_000 as Double
+        assert leasing2.dataSet.get("1").rawValue as Double == 0 as Double
 //@formatter:on
 
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
@@ -198,11 +202,11 @@ class TaskApiTest {
         leasing1 = leasing1Opt.get()
         leasing2 = leasing2Opt.get()
 
-        assert limits.dataSet["limit"].value as Double == 950_000 as Double
-        assert leasing1.dataSet["2"].value as Double == 950_000 as Double
-        assert leasing1.dataSet["1"].value as Double == 30_000 as Double
-        assert leasing2.dataSet["2"].value as Double == 950_000 as Double
-        assert leasing2.dataSet["1"].value as Double == 20_000 as Double
+        assert limits.dataSet.get("limit").rawValue as Double == 950_000 as Double
+        assert leasing1.dataSet.get("2").rawValue as Double == 950_000 as Double
+        assert leasing1.dataSet.get("1").rawValue as Double == 30_000 as Double
+        assert leasing2.dataSet.get("2").rawValue as Double == 950_000 as Double
+        assert leasing2.dataSet.get("1").rawValue as Double == 20_000 as Double
     }
 
     public static final String TASK_BULK_NET_FILE = "ipc_bulk.xml"
@@ -243,16 +247,10 @@ class TaskApiTest {
         PetriNet net = netOptional.getNet()
 
         def case1 = helper.createCase("Case 1", net)
-        helper.setTaskData(TASK_GETTER_TASK, case1.stringId, [
-                (DATA_TEXT)  : [
-                        "value": "text",
-                        "type" : "text"
-                ],
-                (DATA_NUMBER): [
-                        "value": 13,
-                        "type" : "number"
-                ]
-        ])
+        helper.setTaskData(TASK_GETTER_TASK, case1.stringId, new DataSet([
+                (DATA_TEXT)  : new TextField(rawValue: "text"),
+                (DATA_NUMBER): new NumberField(rawValue: 13)
+        ] as Map<String, Field<?>>))
 
         Case control = helper.createCase("Control case", net)
         helper.assignTaskToSuper(TASK_GETTER_TASK, control.stringId)
@@ -261,8 +259,8 @@ class TaskApiTest {
 
         assert controlOpt.isPresent()
         control = controlOpt.get()
-        assert control.dataSet[DATA_TEXT].value == "text"
-        assert control.dataSet[DATA_NUMBER].value == 13
+        assert control.dataSet.get(DATA_TEXT).rawValue == "text"
+        assert control.dataSet.get(DATA_NUMBER).rawValue == 13
     }
 
     public static final String TASK_SETTER_NET_FILE = "ipc_set_data.xml"
@@ -285,7 +283,7 @@ class TaskApiTest {
 
         assert case1Opt.isPresent()
         case1 = case1Opt.get()
-        assert case1.dataSet[DATA_TEXT].value == "some text"
-        assert case1.dataSet[DATA_NUMBER].value == 10
+        assert case1.dataSet.get(DATA_TEXT).rawValue == "some text"
+        assert case1.dataSet.get(DATA_NUMBER).rawValue == 10
     }
 }

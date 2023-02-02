@@ -1,11 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.events;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -54,5 +56,16 @@ public class DataEvent extends BaseEvent {
         } else {
             this.getPostActions().add(action);
         }
+    }
+
+    public DataEvent clone() {
+        DataEvent cloned = new DataEvent(this.getId());
+        cloned.type = this.type;
+        cloned.setTitle(this.getTitle());
+        cloned.setMessage(this.getMessage());
+        // TODO: NAE-1645
+        cloned.setPreActions(this.getPreActions());
+        cloned.setPostActions(this.getPostActions());
+        return cloned;
     }
 }

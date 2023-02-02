@@ -21,7 +21,7 @@ public interface IEventService {
 
     List<EventOutcome> runActions(List<Action> actions);
 
-    List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task);
+    List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task);
 
     List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger);
 

@@ -75,7 +75,7 @@ class DynamicEnumerationTest {
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
 
-        def field = aCase.dataSet["autocomplete"]
+        EnumerationField field = aCase.dataSet.get("autocomplete") as EnumerationField
         assert field.choices.size() == 1
         assert field.choices.find { it.defaultValue == "Case" }
     }

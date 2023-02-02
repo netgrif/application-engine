@@ -216,38 +216,55 @@ class ActionDelegate {
         }
     }
 
+    private DataFieldBehavior getOrCreateBehavior(String fieldId, String transitionId) {
+        DataFieldBehavior dataFieldBehavior = useCase.dataSet.get(fieldId).behaviors.get(transitionId)
+        if (dataFieldBehavior == null) {
+            dataFieldBehavior = new DataFieldBehavior()
+            useCase.dataSet.get(fieldId).behaviors.put(transitionId, dataFieldBehavior)
+        }
+        return dataFieldBehavior
+    }
+
     def visible = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.VISIBLE
+        getOrCreateBehavior(field.stringId, trans.stringId).behavior = FieldBehavior.VISIBLE
     }
 
     def editable = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.EDITABLE
+        getOrCreateBehavior(field.stringId, trans.stringId).behavior = FieldBehavior.EDITABLE
     }
 
     def required = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).required = true
+        getOrCreateBehavior(field.stringId, trans.stringId).required = true
     }
 
     def optional = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).required = false
+        getOrCreateBehavior(field.stringId, trans.stringId).required = false
     }
 
     def hidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.HIDDEN
+        getOrCreateBehavior(field.stringId, trans.stringId).behavior = FieldBehavior.HIDDEN
     }
 
     def forbidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).behaviors.get(trans.stringId).behavior = FieldBehavior.FORBIDDEN
+        getOrCreateBehavior(field.stringId, trans.stringId).behavior = FieldBehavior.FORBIDDEN
     }
 
     def initial = { Field field, Transition trans ->
-        useCase.petriNet.transitions.get(trans.stringId).dataSet.get(field.stringId).behavior
+        copyBehavior(field, trans)
+        DataFieldBehavior fieldBehavior = getOrCreateBehavior(field.stringId, trans.stringId)
+        DataFieldBehavior initialBehavior = trans.dataSet.get(field.importId).behavior
+        if (initialBehavior == null) {
+            initialBehavior = new DataFieldBehavior()
+        }
+        fieldBehavior.behavior = initialBehavior.behavior
+        fieldBehavior.required = initialBehavior.required
+        fieldBehavior.immediate = initialBehavior.immediate
     }
 
     def unchanged = { return UNCHANGED_VALUE }
@@ -444,96 +461,77 @@ class ActionDelegate {
     }
 
     def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior) {
-        DataFieldBehavior fieldBehavior = useCase.dataSet.get(field.stringId).behaviors
-        if (initialBehavior != null) {
-            fieldBehavior.put(trans.stringId, initialBehavior)
-        }
+//        DataFieldBehavior fieldBehavior = useCase.dataSet.get(field.stringId).behaviors
+//        if (initialBehavior != null) {
+//            fieldBehavior.put(trans.stringId, initialBehavior)
+//        }
 //        TODO: NAE-1645
 //        DataField changedField = new DataField(field.stringId)
 //        changedField.setBehavior(fieldBehavior)
-//        SetDataEventOutcome outcome = createSetDataEventOutcome()
-//        outcome.addChangedField(field.stringId, changedField)
-//        this.outcomes.add(outcome)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, field)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedChoices(ChoiceField field) {
-        useCase.dataSet.get(field.stringId).choices = field.choices
-        // TODO: NAE-1645 locale?
-//        DataField changedField = new DataField()
-//        changedField.setChoices(field.choices)
-//        SetDataEventOutcome outcome = createSetDataEventOutcome()
-//        outcome.addChangedField(field.stringId, changedField)
-//        this.outcomes.add(outcome)
+        ChoiceField caseField = useCase.dataSet.get(field.stringId) as ChoiceField
+        caseField.choices = field.choices
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, caseField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedAllowedNets(CaseField field) {
-        useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-//        TODO: NAE-1645
-//        DataField changedField = new DataField()
-//        changedField.setAllowedNets(field.allowedNets)
-//        SetDataEventOutcome outcome = createSetDataEventOutcome()
-//        outcome.addChangedField(field.stringId, changedField)
-//        this.outcomes.add(outcome)
+        CaseField caseField = useCase.dataSet.get(field.stringId) as CaseField
+        caseField.allowedNets = field.allowedNets
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, caseField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedOptions(MapOptionsField field) {
-        useCase.dataSet.get(field.stringId).options = field.options
-//        TODO: NAE-1645
-//        DataField changedField = new DataField()
-//        changedField.setOptions(field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]})
-//        SetDataEventOutcome outcome = createSetDataEventOutcome()
-//        outcome.addChangedField(field.stringId, changedField)
-//        this.outcomes.add(outcome)
+        MapOptionsField caseField =useCase.dataSet.get(field.stringId) as MapOptionsField
+        caseField.options = field.options
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, caseField)
+        this.outcomes.add(outcome)
     }
 
     def saveChangedValidation(Field field) {
-        useCase.dataSet.get(field.stringId).validations = field.validations
+        Field<?> caseField = useCase.dataSet.get(field.stringId)
+        caseField.validations = field.validations
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
             it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
         }
-//        TODO: NAE-1645
-//        DataField changedField = new DataField()
-//        changedField.setValidations(compiled)
-//        SetDataEventOutcome outcome = createSetDataEventOutcome()
-//        outcome.addChangedField(field.stringId, changedField)
-//        this.outcomes.add(outcome)
-    }
-
-    def close = { Transition[] transitions ->
-        def service = ApplicationContextProvider.getBean("taskService")
-        if (!service) {
-            log.error("Could not find task service")
-            return
-        }
-
-        def transitionIds = transitions.collect { it.stringId } as Set
-        service.cancelTasksWithoutReload(transitionIds, useCase.stringId)
+        SetDataEventOutcome outcome = createSetDataEventOutcome()
+        outcome.addChangedField(field.stringId, caseField)
+        this.outcomes.add(outcome)
     }
 
     def execute(String taskId) {
-        [with : { Map dataSet ->
+        [with : { DataSet dataSet ->
             executeTasks(dataSet, taskId, { it._id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
-             [with: { Map dataSet ->
+             [with: { DataSet dataSet ->
                  executeTasks(dataSet, taskId, closure)
              }]
          }]
     }
 
     def execute(Task task) {
-        [with : { Map dataSet ->
+        [with : { DataSet dataSet ->
             executeTasks(dataSet, task.stringId, { it._id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
-             [with: { Map dataSet ->
+             [with: { DataSet dataSet ->
                  executeTasks(dataSet, taskId, closure)
              }]
          }]
     }
 
-    void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
+    void executeTasks(DataSet dataSet, String taskId, Closure<Predicate> predicateClosure) {
         List<String> caseIds = searchCases(predicateClosure)
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
@@ -542,16 +540,15 @@ class ActionDelegate {
         }
     }
 
-    void executeTask(String transitionId, Map dataSet) {
+    void executeTask(String transitionId, DataSet dataSet) {
         QTask qTask = new QTask("task")
         Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
         addTaskOutcomes(task, dataSet)
     }
 
-    private addTaskOutcomes(Task task, Map dataSet) {
+    private addTaskOutcomes(Task task, DataSet dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
-        // TODO: NAE-1645 com.netgrif.application.engine.ipc.CaseApiTest#testSearch
-        this.outcomes.add(dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>)))
+        this.outcomes.add(dataService.setData(task.stringId, dataSet))
         this.outcomes.add(taskService.finishTask(task.stringId))
     }
 
@@ -590,13 +587,13 @@ class ActionDelegate {
              saveChangedChoices(field)
          },
          allowedNets: { cl ->
-             if (!(field instanceof CaseField)) // TODO make this work with FilterField as well
+             if (!(field instanceof CaseField)) {// TODO make this work with FilterField as well
                  return
-
+             }
              def allowedNets = cl()
-             if (allowedNets instanceof Closure && allowedNets() == UNCHANGED_VALUE)
-                 return
-
+             if (allowedNets instanceof Closure && allowedNets() == UNCHANGED_VALUE) {
+                return
+             }
              field = (CaseField) field
              if (allowedNets == null) {
                  field.setAllowedNets(new ArrayList<String>())
@@ -685,6 +682,9 @@ class ActionDelegate {
                 List<UserFieldValue> users = [] as List
                 value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
                 value = new UserListFieldValue(users)
+            }
+            if (value instanceof GString) {
+                value = value.toString()
             }
             field.setRawValue(value)
         }
@@ -993,20 +993,21 @@ class ActionDelegate {
     Map<String, Field> getData(String transitionId, Case useCase) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        if (!task)
+        if (!task) {
             return new HashMap<String, Field>()
+        }
         return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
     }
 
-    private List<Field> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
+    private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
-        // TODO: NAE-1645
         return outcome.getData()
     }
 
-    protected Map<String, Field> mapData(List<Field> data) {
+    // TODO: NAE-1645 should return dataRef?
+    protected Map<String, Field> mapData(List<DataRef> data) {
         return data.collectEntries {
-            [(it.importId): it]
+            [(it.fieldId): it.field]
         }
     }
 
@@ -1018,19 +1019,16 @@ class ActionDelegate {
         FileFieldValue fieldValue = new FileFieldValue()
         fieldValue.setName(filename)
         if (!storagePath) {
-            storagePath = fieldValue.getPath(targetCase.stringId, targetFieldId)
+            storagePath = FileStorageConfiguration.getPath(targetCase.stringId, targetFieldId, filename)
         }
         fieldValue.setPath(storagePath)
         if (targetCase.stringId == useCase.stringId) {
-            change targetCase.getField(targetFieldId) value { fieldValue }
+            change targetCase.dataSet.get(targetFieldId) value { fieldValue }
         } else {
             String taskId = targetCase.getTasks().find(taskPair -> taskPair.transition == targetTransitionId).task
-            def dataSet = [
-                    targetFieldId: [
-                            "value": filename + ":" + storagePath,
-                            "type" : "file"
-                    ]
-            ]
+            DataSet dataSet = new DataSet([
+                    targetFieldId: new FileField(rawValue: fieldValue)
+            ] as Map<String, Field<?>>)
             setData(taskId, dataSet)
         }
     }
@@ -1040,8 +1038,9 @@ class ActionDelegate {
                      Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
                      String template = null, List<String> excludedFields = [], Locale locale = null,
                      ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
-        if (!sourceTransitionId || !targetFileFieldId)
+        if (!sourceTransitionId || !targetFileFieldId) {
             throw new IllegalArgumentException("Source transition or target file field is null")
+        }
         targetTransitionId = targetTransitionId ?: sourceTransitionId
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputDefaultName()

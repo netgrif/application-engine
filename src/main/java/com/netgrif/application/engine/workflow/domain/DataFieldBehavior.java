@@ -45,4 +45,13 @@ public class DataFieldBehavior {
     private boolean isBehaviorSet(FieldBehavior behavior) {
         return behavior.equals(this.behavior);
     }
+
+    @Override
+    public DataFieldBehavior clone() {
+        DataFieldBehavior clone = new DataFieldBehavior();
+        clone.behavior = this.behavior;
+        clone.required = this.required;
+        clone.immediate = this.immediate;
+        return clone;
+    }
 }

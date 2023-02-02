@@ -33,6 +33,10 @@ public class DataRef {
     private Map<DataEventType, DataEvent> events;
     private FieldLayout layout;
     private Component component;
+    @Transient
+    protected String parentTaskId;
+    @Transient
+    protected String parentCaseId;
 
     public DataRef(Field<?> field, DataFieldBehavior behavior) {
         this.field = field;

@@ -65,6 +65,6 @@ class AssignCancelFinishWithCaseTest {
         importHelper.assignTaskToSuper("Task", aCase.stringId)
 
         def cases = caseRepository.findAllByProcessIdentifier(testNet.getNet().identifier)
-        assert cases.find { it.title == "Case 2" }.dataSet["field"].value == 1
+        assert cases.find { it.title == "Case 2" }.dataSet.get("field").rawValue == 1
     }
 }

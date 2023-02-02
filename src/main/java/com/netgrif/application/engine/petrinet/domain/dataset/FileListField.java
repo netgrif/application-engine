@@ -41,10 +41,10 @@ public class FileListField extends Field<FileListFieldValue> {
     }
 
     public void addValue(String fileName, String path) {
-        if (this.getValue() == null || this.getValue().getValue().getNamesPaths() == null) {
+        if (this.getRawValue() == null || this.getRawValue().getNamesPaths() == null) {
             this.setRawValue(new FileListFieldValue());
         }
-        this.getValue().getValue().getNamesPaths().add(new FileFieldValue(fileName, path));
+        this.getRawValue().getNamesPaths().add(new FileFieldValue(fileName, path));
     }
 
     /**

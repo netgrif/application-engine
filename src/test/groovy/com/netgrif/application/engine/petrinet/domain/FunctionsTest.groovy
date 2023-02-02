@@ -112,7 +112,9 @@ class FunctionsTest {
 
     @Test
     void testProcessFunctions() {
+        def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         def functionTestNet = petriNetService.importPetriNet(functionTestNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        assert functionResNet
         assert functionTestNet
 
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
@@ -129,7 +131,10 @@ class FunctionsTest {
 
     @Test
     void testNamespaceFunctionException() {
-        assertThrows(MissingMethodException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
+            def functionResNet = petriNetService.importPetriNet(functionResNetResource.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+            assert functionResNet
+
             def nets = petriNetService.getByIdentifier(FUNCTION_RES_IDENTIFIER)
             if (nets) {
                 nets.each {

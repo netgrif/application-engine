@@ -52,7 +52,9 @@ public class EventService implements IEventService {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
-                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) return;
+                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) {
+                            return;
+                        }
                         runEventActionsOnChanged(task.orElse(null), (SetDataEventOutcome) outcome, DataEventType.SET);
                     });
             allOutcomes.addAll(outcomes);
@@ -73,7 +75,9 @@ public class EventService implements IEventService {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
-                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) return;
+                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) {
+                            return;
+                        }
                         runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
                     });
             allOutcomes.addAll(outcomes);
@@ -82,19 +86,21 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> processDataEvents(Field field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task) {
+    public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task) {
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
-            fieldActions.addAll(DataRef.getEventAction((DataEvent) field.getEvents().get(actionTrigger), phase));
+            fieldActions.addAll(DataRef.getEventAction(field.getEvents().get(actionTrigger), phase));
         }
         if (task != null) {
             Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-            if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty())
+            if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty()) {
                 fieldActions.addAll(DataRef.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
+            }
         }
 
-        if (fieldActions.isEmpty()) return Collections.emptyList();
-
+        if (fieldActions.isEmpty()) {
+            return Collections.emptyList();
+        }
         return runEventActions(useCase, task, fieldActions, actionTrigger);
     }
 
@@ -102,7 +108,7 @@ public class EventService implements IEventService {
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
         // TODO: NAE-1645 6.2.5
         outcome.getChangedFields().getFields().forEach((s, changedField) -> {
-            if (changedField.getValue() != null && trigger == DataEventType.SET) {
+            if (changedField.getRawValue() != null && trigger == DataEventType.SET) {
                 Field<?> field = outcome.getCase().getDataSet().get(s);
                 log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
                 outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));

@@ -52,23 +52,23 @@ class ChangeFieldValueInitTest {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/change_field_value_init.xml"), VersionType.MAJOR, superCreator.getLoggedSuper());
         Case useCase = importHelper.createCase("test", optNet.getNet())
 
-        assert useCase.dataSet["text_static"].value == "TEST VALUE"
-        assert useCase.dataSet["text_dynamic"].value == "TEST VALUE DYNAMIC"
+        assert useCase.dataSet.get("text_static").rawValue == "TEST VALUE"
+        assert useCase.dataSet.get("text_dynamic").rawValue == "TEST VALUE DYNAMIC"
 
         useCase = execute("transition0", useCase)
 
-        assert useCase.dataSet["text_static"].value == "CHANGED VALUE OF text_static"
-        assert useCase.dataSet["text_dynamic"].value == "CHANGED VALUE OF text_dynamic"
+        assert useCase.dataSet.get("text_static").rawValue == "CHANGED VALUE OF text_static"
+        assert useCase.dataSet.get("text_dynamic").rawValue == "CHANGED VALUE OF text_dynamic"
 
         useCase = execute("transition1", useCase)
 
-        assert useCase.dataSet["text_static"].value == "TEST VALUE"
-        assert useCase.dataSet["text_dynamic"].value == "TEST VALUE DYNAMIC"
+        assert useCase.dataSet.get("text_static").rawValue == "TEST VALUE"
+        assert useCase.dataSet.get("text_dynamic").rawValue == "TEST VALUE DYNAMIC"
 
         useCase = execute("transition2", useCase)
 
-        assert useCase.dataSet["text_static"].value == "TEST VALUE DYNAMIC"
-        assert useCase.dataSet["text_dynamic"].value == "TEST VALUE"
+        assert useCase.dataSet.get("text_static").rawValue == "TEST VALUE DYNAMIC"
+        assert useCase.dataSet.get("text_dynamic").rawValue == "TEST VALUE"
 
     }
 

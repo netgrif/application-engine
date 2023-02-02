@@ -59,7 +59,7 @@ class TaskRefInitTest {
 
         assert ((List<String>) aCase.dataSet.get("taskRef_0").rawValue).containsAll(Arrays.asList(task1.stringId, task2.stringId))
         assert ((List<String>) aCase.dataSet.get("taskRef_1").rawValue).isEmpty()
-        assert ((List<String>) aCase.dataSet.get("taskRef_2").rawValue).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").value).size() == 1
+        assert ((List<String>) aCase.dataSet.get("taskRef_2").rawValue).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").rawValue).size() == 1
         assert ((List<String>) aCase.dataSet.get("taskRef_3").rawValue).isEmpty()
     }
 

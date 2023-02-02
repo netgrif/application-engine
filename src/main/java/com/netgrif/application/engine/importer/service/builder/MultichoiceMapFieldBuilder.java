@@ -14,6 +14,7 @@ public class MultichoiceMapFieldBuilder extends FieldBuilder<MultichoiceMapField
     @Override
     public MultichoiceMapField build(Data data, Importer importer) {
         MultichoiceMapField field = new MultichoiceMapField();
+        initialize(field);
         setFieldOptions(field, data, importer);
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {

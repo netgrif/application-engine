@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -166,6 +167,7 @@ class ChangeBehaviorTest {
         assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == EDITABLE
     }
 
+    @SuppressWarnings('GroovyPointlessBoolean')
     @Test
     void initialBehaviorTest() {
         Case testCase = helper.createCase(TEST_CASE_NAME, net)
@@ -190,6 +192,7 @@ class ChangeBehaviorTest {
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == false
 
-        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION) == testCase.petriNet.transitions[MAIN_TRANSITION].dataSet[TEXT_0_FIELD_ID].behavior
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == VISIBLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required == false
     }
 }

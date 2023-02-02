@@ -5,7 +5,12 @@ import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
+import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
@@ -17,6 +22,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -134,7 +140,7 @@ class FilterImportExportTest {
         File exportedFiltersFile = new File(exportedFiltersField.getPath())
         assert exportedFiltersFile.exists()
 
-        importCase.dataSet.get(UPLOAD_FILE_FIELD).value = exportedFiltersField
+        importCase.dataSet.get(UPLOAD_FILE_FIELD).rawValue = exportedFiltersField
         this.workflowService.save(importCase)
         List<String> importedTasksIds = this.importExportService.importFilters()
         assert importedTasksIds.size() == FILTERS_TO_EXPORT.size()
@@ -142,24 +148,15 @@ class FilterImportExportTest {
         validateFilterXML(new FileInputStream(exportedFiltersField.getPath()))
         importedTasksIds.forEach({ taskId ->
             Task filterTask = this.taskService.findOne(taskId)
-            this.dataService.setData(filterTask, ImportHelper.populateDataset([
-                    (VISIBILITY_FIELD): [
-                            "type" : "enumeration_map",
-                            "value": FILTER_VISIBILITY_PRIVATE
-                    ],
-                    (NEW_TITLE_FIELD) : [
-                            "type" : "text",
-                            "value": this.workflowService.findOne(filterTask.caseId).title + " new"
-                    ]
-            ]))
+            this.dataService.setData(filterTask, new DataSet([
+                    (VISIBILITY_FIELD): new EnumerationMapField(rawValue: FILTER_VISIBILITY_PRIVATE),
+                    (NEW_TITLE_FIELD) : new TextField(rawValue: this.workflowService.findOne(filterTask.caseId).title + " new")
+            ] as Map<String, Field<?>>))
         })
         Task importTask = this.taskService.searchOne(QTask.task.caseId.eq(importCase.stringId).and(QTask.task.transitionId.eq("importFilter")))
-        this.dataService.setData(importTask, ImportHelper.populateDataset([
-                (IMPORTED_FILTERS_FIELD): [
-                        "type" : "taskRef",
-                        "value": importedTasksIds
-                ]
-        ]))
+        this.dataService.setData(importTask, new DataSet([
+                (IMPORTED_FILTERS_FIELD): new TaskField(rawValue: importedTasksIds)
+        ] as Map<String, Field<?>>))
         this.taskService.finishTask(importTask, dummyUser)
         Thread.sleep(1000)
         filterCases = this.userFilterSearchService.autocompleteFindFilters("")
@@ -171,17 +168,16 @@ class FilterImportExportTest {
         }
         for (Case filterCase : filterCases) {
             if (filterCase.title in FILTERS_TO_EXPORT_NEW) {
-                assert filterCase.dataSet.get(VISIBILITY_FIELD).value == FILTER_VISIBILITY_PRIVATE
+                assert filterCase.dataSet.get(VISIBILITY_FIELD).rawValue == FILTER_VISIBILITY_PRIVATE
             }
         }
         for (int i = 0; i < FILTERS_TO_EXPORT.size(); i++) {
-//            TODO: NAE-1645
-//            Case filterCase1 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))
-//            DataField filterField1 = filterCase1.dataSet.get(FILTER_FIELD)
-//            Case filterCase2 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT_NEW[i]))
-//            DataField filterField2 = filterCase2.dataSet.get(FILTER_FIELD)
+            Case filterCase1 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT[i]))
+            FilterField filterField1 = filterCase1.dataSet.get(FILTER_FIELD) as FilterField
+            Case filterCase2 = filterCases.get(filterCasesNames.indexOf(FILTERS_TO_EXPORT_NEW[i]))
+            FilterField filterField2 = filterCase2.dataSet.get(FILTER_FIELD) as FilterField
             assert filterCase1.icon == filterCase2.icon
-            assert filterField1.value == filterField2.value
+            assert filterField1.rawValue == filterField2.rawValue
             assert filterField1.allowedNets == filterField2.allowedNets
             assert filterField1.filterMetadata == filterField2.filterMetadata
         }
@@ -294,8 +290,8 @@ class FilterImportExportTest {
         importedCases.forEach({ c ->
             Case oldCase = idToOldCase.get(newToOldCaseId.get(c.getStringId()))
             assert oldCase != null
-            assert newToOldCaseId.get(c.dataSet.get("origin_view_id").value) == oldCase.dataSet.get("origin_view_id").value
-            assert newToOldCaseId.get(c.dataSet.get("parent_filter_id").value) == oldCase.dataSet.get("parent_filter_id").value
+            assert newToOldCaseId.get(c.dataSet.get("origin_view_id").rawValue) == oldCase.dataSet.get("origin_view_id").rawValue
+            assert newToOldCaseId.get(c.dataSet.get("parent_filter_id").rawValue) == oldCase.dataSet.get("parent_filter_id").rawValue
         })
     }
 

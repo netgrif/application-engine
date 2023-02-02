@@ -11,8 +11,11 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexSe
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -24,6 +27,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -121,28 +125,28 @@ class DataSearchRequestTest {
 
         LocalDate date = LocalDate.of(2020, 7, 25);
         Case _case = importHelper.createCase("correct", net.getNet())
-        _case.dataSet["number"].value = 7.0 as Double
-        _case.dataSet["boolean"].value = true
-        _case.dataSet["text"].value = "hello world" as String
-        _case.dataSet["user"].value = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
-        _case.dataSet["date"].value = date
-        _case.dataSet["datetime"].value = date.atTime(13, 37)
-        _case.dataSet["enumeration"].value = (_case.petriNet.dataSet["enumeration"] as ChoiceField).choices.find({ it.defaultValue == "Alice" })
-        _case.dataSet["multichoice"].value = (_case.petriNet.dataSet["multichoice"] as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
-        _case.dataSet["enumeration_map"].value = "alice"
-        _case.dataSet["multichoice_map"].value = ["alice", "bob"].toSet()
-        _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
-        _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet["userList"].value = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
-        //TODO: NAE-1645
-        // Cannot set property 'defaultValue' on null object
-        _case.dataSet["i18n_text"].value.defaultValue = "Modified i18n text value"
-        _case.dataSet["i18n_divider"].value.defaultValue = "Modified i18n divider value"
+        _case.dataSet.get("number").rawValue = 7.0 as Double
+        _case.dataSet.get("boolean").rawValue = true
+        _case.dataSet.get("text").rawValue = "hello world" as String
+        _case.dataSet.get("user").rawValue = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
+        _case.dataSet.get("date").rawValue = date
+        _case.dataSet.get("datetime").rawValue = date.atTime(13, 37)
+        _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
+        _case.dataSet.get("multichoice").rawValue = (_case.petriNet.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
+        _case.dataSet.get("enumeration_map").rawValue = "alice"
+        _case.dataSet.get("multichoice_map").rawValue = ["alice", "bob"].toSet()
+        _case.dataSet.get("file").rawValue = FileFieldValue.fromString("singlefile.txt")
+        _case.dataSet.get("fileList").rawValue = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
+        _case.dataSet.get("userList").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
+        (_case.dataSet.get("i18n_text") as I18nField).rawValue.defaultValue = "Modified i18n text value"
+        (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
 
         Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
         assert actionTrigger != null
-        dataService.setData(actionTrigger, ImportHelper.populateDataset(["testActionTrigger": ["value": "random value", "type": "text"]]))
+        dataService.setData(actionTrigger, new DataSet([
+                "testActionTrigger": new TextField(rawValue: "random value")
+        ] as Map<String, Field<?>>))
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.getNet())

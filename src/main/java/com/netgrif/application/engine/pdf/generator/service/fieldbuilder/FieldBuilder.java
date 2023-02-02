@@ -170,6 +170,7 @@ public abstract class FieldBuilder {
     }
 
     private boolean isDgFlow(DataGroup dataGroup) {
+        // TODO: NAE-1645
         return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(FLOW);
     }
 

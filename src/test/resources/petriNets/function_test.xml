@@ -34,7 +34,7 @@
     </function>
     <function scope="process" name="behaveField">
         { def fieldId, def transitionId, def behavior ->
-            make useCase.getField(fieldId), behavior on useCase.petriNet.transitions[transitionId] when { true }
+            make useCase.dataSet.get(fieldId), behavior on useCase.petriNet.transitions[transitionId] when { true }
         }
     </function>
     <function scope="process" name="evaluateCompactedCondition">
@@ -88,7 +88,7 @@
             number: f.number,
             number2: f.number2;
 
-            change number2 value { function_res.calculate(number.value, number.value)}
+            change number2 value { function_res.calculate(number.rawValue, number.rawValue)}
         </action>
     </data>
     <data type="number">

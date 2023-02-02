@@ -4,6 +4,9 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
@@ -12,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -76,9 +80,8 @@ class SetDataOnButtonTest {
     void setDataFromTestCase() {
         Case parentCase = helper.createCase(PARENT_CASE, net)
         Case childCase = helper.createCase(CHILD_CASE, net)
-//        TODO: NAE-1645
-//        parentCase.dataSet[CHILD_CASE_FIELD_ID].value = childCase.getStringId()
-//        assert parentCase.dataSet[CHILD_CASE_FIELD_ID].value == childCase.getStringId()
+        (parentCase.dataSet.get(CHILD_CASE_FIELD_ID) as TextField).rawValue = childCase.getStringId()
+        assert parentCase.dataSet.get(CHILD_CASE_FIELD_ID).rawValue == childCase.getStringId()
         workflowService.save(parentCase)
 
         Task parentTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
@@ -88,10 +91,9 @@ class SetDataOnButtonTest {
         taskService.finishTask(parentTask.getStringId())
 
         childCase = workflowService.findOne(childCase.getStringId())
-//        TODO: NAE-1645
-//        assert childCase.dataSet[TEXT_0_FIELD_ID].value.toString() == OUTPUT_TEXT_0
-//        assert childCase.dataSet[TEXT_1_FIELD_ID].value.toString() == OUTPUT_TEXT_1
-//        assert childCase.dataSet[TEXT_2_FIELD_ID].value.toString() == OUTPUT_TEXT_2
+        assert childCase.dataSet.get(TEXT_0_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_0
+        assert childCase.dataSet.get(TEXT_1_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_1
+        assert childCase.dataSet.get(TEXT_2_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_2
     }
 
     @Test
@@ -100,28 +102,19 @@ class SetDataOnButtonTest {
 
         Task testCaseTask = taskService.searchOne(QTask.task.caseTitle.eq(PARENT_CASE) & QTask.task.transitionId.eq(TEST_TRANSITION))
         assert testCaseTask != null
-//        TODO: NAE-1645
-//        dataService.setData(testCaseTask.stringId, ImportHelper.populateDataset([
-//                "button_0": [
-//                        "value": "42",
-//                        "type" : "button"
-//                ],
-//                "button_1": [
-//                        "value": 42,
-//                        "type" : "button"
-//                ],
-//                "button_2": [
-//                        "type" : "button"
-//                ]
-//        ] as Map<String, Map<String, String>>))
-//
-//        testCase = workflowService.findOne(testCase.getStringId())
-//
-//        assert testCase.dataSet[BUTTON_0_FIELD_ID].value == 42
-//        assert testCase.dataSet[BUTTON_1_FIELD_ID].value == 42
-//        assert testCase.dataSet[BUTTON_2_FIELD_ID].value == 1
-//        assert testCase.dataSet[TEXT_0_FIELD_ID].value.toString() == OUTPUT_TEXT_0
-//        assert testCase.dataSet[TEXT_1_FIELD_ID].value.toString() == OUTPUT_TEXT_1
-//        assert testCase.dataSet[TEXT_2_FIELD_ID].value.toString() == OUTPUT_TEXT_2
+        dataService.setData(testCaseTask.stringId, new DataSet([
+                "button_0": new ButtonField(rawValue: 42),
+                "button_1": new ButtonField(rawValue: 42),
+                "button_2": new ButtonField(rawValue: 42)
+        ] as Map<String, Field<?>>))
+
+        testCase = workflowService.findOne(testCase.getStringId())
+
+        assert testCase.dataSet.get(BUTTON_0_FIELD_ID).rawValue == 42
+        assert testCase.dataSet.get(BUTTON_1_FIELD_ID).rawValue == 42
+        assert testCase.dataSet.get(BUTTON_2_FIELD_ID).rawValue == 42
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_0
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_1
+        assert testCase.dataSet.get(TEXT_2_FIELD_ID).rawValue.toString() == OUTPUT_TEXT_2
     }
 }

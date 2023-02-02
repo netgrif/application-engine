@@ -66,7 +66,11 @@ public class Transition extends Node {
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
-        setDataRefAttribute(field, dataRef -> field.setBehavior(this.importId, behavior));
+        // TODO: NAE-1645
+        setDataRefAttribute(field, dataRef ->  {
+            field.setBehavior(this.importId, behavior);
+            dataRef.setBehavior(behavior);
+        });
     }
 
     public void setDataRefComponent(Field<?> field, Component component) {
@@ -201,5 +205,17 @@ public class Transition extends Node {
 
     public void addEvent(Event event) {
         events.put(event.getType(), event);
+    }
+
+    public LinkedHashSet<String> getImmediateData() {
+        return dataSet.entrySet().stream()
+                .filter(entry -> {
+                    if (entry.getValue().getBehavior() == null) {
+                        return false;
+                    }
+                    return entry.getValue().getBehavior().isImmediate();
+                })
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

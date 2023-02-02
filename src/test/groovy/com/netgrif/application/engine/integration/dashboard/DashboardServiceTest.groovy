@@ -50,7 +50,7 @@ class DashboardServiceTest {
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)
-            aCase.dataSet["number"].value = testDataInt[random.nextInt(testDataInt.length - 1)]
+            aCase.dataSet.get("number").rawValue = testDataInt[random.nextInt(testDataInt.length - 1)]
             workflowService.save(aCase)
         }
     }
@@ -61,7 +61,7 @@ class DashboardServiceTest {
         Random random = new Random()
         (1..30).each {
             Case aCase = helper.createCase("Default title", net1)
-            aCase.dataSet["text"].value = testData[random.nextInt(testData.length - 1)]
+            aCase.dataSet.get("text").rawValue = testData[random.nextInt(testData.length - 1)]
             workflowService.save(aCase)
         }
     }

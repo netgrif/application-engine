@@ -2,6 +2,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runn
 
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
+import lombok.Data
 import org.bson.types.ObjectId
 
 class Expression {
@@ -30,6 +31,13 @@ class Expression {
     @Override
     String toString() {
         return "[$stringId] $definition"
+    }
+
+    Expression clone() {
+        Expression clone =  new Expression()
+        clone._id = this._id
+        clone.definition = this.definition
+        return clone
     }
 
     @Override

@@ -42,7 +42,7 @@ class CaseApiTest {
 
     private ImportPetriNetEventOutcome testNet
 
-    private def stream = { String name ->
+    private Closure stream = { String name ->
         return CaseApiTest.getClassLoader().getResourceAsStream(name)
     }
 
@@ -85,9 +85,9 @@ class CaseApiTest {
         importHelper.finishTaskAsSuper("Task", cases[0].stringId)
 
         cases = caseRepository.findAll()
-        assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
-        assert cases.findAll { it.title != "Case 1" && it.processIdentifier == "test" }.every { it.dataSet["field"].value == 0 }
-        assert cases.find { it.title == "Case 0" }.dataSet["count"].value == 5
-        assert cases.find { it.title == "Case 0" }.dataSet["paged"].value == 1
+        assert cases.find { it.title == "Case 1" }.dataSet.get("field").rawValue != 0
+        assert cases.findAll { it.title != "Case 1" && it.processIdentifier == "test" }.every { it.dataSet.get("field").rawValue == 0 }
+        assert cases.find { it.title == "Case 0" }.dataSet.get("count").rawValue == 5
+        assert cases.find { it.title == "Case 0" }.dataSet.get("paged").rawValue == 1
     }
 }

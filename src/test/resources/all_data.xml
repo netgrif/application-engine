@@ -675,7 +675,7 @@
                     }
 
                     change multiMap value {
-                    ["eve", "felix"]
+                    ["eve", "felix"] as Set
                     }
                 </action>
             </logic>

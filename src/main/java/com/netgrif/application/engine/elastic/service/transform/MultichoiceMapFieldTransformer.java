@@ -13,7 +13,7 @@ public class MultichoiceMapFieldTransformer extends ElasticDataFieldTransformer<
 
     @Override
     public MapField transform(MultichoiceMapField caseField, MultichoiceMapField petriNetField) {
-        Set<String> values = caseField.getValue().getValue();
+        Set<String> values = caseField.getRawValue();
         if (values == null || values.isEmpty()) {
             return null;
         }

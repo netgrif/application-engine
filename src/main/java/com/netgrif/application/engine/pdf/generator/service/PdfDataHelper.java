@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.QTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
@@ -307,7 +308,11 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     protected boolean isNotHidden(Field<?> field, String transitionId) {
-        return !FieldBehavior.HIDDEN.equals(field.getBehaviors().get(transitionId).getBehavior());
+        DataFieldBehavior fieldBehavior = field.getBehaviors().get(transitionId);
+        if (fieldBehavior == null) {
+            return true;
+        }
+        return fieldBehavior.getBehavior() != FieldBehavior.HIDDEN;
     }
 
     protected boolean isNotExcluded(String fieldId) {

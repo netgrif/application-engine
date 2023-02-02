@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -28,5 +29,14 @@ public class DataFieldBehaviors {
 
     public boolean contains(String transitionId) {
         return behaviors.containsKey(transitionId);
+    }
+
+    @Override
+    public DataFieldBehaviors clone() {
+        DataFieldBehaviors clone = new DataFieldBehaviors();
+        clone.behaviors = this.behaviors.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        return clone;
     }
 }

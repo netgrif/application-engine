@@ -17,6 +17,7 @@ public class TaskRefFieldBuilder extends FieldBuilder<TaskField> {
     @Override
     public TaskField build(Data data, Importer importer) {
         TaskField field = new TaskField();
+        initialize(field);
         setDefaultValues(field, data, defaultValues -> {
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 List<String> defaults = new ArrayList<>();

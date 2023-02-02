@@ -132,9 +132,9 @@ public class TaskService implements ITaskService {
     @Transactional
     public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if (!taskOptional.isPresent())
+        if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
-
+        }
         IUser user = userService.resolveById(loggedUser.getId(), true);
         return assignTask(taskOptional.get(), user);
     }
@@ -549,8 +549,9 @@ public class TaskService implements ITaskService {
     @Override
     public Task findOne(String taskId) {
         Optional<Task> optionalTask = taskRepository.findById(taskId);
-        if (!optionalTask.isPresent())
+        if (optionalTask.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
+        }
         return optionalTask.get();
     }
 
@@ -755,7 +756,7 @@ public class TaskService implements ITaskService {
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())
                 .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
-//                .immediateDataFields(new LinkedHashSet<>(transition.getImmediateData())) TODO: NAE-1645 fix
+                .immediateDataFields(transition.getImmediateData())
                 .assignPolicy(transition.getAssignPolicy())
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())

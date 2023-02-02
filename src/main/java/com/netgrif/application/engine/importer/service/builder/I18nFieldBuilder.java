@@ -13,23 +13,24 @@ public class I18nFieldBuilder extends FieldBuilder<I18nField> {
 
     @Override
     public I18nField build(Data data, Importer importer) {
-        I18nField i18nField = new I18nField();
+        I18nField field = new I18nField();
+        initialize(field);
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            i18nField.setInitExpression(new Expression(initExpression));
+            field.setInitExpression(new Expression(initExpression));
         } else {
             // TODO: NAE-1645 simplify
             if (data.getInits() != null && data.getInits().getInit() != null && !data.getInits().getInit().isEmpty()) {
-                i18nField.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
+                field.setDefaultValue(new I18nString(data.getInits().getInit().get(0).getValue()));
             } else if (data.getInit() != null && (data.getInit().getName() == null || data.getInit().getName().equals(""))) {
-                i18nField.setDefaultValue(new I18nString(data.getInit().getValue()));
+                field.setDefaultValue(new I18nString(data.getInit().getValue()));
             } else if (data.getInit() != null && data.getInit().getName() != null && !data.getInit().getName().equals("")) {
-                i18nField.setDefaultValue(importer.toI18NString(data.getInit()));
+                field.setDefaultValue(importer.toI18NString(data.getInit()));
             } else {
-                i18nField.setDefaultValue(new I18nString(""));
+                field.setDefaultValue(new I18nString(""));
             }
         }
-        return i18nField;
+        return field;
     }
 
     @Override

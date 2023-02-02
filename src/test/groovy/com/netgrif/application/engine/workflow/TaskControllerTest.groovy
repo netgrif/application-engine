@@ -123,11 +123,11 @@ class TaskControllerTest {
 
         dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[]{}))
         testCase = workflowService.findOne(testCase.stringId)
-        assert testCase.dataSet.get("file").value.value != null
+        assert testCase.dataSet.get("file").rawValue != null
 
         taskController.deleteFile(taskId, "file")
         testCase = workflowService.findOne(testCase.stringId)
-        assert testCase.dataSet.get("file").value.value == null
+        assert testCase.dataSet.get("file").rawValue == null
     }
 
     @Test
@@ -137,12 +137,12 @@ class TaskControllerTest {
 
         dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)
-        assert testCase.dataSet.get("fileList").value.value != null
+        assert testCase.dataSet.get("fileList").rawValue != null
 
         taskController.deleteNamedFile(taskId, "fileList", "test")
         testCase = workflowService.findOne(testCase.stringId)
-        assert ((FileListFieldValue) testCase.dataSet.get("fileList").value.value).namesPaths == null ||
-                ((FileListFieldValue) testCase.dataSet.get("fileList").value.value).namesPaths.size() == 0
+        assert ((FileListFieldValue) testCase.dataSet.get("fileList").rawValue).namesPaths == null ||
+                ((FileListFieldValue) testCase.dataSet.get("fileList").rawValue).namesPaths.size() == 0
     }
 
     void testWithRoleAndUserref() {

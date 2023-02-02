@@ -12,6 +12,7 @@ public class EnumerationMapFieldBuilder extends FieldBuilder<EnumerationMapField
     @Override
     public EnumerationMapField build(Data data, Importer importer) {
         EnumerationMapField field = new EnumerationMapField();
+        initialize(field);
         setFieldOptions(field, data, importer);
         setDefaultValue(field, data, init -> {
             if (init != null && !init.isEmpty()) {

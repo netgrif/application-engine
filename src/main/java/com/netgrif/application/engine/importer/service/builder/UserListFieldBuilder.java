@@ -13,6 +13,7 @@ public class UserListFieldBuilder extends FieldBuilder<UserListField> {
     @Override
     public UserListField build(Data data, Importer importer) {
         UserListField field = new UserListField();
+        initialize(field);
         setDefaultValues(field, data, inits -> {
 //            TODO: NAE-1645
         });

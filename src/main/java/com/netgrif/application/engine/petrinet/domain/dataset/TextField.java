@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
+import groovy.lang.GString;
 import lombok.Data;
 
 @Data

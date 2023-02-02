@@ -16,6 +16,7 @@ public class UserFieldBuilder extends FieldBuilder<UserField> {
     @Override
     public UserField build(Data data, Importer importer) {
         UserField field = new UserField();
+        initialize(field);
         if (data.getOptions() != null && data.getOptions().getOption() != null) {
             Set<String> roles = data.getOptions().getOption().stream()
                     .map(Option::getKey)

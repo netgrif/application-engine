@@ -3,6 +3,11 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.FilterField
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
@@ -11,6 +16,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -268,46 +274,29 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
         Task newFilterTask = this.taskService.searchOne(QTask.task.transitionId.eq(AUTO_CREATE_TRANSITION).and(QTask.task.caseId.eq(filterCase.getStringId())))
         this.taskService.assignTask(newFilterTask, this.userService.getLoggedOrSystem())
 
-        def setDataMap = [
-                (FILTER_TYPE_FIELD_ID): [
-                        "type": "enumeration_map",
-                        "value": filterType
-                ],
-                (FILTER_VISIBILITY_FIELD_ID): [
-                        "type": "enumeration_map",
-                        "value": filterVisibility
-                ],
-                (FILTER_FIELD_ID): [
-                        "type": "filter",
-                        "value": filterQuery,
-                        "allowedNets": allowedNets,
-                        "filterMetadata": filterMetadata
-                ]
-        ]
+        DataSet dataSet = new DataSet([
+                (FILTER_TYPE_FIELD_ID): new EnumerationMapField(rawValue: filterType),
+                (FILTER_VISIBILITY_FIELD_ID): new EnumerationMapField(rawValue: filterVisibility),
+                (FILTER_FIELD_ID): new FilterField(rawValue: filterQuery, allowedNets: allowedNets, filterMetadata: filterMetadata)
+        ] as Map<String, Field<?>>)
 
         if (originId != null) {
-            setDataMap.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, [
-                    "type": "text",
-                    "value": originId
-            ])
+            dataSet.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, new TextField(rawValue: originId))
         }
 
 
-        this.dataService.setData(newFilterTask, ImportHelper.populateDataset(setDataMap))
+        this.dataService.setData(newFilterTask, dataSet)
         if (isImported) {
-            this.dataService.setData(newFilterTask, ImportHelper.populateDataset([
-                    (IS_IMPORTED): [
-                            "type": "number",
-                            "value": 1
-                    ]
-            ]))
+            this.dataService.setData(newFilterTask, new DataSet([
+                    (IS_IMPORTED): new NumberField(rawValue: 1)
+            ] as Map<String, Field<?>>))
         }
 
         I18nString translatedTitle = new I18nString(title)
         titleTranslations.forEach({locale, translation -> translatedTitle.addTranslation(locale, translation)})
 
         filterCase = this.workflowService.findOne(filterCase.getStringId())
-        filterCase.dataSet[FILTER_I18N_TITLE_FIELD_ID].value = translatedTitle
+        filterCase.dataSet.get(FILTER_I18N_TITLE_FIELD_ID).rawValue = translatedTitle
         workflowService.save(filterCase)
 
         this.taskService.finishTask(newFilterTask, this.userService.getLoggedOrSystem())

@@ -18,6 +18,7 @@ public class DateTimeFieldBuilder extends FieldBuilder<DateTimeField> {
     @Override
     public DateTimeField build(Data data, Importer importer) {
         DateTimeField field = new DateTimeField();
+        initialize(field);
         setDefaultValue(field, data, defaultValueString -> {
             if (defaultValueString == null) {
                 return;

@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
+import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -71,8 +72,8 @@ class ChoiceFieldTest {
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>))
-        List<Field> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
+        List<DataRef> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
+        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }
@@ -84,7 +85,7 @@ class ChoiceFieldTest {
         ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
+        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice A" }
@@ -96,7 +97,7 @@ class ChoiceFieldTest {
         ] as Map<String, Field<?>>))
 
         fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
+        choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
         assert choices.find { it.defaultValue == "Choice 1" }

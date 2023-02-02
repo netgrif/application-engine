@@ -126,7 +126,7 @@
             <option key="bo">Bob</option>
             <option key="ca">Carol</option>
         </options>
-        <init>al, ca</init>
+        <init>al,ca</init>
     </data>
 
     <data type="boolean">

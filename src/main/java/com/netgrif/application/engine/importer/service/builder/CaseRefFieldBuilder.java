@@ -16,6 +16,7 @@ public class CaseRefFieldBuilder extends FieldBuilder<CaseField> {
     public CaseField build(Data data, Importer importer) {
         AllowedNets nets = data.getAllowedNets();
         CaseField field = new CaseField();
+        initialize(field);
         if (nets != null) {
             field.setAllowedNets(new ArrayList<>(nets.getAllowedNet()));
         }

@@ -15,6 +15,9 @@ public class PostalCodeService implements IPostalCodeService {
 
     @Override
     public void savePostalCodes(Collection<PostalCode> codes) {
+        if (codes.isEmpty()) {
+            return;
+        }
         List<PostalCode> savedCodes = repository.saveAll(codes);
         if (savedCodes.isEmpty()) {
             throw new IllegalArgumentException("Could not save given postal codes");

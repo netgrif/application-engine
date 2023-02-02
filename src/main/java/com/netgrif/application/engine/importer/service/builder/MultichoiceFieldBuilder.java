@@ -15,6 +15,7 @@ public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
     @Override
     public MultichoiceField build(Data data, Importer importer) {
         MultichoiceField field = new MultichoiceField();
+        initialize(field);
         if (data.getOptions() != null) {
             setFieldOptions(field, data, importer);
         } else {

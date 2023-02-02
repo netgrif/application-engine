@@ -29,8 +29,8 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
         if (field.getOptions() != null) {
             choices = field.getOptions().values().stream().map(v -> v.getTranslation(locale)).collect(Collectors.toList());
         }
-        if (field.getValue() != null) {
-            values = field.getValue().getValue().stream().map(value ->
+        if (field.getRawValue() != null) {
+            values = field.getRawValue().stream().map(value ->
                     field.getOptions().get(value).getTranslation(locale)).collect(Collectors.toList());
         }
         String translatedTitle = field.getName().getTranslation(locale);

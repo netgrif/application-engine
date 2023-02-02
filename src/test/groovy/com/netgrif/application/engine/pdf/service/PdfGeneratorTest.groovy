@@ -92,7 +92,7 @@ class PdfGeneratorTest {
         String taskId = testCase.getTasks().find(taskPair -> taskPair.transition.equals("1")).task
         taskService.assignTask(taskId)
         taskService.finishTask(taskId)
-        assert workflowService.findOne(testCase.stringId).getFieldValue("file") != null
+        assert workflowService.findOne(testCase.stringId).getDataSet().get("file").getRawValue() != null
     }
 
     @Test

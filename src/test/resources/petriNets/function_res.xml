@@ -8,7 +8,7 @@
     <function name="createUser" scope="namespace">
         {  com.netgrif.application.engine.auth.domain.User user ->
             if (user != null) {
-                userService.encodeUserPassword(user)
+                registrationService.encodeUserPassword(user)
                 userService.save(user)
             }
         }

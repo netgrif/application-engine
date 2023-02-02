@@ -14,12 +14,14 @@ public class TextFieldBuilder extends FieldBuilder<TextField> {
 
     @Override
     public TextField build(Data data, Importer importer) {
+        TextField field = new TextField();
+        initialize(field);
         String value = null;
         List<I18NStringTypeWithExpression> values = data.getValues();
-        if (values != null && !values.isEmpty())
+        if (values != null && !values.isEmpty()) {
             value = values.get(0).getValue();
-        TextField field = new TextField();
-        field.setRawValue(value);
+        }
+        field.setRawValue(value); // TODO: NAE-1645 is it necessary?
         setDefaultValue(field, data, field::setDefaultValue);
         return field;
     }

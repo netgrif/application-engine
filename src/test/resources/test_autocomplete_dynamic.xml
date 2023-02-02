@@ -20,6 +20,20 @@
             }
             <!-- @formatter:on -->
         </action>
+        <event type="set">
+            <id>autocomplete_set</id>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.autocomplete;
+                    change field choices {
+                    def value = field.value.value.toString()
+                    return findCases { it.title.contains(value) }.collect({it.title})
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
     </data>
     <!-- TRANSITIONS -->
     <transition>

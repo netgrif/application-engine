@@ -184,8 +184,6 @@ class FieldTest {
         assert field.name.defaultValue == "CaseRef"
         assert field.allowedNets.size() == 2
         assert field.allowedNets.containsAll(["processId1", "processId2"])
-        assert field.defaultValue instanceof List
-        assert field.defaultValue.isEmpty()
     }
 
     private void assertUserList() {

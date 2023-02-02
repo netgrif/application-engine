@@ -39,7 +39,7 @@ public class FileField extends DataField {
         FileNameAndExtension extracted = this.extractFileExtensionFromName(value.getName());
         this.fileNameValue.add(extracted.name);
         this.fileExtensionValue.add(extracted.extension);
-        super.fulltextValue.add(extracted.name);
+        super.fulltextValue.add(value.getName());
     }
 
     private FileNameAndExtension extractFileExtensionFromName(String filename) {

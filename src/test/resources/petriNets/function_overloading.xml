@@ -25,8 +25,8 @@
             number2: f.number2,
             text: f.text;
 
-            change number2 value { function_overloading.overloadingTest(number.value, number.value) }
-            change text value { overloadingTest(number.value as String, number.value as String) }
+            change number2 value { function_overloading.overloadingTest(number.rawValue, number.rawValue) }
+            change text value { overloadingTest(number.rawValue as String, number.rawValue as String).toString() }
         </action>
     </data>
     <data type="number">

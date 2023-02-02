@@ -1,36 +1,28 @@
 package com.netgrif.application.engine.startup
 
-
 import com.netgrif.application.engine.auth.domain.*
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
+import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.Filter
-import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.CancelTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.FinishTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.IFilterService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import com.netgrif.application.engine.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
@@ -60,9 +52,6 @@ class ImportHelper {
 
     @Autowired
     private ResourceLoader resourceLoader
-
-    @Autowired
-    private IFilterService filterService
 
     @Autowired(required = false)
     private SuperCreator superCreator
@@ -155,10 +144,6 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper ?: userService.getSystem().transformToLoggedUser())
     }
 
-    boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
-        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
-    }
-
     AssignTaskEventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
         return taskService.assignTask(author, getTaskId(taskTitle, caseId))
     }
@@ -196,7 +181,7 @@ class ImportHelper {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 
-    List<Field> getTaskData(String taskTitle, String caseId) {
+    List<DataRef> getTaskData(String taskTitle, String caseId) {
         return dataService.getData(getTaskId(taskTitle, caseId)).getData()
     }
 

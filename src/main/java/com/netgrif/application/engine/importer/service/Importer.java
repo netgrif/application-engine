@@ -747,7 +747,7 @@ public class Importer {
 
             DataFieldBehavior behavior = new DataFieldBehavior();
             if (logic.getBehavior() != null) {
-                Optional<Behavior> first = logic.getBehavior().stream().filter(b -> !Behavior.REQUIRED.equals(b)).findFirst();
+                Optional<Behavior> first = logic.getBehavior().stream().filter(this::isNotDeprecated).findFirst();
                 behavior.setBehavior(FieldBehavior.fromString(first.orElse(Behavior.EDITABLE)));
                 behavior.setRequired(logic.getBehavior().stream().anyMatch(Behavior.REQUIRED::equals));
                 behavior.setImmediate(logic.getBehavior().stream().anyMatch(Behavior.IMMEDIATE::equals));
@@ -756,6 +756,11 @@ public class Importer {
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
+    }
+
+    // TODO: NAE-1645 Behavior REQ,IMM,OPT deprecated
+    private boolean isNotDeprecated(Behavior behavior) {
+        return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
     }
 
     protected void addDataLayout(Transition transition, DataRef dataRef) {

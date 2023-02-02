@@ -149,17 +149,11 @@
 
 					def childCase = workflowService.findOne(child_case_id.value as String)
 
-					setData("t1", childCase, [
-						"button_0": [
-							"type" : "button"
-						],
-						"button_1": [
-							"type" : "button"
-						],
-						"button_2": [
-							"type" : "button"
-						],
-					])
+					setData("t1", childCase, new com.netgrif.application.engine.workflow.web.responsebodies.DataSet([
+						"button_0": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42),
+						"button_1": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42),
+						"button_2": new com.netgrif.application.engine.petrinet.domain.dataset.ButtonField(rawValue: 42)
+					]))
 				</action>
 			</actions>
 		</event>

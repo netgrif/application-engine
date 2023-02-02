@@ -498,7 +498,7 @@
 		<event type="finish">
 			<id>1</id>
 			<actions phase="pre">
-				<action>
+				<action><!--@formatter:off-->
 					filtersTaskRef: f.filter_tasks,
 					availableEntries: f.available_export_entries,
 					referencedFiltersList: f.referenced_filters;
@@ -513,10 +513,11 @@
 
 						def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 						assignTask(initTask)
-						setData(initTask, [
-								"filter_case": ["type":"caseRef", "value": [filterCase.stringId], "allowedNets":["filter"]],
-								"parentId": ["type":"text", "value":useCase.stringId], "menu_identifier": ["type":"text", value:"defaultMenu"]
-						])
+						setData(initTask, new DataSet([
+								"filter_case": new CaseField(rawValue: [filterCase.stringId], allowedNets: ["filter"]),
+								"parentId": new TextField(rawValue: useCase.stringId),
+								"menu_identifier": new TextField(rawValue: "defaultMenu")
+						]))
 						finishTask(initTask)
 
 						def viewTask = findTask({it.transitionId.eq("view").and(it.caseId.eq(optionCase.stringId))})
@@ -527,8 +528,8 @@
 					change filtersTaskRef value {return filterTaskIds}
 					change referencedFiltersList value {return filterCaseIds}
 
-
 					updateAvailableEntries(useCase)
+					<!--@formatter:on-->
 				</action>
 			</actions>
 		</event>

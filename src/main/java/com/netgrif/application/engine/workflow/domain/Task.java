@@ -107,13 +107,14 @@ public class Task {
      */
     private Boolean requiredFilled;
 
-    /**
-     * ???
-     */
+    // TODO: NAE-1645 remove, dynamically load from dataSet
+    @Getter
+    @Setter
     @JsonIgnore
     @Builder.Default
     private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
-
+    @Getter
+    @Setter
     @Transient
     @Builder.Default
     private List<Field<?>> immediateData = new LinkedList<>();

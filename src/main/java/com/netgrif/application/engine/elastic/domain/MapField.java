@@ -30,7 +30,7 @@ public class MapField extends TextField {
         valuePairs.forEach((key, value) -> {
             this.keyValue.add(key);
             this.textValue.addAll(value);
-            this.textValue.addAll(value);
+            this.fulltextValue.addAll(value);
         });
     }
 }
