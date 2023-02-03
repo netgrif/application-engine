@@ -25,16 +25,4 @@ public abstract class FieldWithAllowedNets<T> extends Field<T> {
         super.clone(clone);
         clone.allowedNets = new ArrayList<>(this.allowedNets);
     }
-
-    public List<String> getAllowedNets() {
-        return allowedNets;
-    }
-
-    public void setAllowedNets(Collection<String> allowedNets) {
-        if (allowedNets == this.allowedNets) {
-            return;
-        }
-        this.allowedNets.clear();
-        this.allowedNets.addAll(allowedNets);
-    }
 }

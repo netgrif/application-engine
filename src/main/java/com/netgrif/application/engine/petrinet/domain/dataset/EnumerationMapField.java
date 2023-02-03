@@ -18,15 +18,6 @@ public class EnumerationMapField extends MapOptionsField<I18nString, String> {
         super();
     }
 
-    public EnumerationMapField(Map<String, I18nString> choices) {
-        super(choices);
-    }
-
-    public EnumerationMapField(Map<String, I18nString> choices, String defaultValue) {
-        super(choices);
-        this.defaultValue = defaultValue;
-    }
-
     @Override
     @QueryType(PropertyType.NONE)
     public DataType getType() {

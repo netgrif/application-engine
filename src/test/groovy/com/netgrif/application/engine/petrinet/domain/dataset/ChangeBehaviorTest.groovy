@@ -1,3 +1,4 @@
+//file:noinspection GroovyPointlessBoolean
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.TestHelper
@@ -90,8 +91,8 @@ class ChangeBehaviorTest {
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
 
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
-        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
-        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required == true
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(MAIN_TRANSITION).required == false
     }
 
     @Test
@@ -131,7 +132,6 @@ class ChangeBehaviorTest {
         Task otherTask = taskService.searchOne(QTask.task.transitionId.eq(TEST_TRANSITION_1) & QTask.task.caseId.eq(testCase.stringId))
         assert otherTask
 
-        // TODO: NAE-1645
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_2": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>))
@@ -141,7 +141,7 @@ class ChangeBehaviorTest {
 
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
-        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == VISIBLE
     }
 
     @Test
@@ -164,10 +164,9 @@ class ChangeBehaviorTest {
         assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
         assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(TEST_TRANSITION_1).behavior == EDITABLE
-        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == EDITABLE
+        assert testCase.dataSet.get(TEXT_1_FIELD_ID).behaviors.get(TEST_TRANSITION_2).behavior == VISIBLE
     }
 
-    @SuppressWarnings('GroovyPointlessBoolean')
     @Test
     void initialBehaviorTest() {
         Case testCase = helper.createCase(TEST_CASE_NAME, net)

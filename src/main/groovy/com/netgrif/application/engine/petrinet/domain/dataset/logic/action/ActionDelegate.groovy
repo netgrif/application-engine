@@ -258,7 +258,7 @@ class ActionDelegate {
     def initial = { Field field, Transition trans ->
         copyBehavior(field, trans)
         DataFieldBehavior fieldBehavior = getOrCreateBehavior(field.stringId, trans.stringId)
-        DataFieldBehavior initialBehavior = trans.dataSet.get(field.importId).behavior
+        DataFieldBehavior initialBehavior = useCase?.petriNet?.dataSet?.get(field.importId)?.behaviors?.get(trans?.importId)
         if (initialBehavior == null) {
             initialBehavior = new DataFieldBehavior()
         }
