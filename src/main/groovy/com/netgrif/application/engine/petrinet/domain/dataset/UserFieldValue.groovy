@@ -44,4 +44,14 @@ class UserFieldValue {
     String getFullName() {
         return name + " " + surname
     }
+
+    @Override
+    String toString() {
+        return "UserFieldValue{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                '}'
+    }
 }
