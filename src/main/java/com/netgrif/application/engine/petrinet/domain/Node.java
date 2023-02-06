@@ -32,7 +32,7 @@ public abstract class Node extends PetriNetObject {
     }
 
     public void setPosition(Position positionData) {
-        if(positionData != null){
+        if (positionData != null) {
             position.setY(positionData.getY());
             position.setX(positionData.getX());
         }
