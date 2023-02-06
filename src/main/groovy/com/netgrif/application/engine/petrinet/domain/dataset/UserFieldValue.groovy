@@ -48,7 +48,6 @@ class UserFieldValue {
     @Override
     String toString() {
         return "UserFieldValue{" +
-                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", email='" + email + '\'' +
