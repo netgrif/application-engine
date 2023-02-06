@@ -21,7 +21,7 @@ public class Executor {
 
     private Map<String, ExecutorService> executors;
 
-    public Executor(@Value("${spring.data.elasticsearch.executors:500}") long maxSize, @Value("${spring.data.elasticsearch.executors.timeout:5}") long timeout) {
+    public Executor(@Value("${spring.data.elasticsearch.executors.size:500}") long maxSize, @Value("${spring.data.elasticsearch.executors.timeout:5}") long timeout) {
         this.executors = Collections.synchronizedMap(new ExecutorMaxSizeHashMap(maxSize, timeout));
         log.info("Executor created, thread capacity: " + maxSize);
     }
@@ -30,10 +30,16 @@ public class Executor {
     public void preDestroy() throws InterruptedException {
         this.executors.forEach((id, executor) -> {
             try {
-                executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS);
                 executor.shutdown();
+                if (!executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                    if (!executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS)) {
+                        log.error("Executor " + id + " did not terminate");
+                    }
+                }
             } catch (InterruptedException e) {
-                log.error("Thread was interrupted while waiting for termination: ", e);
+                log.error("Thread (executor " + id + ") was interrupted while waiting for termination: ", e);
+                executor.shutdownNow();
             }
         });
     }
