@@ -26,15 +26,15 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
-        Boolean rolePerm = userHasAtLeastOneRolePermission(user.transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
-        Boolean userPerm = userHasUserListPermission(user.transformToAnonymousUser(), requestedCase, ProcessRolePermission.DELETE);
-        return user.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        Boolean rolePerm = userHasAtLeastOneRolePermission(user.getSelfOrImpersonated().transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        Boolean userPerm = userHasUserListPermission(user.transformToUser(), requestedCase, ProcessRolePermission.DELETE);
+        return user.getSelfOrImpersonated().isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
         PetriNet net = petriNetService.getPetriNet(netId);
-        return user.isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, ProcessRolePermission.CREATE);
+        return user.getSelfOrImpersonated().isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, ProcessRolePermission.CREATE);
     }
 
     @Override
@@ -55,10 +55,10 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         if (useCase.getUserRefs() == null || useCase.getUserRefs().isEmpty())
             return null;
 
-        if (!useCase.getUsers().containsKey(user.getStringId()))
+        if (!useCase.getUsers().containsKey(user.getSelfOrImpersonated().getStringId()))
             return null;
 
-        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getStringId());
+        Map<String, Boolean> userPermissions = useCase.getUsers().get(user.getSelfOrImpersonated().getStringId());
 
         for (ProcessRolePermission permission : permissions) {
             Boolean perm = userPermissions.get(permission.toString());

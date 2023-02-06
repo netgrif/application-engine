@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.history.domain.taskevents;
 
+import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -20,9 +21,9 @@ public class DelegateTaskEventLog extends TaskEventLog {
     public DelegateTaskEventLog() {
     }
 
-    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, String delegator, String delegate) {
-        super(task, useCase, eventPhase);
-        this.delegator = delegator;
+    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser delegator, String delegate) {
+        super(task, useCase, eventPhase, delegator.getStringId(), delegator.isImpersonating() ? delegator.getImpersonated().getStringId() : null);
+        this.delegator = getUserId();
         this.delegate = delegate;
     }
 }

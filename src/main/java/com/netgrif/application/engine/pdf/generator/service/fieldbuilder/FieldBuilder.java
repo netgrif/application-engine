@@ -109,17 +109,35 @@ public abstract class FieldBuilder {
             while (tokenizer.hasMoreTokens()) {
                 String word = tokenizer.nextToken();
 
-                if (lineLen + word.length() > maxLineLength) {
+                if (word.length() > maxLineLength - lineLen && word.length() > maxLineLength) {
+                    breakLongWordToMultipleLine(output, word, lineLen, (int) maxLineLength);
+                    lineLen = 0;
+                } else if (lineLen + word.length() > maxLineLength) {
                     output.append("\n");
                     lineLen = 0;
+                    output.append(word).append(" ");
+                    lineLen += word.length() + 1;
+                } else {
+                    output.append(word).append(" ");
+                    lineLen += word.length() + 1;
                 }
-                output.append(word).append(" ");
-                lineLen += word.length() + 1;
             }
             lineLen = 0;
             result.addAll(Arrays.asList(output.toString().split("\n")));
         }
         return result;
+    }
+
+    public static void breakLongWordToMultipleLine(StringBuilder output, String longWord, int lineLength, int maxLineLength) {
+        if (maxLineLength - lineLength <= 0) {
+            lineLength = 0;
+        }
+        while (longWord.length() > maxLineLength - lineLength) {
+            output.append(longWord, 0, maxLineLength - lineLength - 4);
+            output.append("\n");
+            longWord = longWord.substring(maxLineLength - lineLength - 3);
+            lineLength = 0;
+        }
     }
 
     private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {

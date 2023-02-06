@@ -2,12 +2,10 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
-import com.netgrif.application.engine.configuration.ElasticsearchConfiguration;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
@@ -39,6 +37,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BinaryOperator;
@@ -99,16 +98,24 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     @Override
     public void remove(String taskId) {
         executor.execute(() -> {
-            repository.deleteAllByStringId(taskId);
-            log.info("[?]: Task \"" + taskId + "\" deleted");
+            try {
+                repository.deleteAllByStringId(taskId);
+                log.info("[?]: Task \"" + taskId + "\" deleted");
+            } catch (RuntimeException e) {
+                log.error("Elastic executor was killed before finish: " + e.getMessage());
+            }
         });
     }
 
     @Override
     public void removeByPetriNetId(String petriNetId) {
         executor.execute(() -> {
-            repository.deleteAllByProcessId(petriNetId);
-            log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
+            try {
+                repository.deleteAllByProcessId(petriNetId);
+                log.info("[" + petriNetId + "]: All tasks of Petri Net with id \"" + petriNetId + "\" deleted");
+            } catch (RuntimeException e) {
+                log.error("Elastic executor was killed before finish: " + e.getMessage());
+            }
         });
     }
 
@@ -132,6 +139,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
                 repository.deleteAllByStringId(task.getStringId());
                 repository.save(task);
                 log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" indexed");
+            } catch (RuntimeException e) {
+                log.error("Elastic executor was killed before finish: " + e.getMessage());
             }
         });
     }
@@ -143,7 +152,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), pageable, locale, isIntersection);
         List<Task> taskPage;
         long total;
         if (query != null) {
@@ -161,7 +170,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
 
     @Override
     public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user.getSelfOrImpersonated(), new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticTask.class);
         } else {
