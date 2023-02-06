@@ -21,9 +21,9 @@ public class DelegateTaskEventLog extends TaskEventLog {
     public DelegateTaskEventLog() {
     }
 
-    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser delegator, String delegatee) {
+    public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser delegator, String delegate) {
         super(task, useCase, eventPhase, delegator.getStringId(), delegator.isImpersonating() ? delegator.getImpersonated().getStringId() : null);
         this.delegator = getUserId();
-        this.delegate = delegatee;
+        this.delegate = delegate;
     }
 }
