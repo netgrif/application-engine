@@ -21,6 +21,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Field
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
@@ -87,6 +88,9 @@ public class DataService implements IDataService {
     @Autowired
     protected IHistoryService historyService;
 
+    @Autowired
+    protected IPetriNetService petriNetService;
+
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
 
@@ -101,6 +105,7 @@ public class DataService implements IDataService {
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
+        IUser user = userService.getLoggedOrSystem();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
@@ -114,7 +119,7 @@ public class DataService implements IDataService {
                 return;
             Field field = useCase.getPetriNet().getField(fieldId).get();
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
                 Map<String, DataFieldLogic> dataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
@@ -149,7 +154,7 @@ public class DataService implements IDataService {
                 }
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
         });
 
         workflowService.save(useCase);
@@ -190,6 +195,7 @@ public class DataService implements IDataService {
     @Override
     public SetDataEventOutcome setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
+        IUser user = userService.getLoggedOrSystem();
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
@@ -231,11 +237,12 @@ public class DataService implements IDataService {
                 }
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField)));
+                historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE, Collections.singletonMap(fieldId, changedField), user));
                 outcome.addOutcomes(resolveDataEvents(field,
                         DataEventType.SET, EventPhase.POST, useCase, task));
 
-                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null));
+                historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST, null, user));
+                applyFieldConnectedChanges(useCase, field);
             }
         });
         updateDataset(useCase);
@@ -600,19 +607,19 @@ public class DataService implements IDataService {
         fout.close();
     }
 
-    private boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+    protected boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
         throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
     }
 
-    private boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
+    protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
         throw new UnsupportedOperationException("Upload new files to the remote storage is not implemented yet.");
     }
 
-    private boolean deleteRemote(Case useCase, FileField field) {
+    protected boolean deleteRemote(Case useCase, FileField field) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
-    private boolean deleteRemote(Case useCase, FileListField field, String name) {
+    protected boolean deleteRemote(Case useCase, FileListField field, String name) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
@@ -689,6 +696,12 @@ public class DataService implements IDataService {
         return fields;
     }
 
+    @Override
+    public UserFieldValue makeUserFieldValue(String id) {
+        IUser user = userService.resolveById(id, true);
+        return new UserFieldValue(user);
+    }
+
     private void updateDataset(Case useCase) {
         Case actual = workflowService.findOne(useCase.getStringId());
         actual.getDataSet().forEach((id, dataField) -> {
@@ -696,6 +709,26 @@ public class DataService implements IDataService {
                 useCase.getDataSet().put(id, dataField);
             }
         });
+    }
+
+    @Override
+    public Case applyFieldConnectedChanges(Case useCase, String fieldId) {
+        PetriNet petriNet = petriNetService.getPetriNet(useCase.getPetriNetId());
+        Optional<Field> field = petriNet.getField(fieldId);
+        if (field.isEmpty()) {
+            throw new IllegalArgumentException("Field with given id [" + fieldId + "] does not exists on Petri net [" + petriNet.getStringId() + " " + petriNet.getIdentifier() + "]");
+        }
+        return applyFieldConnectedChanges(useCase, field.get());
+    }
+
+    @Override
+    public Case applyFieldConnectedChanges(Case useCase, Field field) {
+        switch (field.getType()) {
+            case USERLIST:
+                return workflowService.resolveUserRef(useCase);
+            default:
+                return useCase;
+        }
     }
 
     private List<EventOutcome> resolveDataEvents(Field field, DataEventType trigger, EventPhase phase, Case useCase, Task task) {
@@ -777,7 +810,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = parseListStringValues(node);
+                value = makeUserListFieldValue(node);
                 break;
             case "button":
                 if (node.get("value") == null) {
@@ -809,16 +842,20 @@ public class DataService implements IDataService {
         else return value;
     }
 
-    protected UserFieldValue makeUserFieldValue(String id) {
-        IUser user = userService.resolveById(id, true);
-        return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
-    }
-
     private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
         ArrayNode arrayNode = (ArrayNode) node.get("value");
         HashSet<String> set = new HashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
+    }
+
+    private UserListFieldValue makeUserListFieldValue(ObjectNode nodes) {
+        List<String> userIds = parseListStringValues(nodes);
+
+        if (userIds == null) {
+            return null;
+        }
+        return new UserListFieldValue(userIds.stream().map(this::makeUserFieldValue).collect(Collectors.toList()));
     }
 
     private List<String> parseListStringValues(ObjectNode node) {

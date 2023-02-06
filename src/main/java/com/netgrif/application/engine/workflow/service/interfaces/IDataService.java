@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
+import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
@@ -56,6 +57,12 @@ public interface IDataService {
     Page<Task> setImmediateFields(Page<Task> tasks);
 
     List<Field> getImmediateFields(Task task);
+
+    UserFieldValue makeUserFieldValue(String id);
+
+    Case applyFieldConnectedChanges(Case useCase, String fieldId);
+
+    Case applyFieldConnectedChanges(Case useCase, Field field);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 

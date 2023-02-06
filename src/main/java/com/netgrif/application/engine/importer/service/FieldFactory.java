@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -40,6 +42,9 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
+
+    @Autowired
+    private IUserService userService;
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
@@ -136,8 +141,9 @@ public final class FieldFactory {
             field.setFormat(format);
         }
         if (data.getView() != null) {
+            log.warn("Data attribute [view] in field [" + field.getImportId()  + "] is deprecated.");
             View view = viewFactory.buildView(data);
-            field.setView(view);
+            field.setComponent(new Component(view.getValue()));
         }
 
         if (data.getComponent() != null) {
@@ -181,7 +187,14 @@ public final class FieldFactory {
         }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValues(init);
+                init = init.stream().map(String::trim).collect(Collectors.toList());
+                List<String> finalInits = init.stream().filter(i -> field.getChoices().stream().anyMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
+                List<String> unresolvedChoices = init.stream().filter(i -> field.getChoices().stream().noneMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
+                if (!unresolvedChoices.isEmpty()) {
+                    finalInits.addAll(unresolvedChoices.stream().map(uch -> data.getOptions().getOption().stream().filter(o -> o.getKey().equals(uch)).findFirst().orElse(new Option()).getValue()).collect(Collectors.toList()));
+                    finalInits.removeAll(Collections.singletonList(null));
+                }
+                field.setDefaultValues(finalInits);
             }
         });
         return field;
@@ -196,6 +209,10 @@ public final class FieldFactory {
         }
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
+                String tempInit = init;
+                if (field.getChoices().stream().filter(ch -> ch.getDefaultValue().equals(tempInit)).findAny().isEmpty()) {
+                    init = data.getOptions().getOption().stream().filter(o -> o.getKey().equals(tempInit)).findFirst().orElse(new Option()).getValue();
+                }
                 field.setDefaultValue(init);
             }
         });
@@ -536,6 +553,9 @@ public final class FieldFactory {
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
                 break;
+            case USERLIST:
+                parseUserListValues((UserListField) field, useCase, fieldId);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
@@ -548,6 +568,10 @@ public final class FieldFactory {
             field.setRoles(roles);
         }
         field.setValue((UserFieldValue) useCase.getFieldValue(fieldId));
+    }
+
+    private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
+        field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {

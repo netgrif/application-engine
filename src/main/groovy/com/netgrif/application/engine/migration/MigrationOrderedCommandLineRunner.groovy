@@ -31,7 +31,7 @@ abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandL
         log.info("Applying migration ${title}")
         migrate()
         repository.save(new Migration(title))
-        service.evictCache()
+        service.evictAllCaches()
         log.info("Migration ${title} applied")
     }
 

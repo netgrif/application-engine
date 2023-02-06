@@ -3,8 +3,8 @@ package com.netgrif.application.engine.auth.web;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import com.netgrif.application.engine.auth.service.interfaces.IUserResourceHelperService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.application.engine.auth.web.requestbodies.UserSearchRequestBody;
@@ -39,7 +39,6 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Provider;
@@ -64,7 +63,7 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private IUserResourceHelperService userResourceHelperService;
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -97,7 +96,7 @@ public class UserController {
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<IUser> assembler, Authentication auth, Locale locale) {
         small = small != null && small;
-        Page<IUser> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
+        Page<IUser> page = userService.findAllCoMembers((LoggedUser) auth.getPrincipal(), small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
@@ -115,7 +114,7 @@ public class UserController {
         Page<IUser> page = userService.searchAllCoMembers(query.getFulltext(),
                 roles,
                 negativeRoles,
-                ((LoggedUser) auth.getPrincipal()), small, pageable);
+                (LoggedUser) auth.getPrincipal(), small, pageable);
         Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
         PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
@@ -127,9 +126,10 @@ public class UserController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small != null && small;
-        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LoggedUser actualUser = userService.getLoggedUserFromContext();
+        LoggedUser loggedUser = actualUser.getSelfOrImpersonated();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)) {
-            log.info("User " + loggedUser.getUsername() + " trying to get another user with ID " + userId);
+            log.info("User " + actualUser.getUsername() + " trying to get another user with ID " + userId);
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         }
         IUser user = userService.resolveById(userId, small);
@@ -139,11 +139,8 @@ public class UserController {
     @Operation(summary = "Get logged user", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
-        if (!small)
-            return new UserResource(userResponseFactory.getUser(userService.resolveById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
-        else
-            return new UserResource(userResponseFactory.getUser(((LoggedUser) auth.getPrincipal()).transformToUser(), locale), "profile");
+        small = small != null && small;
+        return userResourceHelperService.getResource((LoggedUser) auth.getPrincipal(), locale, small);
     }
 
     @Operation(summary = "Update user", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -178,7 +175,7 @@ public class UserController {
         return resources;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Assign role to the user", description = "Caller must have the ADMIN role", security = {@SecurityRequirement(name = "BasicAuth")})
     @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
@@ -196,7 +193,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Get all authorities of the system",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -209,7 +206,7 @@ public class UserController {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Assign authority to the user",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

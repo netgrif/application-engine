@@ -22,15 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -138,7 +137,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        pageable = resolveUnmappedSortAttributes(pageable);
+        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -160,7 +161,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
         } else {
@@ -225,6 +227,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         for (CaseSearchRequest.PetriNet process : request.process) {
             if (process.identifier != null) {
                 petriNetQuery.should(termQuery("processIdentifier", process.identifier));
+            }
+            if (process.processId != null) {
+                petriNetQuery.should(termQuery("processId", process.processId));
             }
         }
 
@@ -464,5 +469,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .forEach(groupQuery::should);
         query.filter(groupQuery);
         return false;
+    }
+
+    private Pageable resolveUnmappedSortAttributes(Pageable pageable) {
+        List<Sort.Order> modifiedOrders = new ArrayList<>();
+        pageable.getSort().iterator().forEachRemaining( order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
     }
 }

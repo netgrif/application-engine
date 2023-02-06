@@ -6,10 +6,13 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
+import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
+import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
+import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +28,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
@@ -34,13 +36,14 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.HashSet;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 
 @Slf4j
-@Configuration
 @Controller
+@Configuration
 @EnableWebSecurity
 @Order(SecurityProperties.DEFAULT_FILTER_ORDER)
 public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
@@ -72,6 +75,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     protected NaeLdapProperties ldapProperties;
 
+    @Autowired
+    protected ImpersonatorRepository impersonatorRepository;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -81,13 +87,19 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowedOrigins = properties.getAllowedOrigins();
+
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
         config.addExposedHeader("X-Jwt-Token");
-        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
+        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
+            config.addAllowedOriginPattern("*");
+        } else {
+            config.setAllowedOrigins(allowedOrigins);
+        }
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -102,10 +114,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
-                .cors()
-                .and()
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -114,17 +126,12 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
-                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-                .and()
-                .headers()
-                .frameOptions().disable()
-                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
-                .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
 
+        setHeaders(http);
         setCsrf(http);
+        corsEnable(http);
     }
-
 
     @Override
     protected ProviderManager authenticationManager() throws Exception {
@@ -142,6 +149,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     @Override
+    protected boolean isCorsEnabled() {
+        return properties.isCors();
+    }
+
+    @Override
     protected String[] getStaticPatterns() {
         return this.naeAuthProperties.getStaticPatterns();
     }
@@ -154,6 +166,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Override
     protected Environment getEnvironment() {
         return env;
+    }
+
+    @Override
+    protected SecurityConfigProperties getSecurityConfigProperties() {
+        return properties;
     }
 
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
@@ -172,5 +189,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
+    }
+
+    private HostValidationRequestFilter hostValidationRequestFilter() {
+        return new HostValidationRequestFilter(properties);
+    }
+
+    private ImpersonationRequestFilter impersonationRequestFilter() {
+        return new ImpersonationRequestFilter(impersonatorRepository);
     }
 }

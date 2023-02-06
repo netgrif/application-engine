@@ -5,28 +5,112 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full
-Changelog: [https://github.com/netgrif/application-engine/commits/v6.0.0](https://github.com/netgrif/application-engine/commits/v6.0.0)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-08-18)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-20)
 
 ### Fixed
 
-- [NAE-1666] PDF Generator template file issue
-- [NAE-1702] LdapUser unique dn 
-- [NAE-1699] Create/upload event action is loaded only from the cache
+- [NAE-1761] LoggedUser circular dependency
+- [NAE-1798] UserRefs resolves everytime when case is saved
 
 ### Changed
 
-- [NAE-1663] Optional constructor
-- [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
+- [NAE-1762] Public view URL encoding
 
 ### Added
 
+- [NAE-1678] User impersonation
+- [NAE-1793] Security filter for HTTP headers validation
+- [NAE-1794] Configurable security headers
+
+## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
+
+### Fixed
+
+- [NAE-1806] Anonymous user password might not be 'null'
+
+## [6.2.6](https://github.com/netgrif/application-engine/releases/tag/v6.2.6) (2022-12-12)
+
+### Fixed
+
+- [NAE-1799] Multilevel process identifier handling in 6.2.x for public view
+- [NAE-1801] Change DataService
+
+## [6.2.5](https://github.com/netgrif/application-engine/releases/tag/v6.2.5) (2022-12-05)
+
+### Fixed
+
+- [NAE-1755] PetriNetService cache no caching "null"
+- [NAE-1773] Action that sets null value to field does not trigger next actions
+- [NAE-1776] UncaughtExceptionHandler
+- [NAE-1777] JWT Token user detail not show password
+
+### Added
+
+- [NAE-1753] Currency code in PDF
+- [NAE-1756] Delete PetriNet does not call case delete events
+- [NAE-1780] Configurable CORS security settings
+
+## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
+
+### Fixed
+
+- [NAE-1747] PDF Generator: incorrect file name shortening
+- [NAE-1748] Incorrect handling for long lines in PDF generator
+
+## [6.2.3](https://github.com/netgrif/application-engine/releases/tag/v6.2.3) (2022-10-06)
+
+### Fixed
+
+- [NAE-1728] Simplify value for changing user list
+- [NAE-1730] PetriNetService cache fix upload bug
+- [NAE-1733] Organization group process has deprecated attributes and change import system user
+- [NAE-1735] Enumeration parsing error when trying to use icons with option keys
+
+## [6.2.2](https://github.com/netgrif/application-engine/releases/tag/v6.2.2) (2022-09-28)
+
+### Fixed
+
+- [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
+- [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
+
+## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
+
+### Fixed
+
+- [NAE-1720] PDF number field is not null value
+
+## [6.2.0](https://github.com/netgrif/application-engine/releases/tag/v6.2.0) (2022-09-12)
+
+### Fixed
+
+- [NAE-1626] Trigger of set event for fileList value deletion is not implemented
+- [NAE-1666] PDF Generator template file issue
+- [NAE-1691] Default value number field after the change behavior
+- [NAE-1694] ProcessRoleService.findByImportId doesn't return list of process roles
+- [NAE-1699] Create/upload event action is loaded only from the cache
+- [NAE-1702] LdapUser unique dn 
+
+### Changed
+
+- [NAE-1156] View Deprecation and All Data
+- [NAE-1606] Configuration of case creation button from menu item
+- [NAE-1646] Overridable data field render in PDF generator
+- [NAE-1663] Optional constructor
+- [NAE-1668] PDF Generator 2022 Summer Update
+- [NAE-1677] Message from exception thrown in SET event on data field is not propagated in EventOutcome
+- [NAE-1696] PDF Generator - legacy and flow layout
+
+### Added
+
+- [NAE-1625] PetriNetService cache
+- [NAE-1631] Process download in workflow view
 - [NAE-1647] Elastic mapping for I18N data field
 - [NAE-1665] Generated PDF colors properties
 - [NAE-1660] Filter action API
 - [NAE-1659] Process URI
+- [NAE-1679] User list frontend component
 - [NAE-1698] Springdoc OpenAPI 3 generation
 
 ## [6.1.1](https://github.com/netgrif/application-engine/releases/tag/v6.1.1) (2022-06-09)
