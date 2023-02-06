@@ -22,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
@@ -53,6 +54,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,8 +93,14 @@ public class DataService implements IDataService {
     @Autowired
     protected IPetriNetService petriNetService;
 
+    @Autowired
+    protected IValidationService validation;
+
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
+
+    @Value("${nae.validation.setData.enable:false}")
+    protected boolean validationEnable;
 
     @Override
     public GetDataEventOutcome getData(String taskId) {
@@ -222,6 +230,7 @@ public class DataService implements IDataService {
                 }
                 Object newValue = parseFieldsValues(entry.getValue(), dataField);
                 dataField.setValue(newValue);
+                dataField.setLastModified(LocalDateTime.now());
                 ChangedField changedField = new ChangedField();
                 changedField.setId(fieldId);
                 changedField.addAttribute("value", newValue);
@@ -234,6 +243,9 @@ public class DataService implements IDataService {
                 if (filterMetadata != null) {
                     dataField.setFilterMetadata(filterMetadata);
                     changedField.addAttribute("filterMetadata", filterMetadata);
+                }
+                if (validationEnable) {
+                    validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
                 }
                 outcome.addChangedField(fieldId, changedField);
                 workflowService.save(useCase);
@@ -433,7 +445,7 @@ public class DataService implements IDataService {
         }
     }
 
-    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase){
+    private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase) {
         if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
             DataEvent event = events.get(DataEventType.GET);
             event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
@@ -512,7 +524,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile){
+    public SetDataEventOutcome saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         Task task = taskService.findOne(taskId);
         ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
         FileField field = pair.getRight();
@@ -566,7 +578,7 @@ public class DataService implements IDataService {
 
             try {
                 writeFile(oneFile, file);
-            } catch (IOException e){
+            } catch (IOException e) {
                 log.error(e.getMessage());
                 throw new EventNotExecutableException("File " + oneFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file list field " + field.getStringId(), e);
             }
@@ -586,7 +598,7 @@ public class DataService implements IDataService {
         File file = new File(field.getFilePath(useCase.getStringId()));
         try {
             writeFile(multipartFile, file);
-        } catch (IOException e){
+        } catch (IOException e) {
             log.error(e.getMessage());
             throw new EventNotExecutableException("File " + multipartFile.getName() + " in case " + useCase.getStringId() + " could not be saved to file field " + field.getStringId(), e);
         }
@@ -916,7 +928,7 @@ public class DataService implements IDataService {
         Map<String, String> translations = new HashMap<>();
         if (node.get("value").get("translations") != null) {
             node.get("value").get("translations").fields().forEachRemaining(entry ->
-                translations.put(entry.getKey(), entry.getValue().asText())
+                    translations.put(entry.getKey(), entry.getValue().asText())
             );
         }
         return new I18nString(defaultValue, translations);
