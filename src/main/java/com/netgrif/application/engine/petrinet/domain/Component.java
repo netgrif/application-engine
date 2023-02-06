@@ -44,10 +44,6 @@ public class Component {
 
     @Override
     public Component clone() {
-        Component clone = new Component();
-        clone.setName(this.name);
-        clone.setProperties(new HashMap<>(this.properties));
-        clone.setOptionIcons(this.optionIcons == null ? new ArrayList<>() : this.optionIcons.stream().map(Icon::clone).collect(Collectors.toList()));
-        return clone;
+        return new Component(this.name, new HashMap<>(this.properties), this.optionIcons == null ? new ArrayList<>() : this.optionIcons.stream().map(Icon::clone).collect(Collectors.toList()));
     }
 }
