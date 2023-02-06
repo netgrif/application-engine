@@ -36,6 +36,8 @@ public class HistoryService implements IHistoryService {
         eventLogRepository.save(eventLog);
     }
 
+    protected String clazz = "', _class: '";
+    
     @Override
     public List<EventLog> findAllByIds(List<ObjectId> eventIds) {
         return eventLogRepository.findAllById(eventIds);
@@ -170,13 +172,13 @@ public class HistoryService implements IHistoryService {
 
     @Override
     public <T> Page<T> findByUserId(String id, Class<T> clazz, Pageable pageable) {
-        String queryString = "{userId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{userId: '" + id + this.clazz + clazz.getName() + "'}";
         return findByQuery(queryString, clazz, pageable);
     }
 
     @Override
     public <T> List<T> findAllByUserId(String id, Class<T> clazz) {
-        String queryString = "{userId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{userId: '" + id + this.clazz + clazz.getName() + "'}";
         Query query = new BasicQuery(queryString);
         return findAllByQuery(query, clazz);
     }
@@ -193,13 +195,13 @@ public class HistoryService implements IHistoryService {
 
     @Override
     public <T> Page<T> findByNetId(ObjectId id, Class<T> clazz, Pageable pageable) {
-        String queryString = "{netId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{netId: '" + id + this.clazz + clazz.getName() + "'}";
         return findByQuery(queryString, clazz, pageable);
     }
 
     @Override
     public <T> List<T> findAllByNetId(ObjectId id, Class<T> clazz) {
-        String queryString = "{netId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{netId: '" + id + this.clazz + clazz.getName() + "'}";
         Query query = new BasicQuery(queryString);
         return findAllByQuery(query, clazz);
     }
@@ -211,26 +213,26 @@ public class HistoryService implements IHistoryService {
 
     @Override
     public <T> Page<T> findByTaskId(String id, Class<T> clazz, Pageable pageable) {
-        String queryString = "{taskId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{taskId: '" + id + this.clazz + clazz.getName() + "'}";
         return findByQuery(queryString, clazz, pageable);
     }
 
     @Override
     public <T> List<T> findAllByTaskId(String id, Class<T> clazz) {
-        String queryString = "{taskId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{taskId: '" + id + this.clazz + clazz.getName() + "'}";
         Query query = new BasicQuery(queryString);
         return findAllByQuery(query, clazz);
     }
 
     @Override
     public <T> Page<T> findByCaseId(String id, Class<T> clazz, Pageable pageable) {
-        String queryString = "{caseId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{caseId: '" + id + this.clazz + clazz.getName() + "'}";
         return findByQuery(queryString, clazz, pageable);
     }
 
     @Override
     public <T> List<T> findAllByCaseId(String id, Class<T> clazz) {
-        String queryString = "{caseId: '" + id + "', _class: '" + clazz.getName() + "'}";
+        String queryString = "{caseId: '" + id + this.clazz + clazz.getName() + "'}";
         Query query = new BasicQuery(queryString);
         return findAllByQuery(query, clazz);
     }
