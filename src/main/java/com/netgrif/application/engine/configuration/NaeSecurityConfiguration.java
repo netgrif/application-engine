@@ -127,7 +127,8 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
-
+        configureFilters(http);
+        configureSession(http);
         setHeaders(http);
         setCsrf(http);
         corsEnable(http);
