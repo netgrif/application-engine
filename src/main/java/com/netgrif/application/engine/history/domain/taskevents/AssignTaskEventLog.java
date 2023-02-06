@@ -17,6 +17,6 @@ public class AssignTaskEventLog extends TaskEventLog {
     }
 
     public AssignTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser user) {
-        super(task, useCase, eventPhaseuser, user.isImpersonating() ? user.getImpersonated().getStringId() : null);
+        super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
     }
 }

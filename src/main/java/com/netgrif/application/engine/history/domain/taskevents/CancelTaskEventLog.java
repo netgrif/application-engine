@@ -15,7 +15,7 @@ public class CancelTaskEventLog extends TaskEventLog {
         super();
     }
 
-    public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase,IUser user) {
+    public CancelTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser user) {
         super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
     }
 }
