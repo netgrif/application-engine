@@ -44,4 +44,17 @@ class UserFieldValue {
     String getFullName() {
         return name + " " + surname
     }
+
+    @Override
+    int hashCode() {
+        return this.id.hashCode()
+    }
+
+    @Override
+    boolean equals(Object obj) {
+        if (!(obj instanceof UserFieldValue)) {
+            return false
+        }
+        return this.id != null && ((UserFieldValue) obj).id != null && this.id == ((UserFieldValue) obj).id
+    }
 }

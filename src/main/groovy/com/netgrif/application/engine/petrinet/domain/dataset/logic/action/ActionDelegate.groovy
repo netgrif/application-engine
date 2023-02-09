@@ -676,8 +676,8 @@ class ActionDelegate {
                 value = value as Double
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
-                List<UserFieldValue> users = [] as List
-                value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
+                LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
+                value.each {id -> users.add(new UserFieldValue(userService.findById(id as String, false)))}
                 value = new UserListFieldValue(users)
             }
             field.value = value

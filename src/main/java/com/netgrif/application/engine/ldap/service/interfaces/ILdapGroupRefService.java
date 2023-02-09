@@ -21,6 +21,10 @@ public interface ILdapGroupRefService {
 
     public List<LdapGroup> getAllLdapGroupRoles();
 
+    void deleteProcessRoleByPetrinet(String petrinet);
+
+    void deleteProcessRole(LdapGroup ldapGroup, String petriNet);
+
     Set<ProcessRole> getProcessRoleByLdapGroup(Set<String> groupDn);
 
     public void setRoleToLdapGroup(String groupDn, Set<String> roleIds, LoggedUser loggedUser);

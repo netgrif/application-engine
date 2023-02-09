@@ -308,9 +308,15 @@
 			}
 		</action>
  	</data>
-	<data type="text" immediate="true">
+
+<data type="text" immediate="true">
 		<id>default_headers</id>
 		<title name="default_headers">Set default headers</title>
+	</data>
+  
+<data type="multichoice_map">
+		<id>allowed_nets</id>
+		<title name="allowed_nets">Allowed nets</title>
 	</data>
 
 <!--	<data type="boolean">-->
