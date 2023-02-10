@@ -27,6 +27,7 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
+import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
@@ -107,6 +108,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     protected IHistoryService historyService;
+
+    @Autowired
+    protected IValidationService validation;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
@@ -489,7 +493,7 @@ public class TaskService implements ITaskService {
             if (arc instanceof ResetArc) {
                 useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
             }
-            if(arc.getReference() != null && arc.getSource() instanceof Place){
+            if (arc.getReference() != null && arc.getSource() instanceof Place) {
                 useCase.getConsumedTokens().put(arc.getStringId(), arc.getReference().getMultiplicity());
             }
             arc.execute();
@@ -519,6 +523,10 @@ public class TaskService implements ITaskService {
     @Transactional
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
+            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
+                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
+                validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), useCase.getDataField(entry.getKey()));
+            }
             if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
                 continue;
             if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
@@ -703,7 +711,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Task> save(List<Task>  tasks) {
+    public List<Task> save(List<Task> tasks) {
         tasks = taskRepository.saveAll(tasks);
         tasks.forEach(task -> elasticTaskService.index(this.taskMappingService.transform(task)));
         return tasks;
@@ -849,7 +857,7 @@ public class TaskService implements ITaskService {
     }
 
     private EventOutcome addMessageToOutcome(Transition transition, EventType type, TaskEventOutcome outcome) {
-        if(transition.getEvents().containsKey(type)){
+        if (transition.getEvents().containsKey(type)) {
             outcome.setMessage(transition.getEvents().get(type).getMessage());
         }
         return outcome;

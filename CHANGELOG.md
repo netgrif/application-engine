@@ -7,19 +7,27 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-20)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-02-09)
 
 ### Fixed
 
 - [NAE-1761] LoggedUser circular dependency
 - [NAE-1798] UserRefs resolves everytime when case is saved
+- [NAE-1757] Multichoice and enumeration options not working 
+- [NAE-1759] Update documentation of public views, PDF generator and user list
+- [NAE-1805] Data fields validations are not run on backend
+- [NAE-1811] Process delete does not delete ldap group roles
+- [NAE-1812] Clicking on a column in the case-view that does not have a value has an error behavior
 
 ### Changed
 
+- [NAE-1638] Elasticsearch executor shutdown
 - [NAE-1762] Public view URL encoding
 
 ### Added
 
+- [NAE-1607] Allowed nets configuration for newly created filter
+- [NAE-1630] Add admin endpoint for invalidating user session
 - [NAE-1678] User impersonation
 - [NAE-1793] Security filter for HTTP headers validation
 - [NAE-1794] Configurable security headers
