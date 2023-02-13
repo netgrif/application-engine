@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
@@ -16,7 +15,6 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +49,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
-
     @Autowired
     private ElasticsearchRestTemplate template;
 
@@ -74,23 +71,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Lazy
     public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
-    }
-
-    private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title.keyword", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f,
-            "visualId.keyword", 2f
-    );
-
-    /**
-     * See {@link QueryStringQueryBuilder#fields(Map)}
-     *
-     * @return map where keys are ElasticCase field names and values are boosts of these fields
-     */
-    @Override
-    public Map<String, Float> fullTextFields() {
-        return fullTextFieldMap;
     }
 
     @Override
@@ -374,9 +354,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         query.filter(dataQuery);
     }
 
-    /**
-     * Full text search on fields defined by {@link #fullTextFields()}.
-     */
     private void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
