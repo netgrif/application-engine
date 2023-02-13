@@ -6,6 +6,7 @@ import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -58,6 +59,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private IElasticCasePrioritySearch iElasticCasePrioritySearch;
 
     @Autowired
     public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
@@ -143,8 +147,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
-            Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(caseIndex));
+            Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
@@ -379,7 +383,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         }
 
         // TODO: improvement? wildcard does not scale good
-        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(iElasticCasePrioritySearch.fullTextFields());
         query.must(fullTextQuery);
     }
 
@@ -473,7 +477,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private Pageable resolveUnmappedSortAttributes(Pageable pageable) {
         List<Sort.Order> modifiedOrders = new ArrayList<>();
-        pageable.getSort().iterator().forEachRemaining( order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
+        pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
     }
 }
