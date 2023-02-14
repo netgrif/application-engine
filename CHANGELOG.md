@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-02-09)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-02-12)
 
 ### Fixed
 
@@ -31,6 +31,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1678] User impersonation
 - [NAE-1793] Security filter for HTTP headers validation
 - [NAE-1794] Configurable security headers
+- [NAE-1833] Configuration priority search
 
 ## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
 
