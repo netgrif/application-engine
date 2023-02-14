@@ -59,4 +59,9 @@ public interface IExportService {
 
     OutputStream fillCsvTaskData(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config, LoggedUser user, int pageSize, Locale locale, Boolean isIntersection) throws FileNotFoundException;
 
+    OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException;
+
+    List<String> buildRecord(Set<String> csvHeader, Case exportCase);
+
+    String resolveFieldValue(Case exportCase, String exportFieldId);
 }

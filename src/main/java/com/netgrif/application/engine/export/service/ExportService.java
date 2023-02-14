@@ -211,7 +211,8 @@ public class ExportService implements IExportService {
         return buildTaskCsv(exportTasks, config, outFile);
     }
 
-    protected OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    @Override
+    public OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvTaskHeader(exportTasks) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
         PrintWriter writer = new PrintWriter(outStream, true);
@@ -224,7 +225,8 @@ public class ExportService implements IExportService {
         return outStream;
     }
 
-    protected List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
+    @Override
+    public List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
             if (exportCase.getDataSet().containsKey(dataFieldId)) {
@@ -235,7 +237,8 @@ public class ExportService implements IExportService {
         return recordStringList;
     }
 
-    protected String resolveFieldValue(Case exportCase, String exportFieldId) {
+    @Override
+    public String resolveFieldValue(Case exportCase, String exportFieldId) {
         String fieldValue;
         Field field = exportCase.getField(exportFieldId);
         Object fieldData = exportCase.getDataField(exportFieldId).getValue();
