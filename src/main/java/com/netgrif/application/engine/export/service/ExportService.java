@@ -26,13 +26,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-class ExportService implements IExportService {
+public class ExportService implements IExportService {
 
     @Autowired
     private IWorkflowService workflowService;
@@ -137,10 +138,11 @@ class ExportService implements IExportService {
         return buildCaseCsv(exportCases, config, outFile);
     }
 
-    protected OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    @Override
+    public OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(exportCases) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
-        PrintWriter writer = new PrintWriter(outStream, true);
+        PrintWriter writer = new PrintWriter(outStream, true, StandardCharsets.UTF_8);
         writer.println(String.join(",", csvHeader));
         for (Case exportCase : exportCases) {
             writer.println(String.join(",", buildRecord(csvHeader, exportCase)).replace("\n", "\\n"));
