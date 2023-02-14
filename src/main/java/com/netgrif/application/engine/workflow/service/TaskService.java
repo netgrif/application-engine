@@ -163,7 +163,7 @@ public class TaskService implements ITaskService {
 
         AssignTaskEventOutcome outcome = new AssignTaskEventOutcome(useCase, task, outcomes);
         addMessageToOutcome(transition, EventType.ASSIGN, outcome);
-
+        elasticTaskService.index(this.taskMappingService.transform(task));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getSelfOrImpersonated().getEmail() + "]");
         return outcome;
     }
@@ -598,6 +598,10 @@ public class TaskService implements ITaskService {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if (searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
+            while(!page.hasContent() && pageable.getPageNumber() > 0) {
+                pageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+                page = taskRepository.findAll(searchPredicate, pageable);
+            }
             page = loadUsers(page);
             page = dataService.setImmediateFields(page);
             return page;
