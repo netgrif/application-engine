@@ -9,12 +9,18 @@ import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 @Configuration
+@ConditionalOnProperty(
+        value = "nae.elastic.service.configuration.enable",
+        matchIfMissing = true,
+        havingValue = "true"
+)
 public class ElasticServiceConfiguration {
 
     @Autowired
@@ -45,7 +51,6 @@ public class ElasticServiceConfiguration {
         return new Executor(elasticsearchProperties.getReindexExecutor().getSize(), elasticsearchProperties.getReindexExecutor().getTimeout());
     }
 
-
     @Bean
     @Primary
     public IElasticCaseService elasticCaseService() {
@@ -68,6 +73,5 @@ public class ElasticServiceConfiguration {
     public IElasticTaskService reindexingTaskElasticTaskService() {
         return new ElasticTaskService(taskRepository, elasticsearchTemplate);
     }
-
 
 }
