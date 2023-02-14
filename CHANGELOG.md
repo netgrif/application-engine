@@ -13,7 +13,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 
 - [NAE-1761] LoggedUser circular dependency
 - [NAE-1798] UserRefs resolves everytime when case is saved
-- [NAE-1757] Multichoice and enumeration options not working 
+- [NAE-1757] Multi-choice and enumeration options not working 
 - [NAE-1759] Update documentation of public views, PDF generator and user list
 - [NAE-1805] Data fields validations are not run on backend
 - [NAE-1811] Process delete does not delete ldap group roles
