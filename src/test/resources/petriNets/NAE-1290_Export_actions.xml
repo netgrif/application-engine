@@ -161,6 +161,7 @@
                     request.process = [new com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
                     def config = new com.netgrif.application.engine.export.domain.ExportDataConfig()
                     config.setDataToExport(["text"] as LinkedHashSet)
+                    config.setStandardCharsets(java.nio.charset.StandardCharsets.UTF_8)
                     exportCasesToFile([request], "src/test/resources/csv/case_elastic_export.csv",config)
                 </action>
             </actions>

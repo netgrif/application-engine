@@ -142,7 +142,12 @@ public class ExportService implements IExportService {
     public OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(exportCases) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
-        PrintWriter writer = new PrintWriter(outStream, true, StandardCharsets.UTF_8);
+        PrintWriter writer;
+        if (config == null || config.getStandardCharsets() == null) {
+            writer = new PrintWriter(outStream, true, StandardCharsets.UTF_8);
+        } else {
+            writer = new PrintWriter(outStream, true, config.getStandardCharsets());
+        }
         writer.println(String.join(",", csvHeader));
         for (Case exportCase : exportCases) {
             writer.println(String.join(",", buildRecord(csvHeader, exportCase)).replace("\n", "\\n"));
@@ -271,10 +276,10 @@ public class ExportService implements IExportService {
                 fieldValue = ((UserFieldValue) fieldData).getEmail();
                 break;
             case DATE:
-                fieldValue =((LocalDate) fieldData).toString();
+                fieldValue = ((LocalDate) fieldData).toString();
                 break;
             case DATETIME:
-                fieldValue =((Date) fieldData).toString();
+                fieldValue = ((Date) fieldData).toString();
                 break;
             case USERLIST:
                 fieldValue = ((UserListField) fieldData).getValue().getUserValues().stream().map(UserFieldValue::getId).collect(Collectors.joining(";"));
