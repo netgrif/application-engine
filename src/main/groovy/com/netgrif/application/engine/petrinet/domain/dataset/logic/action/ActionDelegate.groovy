@@ -57,6 +57,7 @@ import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessageCode
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
@@ -1231,12 +1232,12 @@ class ActionDelegate {
 
     MessageResource inviteUser(NewUserRequest newUserRequest) {
         IUser user = registrationService.createNewUser(newUserRequest);
-        if (user == null)
-            return MessageResource.successMessage("Done");
+        if (user == null){
+            return MessageResource.errorMessage("Bad request", ResponseMessageCode.registrationErrorSendMail);
+        }
         mailService.sendRegistrationEmail(user);
-
         mailAttemptService.mailAttempt(newUserRequest.email);
-        return MessageResource.successMessage("Done");
+        return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccessSendMail);
     }
 
     void deleteUser(String email) {

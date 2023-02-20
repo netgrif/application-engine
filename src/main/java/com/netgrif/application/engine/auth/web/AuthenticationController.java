@@ -16,6 +16,7 @@ import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
+import com.netgrif.application.engine.workflow.web.responsebodies.ResponseMessageCode;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -76,17 +77,17 @@ public class AuthenticationController {
         try {
             String email = registrationService.decodeToken(regRequest.token)[0];
             if (!registrationService.verifyToken(regRequest.token))
-                return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!");
+                return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!", ResponseMessageCode.registrationErrorInvalidTokenForMail);
 
             regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
             RegisteredUser user = registrationService.registerUser(regRequest);
             if (user == null)
-                return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.");
+                return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.", ResponseMessageCode.registrationErrorNotFoundUser);
 
-            return MessageResource.successMessage("Registration complete");
+            return MessageResource.successMessage("Registration complete", ResponseMessageCode.registrationSuccessRegistration);
         } catch (InvalidUserTokenException e) {
             log.error(e.getMessage());
-            return MessageResource.errorMessage("Invalid token!");
+            return MessageResource.errorMessage("Invalid token!", ResponseMessageCode.registrationErrorInvalidToken);
         }
     }
 
@@ -95,24 +96,24 @@ public class AuthenticationController {
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
             if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).getSelfOrImpersonated().isAdmin())) {
-                return MessageResource.errorMessage("Only admin can invite new users!");
+                return MessageResource.errorMessage("Only admin can invite new users!", ResponseMessageCode.registrationErrorOnlyAdmin);
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             if (mailAttemptService.isBlocked(newUserRequest.email)) {
-                return MessageResource.successMessage("Done");
+                return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccess);
             }
 
             RegisteredUser user = registrationService.createNewUser(newUserRequest);
             if (user == null)
-                return MessageResource.successMessage("Done");
+                return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccess);
             mailService.sendRegistrationEmail(user);
 
             mailAttemptService.mailAttempt(newUserRequest.email);
-            return MessageResource.successMessage("Done");
+            return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccess);
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Failed");
+            return MessageResource.errorMessage("Failed", ResponseMessageCode.registrationError);
         }
     }
 
@@ -121,12 +122,12 @@ public class AuthenticationController {
     public MessageResource verifyToken(@RequestBody String token) {
         try {
             if (registrationService.verifyToken(token))
-                return MessageResource.successMessage(registrationService.decodeToken(token)[0]);
+                return MessageResource.successMessage(registrationService.decodeToken(token)[0], ResponseMessageCode.registrationSuccess);
             else
-                return MessageResource.errorMessage("Invalid token!");
+                return MessageResource.errorMessage("Invalid token!", ResponseMessageCode.registrationErrorInvalidToken);
         } catch (InvalidUserTokenException e) {
             log.error(e.getMessage());
-            return MessageResource.errorMessage("Invalid token!");
+            return MessageResource.errorMessage("Invalid token!", ResponseMessageCode.registrationErrorInvalidToken);
         }
     }
 
@@ -147,20 +148,20 @@ public class AuthenticationController {
     @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
         if (mailAttemptService.isBlocked(recoveryEmail)) {
-            return MessageResource.successMessage("Done");
+            return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccess);
         }
         try {
             RegisteredUser user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
                 mailAttemptService.mailAttempt(user.getEmail());
-                return MessageResource.successMessage("Done");
+                return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccess);
             } else {
-                return MessageResource.successMessage("Done");
+                return MessageResource.successMessage("Done", ResponseMessageCode.registrationSuccess);
             }
         } catch (MessagingException | IOException | TemplateException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Failed");
+            return MessageResource.errorMessage("Failed", ResponseMessageCode.registrationError);
         }
     }
 
@@ -204,7 +205,7 @@ public class AuthenticationController {
                 return MessageResource.errorMessage("Incorrect password!");
             }
 
-            return MessageResource.successMessage("Password is successfully changed.");
+            return MessageResource.successMessage("Password is successfully changed.", ResponseMessageCode.registrationSuccessChangePassword);
         } catch (Exception e) {
             log.error(e.getMessage());
             return MessageResource.errorMessage("There has been a problem!");
