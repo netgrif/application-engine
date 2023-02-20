@@ -155,7 +155,7 @@ class FilterApiTest {
                 "title"                 : new TextField(rawValue: "FILTER"),
                 "allowed_nets"          : new TextField(rawValue: "filter,preference_filter_item"),
                 "query"                 : new TextField(rawValue: "processIdentifier:filter OR processIdentifier:preference_filter_item"),
-                "type"                  : new TextField(rawValue: "Case"),
+//                "type"                  : new TextField(rawValue: "Case"),
                 "group"                 : new TextField(rawValue: null),
                 "identifier"            : new TextField(rawValue: "new_menu_item"),
                 "icon"                  : new TextField(rawValue: "device_hub"),

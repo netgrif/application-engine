@@ -13,7 +13,6 @@ public abstract class FieldWithAllowedNets<T> extends Field<T> {
 
     public FieldWithAllowedNets() {
         super();
-        allowedNets = new ArrayList<>();
     }
 
     public FieldWithAllowedNets(List<String> allowedNets) {
@@ -23,6 +22,8 @@ public abstract class FieldWithAllowedNets<T> extends Field<T> {
 
     public void clone(FieldWithAllowedNets<T> clone) {
         super.clone(clone);
-        clone.allowedNets = new ArrayList<>(this.allowedNets);
+        if (allowedNets != null) {
+            clone.allowedNets = new ArrayList<>(this.allowedNets);
+        }
     }
 }

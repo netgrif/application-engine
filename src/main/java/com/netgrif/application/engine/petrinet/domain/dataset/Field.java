@@ -48,7 +48,7 @@ public abstract class Field<T> extends Imported {
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
     @JsonIgnore
-    private boolean immediate;
+    private Boolean immediate;
     @JsonIgnore
     private Map<DataEventType, DataEvent> events;
     @JsonIgnore
@@ -78,6 +78,10 @@ public abstract class Field<T> extends Imported {
             return null;
         }
         return this.value.getValue();
+    }
+
+    public boolean isImmediate() {
+        return this.immediate != null && this.immediate;
     }
 
     public void addActions(Collection<Action> dataEvents, DataEventType type) {

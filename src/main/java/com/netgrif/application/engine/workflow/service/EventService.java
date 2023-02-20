@@ -5,7 +5,6 @@ import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -59,12 +58,12 @@ public class EventService implements IEventService {
                     });
             allOutcomes.addAll(outcomes);
         });
-        if (useCase != null) {
-            Case latest = workflowService.findOne(useCase.getStringId());
-            useCase.setTasks(latest.getTasks());
-            useCase.setActivePlaces(latest.getActivePlaces());
-            workflowService.save(useCase);
-        }
+//        if (useCase != null) {
+//            Case latest = workflowService.findOne(useCase.getStringId());
+//            useCase.setTasks(latest.getTasks());
+//            useCase.setActivePlaces(latest.getActivePlaces());
+//            workflowService.save(useCase);
+//        }
         return allOutcomes;
     }
 
@@ -73,13 +72,10 @@ public class EventService implements IEventService {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
-            outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
-                    .forEach(outcome -> {
-                        if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) {
-                            return;
-                        }
-                        runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger);
-                    });
+            outcomes.stream()
+                    .filter(SetDataEventOutcome.class::isInstance)
+                    .filter(outcome -> !((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty())
+                    .forEach(outcome -> runEventActionsOnChanged(task, (SetDataEventOutcome) outcome, trigger));
             allOutcomes.addAll(outcomes);
         });
         return allOutcomes;
@@ -107,14 +103,18 @@ public class EventService implements IEventService {
     @Override
     public void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger) {
         // TODO: NAE-1645 6.2.5
-        outcome.getChangedFields().getFields().forEach((s, changedField) -> {
-            if (changedField.getRawValue() != null && trigger == DataEventType.SET) {
-                Field<?> field = outcome.getCase().getDataSet().get(s);
-                log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + s);
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
-                outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask()));
-            }
-        });
+        if (trigger != DataEventType.SET) {
+            return;
+        }
+        outcome.getChangedFields().getFields().entrySet().stream()
+                .filter(entry -> entry.getValue().getRawValue() != null)
+                .forEach(entry -> {
+                    String fieldId = entry.getKey();
+                    Field<?> field = outcome.getCase().getDataSet().get(fieldId);
+                    log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + fieldId);
+                    outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
+                    outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask()));
+                });
     }
 }
 

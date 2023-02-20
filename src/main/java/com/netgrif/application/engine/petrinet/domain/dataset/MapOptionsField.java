@@ -2,29 +2,17 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 public abstract class MapOptionsField<T, U> extends Field<U> {
 
     protected Map<String, T> options;
     protected Expression optionsExpression;
-
-    public MapOptionsField() {
-        this(new HashMap<>());
-    }
-
-    public MapOptionsField(Map<String, T> options) {
-        super();
-        this.options = options;
-    }
-
-    public MapOptionsField(Expression expression) {
-        super();
-        this.optionsExpression = expression;
-    }
 
     public Expression getExpression() {
         return optionsExpression;

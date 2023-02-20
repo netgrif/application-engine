@@ -21,16 +21,7 @@ abstract class FieldActionsRunner {
     private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
 
     @Lookup("actionDelegate")
-    abstract ActionDelegate getActionDeleget()
-
-    @Autowired
-    private IOrsrService orsrService
-
-    @Autowired
-    private IPostalCodeService postalCodeService
-
-    @Autowired
-    private FieldFactory fieldFactory
+    abstract ActionDelegate getActionDelegate()
 
     @Autowired
     private IFieldActionsCacheService actionsCacheService
@@ -42,9 +33,9 @@ abstract class FieldActionsRunner {
     }
 
     List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, List<Function> functions = []) {
-        if (!actionsCache)
+        if (!actionsCache) {
             actionsCache = new HashMap<>()
-
+        }
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
         try {
@@ -62,7 +53,7 @@ abstract class FieldActionsRunner {
     }
 
     Closure getActionCode(Closure code, List<Function> functions) {
-        def actionDelegate = getActionDeleget()
+        def actionDelegate = getActionDelegate()
 
         actionsCacheService.getCachedFunctions(functions).each {
             actionDelegate.metaClass."${it.function.name}" << it.code
@@ -88,13 +79,4 @@ abstract class FieldActionsRunner {
     def getFromCache(String key) {
         return this.actionsCache.get(key)
     }
-
-    IPostalCodeService getPostalCodeService() {
-        return postalCodeService
-    }
-
-    IOrsrService getOrsrService() {
-        return orsrService
-    }
-
 }

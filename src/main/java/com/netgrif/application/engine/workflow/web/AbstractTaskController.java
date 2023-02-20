@@ -16,6 +16,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.application.engine.workflow.web.responsebodies.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -39,9 +40,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+@Slf4j
 public abstract class AbstractTaskController {
-
-    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     private final ITaskService taskService;
 
@@ -107,7 +107,6 @@ public abstract class AbstractTaskController {
     }
 
     public EntityModel<EventOutcomeWithMessage> finish(LoggedUser loggedUser, String taskId) {
-
         try {
             return EventOutcomeWithMessageResource.successMessage("LocalisedTask " + taskId + " finished", taskService.finishTask(loggedUser, taskId));
         } catch (Exception e) {
@@ -211,7 +210,6 @@ public abstract class AbstractTaskController {
         } catch (Exception e) {
             log.error("Set data on task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
-
         }
     }
 
@@ -234,7 +232,7 @@ public abstract class AbstractTaskController {
     public ResponseEntity<Resource> getFile(String taskId, String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId, false);
 
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null) {
+        if (FileFieldInputStream.isEmpty(fileFieldInputStream)) {
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
         }
 
@@ -266,8 +264,7 @@ public abstract class AbstractTaskController {
     public ResponseEntity<Resource> getNamedFile(String taskId, String fieldId, String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTaskAndName(taskId, fieldId, name);
 
-        // TODO: NAE-1645 FileListFieldTest#downloadFileByTask - File with name test-file-list.txt in field fileList within task 63beb45a86bb3f1ca09d412b was not found!
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null) {
+        if (FileFieldInputStream.isEmpty(fileFieldInputStream)) {
             throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within task " + taskId + " was not found!");
         }
 

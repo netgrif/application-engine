@@ -25,13 +25,18 @@ public class Place extends Node implements Referencable {
     }
 
     public void removeTokens(Integer tokens) throws IllegalArgumentException {
-        if (this.tokens - tokens < 0)
+        if (this.tokens - tokens < 0) {
             throw new IllegalArgumentException("Place can not have negative number of tokens.");
+        }
         this.tokens -= tokens;
     }
 
     public void removeAllTokens() {
         this.tokens = 0;
+    }
+
+    public boolean hasAnyTokens() {
+        return tokens > 0;
     }
 
     @Override

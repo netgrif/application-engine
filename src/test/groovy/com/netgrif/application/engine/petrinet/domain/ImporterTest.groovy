@@ -296,6 +296,7 @@ class ImporterTest {
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
         taskService.assignTask(testCase.getTasks().toList().get(0).getTask())
         testCase = workflowService.findOne(testCase.getStringId())
+        assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
         assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"
     }
 

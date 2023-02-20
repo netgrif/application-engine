@@ -28,6 +28,8 @@ public interface IDataService {
 
     SetDataEventOutcome setData(String taskId, DataSet values);
 
+    SetDataEventOutcome setData(Case useCase, DataSet dataSet);
+
     SetDataEventOutcome setData(Task task, DataSet values);
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview);

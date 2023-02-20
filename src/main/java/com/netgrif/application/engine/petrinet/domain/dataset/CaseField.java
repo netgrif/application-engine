@@ -3,15 +3,13 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 public class CaseField extends FieldWithAllowedNets<List<String>> {
-
-    public CaseField() {
-//        this();
-    }
 
     public CaseField(List<String> allowedNets) {
         super(allowedNets);

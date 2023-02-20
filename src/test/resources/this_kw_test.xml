@@ -16,7 +16,7 @@
         <title></title>
         <event type="set">
             <id>ev</id>
-            <actions phase="pre">
+            <actions phase="post">
                 <action>
                     tester_text_field: f.tester_text_field,
                     tf: f.this;
@@ -64,7 +64,7 @@
             <actions phase="pre">
                 <action>
                     text_field: f.text_field;
-                    change text_field value { "Hello world!"; }
+                    change text_field value { "Hello world!" }
                 </action>
             </actions>
         </event>

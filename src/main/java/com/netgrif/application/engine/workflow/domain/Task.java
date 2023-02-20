@@ -22,7 +22,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -216,7 +215,6 @@ public class Task {
     }
 
     public void resolveViewRoles() {
-        getViewRoles();
         this.viewRoles.clear();
         this.roles.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {
@@ -226,7 +224,6 @@ public class Task {
     }
 
     public void resolveViewUserRefs() {
-        getViewUserRefs();
         this.viewUserRefs.clear();
         this.userRefs.forEach((userRef, perms) -> {
             if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {
@@ -236,7 +233,6 @@ public class Task {
     }
 
     public void resolveViewUsers() {
-        getViewUsers();
         this.viewUsers.clear();
         this.users.forEach((role, perms) -> {
             if (perms.containsKey(RolePermission.VIEW) && perms.get(RolePermission.VIEW)) {

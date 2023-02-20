@@ -60,13 +60,19 @@
             <id>t1_finish</id>
             <actions phase="pre">
                 <action id="1">
+					<!--@formatter:off-->
 					field0: f.text_0,
 					field1: f.text_1;
-					change field0 value { "A" }
-                    assignTask("t2")
-                    finishTask("t2")
-					change field1 value { "B" }
-                </action>
+					setData(new DataSet([
+							"text_0": new TextField(rawValue: "A")
+					]))
+					assignTask("t2")
+					finishTask("t2")
+					setData(new DataSet([
+							"text_1": new TextField(rawValue: "B")
+					]))
+					<!--@formatter:on-->
+				</action>
             </actions>
         </event>
     </transition>
@@ -114,8 +120,10 @@
 				<action>
 					field1: f.text_1,
 					field2: f.text_2;
-					change field1 value { "D" }
-					change field2 value { "E" }
+					setData(new DataSet([
+							"text_1": new TextField(rawValue: "D"),
+							"text_2": new TextField(rawValue: "E")
+					]))
 				</action>
 			</actions>
 		</event>
@@ -125,16 +133,20 @@
 				<action>
 					field1: f.text_1,
 					field2: f.text_2;
-					change field1 value { "G" }
-					change field2 value { "H" }
+					setData(new DataSet([
+							"text_1": new TextField(rawValue: "G"),
+							"text_2": new TextField(rawValue: "H")
+					]))
 				</action>
 			</actions>
 			<actions phase="post">
 				<action>
 					field1: f.text_1,
 					field2: f.text_2;
-					change field1 value { "J" }
-					change field2 value { "K" }
+					setData(new DataSet([
+							"text_1": new TextField(rawValue: "J"),
+							"text_2": new TextField(rawValue: "K")
+					]))
 				</action>
 			</actions>
 		</event>

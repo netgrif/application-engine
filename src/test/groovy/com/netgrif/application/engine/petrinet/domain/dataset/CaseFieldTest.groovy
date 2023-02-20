@@ -79,7 +79,7 @@ class CaseFieldTest {
                 "setVal": new BooleanField(rawValue: true)
         ] as Map<String,Field<?>>))
 
-        SetDataEventOutcome setDataEventOutcome1 = changed1.outcomes.first() as SetDataEventOutcome
+        SetDataEventOutcome setDataEventOutcome1 = changed1.outcomes.first().outcomes.first().outcomes.first() as SetDataEventOutcome
         assert setDataEventOutcome1.changedFields.fields.containsKey(CASE_FIELD_ID)
         List<String> list1 = ((CaseField)setDataEventOutcome1.changedFields.fields[CASE_FIELD_ID]).allowedNets
         assert list1.size() == 2
@@ -99,7 +99,7 @@ class CaseFieldTest {
                 "setNull": new BooleanField(rawValue: true)
         ] as Map<String,Field<?>>))
 
-        SetDataEventOutcome setDataEventOutcome2 = changed2.outcomes.first() as SetDataEventOutcome
+        SetDataEventOutcome setDataEventOutcome2 = changed2.outcomes.first().outcomes.first().outcomes.first() as SetDataEventOutcome
         assert setDataEventOutcome2.changedFields.fields.containsKey(CASE_FIELD_ID)
         List<String> list2 = ((CaseField)setDataEventOutcome2.changedFields.fields[CASE_FIELD_ID]).allowedNets
         assert list2.size() == 0

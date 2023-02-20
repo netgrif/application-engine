@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,22 +14,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
-
-    public MultichoiceMapField() {
-        super();
-        this.defaultValue = new HashSet<>();
-    }
-
-    public MultichoiceMapField(Map<String, I18nString> choices) {
-        super(choices);
-        this.defaultValue = new HashSet<>();
-    }
-
-    public MultichoiceMapField(Map<String, I18nString> choices, Set<String> defaultValues) {
-        this(choices);
-        this.defaultValue = defaultValues;
-    }
 
     @Override
     @QueryType(PropertyType.NONE)

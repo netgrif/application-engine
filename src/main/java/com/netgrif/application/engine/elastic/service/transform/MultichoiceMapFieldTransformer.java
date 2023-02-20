@@ -19,8 +19,10 @@ public class MultichoiceMapFieldTransformer extends ElasticDataFieldTransformer<
         }
         Map<String, I18nString> options = caseField.getOptions() != null ? caseField.getOptions() : petriNetField.getOptions();
         Map<String, List<String>> fieldValues = new HashMap<>();
-        for (String key : values) {
-            fieldValues.put(key, options.get(key).collectTranslations());
+        for (String value : values) {
+            // TODO: NAE-1645 refactor, duplicate with EnumMap transformer
+            I18nString selectedValue = options.get(value) != null ? options.get(value) : new I18nString();
+            fieldValues.put(value, selectedValue.collectTranslations());
         }
         return new MapField(fieldValues);
     }

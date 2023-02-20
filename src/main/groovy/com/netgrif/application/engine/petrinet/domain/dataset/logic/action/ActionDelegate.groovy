@@ -8,6 +8,8 @@ import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
+import com.netgrif.application.engine.business.IPostalCodeService
+import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
@@ -176,6 +178,12 @@ class ActionDelegate {
 
     @Autowired
     IUriService uriService
+
+    @Autowired
+    IPostalCodeService postalCodeService
+
+    @Autowired
+    IOrsrService orsrService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -474,30 +482,28 @@ class ActionDelegate {
     }
 
     def saveChangedChoices(ChoiceField field) {
-        ChoiceField caseField = useCase.dataSet.get(field.stringId) as ChoiceField
-        caseField.choices = field.choices
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, caseField)
-        this.outcomes.add(outcome)
+        this.outcomes.add(dataService.setData(useCase, new DataSet([
+                (field.stringId): field.class.newInstance(choices: field.choices)
+        ] as Map<String, Field<?>>)))
+        useCase = workflowService.findOne(useCase.stringId)
     }
 
     def saveChangedAllowedNets(CaseField field) {
-        CaseField caseField = useCase.dataSet.get(field.stringId) as CaseField
-        caseField.allowedNets = field.allowedNets
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, caseField)
-        this.outcomes.add(outcome)
+        this.outcomes.add(dataService.setData(useCase, new DataSet([
+                (field.stringId): field.class.newInstance(allowedNets: field.allowedNets)
+        ] as Map<String, Field<?>>)))
+        useCase = workflowService.findOne(useCase.stringId)
     }
 
     def saveChangedOptions(MapOptionsField field) {
-        MapOptionsField caseField =useCase.dataSet.get(field.stringId) as MapOptionsField
-        caseField.options = field.options
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, caseField)
-        this.outcomes.add(outcome)
+        this.outcomes.add(dataService.setData(useCase, new DataSet([
+                (field.stringId): field.class.newInstance(options: field.options)
+        ] as Map<String, Field<?>>)))
+        useCase = workflowService.findOne(useCase.stringId)
     }
 
     def saveChangedValidation(Field field) {
+        // TODO: NAE-1645 setData?
         Field<?> caseField = useCase.dataSet.get(field.stringId)
         caseField.validations = field.validations
         List<Validation> compiled = field.validations.collect { it.clone() }
@@ -568,16 +574,19 @@ class ActionDelegate {
              changeFieldValue(field, cl)
          },
          choices    : { cl ->
-             if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
+             if (!(field instanceof MultichoiceField || field instanceof EnumerationField)) {
                  return
+             }
 
              def values = cl()
-             if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE))
+             if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) {
                  return
+             }
 
 
-             if (!(values instanceof Collection))
+             if (!(values instanceof Collection)) {
                  values = [values]
+             }
              field = (ChoiceField) field
              if (values.every { it instanceof I18nString }) {
                  field.setChoices(values as Set<I18nString>)
@@ -657,6 +666,7 @@ class ActionDelegate {
             }
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
+            // TODO: NAE-1645 should be in data service
             if (field instanceof FileListField && task.isPresent()) {
                 field.value.value.namesPaths.forEach(namePath -> {
                     dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
@@ -665,11 +675,13 @@ class ActionDelegate {
             if (field instanceof FileField && task.isPresent()) {
                 dataService.deleteFile(task.get().stringId, field.stringId)
             }
-            field.clearValue()
-            // TODO: NAE-1645 6.2.5
-//            saveChangedValue(field)
+            this.outcomes.add(dataService.setData(useCase, new DataSet([
+                    (field.stringId): field.class.newInstance(rawValue: null)
+            ] as Map<String, Field<?>>)))
+            useCase = workflowService.findOne(useCase.stringId)
         }
         if (value != null) {
+            // TODO: NAE-1645 should be in data service
             if (field instanceof CaseField) {
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
@@ -677,7 +689,6 @@ class ActionDelegate {
             if (field instanceof NumberField) {
                 value = value as Double
             }
-            // TODO: NAE-1645 6.2.5
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
                 List<UserFieldValue> users = [] as List
                 value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
@@ -686,14 +697,11 @@ class ActionDelegate {
             if (value instanceof GString) {
                 value = value.toString()
             }
-            field.setRawValue(value)
+            this.outcomes.add(dataService.setData(useCase, new DataSet([
+                    (field.stringId): field.class.newInstance(rawValue: value)
+            ] as Map<String, Field<?>>)))
+            useCase = workflowService.findOne(useCase.stringId)
         }
-        // TODO: NAE-1645
-//        DataField changedField = new DataField(field.stringId)
-//        changedField.value = value
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, field)
-        this.outcomes.add(outcome)
     }
 
     void changeFieldValidations(Field field, def cl) {
@@ -737,8 +745,11 @@ class ActionDelegate {
     def changeCaseProperty(String property) {
         [about: { cl ->
             def value = cl()
-            if (value instanceof Closure && value() == UNCHANGED_VALUE) return
+            if (value instanceof Closure && value() == UNCHANGED_VALUE) {
+                return
+            }
             useCase."$property" = value
+            useCase = workflowService.save(useCase)
 
             if (property == "title" || property == "color") {
                 List<Task> tasks = taskService.findAllByCase(useCase.stringId)
@@ -766,11 +777,11 @@ class ActionDelegate {
 
     //Get PSC - DSL only for Insurance
     def byCode = { String code ->
-        return actionsRunner.postalCodeService.findAllByCode(code)
+        return postalCodeService.findAllByCode(code)
     }
 
     def byCity = { String city ->
-        return actionsRunner.postalCodeService.findAllByCity(city)
+        return postalCodeService.findAllByCity(city)
     }
 
     def psc(Closure find, String input) {
@@ -780,7 +791,7 @@ class ActionDelegate {
     }
 
     def byIco = { String ico ->
-        return actionsRunner.orsrService.findByIco(ico)
+        return orsrService.findByIco(ico)
     }
 
     def orsr(Closure find, String ico) {
@@ -822,6 +833,7 @@ class ActionDelegate {
         String taskId = getTaskId(transitionId, aCase)
         AssignTaskEventOutcome outcome = taskService.assignTask(user.transformToLoggedUser(), taskId)
         this.outcomes.add(outcome)
+        updateCase()
         return outcome.getTask()
     }
 
@@ -848,6 +860,7 @@ class ActionDelegate {
 
     private Task addTaskOutcomeAndReturnTask(TaskEventOutcome outcome) {
         this.outcomes.add(outcome)
+        updateCase()
         return outcome.getTask()
     }
 
@@ -932,6 +945,10 @@ class ActionDelegate {
         return removeRole(roleId, net, user)
     }
 
+    SetDataEventOutcome setData(DataSet dataSet) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet))
+    }
+
     SetDataEventOutcome setData(Task task, DataSet dataSet) {
         return setData(task.stringId, dataSet)
     }
@@ -947,9 +964,6 @@ class ActionDelegate {
     SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        //TODO: NAE-1645
-        // com.netgrif.application.engine.ipc.TaskApiTest#testSetData
-        // No signature of method: static com.netgrif.application.engine.startup.ImportHelper.populateDataset() is applicable for argument types: (LinkedHashMap) values: [[data_text:[value:some text, type:text], data_number:[value:10, ...]]]
         return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet))
     }
 
@@ -972,6 +986,7 @@ class ActionDelegate {
 
     private SetDataEventOutcome addSetDataOutcomeToOutcomes(SetDataEventOutcome outcome) {
         this.outcomes.add(outcome)
+        updateCase()
         return outcome
     }
 
@@ -1843,4 +1858,10 @@ class ActionDelegate {
         return new I18nString(value, translations)
     }
 
+    void updateCase() {
+        if (!useCase) {
+            return
+        }
+        this.useCase = workflowService.findOne(useCase.stringId)
+    }
 }

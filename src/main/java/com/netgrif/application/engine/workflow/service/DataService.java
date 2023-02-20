@@ -8,7 +8,6 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.importer.service.FieldFactory;
-import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
@@ -35,6 +34,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.util.IOUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,7 +50,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Slf4j
 @Service
@@ -128,25 +127,6 @@ public class DataService implements IDataService {
         return outcome;
     }
 
-    private void resolveComponents(Field<?> field, Transition transition) {
-        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
-        if (transitionComponent != null) {
-            field.setComponent(transitionComponent);
-        }
-    }
-
-    private boolean isForbidden(String fieldId, Transition transition, Field<?> dataField) {
-        if (dataField.getBehaviors().contains(transition.getImportId())) {
-            return dataField.isForbiddenOn(transition.getImportId());
-        } else {
-            return transition.getDataSet().get(fieldId).isForbidden();
-        }
-    }
-
-    public void setCaseData(String caseId, DataSet setData) {
-        Case useCase = workflowService.findOne(caseId);
-    }
-
     @Override
     public SetDataEventOutcome setData(String taskId, DataSet dataSet) {
         Task task = taskService.findOne(taskId);
@@ -154,39 +134,54 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public SetDataEventOutcome setData(Case target, DataSet dataSet) {
+        Task fake = Task.with()._id(new ObjectId()).caseId(target.getStringId()).title(new I18nString("Fake")).transitionId("fake").build();
+        return setData(fake, dataSet);
+    }
+
+    @Override
     public SetDataEventOutcome setData(Task task, DataSet dataSet) {
-        Case useCase = workflowService.findOne(task.getCaseId());
-
-        log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
-
+        log.info("[" + task.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
         if (task.getUserId() != null) {
             task.setUser(userService.findById(task.getUserId(), false));
         }
+        Case useCase = workflowService.findOne(task.getCaseId());
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
-        dataSet.getFields().forEach((fieldId, newDataField) -> {
-            Optional<Field<?>> fieldOptional = useCase.getPetriNet().getField(fieldId);
-            if (fieldOptional.isEmpty()) {
-                return;
-            }
-            Field<?> dataField = useCase.getDataSet().get(fieldId);
-            Field<?> field = fieldOptional.get();
-            // PRE
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
-            historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
-            // EXECUTION
-            if (outcome.getMessage() == null) {
-                setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
-            }
-            dataField.applyChanges(newDataField);
-            outcome.addChangedField(fieldId, newDataField);
-            workflowService.save(useCase);
-            historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
-            // POST
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task));
-            historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
-        });
-        updateDataset(useCase);
-        outcome.setCase(workflowService.save(useCase));
+        for (Map.Entry<String, Field<?>> stringFieldEntry : dataSet.getFields().entrySet()) {
+            String fieldId = stringFieldEntry.getKey();
+            Field<?> newDataField = stringFieldEntry.getValue();
+            outcome.addOutcome(setDataField(task, fieldId, newDataField));
+        }
+//        updateDataset(useCase);
+//        outcome.setCase(workflowService.save(useCase));
+        return outcome;
+    }
+
+    public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField) {
+        Case useCase = workflowService.findOne(task.getCaseId());
+        SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
+        Optional<Field<?>> fieldOptional = useCase.getPetriNet().getField(fieldId);
+        if (fieldOptional.isEmpty()) {
+            throw new IllegalArgumentException(""); // TODO: NAE-1645 exception or not?
+        }
+        Field<?> field = fieldOptional.get();
+        // PRE
+        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
+        useCase = workflowService.findOne(task.getCaseId());
+        historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
+        // EXECUTION
+        if (outcome.getMessage() == null) {
+            setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
+        }
+        useCase.getDataSet().get(fieldId).applyChanges(newDataField);
+        useCase = workflowService.save(useCase);
+        outcome.addChangedField(fieldId, newDataField);
+        historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
+        // POST
+        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task));
+        useCase = workflowService.findOne(task.getCaseId());
+        historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
+
         return outcome;
     }
 
@@ -194,7 +189,7 @@ public class DataService implements IDataService {
         Map<String, DataRef> caseDataSet = useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet();
         I18nString message = null;
         if (field.getEvents().containsKey(type)) {
-            message = ((DataEvent) field.getEvents().get(type)).getMessage();
+            message = field.getEvents().get(type).getMessage();
         } else if (caseDataSet.containsKey(fieldId) && caseDataSet.get(fieldId).getEvents().containsKey(type)) {
             message = caseDataSet.get(fieldId).getEvents().get(type).getMessage();
         }
@@ -250,19 +245,20 @@ public class DataService implements IDataService {
     }
 
     private List<DataGroup> collectTaskRefDataGroups(DataRef taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
-        List<String> taskIds = ((TaskField)taskRefField.getField()).getRawValue();
+        List<String> taskIds = ((TaskField) taskRefField.getField()).getRawValue();
         if (taskIds == null) {
             return new ArrayList<>();
         }
 
         List<DataGroup> groups = new ArrayList<>();
-        taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
-        taskIds.forEach(id -> {
-            collectedTaskIds.add(id);
-            List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getFieldId()).getData();
-            resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
-            groups.addAll(taskRefDataGroups);
-        });
+        taskIds.stream()
+                .filter(id -> !collectedTaskIds.contains(id))
+                .forEach(id -> {
+                    collectedTaskIds.add(id);
+                    List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, taskRefField.getFieldId()).getData();
+                    resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
+                    groups.addAll(taskRefDataGroups);
+                });
 
         return groups;
     }
@@ -271,14 +267,7 @@ public class DataService implements IDataService {
         if (dataGroup.getLayout() == null || dataGroup.getLayout().getType() != LayoutType.GRID) {
             return;
         }
-        dataGroup.setData(
-                dataGroup.getData().stream()
-                        .filter(dataFieldMap::containsKey)
-                        .map(dataFieldMap::get)
-                        .sorted(Comparator.comparingInt(a -> a.getLayout().getY()))
-                        .map(DataRef::getFieldId)
-                        .collect(Collectors.toCollection(LinkedHashSet::new))
-        );
+        dataGroup.setData(dataGroup.getData().stream().filter(dataFieldMap::containsKey).map(dataFieldMap::get).sorted(Comparator.comparingInt(a -> a.getLayout().getY())).map(DataRef::getFieldId).collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     private void resolveTaskRefBehavior(DataRef taskRefField, List<DataGroup> taskRefDataGroups) {
@@ -304,11 +293,11 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {
         Task task = taskService.findOne(taskId);
-
         FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), task, fieldId, forPreview);
 
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+        if (FileFieldInputStream.isEmpty(fileFieldInputStream)) {
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+        }
 
         return fileFieldInputStream;
     }
@@ -351,8 +340,7 @@ public class DataService implements IDataService {
         }
 
         try {
-            return new FileFieldInputStream(field.isRemote() ? download(fileField.get().getPath()) :
-                    new FileInputStream(fileField.get().getPath()), name);
+            return new FileFieldInputStream(field.isRemote() ? download(fileField.get().getPath()) : new FileInputStream(fileField.get().getPath()), name);
         } catch (IOException e) {
             log.error("Getting file failed: ", e);
             return null;
@@ -374,8 +362,7 @@ public class DataService implements IDataService {
             if (forPreview) {
                 return getFilePreview(field, useCase);
             } else {
-                return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getValue().getPath()) :
-                        new FileInputStream(field.getValue().getValue().getPath()));
+                return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getValue().getPath()) : new FileInputStream(field.getValue().getValue().getPath()));
             }
         } catch (IOException e) {
             log.error("Getting file failed: ", e);
@@ -384,11 +371,12 @@ public class DataService implements IDataService {
     }
 
     private void runGetActionsFromFileField(Map<DataEventType, DataEvent> events, Case useCase) {
-        if (events != null && !events.isEmpty() && events.containsKey(DataEventType.GET)) {
-            DataEvent event = events.get(DataEventType.GET);
-            event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
-            event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
+        if (events == null || events.isEmpty() || !events.containsKey(DataEventType.GET)) {
+            return;
         }
+        DataEvent event = events.get(DataEventType.GET);
+        event.getPreActions().forEach(action -> actionsRunner.run(action, useCase));
+        event.getPostActions().forEach(action -> actionsRunner.run(action, useCase));
     }
 
     private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException {
@@ -430,7 +418,6 @@ public class DataService implements IDataService {
             image = renderer.renderImage(0);
         } else {
             image = ImageIO.read(file);
-
         }
         return image;
     }
@@ -492,10 +479,8 @@ public class DataService implements IDataService {
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {
-        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.PRE, useCase, referencingTask));
-        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET,
-                EventPhase.POST, useCase, referencingTask));
+        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask));
+        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask));
         updateDataset(useCase);
         workflowService.save(useCase);
         return outcomes;
@@ -642,9 +627,7 @@ public class DataService implements IDataService {
     @Override
     public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        List<Field<?>> fields = task.getImmediateDataFields().stream()
-                .map(f -> useCase.getDataSet().get(f))
-                .collect(Collectors.toList());
+        List<Field<?>> fields = task.getImmediateDataFields().stream().map(f -> useCase.getDataSet().get(f)).collect(Collectors.toList());
 //        TODO: NAE-1645 order?
 //        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;

@@ -28,7 +28,7 @@ public class EnumerationMapField extends MapOptionsField<I18nString, String> {
         if (this.getOptions() == null) {
             return null;
         }
-        return this.getOptions().get(this.getValue().getValue());
+        return this.getOptions().get(this.getRawValue());
     }
 
     @Override

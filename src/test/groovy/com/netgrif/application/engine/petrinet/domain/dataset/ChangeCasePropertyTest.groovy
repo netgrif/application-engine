@@ -98,6 +98,7 @@ class ChangeCasePropertyTest {
         testCase = workflowService.findOne(testCase.getStringId())
         testCaseTask = taskService.findOne(testCaseTask.getStringId())
 
+        assert testCase.getDataSet().get("bln").rawValue == true
         assert testCase.getTitle() == SET_DATA_TITLE
         assert testCaseTask.getCaseTitle() == SET_DATA_TITLE
     }

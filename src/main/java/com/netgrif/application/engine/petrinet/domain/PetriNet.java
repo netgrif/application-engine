@@ -240,6 +240,9 @@ public class PetriNet extends PetriNetObject {
     }
 
     public Transition getTransition(String id) {
+        if ("fake".equals(id)) {
+            return new Transition();
+        }
         return transitions.get(id);
     }
 
@@ -275,13 +278,9 @@ public class PetriNet extends PetriNetObject {
     }
 
     public Map<String, Integer> getActivePlaces() {
-        Map<String, Integer> activePlaces = new HashMap<>();
-        for (Place place : places.values()) {
-            if (place.getTokens() > 0) {
-                activePlaces.put(place.getStringId(), place.getTokens());
-            }
-        }
-        return activePlaces;
+        return places.values().stream()
+                .filter(Place::hasAnyTokens)
+                .collect(Collectors.toMap(PetriNetObject::getStringId, Place::getTokens));
     }
 
     public void addTransaction(Transaction transaction) {
@@ -292,7 +291,9 @@ public class PetriNet extends PetriNetObject {
         return transactions.values().stream()
                 .filter(transaction ->
                         transaction.getTransitions().contains(transition.getStringId())
-                ).findAny().orElse(null);
+                )
+                .findAny()
+                .orElse(null);
     }
 
     public List<Field<?>> getImmediateFields() {
@@ -352,26 +353,30 @@ public class PetriNet extends PetriNetObject {
     }
 
     private List<Action> getPreCaseActions(CaseEventType type) {
-        if (caseEvents.containsKey(type))
+        if (caseEvents.containsKey(type)) {
             return caseEvents.get(type).getPreActions();
+        }
         return new LinkedList<>();
     }
 
     private List<Action> getPostCaseActions(CaseEventType type) {
-        if (caseEvents.containsKey(type))
+        if (caseEvents.containsKey(type)) {
             return caseEvents.get(type).getPostActions();
+        }
         return new LinkedList<>();
     }
 
     private List<Action> getPreProcessActions(ProcessEventType type) {
-        if (processEvents.containsKey(type))
+        if (processEvents.containsKey(type)) {
             return processEvents.get(type).getPreActions();
+        }
         return new LinkedList<>();
     }
 
     private List<Action> getPostProcessActions(ProcessEventType type) {
-        if (processEvents.containsKey(type))
+        if (processEvents.containsKey(type)) {
             return processEvents.get(type).getPostActions();
+        }
         return new LinkedList<>();
     }
 

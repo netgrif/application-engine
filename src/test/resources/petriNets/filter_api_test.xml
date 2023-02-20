@@ -90,14 +90,18 @@
 					def item
 
 					if (group.value) {
-						item = createMenuItem(uri.value.value, identifier.value.value,
+						item = createMenuItem(
+								uri.value.value,
+								identifier.value.value,
 								filter,
 								group.value.value,
 								["role_1": "netgrif/test/filter_api_test"],
 								[:]
 						)
 					} else {
-						item = createMenuItem(uri.value.value, identifier.value.value,
+						item = createMenuItem(
+								uri.value.value,
+								identifier.value.value,
 								filter,
 								["role_1": "netgrif/test/filter_api_test"],
 								[:]

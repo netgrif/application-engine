@@ -162,7 +162,7 @@ public class WorkflowController {
     })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
             Case aCase = workflowService.findOne(caseId);
             taskService.reloadTasks(aCase);
 
@@ -177,19 +177,14 @@ public class WorkflowController {
     @Operation(summary = "Delete case", security = {@SecurityRequirement(name = "BasicAuth")})
     @DeleteMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            DeleteCaseEventOutcome outcome;
-            if (deleteSubtree) {
-                outcome = workflowService.deleteSubtreeRootedAt(caseId);
-            } else {
-                outcome = workflowService.deleteCase(caseId);
-            }
-            return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted", outcome);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Deleting case [" + caseId + "] failed:", e);
-            return EventOutcomeWithMessageResource.errorMessage("Deleting case " + caseId + " has failed!");
+        caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8);
+        DeleteCaseEventOutcome outcome;
+        if (deleteSubtree) {
+            outcome = workflowService.deleteSubtreeRootedAt(caseId);
+        } else {
+            outcome = workflowService.deleteCase(caseId);
         }
+        return EventOutcomeWithMessageResource.successMessage("Case " + caseId + " was deleted", outcome);
     }
 
     @Operation(summary = "Download case file field value", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -197,8 +192,9 @@ public class WorkflowController {
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
 
-        if (fileFieldInputStream.getInputStream() == null)
+        if (FileFieldInputStream.isEmpty(fileFieldInputStream)) {
             throw new FileNotFoundException("File in field " + fieldId + " within case " + caseId + " was not found!");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -215,8 +211,7 @@ public class WorkflowController {
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
 
-        // TODO: NAE-1645 FileListFieldTest#downloadFileByCaseAndName - "fileFieldInputStream" is null
-        if (fileFieldInputStream.getInputStream() == null) {
+        if (FileFieldInputStream.isEmpty(fileFieldInputStream)) {
             throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within case " + caseId + " was not found!");
         }
 

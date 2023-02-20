@@ -21,4 +21,8 @@ public class FileFieldInputStream {
         this.inputStream = inputStream;
         this.fileName = field.getValue().getValue().getName();
     }
+
+    public static boolean isEmpty(FileFieldInputStream stream) {
+        return stream == null || stream.inputStream == null;
+    }
 }
