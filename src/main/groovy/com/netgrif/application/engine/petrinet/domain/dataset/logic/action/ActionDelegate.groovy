@@ -38,7 +38,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.rules.domain.RuleRepository
 import com.netgrif.application.engine.startup.DefaultFiltersRunner
 import com.netgrif.application.engine.startup.FilterRunner
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.*
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
@@ -74,7 +73,6 @@ import java.util.stream.Collectors
 /**
  * ActionDelegate class contains Actions API methods.
  */
-// TODO: NAE-1645 6.2.5 staticcompile
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
@@ -296,14 +294,6 @@ class ActionDelegate {
         return initValueOfField(field)
     }
 
-    void setValue(String fieldId, Object value) {
-
-    }
-
-    void setValue(Field field, Object value) {
-
-    }
-
     /**
      * Changes behavior of a given field on given transition (transitions) or on each transition containing a field if certain condition is being met.
      * <br>
@@ -339,42 +329,13 @@ class ActionDelegate {
      * @param field which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
-    def make(Field field, Closure behavior) {
-        def behaviorClosureResult
-
+    def make(Field<?> field, Closure<DataFieldBehavior> behavior) {
         [on: { Object transitionObject ->
             [when: { Closure condition ->
-                if (condition()) {
-                    if (transitionObject instanceof Transition) {
-                        behaviorClosureResult = behavior(field, transitionObject)
-                        saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
-                    } else if (transitionObject instanceof List<?>) {
-                        transitionObject.each { trans ->
-                            if (trans instanceof Transition) {
-                                if (trans.dataSet.containsKey(field.stringId)) {
-                                    behaviorClosureResult = behavior(field, trans)
-                                    saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
-                                }
-                            } else {
-                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
-                            }
-                        }
-                    } else if (transitionObject instanceof Closure) {
-                        if (transitionObject == transitions) {
-                            useCase.petriNet.transitions.each { transitionEntry ->
-                                Transition trans = transitionEntry.value
-                                if (trans.dataSet.containsKey(field.stringId)) {
-                                    behaviorClosureResult = behavior(field, trans)
-                                    saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
-                                }
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
-                    }
+                if (!condition()) {
+                    return
                 }
+                makeFieldBehaveOnTransition(field, behavior, transitionObject)
             }]
         }]
     }
@@ -417,89 +378,54 @@ class ActionDelegate {
      * @param list of fields which behaviour will be changed
      * @param behavior one of initial, visible, editable, required, optional, hidden, forbidden
      */
-    def make(List<Field> fields, Closure behavior) {
-        def behaviorClosureResult
-
+    def make(List<Field<?>> fields, Closure behavior) {
         [on: { Object transitionObject ->
             [when: { Closure condition ->
-                if (condition()) {
-                    // TODO: NAE-1645
-                    if (transitionObject instanceof Transition) {
-                        fields.forEach { field ->
-                            behaviorClosureResult = behavior(field, transitionObject)
-                            saveFieldBehavior(field, transitionObject, (behavior == initial) ? behaviorClosureResult as Set : null)
-                        }
-                    } else if (transitionObject instanceof List<?>) {
-                        transitionObject.each { trans ->
-                            if (trans instanceof Transition) {
-                                fields.each { field ->
-                                    if (trans.dataSet.containsKey(field.stringId)) {
-                                        behaviorClosureResult = behavior(field, trans)
-                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
-                                    }
-                                }
-                            } else {
-                                throw new IllegalArgumentException("Invalid call of make method. Method call should contain a list of transitions.")
-                            }
-                        }
-                    } else if (transitionObject instanceof Closure) {
-                        if (transitionObject == transitions) {
-                            useCase.petriNet.transitions.each { transitionEntry ->
-                                Transition trans = transitionEntry.value
-                                fields.each { field ->
-                                    if (trans.dataSet.containsKey(field.stringId)) {
-                                        behaviorClosureResult = behavior(field, trans)
-                                        saveFieldBehavior(field, trans, (behavior == initial) ? behaviorClosureResult as Set : null)
-                                    }
-                                }
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
-                    }
+                if (!condition()) {
+                    return
+                }
+                fields.forEach { field ->
+                    makeFieldBehaveOnTransition(field, behavior, transitionObject)
                 }
             }]
         }]
     }
 
+    void makeFieldBehaveOnTransition(Field<?> field, Closure behavior, Object transitionObject) {
+        if (transitionObject instanceof Transition) {
+            changeBehaviourAndSave(field, behavior, transitionObject)
+        } else if (transitionObject instanceof Collection<Transition>) {
+            transitionObject.each { trans ->
+                changeBehaviourAndSave(field, behavior, trans)
+            }
+        } else if (transitionObject instanceof Closure && transitionObject == transitions) {
+            useCase.petriNet.transitions.each { transitionEntry ->
+                changeBehaviourAndSave(field, behavior, transitionEntry.value)
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid call of make method. Method call should contain specific transition (transitions) or keyword \'transitions\'.")
+        }
+    }
+
+    SetDataEventOutcome setData(Field<?> field, Map changes) {
+        SetDataEventOutcome outcome = dataService.setData(useCase, new DataSet([
+                (field.stringId): field.class.newInstance(changes)
+        ] as Map<String, Field<?>>))
+        this.outcomes.add(outcome)
+        updateCase()
+        return outcome
+    }
+
+    void changeBehaviourAndSave(Field<?> field, Closure<DataFieldBehavior> behavior, Transition trans) {
+        if (!trans.dataSet.containsKey(field.stringId)) {
+            return
+        }
+        behavior(field, trans)
+        setData(field, [behaviors: useCase.dataSet.get(field.importId).behaviors])
+    }
+
     protected SetDataEventOutcome createSetDataEventOutcome() {
         return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
-    }
-
-    def saveFieldBehavior(Field field, Transition trans, Set<FieldBehavior> initialBehavior) {
-//        DataFieldBehavior fieldBehavior = useCase.dataSet.get(field.stringId).behaviors
-//        if (initialBehavior != null) {
-//            fieldBehavior.put(trans.stringId, initialBehavior)
-//        }
-//        TODO: NAE-1645
-//        DataField changedField = new DataField(field.stringId)
-//        changedField.setBehavior(fieldBehavior)
-        SetDataEventOutcome outcome = createSetDataEventOutcome()
-        outcome.addChangedField(field.stringId, field)
-        this.outcomes.add(outcome)
-    }
-
-    def saveChangedChoices(ChoiceField field) {
-        this.outcomes.add(dataService.setData(useCase, new DataSet([
-                (field.stringId): field.class.newInstance(choices: field.choices)
-        ] as Map<String, Field<?>>)))
-        useCase = workflowService.findOne(useCase.stringId)
-    }
-
-    def saveChangedAllowedNets(CaseField field) {
-        this.outcomes.add(dataService.setData(useCase, new DataSet([
-                (field.stringId): field.class.newInstance(allowedNets: field.allowedNets)
-        ] as Map<String, Field<?>>)))
-        useCase = workflowService.findOne(useCase.stringId)
-    }
-
-    def saveChangedOptions(MapOptionsField field) {
-        this.outcomes.add(dataService.setData(useCase, new DataSet([
-                (field.stringId): field.class.newInstance(options: field.options)
-        ] as Map<String, Field<?>>)))
-        useCase = workflowService.findOne(useCase.stringId)
     }
 
     def saveChangedValidation(Field field) {
@@ -593,7 +519,7 @@ class ActionDelegate {
              } else {
                  field.setChoicesFromStrings(values as Set<String>)
              }
-             saveChangedChoices(field)
+             setData(field, [choices: field.choices])
          },
          allowedNets: { cl ->
              if (!(field instanceof CaseField)) {// TODO make this work with FilterField as well
@@ -601,7 +527,7 @@ class ActionDelegate {
              }
              def allowedNets = cl()
              if (allowedNets instanceof Closure && allowedNets() == UNCHANGED_VALUE) {
-                return
+                 return
              }
              field = (CaseField) field
              if (allowedNets == null) {
@@ -611,7 +537,7 @@ class ActionDelegate {
              } else {
                  return
              }
-             saveChangedAllowedNets(field)
+             setData(field, [allowedNets: field.allowedNets])
          },
          options    : { cl ->
              if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField
@@ -633,7 +559,7 @@ class ActionDelegate {
                      options.each { it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String)) }
                      field.setOptions(newOptions)
                  }
-                 saveChangedOptions(field)
+                 setData(field, [options: field.options])
              } else if (field instanceof ChoiceField) {
                  field = (ChoiceField) field
                  if (options.every { it.getValue() instanceof I18nString }) {
@@ -645,7 +571,7 @@ class ActionDelegate {
                      options.each { it -> newChoices.add(new I18nString(it.getValue() as String)) }
                      field.setChoices(newChoices)
                  }
-                 saveChangedChoices(field)
+                 setData(field, [choices: field.choices])
              }
 
          },
@@ -675,10 +601,7 @@ class ActionDelegate {
             if (field instanceof FileField && task.isPresent()) {
                 dataService.deleteFile(task.get().stringId, field.stringId)
             }
-            this.outcomes.add(dataService.setData(useCase, new DataSet([
-                    (field.stringId): field.class.newInstance(rawValue: null)
-            ] as Map<String, Field<?>>)))
-            useCase = workflowService.findOne(useCase.stringId)
+            setData(field, [rawValue: null])
         }
         if (value != null) {
             // TODO: NAE-1645 should be in data service
@@ -697,10 +620,7 @@ class ActionDelegate {
             if (value instanceof GString) {
                 value = value.toString()
             }
-            this.outcomes.add(dataService.setData(useCase, new DataSet([
-                    (field.stringId): field.class.newInstance(rawValue: value)
-            ] as Map<String, Field<?>>)))
-            useCase = workflowService.findOne(useCase.stringId)
+            setData(field, [rawValue: value])
         }
     }
 
@@ -1475,6 +1395,7 @@ class ActionDelegate {
      * @param filter
      * @return
      */
+    // TODO: NAE-1645: missing test on changeFilter action?
     def changeFilter(Case filter) {
         [query         : { cl ->
             updateFilter(filter, [
@@ -1516,7 +1437,7 @@ class ActionDelegate {
              filter = workflowService.findOne(filter.stringId)
              def value = cl()
              filter.setTitle(value as String)
-             filter.dataSet[DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID].value = (value instanceof I18nString) ? value : new I18nString(value as String)
+             filter.dataSet.get(DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID).rawValue = (value instanceof I18nString) ? value : new I18nString(value as String)
              workflowService.save(filter)
          },
          icon          : { cl ->
@@ -1628,6 +1549,7 @@ class ActionDelegate {
          }]
     }
 
+    // TODO: NAE-1645: missing test
     private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
@@ -1862,6 +1784,6 @@ class ActionDelegate {
         if (!useCase) {
             return
         }
-        this.useCase = workflowService.findOne(useCase.stringId)
+        useCase = workflowService.findOne(useCase.stringId)
     }
 }

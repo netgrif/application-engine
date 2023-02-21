@@ -180,9 +180,8 @@ class ChangeBehaviorTest {
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
-
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == EDITABLE
-        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required
+        assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required == true
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: false)
@@ -190,7 +189,6 @@ class ChangeBehaviorTest {
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == false
-
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).behavior == VISIBLE
         assert testCase.dataSet.get(TEXT_0_FIELD_ID).behaviors.get(MAIN_TRANSITION).required == false
     }

@@ -7,6 +7,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapFiel
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class MultichoiceMapFieldBuilder extends FieldBuilder<MultichoiceMapField> {
@@ -17,9 +18,11 @@ public class MultichoiceMapFieldBuilder extends FieldBuilder<MultichoiceMapField
         initialize(field);
         setFieldOptions(field, data, importer);
         setDefaultValues(field, data, init -> {
+            Set<String> defaultValue = new HashSet<>();
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(new HashSet<>(init));
+                defaultValue.addAll(init);
             }
+            field.setDefaultValue(defaultValue);
         });
         return field;
     }
