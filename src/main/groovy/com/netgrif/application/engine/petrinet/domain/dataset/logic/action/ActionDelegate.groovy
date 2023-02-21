@@ -962,7 +962,7 @@ class ActionDelegate {
         } else {
             String taskId = targetCase.getTasks().find(taskPair -> taskPair.transition == targetTransitionId).task
             DataSet dataSet = new DataSet([
-                    targetFieldId: new FileField(rawValue: fieldValue)
+                    (targetFieldId): new FileField(rawValue: fieldValue)
             ] as Map<String, Field<?>>)
             setData(taskId, dataSet)
         }
