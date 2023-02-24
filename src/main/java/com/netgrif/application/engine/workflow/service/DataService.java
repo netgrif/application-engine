@@ -108,7 +108,7 @@ public class DataService implements IDataService {
             if (behavior.isForbidden()) {
                 return;
             }
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
 
             if (outcome.getMessage() == null) {
@@ -118,7 +118,7 @@ public class DataService implements IDataService {
             dataRef.setFieldId(fieldId);
             dataRef.setBehavior(behavior);
             dataSetFields.add(dataRef);
-            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task));
+            outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null));
             historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST));
         });
 
@@ -152,11 +152,10 @@ public class DataService implements IDataService {
             Field<?> newDataField = stringFieldEntry.getValue();
             outcome.addOutcome(setDataField(task, fieldId, newDataField));
         }
-//        updateDataset(useCase);
-//        outcome.setCase(workflowService.save(useCase));
         return outcome;
     }
 
+    @Override
     public SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField) {
         Case useCase = workflowService.findOne(task.getCaseId());
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
@@ -166,7 +165,7 @@ public class DataService implements IDataService {
         }
         Field<?> field = fieldOptional.get();
         // PRE
-        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task));
+        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField));
         useCase = workflowService.findOne(task.getCaseId());
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
         // EXECUTION
@@ -178,7 +177,7 @@ public class DataService implements IDataService {
         outcome.addChangedField(fieldId, newDataField);
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
         // POST
-        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task));
+        outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField));
         useCase = workflowService.findOne(task.getCaseId());
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
 
@@ -479,8 +478,10 @@ public class DataService implements IDataService {
     }
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {
-        List<EventOutcome> outcomes = new ArrayList<>(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask));
-        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask));
+        List<EventOutcome> outcomes = new ArrayList<>();
+        // TODO: NAE-1645 changed value
+        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask, null));
+        outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask, null));
         updateDataset(useCase);
         workflowService.save(useCase);
         return outcomes;
@@ -642,8 +643,8 @@ public class DataService implements IDataService {
         });
     }
 
-    private List<EventOutcome> resolveDataEvents(Field<?> field, DataEventType trigger, EventPhase phase, Case useCase, Task task) {
-        return eventService.processDataEvents(field, trigger, phase, useCase, task);
+    private List<EventOutcome> resolveDataEvents(Field<?> field, DataEventType trigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField) {
+        return eventService.processDataEvents(field, trigger, phase, useCase, task, newDataField);
     }
 
     @Override

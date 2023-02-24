@@ -29,6 +29,7 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.ActionContext
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -190,13 +191,15 @@ class ActionDelegate {
     Optional<Task> task
     def map = [:]
     Action action
+    Field<?> fieldChanges
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
-    def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
+    def init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
         this.action = action
         this.useCase = useCase
         this.task = task
+        this.fieldChanges = fieldChanges
         this.actionsRunner = actionsRunner
         this.initFieldsMap(action.fieldIds, useCase)
         this.initTransitionsMap(action.transitionIds)

@@ -54,6 +54,8 @@ public interface IDataService {
 
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name);
 
+    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField);
+
     GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale);
 
     Page<Task> setImmediateFields(Page<Task> tasks);

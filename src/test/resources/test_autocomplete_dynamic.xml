@@ -14,9 +14,11 @@
         <action trigger="set">
             <!-- @formatter:off -->
             field: f.autocomplete;
-            change field choices {
-                def value = field.value.value.toString()
-                return findCases { it.title.contains(value) }.collect({it.title})
+            if (fieldChanges.value) {
+                change field choices {
+                    def value = field.value.value.toString()
+                    return findCases { it.title.contains(value) }.collect({it.title})
+                }
             }
             <!-- @formatter:on -->
         </action>

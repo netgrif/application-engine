@@ -26,11 +26,8 @@ public class EventService implements IEventService {
 
     private final FieldActionsRunner actionsRunner;
 
-    private final IWorkflowService workflowService;
-
-    public EventService(FieldActionsRunner actionsRunner, IWorkflowService workflowService) {
+    public EventService(FieldActionsRunner actionsRunner) {
         this.actionsRunner = actionsRunner;
-        this.workflowService = workflowService;
     }
 
     @Override
@@ -48,7 +45,7 @@ public class EventService implements IEventService {
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, null, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
                     .forEach(outcome -> {
                         if (((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty()) {
@@ -58,20 +55,14 @@ public class EventService implements IEventService {
                     });
             allOutcomes.addAll(outcomes);
         });
-//        if (useCase != null) {
-//            Case latest = workflowService.findOne(useCase.getStringId());
-//            useCase.setTasks(latest.getTasks());
-//            useCase.setActivePlaces(latest.getActivePlaces());
-//            workflowService.save(useCase);
-//        }
         return allOutcomes;
     }
 
     @Override
-    public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
+    public List<EventOutcome> runEventActions(Case useCase, Task task, Field<?> newDataField, List<Action> actions, DataEventType trigger) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
         actions.forEach(action -> {
-            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
+            List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream()
                     .filter(SetDataEventOutcome.class::isInstance)
                     .filter(outcome -> !((SetDataEventOutcome) outcome).getChangedFields().getFields().isEmpty())
@@ -82,7 +73,7 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task) {
+    public List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField) {
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null && field.getEvents().containsKey(actionTrigger)) {
             fieldActions.addAll(DataRef.getEventAction(field.getEvents().get(actionTrigger), phase));
@@ -97,7 +88,7 @@ public class EventService implements IEventService {
         if (fieldActions.isEmpty()) {
             return Collections.emptyList();
         }
-        return runEventActions(useCase, task, fieldActions, actionTrigger);
+        return runEventActions(useCase, task, newDataField, fieldActions, actionTrigger);
     }
 
     @Override
@@ -112,8 +103,9 @@ public class EventService implements IEventService {
                     String fieldId = entry.getKey();
                     Field<?> field = outcome.getCase().getDataSet().get(fieldId);
                     log.info("[" + outcome.getCase().getStringId() + "] " + outcome.getCase().getTitle() + ": Running actions on changed field " + fieldId);
-                    outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask()));
-                    outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask()));
+                    // TODO: NAE-1645 changed fields
+                    outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.PRE, outcome.getCase(), outcome.getTask(), null));
+                    outcome.addOutcomes(processDataEvents(field, trigger, EventPhase.POST, outcome.getCase(), outcome.getTask(), null));
                 });
     }
 }

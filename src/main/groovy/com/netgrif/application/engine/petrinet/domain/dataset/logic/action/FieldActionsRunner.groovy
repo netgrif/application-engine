@@ -4,6 +4,7 @@ import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.petrinet.domain.Function
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
@@ -29,17 +30,17 @@ abstract class FieldActionsRunner {
     private Map<String, Object> actionsCache = new HashMap<>()
 
     List<EventOutcome> run(Action action, Case useCase, List<Function> functions = []) {
-        return run(action, useCase, Optional.empty(), functions)
+        return run(action, useCase, Optional.empty(), null, functions)
     }
 
-    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, List<Function> functions = []) {
+    List<EventOutcome> run(Action action, Case useCase, Optional<Task> task, Field<?> changes, List<Function> functions = []) {
         if (!actionsCache) {
             actionsCache = new HashMap<>()
         }
         log.debug("Action: $action")
         def code = getActionCode(action, functions)
         try {
-            code.init(action, useCase, task, this)
+            code.init(action, useCase, task, changes, this)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")

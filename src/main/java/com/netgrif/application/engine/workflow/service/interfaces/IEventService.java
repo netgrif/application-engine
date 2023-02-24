@@ -21,9 +21,9 @@ public interface IEventService {
 
     List<EventOutcome> runActions(List<Action> actions);
 
-    List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task);
+    List<EventOutcome> processDataEvents(Field<?> field, DataEventType actionTrigger, EventPhase phase, Case useCase, Task task, Field<?> newDataField);
 
-    List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger);
+    List<EventOutcome> runEventActions(Case useCase, Task task, Field<?> newDataField, List<Action> actions, DataEventType trigger);
 
     void runEventActionsOnChanged(Task task, SetDataEventOutcome outcome, DataEventType trigger);
 }
