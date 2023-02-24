@@ -15,6 +15,8 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Field
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.EventNotExecutableException;
@@ -47,6 +49,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,8 +82,17 @@ public class DataService implements IDataService {
     @Autowired
     protected IHistoryService historyService;
 
+    @Autowired
+    protected IPetriNetService petriNetService;
+
+    @Autowired
+    protected IValidationService validation;
+
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
+
+    @Value("${nae.validation.setData.enable:false}")
+    protected boolean validationEnable;
 
     @Override
     public GetDataEventOutcome getData(String taskId) {
@@ -93,6 +105,7 @@ public class DataService implements IDataService {
     @Override
     public GetDataEventOutcome getData(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
+        IUser user = userService.getLoggedOrSystem();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         Map<String, DataRef> dataRefs = transition.getDataSet();
         List<DataRef> dataSetFields = new ArrayList<>();
@@ -109,7 +122,7 @@ public class DataService implements IDataService {
                 return;
             }
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.PRE, useCase, task, null));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.PRE, user));
 
             if (outcome.getMessage() == null) {
                 setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.GET);
@@ -119,7 +132,7 @@ public class DataService implements IDataService {
             dataRef.setBehavior(behavior);
             dataSetFields.add(dataRef);
             outcome.addOutcomes(resolveDataEvents(field, DataEventType.GET, EventPhase.POST, useCase, task, null));
-            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST));
+            historyService.save(new GetDataEventLog(task, useCase, EventPhase.POST, user));
         });
 
         workflowService.save(useCase);
@@ -172,6 +185,11 @@ public class DataService implements IDataService {
         if (outcome.getMessage() == null) {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
+//      TODO: NAE-1645 from 6.3.0: lastModified, validation
+//        dataField.setLastModified(LocalDateTime.now());
+//        if (validationEnable) {
+//            validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
+//        }
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
@@ -182,6 +200,8 @@ public class DataService implements IDataService {
         historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
 
         return outcome;
+
+
     }
 
     private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field<?> field, DataEventType type) {
@@ -544,19 +564,19 @@ public class DataService implements IDataService {
         fout.close();
     }
 
-    private boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+    protected boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
         throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
     }
 
-    private boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
+    protected boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
         throw new UnsupportedOperationException("Upload new files to the remote storage is not implemented yet.");
     }
 
-    private boolean deleteRemote(Case useCase, FileField field) {
+    protected boolean deleteRemote(Case useCase, FileField field) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 
-    private boolean deleteRemote(Case useCase, FileListField field, String name) {
+    protected boolean deleteRemote(Case useCase, FileListField field, String name) {
         throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
     }
 

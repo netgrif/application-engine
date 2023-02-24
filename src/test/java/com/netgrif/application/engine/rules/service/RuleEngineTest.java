@@ -79,6 +79,7 @@ class RuleEngineTest {
         testHelper.truncateDbs();
         ruleRepository.deleteAll();
         factRepository.deleteAll();
+        refreshableKieBase.refresh();
     }
 
     @Test

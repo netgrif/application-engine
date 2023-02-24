@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/elastic")
 @ConditionalOnProperty(
-        value = "",
+        value = "nae.elastic.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
@@ -39,7 +39,7 @@ public class ElasticController {
     private final IWorkflowService workflowService;
     private final ReindexingTask reindexingTask;
 
-    @Value("${spring.data.elasticsearch.reindex-size}")
+    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
     private int pageSize;
 
     public ElasticController(IWorkflowService workflowService, ReindexingTask reindexingTask) {
@@ -47,7 +47,7 @@ public class ElasticController {
         this.reindexingTask = reindexingTask;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Reindex specified cases",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

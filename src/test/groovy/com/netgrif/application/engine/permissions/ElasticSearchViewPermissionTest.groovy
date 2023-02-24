@@ -155,7 +155,15 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        // TODO: NAE-1645 setData, from 6.3.0
+//        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -170,7 +178,15 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet.get("view_ul_neg").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        // TODO: NAE-1645 setdata, from 6.3.0
+//        case_.dataSet.get("view_ul_neg").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_neg": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 
@@ -187,7 +203,15 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        // TODO: NAE-1645 setData from 6.3.0
+//        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "view_ul_pos": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         case_ = workflowService.save(case_)
         sleep(4000)
 

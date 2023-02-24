@@ -303,6 +303,10 @@
 			}
 		</action>
  	</data>
+	<data type="multichoice_map">
+		<id>allowed_nets</id>
+		<title name="allowed_nets">Allowed nets</title>
+	</data>
 
 <!--	<data type="boolean">-->
 <!--		<id>use_i18n</id>-->

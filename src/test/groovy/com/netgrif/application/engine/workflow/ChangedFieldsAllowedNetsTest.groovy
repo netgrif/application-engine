@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.workflow
 
+import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
@@ -32,12 +33,19 @@ class ChangedFieldsAllowedNetsTest {
     private ImportHelper importHelper
 
     @Autowired
+    private TestHelper helper
+
+    @Autowired
     private IDataService dataService
+
+    @Autowired
+    private TestHelper testHelper
 
     private PetriNet net
 
     @BeforeEach
     void beforeAll() {
+        helper.truncateDbs()
         def netOptional = importHelper.createNet("changed_fields_allowed_nets.xml")
         assert netOptional.isPresent()
         net = netOptional.get()

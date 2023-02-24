@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
@@ -37,6 +38,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     @Setter
     protected boolean anonymous;
 
+    @Getter
+    private LoggedUser impersonated;
+
     public LoggedUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
@@ -71,7 +75,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
             role.set_id(roleId);
             return role;
         }).collect(Collectors.toSet()));
-
+        if (this.isImpersonating()) {
+            user.setImpersonated(this.getImpersonated().transformToUser());
+        }
         return user;
     }
 
@@ -80,7 +86,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setEmail(getUsername());
         anonym.setName("Anonymous");
         anonym.setSurname("User");
-        anonym.setPassword(null);
+        anonym.setPassword("n/a");
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
@@ -92,6 +98,23 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return anonym;
     }
 
+    public void impersonate(LoggedUser toImpersonate) {
+        this.impersonated = toImpersonate;
+    }
+
+    public void clearImpersonated() {
+        this.impersonated = null;
+    }
+
+    public boolean isImpersonating() {
+        return this.impersonated != null;
+    }
+
+    @JsonIgnore
+    public LoggedUser getSelfOrImpersonated() {
+        return this.isImpersonating() ? this.impersonated : this;
+    }
+
     @Override
     public String toString() {
         return "LoggedUser{" +
@@ -99,6 +122,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
                 ", fullName='" + fullName + '\'' +
                 ", groups=" + groups +
                 ", processRoles=" + processRoles +
+                ", impersonated=" + impersonated +
                 '}';
     }
 

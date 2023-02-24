@@ -198,7 +198,15 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet.get("pos_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+//        TODO: NAE-1645 setdata from 6.3.0
+//        case_.dataSet.get("pos_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
         workflowService.save(case_)
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -216,8 +224,20 @@ class WorkflowAuthorizationServiceTest {
         userService.addRole(testUser, negDeleteRole.getStringId())
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
-        case_.dataSet.get("pos_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-        case_.dataSet.get("neg_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+//        TODO: NAE-1645 setData from 6.3.0
+//        case_.dataSet.get("pos_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+//        case_.dataSet.get("neg_user_list").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
+                "pos_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ],
+                "neg_user_list": [
+                        "value": [testUser.stringId],
+                        "type": "userList"
+                ]
+        ] as Map)).getCase()
 
         workflowService.save(case_)
 

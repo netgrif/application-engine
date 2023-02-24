@@ -126,6 +126,7 @@
 		<validations>
 			<validation>
 				<expression>email</expression>
+				<message/>
 			</validation>
 		</validations>
 	</data>
@@ -184,8 +185,9 @@
 			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 			assignTask(initTask)
 			setData(initTask, [
-				"filter_case": ["type":"caseRef", "value": [filterAutocomplete.value.value], "allowedNets":["filter"]],
-				"parentId": ["type":"text", "value":useCase.stringId]
+				"filter_case": ["type":"caseRef", "value": [filterAutocomplete.rawValue], "allowedNets":["filter"]],
+				"parentId": ["type":"text", "value":useCase.stringId],
+				"allowed_nets": ["type": "multichoice_map", "value": filterCase.dataSet["allowed_nets"].rawValue]
 			])
 			finishTask(initTask)
 

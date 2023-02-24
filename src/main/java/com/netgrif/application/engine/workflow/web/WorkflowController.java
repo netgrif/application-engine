@@ -52,7 +52,7 @@ import java.util.Locale;
 @RestController()
 @RequestMapping("/api/workflow")
 @ConditionalOnProperty(
-        value = "#{actionsProperties.}",
+        value = "nae.case.web.enabled",
         havingValue = "true",
         matchIfMissing = true
 )
@@ -151,7 +151,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Reload tasks of case",
             description = "Caller must have the ADMIN role",
             security = {@SecurityRequirement(name = "BasicAuth")})

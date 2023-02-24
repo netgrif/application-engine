@@ -19,6 +19,7 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.importer.model.DataType
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -183,6 +184,9 @@ class ActionDelegate {
 
     @Autowired
     IOrsrService orsrService
+
+    @Autowired
+    IImpersonationService impersonationService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -616,7 +620,7 @@ class ActionDelegate {
                 value = value as Double
             }
             if (field instanceof UserListField && (value instanceof String[] || value instanceof List)) {
-                List<UserFieldValue> users = [] as List
+                LinkedHashSet<UserFieldValue> users = new LinkedHashSet<>()
                 value.each { id -> users.add(new UserFieldValue(userService.findById(id as String, false))) }
                 value = new UserListFieldValue(users)
             }
@@ -774,7 +778,7 @@ class ActionDelegate {
     }
 
     Task cancelTask(Task task, IUser user = userService.loggedOrSystem) {
-        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, userService.loggedOrSystem))
+        return addTaskOutcomeAndReturnTask(taskService.cancelTask(task, user))
     }
 
     void cancelTasks(List<Task> tasks, IUser user = userService.loggedOrSystem) {
