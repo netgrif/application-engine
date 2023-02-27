@@ -1,0 +1,552 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>wizard_cron</id>
+	<initials>CRO</initials>
+	<title>Cron Wizard</title>
+	<icon>settings</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseName>Wizard</caseName>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<data type="boolean">
+		<id>active</id>
+		<title>Aktívny</title>
+		<init>false</init>
+	</data>
+	<data type="text">
+		<id>cron_description</id>
+		<title>Cron Description</title>
+	</data>
+	<data type="text">
+		<id>process_id</id>
+		<title>Id procesu</title>
+	</data>
+	<data type="enumeration_map">
+		<id>process_id_map</id>
+		<title>Id procesov</title>
+	</data>
+	<data type="enumeration_map">
+		<id>seconds</id>
+		<title>Sekundy</title>
+	</data>
+	<data type="enumeration_map">
+		<id>minutes</id>
+		<title>Minúty</title>
+	</data>
+	<data type="enumeration_map">
+		<id>hours</id>
+		<title>Hodiny</title>
+	</data>
+	<data type="enumeration_map">
+		<id>day_of_month</id>
+		<title>Deň v mesiaci</title>
+	</data>
+	<data type="enumeration_map">
+		<id>month</id>
+		<title>Mesiac</title>
+	</data>
+	<data type="enumeration_map">
+		<id>day_of_week</id>
+		<title>Deň v týždni</title>
+	</data>
+	<data type="boolean">
+		<id>edit_description_manually</id>
+		<title>Upraviť cron manuálne</title>
+		<init>false</init>
+	</data>
+	<data type="text">
+		<id>log_text</id>
+		<title>Log</title>
+	</data>
+	<transition>
+		<id>init</id>
+		<x>220</x>
+		<y>460</y>
+		<label>Základné údaje</label>
+		<icon>create</icon>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>init_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>cron_description</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>process_id_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>autocomplete</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>seconds</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>minutes</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>hours</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>day_of_month</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>month</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>day_of_week</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>5</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>edit_description_manually</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>enable_description</id>
+					<actions phase="pre">
+						<action>
+							edit_description_manually: f.edit_description_manually,
+							cron_description: f.cron_description,
+							trans: t.this;
+
+							make cron_description, editable on trans when { edit_description_manually.value == false }
+							make cron_description, visible on trans when { edit_description_manually.value == true }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>init_assign</id>
+			<actions phase="pre">
+				<action>
+					process_id_map: f.process_id_map;
+
+					def nets = petriNetService.getAll()
+					def netOptions = [:]
+					nets.each{ netOptions.put(it.importId, it.title) }
+
+					change process_id_map options { netOptions }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>activate</id>
+		<x>500</x>
+		<y>460</y>
+		<label>Aktivovať</label>
+		<icon>toggle_on</icon>
+		<assignPolicy>auto</assignPolicy>
+		<finishPolicy>auto_no_data</finishPolicy>
+		<event type="finish">
+			<id>activate_finish</id>
+			<actions phase="pre">
+				<action id="createJob">
+					cronJobService.createJob(useCase)
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>log</id>
+		<x>660</x>
+		<y>580</y>
+		<label>Log</label>
+		<layout type="legacy"/>
+		<icon>format_align_justify</icon>
+		<dataGroup>
+			<id>log_group</id>
+			<layout>legacy</layout>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>log_text</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>deactivate</id>
+		<x>500</x>
+		<y>340</y>
+		<label>Deaktivovať</label>
+		<icon>toggle_off</icon>
+		<assignPolicy>auto</assignPolicy>
+		<finishPolicy>auto_no_data</finishPolicy>
+		<event type="finish">
+			<id>deactivate_finish</id>
+			<actions phase="pre">
+				<action>
+					cronJobService.deactivateJob(useCase)
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>edit</id>
+		<x>340</x>
+		<y>340</y>
+		<label>Upraviť</label>
+		<icon>create</icon>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>edit_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>cron_description</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>process_id_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>autocomplete</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>seconds</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>minutes</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>hours</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>day_of_month</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>month</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>day_of_week</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>5</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>edit_description_manually</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>enable_description</id>
+					<actions phase="pre">
+						<action>
+							edit_description_manually: f.edit_description_manually,
+							cron_description: f.cron_description,
+							trans: t.this;
+
+							make cron_description, editable on trans when { edit_description_manually.value == false }
+							make cron_description, visible on trans when { edit_description_manually.value == true }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>delete</id>
+		<x>340</x>
+		<y>580</y>
+		<label>Odstrániť</label>
+		<event type="finish">
+			<id>delete_finish</id>
+			<actions phase="post">
+				<action>
+					async.run {
+						workflowService.deleteCase(useCase.stringId)
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>100</x>
+		<y>460</y>
+		<label>init</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>340</x>
+		<y>460</y>
+		<label>Pravidlo neaktívne</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>660</x>
+		<y>460</y>
+		<label>Pravidlo aktívne</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>init</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>activate</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>activate</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>deactivate</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>regular</type>
+		<sourceId>deactivate</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>read</type>
+		<sourceId>p3</sourceId>
+		<destinationId>log</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>edit</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>edit</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>delete</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
