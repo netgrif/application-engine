@@ -67,6 +67,7 @@ public class Importer {
     protected PetriNet net;
     protected ProcessRole defaultRole;
     protected ProcessRole anonymousRole;
+
     @Getter
     protected Map<String, ProcessRole> roles;
     protected Map<String, Field> fields;
@@ -924,7 +925,7 @@ public class Importer {
     protected String buildActionId(String importedActionId) {
         String sanitizedImportedId;
         if (importedActionId != null) {
-            if (actions.containsKey(this.net.getIdentifier() + "-" + importedActionId)) {
+            if (actions.containsKey(this.net.getIdentifier() + "-" + this.net.getVersion().toString() + "-" + importedActionId)) {
                 throw new IllegalArgumentException("Duplicate action id, action with id [" + importedActionId + "] already exists in petri net with identifier [" + this.net.getIdentifier() + "]");
             }
             sanitizedImportedId = importedActionId;

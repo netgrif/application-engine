@@ -14,10 +14,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import java.util.ArrayList;
 
 @Slf4j
 @Component
@@ -33,16 +32,24 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+        String key = details.getRemoteAddress();
+        if (loginAttemptService.isBlocked(key)) {
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
         String name = authentication.getName();
         User user = userRepository.findByEmail(name);
         if (user == null) {
             log.debug("User not found");
+            loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
         String presentedPassword = authentication.getCredentials().toString();
         if (!this.passwordEncoder.matches(presentedPassword, user.getPassword())) {
             log.debug("Failed to authenticate since password does not match stored value");
+            loginAttemptService.loginFailed(key);
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
@@ -51,7 +58,7 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
 
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails, presentedPassword, userDetails.getAuthorities());
         result.setDetails(authentication.getDetails());
-
+        loginAttemptService.loginSucceeded(user.getStringId());
         return result;
     }
 
