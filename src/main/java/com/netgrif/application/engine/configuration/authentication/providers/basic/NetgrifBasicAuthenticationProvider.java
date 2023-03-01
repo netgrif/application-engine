@@ -34,6 +34,10 @@ public class NetgrifBasicAuthenticationProvider extends NetgrifAuthenticationPro
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         String key = details.getRemoteAddress();
+        if(key == null){
+            throw new BadCredentialsException(this.messages
+                    .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+        }
         if (loginAttemptService.isBlocked(key)) {
             throw new BadCredentialsException(this.messages
                     .getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
