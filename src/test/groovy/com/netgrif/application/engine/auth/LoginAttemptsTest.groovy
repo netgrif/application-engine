@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.configuration.properties.SecurityLimitsProperties
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.startup.ImportHelper
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +34,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @ExtendWith(SpringExtension.class)
 class LoginAttemptsTest {
 
-
     public static final String USER_EMAIL = "test@mail.sk"
     public static final String USER_PASSWORD = "password"
     public static final String USER_BAD_PASSWORD = "totok"
@@ -50,6 +50,8 @@ class LoginAttemptsTest {
     @Autowired
     private ImportHelper importHelper
 
+    @Autowired
+    private SecurityLimitsProperties securityLimitsProperties;
 
     @BeforeEach
     void before() {
@@ -176,7 +178,7 @@ class LoginAttemptsTest {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn()
         assert result
-        sleep(5000) //Wait
+        sleep(securityLimitsProperties.getLoginTimeoutUnit().toMillis(securityLimitsProperties.getLoginTimeout())+2000) //Wait
         //UNBLOCK user
         result = mvc.perform(MockMvcRequestBuilders.get(LOGIN_URL)
                 .accept(MediaTypes.HAL_JSON_VALUE)
