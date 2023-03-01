@@ -135,6 +135,9 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         String key = details.getRemoteAddress();
+        if (key == null) {
+            throw new BadCredentialsException("Bad credentials");
+        }
         final UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
 
         String username = userToken.getName();
