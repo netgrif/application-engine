@@ -876,6 +876,7 @@ public class Importer {
         }
     }
 
+    // TODO: NAE-1645 add atribute "type" to set actions
     protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         action.setImportId(buildActionId(importedAction.getId()));

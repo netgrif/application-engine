@@ -3,12 +3,17 @@ package com.netgrif.application.engine.validation
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
+import com.netgrif.application.engine.petrinet.domain.dataset.DateField
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -84,7 +89,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text01": ["type": "text", "value": "test@netgrif.com"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text01": new TextField(rawValue: "test@netgrif.com")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -96,7 +101,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text01": ["type": "text", "value": "test@netgrif.co.com"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text01": new TextField(rawValue: "test@netgrif.co.com")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -108,7 +113,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text01": ["type": "text", "value": "te.st@netgrif.co.com"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text01": new TextField(rawValue: "te.st@netgrif.co.com")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -121,7 +126,7 @@ class ValidationTest {
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["text01": ["type": "text", "value": "test@@aaa.com"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["text01": new TextField(rawValue: "test@@aaa.com")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -137,7 +142,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["text01": ["type": "text", "value": "test@aaa.s"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["text01": new TextField(rawValue: "test@aaa.s")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -151,7 +156,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text02": ["type": "text", "value": "+421 000 000 000"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text02": new TextField(rawValue: "+421 000 000 000")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -163,7 +168,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text02": ["type": "text", "value": "+421-000-000-000"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text02": new TextField(rawValue: "+421-000-000-000")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -175,7 +180,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text02": ["type": "text", "value": "0910-000-000"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text02": new TextField(rawValue: "0910-000-000")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -187,7 +192,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["text02": ["type": "text", "value": "0910000000"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["text02": new TextField(rawValue: "0910000000")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -201,7 +206,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["text02": ["type": "text", "value": "aaa 000 000 000"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["text02": new TextField(rawValue: "aaa 000 000 000")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -215,7 +220,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex01": ["type": "text", "value": "12345"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex01": new TextField(rawValue: "12345")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -227,7 +232,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex02": ["type": "text", "value": "AbC-012-Z9"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex02": new TextField(rawValue: "AbC-012-Z9")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -239,7 +244,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex03": ["type": "text", "value": "TOTOK4EveR09"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex03": new TextField(rawValue: "TOTOK4EveR09")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -251,7 +256,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex04": ["type": "text", "value": "AA 09 bb"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex04": new TextField(rawValue: "AA 09 bb")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -263,7 +268,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex05": ["type": "text", "value": "A(:?BB+ľščťžýáíééé===é/*-+12154 ô/[]??.!\\.-úaa<>4 MM adsa!!; ff @#&"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex05": new TextField(rawValue: "A(:?BB+ľščťžýáíééé===é/*-+12154 ô/[]??.!\\.-úaa<>4 MM adsa!!; ff @#&")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -275,7 +280,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex05": ["type": "text", "value": "    "]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex05": new TextField(rawValue: "    ")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -287,7 +292,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "Toto00okJeTest012@netgrif.com"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "Toto00okJeTest012@netgrif.com")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -299,7 +304,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "e-mail.totok@netgrif.com"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "e-mail.totok@netgrif.com")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -311,7 +316,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "totok@az.sk.so"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "totok@az.sk.so")]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -325,7 +330,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex01": ["type": "text", "value": "54544545454"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex01": new TextField(rawValue: "54544545454")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -341,7 +346,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex01": ["type": "text", "value": ""]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex01": new TextField(rawValue: "")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -357,7 +362,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex01": ["type": "text", "value": "aav"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex01": new TextField(rawValue: "aav")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -373,7 +378,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex02": ["type": "text", "value": "AAAAAAAAAAAAAaaaaaaaaaa"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex02": new TextField(rawValue: "AAAAAAAAAAAAAaaaaaaaaaa")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -389,7 +394,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex02": ["type": "text", "value": "AAAAAAA??a"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex02": new TextField(rawValue: "AAAAAAA??a")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -405,7 +410,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex02": ["type": "text", "value": "-"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex02": new TextField(rawValue: "-")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -421,7 +426,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex03": ["type": "text", "value": "aaaTOTOKaa1231"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex03": new TextField(rawValue: "aaaTOTOKaa1231")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -437,7 +442,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex03": ["type": "text", "value": "TOTOK"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex03": new TextField(rawValue: "TOTOK")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -453,7 +458,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex03": ["type": "text", "value": "TOTOK4EveR0!"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex03": new TextField(rawValue: "TOTOK4EveR0!")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -469,7 +474,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex04": ["type": "text", "value": "5412122121212121"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex04": new TextField(rawValue: "5412122121212121")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -485,7 +490,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex05": ["type": "text", "value": ""]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex05": new TextField(rawValue: "")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -501,7 +506,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "aaa@@@aaa.ss"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "aaa@@@aaa.ss")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -517,7 +522,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "aaa@aa"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "aaa@aa")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -533,7 +538,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "@aa.sk"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "@aa.sk")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -549,7 +554,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["regex06": ["type": "text", "value": "tot  ok@az.sk.so"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["regex06": new TextField(rawValue: "tot  ok@az.sk.so")]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -564,7 +569,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["boolean_0": ["type": "boolean", "value": "true"]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue:true)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -578,7 +583,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["boolean_0": ["type": "boolean", "value": "false"]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue:false)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -594,7 +599,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["boolean_0": ["type": "boolean", "value": null]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["boolean_0": new BooleanField(rawValue: null)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -609,8 +614,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        importHelper.setTaskData(task.getStringId(), ["date01": ["type": "date", "value": today.toDate()]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date01": new DateField(rawValue: LocalDate.now())]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -622,9 +626,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        today = today.plusDays(1)
-        importHelper.setTaskData(task.getStringId(), ["date01": ["type": "date", "value": today.toDate()]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date01": new DateField(rawValue: LocalDate.now().plusDays(1))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -636,12 +638,8 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        today = today.minusDays(1)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["date01": ["type": "date", "value": text]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date01": new DateField(rawValue: LocalDate.now().minusDays(1))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -655,8 +653,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        importHelper.setTaskData(task.getStringId(), ["date02": ["type": "date", "value": today.toDate()]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date02": new DateField(rawValue: LocalDate.now())]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -668,11 +665,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        today = today.minusDays(1)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date02": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date02": new DateField(rawValue: LocalDate.now().minusDays(1))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -684,12 +677,8 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        today = today.plusDays(1)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["date02": ["type": "date", "value": text]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date02": new DateField(rawValue: LocalDate.now().plusDays(1))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -703,10 +692,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date03": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date03": new DateField(rawValue: LocalDate.of(2020, 3, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -718,10 +704,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date03": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date03": new DateField(rawValue: LocalDate.now())]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -733,12 +716,8 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = LocalDate.now()
-        today = today.plusDays(1)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["date03": ["type": "date", "value": text]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date03": new DateField(rawValue: LocalDate.now().plusDays(1))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -752,10 +731,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date04": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date04": new DateField(rawValue: LocalDate.of(2020, 3, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -767,9 +743,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
-        today = today.minusDays(1)
-        importHelper.setTaskData(task.getStringId(), ["date04": ["type": "date", "value": today.toDate()]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date04": new DateField(rawValue: LocalDate.of(2020, 3, 3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -781,12 +755,9 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
-        today = today.plusDays(1)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
+        // TODO: NAE-1645 should fail with 3.3.2020?
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["date04": ["type": "date", "value": text]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date04": new DateField(rawValue: LocalDate.of(2020, 3, 4))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -800,10 +771,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 1, 1)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date05": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date05": new DateField(rawValue: LocalDate.of(2020, 1, 1))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -815,10 +783,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2022, 3, 3)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date05": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date05": new DateField(rawValue: LocalDate.of(2022,3,3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -830,10 +795,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 4)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date06": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994,7,4))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -845,11 +807,8 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 3)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["date06": ["type": "date", "value": text]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date06": new DateField(rawValue: LocalDate.of(1994,7,3))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -863,10 +822,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 3)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
-        importHelper.setTaskData(task.getStringId(), ["date07": ["type": "date", "value": text]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994,7,3))]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -878,11 +834,8 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 4)
-        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["date07": ["type": "date", "value": text]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["date07": new DateField(rawValue: LocalDate.of(1994,7,4))]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -897,7 +850,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number01": ["type": "number", "value": 3]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number01": new NumberField(rawValue: 3)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -911,7 +864,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number01": ["type": "number", "value": 2]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number01": new NumberField(rawValue: 2)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -925,7 +878,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number02": ["type": "number", "value": 2]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number02": new NumberField(rawValue: 2)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -939,7 +892,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number02": ["type": "number", "value": 3]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number02": new NumberField(rawValue: 3)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -953,7 +906,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number03": ["type": "number", "value": 1.25624]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number03": new NumberField(rawValue: 1.25624)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -967,7 +920,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number03": ["type": "number", "value": -1.1558]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number03": new NumberField(rawValue: -1.1558)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -981,7 +934,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number04": ["type": "number", "value": -1.25624]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number04": new NumberField(rawValue: -1.25624)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -995,7 +948,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number04": ["type": "number", "value": 1.1558]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number04": new NumberField(rawValue: 1.1558)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -1009,7 +962,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number05": ["type": "number", "value": 10]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number05": new NumberField(rawValue: 10)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -1023,7 +976,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number05": ["type": "number", "value": 10.1558]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number05": new NumberField(rawValue: 10.1558d)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -1037,7 +990,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number06": ["type": "number", "value": 13.2452]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number06": new NumberField(rawValue: 13.2452d)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -1051,7 +1004,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number06": ["type": "number", "value": 9.1558]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number06": new NumberField(rawValue: 9.1558)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -1066,7 +1019,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        importHelper.setTaskData(task.getStringId(), ["number07": ["type": "number", "value": 1]])
+        importHelper.setTaskData(task.getStringId(), new DataSet(["number07": new NumberField(rawValue: 1)]))
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
         assert taskFinish != null
     }
@@ -1080,7 +1033,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number07": ["type": "number", "value": 2]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number07": new NumberField(rawValue: 2)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })
@@ -1096,7 +1049,7 @@ class ValidationTest {
         assert task != null
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            importHelper.setTaskData(task.getStringId(), ["number07": ["type": "number", "value": 7]])
+            importHelper.setTaskData(task.getStringId(), new DataSet(["number07": new NumberField(rawValue: 7)]))
             Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
             assert taskFinish != null
         })

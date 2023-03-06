@@ -16,6 +16,8 @@ import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermissi
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -40,6 +42,7 @@ public class Transition extends Node {
     private Map<String, Map<RolePermission, Boolean>> userRefs;
     @org.springframework.data.mongodb.core.mapping.Field("triggers")
     private List<Trigger> triggers;
+    @QueryType(PropertyType.NONE)
     private TaskLayout layout;
     private Integer priority;
     private AssignPolicy assignPolicy;

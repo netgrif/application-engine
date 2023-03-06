@@ -180,28 +180,30 @@ public class DataService implements IDataService {
         // PRE
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField));
         useCase = workflowService.findOne(task.getCaseId());
-        historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
+        // TODO: NAE-1645 user for history
+//        historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
         // EXECUTION
         if (outcome.getMessage() == null) {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
 //      TODO: NAE-1645 from 6.3.0: lastModified, validation
 //        dataField.setLastModified(LocalDateTime.now());
-//        if (validationEnable) {
-//            validation.valid(useCase.getPetriNet().getDataSet().get(entry.getKey()), dataField);
-//        }
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
+        if (validationEnable) {
+            validation.valid(useCase.getDataSet().get(fieldId));
+        }
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
-        historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
+        // TODO: NAE-1645 user for history
+//        historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
         // POST
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField));
         useCase = workflowService.findOne(task.getCaseId());
-        historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
-
+        // TODO: NAE-1645 user for history
+//        historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
+        useCase = applyFieldConnectedChanges(useCase, field);
+        // TODO: NAE-1645 should outcome contain case before or after changes?
         return outcome;
-
-
     }
 
     private void setOutcomeMessage(Task task, Case useCase, TaskEventOutcome outcome, String fieldId, Field<?> field, DataEventType type) {
@@ -671,6 +673,15 @@ public class DataService implements IDataService {
     public UserFieldValue makeUserFieldValue(String id) {
         IUser user = userService.resolveById(id, true);
         return new UserFieldValue(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
+    }
+
+    @Override
+    public Case applyFieldConnectedChanges(Case useCase, Field<?> field) {
+        Field<?> caseField = useCase.getDataSet().get(field.getStringId());
+        if (!(caseField instanceof UserListField)) {
+            return useCase;
+        }
+        return workflowService.resolveUserRef(useCase);
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {

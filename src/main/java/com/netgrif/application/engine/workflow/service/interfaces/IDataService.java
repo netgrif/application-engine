@@ -64,9 +64,7 @@ public interface IDataService {
 
     UserFieldValue makeUserFieldValue(String id);
 
-    Case applyFieldConnectedChanges(Case useCase, String fieldId);
-
-    Case applyFieldConnectedChanges(Case useCase, Field field);
+    Case applyFieldConnectedChanges(Case useCase, Field<?> field);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 

@@ -202,10 +202,10 @@ public class WorkflowService implements IWorkflowService {
         return save(useCase);
     }
 
-    private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
-        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
+    private void resolveUserRefPermissions(Case useCase, String userListId, Map<ProcessRolePermission, Boolean> permission) {
+        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getRawValue());
         if (userIds != null && userIds.size() != 0) {
-            if (permission.containsKey("view") && !permission.get("view")) {
+            if (permission.containsKey(ProcessRolePermission.VIEW) && !permission.get(ProcessRolePermission.VIEW)) {
                 useCase.getNegativeViewUsers().addAll(userIds);
             } else {
                 useCase.addUsers(new HashSet<>(userIds), permission);

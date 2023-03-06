@@ -2,9 +2,9 @@ package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.TextFieldValidation
-import com.netgrif.application.engine.workflow.domain.DataField
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,8 +34,7 @@ class TextFieldValidationTest {
     @Test
     void minlength_Exception() {
         TextFieldValidation textFieldValidation = new TextFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue("totok"  as String)
+        TextField dataField = new TextField(rawValue: 'totok')
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = ["minlength","6"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -49,8 +48,7 @@ class TextFieldValidationTest {
     @Test
     void maxlength_Exception() {
         TextFieldValidation textFieldValidation = new TextFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue("totok" as String)
+        TextField dataField = new TextField(rawValue: 'totok')
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = ["maxlength","4"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -60,7 +58,4 @@ class TextFieldValidationTest {
         })
         Assertions.assertEquals(ErrorMessage, thrown.getMessage());
     }
-
-
-
 }

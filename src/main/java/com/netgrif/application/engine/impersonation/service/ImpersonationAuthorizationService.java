@@ -9,12 +9,14 @@ import com.netgrif.application.engine.configuration.properties.ImpersonationProp
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationAuthorizationService;
+import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField;
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
+import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.workflow.domain.Case;
-import com.netgrif.application.engine.workflow.domain.DataField;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -59,7 +61,7 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
         } else {
             Page<Case> cases = searchConfigs(impersonator.getId(), pageable);
             List<IUser> users = cases.getContent().stream()
-                    .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getValue()).getId())
+                    .map(c -> ((UserFieldValue) c.getDataSet().get("impersonated").getRawValue()).getId())
                     .distinct()
                     .map(id -> userService.findById(id, true))
                     .collect(Collectors.toList());
@@ -122,12 +124,17 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
 
     @Override
     public String getImpersonatedUserId(Case config) {
-        return ((UserFieldValue) config.getDataSet().get("impersonated").getValue()).getId();
+        return ((UserFieldValue) config.getDataSet().get("impersonated").getRawValue()).getId();
     }
 
     @Override
     public LocalDateTime getValidUntil(Case config) {
-        return parseTime(config, "valid_to");
+        return ((DateTimeField) config.getDataSet().get("valid_to")).getRawValue();
+    }
+
+    @Override
+    public LocalDateTime getValidFrom(Case config) {
+        return ((DateTimeField) config.getDataSet().get("valid_from")).getRawValue();
     }
 
     protected CaseSearchRequest makeRequest(String impersonatorId, String impersonatedId) {
@@ -160,15 +167,17 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     protected boolean isValidAndContainsUser(Case config, String id) {
-        Object value = config.getFieldValue("impersonators");
-        if (!(value instanceof Collection)) {
+        MultichoiceMapField impersonators = (MultichoiceMapField) config.getDataSet().get("impersonators");
+        BooleanField isActive = (BooleanField) config.getDataSet().get("is_active");
+        Set<String> value = impersonators.getRawValue();
+        if (value == null) {
             return false;
         }
         LocalDateTime now = LocalDateTime.now();
-        return (((Collection) value).contains(id)) &&
-                ((Boolean) config.getFieldValue("is_active")) &&
-                validateTime(parseTime(config, "valid_from"), now) &&
-                validateTime(now, parseTime(config, "valid_to"));
+        return (value).contains(id) &&
+                (isActive.getRawValue() != null && isActive.getRawValue()) &&
+                validateTime(getValidFrom(config), now) &&
+                validateTime(now, getValidUntil(config));
 
     }
 
@@ -180,27 +189,14 @@ public class ImpersonationAuthorizationService implements IImpersonationAuthoriz
     }
 
     protected Set<String> extractSetFromField(List<Case> cases, String fieldId) {
-        return cases.stream()
-                .map(caze -> getMultichoiceValue(caze.getDataField(fieldId)))
-                .flatMap(List::stream)
-                .collect(Collectors.toSet());
-    }
-
-    protected List<String> getMultichoiceValue(DataField field) {
-        if (field.getValue() == null || !(field.getValue() instanceof List)) {
-            return new ArrayList<>();
+        Set<String> allStrings = new HashSet<>();
+        for (Case c : cases) {
+            Set<String> rawValue = ((MultichoiceMapField) c.getDataSet().get(fieldId)).getRawValue();
+            if (rawValue == null) {
+                continue;
+            }
+            allStrings.addAll(rawValue);
         }
-        return (List<String>) field.getValue();
-    }
-
-    protected LocalDateTime parseTime(Case config, String field) {
-        Object val = config.getFieldValue(field);
-        if (val == null) {
-            return null;
-        }
-        if (val instanceof Date) {
-            return LocalDateTime.ofInstant(((Date) val).toInstant(), ZoneId.systemDefault());
-        }
-        return (LocalDateTime) val;
+        return allStrings;
     }
 }

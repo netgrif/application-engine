@@ -2,9 +2,9 @@ package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.NumberFieldValidation
-import com.netgrif.application.engine.workflow.domain.DataField
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -34,8 +34,7 @@ class NumberFieldValidationTest {
     @Test
     void odd() {
         NumberFieldValidation numberFieldValidation = new NumberFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(5)
+        NumberField dataField = new NumberField(rawValue: 5)
         I18nString validMessage = new I18nString("Invalid Field value")
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -47,8 +46,7 @@ class NumberFieldValidationTest {
     @Test
     void even() {
         NumberFieldValidation numberFieldValidation = new NumberFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(4)
+        NumberField dataField = new NumberField(rawValue: 4)
         I18nString validMessage = new I18nString("Invalid Field value")
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -59,8 +57,7 @@ class NumberFieldValidationTest {
     @Test
     void positive() {
         NumberFieldValidation numberFieldValidation = new NumberFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(4)
+        NumberField dataField = new NumberField(rawValue: 4)
         I18nString validMessage = new I18nString("Invalid Field value")
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -71,8 +68,7 @@ class NumberFieldValidationTest {
     @Test
     void positivenegative() {
         NumberFieldValidation numberFieldValidation = new NumberFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(-4)
+        NumberField dataField = new NumberField(rawValue: -4)
         I18nString validMessage = new I18nString("Invalid Field value")
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -83,8 +79,7 @@ class NumberFieldValidationTest {
     @Test
     void decimal() {
         NumberFieldValidation numberFieldValidation = new NumberFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(4)
+        NumberField dataField = new NumberField(rawValue: 4)
         I18nString validMessage = new I18nString("Invalid Field value")
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -95,13 +90,11 @@ class NumberFieldValidationTest {
     @Test
     void inrange() {
         NumberFieldValidation numberFieldValidation = new NumberFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(7)
+        NumberField dataField = new NumberField(rawValue: 7)
         I18nString validMessage = new I18nString("Invalid Field value")
         List<String> rules = ["5,10"]
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
 
         numberFieldValidation.inrange(input)
     }
-
 }

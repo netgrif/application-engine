@@ -2,9 +2,9 @@ package com.netgrif.application.engine.validation
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.BooleanFieldValidation
-import com.netgrif.application.engine.workflow.domain.DataField
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,12 +31,10 @@ class BooleanFieldValidationTest {
         testHelper.truncateDbs()
     }
 
-
     @Test
     void requiredTrue() {
         BooleanFieldValidation booleanFieldValidation = new BooleanFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(true)
+        BooleanField dataField = new BooleanField(rawValue: true)
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -47,8 +45,7 @@ class BooleanFieldValidationTest {
     @Test
     void notempty() {
         BooleanFieldValidation booleanFieldValidation = new BooleanFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue(true)
+        BooleanField dataField = new BooleanField(rawValue: true)
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -60,8 +57,8 @@ class BooleanFieldValidationTest {
     @Test
     void notempty_Exception() {
         BooleanFieldValidation booleanFieldValidation = new BooleanFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue("")
+        BooleanField dataField = new BooleanField()
+        dataField.value = null
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -75,8 +72,8 @@ class BooleanFieldValidationTest {
     @Test
     void notempty_Exception2() {
         BooleanFieldValidation booleanFieldValidation = new BooleanFieldValidation()
-        DataField dataField = new DataField()
-        dataField.setValue([])
+        BooleanField dataField = new BooleanField()
+        dataField.value = null
         I18nString validMessage = new I18nString(ErrorMessage)
         List<String> rules = []
         ValidationDataInput input = new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" ")))
@@ -86,6 +83,4 @@ class BooleanFieldValidationTest {
         })
         Assertions.assertEquals(ErrorMessage, thrown.getMessage());
     }
-
-
 }

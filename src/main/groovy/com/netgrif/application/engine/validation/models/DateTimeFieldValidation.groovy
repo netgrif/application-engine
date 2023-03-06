@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.validation.models
 
+import com.netgrif.application.engine.petrinet.domain.dataset.DateField
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 
 import java.time.DayOfWeek
@@ -30,37 +33,38 @@ class DateTimeFieldValidation extends AbstractFieldValidation {
 
 
     void between(ValidationDataInput validationData) {
-        LocalDateTime updateDate_TODAY = validationData.getData().getLastModified()
+        LocalDateTime updateDate_TODAY = LocalDateTime.now()
         List<String> regex = validationData.getValidationRegex().trim().split(",")
+        LocalDateTime setDate = getDateTimeValue(validationData.getData())
         if (regex.size() == 2) {
             def fromDate = parseStringToLocalDateTime(regex.get(0)) != null ? parseStringToLocalDateTime(regex.get(0)) : regex.get(0)
             def toDate = parseStringToLocalDateTime(regex.get(1)) != null ? parseStringToLocalDateTime(regex.get(1)) : regex.get(1)
             if ((fromDate == TODAY || fromDate == NOW) && toDate == FUTURE) {
-                if ((validationData.getData().getValue() as LocalDateTime) < updateDate_TODAY) {
+                if (setDate < updateDate_TODAY) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             } else if (fromDate == PAST && (toDate == TODAY || toDate == NOW)) {
-                if ((validationData.getData().getValue() as LocalDateTime) > updateDate_TODAY) {
+                if (setDate > updateDate_TODAY) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             } else if (fromDate == PAST && (toDate instanceof LocalDateTime)) {
-                if ((validationData.getData().getValue() as LocalDateTime) > toDate) {
+                if (setDate > toDate) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             } else if (fromDate == TODAY && (toDate instanceof LocalDateTime)) {
-                if ((validationData.getData().getValue() as LocalDateTime) < toDate || (validationData.getData().getValue() as LocalDateTime) > updateDate_TODAY) {
+                if (setDate < toDate || setDate > updateDate_TODAY) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             } else if ((fromDate instanceof LocalDateTime) && toDate == TODAY) {
-                if ((validationData.getData().getValue() as LocalDateTime) < fromDate || (validationData.getData().getValue() as LocalDateTime) > updateDate_TODAY) {
+                if (setDate < fromDate || setDate > updateDate_TODAY) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             } else if (toDate == FUTURE && (fromDate instanceof LocalDateTime)) {
-                if ((validationData.getData().getValue() as LocalDateTime) < fromDate) {
+                if (setDate < fromDate) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             } else if ((fromDate instanceof LocalDateTime) && (toDate instanceof LocalDateTime)) {
-                if ((validationData.getData().getValue() as LocalDateTime) > toDate || (validationData.getData().getValue() as LocalDateTime) < fromDate) {
+                if (setDate > toDate || setDate < fromDate) {
                     throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
                 }
             }
@@ -68,13 +72,15 @@ class DateTimeFieldValidation extends AbstractFieldValidation {
     }
 
     void workday(ValidationDataInput validationData) {
-        if (isWeekend(validationData.getData().getValue() as LocalDateTime)) {
+        LocalDateTime setDate = getDateTimeValue(validationData.getData())
+        if (isWeekend(setDate)) {
             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
         }
     }
 
     void weekend(ValidationDataInput validationData) {
-        if (!isWeekend(validationData.getData().getValue() as LocalDateTime)) {
+        LocalDateTime setDate = getDateTimeValue(validationData.getData())
+        if (!isWeekend(setDate)) {
             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
         }
     }
@@ -83,7 +89,13 @@ class DateTimeFieldValidation extends AbstractFieldValidation {
         DayOfWeek dayOfWeek = DayOfWeek.of(day.get(ChronoField.DAY_OF_WEEK));
         return dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY;
     }
-
+// TODO: NAE-1645 Refactor, each type own validator with common functions
+    LocalDateTime getDateTimeValue(Field<?> field) {
+        if (field instanceof DateTimeField) {
+            return ((DateTimeField) field).getRawValue()
+        }
+        throw new IllegalArgumentException("Cannot validate field " + field.stringId + " of type " + field.type + " with date validation")
+    }
     protected static LocalDateTime parseStringToLocalDateTime(String stringDate) {
         if (stringDate == null)
             return null

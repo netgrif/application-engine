@@ -2,24 +2,32 @@ package com.netgrif.application.engine.petrinet.domain.dataset;
 
 import lombok.Data;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Data
 public class UserListFieldValue {
 
-    private List<UserFieldValue> userValues;
+    private LinkedHashSet<UserFieldValue> userValues;
 
     public UserListFieldValue() {
-        this(new LinkedList<>());
+        this.userValues = new LinkedHashSet<>();
     }
 
-    public UserListFieldValue(List<UserFieldValue> userValues) {
-        this.userValues = userValues;
+    public UserListFieldValue(Collection<UserFieldValue> userValues) {
+        this();
+        this.userValues = new LinkedHashSet<>(userValues);
     }
 
     public UserListFieldValue(UserFieldValue userValue) {
-        this(List.of(userValue));
+        this(Set.of(userValue));
+    }
+
+    public LinkedHashSet<UserFieldValue> getUserValues() {
+        return userValues;
+    }
+
+    public void setUserValues(Collection<UserFieldValue> userValues) {
+        this.userValues = new LinkedHashSet<>(userValues);
     }
 
     @Override

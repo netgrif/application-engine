@@ -56,7 +56,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
         return Collections.emptyList();
     }
 
-    public void setFieldChoices(ChoiceField field, Data data, Importer importer) {
+    public void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
         if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
             field.setExpression(new Expression(data.getValues().get(0).getValue()));
         } else if (data.getValues() != null) {
@@ -67,7 +67,7 @@ public abstract class FieldBuilder<T extends Field<?>> {
         }
     }
 
-    public void setFieldOptions(ChoiceField field, Data data, Importer importer) {
+    public void setFieldOptions(ChoiceField<?> field, Data data, Importer importer) {
         if (data.getOptions() != null && data.getOptions().getInit() != null) {
             field.setExpression(new Expression(data.getOptions().getInit().getValue()));
             return;

@@ -18,40 +18,40 @@ class TextFieldValidation extends AbstractFieldValidation {
 //    EMAIL = 'email'
 
     void regex(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() != null) {
-            if (!(validationData.getData().getValue() ==~ validationData.getValidationRegex())) {
+        if (validationData.getData().getValue() != null && validationData.getData().getRawValue() != null) {
+            if (!(validationData.getData().getRawValue() ==~ validationData.getValidationRegex())) {
                 throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
             }
         }
     }
 
     void minlength(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() != null) {
-            if (!((validationData.getData().getValue() as String).length() >= validationData.getValidationRegex() as Integer)) {
+        if (validationData.getData().getValue() != null && validationData.getData().getRawValue() != null) {
+            if (!((validationData.getData().getRawValue() as String).length() >= (validationData.getValidationRegex() as Integer))) {
                 throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
             }
         }
     }
 
     void maxlength(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() != null) {
-            if ((validationData.getData().getValue() as String).length() > validationData.getValidationRegex() as Integer) {
+        if (validationData.getData().getValue() != null && validationData.getData().getRawValue() != null) {
+            if ((validationData.getData().getRawValue() as String).length() > (validationData.getValidationRegex() as Integer)) {
                 throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
             }
         }
     }
 
     void telnumber(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() != null) {
-            if (!(validationData.getData().getValue() ==~ telNumberRegex)) {
+        if (validationData.getData().getValue() != null && validationData.getData().getRawValue() != null) {
+            if (!(validationData.getData().getRawValue() ==~ telNumberRegex)) {
                 throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
             }
         }
     }
 
     void email(ValidationDataInput validationData) {
-        if (validationData.getData().getValue() != null) {
-            if (!(validationData.getData().getValue() ==~ emailRegex)) {
+        if (validationData.getData().getValue() != null && validationData.getData().getRawValue() != null) {
+            if (!(validationData.getData().getRawValue() ==~ emailRegex)) {
                 throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
             }
         }

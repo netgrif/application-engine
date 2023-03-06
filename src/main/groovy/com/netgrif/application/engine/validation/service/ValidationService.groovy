@@ -5,7 +5,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import com.netgrif.application.engine.validation.models.*
-import com.netgrif.application.engine.workflow.domain.DataField
 import groovy.util.logging.Slf4j
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.stereotype.Service
@@ -17,24 +16,21 @@ import java.util.stream.Collectors
 class ValidationService implements IValidationService {
 
     @Override
-    public void valid(Field field, DataField dataField) {
-        if (field.getValidations() == null) {
+    void valid(Field<?> dataField) {
+        if (dataField.getValidations() == null) {
             return
         }
-        if (dataField.getValue() == null) {
-            return
-        }
-        field.getValidations().forEach(validation -> {
-            List<String> rules = validation.getValidationRule().trim().split(" ")
+        dataField.getValidations().forEach(validation -> {
+            List<String> rules = validation.getValidationRule().trim().split(" ").toList()
             if (rules.size() >= 1) {
                 AbstractFieldValidation instance = new AbstractFieldValidation()
-                if (field instanceof NumberField) {
+                if (dataField instanceof NumberField) {
                     instance = new NumberFieldValidation()
-                } else if (field instanceof TextField) {
+                } else if (dataField instanceof TextField) {
                     instance = new TextFieldValidation()
-                } else if (field instanceof BooleanField) {
+                } else if (dataField instanceof BooleanField) {
                     instance = new BooleanFieldValidation()
-                } else if (field instanceof DateField) {
+                } else if (dataField instanceof DateField) {
                     instance = new DateFieldValidation()
 //                } else if (field instanceof DateTimeField) {
 //                    instance = new DateTimeFieldValidation()
@@ -67,7 +63,7 @@ class ValidationService implements IValidationService {
                     I18nString validMessage = validation.getValidationMessage() != null ? validation.getValidationMessage() : new I18nString("Invalid Field value")
                     method.invoke(instance, new ValidationDataInput(dataField, validMessage, LocaleContextHolder.getLocale(), rules.stream().skip(1).collect(Collectors.joining(" "))))
                 } else {
-                    log.warn("Method [" + rules.first() + "] in dataField " + field.getImportId() + " not found")
+                    log.warn("Method [" + rules.first() + "] in dataField " + dataField.getImportId() + " not found")
                 }
             }
         })

@@ -596,7 +596,7 @@
                                 </processor>
                             </processors>
                             <options>
-                                <querydsl.excludedClasses>groovy.lang.MetaClass,com.netgrif.application.engine.importer.model.DataType,DataType</querydsl.excludedClasses>
+                                <querydsl.excludedClasses>groovy.lang.MetaClass,com.netgrif.application.engine.importer.model.DataType,DataType,com.netgrif.application.engine.importer.model.DataGroupAlignment,DataGroupAlignment</querydsl.excludedClasses>
                             </options>
                         </configuration>
                     </execution>

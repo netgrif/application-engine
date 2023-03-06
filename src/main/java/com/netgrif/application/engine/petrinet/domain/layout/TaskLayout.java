@@ -2,6 +2,8 @@ package com.netgrif.application.engine.petrinet.domain.layout;
 
 import com.netgrif.application.engine.importer.model.FieldAlignment;
 import com.netgrif.application.engine.importer.model.Transition;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class TaskLayout extends FormLayout {
 
     private Integer offset;
+    @QueryType(PropertyType.NONE)
     private FieldAlignment fieldAlignment;
 
     public TaskLayout(Transition data) {

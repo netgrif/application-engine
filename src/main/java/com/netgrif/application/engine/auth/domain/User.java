@@ -119,6 +119,12 @@ public class User extends AbstractUser implements RegisteredUser {
     }
 
     @Override
+    @JsonIgnore
+    public IUser getSelfOrImpersonated() {
+        return super.getSelfOrImpersonated();
+    }
+
+    @Override
     public String toString() {
         return "User{" +
                 "id=" + _id +

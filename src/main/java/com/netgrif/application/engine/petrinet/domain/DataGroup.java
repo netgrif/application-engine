@@ -3,6 +3,8 @@ package com.netgrif.application.engine.petrinet.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.importer.model.DataGroupAlignment;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
@@ -22,10 +24,12 @@ public class DataGroup extends PetriNetObject {
     @Transient
     private LinkedHashMap<String, DataRef> dataRefs;
 
+    @QueryType(PropertyType.NONE)
     private DataGroupLayout layout;
 
     private I18nString title;
 
+    @QueryType(PropertyType.NONE)
     private DataGroupAlignment alignment;
 
     private Boolean stretch;

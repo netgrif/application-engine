@@ -5,13 +5,16 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
@@ -71,16 +74,10 @@ class UserRefsTest {
         10.times {
             def _case = importHelper.createCase("$it" as String, net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
-            // TODO: NAE-1645 use setData
-            // (_case.dataSet.get("user_list_1") as UserListField).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(id)])
-            String taskId = (new ArrayList<>(_case.getTasks())).get(0).task
-            _case = dataService.setData(taskId, ImportHelper.populateDataset([
-                    "user_list_1": [
-                            "value": [id],
-                            "type": "userList"
-                    ]
-            ] as Map)).getCase()
-            newCases.add(workflowService.save(_case))
+            String taskId = ((new ArrayList<>(_case.getTasks())).get(0) as TaskPair).getTask()
+            dataService.setData(taskId, new DataSet([
+                    "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(id)]))
+            ] as Map<String, Field<?>>)).getCase()
             userIds.add(id)
         }
     }
@@ -89,6 +86,4 @@ class UserRefsTest {
     void testCases() {
         newCases.eachWithIndex { Case entry, int i -> assert entry.users.get(userIds.get(i)) != null }
     }
-
-
 }

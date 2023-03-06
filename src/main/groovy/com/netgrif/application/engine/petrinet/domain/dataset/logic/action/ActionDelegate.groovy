@@ -199,6 +199,11 @@ class ActionDelegate {
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
+    // TODO: NAE-1645 - <action trigger="set" type="value">
+    // TODO: NAE-1645 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
+    // TODO: NAE-1645 - tasky sa vytvoria pri vytvoreni caseu a nemazu sa
+    //- existuje all_data task ktory sa pouziva pri change value
+
     def init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
         this.action = action
         this.useCase = useCase

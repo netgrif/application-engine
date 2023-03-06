@@ -1,5 +1,8 @@
 package com.netgrif.application.engine.validation.models
 
+import com.netgrif.application.engine.petrinet.domain.dataset.DateField
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
 import groovy.util.logging.Slf4j
 
@@ -29,20 +32,11 @@ class DateFieldValidation extends AbstractFieldValidation {
     public static final String PAST = "past"
     public static final String NOW = "now"
 
-
     void between(ValidationDataInput validationData) {
-        LocalDate updateDate_TODAY = validationData.getData().getLastModified().toLocalDate()
+        LocalDate updateDate_TODAY = LocalDate.now()
         List<String> regex = validationData.getValidationRegex().trim().split(",")
-        LocalDate setDate;
-        try {
-            setDate = validationData.getData().getValue() as LocalDate
-        } catch (Exception e){
-            try {
-                setDate = (validationData.getData().getValue() as Date).toLocalDate()
-            }catch (Exception e2){
-                log.error(e2.message)
-            }
-        }
+        LocalDate setDate = getDateValue(validationData.getData())
+
         if (regex.size() == 2) {
             def fromDate = parseStringToLocalDate(regex.get(0)) != null ? parseStringToLocalDate(regex.get(0)) : regex.get(0)
             def toDate = parseStringToLocalDate(regex.get(1)) != null ? parseStringToLocalDate(regex.get(1)) : regex.get(1)
@@ -79,35 +73,25 @@ class DateFieldValidation extends AbstractFieldValidation {
     }
 
     void workday(ValidationDataInput validationData) {
-        LocalDate setDate;
-        try {
-            setDate = validationData.getData().getValue() as LocalDate
-        } catch (Exception e){
-            try {
-                setDate = (validationData.getData().getValue() as Date).toLocalDate()
-            }catch (Exception e2){
-                log.error(e2.message)
-            }
-        }
+        LocalDate setDate = getDateValue(validationData.getData())
         if (isWeekend(setDate)) {
             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
         }
     }
 
     void weekend(ValidationDataInput validationData) {
-        LocalDate setDate;
-        try {
-            setDate = validationData.getData().getValue() as LocalDate
-        } catch (Exception e){
-            try {
-                setDate = (validationData.getData().getValue() as Date).toLocalDate()
-            }catch (Exception e2){
-                log.error(e2.message)
-            }
-        }
+        LocalDate setDate = getDateValue(validationData.getData())
         if (!isWeekend(setDate)) {
             throw new IllegalArgumentException(validationData.getValidationMessage().getTranslation(validationData.getLocale()))
         }
+    }
+
+    // TODO: NAE-1645 Refactor, each type own validator with common functions
+    LocalDate getDateValue(Field<?> field) {
+        if (field instanceof DateField) {
+            return ((DateField) field).getRawValue()
+        }
+        throw new IllegalArgumentException("Cannot validate field " + field.stringId + " of type " + field.type + " with date validation")
     }
 
     protected static boolean isWeekend(LocalDate day) {
@@ -116,22 +100,20 @@ class DateFieldValidation extends AbstractFieldValidation {
     }
 
     protected LocalDate parseStringToLocalDate(String stringDate) {
-        if (stringDate == null)
+        if (stringDate == null) {
             return null
-
+        }
         List<String> patterns = Arrays.asList("dd.MM.yyyy")
         try {
             return LocalDate.parse(stringDate, DateTimeFormatter.BASIC_ISO_DATE)
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             try {
                 return LocalDate.parse(stringDate, DateTimeFormatter.ISO_DATE)
-            } catch (DateTimeParseException ex) {
+            } catch (DateTimeParseException ignored2) {
                 for (String pattern : patterns) {
                     try {
                         return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(pattern))
-                    } catch (DateTimeParseException | IllegalArgumentException exc) {
-                        continue
-                    }
+                    } catch (DateTimeParseException | IllegalArgumentException ignored3) {}
                 }
             }
         }

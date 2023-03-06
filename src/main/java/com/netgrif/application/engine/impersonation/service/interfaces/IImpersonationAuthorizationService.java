@@ -32,4 +32,6 @@ public interface IImpersonationAuthorizationService {
     String getImpersonatedUserId(Case config);
 
     LocalDateTime getValidUntil(Case config);
+
+    LocalDateTime getValidFrom(Case config);
 }

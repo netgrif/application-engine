@@ -12,6 +12,8 @@ import com.netgrif.application.engine.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.application.engine.petrinet.domain.roles.AssignedUserPermission;
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.domain.triggers.Trigger;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +48,7 @@ public class Task {
     @Indexed
     private String transitionId;
 
+    @QueryType(PropertyType.NONE)
     private TaskLayout layout;
 
     private I18nString title;

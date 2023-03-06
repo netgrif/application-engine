@@ -15,12 +15,8 @@ public class SetDataEventLog extends TaskEventLog {
     @Getter
     private final DataSet changedFields;
 
-    public SetDataEventLog(Task task, Case useCase, EventPhase eventPhase) {
-        this(task, useCase, eventPhase, null);
-    }
-
     public SetDataEventLog(Task task, Case useCase, EventPhase eventPhase, DataSet changedFields, IUser user) {
-        super(task, useCase, eventPhase, user.isImpersonating() ? user.getImpersonated().getStringId() : null);
+        super(task, useCase, eventPhase, user.getStringId(), user.isImpersonating() ? user.getImpersonated().getStringId() : null);
         this.changedFields = changedFields;
     }
 }
