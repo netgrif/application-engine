@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -16,11 +17,13 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
+import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -45,7 +48,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-@CompileStatic
 class TaskAuthorizationServiceTest {
 
     private static final String ASSIGN_TASK_URL = "/api/task/assign/"
@@ -293,15 +295,10 @@ class TaskAuthorizationServiceTest {
     @Test
     void testCanAssignWithUsersRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
-//        TODO: NAE-1645: setData from 6.3.0
-//        ((UserListField) case_.dataSet.get("assign_pos_ul")).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-//        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-//        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-//                "assign_pos_ul": [
-//                        "value": [testUser.stringId],
-//                        "type": "userList"
-//                ]
-//        ] as Map)).getCase()
+        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
+        case_ = dataService.setData(taskId, new DataSet([
+                "assign_pos_ul":new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>)).getCase()
         workflowService.save(case_)
         sleep(4000)
 
@@ -312,16 +309,10 @@ class TaskAuthorizationServiceTest {
     @Test
     void testCannotAssignWithUsersRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
-//        TODO: NAE-1645 setData from 6.3.0
-//        ((UserListField) case_.dataSet.get("assign_neg_ul")).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-//        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-//        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-//                "assign_neg_ul": [
-//                        "value": [testUser.stringId],
-//                        "type": "userList"
-//                ]
-//        ] as Map)).getCase()
-        workflowService.save(case_)
+        String taskId = (case_.tasks.first() as TaskPair).task
+        case_ = dataService.setData(taskId, new DataSet([
+                "assign_neg_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>)).getCase()
         sleep(4000)
 
         assert !taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
@@ -333,16 +324,10 @@ class TaskAuthorizationServiceTest {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "assign_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
-//        TODO: NAE-1645 setData from 6.3.0
-//        ((UserListField) case_.dataSet.get("assign_pos_ul")).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-//        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-//        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-//                "assign_pos_ul": [
-//                        "value": [testUser.stringId],
-//                        "type": "userList"
-//                ]
-//        ] as Map)).getCase()
-        workflowService.save(case_)
+        String taskId = (case_.tasks.first() as TaskPair).task
+        case_ = dataService.setData(taskId, new DataSet([
+                "assign_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>)).getCase()
         sleep(4000)
 
         assert taskAuthorizationService.canCallAssign(testUser.transformToLoggedUser(), taskId)
@@ -379,19 +364,12 @@ class TaskAuthorizationServiceTest {
     @Test
     void testCanFinishWithUsersRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
-//        TODO: NAE-1645 setData frm 6.3.0
-//        ((UserListField) case_.dataSet.get("finish_pos_ul")).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-//        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-//        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-//                "finish_pos_ul": [
-//                        "value": [testUser.stringId],
-//                        "type": "userList"
-//                ]
-//        ] as Map)).getCase()
-        workflowService.save(case_)
+        String taskId = (case_.tasks.first() as TaskPair).task
+        case_ = dataService.setData(taskId, new DataSet([
+                "finish_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>)).getCase()
         sleep(4000)
 
-        String taskId = case_.getTasks().first().task
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
@@ -400,19 +378,12 @@ class TaskAuthorizationServiceTest {
     @Test
     void testCannotFinishWithUsersRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
-//        TODO: NAE-1645 setData from 6.3.0
-//        ((UserListField) case_.dataSet.get("finish_neg_ul")).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-//        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-//        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-//                "finish_neg_ul": [
-//                        "value": [testUser.stringId],
-//                        "type": "userList"
-//                ]
-//        ] as Map)).getCase()
-        workflowService.save(case_)
+        String taskId = (case_.tasks.first() as TaskPair).task
+        case_ = dataService.setData(taskId, new DataSet([
+                "finish_neg_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>)).getCase()
         sleep(4000)
 
-        String taskId = case_.getTasks().first().task
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert !taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         workflowService.deleteCase(case_.stringId)
@@ -423,19 +394,12 @@ class TaskAuthorizationServiceTest {
         ProcessRole positiveRole = this.netWithUserRefs.getRoles().values().find(v -> v.getImportId() == "finish_pos_role")
         userService.addRole(testUser, positiveRole.getStringId())
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test Finish", "", testUser.transformToLoggedUser()).getCase()
-//        TODO: NAE-1645 setData from 6.3.0
-//        ((UserListField) case_.dataSet.get("finish_pos_ul")).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-//        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-//        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-//                "finish_pos_ul": [
-//                        "value": [testUser.stringId],
-//                        "type": "userList"
-//                ]
-//        ] as Map)).getCase()
-        workflowService.save(case_)
+        String taskId = (case_.tasks.first() as TaskPair).task
+        case_ = dataService.setData(taskId, new DataSet([
+                "finish_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>)).getCase()
         sleep(4000)
 
-        String taskId = case_.getTasks().first().task
         taskService.assignTask(testUser.transformToLoggedUser(), taskId)
         assert taskAuthorizationService.canCallFinish(testUser.transformToLoggedUser(), taskId)
         userService.removeRole(testUser, positiveRole.getStringId())

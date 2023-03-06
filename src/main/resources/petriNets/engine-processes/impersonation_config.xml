@@ -96,8 +96,7 @@
 					def user = userService.loggedOrSystem
 					change impersonated value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
 					change impersonated_email value { user.email }
-
-					change config_owner value { new com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue([impersonated.value]) }
+					change config_owner value { new com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue([impersonated.rawValue]) }
 				</action>
 
 				<action>
@@ -107,10 +106,9 @@
 					def userSelectCase = createCase("impersonation_users_select")
 					change user_select_taskRef value { [userSelectCase.tasks.find { it.transition == "select_user" }.task] }
 					change user_select_caseId value { userSelectCase.stringId }
-
-					setData((user_select_taskRef.value as List)[0], [
-							"parentId": ["type": "text", "value": useCase.stringId]
-					])
+					setData((user_select_taskRef.rawValue as List)[0], new DataSet([
+							"parentId": new TextField(rawValue: useCase.stringId)
+					]))
 				</action>
 			</actions>
 		</event>
@@ -138,11 +136,14 @@
 		</component>
 
 		<event type="set">
-			<actions phase="pre">
+			<actions phase="post">
 				<action>
+					<!--@formatter:off-->
 					impersonated: f.impersonated;
-
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
+					<!--@formatter:on-->
 				</action>
 			</actions>
 		</event>
@@ -159,8 +160,9 @@
 			<actions phase="pre">
 				<action>
 					impersonated: f.impersonated;
-
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -173,8 +175,9 @@
 			<actions phase="pre">
 				<action>
 					impersonated: f.impersonated;
-
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -187,8 +190,9 @@
 			<actions phase="pre">
 				<action>
 					impersonated: f.impersonated;
-
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -201,8 +205,9 @@
 			<actions phase="pre">
 				<action>
 					impersonated: f.impersonated;
-
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 			<actions phase="post">
@@ -210,7 +215,8 @@
 					impersonated_email: f.impersonated_email,
                     impersonated: f.impersonated;
 
-                    change impersonated_email value { impersonated.value.email }</action>
+                    change impersonated_email value { impersonated.rawValue.email }
+				</action>
 			</actions>
 		</event>
 	</data>
@@ -225,7 +231,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 				<action id="action_2">
 					impersonators: f.impersonators;
@@ -251,7 +259,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 				<action id="10">
 					user_select_caseId: f.user_select_caseId,
@@ -287,7 +297,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -316,7 +328,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -512,7 +526,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 			<actions phase="post">
@@ -563,7 +579,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -573,7 +591,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 			<actions phase="post">
@@ -695,7 +715,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 		</event>
@@ -705,7 +727,9 @@
 				<action>
 					impersonated: f.impersonated;
 
-					validateUser(impersonated.value.id)
+					if (impersonated.rawValue) {
+						validateUser(impersonated.rawValue.id)
+					}
 				</action>
 			</actions>
 			<actions phase="post">

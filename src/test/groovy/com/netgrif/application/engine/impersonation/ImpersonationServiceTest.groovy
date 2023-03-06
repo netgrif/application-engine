@@ -29,6 +29,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -239,7 +240,7 @@ class ImpersonationServiceTest {
         assert impersonationAuthorizationService.canImpersonate(logged, config.stringId)
         assert impersonationAuthorizationService.canImpersonateUser(logged, user2.stringId)
 
-        config.dataSet["valid_to"].value = LocalDateTime.now().minusMinutes(1)
+        config.getDataSet().get("valid_to").rawValue = LocalDateTime.now().minusMinutes(1)
         workflowService.save(config)
         sleep(4000)
 
@@ -325,13 +326,6 @@ class ImpersonationServiceTest {
 
     def createTestCase() {
         return helper.createCase("test", testNet)
-    }
-
-    def setData(Case caze, String transition, Map<String, String> dataSet) {
-        dataService.setData(caze.tasks.find { it.transition == transition }.task, helper.populateDataset(dataSet.collectEntries {
-            [(it.key): (["value": it.value, "type": "text"])]
-        }))
-        return workflowService.findOne(caze.stringId)
     }
 
     def loadTask(Case caze, String trans) {
