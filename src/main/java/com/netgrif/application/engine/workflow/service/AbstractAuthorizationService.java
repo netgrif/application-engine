@@ -47,7 +47,7 @@ public abstract class AbstractAuthorizationService {
     protected Map<RolePermission, Boolean> getAggregateRolePermissions(IUser user, Map<String, Map<RolePermission, Boolean>> permissions) {
         Map<RolePermission, Boolean> aggregatePermissions = new HashMap<>();
 
-        Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role -> role.get_id().toString()).collect(Collectors.toSet());
+        Set<String> userProcessRoleIDs = user.getSelfOrImpersonated().getProcessRoles().stream().map(role -> role.get_id().toString()).collect(Collectors.toSet());
 
         for (Map.Entry<String, Map<RolePermission, Boolean>> role : permissions.entrySet()) {
             aggregateRolePermission(userProcessRoleIDs, role, aggregatePermissions);

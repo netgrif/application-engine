@@ -13,6 +13,7 @@ import com.netgrif.application.engine.impersonation.service.interfaces.IImperson
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -21,15 +22,10 @@ import com.netgrif.application.engine.startup.ImpersonationRunner
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -54,8 +50,8 @@ import java.time.LocalDateTime
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
@@ -186,13 +182,15 @@ class ImpersonationServiceTest {
         impersonationService.impersonateByConfig(config.stringId)
         def impersonatedRoles = userService.loggedUser.getImpersonated().getProcessRoles()
         def impersonatedAuths = userService.loggedUser.getImpersonated().getAuthorities()
-        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId ==role.stringId }  // default role counts
+        assert impersonatedRoles.size() == 2 && impersonatedRoles.any { it.stringId == role.stringId }
+        // default role counts
         assert impersonatedAuths.size() == 1 && impersonatedAuths[0].stringId == auth.stringId
 
         def transformedUser = userService.loggedUser.transformToLoggedUser()
         def transformedUserImpersonated = transformedUser.getSelfOrImpersonated()
         assert transformedUser.isImpersonating()
-        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }  // default role counts
+        assert transformedUserImpersonated.getProcessRoles().size() == 2 && transformedUserImpersonated.getProcessRoles().any { it == role.stringId }
+        // default role counts
         assert transformedUserImpersonated.getAuthorities().size() == 1 && (transformedUserImpersonated.getAuthorities()[0] as Authority).stringId == auth.stringId
     }
 
@@ -305,18 +303,18 @@ class ImpersonationServiceTest {
     def createConfigCase(IUser user, String impersonator, List<String> roles = null, List<String> auths = null) {
         def caze = helper.createCase("config", petriNetService.getNewestVersionByIdentifier(ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER))
         def owner = new UserFieldValue(user)
-        caze.dataSet["impersonated"].value = owner
-        caze.dataSet["impersonated_email"].value = owner.email
-        caze.dataSet["config_owner"].value = new UserListFieldValue([owner])
-        caze.dataSet["impersonators"].value = [impersonator]
-        caze.dataSet["impersonated_roles"].value = roles ?: user.processRoles.stringId as List
-        caze.dataSet["impersonated_authorities"].value = auths ?: user.authorities.stringId as List
-        caze.dataSet["valid_from"].value = LocalDateTime.now().minusDays(1)
+        caze.dataSet.get("impersonated").rawValue = owner
+        caze.dataSet.get("impersonated_email").rawValue = owner.email
+        caze.dataSet.get("config_owner").rawValue = new UserListFieldValue([owner])
+        caze.dataSet.get("impersonators").rawValue = [impersonator]
+        caze.dataSet.get("impersonated_roles").rawValue = roles ?: user.processRoles.stringId as List
+        caze.dataSet.get("impersonated_authorities").rawValue = auths ?: user.authorities.stringId as List
+        caze.dataSet.get("valid_from").rawValue = LocalDateTime.now().minusDays(1)
 
         /* set options so elastic indexing works */
-        caze.dataSet["impersonators"].options = [(impersonator): new I18nString(impersonator)]
-        caze.dataSet["impersonated_roles"].options = (caze.dataSet["impersonated_roles"].value as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
-        caze.dataSet["impersonated_authorities"].options = (caze.dataSet["impersonated_authorities"].value as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
+        ((MultichoiceMapField) caze.dataSet.get("impersonators")).options = [(impersonator): new I18nString(impersonator)]
+        ((MultichoiceMapField) caze.dataSet.get("impersonated_roles")).options = (caze.dataSet.get("impersonated_roles").rawValue as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
+        ((MultichoiceMapField) caze.dataSet.get("impersonated_authorities")).options = (caze.dataSet.get("impersonated_authorities").rawValue as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
         def initTask = caze.tasks.find { it.transition == "t2" }.task
         taskService.assignTask(userService.system.transformToLoggedUser(), initTask)

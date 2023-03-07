@@ -756,10 +756,14 @@ public class TaskService implements ITaskService {
     }
 
     private List<String> getExistingUsers(UserListFieldValue userListValue) {
-        if (userListValue == null)
+        if (userListValue == null) {
             return null;
-        return userListValue.getUserValues().stream().map(UserFieldValue::getId)
-                .filter(id -> userService.resolveById(id, false) != null)
+        }
+        // TODO: NAE-1645 fix null set as user value, remove duplicate code, move this to userservice
+        return userListValue.getUserValues().stream()
+                .filter(Objects::nonNull)
+                .map(UserFieldValue::getId)
+                .filter(id -> id != null && userService.existsById(id))
                 .collect(Collectors.toList());
     }
 

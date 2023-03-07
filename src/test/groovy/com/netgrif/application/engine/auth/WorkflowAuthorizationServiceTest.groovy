@@ -229,8 +229,6 @@ class WorkflowAuthorizationServiceTest {
                 "neg_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)]))
         ] as Map<String, Field<?>>)).getCase()
 
-        workflowService.save(case_)
-
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
 
         userService.removeRole(testUser, posDeleteRole.getStringId())

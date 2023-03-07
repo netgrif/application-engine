@@ -156,6 +156,11 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
+    public boolean existsById(String id) {
+        return userRepository.existsById(id);
+    }
+
+    @Override
     public IUser resolveById(String id, boolean small) {
         return findById(id, small);
     }

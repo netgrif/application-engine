@@ -203,6 +203,7 @@ class ActionDelegate {
     // TODO: NAE-1645 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
     // TODO: NAE-1645 - tasky sa vytvoria pri vytvoreni caseu a nemazu sa
     //- existuje all_data task ktory sa pouziva pri change value
+    // TODO: NAE-1645 - update field map po setdata na aktualne hodnoty
 
     def init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
         this.action = action

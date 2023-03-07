@@ -89,26 +89,31 @@
 			<id>create</id>
 			<actions phase="post">
 				<action id="action_0">
+					<!--@formatter:off-->
 					impersonated_email: f.impersonated_email,
                     impersonated: f.impersonated,
                     config_owner: f.config_owner;
 
 					def user = userService.loggedOrSystem
-					change impersonated value { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(user.id, user.name, user.surname, user.email) }
+					def impersonatedValue = new UserFieldValue(user.id, user.name, user.surname, user.email)
+					change impersonated value { impersonatedValue }
 					change impersonated_email value { user.email }
-					change config_owner value { new com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue([impersonated.rawValue]) }
+					change config_owner value { new UserListFieldValue([impersonatedValue]) }
+					<!--@formatter:on-->
 				</action>
-
 				<action>
+					<!--@formatter:off-->
 					user_select_caseId: f.user_select_caseId,
 					user_select_taskRef: f.user_select_taskRef;
 
 					def userSelectCase = createCase("impersonation_users_select")
-					change user_select_taskRef value { [userSelectCase.tasks.find { it.transition == "select_user" }.task] }
+					def taskId = userSelectCase.tasks.find { it.transition == "select_user" }.task
+					change user_select_taskRef value { [taskId] }
 					change user_select_caseId value { userSelectCase.stringId }
-					setData((user_select_taskRef.rawValue as List)[0], new DataSet([
+					setData(taskId, new DataSet([
 							"parentId": new TextField(rawValue: useCase.stringId)
 					]))
+					<!--@formatter:on-->
 				</action>
 			</actions>
 		</event>
@@ -535,7 +540,7 @@
 				<action>
 					impersonated: f.impersonated;
 
-					impersonationService.endImpersonation(impersonated.value.id)
+					impersonationService.endImpersonation(impersonated.rawValue.id)
 				</action>
 				<action>
 					is_active: f.is_active;
