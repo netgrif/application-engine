@@ -12,6 +12,8 @@ import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskSer
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -22,6 +24,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -155,16 +158,11 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithPosUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        // TODO: NAE-1645 setData, from 6.3.0
-//        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-                "view_ul_pos": [
-                        "value": [testUser.stringId],
-                        "type": "userList"
-                ]
-        ] as Map)).getCase()
-        case_ = workflowService.save(case_)
+        String taskId = case_.tasks.first().task
+        dataService.setData(taskId, new DataSet([
+                "view_ul_pos": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>))
+        case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -178,16 +176,11 @@ class ElasticSearchViewPermissionTest {
     @Test
     void testSearchElasticViewWithUserWithNegUserRef() {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
-        // TODO: NAE-1645 setdata, from 6.3.0
-//        case_.dataSet.get("view_ul_neg").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-                "view_ul_neg": [
-                        "value": [testUser.stringId],
-                        "type": "userList"
-                ]
-        ] as Map)).getCase()
-        case_ = workflowService.save(case_)
+        String taskId = case_.tasks.first().task
+        dataService.setData(taskId, new DataSet([
+                "view_ul_neg": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>))
+        case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()
@@ -203,16 +196,11 @@ class ElasticSearchViewPermissionTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Permission test", "", testUser.transformToLoggedUser()).getCase()
         ProcessRole negViewRole = this.net.getRoles().values().find(v -> v.getImportId() == "view_neg_role")
         userService.addRole(testUser, negViewRole.getStringId())
-        // TODO: NAE-1645 setData from 6.3.0
-//        case_.dataSet.get("view_ul_pos").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)])
-        String taskId = (new ArrayList<>(case_.getTasks())).get(0).task
-        case_ = dataService.setData(taskId, ImportHelper.populateDataset([
-                "view_ul_pos": [
-                        "value": [testUser.stringId],
-                        "type": "userList"
-                ]
-        ] as Map)).getCase()
-        case_ = workflowService.save(case_)
+        String taskId = case_.tasks.first().task
+        dataService.setData(taskId, new DataSet([
+                "view_ul_pos": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+        ] as Map<String, Field<?>>))
+        case_ = workflowService.findOne(case_.stringId)
         sleep(4000)
 
         CaseSearchRequest caseSearchRequest = new CaseSearchRequest()

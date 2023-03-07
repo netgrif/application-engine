@@ -194,7 +194,6 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            // TODO: NAE-1645 merged from 6.3.0, check for errors
             resolveUserRefPermissions(useCase, id, permission);
         });
         useCase.resolveViewUsers();
