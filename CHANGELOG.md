@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-02-12)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-03-08)
 
 ### Fixed
 
@@ -18,6 +18,11 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1805] Data fields validations are not run on backend
 - [NAE-1811] Process delete does not delete ldap group roles
 - [NAE-1812] Clicking on a column in the case-view that does not have a value has an error behavior
+- [NAE-1829] UserFieldValue does not implements .toString() method
+- [NAE-1831] Task with negative permissions displayed
+- [NAE-1834] ExportService - Export CSV files in given charset
+- [NAE-1840] Configurable timeout for failed login attempts
+
 
 ### Changed
 
