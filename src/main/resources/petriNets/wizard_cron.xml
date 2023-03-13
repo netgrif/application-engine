@@ -11,6 +11,11 @@
 		<id>admin</id>
 		<title>Admin</title>
 	</role>
+	<function scope="process" name="updateCronDescription">
+		{  def cron_description ->
+			change cron_description value { "0 " + useCase.getFieldValue("minutes") + " " + useCase.getFieldValue("hours") + " " + useCase.getFieldValue("day_of_month") + " " + useCase.getFieldValue( "month" ) + " "	+ useCase.getFieldValue("day_of_week") + " *"}
+		}
+	</function>
 	<data type="boolean">
 		<id>active</id>
 		<title>Aktívny</title>
@@ -28,38 +33,356 @@
 		<id>process_id_map</id>
 		<title>Id procesov</title>
 	</data>
-	<data type="enumeration_map">
-		<id>seconds</id>
-		<title>Sekundy</title>
-	</data>
-	<data type="enumeration_map">
+	<data type="text">
 		<id>minutes</id>
+		<title/>
+		<init>*</init>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					cron_description: f.cron_description;
+
+					updateCronDescription(cron_description)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="enumeration_map">
+		<id>minutes_enum</id>
+		<title>Minúty výber</title>
+		<options>
+			<option key="every">Každá</option>
+			<option key="specific">Špecifická</option>
+		</options>
+		<init>every</init>
+		<event type="set">
+			<id>show_minutes</id>
+			<actions phase="post">
+				<action>
+					t_init: t.init,
+					t_edit: t.edit,
+					minutes_enum: f.minutes_enum,
+					minutes_specific: f.minutes_specific,
+					minutes: f.minutes;
+
+
+					make minutes_specific, editable on t_init when { minutes_enum.value == "specific" }
+					make minutes_specific, required on t_init when { minutes_enum.value == "specific" }
+					make minutes_specific, hidden on t_init when { minutes_enum.value != "specific" }
+
+					make minutes_specific, editable on t_edit when { minutes_enum.value == "specific" }
+					make minutes_specific, required on t_edit when { minutes_enum.value == "specific" }
+					make minutes_specific, hidden on t_edit when { minutes_enum.value != "specific" }
+
+					if (minutes_enum.value == "every") {
+						change minutes value { "*" }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice_map">
+		<id>minutes_specific</id>
 		<title>Minúty</title>
+		<options>
+			<option key="1">1</option>
+			<option key="2">2</option>
+			<option key="3">3</option>
+			<option key="4">4</option>
+			<option key="5">5</option>
+			<option key="6">6</option>
+			<option key="7">7</option>
+			<option key="8">8</option>
+			<option key="9">9</option>
+			<option key="10">10</option>
+			<option key="11">11</option>
+			<option key="12">12</option>
+		</options>
+		<event type="set">
+			<id>minutes_specific_set</id>
+			<actions phase="post">
+				<action>
+					minutes: f.minutes,
+					minutes_specific: f.minutes_specific;
+
+					change minutes value { minutes_specific.value.join(",") }
+				</action>
+			</actions>
+		</event>
 	</data>
-	<data type="enumeration_map">
+	<data type="text">
 		<id>hours</id>
-		<title>Hodiny</title>
+		<title/>
+		<init>*</init>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					cron_description: f.cron_description;
+
+					updateCronDescription(cron_description)
+				</action>
+			</actions>
+		</event>
 	</data>
 	<data type="enumeration_map">
+		<id>hours_enum</id>
+		<title>Hodiny výber</title>
+		<options>
+			<option key="every">Každá</option>
+			<option key="specific">Špecifická</option>
+		</options>
+		<init>every</init>
+		<event type="set">
+			<id>show_hours</id>
+			<actions phase="post">
+				<action>
+					t_init: t.init,
+					t_edit: t.edit,
+					hours: f.hours,
+					hours_enum: f.hours_enum,
+					hours_specific: f.hours_specific;
+
+					make hours_specific, editable on t_init when { hours_enum.value == "specific" }
+					make hours_specific, required on t_init when { hours_enum.value == "specific" }
+					make hours_specific, hidden on t_init when { hours_enum.value != "specific" }
+
+					make hours_specific, editable on t_edit when { hours_enum.value == "specific" }
+					make hours_specific, required on t_edit when { hours_enum.value == "specific" }
+					make hours_specific, hidden on t_edit when { hours_enum.value != "specific" }
+
+					if (hours_enum.value == "every"){
+						change hours value { "*" }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice_map">
+		<id>hours_specific</id>
+		<title>Hodiny</title>
+		<options>
+			<option key="1">1</option>
+			<option key="2">2</option>
+			<option key="3">3</option>
+			<option key="4">4</option>
+			<option key="5">5</option>
+			<option key="6">6</option>
+			<option key="7">7</option>
+			<option key="8">8</option>
+			<option key="9">9</option>
+			<option key="10">10</option>
+			<option key="11">11</option>
+			<option key="12">12</option>
+		</options>
+		<event type="set">
+			<id>hours_specific_set</id>
+			<actions phase="post">
+				<action>
+					hours_specific: f.hours_specific,
+					hours: f.hours;
+
+					change hours value { hours_specific.value.join(",") }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="enumeration_map">
+		<id>day_enum</id>
+		<title>Deň Výber</title>
+		<options>
+			<option key="every">Každý</option>
+			<option key="specific_month">Špecifický v mesiaci</option>
+			<option key="specific_week">Špecifický v týždni</option>
+		</options>
+		<init>every</init>
+		<event type="set">
+			<id>day_enum_set</id>
+			<actions phase="post">
+				<action>
+					day_enum: f.day_enum,
+					day_of_month: f.day_of_month,
+					day_of_week_select: f.day_of_week_select,
+					day_of_week: f.day_of_week,
+					day_of_month_select: f.day_of_month_select,
+					t_init: t.init,
+					t_edit: t.edit;
+
+					make day_of_week_select, editable on t_init when { day_enum.value == "specific_week" }
+					make day_of_week_select, required on t_init when { day_enum.value == "specific_week" }
+					make day_of_week_select, hidden on t_init when { day_enum.value != "specific_week" }
+
+					make day_of_week_select, editable on t_edit when { day_enum.value == "specific_week" }
+					make day_of_week_select, required on t_edit when { day_enum.value == "specific_week" }
+					make day_of_week_select, hidden on t_edit when { day_enum.value != "specific_week" }
+
+					make day_of_month_select, editable on t_init when { day_enum.value == "specific_month" }
+					make day_of_month_select, required on t_init when { day_enum.value == "specific_month" }
+					make day_of_month_select, hidden on t_init when { day_enum.value != "specific_month" }
+
+					make day_of_month_select, editable on t_edit when { day_enum.value == "specific_month" }
+					make day_of_month_select, required on t_edit when { day_enum.value == "specific_month" }
+					make day_of_month_select, hidden on t_edit when { day_enum.value != "specific_month" }
+
+					if ( day_enum.value == "every"){
+						change day_of_month value { "?" }
+						change day_of_week value { "*" }
+					} else if(day_enum.value == "specific_month"){
+						change day_of_week value { "?" }
+					} else if(day_enum.value == "specific_week"){
+						change day_of_month value { "?" }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
 		<id>day_of_month</id>
 		<title>Deň v mesiaci</title>
+		<init>?</init>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					cron_description: f.cron_description;
+
+					updateCronDescription(cron_description)
+				</action>
+			</actions>
+		</event>
 	</data>
-	<data type="enumeration_map">
-		<id>month</id>
-		<title>Mesiac</title>
+	<data type="multichoice_map">
+		<id>day_of_month_select</id>
+		<title>Deň v mesiaci</title>
+		<options>
+			<option key="1">1</option>
+			<option key="2">2</option>
+			<option key="3">3</option>
+		</options>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					day_of_month: f.day_of_month,
+					day_of_month_select: f.day_of_month_select;
+
+					change day_of_month value { day_of_month_select.value.join(",") }
+				</action>
+			</actions>
+		</event>
 	</data>
-	<data type="enumeration_map">
+	<data type="text">
 		<id>day_of_week</id>
+		<title>Deň v mesiaci</title>
+		<init>*</init>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					cron_description: f.cron_description;
+
+					updateCronDescription(cron_description)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice_map">
+		<id>day_of_week_select</id>
 		<title>Deň v týždni</title>
+		<options>
+			<option key="?">?</option>
+			<option key="MON">Pondelok</option>
+			<option key="TUE">Utorok</option>
+			<option key="WED">Streda</option>
+		</options>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					day_of_week: f.day_of_week,
+					day_of_week_select: f.day_of_week_select;
+
+					change day_of_week value { day_of_week_select.value.join(",")}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>month</id>
+		<title/>
+		<init>*</init>
+		<event type="set">
+			<id>update_cron_description</id>
+			<actions phase="post">
+				<action>
+					cron_description: f.cron_description;
+
+					updateCronDescription(cron_description)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="enumeration_map">
+		<id>month_enum</id>
+		<title>Mesiac</title>
+		<options>
+			<option key="every">Každý</option>
+			<option key="specific">Špecifický</option>
+		</options>
+		<init>every</init>
+		<event type="set">
+			<id>month_enum_set</id>
+			<actions phase="post">
+				<action>
+					month: f.month,
+					month_enum: f.month_enum,
+					month_specific: f.month_specific,
+					t_init: t.init,
+					t_edit: t.edit;
+
+					make month_specific, editable on t_init when { month_enum.value == "specific" }
+					make month_specific, required on t_init when { month_enum.value == "specific" }
+					make month_specific, hidden on t_init when { month_enum.value != "specific" }
+
+					make month_specific, editable on t_edit when { month_enum.value == "specific" }
+					make month_specific, required on t_edit when { month_enum.value == "specific" }
+					make month_specific, hidden on t_edit when { month_enum.value != "specific" }
+
+					if (month_enum.value == "every") {
+						change month value { "*" }
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="multichoice_map">
+		<id>month_specific</id>
+		<title>Mesiac</title>
+		<options>
+			<option key="JAN">Január</option>
+			<option key="FEB">Február</option>
+		</options>
+		<event type="set">
+			<id>month_specific_set</id>
+			<actions phase="post">
+				<action>
+					month: f.month,
+					month_specific: f.month_specific;
+
+					change month value { month_specific.value.join(",") }
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>log_text</id>
+		<title>Log</title>
 	</data>
 	<data type="boolean">
 		<id>edit_description_manually</id>
 		<title>Upraviť cron manuálne</title>
 		<init>false</init>
-	</data>
-	<data type="text">
-		<id>log_text</id>
-		<title>Log</title>
 	</data>
 	<transition>
 		<id>init</id>
@@ -73,38 +396,7 @@
 			<cols>6</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>cron_description</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>process_id_map</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-				<component>
-					<name>autocomplete</name>
-				</component>
-			</dataRef>
-			<dataRef>
-				<id>seconds</id>
+				<id>minutes_enum</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -118,7 +410,21 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>minutes</id>
+				<id>minutes_specific</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>hours_enum</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -132,7 +438,21 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>hours</id>
+				<id>hours_specific</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>day_enum</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -140,27 +460,42 @@
 					<x>2</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>1</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>day_of_month</id>
+				<id>day_of_month_select</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
-					<y>0</y>
+					<x>2</x>
+					<y>1</y>
 					<rows>1</rows>
-					<cols>1</cols>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+
+			</dataRef>
+			<dataRef>
+				<id>day_of_week_select</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>month</id>
+				<id>month_enum</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -168,30 +503,15 @@
 					<x>4</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>1</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>day_of_week</id>
+				<id>month_specific</id>
 				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>5</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>edit_description_manually</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>4</x>
@@ -201,19 +521,64 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+			</dataRef>
+			<dataRef>
+				<id>cron_description</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>edit_description_manually</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 				<event type="set">
 					<id>enable_description</id>
-					<actions phase="pre">
+					<actions phase="post">
 						<action>
 							edit_description_manually: f.edit_description_manually,
 							cron_description: f.cron_description,
 							trans: t.this;
 
-							make cron_description, editable on trans when { edit_description_manually.value == false }
-							make cron_description, visible on trans when { edit_description_manually.value == true }
+							make cron_description, editable on trans when { edit_description_manually.value == true }
+							make cron_description, visible on trans when { edit_description_manually.value == false }
 						</action>
 					</actions>
 				</event>
+			</dataRef>
+			<dataRef>
+				<id>process_id_map</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>autocomplete</name>
+				</component>
 			</dataRef>
 		</dataGroup>
 		<event type="assign">
@@ -302,7 +667,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -316,7 +681,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>4</cols>
 					<template>material</template>
@@ -327,13 +692,13 @@
 				</component>
 			</dataRef>
 			<dataRef>
-				<id>seconds</id>
+				<id>minutes_specific</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -341,13 +706,13 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>minutes</id>
+				<id>hours_specific</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -355,13 +720,13 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>hours</id>
+				<id>day_of_month_select</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -369,41 +734,13 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>day_of_month</id>
+				<id>day_of_week_select</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>month</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>day_of_week</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>5</x>
-					<y>0</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -417,7 +754,7 @@
 				</logic>
 				<layout>
 					<x>4</x>
-					<y>1</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<template>material</template>
@@ -425,17 +762,87 @@
 				</layout>
 				<event type="set">
 					<id>enable_description</id>
-					<actions phase="pre">
+					<actions phase="post">
 						<action>
 							edit_description_manually: f.edit_description_manually,
 							cron_description: f.cron_description,
 							trans: t.this;
 
-							make cron_description, editable on trans when { edit_description_manually.value == false }
-							make cron_description, visible on trans when { edit_description_manually.value == true }
+							make cron_description, editable on trans when { edit_description_manually.value == true }
+							make cron_description, visible on trans when { edit_description_manually.value == false }
 						</action>
 					</actions>
 				</event>
+			</dataRef>
+			<dataRef>
+				<id>minutes_enum</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>hours_enum</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>day_enum</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>month_enum</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>month_specific</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 	</transition>
