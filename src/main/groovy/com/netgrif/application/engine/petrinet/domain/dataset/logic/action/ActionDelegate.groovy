@@ -469,7 +469,7 @@ class ActionDelegate {
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
-                 executeTasks(dataSet, taskId, closure)
+                 executeTasks(dataSet, task.stringId, closure)
              }]
          }]
     }
