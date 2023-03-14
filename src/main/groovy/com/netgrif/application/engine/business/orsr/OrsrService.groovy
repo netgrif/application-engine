@@ -1,19 +1,17 @@
 package com.netgrif.application.engine.business.orsr
 
+import lombok.extern.slf4j.Slf4j
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
+@Slf4j
 @Service
 @SuppressWarnings("GrMethodMayBeStatic")
-class OrsrService implements IOrsrService {
-
-    static final Logger log = LoggerFactory.getLogger(OrsrService.class.getName())
+class OrsrService implements IOrsrService { // TODO: NAE-1645 remove
 
     def ORSR_URL_BASE = "http://www.orsr.sk/"
 

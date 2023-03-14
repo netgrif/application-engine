@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component
-public class DocumentValidator implements IDocumentValidator {
+public class DocumentValidator extends ModelValidator implements IDocumentValidator {
+
     @Override
     public void checkDeprecatedAttributes(Document document) {
         validateAttribute(document.getUsersRef(), "usersRef");

@@ -14,12 +14,11 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -42,6 +41,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -54,8 +54,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @Disabled("Fix Test")
 class ElasticSearchTest {
-
-    private static final Logger log = LoggerFactory.getLogger(ElasticSearchTest)
 
     private static final String LOCALE_SK = "sk"
     private static final String USER_EMAIL = "test@test.com"

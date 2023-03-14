@@ -52,7 +52,6 @@ class Async {
         assert $case.activePlaces["p2"] == 1
         assert $case.activePlaces["p3"] == null
         assert $case.activePlaces["p4"] == 1
-        // TODO: NAE-1645 value == null
         assert $case.dataSet.get("text_0").rawValue as String == "A"
         assert $case.dataSet.get("text_1").rawValue as String == "B"
         assert $case.dataSet.get("text_2").rawValue as String == "K"

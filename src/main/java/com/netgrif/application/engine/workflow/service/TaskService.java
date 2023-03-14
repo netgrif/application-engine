@@ -45,8 +45,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -67,10 +66,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class TaskService implements ITaskService {
-
-    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
     @Autowired
     protected ApplicationEventPublisher publisher;
@@ -759,7 +757,7 @@ public class TaskService implements ITaskService {
         if (userListValue == null) {
             return null;
         }
-        // TODO: NAE-1645 fix null set as user value, remove duplicate code, move this to userservice
+        // TODO: NAE-1645 fix null set as user value, remove duplicate code, move this to userservice, optimize to one request to mongo
         return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
                 .map(UserFieldValue::getId)

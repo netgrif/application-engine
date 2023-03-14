@@ -2,17 +2,14 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField
 import com.netgrif.application.engine.workflow.domain.Case
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 
 import java.lang.reflect.Method
 
-class FileGenerateReflection {
+@Slf4j
+class FileGenerateReflection { // TODO: NAE-1645 remove?
 
-    public static final Logger log = LoggerFactory.getLogger(FileGenerateReflection)
-
-    private static
-    final String GENERATION_METHODS_PACKAGE = "com.netgrif.application.engine.petrinet.domain.dataset.logic.action."
+    private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.application.engine.petrinet.domain.dataset.logic.action."
 
     private Case useCase
     private FileField field
@@ -26,8 +23,12 @@ class FileGenerateReflection {
 
     @Deprecated
     List<Object> executeLogic() {
-        if (field.logic == null) return null
-        if (field.logic.isEmpty()) return null
+        if (field.logic == null) {
+            return null
+        }
+        if (field.logic.isEmpty()) {
+            return null
+        }
 
         List<Object> results = new ArrayList<>()
         field.logic.each { member ->

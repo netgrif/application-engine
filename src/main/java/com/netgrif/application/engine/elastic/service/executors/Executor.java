@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.elastic.service.executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,15 +11,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class Executor {
-
-    public static final Logger log = LoggerFactory.getLogger(Executor.class);
 
     private static final long EXECUTOR_TIMEOUT = 10;
 
     private Map<String, ExecutorService> executors;
-
+    // TODO: NAE-1645 properties?
     public Executor(@Value("${spring.data.elasticsearch.executors.size:500}") long maxSize, @Value("${spring.data.elasticsearch.executors.timeout:5}") long timeout) {
         this.executors = Collections.synchronizedMap(new ExecutorMaxSizeHashMap(maxSize, timeout));
         log.info("Executor created, thread capacity: " + maxSize);

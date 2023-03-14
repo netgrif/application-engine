@@ -8,26 +8,24 @@ import com.netgrif.application.engine.auth.web.responsebodies.IUserFactory;
 import com.netgrif.application.engine.auth.web.responsebodies.User;
 import com.netgrif.application.engine.auth.web.responsebodies.UserResource;
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 
+@Slf4j
 @Service
 public class UserResourceHelperService implements IUserResourceHelperService {
 
-    public static final Logger log = LoggerFactory.getLogger(UserResourceHelperService.class);
+    private final IUserService userService;
+    private final IUserFactory userFactory;
+    private final IImpersonationService impersonationService;
 
-    @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private IUserFactory userFactory;
-
-    @Autowired
-    private IImpersonationService impersonationService;
+    public UserResourceHelperService(IUserService userService, IUserFactory userFactory, IImpersonationService impersonationService) {
+        this.userService = userService;
+        this.userFactory = userFactory;
+        this.impersonationService = impersonationService;
+    }
 
     @Override
     public UserResource getResource(LoggedUser loggedUser, Locale locale, boolean small) {

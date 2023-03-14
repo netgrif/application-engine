@@ -1,25 +1,21 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
-import com.netgrif.application.engine.business.IPostalCodeService
-import com.netgrif.application.engine.business.orsr.IOrsrService
-import com.netgrif.application.engine.importer.service.FieldFactory
+
 import com.netgrif.application.engine.petrinet.domain.Function
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 @SuppressWarnings("GrMethodMayBeStatic")
 abstract class FieldActionsRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
 
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDelegate()

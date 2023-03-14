@@ -132,7 +132,6 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private boolean isGridLayout(DataGroup dataGroup) {
-        // TODO: NAE-1645 constant/enum for "grid"
         return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(LayoutType.GRID);
     }
 

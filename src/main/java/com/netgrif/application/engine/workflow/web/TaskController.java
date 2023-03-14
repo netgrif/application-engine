@@ -9,14 +9,16 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.Eve
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
-import com.netgrif.application.engine.workflow.web.responsebodies.*;
+import com.netgrif.application.engine.workflow.web.responsebodies.CountResponse;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
+import com.netgrif.application.engine.workflow.web.responsebodies.TaskResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/task")
 @ConditionalOnProperty(
@@ -46,8 +49,6 @@ import java.util.Map;
 )
 @Tag(name = "Task")
 public class TaskController extends AbstractTaskController {
-
-    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     public TaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
         super(taskService, dataService, searchService);
@@ -197,7 +198,7 @@ public class TaskController extends AbstractTaskController {
     @Operation(summary = "Upload file into the task",
             description = "Caller must be assigned to the task, or must be an ADMIN",
             security = {@SecurityRequirement(name = "BasicAuth")})
-    @PostMapping(value = "/{id}/file/{field}",  produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{id}/file/{field}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
@@ -256,7 +257,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    // TODO: NAE-1645 6.2.5 return
+    // TODO: NAE-1645 6.2.5 path variables
     public EntityModel<EventOutcomeWithMessage> deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
         return super.deleteNamedFile(taskId, fieldId, name);
     }

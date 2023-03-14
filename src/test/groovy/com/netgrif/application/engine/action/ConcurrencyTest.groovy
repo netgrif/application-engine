@@ -7,22 +7,20 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
 class ConcurrencyTest {
-
-    private static final Logger log = LoggerFactory.getLogger(ConcurrencyTest)
 
     @Autowired
     private ImportHelper importHelper

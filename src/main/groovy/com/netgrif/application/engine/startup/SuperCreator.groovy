@@ -8,18 +8,16 @@ import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupS
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import groovy.transform.CompileStatic
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
+@Slf4j
 @ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 @Component
 @CompileStatic
 class SuperCreator extends AbstractOrderedCommandLineRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(SuperCreator.class.name)
 
     @Autowired
     private IAuthorityService authorityService

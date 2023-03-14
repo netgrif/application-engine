@@ -28,11 +28,10 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
@@ -46,12 +45,11 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+@Slf4j
 @SpringBootTest()
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 class DataSearchRequestTest {
-
-    private static final Logger log = LoggerFactory.getLogger(DataSearchRequestTest)
 
     public static final String PROCESS_TITLE = "Elastic data search request test"
     public static final String PROCESS_INITIALS = "TST"

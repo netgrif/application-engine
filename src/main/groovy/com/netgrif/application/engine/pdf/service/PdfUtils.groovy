@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.pdf.service
 
+import groovy.util.logging.Slf4j
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
@@ -11,12 +12,9 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 import org.apache.pdfbox.pdmodel.interactive.form.PDField
 import org.apache.pdfbox.pdmodel.interactive.form.PDNonTerminalField
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
+@Slf4j
 class PdfUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
     static final int KEY_LENGTH = 128
 

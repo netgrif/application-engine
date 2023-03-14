@@ -96,6 +96,7 @@ class DateTimeFieldValidation extends AbstractFieldValidation {
         }
         throw new IllegalArgumentException("Cannot validate field " + field.stringId + " of type " + field.type + " with date validation")
     }
+
     protected static LocalDateTime parseStringToLocalDateTime(String stringDate) {
         if (stringDate == null)
             return null

@@ -17,9 +17,8 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepositor
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -28,10 +27,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @Service
 public class ProcessRoleService implements IProcessRoleService {
-
-    private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
     private final IUserService userService;
     private final ProcessRoleRepository processRoleRepository;

@@ -10,8 +10,6 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.kie.api.runtime.KieSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +21,7 @@ import java.util.List;
 @Service
 public abstract class RuleEngine implements IRuleEngine {
 
+    // TODO: NAE-1645 properties
     @Value("${rule-engine.rethrow-exceptions:#{false}}")
     protected boolean rethrowExceptions;
 

@@ -3,8 +3,7 @@ package com.netgrif.application.engine
 import com.netgrif.application.engine.importer.model.Document
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,12 +18,12 @@ import javax.xml.bind.Unmarshaller
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE
 
+@Slf4j
 @RestController
 @RequestMapping("/dev/")
 @Profile("dev")
 class DevConsole {
-
-    private static final Logger log = LoggerFactory.getLogger(DevConsole)
+    // TODO: NAE-1645 fix old syntax
 
     @Autowired
     private CaseRepository caseRepository

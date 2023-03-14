@@ -1,13 +1,11 @@
 package com.netgrif.application.engine.importer.service.validation;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-public class ActionValidator implements IActionValidator {
-
-    private static final Logger log = LoggerFactory.getLogger(ActionValidator.class);
+public class ActionValidator extends ModelValidator implements IActionValidator {
 
     @Override
     public void validateAction(String action) {

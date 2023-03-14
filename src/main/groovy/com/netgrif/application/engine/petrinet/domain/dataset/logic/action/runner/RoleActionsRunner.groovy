@@ -5,18 +5,15 @@ import com.netgrif.application.engine.event.IGroovyShellFactory
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.RoleContext
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 @SuppressWarnings("GrMethodMayBeStatic")
 abstract class RoleActionsRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(RoleActionsRunner.class)
 
     @Lookup("roleActionDelegate")
     abstract RoleActionDelegate getRoleActionDelegate()

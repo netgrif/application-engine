@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.web;
 
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.service.ReindexingTask;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource;
@@ -9,21 +10,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/elastic")
 @ConditionalOnProperty(
@@ -34,17 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Elasticsearch")
 public class ElasticController {
 
-    private static final Logger log = LoggerFactory.getLogger(ElasticController.class.getName());
-
     private final IWorkflowService workflowService;
     private final ReindexingTask reindexingTask;
+    private final ElasticsearchProperties properties;
 
-    @Value("${spring.data.elasticsearch.reindexExecutor.size:20}")
-    private int pageSize;
-
-    public ElasticController(IWorkflowService workflowService, ReindexingTask reindexingTask) {
+    public ElasticController(IWorkflowService workflowService, ReindexingTask reindexingTask, ElasticsearchProperties properties) {
         this.workflowService = workflowService;
         this.reindexingTask = reindexingTask;
+        this.properties = properties;
     }
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
@@ -62,14 +56,15 @@ public class ElasticController {
 
             if (count == 0) {
                 log.info("No cases to reindex");
-            } else {
-                long numOfPages = (count / pageSize) + 1;
-                log.info("Reindexing cases: " + numOfPages + " pages");
+                return MessageResource.successMessage("No cases to reindex");
+            }
 
-                for (int page = 0; page < numOfPages; page++) {
-                    log.info("Indexing page " + (page + 1));
-                    reindexingTask.forceReindexPage(predicate, page, numOfPages);
-                }
+            long numOfPages = (count / properties.getReindexExecutor().getSize()) + 1;
+            log.info("Reindexing cases: " + numOfPages + " pages");
+
+            for (int page = 0; page < numOfPages; page++) {
+                log.info("Indexing page " + (page + 1));
+                reindexingTask.forceReindexPage(predicate, page, numOfPages);
             }
 
             return MessageResource.successMessage("Success");

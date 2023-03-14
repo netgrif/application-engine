@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class DataValidator implements IDataValidator {
+public class DataValidator extends ModelValidator implements IDataValidator {
 
     @Override
     public void checkDeprecatedAttributes(Data data) {

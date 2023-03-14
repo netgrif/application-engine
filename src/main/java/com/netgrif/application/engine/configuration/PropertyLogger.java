@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.AbstractEnvironment;
@@ -13,10 +12,9 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @Component
 public class PropertyLogger {
-
-    private static final Logger log = LoggerFactory.getLogger(PropertyLogger.class);
 
     @EventListener
     public void logProperties(ContextRefreshedEvent event) {

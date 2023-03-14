@@ -5,6 +5,7 @@ import com.netgrif.application.engine.configuration.drools.throwable.RuleValidat
 import com.netgrif.application.engine.rules.domain.RuleRepository;
 import com.netgrif.application.engine.rules.domain.StoredRule;
 import com.netgrif.application.engine.utils.DateUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -12,8 +13,6 @@ import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.utils.KieHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -28,10 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
-
-    private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseInitializer.class);
 
     @Value("${drools.template.path:rules/templates/template.drl}")
     private String templatePath;

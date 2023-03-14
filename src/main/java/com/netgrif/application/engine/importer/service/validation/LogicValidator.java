@@ -2,13 +2,13 @@ package com.netgrif.application.engine.importer.service.validation;
 
 import com.netgrif.application.engine.importer.model.Logic;
 import com.netgrif.application.engine.importer.service.throwable.BeatingAttributesException;
-import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
 @Component
-public class LogicValidator implements ILogicValidator {
+public class LogicValidator extends ModelValidator implements ILogicValidator {
+
     @Override
     public void checkDeprecatedAttributes(Logic logic) {
         validateAttribute(logic.isAssigned(), "assigned");
