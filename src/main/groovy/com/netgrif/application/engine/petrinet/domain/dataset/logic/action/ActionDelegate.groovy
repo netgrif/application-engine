@@ -8,8 +8,6 @@ import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
-import com.netgrif.application.engine.business.IPostalCodeService
-import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
@@ -18,8 +16,8 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
+import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -30,7 +28,6 @@ import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGener
 import com.netgrif.application.engine.petrinet.domain.*
 import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.context.ActionContext
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -178,12 +175,6 @@ class ActionDelegate {
 
     @Autowired
     IUriService uriService
-
-    @Autowired
-    IPostalCodeService postalCodeService
-
-    @Autowired
-    IOrsrService orsrService
 
     @Autowired
     IImpersonationService impersonationService
@@ -708,27 +699,10 @@ class ActionDelegate {
         actionsRunner.removeFromCache("${useCase.stringId}-${name}")
     }
 
-    //Get PSC - DSL only for Insurance
-    def byCode = { String code ->
-        return postalCodeService.findAllByCode(code)
-    }
-
-    def byCity = { String city ->
-        return postalCodeService.findAllByCity(city)
-    }
-
     def psc(Closure find, String input) {
         if (find)
             return find(input)
         return null
-    }
-
-    def byIco = { String ico ->
-        return orsrService.findByIco(ico)
-    }
-
-    def orsr(Closure find, String ico) {
-        return find?.call(ico)
     }
 
     Object get(String key) { map[key] }

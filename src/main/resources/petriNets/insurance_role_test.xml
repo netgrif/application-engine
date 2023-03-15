@@ -41,16 +41,6 @@
         <title>Obec</title>
         <id>301001</id>
         <placeholder>Názov</placeholder>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            other: f.301006;
-            change other choices {
-            def postal = psc byCity,field.value;
-            return postal?.first()?.city;
-            }
-            <!--@formatter:on-->
-        </action>
     </data>
     <data type="enumeration">
         <id>301005</id>
@@ -81,29 +71,6 @@
         <title>PSČ</title>
         <id>101001</id>
         <placeholder>PSČ</placeholder>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            obec: f.301005;
-            change obec choices {
-            def postal = psc byCode,field.value;
-            cache "post",postal;
-            return postal.city;
-            }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            obec: f.301005;
-            change obec about {
-            def postal = cache "post";
-            if (postal.size() == 1)
-            return postal?.first()?.city;
-            return null;
-            }
-            <!--@formatter:on-->
-        </action>
         <!--Miesto poistenia PSC-->
         <action trigger="set">
             <!--@formatter:off-->
@@ -6008,57 +5975,6 @@
         <title>IČO</title>
         <id>109058</id>
         <desc>Poistník</desc>
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109012;-->
-        <!--change name about {-->
-        <!--def orsr = psc byIco,ico.value;-->
-        <!--cache "orsr",orsr;-->
-        <!--return orsr?.name;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109045;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr";-->
-        <!--return orsr?.street;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109046;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr";-->
-        <!--return orsr?.streetNumber;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109047;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr";-->
-        <!--return orsr?.postalCode;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109048;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr";-->
-        <!--return orsr?.city;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
         <action trigger="set">
             <!--@formatter:off-->
             field: f.109020,
@@ -6454,57 +6370,6 @@
         <title>IČO</title>
         <id>109059</id>
         <desc>Poistený</desc>
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109026;-->
-        <!--change name about {-->
-        <!--def orsr = psc byIco,ico.value;-->
-        <!--cache "orsr2",orsr;-->
-        <!--return orsr?.name;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109045;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr2";-->
-        <!--return orsr?.street;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109046;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr2";-->
-        <!--return orsr?.streetNumber;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109047;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr2";-->
-        <!--return orsr?.postalCode;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-        <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-        <!--ico: f.this,-->
-        <!--name: f.109048;-->
-        <!--change name about {-->
-        <!--def orsr = cache "orsr2";-->
-        <!--return orsr?.city;-->
-        <!--}-->
-        <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
     </data>
     <data type="text">
         <id>109063</id>
