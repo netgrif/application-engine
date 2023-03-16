@@ -2,7 +2,7 @@ package com.netgrif.application.engine.pdf.generator.domain;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 import com.netgrif.application.engine.pdf.generator.service.renderer.Renderer;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import lombok.Getter;
@@ -111,11 +111,11 @@ public abstract class PdfField implements Comparable<PdfField> {
         int maxValueLineLength = getMaxValueLineSize(this.width - 3 * padding, resource.getFontValueSize(), padding);
         int multiLineHeight = 0;
 
-        List<String> splitLabel = FieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
+        List<String> splitLabel = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
         multiLineHeight += splitLabel.size() * lineHeight + padding;
 
         if (this.values != null) {
-            List<String> splitText = FieldBuilder.generateMultiLineText(this.values, maxValueLineLength);
+            List<String> splitText = PdfFieldBuilder.generateMultiLineText(this.values, maxValueLineLength);
             multiLineHeight += splitText.size() * lineHeight + padding;
         }
         this.changedSize = changeHeight(multiLineHeight);

@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public abstract class SelectionFieldRenderer extends FieldRenderer {
             }};
 
             if (textWidth > field.getWidth() - 4 * padding) {
-                multiLineText = FieldBuilder.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
+                multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
             }
 
             for (String line : multiLineText) {

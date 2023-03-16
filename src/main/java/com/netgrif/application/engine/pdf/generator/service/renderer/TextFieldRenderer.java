@@ -2,7 +2,7 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +34,7 @@ public class TextFieldRenderer extends FieldRenderer {
         int strokeLineCounter = 0;
 
         if (textWidth > field.getWidth() - 3 * padding) {
-            multiLineText = FieldBuilder.generateMultiLineText(field.getValues(), maxLineSize);
+            multiLineText = PdfFieldBuilder.generateMultiLineText(field.getValues(), maxLineSize);
         }
 
         for (String line : multiLineText) {

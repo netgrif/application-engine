@@ -2,7 +2,7 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTitleField;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class TitleRenderer extends Renderer {
 
         if (textWidth > fieldWidth - 2 * padding) {
             x = baseX;
-            multiLineText = FieldBuilder.generateMultiLineText(Collections.singletonList(title), maxLineSize);
+            multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(title), maxLineSize);
         }
 
         for (String line : multiLineText) {

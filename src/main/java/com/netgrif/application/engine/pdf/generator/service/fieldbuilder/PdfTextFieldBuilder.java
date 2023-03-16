@@ -18,9 +18,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TextFieldBuilder extends FieldBuilder {
+public class PdfTextFieldBuilder extends PdfFieldBuilder {
 
-    public TextFieldBuilder(PdfResource resource) {
+    public PdfTextFieldBuilder(PdfResource resource) {
         super(resource);
     }
 

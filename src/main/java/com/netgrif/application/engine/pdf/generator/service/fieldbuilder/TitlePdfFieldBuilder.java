@@ -4,9 +4,9 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTitleField;
 
-public class TitleFieldBuilder extends FieldBuilder {
+public class TitlePdfFieldBuilder extends PdfFieldBuilder {
 
-    public TitleFieldBuilder(PdfResource resource) {
+    public TitlePdfFieldBuilder(PdfResource resource) {
         super(resource);
     }
 

@@ -60,6 +60,8 @@ public class PdfProperties {
 
     protected int fontValueSize = 10;
 
+    protected int originalCols;
+
     protected int formGridCols = 4;
 
     protected int formGridRows = 30;

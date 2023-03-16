@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
@@ -27,7 +27,7 @@ public abstract class FieldRenderer extends Renderer {
         int x = field.getX() + padding, y = renderLinePosY(field, 1);
 
         if (textWidth > field.getWidth() - padding) {
-            multiLineText = FieldBuilder.generateMultiLineText(Collections.singletonList(field.getLabel()), maxLineSize);
+            multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(field.getLabel()), maxLineSize);
         }
 
         for (String line : multiLineText) {

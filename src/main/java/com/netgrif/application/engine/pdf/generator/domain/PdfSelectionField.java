@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.domain;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,11 +26,11 @@ public abstract class PdfSelectionField extends PdfField {
         int maxValueLineLength = getMaxValueLineSize(this.width - 2 * padding, resource.getFontValueSize(), padding);
         int multiLineHeight = 0;
 
-        List<String> splitLabel = FieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
+        List<String> splitLabel = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
         multiLineHeight += splitLabel.size() * lineHeight + padding;
 
         if (this.choices != null) {
-            List<String> splitText = FieldBuilder.generateMultiLineText(this.choices, maxValueLineLength);
+            List<String> splitText = PdfFieldBuilder.generateMultiLineText(this.choices, maxValueLineLength);
             multiLineHeight += splitText.size() * lineHeight + padding;
         }
         this.changedSize = changeHeight(multiLineHeight);

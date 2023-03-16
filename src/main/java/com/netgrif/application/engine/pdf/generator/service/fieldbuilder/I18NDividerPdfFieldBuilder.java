@@ -10,9 +10,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
 
-public class I18nDividerFieldBuilder extends FieldBuilder {
+public class I18NDividerPdfFieldBuilder extends PdfFieldBuilder {
 
-    public I18nDividerFieldBuilder(PdfResource resource) {
+    public I18NDividerPdfFieldBuilder(PdfResource resource) {
         super(resource);
     }
 

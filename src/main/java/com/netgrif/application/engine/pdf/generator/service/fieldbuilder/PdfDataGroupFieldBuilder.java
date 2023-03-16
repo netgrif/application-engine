@@ -5,9 +5,9 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfDataGroupField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 
-public class DataGroupFieldBuilder extends FieldBuilder {
+public class PdfDataGroupFieldBuilder extends PdfFieldBuilder {
 
-    public DataGroupFieldBuilder(PdfResource resource) {
+    public PdfDataGroupFieldBuilder(PdfResource resource) {
         super(resource);
     }
 

@@ -4,7 +4,6 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.DataRef;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import lombok.Getter;
 
@@ -13,7 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public abstract class FieldBuilder {
+public abstract class PdfFieldBuilder {
+
     protected PdfResource resource;
 
     @Getter
@@ -22,10 +22,9 @@ public abstract class FieldBuilder {
     // TODO: NAE-1645 remove
     private static final String LEGACY = "legacy";
     private static final String FLOW = "flow";
-
     private static final String GRID = "grid";
 
-    public FieldBuilder(PdfResource resource) {
+    public PdfFieldBuilder(PdfResource resource) {
         this.resource = resource;
     }
 

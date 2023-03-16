@@ -1,11 +1,12 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
-import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
+import com.netgrif.application.engine.pdf.generator.domain.PdfSelectionField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.DataRef;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.ArrayList;
@@ -13,26 +14,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
+public class PdfEnumerationSelectionFieldBuilder extends PdfSelectionFieldBuilder {
 
-    public MultiChoiceFieldBuilder(PdfResource resource) {
+    public PdfEnumerationSelectionFieldBuilder(PdfResource resource) {
         super(resource);
     }
 
     public PdfField buildField(DataGroup dataGroup, DataRef dataRef, int lastX, int lastY, Locale locale) {
-        MultichoiceField field = (MultichoiceField) dataRef.getField();
+        EnumerationField field = (EnumerationField) dataRef.getField();
         List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
+
         if (field.getChoices() != null) {
             choices = field.getChoices().stream().map(choice -> choice.getTranslation(locale)).collect(Collectors.toList());
         }
         if (field.getValue() != null) {
-            values = field.getValue().getValue().stream().map(value -> value.getTranslation(locale)).collect(Collectors.toList());
+            values.add(field.getValue().getValue().getTranslation(locale));
         }
+
         String translatedTitle = field.getName().getTranslation(locale);
-        PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
+        PdfSelectionField pdfField = new PdfEnumerationField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
         setFieldParams(dataGroup, dataRef, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;

@@ -5,7 +5,6 @@ import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfMultiChoiceField;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.DataRef;
-import com.netgrif.application.engine.petrinet.domain.dataset.I18nField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -14,9 +13,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
+public class MultiChoiceMapPdfSelectionFieldBuilder extends PdfSelectionFieldBuilder {
 
-    public MultiChoiceMapFieldBuilder(PdfResource resource) {
+    public MultiChoiceMapPdfSelectionFieldBuilder(PdfResource resource) {
         super(resource);
     }
 

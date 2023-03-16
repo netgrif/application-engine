@@ -2,7 +2,7 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.awt.*;
@@ -37,7 +37,7 @@ public class I18nDividerFieldRenderer extends FieldRenderer {
         int x = field.getX() + padding, y = renderLinePosY(field, 1);
 
         if (textWidth > field.getWidth() - padding) {
-            multiLineText = FieldBuilder.generateMultiLineText(field.getValues(), maxLineSize);
+            multiLineText = PdfFieldBuilder.generateMultiLineText(field.getValues(), maxLineSize);
         }
 
         for (String line : multiLineText) {
