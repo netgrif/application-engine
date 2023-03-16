@@ -85,14 +85,6 @@
             <id>postal</id>
             <logic>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    city: f.city;
-                    change city choices {
-                    def postals = psc byCode,field.value;
-                    return postals.collect({it.city}).unique();
-                    }
-                </action>
             </logic>
             <layout>
                 <x>0</x>

@@ -23,7 +23,6 @@ class RunnerController {
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
-            PostalCodeImporter,
             DemoRunner,
             QuartzSchedulerRunner,
             PdfRunner,
