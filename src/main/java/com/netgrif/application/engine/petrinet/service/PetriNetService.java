@@ -33,11 +33,10 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -64,10 +63,9 @@ import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
+@Slf4j
 @Service
 public class PetriNetService implements IPetriNetService {
-
-    private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
 
     @Autowired
     private IProcessRoleService processRoleService;

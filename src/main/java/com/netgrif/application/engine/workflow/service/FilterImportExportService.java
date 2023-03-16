@@ -9,10 +9,8 @@ import com.google.common.collect.Lists;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.FilterProperties;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.startup.DefaultFiltersRunner;
@@ -24,11 +22,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,11 +39,9 @@ import java.util.*;
  * Service that provides methods for creation of filter export/import cases for users.
  * Also provides methods to export and import filters.
  */
-
+@Slf4j
 @Service
 public class FilterImportExportService implements IFilterImportExportService {
-
-    private static final Logger log = LoggerFactory.getLogger(FilterImportExportService.class);
 
     private static final String EXPORT_NET_IDENTIFIER = "export_filters";
     private static final String IMPORT_NET_IDENTIFIER = "import_filters";

@@ -197,7 +197,6 @@ class RuleEngineTest {
         ruleRepository.save(rule4);
 
         CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superUser);
-//        TODO: NAE-1645 assertion error
         assert caseOutcome.getCase().getTitle().equals(NEW_CASE_TITLE);
 
         Task task = findTask(caseOutcome.getCase(), TRANS_1);
@@ -324,7 +323,6 @@ class RuleEngineTest {
         List<Fact> facts = factRepository.findAll(QCaseFact.caseFact.caseId.eq(caze.getStringId()), PageRequest.of(0, 100)).getContent();
         assert facts.stream().noneMatch(it -> ((TestFact) it).number == -2);
         assert facts.stream().noneMatch(it -> ((TestFact) it).number == -1);
-//        TODO: NAE-1645 assertion error
         assert facts.stream().filter(it -> ((TestFact) it).number == 1).count() == 1;
         assert facts.stream().filter(it -> ((TestFact) it).number == 2).count() == 1;
 

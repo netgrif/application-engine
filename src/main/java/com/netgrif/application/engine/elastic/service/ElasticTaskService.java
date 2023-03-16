@@ -15,11 +15,10 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.PetriNet;
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -37,7 +36,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BinaryOperator;
@@ -45,16 +43,16 @@ import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
+@Slf4j
 @Service
 public class ElasticTaskService extends ElasticViewPermissionService implements IElasticTaskService {
-
-    private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
     private ElasticTaskRepository repository;
     private ITaskService taskService;
     private ElasticsearchRestTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    // TODO: NAE-1645 properties
     @Value("${spring.data.elasticsearch.index.task}")
     private String taskIndex;
 
@@ -156,8 +154,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class,  IndexCoordinates.of(taskIndex));
-            Page<ElasticTask> indexedTasks = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();
         } else {

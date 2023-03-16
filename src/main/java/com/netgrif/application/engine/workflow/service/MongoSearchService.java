@@ -3,8 +3,7 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.querydsl.core.BooleanBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,10 +20,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Slf4j
 @Service
 public class MongoSearchService<T> {
-
-    private static final Logger log = LoggerFactory.getLogger(MongoSearchService.class.getName());
 
     private static final String ERROR_KEY = "ERROR";
 

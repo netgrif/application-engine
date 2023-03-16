@@ -3,8 +3,7 @@ package com.netgrif.application.engine.configuration.security;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -18,9 +17,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 public class ImpersonationRequestFilter extends OncePerRequestFilter {
-
-    public static final Logger log = LoggerFactory.getLogger(ImpersonationRequestFilter.class);
 
     private final ImpersonatorRepository impersonatorRepository;
 

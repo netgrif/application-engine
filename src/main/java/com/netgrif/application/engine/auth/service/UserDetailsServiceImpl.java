@@ -6,8 +6,7 @@ import com.netgrif.application.engine.auth.domain.UserState;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
 import com.netgrif.application.engine.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.application.engine.event.events.user.UserLoginEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
     protected UserRepository userRepository;
@@ -40,7 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
-            logger.info("User " + email + " with IP Address " + ip + " is blocked.");
+            log.info("User " + email + " with IP Address " + ip + " is blocked.");
             throw new RuntimeException("blocked");
         }
 

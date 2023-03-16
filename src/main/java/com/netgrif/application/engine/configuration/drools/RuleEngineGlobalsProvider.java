@@ -10,9 +10,8 @@ import com.netgrif.application.engine.rules.service.interfaces.IRuleEvaluationSc
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService;
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.kie.api.runtime.KieSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +21,9 @@ import java.util.List;
 
 import static com.netgrif.application.engine.configuration.drools.RuleEngineGlobal.engineGlobal;
 
+@Slf4j
 @Service
 public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
-
-    private static final Logger log = LoggerFactory.getLogger("RuleEngine");
 
     protected List<RuleEngineGlobal> globals;
     protected List<String> imports;

@@ -3,19 +3,17 @@ package com.netgrif.application.engine.configuration.drools;
 import com.netgrif.application.engine.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.application.engine.configuration.drools.interfaces.IRefreshableKieBase;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.kie.api.KieBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 public class RefreshableKieBase implements IRefreshableKieBase {
-
-    public static final Logger log = LoggerFactory.getLogger(RefreshableKieBase.class);
 
     @Value("${drools.knowBase.auto-refresh:#{true}}")
     private boolean autoRefresh;

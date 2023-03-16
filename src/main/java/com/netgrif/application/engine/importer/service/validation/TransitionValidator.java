@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component
-public class TransitionValidator implements ITransitionValidator {
+public class TransitionValidator extends ModelValidator implements ITransitionValidator {
 
     @Override
     public void checkDeprecatedAttributes(Transition transition) {

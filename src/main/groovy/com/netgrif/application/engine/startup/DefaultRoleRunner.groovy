@@ -6,18 +6,16 @@ import com.netgrif.application.engine.petrinet.domain.events.EventType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
 import groovy.transform.CompileStatic
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
+@Slf4j
 @Component
 @Profile("!update")
 @CompileStatic
 class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(DefaultRoleRunner.class)
 
     @Autowired
     private ProcessRoleRepository repository

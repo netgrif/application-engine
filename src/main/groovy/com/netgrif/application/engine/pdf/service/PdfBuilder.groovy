@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.pdf.service
 
+import groovy.util.logging.Slf4j
 import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.*
 import org.apache.pdfbox.pdmodel.common.PDRectangle
@@ -8,14 +9,11 @@ import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import static com.netgrif.application.engine.pdf.service.PdfUtils.mmToPoint
 
+@Slf4j
 class PdfBuilder {
-
-    public static final Logger log = LoggerFactory.getLogger(PdfBuilder)
 
     protected PDDocument document
 

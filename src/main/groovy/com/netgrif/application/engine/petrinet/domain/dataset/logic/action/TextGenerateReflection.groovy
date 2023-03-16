@@ -2,14 +2,12 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.action
 
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.workflow.domain.Case
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import groovy.util.logging.Slf4j
 
 import java.lang.reflect.Method
 
-class TextGenerateReflection {
-
-    public static final Logger log = LoggerFactory.getLogger(TextGenerateReflection)
+@Slf4j
+class TextGenerateReflection { // TODO: NAE-1645 remove
 
     private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.application.engine.petrinet.domain.dataset.logic.action."
 

@@ -13,8 +13,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.TaskRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,11 +28,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Component
 @ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
 public class ReindexingTask {
-
-    private static final Logger log = LoggerFactory.getLogger(ReindexingTask.class);
 
     private int pageSize;
     private CaseRepository caseRepository;

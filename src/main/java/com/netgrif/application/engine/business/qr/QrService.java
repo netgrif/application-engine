@@ -5,9 +5,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.javase.QRCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -19,10 +18,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class QrService implements IQrService {
-
-    private static Logger log = LoggerFactory.getLogger(QrService.class);
 
     @Override
     public Optional<InputStream> generateToStream(QrCode code) {

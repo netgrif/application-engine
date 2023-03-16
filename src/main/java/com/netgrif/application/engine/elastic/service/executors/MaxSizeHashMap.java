@@ -1,15 +1,13 @@
 package com.netgrif.application.engine.elastic.service.executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+@Slf4j
 public class MaxSizeHashMap<T> extends LinkedHashMap<String, T> {
-
-    public static final Logger log = LoggerFactory.getLogger(MaxSizeHashMap.class);
 
     private final long maxSize;
     private final Consumer<T> removeEldest;

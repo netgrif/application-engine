@@ -21,9 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
@@ -47,6 +46,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/petrinet")
 @ConditionalOnProperty(
@@ -56,8 +56,6 @@ import java.util.*;
 )
 @Tag(name = "PetriNet")
 public class PetriNetController {
-
-    private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;

@@ -53,10 +53,9 @@ import com.netgrif.application.engine.workflow.web.responsebodies.MessageResourc
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import groovy.transform.NamedVariant
+import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.quartz.Scheduler
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
@@ -72,10 +71,9 @@ import java.util.stream.Collectors
 /**
  * ActionDelegate class contains Actions API methods.
  */
+@Slf4j
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
-
-    static final Logger log = LoggerFactory.getLogger(ActionDelegate)
 
     public static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
     public static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
@@ -462,7 +460,7 @@ class ActionDelegate {
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
-                 executeTasks(dataSet, taskId, closure)
+                 executeTasks(dataSet, task.stringId, closure)
              }]
          }]
     }

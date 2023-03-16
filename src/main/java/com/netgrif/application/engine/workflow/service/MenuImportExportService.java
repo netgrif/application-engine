@@ -21,8 +21,7 @@ import com.netgrif.application.engine.workflow.domain.menu.MenuEntry;
 import com.netgrif.application.engine.workflow.domain.menu.MenuEntryRole;
 import com.netgrif.application.engine.workflow.service.interfaces.*;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,11 +36,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class MenuImportExportService implements IMenuImportExportService {
-
-    private static final Logger log = LoggerFactory.getLogger(MenuImportExportService.class);
-
+// TODO: NAE-1645 replace logger declarations with @Slf4j
     private static final String MENU_ITEM_NAME = "entry_name";
     private static final String USE_ICON = "use_icon";
     private static final String ALLOWED_ROLES = "allowed_roles";
@@ -308,8 +306,8 @@ public class MenuImportExportService implements IMenuImportExportService {
     }
 
     private MenuEntry createMenuEntryExportClass(Case menuItemCase, String filterCaseId) {
-        Map<String, I18nString> allowedRoles = ((EnumerationMapField)menuItemCase.getDataSet().get(ALLOWED_ROLES)).getOptions();
-        Map<String, I18nString> bannedRoles = ((EnumerationMapField)menuItemCase.getDataSet().get(BANNED_ROLES)).getOptions();
+        Map<String, I18nString> allowedRoles = ((EnumerationMapField) menuItemCase.getDataSet().get(ALLOWED_ROLES)).getOptions();
+        Map<String, I18nString> bannedRoles = ((EnumerationMapField) menuItemCase.getDataSet().get(BANNED_ROLES)).getOptions();
 
         List<MenuEntryRole> menuEntryRoleList = new ArrayList<>();
 
@@ -336,7 +334,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         MenuEntry exportMenuItem = new MenuEntry();
         exportMenuItem.setEntryName(menuItemCase.getDataSet().get(MENU_ITEM_NAME).toString());
         exportMenuItem.setFilterCaseId(filterCaseId);
-        exportMenuItem.setUseIcon(((BooleanField)menuItemCase.getDataSet().get(USE_ICON)).getValue().getValue());
+        exportMenuItem.setUseIcon(((BooleanField) menuItemCase.getDataSet().get(USE_ICON)).getValue().getValue());
         if (!menuEntryRoleList.isEmpty()) exportMenuItem.setMenuEntryRoleList(menuEntryRoleList);
 
         return exportMenuItem;
@@ -346,7 +344,7 @@ public class MenuImportExportService implements IMenuImportExportService {
     public Map<String, I18nString> createAvailableEntriesChoices(List<Case> menuItemCases) {
         Map<String, I18nString> availableItems;
         availableItems = menuItemCases.stream()
-                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString(((TextField)v.getDataSet().get(ENTRY_DEFAULT_NAME)).getValue().getValue())));
+                .collect(Collectors.toMap(Case::getStringId, v -> new I18nString(((TextField) v.getDataSet().get(ENTRY_DEFAULT_NAME)).getValue().getValue())));
 
         return availableItems;
     }

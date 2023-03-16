@@ -13,10 +13,9 @@ import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetRefere
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -37,10 +36,9 @@ import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
+@Slf4j
 @Service
 public class ElasticCaseService extends ElasticViewPermissionService implements IElasticCaseService {
-
-    private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     private ElasticCaseRepository repository;
 

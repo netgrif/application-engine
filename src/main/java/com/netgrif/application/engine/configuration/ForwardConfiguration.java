@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,11 +10,10 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @Controller
 @ControllerAdvice
 public class ForwardConfiguration {
-
-    private static final Logger log = LoggerFactory.getLogger(ForwardConfiguration.class);
 
     @RequestMapping(value = "/{path:[^api]*}")
     public String redirect(HttpServletRequest request) {

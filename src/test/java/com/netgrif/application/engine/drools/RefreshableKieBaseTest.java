@@ -5,13 +5,12 @@ import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
 import com.netgrif.application.engine.rules.domain.StoredRule;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ApplicationEngine.class
@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
 public class RefreshableKieBaseTest {
-
-    public static final Logger log = LoggerFactory.getLogger(RefreshableKieBaseTest.class);
 
     @Autowired
     private TestHelper testHelper;
