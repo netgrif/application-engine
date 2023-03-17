@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class StoredRule {
 
     @Id
-    private ObjectId _id;
+    private ObjectId id;
 
     @Indexed
     private String identifier;
@@ -46,14 +46,13 @@ public class StoredRule {
     private LocalDateTime creationDate;
 
     public StoredRule() {
-        _id = new ObjectId();
-        identifier = _id.toString();
+        id = new ObjectId();
+        identifier = id.toString();
         lastUpdate = LocalDateTime.now();
         creationDate = LocalDateTime.now();
     }
 
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
-
 }

@@ -50,7 +50,7 @@ public class DataGroup extends PetriNetObject {
     private int nestingLevel;
 
     public DataGroup() {
-        this._id = new ObjectId();
+        this.id = new ObjectId();
         this.data = new LinkedHashSet<>();
     }
 

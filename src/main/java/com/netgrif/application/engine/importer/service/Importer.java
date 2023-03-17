@@ -171,7 +171,7 @@ public class Importer {
 
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
-        savedFile.getParentFile().mkdirs(); // TODO: NAE-1645 return false? storage should be created so maybe delete this line?
+        savedFile.getParentFile().mkdirs(); // TODO: release/7.0.0 return false? storage should be created so maybe delete this line?
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
         return savedFile.toPath();
@@ -758,7 +758,7 @@ public class Importer {
         }
     }
 
-    // TODO: NAE-1645 Behavior REQ,IMM,OPT deprecated
+    // TODO: release/7.0.0 Behavior REQ,IMM,OPT deprecated
     private boolean isNotDeprecated(Behavior behavior) {
         return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
     }
@@ -876,7 +876,7 @@ public class Importer {
         }
     }
 
-    // TODO: NAE-1645 add atribute "type" to set actions
+    // TODO: release/7.0.0 add atribute "type" to set actions
     protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         action.setImportId(buildActionId(importedAction.getId()));
@@ -1013,7 +1013,7 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        role.set_id(new ObjectId());
+        role.setId(new ObjectId());
 
         role.setNetId(net.getStringId());
         net.addRole(role);

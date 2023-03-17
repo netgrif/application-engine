@@ -126,7 +126,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findGroup(String groupID) {
-        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ObjectId(groupID))));
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$.id.eq(new ObjectId(groupID))));
         if (!isGroupCase(result)) {
             return null;
         }
@@ -153,7 +153,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public List<Case> findByIds(Collection<String> groupIds) {
-        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
+        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$.id::eq).collect(Collectors.toList());
         BooleanBuilder builder = new BooleanBuilder();
         groupQueries.forEach(builder::or);
         return this.workflowService.searchAll(groupCase().and(builder)).getContent();
@@ -208,7 +208,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public void addUser(IUser user, Case groupCase) {
-        // TODO: NAE-1645: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
+        // TODO: release/7.0.0: WorkflowServiceTest#createCaseWithLocale - Cannot invoke "com.netgrif.application.engine.workflow.domain.Case.getDataField(String)" because "groupCase" is null
         MapOptionsField<I18nString, String> field = (MapOptionsField<I18nString, String>) groupCase.getDataSet().get(GROUP_MEMBERS_FIELD);
         Map<String, I18nString> existingUsers = field.getOptions();
         if (existingUsers == null) {
@@ -242,7 +242,7 @@ public class NextGroupService implements INextGroupService {
         String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if (user.equals(authorId)) {
-                log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
+                log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.getId().toString() + "]");
             } else {
                 existingUsers.remove(user);
                 securityContextService.saveToken(user);
@@ -259,7 +259,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllCoMembers(IUser user) {
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        Set<String> users = workflowService.searchAll(
 //                        groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(user.getStringId())))
 //                .map(it -> it.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet()).stream()
@@ -276,7 +276,7 @@ public class NextGroupService implements INextGroupService {
         if (!isGroupCase(groupCase)) {
             return null;
         }
-//        TODO: NAE-1645 check field type is enummap
+//        TODO: release/7.0.0 check field type is enummap
         Set<String> userIds = ((EnumerationMapField)groupCase.getDataSet().get(GROUP_MEMBERS_FIELD)).getOptions().keySet();
         List<IUser> resultList = new ArrayList<>();
         userIds.forEach(id -> resultList.add(userService.resolveById(id, true)));
@@ -285,9 +285,9 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllGroupsOfUser(IUser groupUser) {
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId())))
-//                .map(aCase -> aCase.get_id().toString()).getContent();
+//                .map(aCase -> aCase.getId().toString()).getContent();
 //        return new HashSet<>(groupList);
         return new HashSet<>();
     }
@@ -363,7 +363,7 @@ public class NextGroupService implements INextGroupService {
     protected DataSet getInitialGroupData(IUser author, String title, Case groupCase) {
         DataSet dataSet = new DataSet();
 
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
 //        workflowService.save(groupCase);
 //

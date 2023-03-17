@@ -89,13 +89,12 @@ class WorkflowServiceTest {
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
         importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
 
-        importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
-        importHelper.finishTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.assignTask("Manuel", aCase.getStringId(), superCreator.getLoggedSuper())
+        importHelper.finishTask("Manuel", aCase.getStringId(), superCreator.getLoggedSuper())
 
         assert workflowService.findOne(aCase.stringId).getActivePlaces().containsKey("p3")
         assert workflowService.findOne(aCase.stringId).getActivePlaces().size() == 1
     }
-
 
     @Test
     void createCaseWithLocale() {
@@ -105,10 +104,10 @@ class WorkflowServiceTest {
         def net = testNet.getNet()
         Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
 
-        assert aCase.title.equals("Slovenský preklad")
+        assert aCase.title == "Slovenský preklad"
 
         Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
 
-        assert enCase.title.equals("English translation")
+        assert enCase.title == "English translation"
     }
 }

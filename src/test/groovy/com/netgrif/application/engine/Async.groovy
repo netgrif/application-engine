@@ -47,7 +47,6 @@ class Async {
         $case = workflowService.findOne($case.stringId)
         def tasks = taskService.findAllByCase($case.stringId, Locale.UK)
 
-        assert $case.tasks.size() == 0
         assert $case.activePlaces["p1"] == null
         assert $case.activePlaces["p2"] == 1
         assert $case.activePlaces["p3"] == null

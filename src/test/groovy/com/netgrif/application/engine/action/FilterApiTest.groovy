@@ -130,8 +130,8 @@ class FilterApiTest {
 
         Thread.sleep(2000)
 
-        assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(item.stringId))) == null
-        assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
+        assert workflowService.searchOne(QCase.case$.id.eq(new ObjectId(item.stringId))) == null
+        assert workflowService.searchOne(QCase.case$.id.eq(new ObjectId(filter.stringId))) == null
     }
 
 

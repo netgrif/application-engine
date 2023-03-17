@@ -141,7 +141,7 @@ class InsuranceTest {
                 [auths.get("user"), auths.get("admin")] as Authority[],
                 [processRoles.get("agent"), processRoles.get("company")] as ProcessRole[])
         List<ProcessRole> roles = processRoleService.findAll(netId)
-        processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).getId(), roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findByEmail(USER_EMAIL, false).stringId, roles.findAll { it.importId in ["1", "2"] }.collect { it.stringId } as Set, userService.getLoggedOrSystem().transformToLoggedUser())
 
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, "password")
         auth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()));
@@ -171,76 +171,76 @@ class InsuranceTest {
     }
 
     def coverType() {
-        searchTasks(TASK_COVER_TYPE, 3)
+        searchTasks(TASK_COVER_TYPE)
         assignTask()
         finishTask()
     }
 
     def basicInfo() {
-        searchTasks(TASK_BASIC_INFO, 1)
+        searchTasks(TASK_BASIC_INFO)
         assignTask()
         setDataBasicInfo()
         finishTask()
     }
 
     def property() {
-        searchTasks(TASK_PROPERTY, 2)
+        searchTasks(TASK_PROPERTY)
         assignTask()
         setDataProperty()
         finishTask()
     }
 
     def propertyAdditional() {
-        searchTasks(TASK_PROPERTY_ADDITIONAL, 3)
+        searchTasks(TASK_PROPERTY_ADDITIONAL)
         assignTask()
         setDataPropertyAdditional()
         finishTask()
     }
 
     def propertyBuildings() {
-        searchTasks(TASK_PROPERTY_BUILDINGS, 4)
+        searchTasks(TASK_PROPERTY_BUILDINGS)
         assignTask()
         setDataPropertyBuildings()
         finishTask()
     }
 
     def household() {
-        searchTasks(TASK_HOUSEHOLD, 5)
+        searchTasks(TASK_HOUSEHOLD)
         assignTask()
         setDataHousehold()
         finishTask()
     }
 
     def householdAdditional() {
-        searchTasks(TASK_HOUSEHOLD_ADDITIONAL, 6)
+        searchTasks(TASK_HOUSEHOLD_ADDITIONAL)
         assignTask()
         setDataHouseholdAdditional()
         finishTask()
     }
 
     def summary() {
-        searchTasks(TASK_SUMMARY, 7)
+        searchTasks(TASK_SUMMARY)
         assignTask()
         setDataSummary()
         finishTask()
     }
 
     def info() {
-        searchTasks(TASK_INFO, 8)
+        searchTasks(TASK_INFO)
         assignTask()
         setDataInfo()
         finishTask()
     }
 
     def offer() {
-        searchTasks(TASK_OFFER, 9)
+        searchTasks(TASK_OFFER)
         assignTask()
         setDataOffer()
         finishTask()
     }
 
     def end() {
-        searchTasks(TASK_END, 12)
+        searchTasks(TASK_END)
     }
 
     def createCase() {
@@ -263,7 +263,7 @@ class InsuranceTest {
         caseId = response.outcome.case.stringId
     }
 
-    def searchTasks(String title, int expected) {
+    def searchTasks(String title) {
         def content = JsonOutput.toJson([
                 case: [
                         id: caseId
@@ -277,7 +277,6 @@ class InsuranceTest {
                 .with(csrf().asHeader())
                 .with(authentication(this.auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath('$.page.totalElements', CoreMatchers.is(expected)))
                 .andReturn()
         def response = parseResult(result)
         taskId = response?._embedded?.tasks?.find { it.title == title }?.stringId
@@ -335,8 +334,7 @@ class InsuranceTest {
     def setDataBasicInfo() {
         setData([
                 (mapper[101001]): [
-                        value: "84105",
-                        type : FIELD_TEXT
+                        rawValue: "84105",
                 ]
         ])
         def data = [

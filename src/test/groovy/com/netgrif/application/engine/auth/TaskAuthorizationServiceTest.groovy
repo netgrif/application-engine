@@ -217,7 +217,7 @@ class TaskAuthorizationServiceTest {
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
 
-        // TODO: NAE-1645 change to dataset?
+        // TODO: release/7.0.0 change to dataset?
         def body = JsonOutput.toJson([
                 text: [
                         value: "Helo world",

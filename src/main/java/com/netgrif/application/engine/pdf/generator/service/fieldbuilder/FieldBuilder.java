@@ -19,7 +19,7 @@ public abstract class FieldBuilder {
     @Getter
     protected int lastX, lastY;
 
-    // TODO: NAE-1645 remove
+    // TODO: release/7.0.0 remove
     private static final String LEGACY = "legacy";
     private static final String FLOW = "flow";
 
@@ -170,7 +170,7 @@ public abstract class FieldBuilder {
     }
 
     private boolean isDgFlow(DataGroup dataGroup) {
-        // TODO: NAE-1645
+        // TODO: release/7.0.0
         return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(FLOW);
     }
 

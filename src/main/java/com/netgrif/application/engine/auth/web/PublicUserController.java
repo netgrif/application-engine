@@ -89,7 +89,7 @@ public class PublicUserController {
     @Operation(summary = "Get user's preferences")
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences() {
-        String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+        String userId = userService.getAnonymousLogged().transformToAnonymousUser().getStringId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -103,7 +103,7 @@ public class PublicUserController {
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences) {
         try {
-            String userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+            String userId = userService.getAnonymousLogged().transformToAnonymousUser().getStringId();
             preferences.setUserId(userId);
             preferencesService.save(preferences);
             return MessageResource.successMessage("User preferences saved");

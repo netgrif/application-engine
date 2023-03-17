@@ -81,7 +81,7 @@ public class TextFieldBuilder extends FieldBuilder {
     private String formatDate(Field<?> field) {
         ZonedDateTime value = ZonedDateTime.now();
         if (field.getValue() != null) {
-            // TODO: NAE-1645 not needed anymore, fixed class of value
+            // TODO: release/7.0.0 not needed anymore, fixed class of value
             if (field.getValue().getValue() instanceof LocalDate)
                 value = DateUtils.localDateToZonedDate((LocalDate) field.getValue().getValue(), resource.getDateZoneId());
             else if (field.getValue().getValue() instanceof Date)

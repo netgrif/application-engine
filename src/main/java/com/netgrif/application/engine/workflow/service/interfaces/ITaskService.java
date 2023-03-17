@@ -38,8 +38,6 @@ public interface ITaskService {
 
     List<Task> findAllById(List<String> ids);
 
-    void createTasks(Case useCase);
-
     Page<Task> findByUser(Pageable pageable, IUser user);
 
     Task findById(String id);

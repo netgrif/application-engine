@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class MenuImportExportService implements IMenuImportExportService {
-// TODO: NAE-1645 replace logger declarations with @Slf4j
+// TODO: release/7.0.0 replace logger declarations with @Slf4j
     private static final String MENU_ITEM_NAME = "entry_name";
     private static final String USE_ICON = "use_icon";
     private static final String ALLOWED_ROLES = "allowed_roles";
@@ -141,7 +141,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         //Change remove_option button value to trigger its SET action
         if (!menuItemIdsToReplace.isEmpty()) menuItemIdsToReplace.forEach(id -> {
             DataSet caseToRemoveData = new DataSet();
-//            TODO: NAE-1645
+//            TODO: release/7.0.0
 //            DataField removeBtnData = new DataField();
 //            removeBtnData.setValue("removed");
 //            caseToRemoveData.getFields().put("remove_option", removeBtnData);
@@ -167,7 +167,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(parentId)));
 
             DataSet groupData = new DataSet();
-//            TODO: NAE-1645
+//            TODO: release/7.0.0
 //            DataField groupImportResultMessage = new DataField();
 //            groupImportResultMessage.setValue(resultMessage.toString());
 //            groupData.getFields().put("import_results", groupImportResultMessage);
@@ -257,7 +257,7 @@ public class MenuImportExportService implements IMenuImportExportService {
         Task task = taskService.searchOne(qTask.transitionId.eq("init").and(qTask.caseId.eq(menuItemCase.getStringId())));
         try {
             taskService.assignTask(task, userService.getLoggedUser());
-//            TODO: NAE-1645
+//            TODO: release/7.0.0
 //            menuItemCase.getDataSet().get(MENU_IDENTIFIER).setValue(menuIdentifier);
 //            menuItemCase.getDataSet().get(PARENT_ID).setValue(parentId);
 //            menuItemCase.getDataSet().get(ALLOWED_ROLES).setOptions(allowedRoles);

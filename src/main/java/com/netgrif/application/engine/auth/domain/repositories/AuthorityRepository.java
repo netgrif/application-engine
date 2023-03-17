@@ -15,5 +15,5 @@ public interface AuthorityRepository extends MongoRepository<Authority, String>,
 
     List<Authority> findAllByNameStartsWith(String prefix);
 
-    List<Authority> findAllBy_idIn(List<ObjectId> ids);
+    List<Authority> findAllByIdIn(List<ObjectId> ids);
 }

@@ -24,10 +24,9 @@ public class Authority implements GrantedAuthority {
     public static final String user = ROLE + "USER";
     public static final String anonymous = ROLE + "ANONYMOUS";
 
-
     @Id
     @Getter
-    private ObjectId _id;
+    private ObjectId id;
 
     @NotNull
     @JsonIgnore
@@ -60,7 +59,7 @@ public class Authority implements GrantedAuthority {
     }
 
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
 
     @Override
@@ -85,7 +84,7 @@ public class Authority implements GrantedAuthority {
     @Override
     public String toString() {
         return "Authority{" +
-                "id=" + _id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
     }

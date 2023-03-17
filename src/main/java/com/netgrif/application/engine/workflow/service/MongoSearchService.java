@@ -92,7 +92,7 @@ public class MongoSearchService<T> {
         log.info("Executing search query: " + queryString);
         return new PageImpl<>(mongoTemplate.find(query, tClass),
                 pageable,
-                mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), tClass));
+                mongoTemplate.count(new BasicQuery(queryString, "{id:1}"), tClass));
     }
 
 

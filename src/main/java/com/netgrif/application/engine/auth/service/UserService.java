@@ -188,7 +188,7 @@ public class UserService extends AbstractUserService {
         Set<String> members = groupService.getAllCoMembers(loggedUser.getSelfOrImpersonated().transformToUser());
         members.add(loggedUser.getSelfOrImpersonated().getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
-        return changeType(userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
+        return changeType(userRepository.findAllByIdInAndState(objMembers, UserState.ACTIVE, pageable), pageable);
     }
 
     @Override
@@ -215,9 +215,9 @@ public class UserService extends AbstractUserService {
         members.add(loggedUser.getSelfOrImpersonated().getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
-            predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
+            predicate = predicate.and(QUser.user.processRoles.any().id.in(roleIds));
         }
-        predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
+        predicate = predicate.and(QUser.user.processRoles.any().id.in(negateRoleIds).not());
         Page<User> users = userRepository.findAll(predicate, pageable);
 
         return changeType(users, pageable);
@@ -225,7 +225,7 @@ public class UserService extends AbstractUserService {
 
     private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
         BooleanExpression predicate = QUser.user
-                ._id.in(members)
+                .id.in(members)
                 .and(QUser.user.state.eq(UserState.ACTIVE));
         for (String word : query.split(" ")) {
             predicate = predicate
@@ -239,19 +239,19 @@ public class UserService extends AbstractUserService {
     @Override
 
     public Page<IUser> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        Page<User> users = userRepository.findDistinctByStateAndProcessRoles_IdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         return changeType(users, pageable);
     }
 
     @Override
     public List<IUser> findAllByProcessRoles(Set<String> roleIds, boolean small) {
-        List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
+        List<User> users = userRepository.findAllByProcessRoles_IdIn(new ArrayList<>(roleIds));
         return changeType(users);
     }
 
     @Override
     public List<IUser> findAllByIds(Set<String> ids, boolean small) {
-        List<User> users = userRepository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
+        List<User> users = userRepository.findAllByIdIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
         return changeType(users);
     }
 
@@ -336,7 +336,7 @@ public class UserService extends AbstractUserService {
     public void deleteUser(IUser user) {
         User dbUser = (User) user;
         if (userRepository.findById(dbUser.getStringId()).isEmpty()) {
-            throw new IllegalArgumentException("Could not find user with id [" + dbUser.get_id() + "]");
+            throw new IllegalArgumentException("Could not find user with id [" + dbUser.getId() + "]");
         }
         userRepository.delete(dbUser);
     }

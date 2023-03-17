@@ -1,50 +1,28 @@
 package com.netgrif.application.engine.workflow.domain.triggers;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.netgrif.application.engine.importer.model.TriggerType;
 import com.netgrif.application.engine.petrinet.domain.Imported;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryExclude;
+import com.querydsl.core.annotations.QueryType;
+import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Data
 @Document
 public abstract class Trigger extends Imported {
 
     @Id
-    protected ObjectId _id;
+    private ObjectId id;
 
-    protected Trigger() {
-        this._id = new ObjectId();
+    public Trigger() {
+        this.id = new ObjectId();
     }
 
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public void set_id(ObjectId _id) {
-        this._id = _id;
-    }
+    @QueryType(PropertyType.NONE)
+    public abstract TriggerType getType();
 
     public abstract Trigger clone();
-
-    public enum Type {
-        AUTO("auto"),
-        MESSAGE("message"),
-        TIME("time"),
-        USER("user");
-
-        String name;
-
-        Type(String name) {
-            this.name = name;
-        }
-
-        public static Type fromString(String name) {
-            return Type.valueOf(name.toUpperCase());
-        }
-
-        @JsonValue
-        public String getName() {
-            return name;
-        }
-    }
 }

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.importer.model.TriggerType;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
@@ -28,6 +29,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.netgrif.application.engine.workflow.domain.State.DISABLED;
+
 @Document
 @AllArgsConstructor
 @Getter
@@ -37,7 +40,7 @@ public class Task {
 
     @Id
     @Builder.Default
-    private ObjectId _id = new ObjectId();
+    private ObjectId id = new ObjectId();
 
     @Indexed
     private String processId;
@@ -48,13 +51,16 @@ public class Task {
     @Indexed
     private String transitionId;
 
+    @Indexed
+    private State state = DISABLED;
+
     @QueryType(PropertyType.NONE)
     private TaskLayout layout;
 
     private I18nString title;
-
+    // TODO: release/7.0.0: TaskResource concern?
     private String caseColor;
-
+    // TODO: release/7.0.0: TaskResource concern?
     private String caseTitle;
 
     private Integer priority;
@@ -65,7 +71,6 @@ public class Task {
     @org.springframework.data.annotation.Transient
     private IUser user;
 
-    @DBRef
     @Builder.Default
     private List<Trigger> triggers = new LinkedList<>();
 
@@ -96,20 +101,15 @@ public class Task {
     @Builder.Default
     private List<String> negativeViewUsers = new LinkedList<>();
 
-    private LocalDateTime startDate;
+    private LocalDateTime lastAssigned;
 
-    private LocalDateTime finishDate;
+    private LocalDateTime lastFinished;
 
     private String finishedBy;
 
     private String transactionId;
 
-    /**
-     * transient
-     */
-    private Boolean requiredFilled;
-
-    // TODO: NAE-1645 remove, dynamically load from dataSet
+    // TODO: release/7.0.0 remove, dynamically load from dataSet
     @Getter
     @Setter
     @JsonIgnore
@@ -145,11 +145,11 @@ public class Task {
 
     @JsonIgnore
     public ObjectId getObjectId() {
-        return _id;
+        return id;
     }
 
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
 
     public String getTransitionId() {
@@ -210,11 +210,11 @@ public class Task {
         return userId;
     }
 
-    public enum Type {
-        USER,
-        AUTO,
-        TIME,
-        MESSAGE,
+    public boolean isAutoTriggered() {
+        if (triggers == null || triggers.isEmpty()) {
+            return false;
+        }
+        return triggers.stream().anyMatch(trigger -> trigger != null && TriggerType.AUTO.equals(trigger.getType()));
     }
 
     public void resolveViewRoles() {
@@ -245,6 +245,7 @@ public class Task {
     }
 
     private void compareExistingUserPermissions(String userId, Map<RolePermission, Boolean> permissions) {
+        // TODO: release/7.0.0 check if possible to reduce duplicated code, possible solution is to have abstraction on permissions map
         permissions.forEach((id, perm) -> {
             if ((users.containsKey(userId) && !users.get(userId).containsKey(id)) || (users.containsKey(userId) && users.get(userId).containsKey(id) && users.get(userId).get(id))) {
                 users.get(userId).put(id, perm);

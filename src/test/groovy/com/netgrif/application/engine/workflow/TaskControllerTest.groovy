@@ -194,7 +194,7 @@ class TaskControllerTest {
         assert task != null
         List<String> userIds = [] as List
         userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId())
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        dataService.setData(task.stringId, ImportHelper.populateDataset([
 //                "performable_users": [
 //                        "value": userIds,
@@ -211,7 +211,7 @@ class TaskControllerTest {
                 this.role = role
             }
         }
-        processRoleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId(), [role._id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
+        processRoleService.assignRolesToUser(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId(), [role.id.toString()] as Set, userService.getLoggedOrSystem().transformToLoggedUser())
     }
 
     Page<Task> findTasksByMongo() {

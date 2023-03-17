@@ -211,7 +211,7 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {// TODO: NAE-1645: dataBody?
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {// TODO: release/7.0.0: dataBody?
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             dataBody.forEach((task, value) -> outcomes.put(task, dataService.saveFile(task, fieldId, multipartFile)));
@@ -251,7 +251,7 @@ public abstract class AbstractTaskController {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
     }
 
-    // TODO: NAE-1645 remove fieldId and use dataBody (taskStringId: fieldImportId)
+    // TODO: release/7.0.0 remove fieldId and use dataBody (taskStringId: fieldImportId)
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.forEach((task, ignored) -> outcomes.put(task, dataService.saveFiles(task, fieldId, multipartFiles)));

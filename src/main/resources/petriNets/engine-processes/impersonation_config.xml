@@ -94,8 +94,8 @@
                     impersonated: f.impersonated,
                     config_owner: f.config_owner;
 
-					def user = userService.loggedOrSystem
-					def impersonatedValue = new UserFieldValue(user.id, user.name, user.surname, user.email)
+					IUser user = userService.loggedOrSystem
+					UserFieldValue impersonatedValue = new UserFieldValue(user)
 					change impersonated value { impersonatedValue }
 					change impersonated_email value { user.email }
 					change config_owner value { new UserListFieldValue([impersonatedValue]) }
@@ -316,7 +316,7 @@
 					impersonated: f.impersonated,
 					impersonated_authorities: f.impersonated_authorities;
 
-					def impersonatedUser = userService.findById(impersonated.value.id, false)
+					def impersonatedUser = userService.findById(impersonated.rawValue.id, false)
 					change impersonated_authorities options {
 						impersonatedUser.authorities.collectEntries { [(it.stringId): (it.name)] }
 					}
@@ -347,7 +347,7 @@
 					impersonated: f.impersonated,
 					impersonated_roles: f.impersonated_roles;
 
-					def impersonatedUser = userService.findById(impersonated.value.id, false)
+					def impersonatedUser = userService.findById(impersonated.rawValue.id, false)
 					change impersonated_roles options {
 						return impersonatedUser.processRoles.findAll { it.netId }.sort { it.netId }.collectEntries {
 							def net = petriNetService.get(new org.bson.types.ObjectId(it.netId))

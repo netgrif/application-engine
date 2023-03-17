@@ -180,7 +180,7 @@
 				return;
 			}
 
-			def filterCase = findCase({it._id.eq(filterAutocomplete.value.value)})
+			def filterCase = findCase({it.id.eq(filterAutocomplete.value.value)})
 			def optionCase = createCase("preference_filter_item", filterCase == null ? "" : filterCase.title)
 			def initTask = findTask({it.transitionId.eq("init").and(it.caseId.eq(optionCase.stringId))})
 			assignTask(initTask)

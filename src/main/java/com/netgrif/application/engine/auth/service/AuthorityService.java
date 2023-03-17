@@ -15,8 +15,11 @@ import java.util.stream.Collectors;
 @Service
 public class AuthorityService implements IAuthorityService {
 
-    @Autowired
-    private AuthorityRepository repository;
+    private final AuthorityRepository repository;
+
+    public AuthorityService(AuthorityRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public List<Authority> findAll() {
@@ -27,8 +30,9 @@ public class AuthorityService implements IAuthorityService {
     @Transactional
     public Authority getOrCreate(String name) {
         Authority authority = repository.findByName(name);
-        if (authority == null)
+        if (authority == null) {
             authority = repository.save(new Authority(name));
+        }
         return authority;
     }
 
@@ -52,15 +56,17 @@ public class AuthorityService implements IAuthorityService {
         return repository.findAllByNameStartsWith(Authority.ROLE);
     }
 
+    @Override
     public Authority getOne(String id) {
         Optional<Authority> authority = repository.findById(id);
-        if (!authority.isPresent())
+        if (authority.isEmpty()) {
             throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
+        }
         return authority.get();
     }
 
     @Override
     public List<Authority> findAllByIds(List<String> ids) {
-        return repository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()));
+        return repository.findAllByIdIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 }

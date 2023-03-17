@@ -319,8 +319,8 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public FileSystemResource getFile(String netId, String title) {
         if (title == null || title.length() == 0) {
-            Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));
-            query.fields().include("_id").include("title");
+            Query query = Query.query(Criteria.where("id").is(new ObjectId(netId)));
+            query.fields().include("id").include("title");
             List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
             if (nets.isEmpty())
                 return null;
@@ -466,7 +466,7 @@ public class PetriNetService implements IPetriNetService {
 
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
-        this.repository.deleteBy_id(petriNet.getObjectId());
+        this.repository.deleteById(petriNet.getObjectId());
         this.evictCache(petriNet);
         // net functions must by removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);

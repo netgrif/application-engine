@@ -61,7 +61,7 @@ class ChangedFieldsAllowedNetsTest {
         assert taskId != null
 
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        SetDataEventOutcome dataSet = dataService.setData(taskId, ImportHelper.populateDataset(
 //                [(TRIGGER_FIELD_ID): [
 //                        "value": "trigger",

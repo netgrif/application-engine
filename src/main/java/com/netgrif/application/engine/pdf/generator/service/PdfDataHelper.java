@@ -84,7 +84,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         if (transition.getLayout() != null && transition.getLayout().getCols() != null)
             resource.setFormGridCols(transition.getLayout().getCols());
         QTask qTask = new QTask("task");
-        this.taskId = taskService.searchOne(qTask.transitionId.eq(transition.getStringId()).and(qTask.caseId.eq(useCase.get_id().toString()))).getStringId();
+        this.taskId = taskService.searchOne(qTask.transitionId.eq(transition.getStringId()).and(qTask.caseId.eq(useCase.getId().toString()))).getStringId();
         this.originalCols = resource.getFormGridCols();
     }
 
@@ -160,7 +160,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         Field<?> field = dataRef.getField();
         if (isNotHidden(field, dataGroup.getParentTransitionId()) && isNotExcluded(field.getStringId())) {
             PdfField pdfField = null;
-//            TODO: NAE-1645 fix, builder and registry for each type and component
+//            TODO: release/7.0.0 fix, builder and registry for each type and component
             switch (field.getType()) {
                 case BUTTON:
                 case TASK_REF:
@@ -182,7 +182,7 @@ public class PdfDataHelper implements IPdfDataHelper {
                     pdfFields.add(pdfField);
                     break;
                 case I_18_N:
-                    // TODO: NAE-1645 dataRef component?
+                    // TODO: release/7.0.0 dataRef component?
                     if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), Component.DIVIDER)) {
                         pdfField = createI18nDividerField(dataGroup, dataRef);
                         pdfFields.add(pdfField);

@@ -23,7 +23,7 @@ public class Transaction extends PetriNetObject {
     private I18nString title;
 
     public Transaction() {
-        this._id = new ObjectId();
+        this.id = new ObjectId();
         this.transitions = new LinkedList<>();
     }
 

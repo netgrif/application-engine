@@ -188,11 +188,11 @@ class ActionDelegate {
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
-    // TODO: NAE-1645 - <action trigger="set" type="value">
-    // TODO: NAE-1645 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
-    // TODO: NAE-1645 - tasky sa vytvoria pri vytvoreni caseu a nemazu sa
+    // TODO: release/7.0.0 - <action trigger="set" type="value">
+    // TODO: release/7.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
+    // TODO: release/7.0.0 - tasky sa vytvoria pri vytvoreni caseu a nemazu sa
     //- existuje all_data task ktory sa pouziva pri change value
-    // TODO: NAE-1645 - update field map po setdata na aktualne hodnoty
+    // TODO: release/7.0.0 - update field map po setdata na aktualne hodnoty
 
     def init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
         this.action = action
@@ -431,7 +431,7 @@ class ActionDelegate {
     }
 
     def saveChangedValidation(Field field) {
-        // TODO: NAE-1645 setData?
+        // TODO: release/7.0.0 setData?
         Field<?> caseField = useCase.dataSet.get(field.stringId)
         caseField.validations = field.validations
         List<Validation> compiled = field.validations.collect { it.clone() }
@@ -445,7 +445,7 @@ class ActionDelegate {
 
     def execute(String taskId) {
         [with : { DataSet dataSet ->
-            executeTasks(dataSet, taskId, { it._id.isNotNull() })
+            executeTasks(dataSet, taskId, { it.id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
@@ -456,7 +456,7 @@ class ActionDelegate {
 
     def execute(Task task) {
         [with : { DataSet dataSet ->
-            executeTasks(dataSet, task.stringId, { it._id.isNotNull() })
+            executeTasks(dataSet, task.stringId, { it.id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
@@ -594,7 +594,7 @@ class ActionDelegate {
             }
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
-            // TODO: NAE-1645 should be in data service
+            // TODO: release/7.0.0 should be in data service
             if (field instanceof FileListField && task.isPresent()) {
                 field.value.value.namesPaths.forEach(namePath -> {
                     dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
@@ -606,7 +606,7 @@ class ActionDelegate {
             setData(field, [rawValue: null])
         }
         if (value != null) {
-            // TODO: NAE-1645 should be in data service
+            // TODO: release/7.0.0 should be in data service
             if (field instanceof CaseField) {
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
@@ -800,7 +800,7 @@ class ActionDelegate {
     }
 
     Task findTask(String mongoId) {
-        return taskService.searchOne(QTask.task._id.eq(new ObjectId(mongoId)))
+        return taskService.searchOne(QTask.task.id.eq(new ObjectId(mongoId)))
     }
 
     String getTaskId(String transitionId, Case aCase = useCase) {
@@ -924,7 +924,7 @@ class ActionDelegate {
         return outcome.getData()
     }
 
-    // TODO: NAE-1645 should return dataRef?
+    // TODO: release/7.0.0 should return dataRef?
     protected Map<String, Field> mapData(List<DataRef> data) {
         return data.collectEntries {
             [(it.fieldId): it.field]
@@ -1349,10 +1349,10 @@ class ActionDelegate {
         filterCase.setIcon(icon)
         filterCase.dataSet.get(DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID).rawValue = (title instanceof I18nString) ? title : new I18nString(title as String)
         filterCase = workflowService.save(filterCase)
-        Task newFilterTask = findTask { it._id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
+        Task newFilterTask = findTask { it.id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
         assignTask(newFilterTask)
 
-        // TODO: NAE-1645
+        // TODO: release/7.0.0
         DataSet dataSet = new DataSet([
                 (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : new EnumerationMapField(rawValue: type),
                 (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): new EnumerationMapField(rawValue: visibility),
@@ -1380,7 +1380,7 @@ class ActionDelegate {
      * @param filter
      * @return
      */
-    // TODO: NAE-1645: missing test on changeFilter action?
+    // TODO: release/7.0.0: missing test on changeFilter action?
     def changeFilter(Case filter) {
         [query         : { cl ->
             updateFilter(filter, [
@@ -1534,7 +1534,7 @@ class ActionDelegate {
          }]
     }
 
-    // TODO: NAE-1645: missing test
+    // TODO: release/7.0.0: missing test
     private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
@@ -1623,7 +1623,7 @@ class ActionDelegate {
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
         itemCase = workflowService.save(itemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
+        Task newItemTask = findTask { it.id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
         assignTask(newItemTask)
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE): new CaseField(rawValue: [filter.stringId] as List<String>),

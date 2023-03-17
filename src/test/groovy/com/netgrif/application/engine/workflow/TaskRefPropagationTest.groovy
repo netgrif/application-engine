@@ -99,7 +99,7 @@ class TaskRefPropagationTest {
 
         String parentTaskId = parent.tasks.find { it.transition == "4" }.task
         String childTaskId = child.tasks.find { it.transition == "4" }.task
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        parent.dataSet["children_tasks"].value = [childTaskId]
 //        child.dataSet["parentId"].value = parent.stringId
 
@@ -108,7 +108,7 @@ class TaskRefPropagationTest {
 
         /* validate getDataGroups object and taskRef field ids */
         List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK")).data
-        // TODO: NAE-1645 fix
+        // TODO: release/7.0.0 fix
 //        LocalisedField parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
 //        LocalisedField parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)
 //        LocalisedField parentMultichoiceSetter = findField(parentData, PARENT_FIELD_MULTICHOICE_SETTER_TITLE)

@@ -177,7 +177,7 @@ public class TaskController extends AbstractTaskController {
     @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
-        // TODO: NAE-1645 6.2.5 set order?
+        // TODO: release/7.0.0 6.2.5 set order?
         return super.getData(taskId, locale);
     }
 
@@ -257,7 +257,7 @@ public class TaskController extends AbstractTaskController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements"),
     })
-    // TODO: NAE-1645 6.2.5 path variables
+    // TODO: release/7.0.0 6.2.5 path variables
     public EntityModel<EventOutcomeWithMessage> deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
         return super.deleteNamedFile(taskId, fieldId, name);
     }

@@ -117,7 +117,7 @@ public class DataService implements IDataService {
         dataRefs.forEach((fieldId, dataRef) -> {
             Field<?> field = useCase.getDataSet().get(fieldId);
             DataFieldBehavior behavior = field.getBehaviors().get(task.getTransitionId());
-            // TODO: NAE-1645 behavior is null
+            // TODO: release/7.0.0 behavior is null
             if (behavior.isForbidden()) {
                 return;
             }
@@ -148,7 +148,7 @@ public class DataService implements IDataService {
 
     @Override
     public SetDataEventOutcome setData(Case target, DataSet dataSet) {
-        Task fake = Task.with()._id(new ObjectId()).caseId(target.getStringId()).title(new I18nString("Fake")).transitionId("fake").build();
+        Task fake = Task.with().id(new ObjectId()).caseId(target.getStringId()).title(new I18nString("Fake")).transitionId("fake").build();
         return setData(fake, dataSet);
     }
 
@@ -165,7 +165,7 @@ public class DataService implements IDataService {
             Field<?> newDataField = stringFieldEntry.getValue();
             outcome.addOutcome(setDataField(task, fieldId, newDataField));
         }
-        // TODO: NAE-1645 update case from repo
+        // TODO: release/7.0.0 update case from repo
         return outcome;
     }
 
@@ -175,19 +175,19 @@ public class DataService implements IDataService {
         SetDataEventOutcome outcome = new SetDataEventOutcome(useCase, task);
         Optional<Field<?>> fieldOptional = useCase.getPetriNet().getField(fieldId);
         if (fieldOptional.isEmpty()) {
-            throw new IllegalArgumentException(""); // TODO: NAE-1645 exception or not?
+            throw new IllegalArgumentException(""); // TODO: release/7.0.0 exception or not?
         }
         Field<?> field = fieldOptional.get();
         // PRE
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.PRE, useCase, task, newDataField));
         useCase = workflowService.findOne(task.getCaseId());
-        // TODO: NAE-1645 user for history
+        // TODO: release/7.0.0 user for history
 //        historyService.save(new SetDataEventLog(task, useCase, EventPhase.PRE));
         // EXECUTION
         if (outcome.getMessage() == null) {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
-//      TODO: NAE-1645 from 6.3.0: lastModified, validation
+//      TODO: release/7.0.0 from 6.3.0: lastModified, validation
 //        dataField.setLastModified(LocalDateTime.now());
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
         if (validationEnable) {
@@ -195,15 +195,15 @@ public class DataService implements IDataService {
         }
         useCase = workflowService.save(useCase);
         outcome.addChangedField(fieldId, newDataField);
-        // TODO: NAE-1645 user for history
+        // TODO: release/7.0.0 user for history
 //        historyService.save(new SetDataEventLog(task, useCase, EventPhase.EXECUTION, DataSet.of(fieldId, newDataField)));
         // POST
         outcome.addOutcomes(resolveDataEvents(field, DataEventType.SET, EventPhase.POST, useCase, task, newDataField));
         useCase = workflowService.findOne(task.getCaseId());
-        // TODO: NAE-1645 user for history
+        // TODO: release/7.0.0 user for history
 //        historyService.save(new SetDataEventLog(task, useCase, EventPhase.POST));
         useCase = applyFieldConnectedChanges(useCase, field);
-        // TODO: NAE-1645 should outcome contain case before or after changes?
+        // TODO: release/7.0.0 should outcome contain case before or after changes?
         return outcome;
     }
 
@@ -502,7 +502,7 @@ public class DataService implements IDataService {
 
     private List<EventOutcome> getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase) {
         List<EventOutcome> outcomes = new ArrayList<>();
-        // TODO: NAE-1645 changed value
+        // TODO: release/7.0.0 changed value
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.PRE, useCase, referencingTask, null));
         outcomes.addAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), DataEventType.SET, EventPhase.POST, useCase, referencingTask, null));
         updateDataset(useCase);
@@ -599,7 +599,7 @@ public class DataService implements IDataService {
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
-        // TODO: NAE-1645 6.2.5
+        // TODO: release/7.0.0 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
@@ -630,7 +630,7 @@ public class DataService implements IDataService {
             }
             ((FileListField) useCase.getDataSet().get(field.getStringId())).setRawValue(field.getValue().getValue());
         }
-        // TODO: NAE-1645 6.2.5
+        // TODO: release/7.0.0 6.2.5
         return new SetDataEventOutcome(useCase, task, getChangedFieldByFileFieldContainer(fieldId, task, useCase));
     }
 
@@ -652,7 +652,7 @@ public class DataService implements IDataService {
     public List<Field<?>> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
         List<Field<?>> fields = task.getImmediateDataFields().stream().map(f -> useCase.getDataSet().get(f)).collect(Collectors.toList());
-//        TODO: NAE-1645 order?
+//        TODO: release/7.0.0 order?
 //        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
         return fields;
     }

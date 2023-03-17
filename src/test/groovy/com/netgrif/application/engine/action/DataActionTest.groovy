@@ -41,7 +41,7 @@ class DataActionTest {
         assert mainNet.isPresent()
         def $case = importHelper.createCase("Case 1", mainNet.get())
         Task task = taskService.findOne($case.tasks.first().task)
-//        TODO: NAE-1645
+//        TODO: release/7.0.0
 //        List<Field> dataGet = dataService.getData($case.tasks.first().task).getData()
 //        dataGet.first().value == ";get-pre;get-post"
 //

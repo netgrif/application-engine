@@ -160,7 +160,8 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> findAllById(List<String> ids) {
-        return repository.findAllBy_idIn(ids).stream()
+        // TODO: release/7.0.0 check if repository method works, expects ObjectId
+        return repository.findAllByIdIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
                 .peek(this::initialize)
@@ -184,7 +185,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
-        // TODO: NAE-1645: decrypt data set was not called before
+        // TODO: release/7.0.0: decrypt data set was not called before
         page.getContent().forEach(this::initialize);
         return page;
     }
@@ -216,7 +217,7 @@ public class WorkflowService implements IWorkflowService {
         if (userListValue == null) {
             return null;
         }
-        // TODO: NAE-1645 fix null set as user value
+        // TODO: release/7.0.0 fix null set as user value
         return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
                 .map(UserFieldValue::getId)
@@ -267,7 +268,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(loggedOrImpersonated.transformToAuthor());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setTitle(makeTitle.apply(useCase));
-        // TODO: NAE-1645 6.2.5
+        // TODO: release/7.0.0 6.2.5
         UriNode uriNode = uriService.getOrCreate(petriNet, UriContentType.CASE);
         useCase.setUriNodeId(uriNode.getId());
 
@@ -312,10 +313,10 @@ public class WorkflowService implements IWorkflowService {
         String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
-//        TODO: NAE-1645 remove mongoTemplates from project
+//        TODO: release/7.0.0 remove mongoTemplates from project
         List<Case> cases = mongoTemplate.find(query, Case.class);
         cases.forEach(this::initialize);
-        return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class));
+        return new PageImpl<>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{id:1}"), Case.class));
     }
 
     @Override
