@@ -26,10 +26,7 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.EDITABLE
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.FORBIDDEN
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.HIDDEN
-import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.VISIBLE
+import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -294,7 +291,7 @@ class ImporterTest {
 
         assert net != null
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
-        taskService.assignTask(testCase.getTasks().find {it.transition == "t1"}.getTask())
+        taskService.assignTask(testCase.getTasks().find { it.transition == "t1" }.getTask())
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
         assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"
@@ -320,7 +317,7 @@ class ImporterTest {
         assertBehaviors(testCase.dataSet.get(FILE_LIST_FIELD).behaviors.get("1"), HIDDEN)
         assertBehaviors(testCase.dataSet.get(USER_FIELD).behaviors.get("1"), HIDDEN, false, true)
         assertBehaviors(testCase.dataSet.get(BUTTON_FIELD).behaviors.get("1"), EDITABLE, true, true)
-        assertBehaviors(testCase.dataSet.get(I18N_FIELD).behaviors.get("1"), HIDDEN, false ,true)
+        assertBehaviors(testCase.dataSet.get(I18N_FIELD).behaviors.get("1"), HIDDEN, false, true)
     }
 
     @SuppressWarnings('GrMethodMayBeStatic')
@@ -368,7 +365,7 @@ class ImporterTest {
     }
 
     @Test
-    void createTransitionNoLabel(){
+    void createTransitionNoLabel() {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/importTest/NoLabel.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert net
         PetriNet importNet = petriNetService.findByImportId(net.getImportId()).get()
