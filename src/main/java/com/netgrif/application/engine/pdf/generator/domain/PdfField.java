@@ -3,8 +3,9 @@ package com.netgrif.application.engine.pdf.generator.domain;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
-import com.netgrif.application.engine.pdf.generator.service.renderer.Renderer;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.layout.QDataGroupLayout;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
 /**
  * Class that holds information about fields that will be exported to PDF
  */
-public abstract class PdfField implements Comparable<PdfField> {
+public abstract class PdfField<T> implements Comparable<PdfField<T>> {
 
     @Getter
     @Setter
@@ -31,11 +32,11 @@ public abstract class PdfField implements Comparable<PdfField> {
 
     @Getter
     @Setter
-    protected String label;
+    protected List<String> label;
 
     @Getter
     @Setter
-    protected List<String> values;
+    protected T value;
 
     @Getter
     @Setter
@@ -89,9 +90,9 @@ public abstract class PdfField implements Comparable<PdfField> {
     @Setter
     protected PdfResource resource;
 
-    @Getter
-    @Setter
-    protected Renderer renderer;
+//    @Getter
+//    @Setter
+//    protected Renderer renderer;
 
     public PdfField() {
         changedSize = false;
@@ -104,30 +105,37 @@ public abstract class PdfField implements Comparable<PdfField> {
         this.resource = resource;
     }
 
-    public void countMultiLineHeight(int fontSize, PdfResource resource) {
-        int padding = resource.getPadding();
-        int lineHeight = resource.getLineHeight();
-        int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);
-        int maxValueLineLength = getMaxValueLineSize(this.width - 3 * padding, resource.getFontValueSize(), padding);
-        int multiLineHeight = 0;
-
-        List<String> splitLabel = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
-        multiLineHeight += splitLabel.size() * lineHeight + padding;
-
-        if (this.values != null) {
-            List<String> splitText = PdfFieldBuilder.generateMultiLineText(this.values, maxValueLineLength);
-            multiLineHeight += splitText.size() * lineHeight + padding;
-        }
-        this.changedSize = changeHeight(multiLineHeight);
+    public PdfField(String fieldId, DataGroup dataGroup, DataType type) {
+        this();
+        this.fieldId = fieldId;
+        this.dataGroup = dataGroup;
+        this.type = type;
     }
 
-    protected boolean changeHeight(int multiLineHeight) {
-        if (multiLineHeight <= this.height) {
-            return false;
-        }
-        this.height = multiLineHeight;
-        return true;
-    }
+//    public void countMultiLineHeight(int fontSize, PdfResource resource) {
+//        int padding = resource.getPadding();
+//        int lineHeight = resource.getLineHeight();
+//        int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);
+//        int maxValueLineLength = getMaxValueLineSize(this.width - 3 * padding, resource.getFontValueSize(), padding);
+//        int multiLineHeight = 0;
+//
+//        List<String> splitLabel = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
+//        multiLineHeight += splitLabel.size() * lineHeight + padding;
+//
+//        if (this.value != null) {
+//            List<String> splitText = PdfFieldBuilder.generateMultiLineText(this.value, maxValueLineLength);
+//            multiLineHeight += splitText.size() * lineHeight + padding;
+//        }
+//        this.changedSize = changeHeight(multiLineHeight);
+//    }
+
+//    protected boolean changeHeight(int multiLineHeight) {
+//        if (multiLineHeight <= this.height) {
+//            return false;
+//        }
+//        this.height = multiLineHeight;
+//        return true;
+//    }
 
     @Override
     public int compareTo(PdfField pdfField) {
@@ -138,8 +146,8 @@ public abstract class PdfField implements Comparable<PdfField> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PdfField field = (PdfField) o;
-        return fieldId == field.fieldId &&
+        PdfField<?> field = (PdfField<?>) o;
+        return Objects.equals(fieldId, field.fieldId) &&
                 type == field.type;
     }
 
@@ -148,11 +156,5 @@ public abstract class PdfField implements Comparable<PdfField> {
         return Objects.hash(fieldId, type);
     }
 
-    protected int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
-    }
 
-    protected int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
-    }
 }

@@ -1,47 +1,153 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilder;
 
+import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.DataRef;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
+import lombok.Data;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
-public abstract class PdfFieldBuilder {
+import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils.generateMultiLineText;
+import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils.getMaxLineSize;
+
+@Data
+public abstract class PdfFieldBuilder<T> {
 
     protected PdfResource resource;
 
     @Getter
     protected int lastX, lastY;
 
-    // TODO: NAE-1645 remove
-    private static final String LEGACY = "legacy";
-    private static final String FLOW = "flow";
-    private static final String GRID = "grid";
+    public PdfFieldBuilder() {
 
-    public PdfFieldBuilder(PdfResource resource) {
-        this.resource = resource;
     }
 
-    protected void setFieldParams(DataGroup dg, DataRef dataRef, PdfField pdfField) {
-        pdfField.setLayoutX(countFieldLayoutX(dg, dataRef));
-        pdfField.setLayoutY(countFieldLayoutY(dg, dataRef));
-        pdfField.setWidth(countFieldWidth(dg, dataRef));
-        pdfField.setHeight(countFieldHeight());
+    public abstract PdfField<T> buildField(PdfFieldBuildingBlock buildingBlock);
+
+    public abstract DataType getType();
+
+    protected abstract void setupValue(PdfFieldBuildingBlock buildingBlock, PdfField<T> pdfField);
+
+    protected abstract int countValueMultiLineHeight(PdfField<T> pdfField);
+
+    public static int countTopPosY(PdfField<?> field, PdfResource resource) {
+        return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
     }
 
-    protected void setFieldPositions(PdfField pdfField, int fontSize) {
+    public static int countBottomPosY(PdfField<?> field, PdfResource resource) {
+        return (field.getLayoutY() * resource.getFormGridRowHeight()) + field.getHeight() + resource.getPadding();
+    }
+
+    public boolean changeHeight(int multiLineHeight, PdfField<T> pdfField) {
+        if (multiLineHeight <= pdfField.getHeight()) {
+            return false;
+        }
+        pdfField.setHeight(multiLineHeight);
+        return true;
+    }
+
+
+
+    protected void setFieldParams(PdfFieldBuildingBlock buildingBlock, PdfField<T> pdfField) {
+        pdfField.setLayoutX(countFieldLayoutX(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
+        pdfField.setLayoutY(countFieldLayoutY(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
+        pdfField.setWidth(countFieldWidth(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
+        setupLabel(buildingBlock, pdfField);
+        setupValue(buildingBlock, pdfField);
+        pdfField.setChangedSize(changeHeight(countMultiLineHeight(pdfField), pdfField));
+    }
+
+    protected void setFieldPositions(PdfField<T> pdfField) {
         pdfField.setX(countPosX(pdfField));
         pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
         pdfField.setTopY(countTopPosY(pdfField, resource));
         pdfField.setOriginalBottomY(countBottomPosY(pdfField, resource));
         pdfField.setBottomY(countBottomPosY(pdfField, resource));
-        pdfField.countMultiLineHeight(fontSize, resource);
+        //countMultiLineHeight(fontSize, pdfField);
+    }
+
+//    protected int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
+//        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
+//    }
+
+
+//    protected int countFieldHeight() {
+//        return resource.getFormGridRowHeight() - resource.getPadding();
+//    }
+
+    private int countFieldWidth(DataGroup dataGroup, DataRef field) {
+        if (isDgFlow(dataGroup)) {
+            return resource.getFormGridColWidth() - resource.getPadding();
+        } else if (isDgLegacy(dataGroup)) {
+            return (isStretch(dataGroup) ?
+                    (resource.getFormGridColWidth() * resource.getFormGridCols())
+                    : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
+        }
+        return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
+    }
+
+//    private int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
+//        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
+//    }
+
+    private boolean checkFullRow(DataGroup dataGroup, DataRef field) {
+        return (isStretch(dataGroup)) ||
+                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
+    }
+
+    private boolean checkCol(FieldLayout layout) {
+        return layout != null && layout.getCols() != null;
+    }
+
+    private boolean isStretch(DataGroup dataGroup) {
+        return dataGroup.getStretch() != null && dataGroup.getStretch();
+    }
+
+    private boolean isDgFlow(DataGroup dataGroup) {
+        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(LayoutType.FLOW);
+    }
+
+    private boolean isDgLegacy(DataGroup dataGroup) {
+        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals(LayoutType.LEGACY);
+    }
+
+    private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {
+        if (checkCol(layout)) {
+            resource.setRowGridFree(resource.getFormGridCols() - layout.getCols());
+        } else {
+            if (isStretch(dataGroup))
+                resource.setRowGridFree(0);
+            else {
+                resource.setRowGridFree(resource.getFormGridCols() - 2);
+            }
+        }
+    }
+
+    private void setupLabel(PdfFieldBuildingBlock buildingBlock, PdfField<T> pdfField) {
+        String translatedTitle = buildingBlock.getDataRef().getField().getName().getTranslation(buildingBlock.getLocale());
+        int maxLabelLineLength = getMaxLineSize(pdfField.getWidth(), resource.getFontLabelSize(), resource.getPadding(), resource.getSizeMultiplier());
+        List<String> label = generateMultiLineText(Collections.singletonList(translatedTitle), maxLabelLineLength);
+        pdfField.setLabel(label);
+    }
+
+    private int countMultiLineHeight(PdfField<T> pdfField) {
+        int multiLineHeight = 0;
+        multiLineHeight += countLabelMultiLineHeight(pdfField);
+        if (pdfField.getValue() != null) {
+            multiLineHeight += countValueMultiLineHeight(pdfField);
+        }
+        return multiLineHeight;
+    }
+
+    private int countLabelMultiLineHeight(PdfField<T> pdfField) {
+        return pdfField.getLabel().size() *  resource.getLineHeight() + resource.getPadding();
     }
 
     private int countFieldLayoutX(DataGroup dataGroup, DataRef field) {
@@ -85,107 +191,8 @@ public abstract class PdfFieldBuilder {
         return y;
     }
 
-    public int countPosX(PdfField field) {
+    private int countPosX(PdfField<T> field) {
         return (field.getLayoutX() * resource.getFormGridColWidth() + resource.getPadding());
     }
 
-    public static int countTopPosY(PdfField field, PdfResource resource) {
-        return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
-    }
-
-    public static int countBottomPosY(PdfField field, PdfResource resource) {
-        return (field.getLayoutY() * resource.getFormGridRowHeight()) + field.getHeight() + resource.getPadding();
-    }
-
-    public static List<String> generateMultiLineText(List<String> values, float maxLineLength) {
-        StringTokenizer tokenizer;
-        StringBuilder output;
-        List<String> result = new ArrayList<>();
-        int lineLen = 0;
-
-        for (String value : values) {
-            tokenizer = new StringTokenizer(value.trim(), " ");
-            output = new StringBuilder(value.length());
-            while (tokenizer.hasMoreTokens()) {
-                String word = tokenizer.nextToken();
-
-                if (word.length() > maxLineLength - lineLen && word.length() > maxLineLength) {
-                    breakLongWordToMultipleLine(output, word, lineLen, (int) maxLineLength);
-                    lineLen = 0;
-                } else if (lineLen + word.length() > maxLineLength) {
-                    output.append("\n");
-                    lineLen = 0;
-                    output.append(word).append(" ");
-                    lineLen += word.length() + 1;
-                } else {
-                    output.append(word).append(" ");
-                    lineLen += word.length() + 1;
-                }
-            }
-            lineLen = 0;
-            result.addAll(Arrays.asList(output.toString().split("\n")));
-        }
-        return result;
-    }
-
-    public static void breakLongWordToMultipleLine(StringBuilder output, String longWord, int lineLength, int maxLineLength) {
-        if (maxLineLength - lineLength <= 0) {
-            lineLength = 0;
-        }
-        while (longWord.length() > maxLineLength - lineLength) {
-            output.append(longWord, 0, maxLineLength - lineLength - 4);
-            output.append("\n");
-            longWord = longWord.substring(maxLineLength - lineLength - 3);
-            lineLength = 0;
-        }
-    }
-
-    private int countFieldWidth(DataGroup dataGroup, DataRef field) {
-        if (isDgFlow(dataGroup)) {
-            return resource.getFormGridColWidth() - resource.getPadding();
-        } else if (isDgLegacy(dataGroup)) {
-            return (isStretch(dataGroup) ?
-                    (resource.getFormGridColWidth() * resource.getFormGridCols())
-                    : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
-        }
-        return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-    }
-
-    private int countFieldHeight() {
-        return resource.getFormGridRowHeight() - resource.getPadding();
-    }
-
-    private boolean checkFullRow(DataGroup dataGroup, DataRef field) {
-        return (isStretch(dataGroup)) ||
-                (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
-    }
-
-    private boolean checkCol(FieldLayout layout) {
-        return layout != null && layout.getCols() != null;
-    }
-
-    private boolean isStretch(DataGroup dataGroup) {
-        return dataGroup.getStretch() != null && dataGroup.getStretch();
-    }
-
-    private boolean isDgFlow(DataGroup dataGroup) {
-        // TODO: NAE-1645
-        return dataGroup.getLayout() != null && dataGroup.getLayout().getType() != null && dataGroup.getLayout().getType().equals(FLOW);
-    }
-
-    private boolean isDgLegacy(DataGroup dataGroup) {
-        return dataGroup.getLayout() == null || dataGroup.getLayout().getType() == null || dataGroup.getLayout().getType().equals(LEGACY);
-    }
-
-    private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout) {
-        if (checkCol(layout)) {
-            resource.setRowGridFree(resource.getFormGridCols() - layout.getCols());
-        } else {
-            if (isStretch(dataGroup))
-                resource.setRowGridFree(0);
-            else {
-                resource.setRowGridFree(resource.getFormGridCols() - 2);
-            }
-        }
-    }
 }

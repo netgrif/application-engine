@@ -1,10 +1,14 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
+import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator;
+import com.netgrif.application.engine.pdf.generator.service.renderer.FieldRenderer;
+import com.netgrif.application.engine.pdf.generator.service.renderer.TextFieldRenderer;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -25,6 +29,9 @@ import org.w3c.dom.Document;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Generates PDF from the given transition form
@@ -35,11 +42,17 @@ public class PdfGenerator implements IPdfGenerator {
 
     private PDDocument pdf;
 
-    @Autowired
-    private IPdfDataHelper pdfDataHelper;
+    private final IPdfDataHelper pdfDataHelper;
 
-    @Autowired
-    private IPdfDrawer pdfDrawer;
+    private final IPdfDrawer pdfDrawer;
+
+    private final Map<DataType, FieldRenderer<?>> rendererMap;
+
+    public PdfGenerator(IPdfDataHelper pdfDataHelper, List<FieldRenderer<?>> renderers, IPdfDrawer pdfDrawer) {
+        this.pdfDataHelper = pdfDataHelper;
+        this.rendererMap = renderers.stream().collect(Collectors.toMap(FieldRenderer::getType, Function.identity()));
+        this.pdfDrawer = pdfDrawer;
+    }
 
     @Override
     public void setupPdfGenerator(PdfResource pdfResource) throws IOException {
@@ -54,6 +67,10 @@ public class PdfGenerator implements IPdfGenerator {
         this.pdf.setVersion(version);
         pdfDataHelper.setupDataHelper(pdfResource);
         pdfDrawer.setupDrawer(pdf, pdfResource);
+        rendererMap.values().parallelStream().forEach(r -> {
+            r.setPdfDrawer(pdfDrawer);
+            r.setResource(pdfResource);
+        });
 
         pdfResource.setTitleFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontTitleResource().getFile()), true));
         pdfResource.setLabelFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontLabelResource().getFile()), true));
@@ -68,7 +85,7 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void addCustomField(PdfField field, PdfResource pdfResource) {
+    public void addCustomField(PdfField<?> field, PdfResource pdfResource) {
         generateData(field, pdfResource);
     }
 
@@ -122,29 +139,29 @@ public class PdfGenerator implements IPdfGenerator {
         pdfDataHelper.setTaskId(useCase, transition);
         pdfDataHelper.generateTitleField();
         pdfDataHelper.generatePdfFields();
-        pdfDataHelper.correctFieldsPosition();
+        //pdfDataHelper.correctFieldsPosition();
         pdfDrawer.setupDrawer(pdf, pdfResource);
     }
 
     @Override
-    public void generateData(PdfField pdfField, PdfResource pdfResource) {
+    public void generateData(PdfField<?> pdfField, PdfResource pdfResource) {
         pdfDataHelper.getPdfFields().add(pdfField);
-        pdfDataHelper.correctFieldsPosition();
+        //pdfDataHelper.correctFieldsPosition();
     }
 
-    protected File transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource) throws IOException {
+    protected File transformRequestToPdf(List<PdfField<?>> pdfFields, PdfResource pdfResource) throws IOException {
         File output = new File(((ClassPathResource) pdfResource.getOutputResource()).getPath());
         transformRequestToPdf(pdfFields, pdfResource, new FileOutputStream(output));
         return output;
     }
 
-    protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
+    protected void transformRequestToPdf(List<PdfField<?>> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
         if (pdfResource.getTemplateResource().exists()) {
             InputStream template = pdfResource.getTemplateResource().getInputStream();
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }
         pdfDrawer.newPage();
-        drawTransitionForm(pdfFields);
+        drawTransitionForm(pdfFields, pdfResource);
         pdfDrawer.closeContentStream();
         pdf.save(stream);
         pdfDrawer.closeTemplate();
@@ -153,38 +170,41 @@ public class PdfGenerator implements IPdfGenerator {
         log.info("PDF is generated from transition.");
     }
 
-    protected void drawTransitionForm(List<PdfField> pdfFields) throws IOException {
+    protected void drawTransitionForm(List<PdfField<?>> pdfFields, PdfResource resource) throws IOException {
         log.info("Drawing form to PDF.");
 
-        for (PdfField pdfField : pdfFields) {
-
-            if (pdfField.getFieldId().equals("titleField")) {
-                pdfDrawer.drawTitleField(pdfField);
-            } else if (!pdfField.isDgField()) {
-                switch (pdfField.getType()) {
-                    case MULTICHOICE_MAP:
-                    case MULTICHOICE:
-                        pdfDrawer.drawMultiChoiceField(pdfField);
-                        break;
-                    case ENUMERATION_MAP:
-                    case ENUMERATION:
-                        pdfDrawer.drawEnumerationField(pdfField);
-                        break;
-                    case BOOLEAN:
-                        pdfDrawer.drawBooleanField(pdfField);
-                        break;
-                    case I_18_N:
-                        pdfDrawer.drawI18nDividerField(pdfField);
-                        break;
-                    default:
-                        pdfDrawer.drawTextField(pdfField);
-                        break;
-                }
-            } else {
-                pdfDrawer.drawDataGroupField(pdfField);
-            }
+        for (PdfField<?> pdfField : pdfFields) {
+            FieldRenderer<?> fieldRenderer = rendererMap.get(pdfField.getType());
+            fieldRenderer.setField(pdfField);
+            fieldRenderer.renderLabel();
+            fieldRenderer.renderValue();
+//            if (pdfField.getFieldId().equals("titleField")) {
+//                pdfDrawer.drawTitleField(pdfField);
+//            } else if (!pdfField.isDgField()) {
+//                switch (pdfField.getType()) {
+//                    case MULTICHOICE_MAP:
+//                    case MULTICHOICE:
+//                        pdfDrawer.drawMultiChoiceField(pdfField);
+//                        break;
+//                    case ENUMERATION_MAP:
+//                    case ENUMERATION:
+//                        pdfDrawer.drawEnumerationField(pdfField);
+//                        break;
+//                    case BOOLEAN:
+//                        pdfDrawer.drawBooleanField(pdfField);
+//                        break;
+//                    case I_18_N:
+//                        pdfDrawer.drawI18nDividerField(pdfField);
+//                        break;
+//                    default:
+//                        pdfDrawer.drawTextField(pdfField);
+//                        break;
+//                }
+//            } else {
+//                pdfDrawer.drawDataGroupField(pdfField);
+//            }
         }
-        pdfDrawer.drawPageNumber();
+        //pdfDrawer.drawPageNumber();
     }
 
     protected PDFormXObject getSvg(Resource resource) throws IOException {

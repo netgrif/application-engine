@@ -6,6 +6,8 @@ import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanForma
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.renderer.*;
+import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import lombok.Setter;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.multipdf.PDFCloneUtility;
@@ -23,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.netgrif.application.engine.pdf.generator.service.renderer.Renderer.removeUnsupportedChars;
 
 /**
  * A drawer service that is able to draw elements to a content stream
@@ -111,71 +112,71 @@ public class PdfDrawer implements IPdfDrawer {
         }
     }
 
-    @Override
-    public void drawPageNumber() throws IOException {
-        PageNumberRenderer pageNumberRenderer = new PageNumberRenderer();
-        pageNumberRenderer.setupRenderer(this, resource);
-        pageNumberRenderer.setFormat(resource.getPageNumberFormat());
+//    @Override
+//    public void drawPageNumber() throws IOException {
+//        PageNumberRenderer pageNumberRenderer = new PageNumberRenderer();
+//        pageNumberRenderer.setupRenderer(this, resource);
+//        pageNumberRenderer.setFormat(resource.getPageNumberFormat());
+//
+//        for (PDPage page : pageList) {
+//            contentStream.close();
+//            contentStream = new PDPageContentStream(pdf, page, PDPageContentStream.AppendMode.APPEND, true, true);
+//            pageNumberRenderer.renderPageNumber(pageList.indexOf(page) + 1, pageList.size());
+//        }
+//    }
+//
+//    @Override
+//    public void drawTitleField(PdfField field) throws IOException {
+//        TitleRenderer titleFieldRenderer = new TitleRenderer();
+//        titleFieldRenderer.setupRenderer(this, resource);
+//        titleFieldRenderer.renderLabel(field);
+//    }
+//
+//    @Override
+//    public void drawDataGroupField(PdfField field) throws IOException {
+//        DataGroupFieldRenderer dataGroupRenderer = new DataGroupFieldRenderer();
+//        dataGroupRenderer.setupRenderer(this, resource);
+//        dataGroupRenderer.renderLabel(field);
+//    }
 
-        for (PDPage page : pageList) {
-            contentStream.close();
-            contentStream = new PDPageContentStream(pdf, page, PDPageContentStream.AppendMode.APPEND, true, true);
-            pageNumberRenderer.renderPageNumber(pageList.indexOf(page) + 1, pageList.size());
-        }
-    }
+//    @Override
+//    public void drawTextField(PdfField<?> field) throws IOException {
+//        FieldRenderer<?> textFieldRenderer = new TextFieldRenderer();
+//        textFieldRenderer.setField(field);
+//        int lineCounter = textFieldRenderer.renderLabel();
+//        textFieldRenderer.renderValue(field, lineCounter);
+//    }
 
-    @Override
-    public void drawTitleField(PdfField field) throws IOException {
-        TitleRenderer titleFieldRenderer = new TitleRenderer();
-        titleFieldRenderer.setupRenderer(this, resource);
-        titleFieldRenderer.renderLabel(field);
-    }
-
-    @Override
-    public void drawDataGroupField(PdfField field) throws IOException {
-        DataGroupFieldRenderer dataGroupRenderer = new DataGroupFieldRenderer();
-        dataGroupRenderer.setupRenderer(this, resource);
-        dataGroupRenderer.renderLabel(field);
-    }
-
-    @Override
-    public void drawTextField(PdfField field) throws IOException {
-        TextFieldRenderer textFieldRenderer = new TextFieldRenderer();
-        textFieldRenderer.setupRenderer(this, resource);
-        int lineCounter = textFieldRenderer.renderLabel(field);
-        textFieldRenderer.renderValue(field, lineCounter);
-    }
-
-    @Override
-    public void drawI18nDividerField(PdfField field) throws IOException {
-        I18nDividerFieldRenderer i18nDividerFieldRenderer = new I18nDividerFieldRenderer();
-        i18nDividerFieldRenderer.setupRenderer(this, resource);
-        i18nDividerFieldRenderer.renderValue(field, 0);
-    }
-
-    @Override
-    public void drawBooleanField(PdfField field) throws IOException {
-        BooleanFieldRenderer booleanFieldRenderer = new BooleanFieldRenderer();
-        booleanFieldRenderer.setupRenderer(this, resource);
-        int lineCounter = booleanFieldRenderer.renderLabel(field);
-        booleanFieldRenderer.renderValue(field, lineCounter);
-    }
-
-    @Override
-    public void drawEnumerationField(PdfField field) throws IOException {
-        EnumerationRenderer enumerationRenderer = new EnumerationRenderer();
-        enumerationRenderer.setupRenderer(this, resource);
-        int lineCounter = enumerationRenderer.renderLabel(field);
-        enumerationRenderer.renderValue(field, lineCounter);
-    }
-
-    @Override
-    public void drawMultiChoiceField(PdfField field) throws IOException {
-        MultiChoiceRenderer multiChoiceRenderer = new MultiChoiceRenderer();
-        multiChoiceRenderer.setupRenderer(this, resource);
-        int lineCounter = multiChoiceRenderer.renderLabel(field);
-        multiChoiceRenderer.renderValue(field, lineCounter);
-    }
+//    @Override
+//    public void drawI18nDividerField(PdfField field) throws IOException {
+//        I18nDividerFieldRenderer i18nDividerFieldRenderer = new I18nDividerFieldRenderer();
+//        i18nDividerFieldRenderer.setupRenderer(this, resource);
+//        i18nDividerFieldRenderer.renderValue(field, 0);
+//    }
+//
+//    @Override
+//    public void drawBooleanField(PdfField field) throws IOException {
+//        BooleanFieldRenderer booleanFieldRenderer = new BooleanFieldRenderer();
+//        booleanFieldRenderer.setupRenderer(this, resource);
+//        int lineCounter = booleanFieldRenderer.renderLabel(field);
+//        booleanFieldRenderer.renderValue(field, lineCounter);
+//    }
+//
+//    @Override
+//    public void drawEnumerationField(PdfField field) throws IOException {
+//        EnumerationRenderer enumerationRenderer = new EnumerationRenderer();
+//        enumerationRenderer.setupRenderer(this, resource);
+//        int lineCounter = enumerationRenderer.renderLabel(field);
+//        enumerationRenderer.renderValue(field, lineCounter);
+//    }
+//
+//    @Override
+//    public void drawMultiChoiceField(PdfField field) throws IOException {
+//        MultiChoiceRenderer multiChoiceRenderer = new MultiChoiceRenderer();
+//        multiChoiceRenderer.setupRenderer(this, resource);
+//        int lineCounter = multiChoiceRenderer.renderLabel(field);
+//        multiChoiceRenderer.renderValue(field, lineCounter);
+//    }
 
     @Override
     public void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException {
@@ -257,7 +258,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.setNonStrokingColor(color);
         contentStream.beginText();
         contentStream.newLineAtOffset(x, y);
-        contentStream.showText(removeUnsupportedChars(text, resource));
+        contentStream.showText(PdfGeneratorUtils.removeUnsupportedChars(text, resource));
         contentStream.endText();
     }
 
@@ -267,7 +268,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.setFont(font, fontSize);
         contentStream.beginText();
         contentStream.newLineAtOffset(x, y);
-        contentStream.showText(removeUnsupportedChars(text, resource));
+        contentStream.showText(PdfGeneratorUtils.removeUnsupportedChars(text, resource));
         contentStream.endText();
     }
 

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pdf.generator.service;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.model.LayoutType;
+import com.netgrif.application.engine.importer.service.builder.FieldBuilder;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.*;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,7 +49,7 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Getter
     @Setter
-    private List<PdfField> pdfFields;
+    private List<PdfField<?>> pdfFields;
 
     @Getter
     @Setter
@@ -59,16 +61,23 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Getter
     @Setter
-    private Stack<PdfField> changedPdfFields;
+    private Stack<PdfField<?>> changedPdfFields;
 
     @Getter
     @Setter
     private int lastX, lastY;
 
+//    @Getter
+//    @Setter
+//    private int originalCols;
+
     @Getter
     @Setter
-    private int originalCols;
+    private Map<DataType, PdfFieldBuilder<?>> pdfFieldBuilders;
 
+    public PdfDataHelper(List<PdfFieldBuilder<?>> builders) {
+        this.pdfFieldBuilders = builders.stream().collect(Collectors.toMap(PdfFieldBuilder::getType, Function.identity()));
+    }
 
     @Override
     public void setupDataHelper(PdfResource resource) {
@@ -78,6 +87,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         this.dataGroups = new ArrayList<>();
         this.changedPdfFields = new Stack<>();
         this.excludedFields = new ArrayList<>();
+        pdfFieldBuilders.values().parallelStream().forEach(b -> b.setResource(resource));
     }
 
     @Override
@@ -91,11 +101,11 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Override
     public void generateTitleField() {
-        log.info("Setting title field for PDF");
-        resource.setBaseY(resource.getPageHeight() - resource.getMarginTitle());
-        PdfField titleField = new TitlePdfFieldBuilder(resource).createTitleField();
-        pdfFields.add(titleField);
-        resource.setBaseY(resource.getBaseY() - titleField.getHeight());
+//        log.info("Setting title field for PDF");
+//        resource.setBaseY(resource.getPageHeight() - resource.getMarginTitle());
+//        PdfField titleField = new PdfTitleFieldBuilder(resource).buildField();
+//        pdfFields.add(titleField);
+//        resource.setBaseY(resource.getBaseY() - titleField.getHeight());
     }
 
     @Override
@@ -107,13 +117,14 @@ public class PdfDataHelper implements IPdfDataHelper {
         this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale()).getData();
 
         dataGroups.forEach(dataGroup -> {
+            generatePdfDataGroup(dataGroup);
             if (dataGroup.getParentTaskRefId() == null) {
                 refreshGrid(dataGroup);
                 generateFromDataGroup(dataGroup);
                 this.lastX = Integer.MAX_VALUE;
             }
         });
-        Collections.sort(pdfFields);
+        pdfFields.sort(Comparator.comparing(PdfField::getOriginalBottomY));
     }
 
     private void generateFromDataGroup(DataGroup dataGroup) {
@@ -148,7 +159,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         });
 
         while (!changedPdfFields.empty()) {
-            PdfField pdfField = changedPdfFields.pop();
+            PdfField<?> pdfField = changedPdfFields.pop();
             if (pdfField.isChangedSize()) {
                 shiftFields(pdfField);
             }
@@ -161,98 +172,111 @@ public class PdfDataHelper implements IPdfDataHelper {
     protected void generateField(DataGroup dataGroup, DataRef dataRef) {
         Field<?> field = dataRef.getField();
         if (isNotHidden(field, dataGroup.getParentTransitionId()) && isNotExcluded(field.getStringId())) {
-            PdfField pdfField = null;
+            PdfField<?> pdfField = createPdfField(dataGroup, dataRef);
+            if (pdfField == null) {
+                return;
+            }
+            pdfFields.add(pdfField);
 //            TODO: NAE-1645 fix, builder and registry for each type and component
-            switch (field.getType()) {
-                case BUTTON:
-                case TASK_REF:
-                    break;
-                case ENUMERATION_MAP:
-                    pdfField = createEnumMapField(dataGroup, dataRef);
-                    pdfFields.add(pdfField);
-                    break;
-                case ENUMERATION:
-                    pdfField = createEnumField(dataGroup, dataRef);
-                    pdfFields.add(pdfField);
-                    break;
-                case MULTICHOICE_MAP:
-                    pdfField = createMultiChoiceMapField(dataGroup, dataRef);
-                    pdfFields.add(pdfField);
-                    break;
-                case MULTICHOICE:
-                    pdfField = createMultiChoiceField(dataGroup, dataRef);
-                    pdfFields.add(pdfField);
-                    break;
-                case I_18_N:
-                    // TODO: NAE-1645 dataRef component?
-                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), Component.DIVIDER)) {
-                        pdfField = createI18nDividerField(dataGroup, dataRef);
-                        pdfFields.add(pdfField);
-                    }
-                    break;
-                default:
-                    pdfField = createPdfTextField(dataGroup, dataRef);
-                    pdfFields.add(pdfField);
-                    break;
-            }
-            if (pdfField != null) {
-                generatePdfDataGroup(dataGroup, pdfField);
-            }
+//            switch (field.getType()) {
+//                case BUTTON:
+//                case TASK_REF:
+//                    break;
+//                case ENUMERATION_MAP:
+//                    pdfField = createEnumMapField(dataGroup, dataRef);
+//                    pdfFields.add(pdfField);
+//                    break;
+//                case ENUMERATION:
+//                     pdfField = createEnumField(dataGroup, dataRef);
+//                    pdfFields.add(pdfField);
+//                    break;
+//                case MULTICHOICE_MAP:
+//                    pdfField = createMultiChoiceMapField(dataGroup, dataRef);
+//                    pdfFields.add(pdfField);
+//                    break;
+//                case MULTICHOICE:
+//                    pdfField = createMultiChoiceField(dataGroup, dataRef);
+//                    pdfFields.add(pdfField);
+//                    break;
+//                case I_18_N:
+//                    // TODO: NAE-1645 dataRef component?
+//                    if (field.getComponent() != null && Objects.equals(field.getComponent().getName(), Component.DIVIDER)) {
+//                        pdfField = createI18nDividerField(dataGroup, dataRef);
+//                        pdfFields.add(pdfField);
+//                    }
+//                    break;
+//                default:
+//                    pdfField = createPdfTextField(dataGroup, dataRef);
+//                    pdfFields.add(pdfField);
+//                    break;
+//            }
+//            if (pdfField != null) {
+//                generatePdfDataGroup(dataGroup, pdfField);
+//            }
         }
     }
 
-    protected PdfField createPdfTextField(DataGroup dataGroup, DataRef field) {
-        PdfTextFieldBuilder builder = new PdfTextFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+    protected PdfField<?> createPdfField(DataGroup dataGroup, DataRef field) {
+        PdfFieldBuilder<?> builder = pdfFieldBuilders.get(field.getField().getType());
+        if (builder == null) {
+            return null;
+        }
+        PdfField<?> pdfField = builder.buildField(PdfFieldBuildingBlock.builder()
+                .dataGroup(dataGroup)
+                .dataRef(field)
+                .lastX(lastX)
+                .lastY(lastY)
+                .build()
+        );
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createEnumField(DataGroup dataGroup, DataRef field) {
-        PdfEnumerationSelectionFieldBuilder builder = new PdfEnumerationSelectionFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
-        updateLastCoordinates(builder.getLastX(), builder.getLastY());
-        return pdfField;
-    }
-
-    protected PdfField createMultiChoiceField(DataGroup dataGroup, DataRef field) {
-        PdfMultiChoiceSelectionFieldBuilder builder = new PdfMultiChoiceSelectionFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
-        updateLastCoordinates(builder.getLastX(), builder.getLastY());
-        return pdfField;
-    }
-
-    protected PdfField createEnumMapField(DataGroup dataGroup, DataRef field) {
-        PdfEnumerationMapSelectionFieldBuilder builder = new PdfEnumerationMapSelectionFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
-        updateLastCoordinates(builder.getLastX(), builder.getLastY());
-        return pdfField;
-    }
-
-    protected PdfField createMultiChoiceMapField(DataGroup dataGroup, DataRef field) {
-        MultiChoiceMapPdfSelectionFieldBuilder builder = new MultiChoiceMapPdfSelectionFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
-        updateLastCoordinates(builder.getLastX(), builder.getLastY());
-        return pdfField;
-    }
-
-    protected PdfField createI18nDividerField(DataGroup dataGroup, DataRef field) {
-        I18NDividerPdfFieldBuilder builder = new I18NDividerPdfFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
-        updateLastCoordinates(builder.getLastX(), builder.getLastY());
-        return pdfField;
-    }
+//    protected PdfField createEnumField(DataGroup dataGroup, DataRef field) {
+//        PdfEnumerationSelectionFieldBuilder builder = new PdfEnumerationSelectionFieldBuilder(resource);
+//        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+//        updateLastCoordinates(builder.getLastX(), builder.getLastY());
+//        return pdfField;
+//    }
+//
+//    protected PdfField createMultiChoiceField(DataGroup dataGroup, DataRef field) {
+//        PdfMultiChoiceSelectionFieldBuilder builder = new PdfMultiChoiceSelectionFieldBuilder(resource);
+//        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+//        updateLastCoordinates(builder.getLastX(), builder.getLastY());
+//        return pdfField;
+//    }
+//
+//    protected PdfField createEnumMapField(DataGroup dataGroup, DataRef field) {
+//        PdfEnumerationMapSelectionFieldBuilder builder = new PdfEnumerationMapSelectionFieldBuilder(resource);
+//        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+//        updateLastCoordinates(builder.getLastX(), builder.getLastY());
+//        return pdfField;
+//    }
+//
+//    protected PdfField createMultiChoiceMapField(DataGroup dataGroup, DataRef field) {
+//        PdfMultiChoiceMapSelectionFieldBuilder builder = new PdfMultiChoiceMapSelectionFieldBuilder(resource);
+//        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+//        updateLastCoordinates(builder.getLastX(), builder.getLastY());
+//        return pdfField;
+//    }
+//
+//    protected PdfField createI18nDividerField(DataGroup dataGroup, DataRef field) {
+//        PdfI18NDividerFieldBuilder builder = new PdfI18NDividerFieldBuilder(resource);
+//        PdfField pdfField = builder.buildField(dataGroup, field, lastX, lastY);
+//        updateLastCoordinates(builder.getLastX(), builder.getLastY());
+//        return pdfField;
+//    }
 
     protected void updateLastCoordinates(int lastX, int lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
     }
 
-    protected int updateBottomY(PdfField pdfField) {
-        return PdfFieldBuilder.countBottomPosY(pdfField, pdfField.getResource());
+    protected int updateBottomY(PdfField<?> pdfField) {
+        return PdfFieldBuilder.countBottomPosY(pdfField, resource);
     }
 
-    protected void shiftFields(PdfField currentField) {
+    protected void shiftFields(PdfField<?> currentField) {
         pdfFields.forEach(field -> {
             if (currentField != field) {
                 shiftField(currentField, field);
@@ -260,7 +284,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         });
     }
 
-    protected void shiftField(PdfField currentField, PdfField fieldBelow) {
+    protected void shiftField(PdfField<?>  currentField, PdfField<?>  fieldBelow) {
         int belowTopY, cFieldBottomY;
         belowTopY = fieldBelow.getTopY();
         cFieldBottomY = currentField.getBottomY();
@@ -269,14 +293,14 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    protected void generatePdfDataGroup(DataGroup dataGroup, PdfField pdfField) {
-        PdfField dgField;
-        if (dataGroup != null && dataGroup.getTitle() != null) {
-            dgField = new PdfDataGroupFieldBuilder(resource).buildField(dataGroup, pdfField);
-            if (!pdfFields.contains(dgField)) {
-                pdfFields.add(dgField);
-            }
-        }
+    protected void generatePdfDataGroup(DataGroup dataGroup) {
+//        PdfField<?>  dgField;
+//        if (dataGroup != null && dataGroup.getTitle() != null) {
+//            dgField = new PdfDataGroupFieldBuilder(resource).buildField(dataGroup);
+//            if (!pdfFields.contains(dgField)) {
+//                pdfFields.add(dgField);
+//            }
+//        }
     }
 
     protected void shiftDown(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
@@ -290,11 +314,11 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    protected boolean isCoveredByDataGroup(PdfField currentField, PdfField fieldBelow) {
+    protected boolean isCoveredByDataGroup(PdfField<?> currentField, PdfField<?> fieldBelow) {
         return currentField.isDgField() && currentField.getOriginalTopY() <= fieldBelow.getOriginalTopY();
     }
 
-    protected boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow) {
+    protected boolean isCoveredByDataField(PdfField<?> currentField, PdfField<?> fieldBelow) {
         return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
     }
 

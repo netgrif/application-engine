@@ -24,21 +24,21 @@ public interface IPdfDrawer {
 
     void closeContentStream() throws IOException;
 
-    void drawTitleField(PdfField field) throws IOException;
+//    void drawTitleField(PdfField field) throws IOException;
+//
+//    void drawDataGroupField(PdfField field) throws IOException;
 
-    void drawDataGroupField(PdfField field) throws IOException;
+//    void drawTextField(PdfField<?> field) throws IOException;
 
-    void drawTextField(PdfField field) throws IOException;
-
-    void drawI18nDividerField(PdfField field) throws IOException;
-
-    void drawBooleanField(PdfField field) throws IOException;
-
-    void drawEnumerationField(PdfField field) throws IOException;
-
-    void drawMultiChoiceField(PdfField field) throws IOException;
-
-    void drawPageNumber() throws IOException;
+//    void drawI18nDividerField(PdfField field) throws IOException;
+//
+//    void drawBooleanField(PdfField field) throws IOException;
+//
+//    void drawEnumerationField(PdfField field) throws IOException;
+//
+//    void drawMultiChoiceField(PdfField field) throws IOException;
+//
+//    void drawPageNumber() throws IOException;
 
     void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException;
 

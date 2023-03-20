@@ -1,50 +1,99 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
+import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.domain.PdfField;
-import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
+import com.netgrif.application.engine.pdf.generator.service.PdfDrawer;
+import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import lombok.Data;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import lombok.EqualsAndHashCode;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Data
-public abstract class FieldRenderer extends Renderer {
-    PdfField helperField;
+@EqualsAndHashCode
+public abstract class FieldRenderer<T extends PdfField<?>> {
 
-    public abstract void renderValue(PdfField field, int lineCounter) throws IOException;
+    private T field;
 
-    protected int renderLabel(PdfField field, PDType0Font font, int fontSize, Color colorLabel) throws IOException {
-        float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize, resource);
-        int maxLineSize = getMaxLabelLineSize(field.getWidth(), fontSize);
-        List<String> multiLineText = new ArrayList<String>() {{
-            add(field.getLabel());
-        }};
+    private IPdfDrawer pdfDrawer;
+
+    private PdfResource resource;
+
+    private int lineCounter;
+
+//    int marginLeft, marginBottom, marginTop;
+//
+//    int lineHeight, pageDrawableWidth, padding, pageHeight, baseX;
+//    int fontValueSize, fontLabelSize, fontTitleSize;
+//
+//    float strokeWidth;
+//
+//    Color colorString, colorLabelString, colorDataGroupLabel;
+
+    public FieldRenderer() {
+    }
+
+    public void setField(PdfField<?> field) {
+        this.field = (T) field;
+    }
+
+    public abstract DataType getType();
+
+    public abstract void renderValue() throws IOException;
+
+
+//    public void setupRenderer() {
+//        this.marginLeft = resource.getMarginLeft();
+//        this.marginBottom = resource.getMarginBottom();
+//        this.marginTop = resource.getMarginTop();
+//        this.lineHeight = resource.getLineHeight();
+//        this.pageDrawableWidth = resource.getPageDrawableWidth();
+//        this.padding = resource.getPadding();
+//        this.colorString = Color.decode(resource.getColorString().toUpperCase());
+//        this.colorDataGroupLabel = Color.decode(resource.getColorDataGroup().toUpperCase());
+//        this.colorLabelString = Color.decode(resource.getColorLabelString().toUpperCase());
+//        this.baseX = resource.getBaseX();
+//        this.pageHeight = resource.getPageHeight();
+//        this.fontValueSize = resource.getFontValueSize();
+//        this.fontLabelSize = resource.getFontLabelSize();
+//        this.fontTitleSize = resource.getFontTitleSize();
+//        this.strokeWidth = resource.getStrokeWidth();
+//    }
+
+    public void renderLabel() throws IOException {
+//        float textWidth = getTextWidth(field.getLabel(), resource.getLabelFont(), resource.getFontLabelSize(), resource);
+//        int maxLineSize = PdfGeneratorUtils.getMaxLineSize(field.getWidth(), resource.getFontLabelSize());
+        List<String> multiLineText = field.getLabel();
         int linesOnPage = 0;
-        int x = field.getX() + padding, y = renderLinePosY(field, 1);
+        int x = field.getX() + resource.getPadding(), y = renderLinePosY(field, 1);
 
-        if (textWidth > field.getWidth() - padding) {
-            multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(field.getLabel()), maxLineSize);
-        }
+//        if (textWidth > field.getWidth() - padding) {
+//            multiLineText = PdfFieldBuilder.generateMultiLineText(field.getLabel(), maxLineSize);
+//        }
 
         for (String line : multiLineText) {
             linesOnPage++;
             linesOnPage = renderPageBrake(field, linesOnPage, y);
             y = renderLinePosY(field, linesOnPage);
-            pdfDrawer.writeString(font, fontSize, x, y, line, colorLabel);
+            pdfDrawer.writeString(resource.getLabelFont(), resource.getFontLabelSize(), x, y, line, Color.decode(resource.getColorLabelString().toUpperCase()));
         }
         pdfDrawer.checkOpenPages();
-        return multiLineText.size();
+        this.lineCounter = multiLineText.size();
     }
 
-    protected int renderPageBrake(PdfField field, int linesOnPage, int y) throws IOException {
-        if (y < marginBottom) {
+
+//    protected int getMaxLabelLineSize(int fieldWidth, int fontSize) {
+//        return (int) ((fieldWidth - resource.getPadding()) * resource.getSizeMultiplier() / fontSize);
+//    }
+
+    protected int renderPageBrake(PdfField<?> field, int linesOnPage, int y) throws IOException {
+        if (y < resource.getMarginBottom()) {
             field.setHeight(renderHeight(field, linesOnPage));
             linesOnPage = 1;
-            while (y < marginBottom) {
+            while (y < resource.getMarginBottom()) {
                 pdfDrawer.newPage();
                 field.setBottomY(renderBottomY(field));
                 y = renderLinePosY(field, linesOnPage);
@@ -53,14 +102,14 @@ public abstract class FieldRenderer extends Renderer {
         return linesOnPage;
     }
 
-    protected int renderPageBrake(PdfField field, int linesOnPage, int strokeLineCounter, int y) throws IOException {
-        if (y < marginBottom) {
+    protected int renderPageBrake(PdfField<?> field, int linesOnPage, int strokeLineCounter, int y) throws IOException {
+        if (y < resource.getMarginBottom()) {
             if (resource.isTextFieldStroke()) {
-                pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), strokeLineCounter, strokeWidth);
+                pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), strokeLineCounter, resource.getStrokeWidth());
             }
             field.setHeight(renderHeight(field, linesOnPage));
             linesOnPage = 1;
-            while (y < marginBottom) {
+            while (y < resource.getMarginBottom()) {
                 pdfDrawer.newPage();
                 field.setBottomY(renderBottomY(field));
                 y = renderLinePosY(field, linesOnPage);
@@ -69,19 +118,44 @@ public abstract class FieldRenderer extends Renderer {
         return linesOnPage;
     }
 
-    protected int renderLinePosY(PdfField field, int linesOnPage) {
-        return field.getBottomY() + field.getHeight() - lineHeight * linesOnPage;
+    protected int renderLinePosY(PdfField<?> field, int linesOnPage) {
+        return field.getBottomY() + field.getHeight() - resource.getLineHeight() * linesOnPage;
     }
 
-    protected int renderBottomY(PdfField field) {
-        return field.getBottomY() + pageHeight - marginTop - marginBottom - lineHeight;
+    protected int renderBottomY(PdfField<?> field) {
+        return field.getBottomY() + resource.getPageHeight() - resource.getMarginTop() - resource.getMarginBottom() - resource.getLineHeight();
     }
 
-    protected int renderHeight(PdfField field, int linesOnPage) {
-        return field.getHeight() - lineHeight * (linesOnPage - 1);
+    protected int renderHeight(PdfField<?> field, int linesOnPage) {
+        return field.getHeight() - resource.getLineHeight() * (linesOnPage - 1);
     }
 
-    protected int getMaxValueLineSize(int fieldWidth) {
-        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontValueSize);
-    }
+//    protected int getMaxValueLineSize(int fieldWidth) {
+//        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontValueSize);
+//    }
+
+//    private String removeUnsupportedChars(String input, PdfResource resource) {
+//        String value = Jsoup.parse(input.replaceAll("\\s{1,}", " ")).text();
+//        value = Normalizer.normalize(value, Normalizer.Form.NFC);
+//        StringBuilder b = new StringBuilder();
+//        for (int i = 0; i < value.length(); i++) {
+//            if (isCharEncodable(value.charAt(i), resource.getValueFont())) {
+//                b.append(value.charAt(i));
+//            } else if (isCharEncodable(value.charAt(i), resource.getLabelFont())) {
+//                b.append(value.charAt(i));
+//            } else if (isCharEncodable(value.charAt(i), resource.getTitleFont())) {
+//                b.append(value.charAt(i));
+//            }
+//        }
+//        return b.toString();
+//    }
+//
+//    private boolean isCharEncodable(char character, PDType0Font font) {
+//        try {
+//            font.encode(Character.toString(character));
+//            return true;
+//        } catch (IllegalArgumentException | IOException iae) {
+//            return false;
+//        }
+//    }
 }
