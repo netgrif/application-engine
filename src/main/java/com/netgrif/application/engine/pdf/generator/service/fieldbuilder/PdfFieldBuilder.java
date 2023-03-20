@@ -38,11 +38,11 @@ public abstract class PdfFieldBuilder<T> {
     protected abstract int countValueMultiLineHeight(PdfField<T> pdfField);
 
     public static int countTopPosY(PdfField<?> field, PdfResource resource) {
-        return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
+        return resource.getBaseY() - (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
     }
 
     public static int countBottomPosY(PdfField<?> field, PdfResource resource) {
-        return (field.getLayoutY() * resource.getFormGridRowHeight()) + field.getHeight() + resource.getPadding();
+        return resource.getBaseY() - (field.getLayoutY() * resource.getFormGridRowHeight()) + field.getHeight() + resource.getPadding();
     }
 
     public boolean changeHeight(int multiLineHeight, PdfField<T> pdfField) {
@@ -192,7 +192,7 @@ public abstract class PdfFieldBuilder<T> {
     }
 
     private int countPosX(PdfField<T> field) {
-        return (field.getLayoutX() * resource.getFormGridColWidth() + resource.getPadding());
+        return resource.getBaseX() + (field.getLayoutX() * resource.getFormGridColWidth() + resource.getPadding());
     }
 
 }
