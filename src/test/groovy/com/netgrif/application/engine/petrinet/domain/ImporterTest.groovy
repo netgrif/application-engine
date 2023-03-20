@@ -124,7 +124,7 @@ class ImporterTest {
                 return a.importId <=> b.importId
             })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
         }
-        assert net.transitions.size() == 2
+        assert net.transitions.size() == 3
         2.times {
             net.transitions.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
@@ -163,7 +163,7 @@ class ImporterTest {
                 return a.importId <=> b.importId
             })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
         }
-        assert net.transitions.size() == 2
+        assert net.transitions.size() == 3
         2.times {
             net.transitions.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
@@ -204,7 +204,7 @@ class ImporterTest {
                 return a.importId <=> b.importId
             })[it].name.defaultValue == ("newVariable_${it + 6}" as String)
         }
-        assert net2.transitions.size() == 1
+        assert net2.transitions.size() == 2
         net2.transitions.values()[0].importId == "task3"
         net2.transitions.values()[0].title.defaultValue == "task3"
         assert net2.places.size() == 0
@@ -231,7 +231,7 @@ class ImporterTest {
                 return a.importId <=> b.importId
             })[it].name.defaultValue == ("newVariable_${it + 6}" as String)
         }
-        assert net2.transitions.size() == 1
+        assert net2.transitions.size() == 2
         net2.transitions.values()[0].importId == "task3"
         net2.transitions.values()[0].title.defaultValue == "task3"
         assert net2.places.size() == 0
@@ -264,7 +264,7 @@ class ImporterTest {
                 return a.importId <=> b.importId
             })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
         }
-        assert net.transitions.size() == 2
+        assert net.transitions.size() == 3
         2.times {
             net.transitions.values().toSorted({ a, b ->
                 return a.importId <=> b.importId
@@ -294,7 +294,7 @@ class ImporterTest {
 
         assert net != null
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
-        taskService.assignTask(testCase.getTasks().toList().get(0).getTask())
+        taskService.assignTask(testCase.getTasks().find {it.transition == "t1"}.getTask())
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
         assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"

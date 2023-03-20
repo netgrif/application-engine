@@ -47,7 +47,7 @@ class AllDataTransitionTest {
     }
 
     @Test
-    void testUserList() throws MissingPetriNetMetaDataException, IOException {
+    void testAllData() throws MissingPetriNetMetaDataException, IOException {
         ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(resourceFile.inputStream, VersionType.MAJOR, superCreator.getLoggedSuper());
         assert outcome.getNet() != null;
         PetriNet net = outcome.getNet()

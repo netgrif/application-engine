@@ -266,7 +266,7 @@ class PdfGeneratorTest {
         assertNotNull(testCase)
         List<TaskReference> tasks = taskService.findAllByCase(testCase.stringId, Locale.ENGLISH)
         assertNotNull(tasks)
-        assertEquals(2, tasks.size())
+        assertEquals(3, tasks.size())
         TaskReference task = tasks.find {it.transitionId == "1"}
         AssignTaskEventOutcome outcome = taskService.assignTask(task.stringId)
         assertNotNull(outcome)
@@ -289,7 +289,7 @@ class PdfGeneratorTest {
 
         List<TaskReference> tasks = taskService.findAllByCase(testCase.stringId, Locale.ENGLISH)
         assertNotNull(tasks)
-        assertEquals(2, tasks.size())
+        assertEquals(3, tasks.size())
         TaskReference task = tasks.find {it.transitionId == "2"}
         AssignTaskEventOutcome outcome = taskService.assignTask(task.stringId)
         assertNotNull(outcome)

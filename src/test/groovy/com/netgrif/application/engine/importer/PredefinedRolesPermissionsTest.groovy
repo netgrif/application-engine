@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.importer.service.RoleFactory
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -56,6 +57,8 @@ class PredefinedRolesPermissionsTest {
     @Autowired
     private RoleFactory roleFactory
 
+    @Autowired
+    private AllDataConfiguration configuration
 
     @Value("classpath:predefinedPermissions/role_permissions_default_role_defined.xml")
     private Resource definedDefaultRoleNet
@@ -459,10 +462,10 @@ class PredefinedRolesPermissionsTest {
 
         assert aCase != null
         assert !aCase.getTasks().isEmpty()
-        assert aCase.getTasks().size() == 1
+        assert aCase.getTasks().size() == 2
 
         List<TaskPair> temp = new ArrayList<>(aCase.getTasks())
-        Task task = taskService.findOne(temp.get(0).task)
+        Task task = taskService.findOne(temp.find { it.transition != configuration.allData.id }.task)
 
         assert task != null
 

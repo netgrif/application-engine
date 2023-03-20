@@ -190,7 +190,6 @@ class ActionDelegate {
 
     // TODO: release/7.0.0 - <action trigger="set" type="value">
     // TODO: release/7.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
-    // TODO: release/7.0.0 - tasky sa vytvoria pri vytvoreni caseu a nemazu sa
     //- existuje all_data task ktory sa pouziva pri change value
     // TODO: release/7.0.0 - update field map po setdata na aktualne hodnoty
 
