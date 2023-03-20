@@ -84,6 +84,9 @@ public class Importer {
     protected List<com.netgrif.application.engine.petrinet.domain.Function> functions;
 
     @Autowired
+    protected AllDataConfiguration allDataConfiguration;
+
+    @Autowired
     protected FieldFactory fieldFactory;
 
     @Autowired
@@ -162,11 +165,12 @@ public class Importer {
         this.functions = new LinkedList<>();
     }
 
-    protected void unmarshallXml(InputStream xml) throws JAXBException {
+    public Document unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
+        return document;
     }
 
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
@@ -185,6 +189,7 @@ public class Importer {
         document.getI18N().forEach(this::addI18N);
 
         setMetaData();
+        addAllDataTransition();
         net.setIcon(document.getIcon());
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
@@ -219,6 +224,34 @@ public class Importer {
         }
 
         return Optional.of(net);
+    }
+
+    protected void addAllDataTransition() {
+        com.netgrif.application.engine.importer.model.Transition allData = allDataConfiguration.getAllData();
+        if (document.getTransition().stream().anyMatch(transition -> allData.getId().equals(transition.getId()))) {
+            return;
+        }
+        com.netgrif.application.engine.importer.model.DataGroup dataGroup = allData.getDataGroup().get(0);
+        int y = 0;
+        for (Field<?> field : fields.values()) {
+            DataRef dataRef = new DataRef();
+            dataRef.setId(field.getImportId());
+            Layout layout = new Layout();
+            layout.setCols(dataGroup.getCols());
+            layout.setRows(1);
+            layout.setX(0);
+            layout.setY(y);
+            layout.setOffset(0);
+            layout.setTemplate(Template.MATERIAL);
+            layout.setAppearance(Appearance.OUTLINE);
+            dataRef.setLayout(layout);
+            Logic logic = new Logic();
+            logic.getBehavior().add(Behavior.EDITABLE);
+            dataRef.setLogic(logic);
+            dataGroup.getDataRef().add(dataRef);
+            y++;
+        }
+        document.getTransition().add(allData);
     }
 
     protected void resolveRoleRef(CaseRoleRef roleRef) {
