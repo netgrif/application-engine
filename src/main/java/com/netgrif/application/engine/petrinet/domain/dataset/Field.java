@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
@@ -33,6 +34,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @Document
 @Data
 @NoArgsConstructor
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@type")
 public abstract class Field<T> extends Imported {
 
     @Id
@@ -155,7 +157,7 @@ public abstract class Field<T> extends Imported {
 //            clone.value = this.value.clone();
 //        }
         clone.immediate = this.immediate;
-        if (this.events != null ) {
+        if (this.events != null) {
             clone.events = this.events.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));

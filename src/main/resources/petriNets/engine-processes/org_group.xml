@@ -18,14 +18,14 @@
 		com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
 		com.netgrif.application.engine.petrinet.domain.dataset.CaseField referencedFiltersList
 		->
-			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value.value)) {
+			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.rawValue)) {
 				change previewTaskRef value {
-					return [findTask({it.caseId.eq(filterAutocomplete.value.value).and(it.transitionId.eq("view_filter"))}).stringId]
+					return [findTask({it.caseId.eq(filterAutocomplete.rawValue).and(it.transitionId.eq("view_filter"))}).stringId]
 				}
 			} else {
 				change filterAutocomplete options {
-					return findFilters(filterAutocomplete.value.value != null ? filterAutocomplete.value.value : "")
-							.findAll({filterCase -&gt; !referencedFiltersList.value.value.contains(filterCase.stringId)})
+					return findFilters(filterAutocomplete.rawValue != null ? filterAutocomplete.rawValue : "")
+							.findAll({filterCase -&gt; !referencedFiltersList.rawValue.contains(filterCase.stringId)})
 							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
 				}
 				change previewTaskRef value {

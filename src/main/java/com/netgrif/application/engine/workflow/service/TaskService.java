@@ -439,6 +439,7 @@ public class TaskService implements ITaskService {
             } else {
                 task.setState(State.DISABLED);
             }
+            save(task);
         }
         if (autoTriggered != null) {
             executeTransition(autoTriggered, workflowService.findOne(useCase.getStringId()));

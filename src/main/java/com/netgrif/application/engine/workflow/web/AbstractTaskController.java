@@ -199,7 +199,7 @@ public abstract class AbstractTaskController {
     public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.getTasks().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet)));
+            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet)));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {

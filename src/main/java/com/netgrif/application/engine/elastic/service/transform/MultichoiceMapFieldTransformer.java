@@ -13,6 +13,7 @@ public class MultichoiceMapFieldTransformer extends ElasticDataFieldTransformer<
 
     @Override
     public MapField transform(MultichoiceMapField caseField, MultichoiceMapField petriNetField) {
+        // TODO: release/7.0.0 ArrayList cannot be cast to Set
         Set<String> values = caseField.getRawValue();
         if (values == null || values.isEmpty()) {
             return null;

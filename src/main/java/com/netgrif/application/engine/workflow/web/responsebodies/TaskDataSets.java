@@ -11,6 +11,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class TaskDataSets {
 
-    private Map<String, DataSet> tasks;
+    private Map<String, DataSet> body;
 
 }

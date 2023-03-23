@@ -7,12 +7,13 @@ import com.netgrif.application.engine.importer.service.validation.IActionValidat
 import com.netgrif.application.engine.importer.service.validation.IDocumentValidator;
 import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
 import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Transaction;
 import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
@@ -22,10 +23,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.events.*;
+import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
+import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
@@ -190,6 +195,7 @@ public class Importer {
 
         setMetaData();
         addAllDataTransition();
+
         net.setIcon(document.getIcon());
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
@@ -227,17 +233,28 @@ public class Importer {
     }
 
     protected void addAllDataTransition() {
-        com.netgrif.application.engine.importer.model.Transition allData = allDataConfiguration.getAllData();
-        if (document.getTransition().stream().anyMatch(transition -> allData.getId().equals(transition.getId()))) {
+        com.netgrif.application.engine.importer.model.Transition allDataConfig = allDataConfiguration.getAllData();
+        if (document.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
             return;
         }
-        com.netgrif.application.engine.importer.model.DataGroup dataGroup = allData.getDataGroup().get(0);
+        com.netgrif.application.engine.importer.model.DataGroup configDataGroup = allDataConfig.getDataGroup().get(0);
         int y = 0;
-        for (Field<?> field : fields.values()) {
+        com.netgrif.application.engine.importer.model.Transition allDataTransition = new com.netgrif.application.engine.importer.model.Transition();
+        allDataTransition.setId(allDataConfig.getId());
+        allDataTransition.setX(allDataConfig.getX());
+        allDataTransition.setY(allDataConfig.getY());
+        allDataTransition.setLabel(allDataConfig.getLabel());
+        allDataTransition.setIcon(allDataConfig.getIcon());
+        allDataTransition.setPriority(allDataConfig.getPriority());
+        allDataTransition.setAssignPolicy(allDataConfig.getAssignPolicy());
+        allDataTransition.setFinishPolicy(allDataConfig.getFinishPolicy());
+        // TODO: NAE-1858: all properties
+        com.netgrif.application.engine.importer.model.DataGroup allDataGroup = new com.netgrif.application.engine.importer.model.DataGroup();
+        for (Data field : document.getData()) {
             DataRef dataRef = new DataRef();
-            dataRef.setId(field.getImportId());
+            dataRef.setId(field.getId());
             Layout layout = new Layout();
-            layout.setCols(dataGroup.getCols());
+            layout.setCols(configDataGroup.getCols());
             layout.setRows(1);
             layout.setX(0);
             layout.setY(y);
@@ -248,10 +265,11 @@ public class Importer {
             Logic logic = new Logic();
             logic.getBehavior().add(Behavior.EDITABLE);
             dataRef.setLogic(logic);
-            dataGroup.getDataRef().add(dataRef);
+            allDataGroup.getDataRef().add(dataRef);
             y++;
         }
-        document.getTransition().add(allData);
+        allDataTransition.getDataGroup().add(allDataGroup);
+        document.getTransition().add(allDataTransition);
     }
 
     protected void resolveRoleRef(CaseRoleRef roleRef) {
@@ -706,10 +724,11 @@ public class Importer {
     protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         DataGroup dataGroup = new DataGroup();
 
-        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
+        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0) {
             dataGroup.setImportId(importDataGroup.getId());
-        else
+        } else {
             dataGroup.setImportId(transition.getImportId() + "_dg_" + index);
+        }
 
         dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
