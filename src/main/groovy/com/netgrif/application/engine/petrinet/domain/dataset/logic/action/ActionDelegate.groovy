@@ -696,12 +696,6 @@ class ActionDelegate {
         actionsRunner.removeFromCache("${useCase.stringId}-${name}")
     }
 
-    def psc(Closure find, String input) {
-        if (find)
-            return find(input)
-        return null
-    }
-
     Object get(String key) { map[key] }
 
     void set(String key, Object value) { map[key] = value }
