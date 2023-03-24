@@ -3,11 +3,8 @@ package com.netgrif.application.engine.pdf.generator.service;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
-import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
-import com.netgrif.application.engine.pdf.generator.service.renderer.*;
 import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import lombok.Setter;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.multipdf.PDFCloneUtility;
@@ -22,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 
@@ -179,8 +176,8 @@ public class PdfDrawer implements IPdfDrawer {
 //    }
 
     @Override
-    public void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException {
-        if (checkBooleanValue(values, text)) {
+    public void drawBooleanBox(Boolean value, Map.Entry<Boolean, String> text, int x, int y) throws IOException {
+        if (value.equals(text.getKey())) {
             drawSvg(resource.getBooleanChecked(), x, y);
         } else {
             drawSvg(resource.getBooleanUnchecked(), x, y);
@@ -188,17 +185,17 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
-    public boolean drawSelectionButton(List<String> values, String choice, int x, int y, DataType fieldType) throws IOException {
+    public boolean drawSelectionButton(Set<String> values, String choice, int x, int y, String fieldType) throws IOException {
         if (values.contains(choice)) {
-            if (fieldType == DataType.MULTICHOICE || fieldType == DataType.MULTICHOICE_MAP) {
+            if (Objects.equals(fieldType, DataType.MULTICHOICE.value()) || Objects.equals(fieldType, DataType.MULTICHOICE_MAP.value())) {
                 drawSvg(resource.getCheckboxChecked(), x, y);
-            } else if (fieldType == DataType.ENUMERATION || fieldType == DataType.ENUMERATION_MAP) {
+            } else if (Objects.equals(fieldType, DataType.ENUMERATION.value()) || Objects.equals(fieldType, DataType.ENUMERATION_MAP.value())) {
                 drawSvg(resource.getRadioChecked(), x, y);
             }
         } else {
-            if (fieldType == DataType.MULTICHOICE || fieldType == DataType.MULTICHOICE_MAP) {
+            if (Objects.equals(fieldType, DataType.MULTICHOICE.value()) || Objects.equals(fieldType, DataType.MULTICHOICE_MAP.value())) {
                 drawSvg(resource.getCheckboxUnchecked(), x, y);
-            } else if (fieldType == DataType.ENUMERATION || fieldType == DataType.ENUMERATION_MAP) {
+            } else if (Objects.equals(fieldType, DataType.ENUMERATION.value()) || Objects.equals(fieldType, DataType.ENUMERATION_MAP.value())) {
                 drawSvg(resource.getRadioUnchecked(), x, y);
             }
         }
@@ -270,20 +267,6 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.newLineAtOffset(x, y);
         contentStream.showText(PdfGeneratorUtils.removeUnsupportedChars(text, resource));
         contentStream.endText();
-    }
-
-    protected boolean checkBooleanValue(List<String> values, String text) {
-        PdfBooleanFormat format = resource.getBooleanFormat();
-        if (values.get(0).equals("true")) {
-            if (!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)) {
-                return format.getValue().get(0).equals(text);
-            } else {
-                return true;
-            }
-        } else if (format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_EN) || format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK)) {
-            return format.getValue().get(1).equals(text);
-        }
-        return false;
     }
 
     protected void drawSvg(PDFormXObject resourceObject, int x, int y) throws IOException {

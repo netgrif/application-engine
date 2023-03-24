@@ -1069,7 +1069,11 @@ public class Importer {
         if (imported == null) {
             return null;
         }
-        I18nString string = i18n.getOrDefault(imported.getName(), new I18nString(imported.getName(), imported.getValue()));
+        String key = imported.getName();
+        if (imported instanceof Option) {
+            key = ((Option) imported).getKey();
+        }
+        I18nString string = i18n.getOrDefault(imported.getName(), new I18nString(key, imported.getValue()));
         if (string.getDefaultValue() == null) {
             string.setDefaultValue(imported.getValue());
         }

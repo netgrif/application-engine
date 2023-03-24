@@ -23,7 +23,7 @@ public class MultichoiceFieldBuilder extends FieldBuilder<MultichoiceField> {
         }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(init.stream().map(I18nString::new).collect(Collectors.toSet()));
+                field.setDefaultValue(init.stream().map(v -> new I18nString(v, v)).collect(Collectors.toSet()));
             }
         });
         return field;

@@ -1,7 +1,7 @@
-//package com.netgrif.application.engine.pdf.generator.service.renderer;
+ //package com.netgrif.application.engine.pdf.generator.service.renderer;
 //
 //import com.netgrif.application.engine.pdf.generator.config.types.PdfPageNumberFormat;
-//import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+//import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 //import lombok.Setter;
 //
 //import java.io.IOException;

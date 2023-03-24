@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.workflow.domain.Case;

@@ -1,18 +1,42 @@
-//package com.netgrif.application.engine.pdf.generator.service.renderer;
-//
-//import com.netgrif.application.engine.pdf.generator.domain.PdfField;
-//import com.netgrif.application.engine.pdf.generator.domain.PdfTextField;
-//import com.netgrif.application.engine.pdf.generator.service.fieldbuilder.PdfFieldBuilder;
-//import org.apache.pdfbox.pdmodel.font.PDType0Font;
-//
-//import java.awt.*;
-//import java.io.IOException;
-//import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.List;
-//
-//public class I18nDividerFieldRenderer extends FieldRenderer {
-//
+package com.netgrif.application.engine.pdf.generator.service.renderer;
+
+import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfI18nDividerField;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
+
+public class I18nDividerFieldRenderer extends PdfFieldRenderer<List<String>, PdfI18nDividerField> {
+
+    @Override
+    public String getType() {
+        return DataType.I_18_N.value();
+    }
+
+    @Override
+    public void renderValue() throws IOException {
+//        float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize, resource);
+//        int maxLineSize = getMaxLabelLineSize(field.getWidth(), fontSize);
+        PdfI18nDividerField clonedField = (PdfI18nDividerField) getField().getCopier().copyOf();
+        List<String> multiLineText = clonedField.getValue();
+        int linesOnPage = 0;
+        int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, 1);
+
+//        if (textWidth > field.getWidth() - padding) {
+//            multiLineText = PdfFieldBuilder.generateMultiLineText(field.getValue(), maxLineSize);
+//        }
+
+        for (String line : multiLineText) {
+            linesOnPage++;
+            linesOnPage = renderPageBrake(clonedField, linesOnPage, y);
+            y = renderLinePosY(clonedField, linesOnPage);
+            getPdfDrawer().writeString(getResource().getLabelFont(), getResource().getFontGroupSize(), x, y, line, Color.decode(getResource().getColorDataGroup().toUpperCase()));
+        }
+        getPdfDrawer().checkOpenPages();
+    }
+
 //    public void setFieldParams(PdfField field) {
 //        helperField = new PdfTextField(field.getFieldId(), field.getLabel(), field.getValue(), field.getType(),
 //                resource.getBaseX() + field.getX(), resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
@@ -28,7 +52,7 @@
 //        setFieldParams(field);
 //        renderValue(helperField, resource.getLabelFont(), resource.getFontGroupSize(), colorDataGroupLabel);
 //    }
-//
+
 //    private void renderValue(PdfField field, PDType0Font font, int fontSize, Color colorLabel) throws IOException {
 //        float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize, resource);
 //        int maxLineSize = getMaxLabelLineSize(field.getWidth(), fontSize);
@@ -47,5 +71,5 @@
 //            pdfDrawer.writeString(font, fontSize, x, y, line, colorLabel);
 //        }
 //        pdfDrawer.checkOpenPages();
-//    }
-//}
+  //  }
+}

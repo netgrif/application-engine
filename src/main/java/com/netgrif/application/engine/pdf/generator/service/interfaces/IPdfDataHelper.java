@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfDocumentContent;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -14,11 +14,9 @@ public interface IPdfDataHelper {
 
     void setTaskId(Case useCase, Transition transition);
 
-    void setPdfFields(List<PdfField<?>> fields);
-
     void setExcludedFields(List<String> excludedFields);
 
-    List<PdfField<?>> getPdfFields();
+    PdfDocumentContent getPdfDocumentContent();
 
     void setupDataHelper(PdfResource resource);
 
