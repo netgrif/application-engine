@@ -37,10 +37,13 @@ public class PropertyLogger {
 
     private String getSanitizedProperty(String property, Environment env) {
         String value = env.getProperty(property);
-        if (value == null) return "";
+        if (value == null) {
+            return "";
+        }
         if (Arrays.stream(SECRET_PROPS).anyMatch(s -> property.toLowerCase().endsWith(s))) {
-            return value.isEmpty() ? "" : "*****";
+            return value.isEmpty() ? "" : "**********";
         }
         return value;
     }
+
 }

@@ -38,6 +38,12 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1794] Configurable security headers
 - [NAE-1833] Configuration priority search
 
+## [6.2.8](https://github.com/netgrif/application-engine/releases/tag/v6.2.8) (2023-03-22)
+
+### Fixed
+
+- [NAE-1853] Passwords loaded from environment variables are shown in application logs
+
 ## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
 
 ### Fixed
@@ -88,6 +94,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
 - [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
+
 
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 
