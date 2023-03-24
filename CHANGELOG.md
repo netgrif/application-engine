@@ -7,7 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-03-08)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-03-24)
 
 ### Fixed
 
@@ -22,7 +22,9 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1831] Task with negative permissions displayed
 - [NAE-1834] ExportService - Export CSV files in given charset
 - [NAE-1840] Configurable timeout for failed login attempts
-
+- [NAE-1853] Passwords loaded from environment variables are shown in application logs
+- [NAE-1860] Assigning authority to a user via REST API ends up with error
+- [NAE-1861] Requesting unknown endpoint ends with Stackoverflow
 
 ### Changed
 
