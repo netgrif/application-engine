@@ -149,11 +149,15 @@
 			<name>autocomplete_dynamic</name>
 		</component>
 		<action trigger="set">
+			<!-- @formatter:off -->
 			filterAutocomplete: f.this,
 			previewTaskRef: f.filter_preview,
 			referencedFiltersList: f.referenced_filters;
 
-			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
+			if (fieldChanges.value) {
+				updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
+			}
+			<!-- @formatter:on -->
 		</action>
 		<action trigger="get">
 			filterAutocomplete: f.this,
