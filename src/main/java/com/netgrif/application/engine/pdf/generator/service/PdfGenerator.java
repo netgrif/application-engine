@@ -45,9 +45,9 @@ public class PdfGenerator implements IPdfGenerator {
 
     private final IPdfDrawer pdfDrawer;
 
-    private final Map<String, PdfFieldRenderer<?, ?>> rendererMap;
+    private final Map<String, PdfFieldRenderer<?>> rendererMap;
 
-    public PdfGenerator(IPdfDataHelper pdfDataHelper, List<PdfFieldRenderer<?, ?>> renderers, IPdfDrawer pdfDrawer) {
+    public PdfGenerator(IPdfDataHelper pdfDataHelper, List<PdfFieldRenderer<?>> renderers, IPdfDrawer pdfDrawer) {
         this.pdfDataHelper = pdfDataHelper;
         this.rendererMap = renderers.stream().collect(Collectors.toMap(PdfFieldRenderer::getType, Function.identity()));
         this.pdfDrawer = pdfDrawer;
@@ -177,7 +177,7 @@ public class PdfGenerator implements IPdfGenerator {
         renderer.renderValue();
 
         for (PdfField<?> pdfField : documentContent.getPdfFormFields()) {
-            PdfFieldRenderer<?, ?> fieldRenderer = rendererMap.get(pdfField.getType());
+            PdfFieldRenderer<?> fieldRenderer = rendererMap.get(pdfField.getType());
             fieldRenderer.setField(pdfField);
             fieldRenderer.renderLabel();
             fieldRenderer.renderValue();

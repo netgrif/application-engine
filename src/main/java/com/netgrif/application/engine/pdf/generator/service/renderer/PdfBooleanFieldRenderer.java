@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfBooleanFieldRenderer extends PdfFieldRenderer<Boolean, PdfBooleanField> {
+public class PdfBooleanFieldRenderer extends PdfFieldRenderer<PdfBooleanField> {
 
     @Override
     public String getType() {

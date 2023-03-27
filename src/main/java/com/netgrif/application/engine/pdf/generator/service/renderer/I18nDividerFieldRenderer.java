@@ -8,7 +8,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
-public class I18nDividerFieldRenderer extends PdfFieldRenderer<List<String>, PdfI18nDividerField> {
+public class I18nDividerFieldRenderer extends PdfFieldRenderer<PdfI18nDividerField> {
 
     @Override
     public String getType() {

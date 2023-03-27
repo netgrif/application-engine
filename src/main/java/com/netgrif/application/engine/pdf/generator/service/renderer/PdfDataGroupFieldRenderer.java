@@ -12,7 +12,7 @@ import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfDataGroupFieldRenderer extends PdfFieldRenderer<List<String>, PdfDataGroupField> {
+public class PdfDataGroupFieldRenderer extends PdfFieldRenderer<PdfDataGroupField> {
 
 
     @Override

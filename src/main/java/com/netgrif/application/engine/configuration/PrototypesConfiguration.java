@@ -48,7 +48,7 @@ public class PrototypesConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IPdfGenerator pdfGenerator(IPdfDataHelper pdfDataHelper, List<PdfFieldRenderer<?, ?>> renderers, IPdfDrawer pdfDrawer) {
+    public IPdfGenerator pdfGenerator(IPdfDataHelper pdfDataHelper, List<PdfFieldRenderer<?>> renderers, IPdfDrawer pdfDrawer) {
         return new PdfGenerator(pdfDataHelper, renderers, pdfDrawer);
     }
 

@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Component
 @Scope((ConfigurableBeanFactory.SCOPE_PROTOTYPE))
-public class PdfDateFieldRenderer extends PdfFieldRenderer<String, PdfDateField> {
+public class PdfDateFieldRenderer extends PdfFieldRenderer<PdfDateField> {
 
     @Override
     public String getType() {

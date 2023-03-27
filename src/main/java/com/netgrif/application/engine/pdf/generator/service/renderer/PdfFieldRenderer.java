@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode
-public abstract class PdfFieldRenderer<U, T extends PdfField<U>> {
+public abstract class PdfFieldRenderer<T extends PdfField<?>> {
 
     private T field;
 

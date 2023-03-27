@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfUserFieldRenderer extends PdfFieldRenderer<String, PdfUserField> {
+public class PdfUserFieldRenderer extends PdfFieldRenderer<PdfUserField> {
 
     @Override
     public String getType() {

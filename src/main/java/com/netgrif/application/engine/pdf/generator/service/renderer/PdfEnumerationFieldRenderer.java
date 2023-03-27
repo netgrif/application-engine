@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfEnumerationFieldRenderer extends PdfFieldRenderer<Map<String, List<String>>, PdfEnumerationField> {
+public class PdfEnumerationFieldRenderer extends PdfFieldRenderer<PdfEnumerationField> {
 
     @Override
     public String getType() {

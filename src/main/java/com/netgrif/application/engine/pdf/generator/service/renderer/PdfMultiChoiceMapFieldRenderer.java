@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfMultiChoiceMapFieldRenderer extends PdfFieldRenderer<Map<String, List<String>>, PdfMultiChoiceMapField> {
+public class PdfMultiChoiceMapFieldRenderer extends PdfFieldRenderer<PdfMultiChoiceMapField> {
 
     @Override
     public String getType() {

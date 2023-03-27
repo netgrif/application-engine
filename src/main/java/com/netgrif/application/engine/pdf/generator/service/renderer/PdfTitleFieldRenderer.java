@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfTitleFieldRenderer extends PdfFieldRenderer<List<String>, PdfTitleField> {
+public class PdfTitleFieldRenderer extends PdfFieldRenderer<PdfTitleField> {
 
 //    public void setFieldParams(PdfTitleField field) {
 //        fieldY = field.getBottomY();

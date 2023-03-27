@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfTextFieldRenderer extends PdfFieldRenderer<List<String>, PdfTextField> {
+public class PdfTextFieldRenderer extends PdfFieldRenderer<PdfTextField> {
 
     public PdfTextFieldRenderer() {
         super();
