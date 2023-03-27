@@ -1069,7 +1069,10 @@ public class Importer {
         if (imported == null) {
             return null;
         }
-        String key = imported.getName();
+        String key = imported.getValue();
+        if (imported.getName() != null) {
+            key = imported.getName();
+        }
         if (imported instanceof Option) {
             key = ((Option) imported).getKey();
         }

@@ -65,6 +65,7 @@ public class PdfDataGroupFieldBuilder extends PdfFieldBuilder<PdfDataGroupField>
     }
 
     private void setFieldParams(PdfDataGroupFieldBuildingBlock buildingBlock, PdfDataGroupField pdfField) {
+        lastX = buildingBlock.getLastX();
         lastY = buildingBlock.getLastY();
         if (buildingBlock.getLastX() != 0) {
             lastY++;

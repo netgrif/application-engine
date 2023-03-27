@@ -79,9 +79,9 @@ public abstract class PdfFieldRenderer<T extends PdfField<?>> {
         for (String line : multiLineText) {
             linesOnPage++;
             linesOnPage = renderPageBrake(clonedField, linesOnPage, y);
-            if (multiLineText.indexOf(line) == 0) {
-                y = renderLinePosY(clonedField, linesOnPage);
-            }
+            //if (multiLineText.indexOf(line) == 0) {
+            y = renderLinePosY(clonedField, linesOnPage);
+            //}
             pdfDrawer.writeString(resource.getLabelFont(), resource.getFontLabelSize(), x, y, line, Color.decode(resource.getColorLabelString().toUpperCase()));
         }
         pdfDrawer.checkOpenPages();

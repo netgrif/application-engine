@@ -197,6 +197,7 @@ class PdfGeneratorTest {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         PdfField pdf = new PdfTextField("footer_company_title")
         pdf.setLabel(Collections.singletonList("Netgrif Application Engine"))
+        pdf.setValue(["Custom value"])
         pdf.setX(pdfResource.getMarginLeft())
         pdf.setOriginalTopY(pdfResource.getPageHeight() - pdfResource.getMarginBottom())
         pdf.setTopY(pdfResource.getPageHeight() - pdfResource.getMarginBottom())

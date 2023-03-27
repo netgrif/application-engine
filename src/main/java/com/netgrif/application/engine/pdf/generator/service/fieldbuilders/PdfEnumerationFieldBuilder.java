@@ -41,7 +41,7 @@ public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerati
 
     @Override
     protected int countValueMultiLineHeight(PdfEnumerationField pdfField) {
-        return 0;
+        return (int) pdfField.getValue().values().stream().mapToLong(List::size).sum() * resource.getLineHeight() + resource.getPadding();
     }
 
     private PdfEnumerationField buildField(PdfFormFieldBuildingBlock buildingBlock) {
