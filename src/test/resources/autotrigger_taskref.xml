@@ -40,10 +40,13 @@
 			<id>t2_finish</id>
 			<actions phase="pre">
 				<action>
+					<!--@formatter:off-->
 					tema: f.tema;
 
-					change tema value {[useCase.tasks.find{it.transition=="t1"}?.task]
+					change tema value {
+						[useCase.getTaskStringId("t1")]
 					}
+					<!--@formatter:on-->
 				</action>
 			</actions>
 		</event>

@@ -5,6 +5,7 @@ import com.netgrif.application.engine.workflow.domain.State
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.Ignore
 import org.junit.jupiter.api.Test
@@ -18,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-@Ignore
+@CompileStatic
 class Async {
 
     @Autowired
@@ -41,7 +42,7 @@ class Async {
         def net = netOptional.get()
         def $case = importHelper.createCase("Async run", net)
 
-        def t1Id = $case.tasks.find { it.transition == "t1" }.task
+        def t1Id = $case.getTaskStringId("t1")
 
         taskService.assignTask(t1Id)
         taskService.finishTask(t1Id)

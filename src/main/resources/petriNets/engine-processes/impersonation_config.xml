@@ -107,7 +107,7 @@
 					user_select_taskRef: f.user_select_taskRef;
 
 					def userSelectCase = createCase("impersonation_users_select")
-					def taskId = userSelectCase.tasks.find { it.transition == "select_user" }.task
+					def taskId = userSelectCase.getTaskStringId("select_user")
 					change user_select_taskRef value { [taskId] }
 					change user_select_caseId value { userSelectCase.stringId }
 					setData(taskId, new DataSet([

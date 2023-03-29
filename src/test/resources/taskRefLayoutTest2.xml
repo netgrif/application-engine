@@ -16,28 +16,34 @@
         <id>taskRef</id>
         <title>TaskRef</title>
         <action trigger="get">
+            <!--@formatter:off-->
             taskRef : f.this;
 
             def list = []
+            // TODO: release/7.0.0 fix mongo search by data
             findCases { it.processIdentifier.eq("priloha") }.findAll { it.dataSet["requestID"].value == useCase.stringId
-            }.each { list.addAll(it.tasks.collect { it.task }) }.sort{ it.creationDate }
+            }.each { list.addAll(it.tasks.values().collect { it.task }) }.sort{ it.creationDate }
             change taskRef value { list }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="button">
         <id>buttonicek</id>
         <title></title>
-        <placeholder>Chuju</placeholder>
+        <placeholder>Button</placeholder>
         <action trigger="set">
+            <!--@formatter:off-->
             taskRef : f.taskRef;
 
             def aPriloha = createCase("priloha")
-            aPriloha.dataSet.get("requestID").setValue(useCase.stringId)
+            aPriloha.dataSet.get("requestID").rawValue = useCase.stringId
             workflowService.save(aPriloha)
             def list = []
+            // TODO: release/7.0.0 fix mongo search by data
             findCases { it.processIdentifier.eq("priloha") }.findAll { it.dataSet["requestID"].value == useCase.stringId
-            }.each { list.addAll(it.tasks.collect { it.task }) }.sort{ it.creationDate }
+            }.each { list.addAll(it.tasks.values().collect { it.task }) }.sort{ it.creationDate }
             change taskRef value { list }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="text">

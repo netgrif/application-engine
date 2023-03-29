@@ -97,8 +97,8 @@ class TaskRefPropagationTest {
         Case parent = importHelper.createCase("PARENT", netParent)
         Case child = importHelper.createCase("CHILD", netChild)
 
-        String parentTaskId = parent.tasks.find { it.transition == "4" }.task
-        String childTaskId = child.tasks.find { it.transition == "4" }.task
+        String parentTaskId = parent.getTaskStringId("4")
+        String childTaskId = child.getTaskStringId("4")
 //        TODO: release/7.0.0
 //        parent.dataSet["children_tasks"].value = [childTaskId]
 //        child.dataSet["parentId"].value = parent.stringId

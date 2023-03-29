@@ -377,7 +377,7 @@ class RuleEngineTest {
     }
 
     private Task findTask(Case caze, String trans) {
-        return taskService.findOne(caze.getTasks().stream().filter(it -> it.getTransition().equals(trans)).findFirst().get().getTask());
+        return taskService.findById(caze.getTaskStringId(trans));
     }
 
     public static class TestFact extends CaseFact {

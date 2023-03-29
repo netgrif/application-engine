@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,6 +28,7 @@ import java.time.temporal.ChronoUnit
 @Slf4j
 @SpringBootTest
 @ActiveProfiles(["test"])
+@CompileStatic
 @ExtendWith(SpringExtension.class)
 class DynamicValidationPerformanceTest {
 
@@ -78,7 +80,7 @@ class DynamicValidationPerformanceTest {
     }
 
     Task task(Case useCase) {
-        return taskService.findOne(useCase.tasks.find { it.transition == "transition" }.task)
+        return taskService.findOne(useCase.getTaskStringId("transition"))
     }
 
     void run(Case first, Case second) {

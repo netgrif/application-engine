@@ -461,11 +461,10 @@ class PredefinedRolesPermissionsTest {
         Case aCase = createCaseOutcome.getCase()
 
         assert aCase != null
-        assert !aCase.getTasks().isEmpty()
         assert aCase.getTasks().size() == 2
 
-        List<TaskPair> temp = new ArrayList<>(aCase.getTasks())
-        Task task = taskService.findOne(temp.find { it.transition != configuration.allData.id }.task)
+        List<TaskPair> temp = aCase.getTasks().values() as List<TaskPair>
+        Task task = taskService.findOne(temp.find { it.transitionId != configuration.allData.id }.taskStringId)
 
         assert task != null
 

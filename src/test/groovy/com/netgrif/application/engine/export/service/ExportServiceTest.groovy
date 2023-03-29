@@ -15,6 +15,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Order
@@ -28,6 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest
 @ActiveProfiles(["test"])
+@CompileStatic
 @ExtendWith(SpringExtension.class)
 class ExportServiceTest {
 
@@ -76,7 +78,7 @@ class ExportServiceTest {
     @Test
     @Order(2)
     void testCaseMongoExport() {
-        String exportTask = mainCase.tasks.find { it.transition == "t1" }.task
+        String exportTask = mainCase.getTaskStringId("t1")
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_mongo_export.csv")
         assert csvFile.readLines().size() == 11
@@ -91,7 +93,7 @@ class ExportServiceTest {
     @Order(3)
     void testCaseElasticExport() {
         Thread.sleep(5000)  //Elastic wait
-        String exportTask = mainCase.tasks.find { it.transition == "t2" }.task
+        String exportTask = mainCase.getTaskStringId("t2")
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/case_elastic_export.csv")
         assert csvFile.readLines().size() == 11
@@ -105,7 +107,7 @@ class ExportServiceTest {
     @Test
     @Order(4)
     void testTaskMongoExport() {
-        String exportTask = mainCase.tasks.find { it.transition == "t3" }.task
+        String exportTask = mainCase.getTaskStringId("t3")
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         File csvFile = new File("src/test/resources/csv/task_mongo_export.csv")
         assert csvFile.readLines().size() == 11
@@ -122,7 +124,7 @@ class ExportServiceTest {
     @Disabled("Github action")
     void testTaskElasticExport() {
         Thread.sleep(10000)  //Elastic wait
-        String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
+        String exportTask = mainCase.getTaskStringId("t4")
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
         Thread.sleep(20000)  //Elastic wait
 
@@ -132,8 +134,8 @@ class ExportServiceTest {
         taskRequest.transitionId = ["t4"] as List
         actionDelegate.exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
         File csvFile = new File("src/test/resources/csv/task_elastic_export.csv")
-        int pocet = ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
-        assert csvFile.readLines().size() == pocet
+        int count = ((taskRepository.count(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as int) + 1)
+        assert csvFile.readLines().size() == count
         String[] headerSplit = csvFile.readLines()[0].split(",")
         assert (headerSplit.contains("immediate_multichoice")
                 && headerSplit.contains("immediate_number")
@@ -145,9 +147,9 @@ class ExportServiceTest {
     @Test
     void buildDefaultCsvTaskHeaderTest(){
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
-        String exportTask = mainCase.tasks.find { it.transition == "t4" }.task
+        String exportTask = mainCase.getTaskStringId("t4")
         taskService.assignTask(userService.findByEmail("super@netgrif.com", false).transformToLoggedUser(), exportTask)
-        List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4")))
+        List<Task> task = taskRepository.findAll(QTask.task.processId.eq(processId).and(QTask.task.transitionId.eq("t4"))) as List<Task>
         Set<String> header = exportService.buildDefaultCsvTaskHeader(task)
         assert header != null
         // TODO: release/7.0.0 empty header

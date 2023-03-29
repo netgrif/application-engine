@@ -90,9 +90,9 @@ public interface ITaskService {
 
     Task resolveUserRef(Task task, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, Case useCase);
+    void delete(List<Task> tasks, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, String caseId);
+    void delete(List<Task> tasks, String caseId);
 
     void deleteTasksByCase(String caseId);
 

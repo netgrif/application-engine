@@ -291,7 +291,7 @@ class ImporterTest {
 
         assert net != null
         Case testCase = workflowService.createCase(net.stringId, "Test case", "", superCreator.loggedSuper).getCase()
-        taskService.assignTask(testCase.getTasks().find { it.transition == "t1" }.getTask())
+        taskService.assignTask(testCase.getTaskStringId("t1"))
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.getDataSet().get("text_field").getRawValue() == "Hello world!"
         assert testCase.getDataSet().get("tester_text_field").getRawValue() == "Hello world!"

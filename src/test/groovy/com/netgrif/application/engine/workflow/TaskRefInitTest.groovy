@@ -74,7 +74,7 @@ class TaskRefInitTest {
     void autoTriggerTaskRef() {
         Case bCase = helper.createCase("Task ref init with auto trigger", autoTrigger)
 
-        String taskId = bCase.tasks.stream().filter({ t -> t.transition == "t1" }).findFirst().get().task
+        String taskId = bCase.getTaskStringId("t1")
         List<String> value = bCase.dataSet.get("tema").rawValue as List<String>
         assert value.contains(taskId) &&
                 value.size() == 1

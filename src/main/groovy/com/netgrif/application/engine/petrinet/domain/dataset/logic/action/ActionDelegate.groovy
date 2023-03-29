@@ -17,7 +17,6 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -86,8 +85,6 @@ class ActionDelegate {
     public static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
 
     static final String UNCHANGED_VALUE = "unchangedooo"
-    static final String ALWAYS_GENERATE = "always"
-    static final String ONCE_GENERATE = "once"
     static final String TRANSITIONS = "transitions"
 
     @Value('${nae.mail.from}')
@@ -190,10 +187,10 @@ class ActionDelegate {
 
     // TODO: release/7.0.0 - <action trigger="set" type="value">
     // TODO: release/7.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
-    //- existuje all_data task ktory sa pouziva pri change value
-    // TODO: release/7.0.0 - update field map po setdata na aktualne hodnoty
+    // TODO: release/7.0.0 - setdata with user
+    // TODO: release/7.0.0 - deprecate enum/multichoice with chooices, keep only maps with options
 
-    def init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
+    void init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
         this.action = action
         this.useCase = useCase
         this.task = task
@@ -204,7 +201,7 @@ class ActionDelegate {
         this.outcomes = new ArrayList<>()
     }
 
-    def initFieldsMap(Map<String, String> fieldIds, Case useCase) {
+    void initFieldsMap(Map<String, String> fieldIds, Case useCase) {
         fieldIds.each { name, id ->
             set(name, useCase.getDataSet().get(id))
         }
@@ -216,7 +213,7 @@ class ActionDelegate {
         }
     }
 
-    def copyBehavior(Field field, Transition transition) {
+    void copyBehavior(Field field, Transition transition) {
         Field<?> caseField = useCase.dataSet.get(field.stringId)
         if (caseField.behaviors.get(transition.stringId) == null) {
             caseField.behaviors.put(transition.stringId, transition.dataSet.get(field.stringId).behavior)
@@ -274,6 +271,7 @@ class ActionDelegate {
         fieldBehavior.immediate = initialBehavior.immediate
     }
 
+    // TODO: release/7.0.0 deprecated?
     def unchanged = { return UNCHANGED_VALUE }
 
     def initValueOfField = { Field field ->
@@ -647,22 +645,6 @@ class ActionDelegate {
         saveChangedValidation(field)
     }
 
-    def always = { return ALWAYS_GENERATE }
-    def once = { return ONCE_GENERATE }
-
-    def generate(String methods, Closure repeated) {
-        [into: { Field field ->
-            if (field.type == DataType.FILE)
-                File f = new FileGenerateReflection(useCase, field as FileField, repeated() == ALWAYS_GENERATE).callMethod(methods) as File
-            else if (field.type == DataType.TEXT)
-                new TextGenerateReflection(useCase, field as TextField, repeated() == ALWAYS_GENERATE).callMethod(methods) as String
-            /*if(f != null) {
-                useCase.dataSet.get(field.objectId).value = f.name
-                field.value = f.name
-            }*/
-        }]
-    }
-
     def changeCaseProperty(String property) {
         [about: { cl ->
             def value = cl()
@@ -710,6 +692,10 @@ class ActionDelegate {
         QCase qCase = new QCase("case")
         Page<Case> result = workflowService.search(predicate(qCase), pageable)
         return result.content
+    }
+
+    Case findCase(String id) {
+        return workflowService.findOne(id)
     }
 
     Case findCase(Closure<Predicate> predicate) {
@@ -867,7 +853,7 @@ class ActionDelegate {
 
     @Deprecated
     SetDataEventOutcome setDataWithPropagation(String transitionId, Case caze, DataSet dataSet) {
-        Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
+        Task task = taskService.findOne(caze.getTaskStringId(transitionId))
         return setDataWithPropagation(task, dataSet)
     }
 
@@ -938,7 +924,7 @@ class ActionDelegate {
         if (targetCase.stringId == useCase.stringId) {
             change targetCase.dataSet.get(targetFieldId) value { fieldValue }
         } else {
-            String taskId = targetCase.getTasks().find(taskPair -> taskPair.transition == targetTransitionId).task
+            String taskId = targetCase.getTaskStringId(targetTransitionId)
             DataSet dataSet = new DataSet([
                     (targetFieldId): new FileField(rawValue: fieldValue)
             ] as Map<String, Field<?>>)
@@ -1342,10 +1328,9 @@ class ActionDelegate {
         filterCase.setIcon(icon)
         filterCase.dataSet.get(DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID).rawValue = (title instanceof I18nString) ? title : new I18nString(title as String)
         filterCase = workflowService.save(filterCase)
-        Task newFilterTask = findTask { it.id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
+        Task newFilterTask = findTask(filterCase.getTaskStringId(DefaultFiltersRunner.AUTO_CREATE_TRANSITION))
         assignTask(newFilterTask)
 
-        // TODO: release/7.0.0
         DataSet dataSet = new DataSet([
                 (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : new EnumerationMapField(rawValue: type),
                 (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): new EnumerationMapField(rawValue: visibility),
@@ -1546,7 +1531,8 @@ class ActionDelegate {
      * @return
      */
     def deleteMenuItem(Case item) {
-        String task = item.tasks.find { it.transition == "view" }.task
+        // TODO: release/7.0.0 decouple
+        String task = item.getTaskStringId("view")
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_REMOVE_OPTION): new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
@@ -1613,10 +1599,12 @@ class ActionDelegate {
         orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
         Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
         itemCase.setUriNodeId(uriService.findByUri(uri).id)
+        // TODO: release/7.0.0 check .options syntax
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
         itemCase = workflowService.save(itemCase)
-        Task newItemTask = findTask { it.id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
+        // TODO: release/7.0.0 decouple
+        Task newItemTask = findTask(itemCase.getTaskStringId("init"))
         assignTask(newItemTask)
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE): new CaseField(rawValue: [filter.stringId] as List<String>),
@@ -1625,8 +1613,8 @@ class ActionDelegate {
         ] as Map<String, Field<?>>)
         setData(newItemTask, dataSet)
         finishTask(newItemTask)
-
-        def task = orgGroup.tasks.find { it.transition == "append_menu_item" }.task
+// TODO: release/7.0.0 decouple
+        def task = orgGroup.getTaskStringId("append_menu_item")
         dataService.setData(task, new DataSet([
                 (PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM): new TextField(rawValue: itemCase.stringId)
         ] as Map<String, Field<?>>))
@@ -1763,5 +1751,6 @@ class ActionDelegate {
             return
         }
         useCase = workflowService.findOne(useCase.stringId)
+        initFieldsMap(action.fieldIds, useCase)
     }
 }

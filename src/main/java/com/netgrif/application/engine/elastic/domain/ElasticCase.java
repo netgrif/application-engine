@@ -120,8 +120,8 @@ public class ElasticCase {
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
         authorEmail = useCase.getAuthor().getEmail();
-        taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
-        taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
+        taskIds = useCase.getTasks().keySet();
+        taskMongoIds = useCase.getTasks().values().stream().map(TaskPair::getTaskStringId).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
         viewRoles = new HashSet<>(useCase.getViewRoles());
         viewUserRefs = new HashSet<>(useCase.getViewUserRefs());

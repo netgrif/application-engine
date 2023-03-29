@@ -9,7 +9,10 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
+import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
@@ -25,6 +28,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.TaskController
 import com.netgrif.application.engine.workflow.web.WorkflowController
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -119,7 +123,7 @@ class TaskControllerTest {
     @Test
     void testDeleteFile() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.tasks.find { it.transition == "1" }.task
+        String taskId = testCase.getTaskStringId("1")
 
         dataService.saveFile(taskId, "file", new MockMultipartFile("test", new byte[]{}))
         testCase = workflowService.findOne(testCase.stringId)
@@ -133,7 +137,7 @@ class TaskControllerTest {
     @Test
     void testDeleteFileByName() {
         Case testCase = helper.createCase("My case", net)
-        String taskId = testCase.tasks.find { it.transition == "1" }.task
+        String taskId = testCase.getTaskStringId( "1")
 
         dataService.saveFiles(taskId, "fileList", new MockMultipartFile[]{new MockMultipartFile("test", "test", null, new byte[]{})})
         testCase = workflowService.findOne(testCase.stringId)
@@ -192,15 +196,11 @@ class TaskControllerTest {
 
     void setUserListValue() {
         assert task != null
-        List<String> userIds = [] as List
-        userIds.add(userService.findByEmail(DUMMY_USER_MAIL, false).getStringId())
-//        TODO: release/7.0.0
-//        dataService.setData(task.stringId, ImportHelper.populateDataset([
-//                "performable_users": [
-//                        "value": userIds,
-//                        "type" : "userList"
-//                ]
-//        ] as Map<String, Map<String, String>>))
+        String userId = userService.findByEmail(DUMMY_USER_MAIL, false).getStringId()
+        // TODO: release/7.0.0 field 'performable_users' does not exist
+//        dataService.setData(task.stringId, new DataSet([
+//                "performable_users": new UserListField(rawValue: new UserListFieldValue(dataService.makeUserFieldValue(userId)))
+//        ] as Map<String, Field<?>>))
     }
 
     void setUserRole() {

@@ -696,11 +696,10 @@ public class TaskService implements ITaskService {
 
     @Override
     public void resolveUserRef(Case useCase) {
-        useCase.getTasks().forEach(taskPair -> {
-            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
+        useCase.getTasks().values().forEach(taskPair -> {
+            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTaskStringId());
             taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
         });
-
     }
 
     @Override
@@ -811,7 +810,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void delete(Iterable<? extends Task> tasks, Case useCase) {
+    public void delete(List<Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
         log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
@@ -819,7 +818,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void delete(Iterable<? extends Task> tasks, String caseId) {
+    public void delete(List<Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
         log.info("[" + caseId + "]: Tasks of case are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);

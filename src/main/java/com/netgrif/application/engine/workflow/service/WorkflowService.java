@@ -374,23 +374,22 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
+    public void removeTasksFromCase(List<Task> tasks, String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         }
         Case useCase = caseOptional.get();
-        return removeTasksFromCase(tasks, useCase);
+        removeTasksFromCase(tasks, useCase);
     }
 
     @Override
-    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
-        if (StreamSupport.stream(tasks.spliterator(), false).findAny().isEmpty()) {
-            return true;
+    public void removeTasksFromCase(List<Task> tasks, Case useCase) {
+        if (tasks == null || tasks.isEmpty()) {
+            return;
         }
-        boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
+        useCase.removeTasks(tasks);
         save(useCase);
-        return deleteSuccess;
     }
 
     @Override
@@ -428,12 +427,14 @@ public class WorkflowService implements IWorkflowService {
         useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
             if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty() && useCase.getDataSet().get(field.getStringId()).getValue() != null &&
                     useCase.getDataSet().get(field.getStringId()).getRawValue().equals(field.getDefaultValue())) {
-                ((TaskField)useCase.getDataSet().get(field.getStringId())).setRawValue(new ArrayList<>());
-                List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
-                        (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
-                if (!taskPairList.isEmpty()) {
-                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataSet().get(field.getStringId()).getRawValue()).add(pair.getTask()));
-                }
+                TaskField taskRef = (TaskField) useCase.getDataSet().get(field.getStringId());
+                taskRef.setRawValue(new ArrayList<>());
+                field.getDefaultValue().forEach(transitionId -> {
+                    if (!useCase.getTasks().containsKey(transitionId)) {
+                        return;
+                    }
+                    taskRef.getRawValue().add(useCase.getTasks().get(transitionId).getTaskStringId());
+                });
             }
         });
         save(useCase);

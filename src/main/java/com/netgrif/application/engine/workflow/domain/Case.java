@@ -72,7 +72,7 @@ public class Case {
     @QueryType(PropertyType.NONE)
     private Map<String, Integer> consumedTokens = new HashMap<>();
     @Indexed
-    private Set<TaskPair> tasks = new HashSet<>();
+    private Map<String, TaskPair> tasks = new HashMap<>();
     // TODO: release/7.0.0 review json ignore and refactor to common Permission class
     @JsonIgnore
     private Set<String> enabledRoles = new HashSet<>();
@@ -151,19 +151,29 @@ public class Case {
         return n + "";
     }
 
-    public boolean addTask(Task task) {
-        return this.tasks.add(new TaskPair(task.getStringId(), task.getTransitionId()));
+    public ObjectId getTaskId(String transitionId) {
+        if (transitionId == null) {
+            throw new IllegalArgumentException("TransitionId cannot be null");
+        }
+        TaskPair taskPair = tasks.get(transitionId);
+        if (taskPair == null) {
+            throw new IllegalArgumentException("Case does not have task with transitionId [" + transitionId + "]");
+        }
+        return taskPair.getTaskId();
     }
 
-    public boolean removeTask(Task task) {
-        return this.removeTasks(Collections.singletonList(task));
+    public String getTaskStringId(String transitionId) {
+        return getTaskId(transitionId).toString();
     }
 
-    public boolean removeTasks(List<Task> tasks) {
-        int sizeBeforeChange = this.tasks.size();
-        Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
-        this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());
-        return this.tasks.size() != sizeBeforeChange;
+    public void addTask(Task task) {
+        this.tasks.put(task.getTransitionId(), new TaskPair(task));
+    }
+
+    public void removeTasks(List<Task> tasks) {
+        tasks.forEach(task ->
+                this.tasks.remove(task.getTransitionId())
+        );
     }
 
     public String getPetriNetId() {
