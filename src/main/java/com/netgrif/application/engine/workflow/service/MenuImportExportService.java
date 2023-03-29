@@ -149,7 +149,7 @@ public class MenuImportExportService implements IMenuImportExportService {
             Case caseToRemove = workflowService.findOne(id);
             QTask qTask = new QTask("task");
             Task task = taskService.searchOne(qTask.transitionId.eq("view").and(qTask.caseId.eq(caseToRemove.getStringId())));
-            dataService.setData(task, caseToRemoveData);
+            dataService.setData(task, caseToRemoveData, userService.getLoggedOrSystem());
         });
 
         //Import filters
@@ -171,7 +171,7 @@ public class MenuImportExportService implements IMenuImportExportService {
 //            DataField groupImportResultMessage = new DataField();
 //            groupImportResultMessage.setValue(resultMessage.toString());
 //            groupData.getFields().put("import_results", groupImportResultMessage);
-            dataService.setData(task, groupData);
+            dataService.setData(task, groupData, userService.getLoggedOrSystem());
         });
 
         importedFilterTaskIds.values().forEach(taskId -> {

@@ -49,7 +49,6 @@ public class LdapUserService extends UserService {
 
 
     public LdapUser transformToUserFromLdap(IUser user) {
-
         LdapUser userFromLdap = ldapUserRepository.findByEmail(user.getEmail());
         if (userFromLdap == null && user.getStringId() != null) {
             userFromLdap = new LdapUser(new ObjectId(user.getStringId()));
@@ -59,5 +58,4 @@ public class LdapUserService extends UserService {
         userFromLdap.loadFromUser(user);
         return userFromLdap;
     }
-
 }

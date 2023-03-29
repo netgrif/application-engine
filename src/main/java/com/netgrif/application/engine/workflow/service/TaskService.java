@@ -141,7 +141,7 @@ public class TaskService implements ITaskService {
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        IUser user = getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(loggedUser);
         return assignTask(taskOptional.get(), user);
     }
 
@@ -210,7 +210,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
         Task task = taskOptional.get();
-        IUser user = getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(loggedUser);
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
@@ -272,7 +272,7 @@ public class TaskService implements ITaskService {
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        IUser user = getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(loggedUser);
         return cancelTask(taskOptional.get(), user);
     }
 
@@ -350,7 +350,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
-        IUser delegateUser = getUserFromLoggedUser(loggedUser);
+        IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
 
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
@@ -505,7 +505,7 @@ public class TaskService implements ITaskService {
             log.info("assignTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
             outcomes.add(assignTask(task.getStringId()));
             log.info("getData [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
-            outcomes.add(dataService.getData(task.getStringId()));
+            outcomes.add(dataService.getData(task.getStringId(), userService.getSystem()));
             log.info("finishTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
             outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
@@ -861,12 +861,5 @@ public class TaskService implements ITaskService {
         mainOutcome = outcomes.remove(key);
         mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
         return mainOutcome;
-    }
-
-    protected IUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        IUser user = userService.resolveById(loggedUser.getId(), true);
-        IUser fromLogged = loggedUser.transformToUser();
-        user.setImpersonated(fromLogged.getImpersonated());
-        return user;
     }
 }

@@ -72,7 +72,7 @@ import java.util.stream.Collectors
  */
 @Slf4j
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
-class ActionDelegate {
+class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
 
     public static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
     public static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
@@ -406,10 +406,10 @@ class ActionDelegate {
         }
     }
 
-    SetDataEventOutcome setData(Field<?> field, Map changes) {
+    SetDataEventOutcome setData(Field<?> field, Map changes, IUser user = userService.loggedOrSystem) {
         SetDataEventOutcome outcome = dataService.setData(useCase, new DataSet([
                 (field.stringId): field.class.newInstance(changes)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), user)
         this.outcomes.add(outcome)
         updateCase()
         return outcome
@@ -479,7 +479,7 @@ class ActionDelegate {
 
     private addTaskOutcomes(Task task, DataSet dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
-        this.outcomes.add(dataService.setData(task.stringId, dataSet))
+        this.outcomes.add(dataService.setData(task.stringId, dataSet, userService.loggedOrSystem))
         this.outcomes.add(taskService.finishTask(task.stringId))
     }
 
@@ -829,26 +829,26 @@ class ActionDelegate {
         return removeRole(roleId, net, user)
     }
 
-    SetDataEventOutcome setData(DataSet dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet))
+    SetDataEventOutcome setData(DataSet dataSet, IUser user = userService.loggedOrSystem) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet, user))
     }
 
-    SetDataEventOutcome setData(Task task, DataSet dataSet) {
-        return setData(task.stringId, dataSet)
+    SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user = userService.loggedOrSystem) {
+        return setData(task.stringId, dataSet, user)
     }
 
-    SetDataEventOutcome setData(String taskId, DataSet dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet))
+    SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user = userService.loggedOrSystem) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, user))
     }
 
     SetDataEventOutcome setData(Transition transition, DataSet dataSet) {
         return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
     }
 
-    SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet) {
+    SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet, IUser user = userService.loggedOrSystem) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet))
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet, user))
     }
 
     @Deprecated
@@ -874,28 +874,28 @@ class ActionDelegate {
         return outcome
     }
 
-    Map<String, Field> getData(Task task) {
+    Map<String, Field> getData(Task task, IUser user = userService.loggedOrSystem) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user)))
     }
 
-    Map<String, Field> getData(String taskId) {
+    Map<String, Field> getData(String taskId, IUser user = userService.loggedOrSystem) {
         Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user)))
     }
 
-    Map<String, Field> getData(Transition transition) {
-        return getData(transition.stringId, this.useCase)
+    Map<String, Field> getData(Transition transition, IUser user = userService.loggedOrSystem) {
+        return getData(transition.stringId, this.useCase, user)
     }
 
-    Map<String, Field> getData(String transitionId, Case useCase) {
+    Map<String, Field> getData(String transitionId, Case useCase, IUser user = userService.loggedOrSystem) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         if (!task) {
             return new HashMap<String, Field>()
         }
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user)))
     }
 
     private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
@@ -947,6 +947,7 @@ class ActionDelegate {
         if (pdfResource.getOutputFolder()) {
             storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
         } else {
+            // TODO: release/7.0.0 check syntax
             storagePath = new FileFieldValue(filename, "").getPath(targetCase.stringId, targetFileFieldId)
         }
 
@@ -967,30 +968,9 @@ class ActionDelegate {
         saveFileToField(targetCase, targetTransitionId, targetFileFieldId, filename, storagePath)
     }
 
-    void generatePdf(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
-                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
-        if (!sourceTransition || !targetFileField)
-            throw new IllegalArgumentException("Source transition or target file field is null")
-        targetTransition = targetTransition ?: sourceTransition
-        generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
-                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
-    }
-
-    @NamedVariant
-    void generatePDF(String sourceTransitionId, String targetFileFieldId,
-                     Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
+    void generatePdf(Transition sourceTransition, FileField targetFileField,
+                     Case sourceCase = useCase, Case targetCase = useCase, Transition targetTransition = null,
                      String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 20) {
-        if (!sourceTransitionId || !targetFileFieldId)
-            throw new IllegalArgumentException("Source transition or target file field is null")
-        targetTransitionId = targetTransitionId ?: sourceTransitionId
-        generatePdf(sourceTransitionId, targetFileFieldId, sourceCase, targetCase, targetTransitionId,
-                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
-    }
-
-    void generatePDF(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
-                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
                      ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
         if (!sourceTransition || !targetFileField)
             throw new IllegalArgumentException("Source transition or target file field is null")
@@ -1500,6 +1480,7 @@ class ActionDelegate {
          },
          filter      : { cl ->
              def filter = cl() as Case
+             // TODO: release/7.0.0 fix
              setData("change_filter", item, [
                      (PREFERENCE_ITEM_FIELD_NEW_FILTER_ID): ["type": "text", "value": filter.stringId]
              ])
@@ -1536,7 +1517,7 @@ class ActionDelegate {
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_REMOVE_OPTION): new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
-        dataService.setData(task, dataSet)
+        dataService.setData(task, dataSet, userService.loggedOrSystem)
     }
 
     /**
@@ -1617,7 +1598,7 @@ class ActionDelegate {
         def task = orgGroup.getTaskStringId("append_menu_item")
         dataService.setData(task, new DataSet([
                 (PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM): new TextField(rawValue: itemCase.stringId)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), userService.loggedOrSystem)
 
         return workflowService.findOne(itemCase.stringId)
     }

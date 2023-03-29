@@ -111,7 +111,7 @@ public class NextGroupService implements INextGroupService {
 
         DataSet taskData = getInitialGroupData(author, title, outcome.getCase());
         Task initTask = getGroupInitTask(outcome.getCase());
-        dataService.setData(initTask.getStringId(), taskData);
+        dataService.setData(initTask.getStringId(), taskData, author);
 
         try {
             taskService.assignTask(author.transformToLoggedUser(), initTask.getStringId());
