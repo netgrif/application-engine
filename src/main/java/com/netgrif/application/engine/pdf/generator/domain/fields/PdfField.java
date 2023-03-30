@@ -17,9 +17,9 @@ public abstract class PdfField<T> implements Comparable<PdfField<T>> {
     @Setter
     protected String fieldId;
 
-//    @Getter
-//    @Setter
-//    protected DataGroup dataGroup;
+    @Getter
+    @Setter
+    protected String component;
 
     @Getter
     @Setter

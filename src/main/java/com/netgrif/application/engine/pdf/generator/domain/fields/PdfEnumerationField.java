@@ -6,8 +6,9 @@ import com.netgrif.application.engine.pdf.generator.domain.factories.PdfSelectio
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class PdfEnumerationField extends PdfSelectionField<String> {
+public class PdfEnumerationField extends PdfSelectionField<Set<String>> {
 
     public PdfEnumerationField() {
         super();
@@ -33,7 +34,7 @@ public class PdfEnumerationField extends PdfSelectionField<String> {
     }
 
     @Override
-    public PdfSelectionFieldCopier<String> getCopier() {
+    public PdfSelectionFieldCopier<Set<String>> getCopier() {
         return new PdfSelectionFieldCopier<>(this);
     }
 }

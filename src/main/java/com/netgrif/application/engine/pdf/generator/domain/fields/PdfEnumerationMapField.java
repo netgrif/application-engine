@@ -3,7 +3,9 @@ package com.netgrif.application.engine.pdf.generator.domain.fields;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.factories.PdfSelectionFieldCopier;
 
-public class PdfEnumerationMapField extends PdfSelectionField<String>{
+import java.util.Set;
+
+public class PdfEnumerationMapField extends PdfSelectionField<Set<String>>{
 
     public PdfEnumerationMapField() {
         super();
@@ -29,7 +31,7 @@ public class PdfEnumerationMapField extends PdfSelectionField<String>{
     }
 
     @Override
-    public PdfSelectionFieldCopier<String> getCopier() {
+    public PdfSelectionFieldCopier<Set<String>> getCopier() {
         return new PdfSelectionFieldCopier<>(this);
     }
 }

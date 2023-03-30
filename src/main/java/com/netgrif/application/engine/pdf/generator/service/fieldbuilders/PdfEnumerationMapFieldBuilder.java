@@ -4,6 +4,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfEnumerationMapField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -40,7 +41,7 @@ public class PdfEnumerationMapFieldBuilder extends PdfFormFieldBuilder<PdfEnumer
 
     @Override
     protected int countValueMultiLineHeight(PdfEnumerationMapField pdfField) {
-        return (int) pdfField.getValue().values().stream().mapToLong(List::size).sum() * resource.getLineHeight() + resource.getPadding();
+        return pdfField.getSelectedValues().size() * resource.getLineHeight() + resource.getPadding();
     }
 
     private PdfEnumerationMapField buildField(PdfFormFieldBuildingBlock buildingBlock) {
@@ -53,19 +54,15 @@ public class PdfEnumerationMapFieldBuilder extends PdfFormFieldBuilder<PdfEnumer
     }
 
     private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfEnumerationMapField pdfField) {
-        EnumerationMapField field = (EnumerationMapField) buildingBlock.getDataRef().getField();
+        EnumerationField field = (EnumerationField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),
                 resource.getPadding(),
                 resource.getSizeMultiplier()
         );
-        if (field.getOptions() != null) {
-            Map<String, List<String>> choices = field.getOptions().entrySet().stream().collect(Collectors.toMap(e -> e.getValue().getKey(), e -> generateMultiLineText(Collections.singletonList(e.getValue().getTranslation(buildingBlock.getLocale())), maxValueLineLength)));
-            pdfField.setValue(choices);
-        }
         if (field.getValue() != null) {
-            String values = field.getValue().getValue();
+            Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().getTranslation(buildingBlock.getLocale())), maxValueLineLength));
             pdfField.setSelectedValues(values);
         }
     }

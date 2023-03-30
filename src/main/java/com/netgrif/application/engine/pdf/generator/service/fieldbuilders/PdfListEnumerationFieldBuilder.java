@@ -2,16 +2,19 @@ package com.netgrif.application.engine.pdf.generator.service.fieldbuilders;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfEnumerationField;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfSelectionField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils.generateMultiLineText;
@@ -19,20 +22,16 @@ import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUti
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerationField> {
-
-    public PdfEnumerationFieldBuilder() {
-        super();
-    }
-
-    @Override
-    public PdfEnumerationField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
-    }
+public class PdfListEnumerationFieldBuilder extends PdfEnumerationFieldBuilder {
 
     @Override
     public String getType() {
-        return DataType.ENUMERATION.value();
+        return DataType.ENUMERATION.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    }
+
+    @Override
+    protected int countValueMultiLineHeight(PdfEnumerationField pdfField) {
+        return (int) pdfField.getValue().values().stream().mapToLong(List::size).sum() * resource.getLineHeight() + resource.getPadding();
     }
 
     @Override
@@ -44,27 +43,13 @@ public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerati
                 resource.getPadding(),
                 resource.getSizeMultiplier()
         );
+        if (field.getChoices() != null) {
+            Map<String, List<String>> choices = field.getChoices().stream().collect(Collectors.toMap(I18nString::getKey, e -> generateMultiLineText(Collections.singletonList(e.getTranslation(buildingBlock.getLocale())), maxValueLineLength)));
+            pdfField.setValue(choices);
+        }
         if (field.getValue() != null) {
-            Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().getTranslation(buildingBlock.getLocale())), maxValueLineLength));
+            Set<String> values = Collections.singleton(field.getValue().getValue().getKey());
             pdfField.setSelectedValues(values);
         }
-    }
-
-    @Override
-    protected int countValueMultiLineHeight(PdfEnumerationField pdfField) {
-        return pdfField.getSelectedValues().size() * resource.getLineHeight() + resource.getPadding();
-    }
-
-    private PdfEnumerationField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfEnumerationField pdfField = new PdfEnumerationField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfEnumerationField pdfField) {
-
     }
 }

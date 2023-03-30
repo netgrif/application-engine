@@ -177,7 +177,7 @@ public class PdfGenerator implements IPdfGenerator {
         renderer.renderValue();
 
         for (PdfField<?> pdfField : documentContent.getPdfFormFields()) {
-            PdfFieldRenderer<?> fieldRenderer = rendererMap.get(pdfField.getType());
+            PdfFieldRenderer<?> fieldRenderer = rendererMap.get(pdfField.getComponent());
             fieldRenderer.setField(pdfField);
             fieldRenderer.renderLabel();
             fieldRenderer.renderValue();

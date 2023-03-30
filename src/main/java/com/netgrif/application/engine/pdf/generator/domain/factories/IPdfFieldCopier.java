@@ -7,6 +7,7 @@ public interface IPdfFieldCopier<U, T extends PdfField<U>> {
     default T copyOf(T field) {
         T copy = (T) field.newInstance();
         copy.setFieldId(field.getFieldId());
+        copy.setComponent(field.getComponent());
         copy.setLabel(field.getLabel());
         copy.setValue(field.getValue());
         copy.setLayoutX(field.getLayoutX());

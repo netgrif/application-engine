@@ -30,6 +30,7 @@ public abstract class PdfFormFieldBuilder<T extends PdfField<?>> extends PdfFiel
     }
 
     protected void setFieldParams(PdfFormFieldBuildingBlock buildingBlock, T pdfField) {
+        pdfField.setComponent(buildingBlock.getDataRef().getCombinedTypeComponent());
         pdfField.setLayoutX(countFieldLayoutX(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
         pdfField.setLayoutY(countFieldLayoutY(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
         pdfField.setWidth(countFieldWidth(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));

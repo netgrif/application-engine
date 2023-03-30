@@ -10,6 +10,8 @@ import java.util.Map;
 
 public abstract class PdfSelectionField<S> extends PdfField<Map<String, List<String>>> {
 
+    public static final String LIST_COMPONENT_NAME = "list";
+
     @Getter
     @Setter
     protected S selectedValues;

@@ -231,7 +231,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private PdfField<?> createPdfField(DataGroup dataGroup, DataRef field) {
-        PdfFieldBuilder<?> builder = pdfFieldBuilders.get(field.getField().getType().value());
+        PdfFieldBuilder<?> builder = pdfFieldBuilders.get(field.getCombinedTypeComponent());
         if (builder == null) {
             return null;
         }

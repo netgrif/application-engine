@@ -26,7 +26,12 @@ public class PdfMultiChoiceFieldBuilder extends PdfFormFieldBuilder<PdfMultiChoi
 
     @Override
     public PdfMultiChoiceField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfMultiChoiceField pdfField = new PdfMultiChoiceField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -36,38 +41,21 @@ public class PdfMultiChoiceFieldBuilder extends PdfFormFieldBuilder<PdfMultiChoi
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfMultiChoiceField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
-    }
-
-    @Override
-    protected int countValueMultiLineHeight(PdfMultiChoiceField pdfField) {
-        return (int) pdfField.getValue().values().stream().mapToLong(List::size).sum() * resource.getLineHeight() + resource.getPadding();
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfMultiChoiceField pdfField) {
-        MultichoiceField field = (MultichoiceField) buildingBlock.getDataRef().getField();
+        MultichoiceField field = (MultichoiceField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),
                 resource.getPadding(),
                 resource.getSizeMultiplier()
         );
-        if (field.getChoices() != null) {
-            Map<String, List<String>> choices = field.getChoices().stream().collect(Collectors.toMap(I18nString::getKey, e -> generateMultiLineText(Collections.singletonList(e.getTranslation(buildingBlock.getLocale())), maxValueLineLength)));
-            pdfField.setValue(choices);
-        }
         if (field.getValue() != null) {
-            Set<String> values = field.getValue().getValue().stream().map(I18nString::getKey).collect(Collectors.toSet());
+            Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().stream().map(v -> v.getTranslation(buildingBlock.getLocale())).collect(Collectors.joining(", "))), maxValueLineLength));
             pdfField.setSelectedValues(values);
         }
     }
 
-    private PdfMultiChoiceField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfMultiChoiceField pdfField = new PdfMultiChoiceField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
+    @Override
+    protected int countValueMultiLineHeight(PdfMultiChoiceField pdfField) {
+        return pdfField.getSelectedValues().size() * resource.getLineHeight() + resource.getPadding();
     }
 }
