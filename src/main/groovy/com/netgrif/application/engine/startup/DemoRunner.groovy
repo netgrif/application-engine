@@ -40,6 +40,6 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        helper.createCase("PDF", helper.createNet("nae_1844.xml", VersionType.MAJOR).get());
+
     }
 }
