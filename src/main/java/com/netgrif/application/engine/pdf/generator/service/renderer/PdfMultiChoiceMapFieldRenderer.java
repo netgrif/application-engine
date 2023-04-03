@@ -30,11 +30,6 @@ public class PdfMultiChoiceMapFieldRenderer extends PdfFieldRenderer<PdfMultiCho
         int lineCounter = getLineCounter();
         int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, lineCounter);
         int strokeLineCounter = 0;
-
-//        if (textWidth > getField().getWidth() - 3 * getResource().getPadding()) {
-//            multiLineText = generateMultiLineText(getField().getValue(), maxLineSize);
-//        }
-
         for (String line : multiLineText) {
             lineCounter++;
             lineCounter = renderPageBrake(clonedField, lineCounter, strokeLineCounter, y);

@@ -28,14 +28,6 @@ public class PdfDataGroupFieldRenderer extends PdfFieldRenderer<PdfDataGroupFiel
         }
         List<String> multiLineText = clonedField.getValue();
         int lineCounter = 0, x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, 1);
-        //int maxLineSize = getMaxLabelLineSize(fieldWidth, fontTitleSize);
-
-//        multiLineText.add(title);
-
-//        if (textWidth > fieldWidth - 2 * padding) {
-//            x = baseX;
-//            multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(title), maxLineSize);
-//        }
 
         for (String line : multiLineText) {
             lineCounter++;
@@ -46,15 +38,4 @@ public class PdfDataGroupFieldRenderer extends PdfFieldRenderer<PdfDataGroupFiel
         getPdfDrawer().checkOpenPages();
     }
 
-//    public void setFieldParams(PdfField field) {
-//        helperField = new PdfDataGroupField(field.getFieldId(), field.getLabel(), field.getValue(), field.getType(), resource.getBaseX() + field.getX(),
-//                resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
-//    }
-//
-//    @Override
-//    public int renderLabel(PdfField field) throws IOException {
-//        setFieldParams(field);
-//        renderLabel(helperField, resource.getLabelFont(), resource.getFontGroupSize(), colorDataGroupLabel);
-//        return 0;
-//    }
 }

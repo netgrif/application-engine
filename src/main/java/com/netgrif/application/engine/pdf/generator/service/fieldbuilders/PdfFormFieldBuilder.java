@@ -4,6 +4,7 @@ import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
+import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
 import com.netgrif.application.engine.petrinet.domain.DataRef;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
@@ -30,7 +31,7 @@ public abstract class PdfFormFieldBuilder<T extends PdfField<?>> extends PdfFiel
     }
 
     protected void setFieldParams(PdfFormFieldBuildingBlock buildingBlock, T pdfField) {
-        pdfField.setComponent(buildingBlock.getDataRef().getCombinedTypeComponent());
+        pdfField.setComponent(PdfGeneratorUtils.getCombinedTypeComponent(buildingBlock.getDataRef()));
         pdfField.setLayoutX(countFieldLayoutX(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
         pdfField.setLayoutY(countFieldLayoutY(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));
         pdfField.setWidth(countFieldWidth(buildingBlock.getDataGroup(), buildingBlock.getDataRef()));

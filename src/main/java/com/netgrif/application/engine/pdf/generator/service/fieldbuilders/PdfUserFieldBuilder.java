@@ -24,7 +24,12 @@ public class PdfUserFieldBuilder extends PdfFormFieldBuilder<PdfUserField> {
 
     @Override
     public PdfUserField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfUserField pdfField = new PdfUserField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -34,26 +39,13 @@ public class PdfUserFieldBuilder extends PdfFormFieldBuilder<PdfUserField> {
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfUserField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
+        Field<?> field = ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
+        String value = field.getValue() != null ? ((UserFieldValue) field.getValue().getValue()).getFullName() : "";
+        pdfField.setValue(value);
     }
 
     @Override
     protected int countValueMultiLineHeight(PdfUserField pdfField) {
         return resource.getLineHeight() + resource.getPadding();
-    }
-
-    private PdfUserField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfUserField pdfField = new PdfUserField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfUserField pdfField) {
-        Field<?> field = buildingBlock.getDataRef().getField();
-        String value = field.getValue() != null ? ((UserFieldValue) field.getValue().getValue()).getFullName() : "";
-        pdfField.setValue(value);
     }
 }

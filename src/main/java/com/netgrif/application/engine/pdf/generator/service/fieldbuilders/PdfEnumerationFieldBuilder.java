@@ -27,7 +27,12 @@ public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerati
 
     @Override
     public PdfEnumerationField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfEnumerationField pdfField = new PdfEnumerationField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -53,18 +58,5 @@ public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerati
     @Override
     protected int countValueMultiLineHeight(PdfEnumerationField pdfField) {
         return pdfField.getSelectedValues().size() * resource.getLineHeight() + resource.getPadding();
-    }
-
-    private PdfEnumerationField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfEnumerationField pdfField = new PdfEnumerationField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfEnumerationField pdfField) {
-
     }
 }

@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.pdf.generator.config;
 
-import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfDateFormat;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfPageNumberFormat;
 import lombok.Data;

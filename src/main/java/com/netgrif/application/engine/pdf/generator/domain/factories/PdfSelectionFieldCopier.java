@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.pdf.generator.domain.factories;
 
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfSelectionField;
 
 import java.util.List;

@@ -4,6 +4,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfDateTimeField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.utils.DateUtils;
 import org.apache.commons.lang.StringUtils;
@@ -21,7 +22,12 @@ public class PdfDateTimeFieldBuilder extends PdfFormFieldBuilder<PdfDateTimeFiel
 
     @Override
     public PdfDateTimeField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfDateTimeField pdfField = new PdfDateTimeField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -31,27 +37,14 @@ public class PdfDateTimeFieldBuilder extends PdfFormFieldBuilder<PdfDateTimeFiel
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfDateTimeField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
+        DateTimeField field = (DateTimeField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
+        String value = field.getValue() != null ? formatDateTime(field) : StringUtils.EMPTY;
+        pdfField.setValue(value);
     }
 
     @Override
     protected int countValueMultiLineHeight(PdfDateTimeField pdfField) {
         return resource.getLineHeight() + resource.getPadding();
-    }
-
-    private PdfDateTimeField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfDateTimeField pdfField = new PdfDateTimeField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfDateTimeField pdfField) {
-        Field<?> field = buildingBlock.getDataRef().getField();
-        String value = field.getValue() != null ? formatDateTime(field) : StringUtils.EMPTY;
-        pdfField.setValue(value);
     }
 
     private String formatDateTime(Field<?> field) {

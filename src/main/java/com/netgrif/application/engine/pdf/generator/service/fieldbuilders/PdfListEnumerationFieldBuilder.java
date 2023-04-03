@@ -48,7 +48,7 @@ public class PdfListEnumerationFieldBuilder extends PdfEnumerationFieldBuilder {
             pdfField.setValue(choices);
         }
         if (field.getValue() != null) {
-            Set<String> values = Collections.singleton(field.getValue().getValue().getKey());
+            Set<String> values = Collections.singleton(field.getValue().getValue().getDefaultValue());
             pdfField.setSelectedValues(values);
         }
     }

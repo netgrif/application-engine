@@ -43,22 +43,4 @@ public class PdfBooleanFieldRenderer extends PdfFieldRenderer<PdfBooleanField> {
         }
         getPdfDrawer().checkOpenPages();
     }
-
-//    private void renderValue(PdfField field, int lineCounter, float strokeWidth) throws IOException {
-//        int x = field.getX() + padding, y = renderLinePosY(field, lineCounter);
-//        lineCounter++;
-//        lineCounter = renderPageBrake(field, lineCounter, y);
-//        y = renderLinePosY(field, lineCounter);
-//        if (resource.isBooleanFieldStroke()) {
-//            pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), 1, strokeWidth);
-//        }
-//
-//        List<String> booleanValues = booleanFormat.getValue();
-//        for (String value : booleanValues) {
-//            x += booleanValues.indexOf(value) * (padding * 9);
-//            pdfDrawer.drawBooleanBox(field.getValue(), value, x, y);
-//            pdfDrawer.writeString(resource.getValueFont(), resource.getFontValueSize(), x + fontLabelSize + padding, y, value, colorString);
-//        }
-//        pdfDrawer.checkOpenPages();
-//    }
 }

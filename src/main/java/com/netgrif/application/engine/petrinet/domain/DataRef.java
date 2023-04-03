@@ -85,11 +85,6 @@ public class DataRef {
         return isBehaviorSet(VISIBLE);
     }
 
-    @JsonIgnore
-    public String getCombinedTypeComponent() {
-        return component != null ? field.getType().value() + "_" + component.getName() : field.getType().value();
-    }
-
     private boolean isBehaviorSet(FieldBehavior behavior) {
         return behavior.equals(this.behavior.getBehavior());
     }

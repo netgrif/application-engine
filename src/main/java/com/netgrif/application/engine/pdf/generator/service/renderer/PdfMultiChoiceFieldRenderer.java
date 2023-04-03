@@ -31,11 +31,6 @@ public class PdfMultiChoiceFieldRenderer extends PdfFieldRenderer<PdfMultiChoice
         int lineCounter = getLineCounter();
         int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, lineCounter);
         int strokeLineCounter = 0;
-
-//        if (textWidth > getField().getWidth() - 3 * getResource().getPadding()) {
-//            multiLineText = generateMultiLineText(getField().getValue(), maxLineSize);
-//        }
-
         for (String line : multiLineText) {
             lineCounter++;
             lineCounter = renderPageBrake(clonedField, lineCounter, strokeLineCounter, y);
@@ -49,20 +44,4 @@ public class PdfMultiChoiceFieldRenderer extends PdfFieldRenderer<PdfMultiChoice
         }
         getPdfDrawer().checkOpenPages();
     }
-
-//    public void setFieldParams(PdfMultiChoiceField field) {
-//        helperField = new PdfMultiChoiceField(field.getFieldId(), field.getLabel(), field.getValue(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
-//                resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
-//    }
-
-//    @Override
-//    public int renderLabel(PdfField field) throws IOException {
-//        setFieldParams((PdfMultiChoiceField) field);
-//        return renderLabel(helperField, resource.getLabelFont(), fontLabelSize, colorLabelString);
-//    }
-
-//    public void renderValue(PdfField field, int lineCounter) throws IOException {
-//        setFieldParams((PdfMultiChoiceField) field);
-//        renderValue((PdfSelectionField) helperField, lineCounter);
-//    }
 }

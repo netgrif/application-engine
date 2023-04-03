@@ -7,6 +7,7 @@ import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTitleField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator;
+import com.netgrif.application.engine.pdf.generator.service.renderer.PageNumberRenderer;
 import com.netgrif.application.engine.pdf.generator.service.renderer.PdfFieldRenderer;
 import com.netgrif.application.engine.pdf.generator.service.renderer.PdfTitleFieldRenderer;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
@@ -23,6 +24,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
@@ -31,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.netgrif.application.engine.pdf.generator.service.renderer.PageNumberRenderer.PAGE_NUMBER_TYPE;
 
 /**
  * Generates PDF from the given transition form
@@ -145,7 +149,6 @@ public class PdfGenerator implements IPdfGenerator {
     @Override
     public void generateData(PdfField<?> pdfField, PdfResource pdfResource) {
         pdfDataHelper.getPdfDocumentContent().addFormField(pdfField);
-        //pdfDataHelper.correctFieldsPosition();
     }
 
     protected File transformRequestToPdf(PdfDocumentContent documentContent, PdfResource pdfResource) throws IOException {
@@ -181,33 +184,9 @@ public class PdfGenerator implements IPdfGenerator {
             fieldRenderer.setField(pdfField);
             fieldRenderer.renderLabel();
             fieldRenderer.renderValue();
-//            if (pdfField.getFieldId().equals("titleField")) {
-//                pdfDrawer.drawTitleField(pdfField);
-//            } else if (!pdfField.isDgField()) {
-//                switch (pdfField.getType()) {
-//                    case MULTICHOICE_MAP:
-//                    case MULTICHOICE:
-//                        pdfDrawer.drawMultiChoiceField(pdfField);
-//                        break;
-//                    case ENUMERATION_MAP:
-//                    case ENUMERATION:
-//                        pdfDrawer.drawEnumerationField(pdfField);
-//                        break;
-//                    case BOOLEAN:
-//                        pdfDrawer.drawBooleanField(pdfField);
-//                        break;
-//                    case I_18_N:
-//                        pdfDrawer.drawI18nDividerField(pdfField);
-//                        break;
-//                    default:
-//                        pdfDrawer.drawTextField(pdfField);
-//                        break;
-//                }
-//            } else {
-//                pdfDrawer.drawDataGroupField(pdfField);
-//            }
         }
-        //pdfDrawer.drawPageNumber();
+        PageNumberRenderer pageNumberRenderer = (PageNumberRenderer) rendererMap.get(PAGE_NUMBER_TYPE);
+        pageNumberRenderer.renderValue();
     }
 
     protected PDFormXObject getSvg(Resource resource) throws IOException {

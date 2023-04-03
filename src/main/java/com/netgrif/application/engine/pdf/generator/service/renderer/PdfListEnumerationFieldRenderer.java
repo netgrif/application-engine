@@ -30,15 +30,6 @@ public class PdfListEnumerationFieldRenderer extends PdfEnumerationFieldRenderer
 
         for (Map.Entry<String, List<String>> choice : clonedField.getValue().entrySet()) {
             boolean buttonDrawn = false;
-//            float textWidth = getTextWidth(choice.getValue(), clonedField.getValueFont(), fontValueSize, resource);
-//            multiLineText = new ArrayList<>() {{
-//                add(choice);
-//            }};
-
-//            if (textWidth > field.getWidth() - 4 * padding) {
-//                multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
-//            }
-
             for (String line : choice.getValue()) {
                 lineCounter++;
                 lineCounter = renderPageBrake(clonedField, lineCounter, y);

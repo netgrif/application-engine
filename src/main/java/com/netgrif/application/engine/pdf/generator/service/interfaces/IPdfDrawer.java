@@ -2,10 +2,13 @@ package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +25,14 @@ public interface IPdfDrawer {
     void checkOpenPages() throws IOException;
 
     void closeContentStream() throws IOException;
+
+    PDPageContentStream getContentStream();
+
+    void setContentStream(PDPageContentStream contentStream);
+
+    List<PDPage> getPageList();
+
+    PDDocument getPdf();
 
 //    void drawTitleField(PdfField field) throws IOException;
 //

@@ -76,20 +76,4 @@ public class PdfDataGroupFieldBuilder extends PdfFieldBuilder<PdfDataGroupField>
         setupValue(buildingBlock, pdfField);
         pdfField.setHeight(countFieldHeight());
     }
-//    @Override
-//    public PdfField buildField(PdfFieldBuildingBlock buildingBlock) {
-//        return buildField(buildingBlock.getDataGroup());
-//    }
-//
-//    @Override
-//    public DataType getType() {
-//        return null;
-//    }
-//
-//    public PdfField buildField(DataGroup dataGroup, PdfField pdfField) {
-//        PdfField dgField = new PdfDataGroupField(dataGroup.getImportId(), 0, pdfField.getLayoutY(),
-//                resource.getPageDrawableWidth(), resource.getFormGridRowHeight() - resource.getPadding(), dataGroup.getTitle().toString(), true, resource);
-//        setFieldPositions(dgField, resource.getFontGroupSize());
-//        return dgField;
-//    }
 }

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.utils;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
+import com.netgrif.application.engine.petrinet.domain.DataRef;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.jsoup.Jsoup;
 
@@ -12,6 +13,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class PdfGeneratorUtils {
+
+    public static String getCombinedTypeComponent(DataRef dataRef) {
+        return dataRef.getComponent() != null ? dataRef.getField().getType().value() + "_" + dataRef.getComponent() .getName() : dataRef.getField().getType().value();
+    }
 
     public static int getMaxLineSize(int fieldWidth, int fontSize, int padding, float sizeMultiplier) {
         return (int) ((fieldWidth - padding) * sizeMultiplier / fontSize);

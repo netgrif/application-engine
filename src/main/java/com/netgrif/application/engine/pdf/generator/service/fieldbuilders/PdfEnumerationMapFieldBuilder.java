@@ -26,7 +26,12 @@ public class PdfEnumerationMapFieldBuilder extends PdfFormFieldBuilder<PdfEnumer
 
     @Override
     public PdfEnumerationMapField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfEnumerationMapField pdfField = new PdfEnumerationMapField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -36,24 +41,6 @@ public class PdfEnumerationMapFieldBuilder extends PdfFormFieldBuilder<PdfEnumer
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfEnumerationMapField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
-    }
-
-    @Override
-    protected int countValueMultiLineHeight(PdfEnumerationMapField pdfField) {
-        return pdfField.getSelectedValues().size() * resource.getLineHeight() + resource.getPadding();
-    }
-
-    private PdfEnumerationMapField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfEnumerationMapField pdfField = new PdfEnumerationMapField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfEnumerationMapField pdfField) {
         EnumerationField field = (EnumerationField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
@@ -65,5 +52,10 @@ public class PdfEnumerationMapFieldBuilder extends PdfFormFieldBuilder<PdfEnumer
             Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().getTranslation(buildingBlock.getLocale())), maxValueLineLength));
             pdfField.setSelectedValues(values);
         }
+    }
+
+    @Override
+    protected int countValueMultiLineHeight(PdfEnumerationMapField pdfField) {
+        return pdfField.getSelectedValues().size() * resource.getLineHeight() + resource.getPadding();
     }
 }

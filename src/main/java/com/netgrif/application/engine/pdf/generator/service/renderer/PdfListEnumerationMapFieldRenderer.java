@@ -24,23 +24,12 @@ public class PdfListEnumerationMapFieldRenderer extends PdfEnumerationMapFieldRe
 
     @Override
     public void renderValue() throws IOException {
-//        int maxLineSize = getMaxValueLineSize(field.getWidth() - 3 * padding);
-//        List<String> multiLineText;
         PdfEnumerationMapField clonedField = (PdfEnumerationMapField) getField().getCopier().copyOf();
         int lineCounter = getLineCounter();
         int x = clonedField.getX() + 4 * getResource().getPadding(), y = renderLinePosY(clonedField, lineCounter);
 
         for (Map.Entry<String, List<String>> choice : clonedField.getValue().entrySet()) {
             boolean buttonDrawn = false;
-//            float textWidth = getTextWidth(choice.getValue(), clonedField.getValueFont(), fontValueSize, resource);
-//            multiLineText = new ArrayList<>() {{
-//                add(choice);
-//            }};
-
-//            if (textWidth > field.getWidth() - 4 * padding) {
-//                multiLineText = PdfFieldBuilder.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
-//            }
-
             for (String line : choice.getValue()) {
                 lineCounter++;
                 lineCounter = renderPageBrake(clonedField, lineCounter, y);

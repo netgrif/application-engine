@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.domain.factories;
 
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfBooleanField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 
 public class PdfBooleanFieldCopier extends PdfFieldCopier<Boolean, PdfBooleanField> {
 

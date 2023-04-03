@@ -5,6 +5,7 @@ import com.netgrif.application.engine.pdf.generator.domain.fields.PdfFileField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -22,7 +23,12 @@ public class PdfFileFieldBuilder extends PdfFormFieldBuilder<PdfFileField> {
 
     @Override
     public PdfFileField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfFileField pdfField = new PdfFileField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -32,26 +38,8 @@ public class PdfFileFieldBuilder extends PdfFormFieldBuilder<PdfFileField> {
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfFileField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
-    }
-
-    @Override
-    public int countValueMultiLineHeight(PdfFileField pdfField) {
-        return pdfField.getValue().size() * resource.getLineHeight() + resource.getPadding();
-    }
-
-    private PdfFileField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfFileField pdfField = new PdfFileField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfFileField pdfField) {
-        Field<?> field = buildingBlock.getDataRef().getField();
-        String rawValue = field.getValue() != null ? shortenFileName(((FileFieldValue) field.getValue().getValue()).getName()) : "";
+        FileField field = (FileField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
+        String rawValue = field.getValue() != null ? shortenFileName(field.getValue().getValue().getName()) : "";
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),
@@ -60,6 +48,11 @@ public class PdfFileFieldBuilder extends PdfFormFieldBuilder<PdfFileField> {
         );
         List<String> value = generateMultiLineText(Collections.singletonList(rawValue), maxValueLineLength);
         pdfField.setValue(value);
+    }
+
+    @Override
+    public int countValueMultiLineHeight(PdfFileField pdfField) {
+        return pdfField.getValue().size() * resource.getLineHeight() + resource.getPadding();
     }
 
     private String shortenFileName(String fileName) {

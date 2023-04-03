@@ -21,21 +21,11 @@ public class PdfNumberFieldRenderer extends PdfFieldRenderer<PdfNumberField> {
 
     @Override
     public void renderValue() throws IOException {
-//        float textWidth = getTextWidth(getField().getValue(), getResource().getValueFont(), getResource().getFontValueSize(), getResource());
-//        int maxLineSize = getMaxLineSize(
-//                getField().getWidth() - 3 * getResource().getPadding(),
-//                getResource().getFontValueSize(),
-//                getResource().getPadding(),
-//                getResource().getSizeMultiplier()
-//        );
         PdfNumberField clonedField = (PdfNumberField) getField().getCopier().copyOf();
         String text = clonedField.getValue();
         int lineCounter = getLineCounter();
         int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, lineCounter);
 
-//        if (textWidth > clonedField.getWidth() - 3 * getResource().getPadding()) {
-//            multiLineText = generateMultiLineText(clonedField.getValue(), maxLineSize);
-//        }
         lineCounter++;
         renderPageBrake(clonedField, lineCounter, 0, y);
         y = renderLinePosY(clonedField, lineCounter);

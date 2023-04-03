@@ -26,22 +26,11 @@ public class PdfTextFieldRenderer extends PdfFieldRenderer<PdfTextField> {
 
     @Override
     public void renderValue() throws IOException {
-//        float textWidth = getTextWidth(getField().getValue(), getResource().getValueFont(), getResource().getFontValueSize(), getResource());
-//        int maxLineSize = getMaxLineSize(
-//                getField().getWidth() - 3 * getResource().getPadding(),
-//                getResource().getFontValueSize(),
-//                getResource().getPadding(),
-//                getResource().getSizeMultiplier()
-//        );
         PdfTextField clonedField = (PdfTextField) getField().getCopier().copyOf();
         List<String> multiLineText = clonedField.getValue();
         int lineCounter = getLineCounter();
         int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, lineCounter);
         int strokeLineCounter = 0;
-
-//        if (textWidth > getField().getWidth() - 3 * getResource().getPadding()) {
-//            multiLineText = generateMultiLineText(getField().getValue(), maxLineSize);
-//        }
 
         for (String line : multiLineText) {
             lineCounter++;
@@ -56,42 +45,4 @@ public class PdfTextFieldRenderer extends PdfFieldRenderer<PdfTextField> {
         }
         getPdfDrawer().checkOpenPages();
     }
-
-
-//    public void setFieldParams(PdfTextField field) {
-//        setField(field);
-//    }
-
-//    @Override
-//    public int renderLabel(PdfTextField field) throws IOException {
-//        setField(field);
-//        return renderLabel();
-//    }
-
-
-//    private void renderValue(PdfTextField field, int lineCounter, float strokeWidth) throws IOException {
-//        float textWidth = getTextWidth(field.getValue(), resource.getValueFont(), fontValueSize, resource);
-//        int maxLineSize = getMaxValueLineSize(field.getWidth() - 3 * padding);
-//        List<String> multiLineText = field.getValue();
-//        int x = field.getX() + padding, y = renderLinePosY(field, lineCounter);
-//        int strokeLineCounter = 0;
-//
-//        if (textWidth > field.getWidth() - 3 * padding) {
-//            multiLineText = PdfFieldBuilder.generateMultiLineText(field.getValue(), maxLineSize);
-//        }
-//
-//        for (String line : multiLineText) {
-//            lineCounter++;
-//            lineCounter = renderPageBrake(field, lineCounter, strokeLineCounter, y);
-//            strokeLineCounter = lineCounter == 1 ? 0 : strokeLineCounter;
-//            y = renderLinePosY(field, lineCounter);
-//            strokeLineCounter++;
-//            pdfDrawer.writeString(resource.getValueFont(), fontValueSize, x, y, line, colorString);
-//        }
-//        if (resource.isTextFieldStroke()) {
-//            pdfDrawer.drawStroke(field.getX(), y, field.getBottomY(), field.getWidth(), strokeLineCounter, strokeWidth);
-//        }
-//        pdfDrawer.checkOpenPages();
-//    }
-
 }

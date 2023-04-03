@@ -49,7 +49,7 @@ public class PdfListMultiChoiceFieldBuilder extends PdfMultiChoiceFieldBuilder {
             pdfField.setValue(choices);
         }
         if (field.getValue() != null) {
-            Set<String> values = field.getValue().getValue().stream().map(I18nString::getKey).collect(Collectors.toSet());
+            Set<String> values = field.getValue().getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             pdfField.setSelectedValues(values);
         }
     }

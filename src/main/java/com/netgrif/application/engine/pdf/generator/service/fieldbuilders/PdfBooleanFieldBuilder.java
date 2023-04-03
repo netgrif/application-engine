@@ -21,7 +21,12 @@ public class PdfBooleanFieldBuilder extends PdfFormFieldBuilder<PdfBooleanField>
 
     @Override
     public PdfBooleanField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfBooleanField pdfField = new PdfBooleanField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -36,21 +41,8 @@ public class PdfBooleanFieldBuilder extends PdfFormFieldBuilder<PdfBooleanField>
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfBooleanField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
-    }
-
-    private PdfBooleanField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfBooleanField pdfField = new PdfBooleanField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfBooleanField pdfField) {
-        Field<?> field = buildingBlock.getDataRef().getField();
+        BooleanField field = (BooleanField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         pdfField.setFormat(PdfBooleanFormat.getByLocale(buildingBlock.getLocale()));
-        pdfField.setValue(((BooleanField) field).getValue().getValue() != null && ((BooleanField) field).getValue().getValue());
+        pdfField.setValue(field.getValue().getValue() != null && field.getValue().getValue());
     }
 }

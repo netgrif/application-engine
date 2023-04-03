@@ -20,7 +20,12 @@ public class PdfI18NDividerFieldBuilder extends PdfFormFieldBuilder<PdfI18nDivid
 
     @Override
     public PdfI18nDividerField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfI18nDividerField pdfField = new PdfI18nDividerField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -35,20 +40,7 @@ public class PdfI18NDividerFieldBuilder extends PdfFormFieldBuilder<PdfI18nDivid
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfI18nDividerField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
-    }
-
-    private PdfI18nDividerField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfI18nDividerField pdfField = new PdfI18nDividerField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfI18nDividerField pdfField) {
-        I18nField field = (I18nField) buildingBlock.getDataRef().getField();
+        I18nField field = (I18nField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         String rawValue = field.getValue() != null ? field.getValue().getValue().getTranslation(buildingBlock.getLocale()) : "";
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),

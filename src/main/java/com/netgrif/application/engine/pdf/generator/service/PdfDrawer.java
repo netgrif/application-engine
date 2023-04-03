@@ -5,6 +5,7 @@ import com.netgrif.application.engine.pdf.generator.config.PdfResource;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.multipdf.PDFCloneUtility;
@@ -29,13 +30,17 @@ import java.util.List;
 @Service
 public class PdfDrawer implements IPdfDrawer {
 
+    @Getter
     private PDDocument pdf;
 
     @Setter
     private PDDocument templatePdf;
 
+    @Getter
+    @Setter
     private PDPageContentStream contentStream;
 
+    @Getter
     private List<PDPage> pageList;
 
     private PDPage currentPage = null;

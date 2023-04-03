@@ -2,7 +2,6 @@ package com.netgrif.application.engine.pdf.generator.domain.factories;
 
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import lombok.Getter;
-import lombok.Setter;
 
 public class PdfFieldCopier<U, T extends PdfField<U>> implements IPdfFieldCopier<U, T> {
 

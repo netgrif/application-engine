@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfI18nDividerField;
 
 import java.awt.*;
@@ -17,16 +16,10 @@ public class I18nDividerFieldRenderer extends PdfFieldRenderer<PdfI18nDividerFie
 
     @Override
     public void renderValue() throws IOException {
-//        float textWidth = getTextWidth(Collections.singletonList(field.getLabel()), font, fontSize, resource);
-//        int maxLineSize = getMaxLabelLineSize(field.getWidth(), fontSize);
         PdfI18nDividerField clonedField = (PdfI18nDividerField) getField().getCopier().copyOf();
         List<String> multiLineText = clonedField.getValue();
         int linesOnPage = 0;
         int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, 1);
-
-//        if (textWidth > field.getWidth() - padding) {
-//            multiLineText = PdfFieldBuilder.generateMultiLineText(field.getValue(), maxLineSize);
-//        }
 
         for (String line : multiLineText) {
             linesOnPage++;

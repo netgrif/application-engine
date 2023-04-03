@@ -5,6 +5,7 @@ import com.netgrif.application.engine.pdf.generator.domain.fields.PdfNumberField
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,12 @@ public class PdfNumberFieldBuilder extends PdfFormFieldBuilder<PdfNumberField> {
 
     @Override
     public PdfNumberField buildField(PdfBuildingBlock buildingBlock) {
-        return buildField((PdfFormFieldBuildingBlock) buildingBlock);
+        this.lastX = buildingBlock.getLastX();
+        this.lastY = buildingBlock.getLastY();
+        PdfNumberField pdfField = new PdfNumberField(((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField().getStringId());
+        setFieldParams(buildingBlock, pdfField);
+        setFieldPositions(pdfField);
+        return pdfField;
     }
 
     @Override
@@ -34,22 +40,9 @@ public class PdfNumberFieldBuilder extends PdfFormFieldBuilder<PdfNumberField> {
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfNumberField pdfField) {
-        setupValue((PdfFormFieldBuildingBlock) buildingBlock, pdfField);
-    }
-
-    private PdfNumberField buildField(PdfFormFieldBuildingBlock buildingBlock) {
-        this.lastX = buildingBlock.getLastX();
-        this.lastY = buildingBlock.getLastY();
-        PdfNumberField pdfField = new PdfNumberField(buildingBlock.getDataRef().getField().getStringId());
-        setFieldParams(buildingBlock, pdfField);
-        setFieldPositions(pdfField);
-        return pdfField;
-    }
-
-    private void setupValue(PdfFormFieldBuildingBlock buildingBlock, PdfNumberField pdfField) {
-        Field<?> field = buildingBlock.getDataRef().getField();
+        NumberField field = (NumberField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         String value;
-        double number = field.getValue() != null ? (double) field.getValue().getValue() : 0.0;
+        double number = field.getValue() != null ? field.getValue().getValue() : 0.0;
         if (field.getValue() != null && isCurrencyField(field)) {
             Map<String, String> properties = field.getComponent().getProperties();
             NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale(properties.get("locale")));
