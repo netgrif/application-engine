@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -51,6 +52,9 @@ class SetDataOnButtonTest {
 
     @Autowired
     private TestHelper testHelper
+
+    @Autowired
+    private SuperCreator superCreator
 
     String CHILD_CASE_FIELD_ID = "child_case_id"
     String TEXT_0_FIELD_ID = "text_0"
@@ -106,7 +110,7 @@ class SetDataOnButtonTest {
                 "button_0": new ButtonField(rawValue: 42),
                 "button_1": new ButtonField(rawValue: 42),
                 "button_2": new ButtonField(rawValue: 42)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
 

@@ -8,6 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -54,6 +55,9 @@ class ChangeBehaviorTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private SuperCreator superCreator
+
     String TEXT_0_FIELD_ID = "text_0"
     String TEXT_1_FIELD_ID = "text_1"
     String BOOLEAN_0_FIELD_ID = "boolean_0"
@@ -85,7 +89,7 @@ class ChangeBehaviorTest {
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
@@ -108,7 +112,7 @@ class ChangeBehaviorTest {
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_1": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_1_FIELD_ID).rawValue == true
@@ -134,7 +138,7 @@ class ChangeBehaviorTest {
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_2": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_2_FIELD_ID).rawValue == true
@@ -155,7 +159,7 @@ class ChangeBehaviorTest {
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_3": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_3_FIELD_ID).rawValue == true
@@ -176,7 +180,7 @@ class ChangeBehaviorTest {
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == true
@@ -185,7 +189,7 @@ class ChangeBehaviorTest {
 
         dataService.setData(mainTask.stringId, new DataSet([
                 "boolean_0": new BooleanField(rawValue: false)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         testCase = workflowService.findOne(testCase.getStringId())
         assert testCase.dataSet.get(BOOLEAN_0_FIELD_ID).rawValue == false

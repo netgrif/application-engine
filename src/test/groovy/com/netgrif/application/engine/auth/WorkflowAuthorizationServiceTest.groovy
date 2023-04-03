@@ -203,7 +203,7 @@ class WorkflowAuthorizationServiceTest {
         String taskId = case_.getTaskStringId("1")
         case_ = dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
-        ] as Map<String, Field<?>>)).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
         workflowService.save(case_)
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
@@ -225,7 +225,7 @@ class WorkflowAuthorizationServiceTest {
         case_ = dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
                 "neg_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>)).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
 
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
 

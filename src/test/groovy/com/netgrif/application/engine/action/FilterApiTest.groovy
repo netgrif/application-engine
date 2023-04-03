@@ -9,6 +9,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -55,6 +56,9 @@ class FilterApiTest {
     @Autowired
     private INextGroupService nextGroupService
 
+    @Autowired
+    private SuperCreator superCreator
+
     @BeforeEach
     void before() {
         testHelper.truncateDbs()
@@ -98,7 +102,7 @@ class FilterApiTest {
                 "icon"                  : new TextField(rawValue: ""),
                 "create_filter_and_menu": new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
-        dataService.setData(caze.getTaskStringId("t1"), dataSet)
+        dataService.setData(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper())
         caze = workflowService.findOne(caze.stringId)
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
@@ -122,7 +126,7 @@ class FilterApiTest {
         DataSet dataSet = new DataSet([
                 "delete_filter_and_menu": new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
-        dataService.setData(caze.getTaskStringId("t1"), dataSet)
+        dataService.setData(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper())
         workflowService.findOne(caze.stringId)
         Case defGroup = nextGroupService.findDefaultGroup()
         List<String> taskIds = (defGroup.dataSet.get(ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS).value.value ?: []) as List
@@ -143,7 +147,7 @@ class FilterApiTest {
         DataSet dataSet = new DataSet([
                 "find_filter": new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
-        dataService.setData(caze.getTaskStringId("t1"), dataSet)
+        dataService.setData(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper())
         caze = workflowService.findOne(caze.stringId)
         assert caze.dataSet.get("found_filter").rawValue == filter.stringId
     }
@@ -160,7 +164,7 @@ class FilterApiTest {
                 "icon"                  : new TextField(rawValue: "device_hub"),
                 "create_filter_and_menu": new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
-        dataService.setData(caze.getTaskStringId("t1"), dataSet)
+        dataService.setData(caze.getTaskStringId("t1"), dataSet, superCreator.getLoggedSuper())
         caze = workflowService.findOne(caze.stringId)
         return caze
     }

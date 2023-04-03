@@ -107,7 +107,7 @@ class TaskRefPropagationTest {
         workflowService.save(child)
 
         /* validate getDataGroups object and taskRef field ids */
-        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK")).data
+        List<DataGroup> parentData = dataService.getDataGroups(parentTaskId, Locale.forLanguageTag("SK"), superCreator.getLoggedSuper()).data
         // TODO: release/7.0.0 fix
 //        LocalisedField parentText = findField(parentData, PARENT_FIELD_TEXT_TITLE)
 //        LocalisedField parentMultichoice = findField(parentData, PARENT_FIELD_MULTICHOICE_TITLE)

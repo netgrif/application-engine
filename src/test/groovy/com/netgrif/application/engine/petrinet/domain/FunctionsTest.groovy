@@ -9,12 +9,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
+import net.bytebuddy.implementation.bind.annotation.SuperCall
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -48,6 +50,9 @@ class FunctionsTest {
 
     @Autowired
     private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
 
     @Autowired
     private TestHelper testHelper
@@ -96,7 +101,7 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        dataService.setData(aCase.getTaskStringId("1"), new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>))
+        dataService.setData(aCase.getTaskStringId("1"), new DataSet(["createUser": new BooleanField(rawValue: true)] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         IUser user = userService.findByEmail("test@test.com", true)
         assert user
@@ -114,7 +119,7 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["enum": new EnumerationField (rawValue: new I18nString("ano"))] as Map<String, Field<?>>)))
+        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["enum": new EnumerationField (rawValue: new I18nString("ano"))] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
 
         NumberField field = aCase.getDataSet().get("number") as NumberField
@@ -142,7 +147,7 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)))
+            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue: 20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         })
     }
 
@@ -160,12 +165,12 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["text": new TextField(rawValue:  "20")] as Map<String, Field<?>>)))
+            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["text": new TextField(rawValue:  "20")] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
 
             functionTestNet = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
             assert functionTestNet
 
-            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["text": new TextField(rawValue:  "20")] as Map<String, Field<?>>)))
+            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["text": new TextField(rawValue:  "20")] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         })
     }
 
@@ -176,7 +181,7 @@ class FunctionsTest {
             assert functionTestNet
 
             Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number3": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
+            dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number3": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         })
     }
 
@@ -189,7 +194,7 @@ class FunctionsTest {
         assert functionTestNet
 
         Case aCase = workflowService.createCase(functionTestNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
+        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
 
         assert aCase.getDataSet().get("number2").rawValue == 20 + 20
@@ -197,7 +202,7 @@ class FunctionsTest {
         functionResNet = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
         assert functionResNet
 
-        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
+        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
 
         assert aCase.getDataSet().get("number2").rawValue == 20 * 20
@@ -232,7 +237,7 @@ class FunctionsTest {
         assert petriNet
 
         Case aCase = workflowService.createCase(petriNet.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
-        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)))
+        dataService.setData(aCase.getTaskStringId("1"), new DataSet((["number": new NumberField(rawValue:  20d)] as Map<String, Field<?>>)), superCreator.getLoggedSuper())
         aCase = workflowService.findOne(aCase.getStringId())
         NumberField numberField2 = aCase.dataSet.get("number2") as NumberField
         TextField textField = aCase.dataSet.get("text") as TextField

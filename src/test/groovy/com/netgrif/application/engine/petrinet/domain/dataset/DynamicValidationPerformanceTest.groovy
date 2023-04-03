@@ -76,7 +76,7 @@ class DynamicValidationPerformanceTest {
 
     Map<String, Field> getData(Case useCase) {
         Task task = task(useCase)
-        return dataService.getData(task, useCase).getData().collectEntries { [(it.fieldId): (it)] }
+        return dataService.getData(task, useCase, superCreator.getSuperUser()).getData().collectEntries { [(it.fieldId): (it)] }
     }
 
     Task task(Case useCase) {
