@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.configuration.authentication.providers;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.ldap.domain.LdapGroupRef;
@@ -62,7 +62,7 @@ class NetgrifLdapAuthenticationProviderTest {
     @Autowired
     private IPetriNetService petriNetService;
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     private static final String USER_EMAIL_Test1 = "ben@netgrif.com";
     private static final String USER_PASSWORD_Test1 = "benpassword";

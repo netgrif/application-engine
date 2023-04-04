@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.validation
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
@@ -23,7 +23,7 @@ class NumberFieldValidationTest {
 
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @BeforeEach
     void setup() {

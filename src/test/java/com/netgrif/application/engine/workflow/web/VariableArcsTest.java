@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.MockService;
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.User;
@@ -17,7 +17,6 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.startup.DefaultRoleRunner;
 import com.netgrif.application.engine.startup.ImportHelper;
 import com.netgrif.application.engine.startup.SuperCreator;
 import com.netgrif.application.engine.startup.SystemUserRunner;
@@ -84,7 +83,7 @@ public class VariableArcsTest {
     private SuperCreator superCreator;
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     private PetriNet loaded;
 

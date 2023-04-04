@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -39,7 +39,7 @@ import java.time.LocalDateTime;
 class RuleEvaluationScheduleServiceTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @Autowired
     private RuleRepository ruleRepository;

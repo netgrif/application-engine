@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.orgstructure.groups
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -40,7 +40,7 @@ class NextGroupServiceTest {
     private ImportHelper importHelper
 
     @Autowired
-    TestHelper testHelper
+    EngineTest testHelper
 
     @Test
     void groupTest() {

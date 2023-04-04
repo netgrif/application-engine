@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
@@ -49,7 +49,7 @@ class RuleEngineTest {
     public static final Double NUM_VALUE = 99.0;
     public static final String TRANS_1 = "2";
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
     @Autowired
     private RuleRepository ruleRepository;
     @Autowired

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc
 import com.netgrif.application.engine.petrinet.domain.arcs.InhibitorArc
@@ -40,7 +40,7 @@ class PetriNetTest {
     private ProcessRoleRepository processRoleRepository
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Value("classpath:net_clone.xml")
     private Resource netResource

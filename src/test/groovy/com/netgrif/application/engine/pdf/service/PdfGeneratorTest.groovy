@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.pdf.service
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.UserService
 import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.Importer
@@ -69,7 +69,7 @@ class PdfGeneratorTest {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private ITaskService taskService

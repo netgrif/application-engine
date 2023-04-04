@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -38,7 +38,7 @@ class CaseFieldTest {
     private ImportHelper importHelper
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private IPetriNetService petriNetService

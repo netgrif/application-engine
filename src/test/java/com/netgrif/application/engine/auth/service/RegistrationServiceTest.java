@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.auth.service;
 
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.domain.User;
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository;
@@ -33,7 +33,7 @@ public class RegistrationServiceTest {
     UserRepository repository;
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @BeforeEach
     void before() {

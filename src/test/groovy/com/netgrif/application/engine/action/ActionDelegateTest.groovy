@@ -2,13 +2,14 @@ package com.netgrif.application.engine.action
 
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
 import com.netgrif.application.engine.workflow.web.responsebodies.MessageResource
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -22,24 +23,13 @@ import javax.mail.internet.MimeMessage
 
 @SpringBootTest
 @ActiveProfiles(["test"])
+@CompileStatic
 @ExtendWith(SpringExtension.class)
-class ActionDelegateTest {
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private ActionDelegate actionDelegate
-
-    @Autowired
-    private IFilterImportExportService importExportService
-
-    @Autowired
-    private IUserService userService
+class ActionDelegateTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test
@@ -98,6 +88,4 @@ class ActionDelegateTest {
         assert messages
         smtpServer.stop()
     }
-
-
 }

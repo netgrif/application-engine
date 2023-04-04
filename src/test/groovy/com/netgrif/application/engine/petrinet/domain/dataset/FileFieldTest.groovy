@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
@@ -53,7 +53,7 @@ class FileFieldTest {
     private ImportHelper importHelper
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private Importer importer

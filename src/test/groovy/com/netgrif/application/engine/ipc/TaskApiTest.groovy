@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.ipc
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.history.domain.baseevent.EventLog
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository
@@ -54,7 +54,7 @@ class TaskApiTest {
     private IPetriNetService petriNetService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private SuperCreator superCreator;

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.domain.User
@@ -12,7 +12,6 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.security.service.ISecurityContextService
-import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
@@ -46,7 +45,7 @@ class SecurityContextTest {
     private IProcessRoleService processRoleService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private IUserService userService

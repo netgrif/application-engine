@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -50,7 +49,6 @@ public class RegistrationService implements IRegistrationService {
     protected BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpiredUsers() {
         log.info("Removing expired unactivated invited users");
@@ -59,7 +57,6 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void resetExpiredToken() {
         log.info("Resetting expired user tokens");
@@ -113,7 +110,6 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    @Transactional
     public User createNewUser(NewUserRequest newUser) {
         User user;
         if (userRepository.existsByEmail(newUser.email)) {

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -21,13 +21,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR;
+
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
 public class ConstructorAndDestructorTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -45,7 +47,7 @@ public class ConstructorAndDestructorTest {
 
     @Test
     public void testConstructorAndDestructor() throws MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetEventOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/constructor_destructor.xml"), MAJOR, superCreator.getLoggedSuper());
 
         assert outcome.getNet() != null;
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq("Construct"));

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -41,7 +41,7 @@ class ReindexTest {
     private ReindexingTask reindexingTask
 
     @Autowired
-    TestHelper testHelper
+    EngineTest testHelper
 
     @BeforeEach
     void before() {

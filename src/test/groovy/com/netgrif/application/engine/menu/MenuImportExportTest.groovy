@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.menu
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -78,7 +78,7 @@ class MenuImportExportTest {
     FilterRunner filterRunner
 
     @Autowired
-    TestHelper testHelper
+    EngineTest testHelper
 
     @Autowired
     private CaseRepository repository;

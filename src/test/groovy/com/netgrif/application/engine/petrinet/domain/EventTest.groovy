@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
@@ -71,7 +71,7 @@ class EventTest {
     @Autowired
     private IPetriNetService petriNetService;
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)

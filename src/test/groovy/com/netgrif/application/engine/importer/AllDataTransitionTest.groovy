@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.Transition
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class AllDataTransitionTest {
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private IPetriNetService petriNetService

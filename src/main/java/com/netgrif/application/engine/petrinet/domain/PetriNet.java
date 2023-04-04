@@ -15,9 +15,12 @@ import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,116 +29,37 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Data
 @Document
 public class PetriNet extends PetriNetObject {
 
-
-    @Getter
-    @Setter
-    private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
-
-    @Getter
-    @Setter
+    private String identifier;
     private String uriNodeId;
-
-    @Getter
     private I18nString title;
-
-    @Getter
-    @Setter
     private boolean defaultRoleEnabled;
-
-    @Getter
-    @Setter
     private boolean anonymousRoleEnabled;
-
-    @Getter
-    @Setter
     private I18nString defaultCaseName;
-
-    @Getter
-    @Setter
     private Expression defaultCaseNameExpression;
-
-    @Getter
-    @Setter
     private String initials;
-
-    @Getter
-    @Setter
     private String icon;
-
-    // TODO: 18. 3. 2017 replace with Spring auditing
-    @Getter
-    @Setter
-    private LocalDateTime creationDate;
-
-    @Getter
-    @Setter
+    @CreatedDate
+    private LocalDateTime creationDate; // TODO: NAE-1848 test
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
     private Version version;
-
-    @Getter
-    @Setter
     private Author author;
-
-    @org.springframework.data.mongodb.core.mapping.Field("places")
-    @Getter
-    @Setter
     private Map<String, Place> places;
-
-    @org.springframework.data.mongodb.core.mapping.Field("transitions")
-    @Getter
-    @Setter
     private Map<String, Transition> transitions;
-
-    @org.springframework.data.mongodb.core.mapping.Field("arcs")
-    @Getter
-    @Setter
-    // TODO: release/7.0.0 save sorted by execution priority
-    private Map<String, List<Arc>> arcs;//todo: import id
-
-    @org.springframework.data.mongodb.core.mapping.Field("dataset")
-    @Getter
-    @Setter
+    private Map<String, List<Arc>> arcs;// TODO: NAE-1848 sort, test
     private Map<String, Field<?>> dataSet;
-
-    @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
-    @Getter
-    @Setter
     private Map<String, ProcessRole> roles;
-
-    @org.springframework.data.mongodb.core.mapping.Field("transactions")
-    @Getter
-    @Setter
-    private Map<String, Transaction> transactions;//todo: import id
-
-    @Getter
-    @Setter
     private Map<ProcessEventType, ProcessEvent> processEvents;
-
-    @Getter
-    @Setter
     private Map<CaseEventType, CaseEvent> caseEvents;
-
-    @Getter
-    @Setter
     private Map<String, Map<ProcessRolePermission, Boolean>> permissions;
-
-    @Getter
-    @Setter
     private List<String> negativeViewRoles;
-
-    @Getter
-    @Setter
     private Map<String, Map<ProcessRolePermission, Boolean>> userRefs;
-
-    @Getter
-    @Setter
     private List<Function> functions;
-
-    @Getter
-    @Setter
     private String importXmlPath;
 
     public PetriNet() {
@@ -153,7 +77,6 @@ public class PetriNet extends PetriNetObject {
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         negativeViewRoles = new LinkedList<>();
-        transactions = new LinkedHashMap<>();
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
@@ -283,19 +206,6 @@ public class PetriNet extends PetriNetObject {
                 .collect(Collectors.toMap(PetriNetObject::getStringId, Place::getTokens));
     }
 
-    public void addTransaction(Transaction transaction) {
-        this.transactions.put(transaction.getStringId(), transaction);
-    }
-
-    public Transaction getTransactionByTransition(Transition transition) {
-        return transactions.values().stream()
-                .filter(transaction ->
-                        transaction.getTransitions().contains(transition.getStringId())
-                )
-                .findAny()
-                .orElse(null);
-    }
-
     public List<Field<?>> getImmediateFields() {
         return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
     }
@@ -404,7 +314,6 @@ public class PetriNet extends PetriNetObject {
         clone.setAuthor(this.author);
         clone.setTransitions(this.transitions);
         clone.setRoles(this.roles);
-        clone.setTransactions(this.transactions);
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setObjectId(this.id);

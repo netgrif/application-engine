@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
@@ -12,7 +12,6 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetServi
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
@@ -58,7 +57,7 @@ class UserRefsTest {
     private SuperCreator superCreator
 
     @Autowired
-    private TestHelper helper
+    private EngineTest helper
 
     List<Case> newCases
 

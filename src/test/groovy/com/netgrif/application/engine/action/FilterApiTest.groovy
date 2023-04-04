@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.UriContentType
@@ -30,39 +30,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 @CompileStatic
-class FilterApiTest {
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private FilterRunner filterRunner
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private IUriService uriService
-
-    @Autowired
-    private INextGroupService nextGroupService
-
-    @Autowired
-    private SuperCreator superCreator
+class FilterApiTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
-        helper.createNet("filter_api_test.xml")
+        truncateDbs()
+        importHelper.createNet("filter_api_test.xml")
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.validation
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.validation.domain.ValidationDataInput
@@ -24,7 +24,7 @@ class TextFieldValidationTest {
 
     public static final String ErrorMessage = "Invalid Field value"
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @BeforeEach
     void setup() {

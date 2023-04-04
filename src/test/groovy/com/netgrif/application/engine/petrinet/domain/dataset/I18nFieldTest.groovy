@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class I18nFieldTest {
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @BeforeEach
     void beforeAll() {

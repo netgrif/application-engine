@@ -2,7 +2,7 @@
 package com.netgrif.application.engine.workflow
 
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.DataRef
 import com.netgrif.application.engine.petrinet.domain.PetriNet
@@ -45,7 +45,7 @@ class DataServiceTest {
     private IDataService dataService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private PetriNet agreementNet
 

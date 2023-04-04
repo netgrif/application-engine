@@ -1,7 +1,7 @@
 package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.MockService
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.domain.ElasticCase
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
@@ -91,7 +91,7 @@ class DataSearchRequestTest {
     private IDataService dataService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private ArrayList<Map.Entry<String, String>> testCases
 

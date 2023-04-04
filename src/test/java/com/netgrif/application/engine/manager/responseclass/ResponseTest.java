@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager.responseclass;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.manager.web.body.response.AllLoggedUsersResponse;
 import com.netgrif.application.engine.manager.web.body.response.MessageLogoutResponse;
@@ -22,7 +22,7 @@ import java.util.Collection;
 class ResponseTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @Autowired
     private SuperCreator superCreator;

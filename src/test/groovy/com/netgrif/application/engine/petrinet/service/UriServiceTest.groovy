@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.service
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.configuration.properties.UriProperties
 import com.netgrif.application.engine.petrinet.domain.UriContentType
 import com.netgrif.application.engine.petrinet.domain.UriNode
@@ -33,7 +33,7 @@ class UriServiceTest {
     private UriProperties uriProperties
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @BeforeEach
     void init() {

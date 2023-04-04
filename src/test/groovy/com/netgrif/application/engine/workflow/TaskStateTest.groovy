@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.startup.ImportHelper
@@ -28,7 +28,7 @@ import static com.netgrif.application.engine.workflow.domain.State.ENABLED
 class TaskStateTest {
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
     @Autowired
     private ImportHelper importHelper
     @Autowired

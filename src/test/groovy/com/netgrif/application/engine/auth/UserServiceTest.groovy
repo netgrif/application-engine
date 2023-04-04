@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.auth
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class UserServiceTest {
 
     @Autowired
-    private TestHelper helper
+    private EngineTest helper
 
     @Autowired
     private ImportHelper importHelper

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.validation
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
@@ -24,7 +24,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @SpringBootTest
 @ActiveProfiles(["test"])
@@ -38,7 +37,7 @@ class ValidationTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private IPetriNetService petriNetService;

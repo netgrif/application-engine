@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.petrinet.domain.arcs;
 
-public class ArcOrderComparator {
+import java.util.Comparator;
 
-    private static ArcOrderComparator ourInstance = new ArcOrderComparator();
+public class ArcOrderComparator implements Comparator<Arc> {
+
+    private static final ArcOrderComparator ourInstance = new ArcOrderComparator();
 
     public static ArcOrderComparator getInstance() {
         return ourInstance;
@@ -11,6 +13,7 @@ public class ArcOrderComparator {
     private ArcOrderComparator() {
     }
 
+    @Override
     public int compare(Arc first, Arc second) {
         if (first instanceof ResetArc) {
             return 1;

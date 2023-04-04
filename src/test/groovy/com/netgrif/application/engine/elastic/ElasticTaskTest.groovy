@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.ReindexingTask
@@ -37,7 +37,7 @@ class ElasticTaskTest {
     @Autowired
     private TaskRepository taskRepository
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
     @Autowired
     private ImportHelper helper
     @Autowired

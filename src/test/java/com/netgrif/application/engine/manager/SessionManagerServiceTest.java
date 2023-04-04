@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.manager;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ class SessionManagerServiceTest {
     private ISessionManagerService managerService;
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @BeforeEach
     public void before() {

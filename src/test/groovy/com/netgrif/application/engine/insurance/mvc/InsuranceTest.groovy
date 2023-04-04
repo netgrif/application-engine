@@ -2,7 +2,7 @@ package com.netgrif.application.engine.insurance.mvc
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
@@ -117,7 +117,7 @@ class InsuranceTest {
     private IUserService userService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
     // TODO: NAE-1858 remove, for test only
     @Autowired
     private IWorkflowService workflowService

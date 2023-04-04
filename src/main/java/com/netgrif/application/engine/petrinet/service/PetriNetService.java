@@ -11,9 +11,8 @@ import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
-import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
@@ -23,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
@@ -40,7 +40,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -50,7 +49,6 @@ import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Provider;
 import java.io.ByteArrayInputStream;
@@ -75,9 +73,6 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    @Autowired
-    private ApplicationEventPublisher publisher;
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
@@ -169,18 +164,12 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Deprecated
-    public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
-    }
-
-    @Override
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         ImportPetriNetEventOutcome outcome = new ImportPetriNetEventOutcome();
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
         Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (!imported.isPresent()) {
+        if (imported.isEmpty()) {
             return outcome;
         }
         PetriNet net = imported.get();
@@ -226,13 +215,6 @@ public class PetriNetService implements IPetriNetService {
         ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
     }
 
-    private InputStream copy(InputStream xmlFile) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, baos);
-        byte[] bytes = baos.toByteArray();
-        return new ByteArrayInputStream(bytes);
-    }
-
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
         petriNet.initializeArcs();
@@ -244,8 +226,9 @@ public class PetriNetService implements IPetriNetService {
     @Cacheable(value = "petriNetById", unless = "#result == null")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
-        if (!net.isPresent())
+        if (net.isEmpty()) {
             throw new IllegalArgumentException("No Petri net with id: " + id + " was found.");
+        }
 
         net.get().initializeArcs();
         return net.get();
@@ -255,8 +238,9 @@ public class PetriNetService implements IPetriNetService {
     @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless = "#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
-        if (net == null)
+        if (net == null) {
             return null;
+        }
         net.initializeArcs();
         return net;
     }
@@ -279,8 +263,9 @@ public class PetriNetService implements IPetriNetService {
     @Cacheable(value = "petriNetNewest", unless = "#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
-        if (nets.isEmpty())
+        if (nets.isEmpty()) {
             return null;
+        }
         return nets.get(0);
     }
 
@@ -378,8 +363,8 @@ public class PetriNetService implements IPetriNetService {
         Iterable<PetriNet> nets = get(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
-        nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
-                .map(entry -> transformToReference(net, entry.getValue(), locale)).collect(Collectors.toList())));
+        nets.forEach(net -> references.addAll(net.getTransitions().values().stream()
+                .map(transition -> transformToReference(net, transition, locale)).collect(Collectors.toList())));
 
         return references;
     }
@@ -442,7 +427,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Transactional
     public void deletePetriNet(String processId, LoggedUser loggedUser) {
         Optional<PetriNet> petriNetOptional = repository.findById(processId);
         if (!petriNetOptional.isPresent()) {

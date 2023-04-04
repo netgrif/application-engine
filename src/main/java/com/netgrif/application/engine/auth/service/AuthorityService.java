@@ -4,9 +4,7 @@ import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +25,6 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
-    @Transactional
     public Authority getOrCreate(String name) {
         Authority authority = repository.findByName(name);
         if (authority == null) {

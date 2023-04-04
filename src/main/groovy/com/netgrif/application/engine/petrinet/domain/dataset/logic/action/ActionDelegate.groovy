@@ -187,7 +187,6 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
 
     // TODO: release/7.0.0 - <action trigger="set" type="value">
     // TODO: release/7.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
-    // TODO: release/7.0.0 - setdata with user
     // TODO: release/7.0.0 - deprecate enum/multichoice with chooices, keep only maps with options
 
     void init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {

@@ -77,9 +77,10 @@ public class Arc extends PetriNetObject {
     }
 
     public boolean isExecutable() {
-        if (source instanceof Transition)
+        if (source instanceof Transition) {
             return true;
-        if (this.reference != null){
+        }
+        if (this.reference != null) {
             this.multiplicity = this.reference.getMultiplicity();
         }
         return ((Place) source).getTokens() >= multiplicity;

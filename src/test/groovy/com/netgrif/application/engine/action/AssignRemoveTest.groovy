@@ -1,22 +1,15 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -28,34 +21,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class AssignRemoveTest {
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private IUserService userService
+class AssignRemoveTest extends EngineTest {
 
     private Authentication auth
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
         def user = userService.system
 
         auth = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user)

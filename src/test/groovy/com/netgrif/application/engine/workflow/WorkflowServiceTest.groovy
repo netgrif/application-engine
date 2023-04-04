@@ -1,12 +1,10 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ipc.TaskApiTest
-import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.utils.InputStreamToString
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
@@ -17,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+
+import static com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
@@ -36,7 +36,7 @@ class WorkflowServiceTest {
     private IWorkflowService workflowService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private IPetriNetService petriNetService
@@ -55,7 +55,7 @@ class WorkflowServiceTest {
 
     @Test
     void testFindOneImmediateData() {
-        def testNet = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(NET_FILE), MAJOR, superCreator.getLoggedSuper())
         assert testNet.getNet() != null
         Case aCase = importHelper.createCase("Case 1", testNet.getNet())
 
@@ -69,7 +69,7 @@ class WorkflowServiceTest {
 
     @Test
     void testFirstTransitionAuto() {
-        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), MAJOR, superCreator.getLoggedSuper()).getNet()
         assert testNet
 
         def net = testNet
@@ -83,7 +83,7 @@ class WorkflowServiceTest {
 
     @Test
     void testSecondTransitionAuto() {
-        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), MAJOR, superCreator.getLoggedSuper()).getNet()
 
         Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
@@ -98,7 +98,7 @@ class WorkflowServiceTest {
 
     @Test
     void createCaseWithLocale() {
-        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), "major", superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), MAJOR, superCreator.getLoggedSuper())
         assert testNet.getNet() != null
 
         def net = testNet.getNet()

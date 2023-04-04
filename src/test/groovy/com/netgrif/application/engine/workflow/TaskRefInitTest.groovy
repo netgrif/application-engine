@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.workflow
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -39,7 +39,7 @@ class TaskRefInitTest {
     private IUserService userService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     PetriNet net = null
     PetriNet autoTrigger = null

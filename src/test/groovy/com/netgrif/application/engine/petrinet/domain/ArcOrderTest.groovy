@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc
@@ -36,7 +36,7 @@ class ArcOrderTest {
     private SuperCreator superCreator
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private def stream = { String name ->
         return ArcOrderTest.getClassLoader().getResourceAsStream(name)

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.drools;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.configuration.drools.RefreshableKieBase;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RefreshableKieBaseTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @Autowired
     private RefreshableKieBase refreshableKieBase;

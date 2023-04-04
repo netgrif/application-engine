@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class RemoveActionTest {
+class RemoveActionTest extends EngineTest {
 
 
     public static final String USER_EMAIL = "test@mail.sk"
@@ -57,40 +57,13 @@ class RemoveActionTest {
     @Autowired
     private WebApplicationContext wac
 
-    @Autowired
-    private MongoTemplate template
-
-    @Autowired
-    private UserRepository userRepository
-
-    @Autowired
-    private ProcessRoleRepository processRoleRepository
-
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private SuperAdminConfiguration configuration
-
     private MockMvc mvc
     private PetriNet petriNet
     private Authentication auth
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)

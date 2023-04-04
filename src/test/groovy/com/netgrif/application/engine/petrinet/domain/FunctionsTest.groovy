@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
@@ -16,7 +16,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.transform.CompileStatic
-import net.bytebuddy.implementation.bind.annotation.SuperCall
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -55,7 +54,7 @@ class FunctionsTest {
     private SuperCreator superCreator
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private static final String FUNCTION_RES_IDENTIFIER = "function_res"
 

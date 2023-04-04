@@ -14,16 +14,13 @@ import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchReque
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public interface ITaskService {
 
-    @Transactional
     void reloadTasks(Case useCase);
 
     Task findOne(String taskId);
@@ -50,39 +47,27 @@ public interface ITaskService {
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    @Transactional(rollbackFor = Exception.class)
     List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 
-    @Transactional
     FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException;
 
     FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     FinishTaskEventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
-    @Transactional
     List<AssignTaskEventOutcome> assignTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException;
 
-    @Transactional
     AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException;
 
     AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     AssignTaskEventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
-    @Transactional(rollbackFor = Exception.class)
     List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user);
 
-    @Transactional
     CancelTaskEventOutcome cancelTask(Task task, IUser user);
 
     CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId);
-
-    /**
-     * cancel task action
-     */
-    @SuppressWarnings("unused")
-    void cancelTasksWithoutReload(Set<String> transitions, String caseId);
 
     DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException;
 

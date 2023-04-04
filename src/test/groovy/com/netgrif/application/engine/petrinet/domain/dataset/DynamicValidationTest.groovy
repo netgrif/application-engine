@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -28,7 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class DynamicValidationTest {
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private ImportHelper importHelper

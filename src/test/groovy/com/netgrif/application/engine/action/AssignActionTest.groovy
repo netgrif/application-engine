@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -25,7 +25,6 @@ import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
@@ -36,14 +35,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class AssignActionTest {
+class AssignActionTest extends EngineTest {
 
     private static final String GROUP_NAME = "Test group"
     public static final String USER_EMAIL = "test@mail.sk"
@@ -52,31 +50,7 @@ class AssignActionTest {
     public static final String ROLE_API = "/api/user/{}/role/assign"
 
     @Autowired
-    private Importer importer
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
     private WebApplicationContext wac
-
-    @Autowired
-    private MongoTemplate template
-
-    @Autowired
-    private UserRepository userRepository
-
-    @Autowired
-    private ProcessRoleRepository processRoleRepository
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private TestHelper testHelper
 
     private MockMvc mvc
     private PetriNet mainNet
@@ -85,25 +59,13 @@ class AssignActionTest {
 
     @BeforeEach
     void before() {
-
-        testHelper.truncateDbs()
+        truncateDbs()
 
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
 
-        createMainAndSecondaryNet()
-
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
-
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
-                [auths.get("user"), auths.get("admin")] as Authority[],
-//                [org] as Group[],
-                [] as ProcessRole[])
-    }
-
-    private void createMainAndSecondaryNet() {
         def mainNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/assignRoleMainNet_test_.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert mainNet.getNet() != null
 
@@ -112,12 +74,12 @@ class AssignActionTest {
 
         this.mainNet = mainNet.getNet()
         this.secondaryNet = secondaryNet.getNet()
-    }
+        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-    private void cleanDatabases() {
-        template.db.drop()
-        userRepository.deleteAll()
-        processRoleRepository.deleteAll()
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
+                [auths.get("user"), auths.get("admin")] as Authority[],
+//                [org] as Group[],
+                [] as ProcessRole[])
     }
 
     @Test

@@ -2,21 +2,15 @@ package com.netgrif.application.engine.auth
 
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetup
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.auth.web.AuthenticationController
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.auth.web.requestbodies.RegistrationRequest
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.mail.EmailType
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import groovy.transform.CompileStatic
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.AfterEach
@@ -40,7 +34,7 @@ import javax.mail.internet.MimeMultipart
 @SpringBootTest
 @Disabled("ClassCast")
 @CompileStatic
-class AuthenticationControllerTest {
+class AuthenticationControllerTest extends EngineTest {
 
     private static final String EMAIL = "tets@test.com"
     private static final String NAME = "name"
@@ -53,41 +47,21 @@ class AuthenticationControllerTest {
     @Autowired
     private AuthenticationController controller
 
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private UserRepository userRepository
-
-    @Autowired
-    private AuthorityRepository authorityRepository
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private SuperCreator superCreator
-
     private GreenMail smtpServer
 
     private Map<String, ProcessRole> processRoles
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
-        if (authorityRepository.count() == 0)
+        if (authorityRepository.count() == 0) {
             importHelper.createAuthority(Authority.user)
+        }
 //        group = importHelper.createGroup(GROUP_NAME)
 //        processRoles = importHelper.getProcessRoles(net.getNet())
     }

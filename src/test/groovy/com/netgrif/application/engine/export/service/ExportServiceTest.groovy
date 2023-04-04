@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.export.service
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.application.engine.export.service.interfaces.IExportService
@@ -49,7 +49,7 @@ class ExportServiceTest {
     private IUserService userService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private TaskRepository taskRepository

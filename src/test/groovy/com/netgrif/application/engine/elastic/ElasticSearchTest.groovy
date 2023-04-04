@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ApplicationEngine
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
@@ -82,7 +82,7 @@ class ElasticSearchTest {
     private SuperCreator superCreator
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private Authentication auth
     private MockMvc mvc

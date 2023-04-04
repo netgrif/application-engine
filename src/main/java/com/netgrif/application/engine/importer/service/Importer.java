@@ -82,7 +82,6 @@ public class Importer {
     protected Map<String, Field<?>> fields;
     protected Map<String, Transition> transitions;
     protected Map<String, Place> places;
-    protected Map<String, Transaction> transactions;
     protected Map<String, I18nString> i18n;
     protected Map<String, Action> actions;
     protected Map<String, Action> actionRefs;
@@ -161,7 +160,6 @@ public class Importer {
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
-        this.transactions = new HashMap<>();
         this.defaultRole = processRoleService.defaultRole();
         this.anonymousRole = processRoleService.anonymousRole();
         this.i18n = new HashMap<>();
@@ -202,7 +200,6 @@ public class Importer {
 
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
-        document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
         document.getTransition().forEach(this::createTransition);
         document.getArc().forEach(this::createArc);
@@ -556,9 +553,6 @@ public class Importer {
                     addTrigger(transition, trigger)
             );
         }
-        if (importTransition.getTransactionRef() != null) {
-            addToTransaction(transition, importTransition.getTransactionRef());
-        }
         if (importTransition.getDataGroup() != null) {
             for (com.netgrif.application.engine.importer.model.DataGroup dataGroup : importTransition.getDataGroup()) {
                 addDataGroup(transition, dataGroup, importTransition.getDataGroup().indexOf(dataGroup));
@@ -747,14 +741,6 @@ public class Importer {
             addDataLayout(transition, dataRef);
             addDataComponent(transition, dataRef);
         }
-    }
-
-    protected void addToTransaction(Transition transition, TransactionRef transactionRef) {
-        Transaction transaction = getTransaction(transactionRef.getId());
-        if (transaction == null) {
-            throw new IllegalArgumentException("Referenced transaction [" + transactionRef.getId() + "] in transition [" + transition.getTitle() + "] doesn't exist.");
-        }
-        transaction.addTransition(transition);
     }
 
     protected void addRoleLogic(Transition transition, RoleRef roleRef) {
@@ -1099,15 +1085,6 @@ public class Importer {
         return finalEvents;
     }
 
-    protected void createTransaction(com.netgrif.application.engine.importer.model.Transaction importTransaction) {
-        Transaction transaction = new Transaction();
-        transaction.setTitle(toI18NString(importTransaction.getTitle()));
-        transaction.setImportId(importTransaction.getId());
-
-        net.addTransaction(transaction);
-        transactions.put(importTransaction.getId(), transaction);
-    }
-
     protected Node getNode(String id) {
         if (places.containsKey(id)) {
             return getPlace(id);
@@ -1249,14 +1226,6 @@ public class Importer {
             throw new IllegalArgumentException("Place " + id + " not found");
         }
         return place;
-    }
-
-    public Transaction getTransaction(String id) {
-        Transaction transaction = transactions.get(id);
-        if (transaction == null) {
-            throw new IllegalArgumentException("Transaction " + id + " not found");
-        }
-        return transaction;
     }
 
     public I18nString getI18n(String id) {

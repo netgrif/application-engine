@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -46,7 +46,7 @@ class ActionRefTest {
     private UserRepository userRepository
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @BeforeEach
     void before() {

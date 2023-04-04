@@ -24,7 +24,6 @@ import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -273,7 +272,6 @@ public class MenuImportExportService implements IMenuImportExportService {
         return task.getCaseId() + "," + filterCase.getStringId() + "," + item.getUseIcon().toString();
     }
 
-    @Transactional
     protected MenuAndFilters loadFromXML(FileFieldValue ffv) throws IOException, IllegalMenuFileException {
         File f = new File(ffv.getPath());
         validateFilterXML(new FileInputStream(f));
@@ -283,7 +281,6 @@ public class MenuImportExportService implements IMenuImportExportService {
         return xmlMapper.readValue(xml, MenuAndFilters.class);
     }
 
-    @Transactional
     protected FileFieldValue createXML(MenuAndFilters menuAndFilters, String parentId, FileField fileField) throws IOException {
         FileFieldValue ffv = new FileFieldValue();
         try {

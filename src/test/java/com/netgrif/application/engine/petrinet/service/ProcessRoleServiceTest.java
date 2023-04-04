@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.service;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -31,7 +31,7 @@ class ProcessRoleServiceTest {
     private final static String ROLE_IMPORT_ID = "process_role";
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @Autowired
     private IPetriNetService petriNetService;

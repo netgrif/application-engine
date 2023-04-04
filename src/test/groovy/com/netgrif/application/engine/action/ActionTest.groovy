@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.action
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
 import com.netgrif.application.engine.petrinet.domain.events.*
@@ -9,6 +9,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import groovy.transform.CompileStatic
 import org.bson.types.ObjectId
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,16 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class ActionTest {
-
-    @Autowired
-    private FieldActionsRunner runner
-
-    @Autowired
-    private TestHelper testHelper
-
-    @Autowired
-    private ImportHelper importHelper
+class ActionTest extends EngineTest {
 
     @Test
     void testActionImports() {
@@ -40,12 +32,12 @@ class ActionTest {
             println LocalDate.MAX
             println new ObjectId().toString()
         ''', "set")
-        runner.run(testAction, dummy, Optional.of(task), null)
+        fieldActionsRunner.run(testAction, dummy, Optional.of(task), null)
     }
 
     @Test
     void testImportActionWithId() {
-        testHelper.truncateDbs()
+        truncateDbs()
         def netOptional = importHelper.createNet("NAE-1616_duplicate_action_id.xml")
         assert netOptional.isPresent()
         def net = netOptional.get()

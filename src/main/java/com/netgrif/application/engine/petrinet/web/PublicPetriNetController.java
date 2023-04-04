@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
-import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
@@ -83,13 +82,6 @@ public class PublicPetriNetController {
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
         return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), netId, locale);
-    }
-
-    @Operation(summary = "Get transactions of process")
-    @GetMapping(value = "/{netId}/transactions", produces = MediaTypes.HAL_JSON_VALUE)
-    public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = petriNetService.getPetriNet(decodeUrl(netId));
-        return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
     @Operation(summary = "Get data fields of transitions")

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.drools;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.application.engine.configuration.drools.throwable.RuleValidationException;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class KnowledgeBaseInitializerTest {
 
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
 
     @Autowired
     private IKnowledgeBaseInitializer knowledgeBaseInitializer;

@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.integration.dashboard
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -34,7 +34,7 @@ class DashboardServiceTest {
     private SuperCreator superCreator
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     String[] testData = ["dummy", "prod", "dev", "pre-prod", "helper"]
     int[] testDataInt = [15, 20, 32, 11, 7, 12]

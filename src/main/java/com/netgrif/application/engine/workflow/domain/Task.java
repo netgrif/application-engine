@@ -106,8 +106,6 @@ public class Task {
 
     private String finishedBy;
 
-    private String transactionId;
-
     // TODO: release/7.0.0 remove, dynamically load from dataSet
     @Getter
     @Setter

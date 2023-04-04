@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior
@@ -43,7 +43,7 @@ class ImporterTest {
     @Autowired
     private ProcessRoleRepository processRoleRepository
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
     @Autowired
     private ImportHelper importHelper
     @Autowired

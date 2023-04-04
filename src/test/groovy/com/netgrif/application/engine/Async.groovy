@@ -7,7 +7,6 @@ import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.junit.Ignore
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class Async {
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private ImportHelper importHelper

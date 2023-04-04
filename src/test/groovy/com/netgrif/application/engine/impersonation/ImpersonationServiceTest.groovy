@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.impersonation
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
@@ -62,7 +62,7 @@ class ImpersonationServiceTest {
     public static final String X_AUTH_TOKEN = "x-auth-token"
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     @Autowired
     private ImportHelper helper

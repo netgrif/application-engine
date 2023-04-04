@@ -57,7 +57,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -305,27 +304,6 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    /**
-     * Used in cancel task action
-     */
-    @Override
-    public void cancelTasksWithoutReload(Set<String> transitions, String caseId) {
-        List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
-        Case useCase = null;
-        for (Task task : tasks) {
-            if (task.getUserId() == null) {
-                continue;
-            }
-            if (useCase == null) {
-                useCase = workflowService.findOne(task.getCaseId());
-            }
-            Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-            eventService.runActions(transition.getPreCancelActions(), useCase, task, transition);
-            returnTokens(task, useCase.getStringId());
-            eventService.runActions(transition.getPostCancelActions(), useCase, task, transition);
-        }
-    }
-
     private Task returnTokens(Task task, String useCaseId) {
         Case useCase = workflowService.findOne(useCaseId);
         PetriNet net = useCase.getPetriNet();
@@ -347,7 +325,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
         IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
@@ -414,7 +391,6 @@ public class TaskService implements ITaskService {
      * </table>
      */
     @Override
-    @Transactional
     public void reloadTasks(Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Reloading tasks in [" + useCase.getTitle() + "]");
         PetriNet net = useCase.getPetriNet();
@@ -446,20 +422,28 @@ public class TaskService implements ITaskService {
         }
     }
 
-    @Transactional
     boolean isExecutable(Transition transition, PetriNet net) {
-        Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
+        PetriNet testNet = net.clone();
+        Collection<Arc> arcsOfTransition = testNet.getArcsOfTransition(transition);
 
-        if (arcsOfTransition == null) {
+        if (arcsOfTransition == null || arcsOfTransition.isEmpty()) {
             return true;
         }
-        // TODO: NAE-1858 is this valid check? what about multiple input arcs from same place?
-        return arcsOfTransition.stream()
-                .filter(arc -> arc.getDestination().equals(transition)) // todo: from same source error
-                .allMatch(Arc::isExecutable);
+        try {
+            arcsOfTransition.stream()
+                    .filter(arc -> arc.getDestination().equals(transition))
+                    .sorted(ArcOrderComparator.getInstance())
+                    .forEach(arc -> {
+                        if (!arc.isExecutable()) {
+                            throw new IllegalStateException();
+                        }
+                    });
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 
-    @Transactional
     void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[" + useCaseId + "]: Finish execution of task [" + transition.getTitle() + "] in case [" + useCase.getTitle() + "]");
@@ -469,13 +453,11 @@ public class TaskService implements ITaskService {
         workflowService.save(useCase);
     }
 
-    @Transactional
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         log.info("[" + useCase.getStringId() + "]: Start execution of " + transition.getTitle() + " in case " + useCase.getTitle());
         execute(transition, useCase, arc -> arc.getDestination().equals(transition));
     }
 
-    @Transactional
     protected void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
         Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
 
@@ -483,7 +465,7 @@ public class TaskService implements ITaskService {
             throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
         }
 
-        filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1, o2)).forEach(arc -> {
+        filteredSupplier.get().sorted(ArcOrderComparator.getInstance()).forEach(arc -> {
             if (arc instanceof ResetArc) {
                 useCase.getConsumedTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
             }
@@ -496,7 +478,6 @@ public class TaskService implements ITaskService {
         workflowService.updateMarking(useCase);
     }
 
-    @Transactional
     protected List<EventOutcome> executeTransition(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: executeTransition [" + task.getTransitionId() + "] in case [" + useCase.getTitle() + "]");
         useCase = workflowService.decrypt(useCase);
@@ -514,7 +495,6 @@ public class TaskService implements ITaskService {
         return outcomes;
     }
 
-    @Transactional
     void validateData(Transition transition, Case useCase) {
 //        TODO: release/7.0.0 fix validation
 //        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
@@ -539,7 +519,6 @@ public class TaskService implements ITaskService {
 //        }
     }
 
-    @Transactional
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Task " + task.getTitle() + " scheduled to run at " + time.toString());
         scheduler.schedule(() -> {
@@ -779,12 +758,6 @@ public class TaskService implements ITaskService {
         }
         task.resolveViewRoles();
         task.resolveViewUserRefs();
-
-        Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
-        if (transaction != null) {
-            task.setTransactionId(transaction.getStringId());
-        }
-
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);

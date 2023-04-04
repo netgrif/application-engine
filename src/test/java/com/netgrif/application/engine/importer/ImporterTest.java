@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.importer;
 
-import com.netgrif.application.engine.TestHelper;
+import com.netgrif.application.engine.EngineTest;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.importer.service.AllDataConfiguration;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -46,7 +45,7 @@ public class ImporterTest {
     private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
     @Autowired
-    private TestHelper testHelper;
+    private EngineTest testHelper;
     @Autowired
     private PetriNetRepository repository;
     @Autowired

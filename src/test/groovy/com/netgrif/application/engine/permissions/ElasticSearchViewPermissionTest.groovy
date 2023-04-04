@@ -1,6 +1,6 @@
 package com.netgrif.application.engine.permissions
 
-import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
@@ -72,7 +72,7 @@ class ElasticSearchViewPermissionTest {
     private IDataService dataService
 
     @Autowired
-    private TestHelper testHelper
+    private EngineTest testHelper
 
     private static final String USER_EMAIL = "user123987645@test.com"
 
