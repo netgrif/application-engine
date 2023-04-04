@@ -21,11 +21,13 @@ public class DateTimeTrigger extends TimeTrigger {
      */
     public DateTimeTrigger(String timeString) throws DateTimeParseException {
         super(timeString);
-        startDate = LocalDateTime.parse(timeString);
+        setStartDate(LocalDateTime.parse(timeString));
     }
+
+
 
     @Override
     public DateTimeTrigger clone() {
-        return new DateTimeTrigger(timeString);
+        return new DateTimeTrigger(getTimeString());
     }
 }

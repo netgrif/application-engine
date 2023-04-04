@@ -183,9 +183,9 @@ public abstract class AbstractTaskController {
     }
 
 
-    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale) {
+    public EntityModel<EventOutcomeWithMessage> getData(String taskId, Locale locale, Authentication auth) {
         try {
-            GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale);
+            GetDataGroupsEventOutcome outcome = dataService.getDataGroups(taskId, locale, (LoggedUser) auth.getPrincipal());
             return EventOutcomeWithMessageResource.successMessage("Get data groups successful", outcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
             log.error("Get data on task [" + taskId + "] failed: ", e);
@@ -196,10 +196,10 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody) {
+    public EntityModel<EventOutcomeWithMessage> setData(String taskId, TaskDataSets dataBody, Authentication auth) {
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
-            dataBody.getTasks().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet)));
+            dataBody.getBody().forEach((task, dataSet) -> outcomes.put(task, dataService.setData(task, dataSet, (LoggedUser) auth.getPrincipal())));
             SetDataEventOutcome mainOutcome = taskService.getMainOutcome(outcomes, taskId);
             return EventOutcomeWithMessageResource.successMessage("Data field values have been successfully set", mainOutcome);
         } catch (IllegalArgumentWithChangedFieldsException e) {
@@ -211,7 +211,7 @@ public abstract class AbstractTaskController {
         }
     }
 
-    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {// TODO: NAE-1645: dataBody?
+    public EntityModel<EventOutcomeWithMessage> saveFile(String taskId, String fieldId, MultipartFile multipartFile, Map<String, String> dataBody) {// TODO: release/7.0.0: dataBody?
         try {
             Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
             dataBody.forEach((task, value) -> outcomes.put(task, dataService.saveFile(task, fieldId, multipartFile)));
@@ -223,7 +223,6 @@ public abstract class AbstractTaskController {
         } catch (Exception e) {
             log.error("Set data on task [" + taskId + "] failed: ", e);
             return EventOutcomeWithMessageResource.errorMessage(e.getMessage());
-
         }
     }
 
@@ -251,7 +250,7 @@ public abstract class AbstractTaskController {
         return EventOutcomeWithMessageResource.successMessage("Data field values have been sucessfully set", mainOutcome);
     }
 
-    // TODO: NAE-1645 remove fieldId and use dataBody (taskStringId: fieldImportId)
+    // TODO: release/7.0.0 remove fieldId and use dataBody (taskStringId: fieldImportId)
     public EntityModel<EventOutcomeWithMessage> saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles, Map<String, String> dataBody) {
         Map<String, SetDataEventOutcome> outcomes = new HashMap<>();
         dataBody.forEach((task, ignored) -> outcomes.put(task, dataService.saveFiles(task, fieldId, multipartFiles)));

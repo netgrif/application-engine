@@ -73,7 +73,7 @@ class UserListTest {
 
         dataService.setData(task.stringId, new DataSet([
                 "users_1": new UserListField(rawValue: new UserListFieldValue(new UserFieldValue(superCreator.getSuperUser())))
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getLoggedSuper())
 
         assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getStringId())
         assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getStringId())

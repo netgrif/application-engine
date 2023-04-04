@@ -28,7 +28,7 @@ public class ProcessRole extends Imported {
 
     @Id
     @Setter
-    private ObjectId _id;
+    private ObjectId id;
 
     private I18nString name;
 
@@ -44,28 +44,28 @@ public class ProcessRole extends Imported {
     private Map<EventType, Event> events;
 
     public ProcessRole() {
-        _id = new ObjectId();
+        id = new ObjectId();
     }
 
     public ProcessRole(String id) {
-        _id = new ObjectId(id);
+        this.id = new ObjectId(id);
     }
 
     @EqualsAndHashCode.Include
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
 
-    public ObjectId get_id() {
-        return _id;
+    public ObjectId getId() {
+        return id;
     }
 
-    public void set_id(ObjectId _id) {
-        this._id = _id;
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
-    public void set_id(String id) {
-        this._id = new ObjectId(id);
+    public void setId(String id) {
+        this.id = new ObjectId(id);
     }
 
     public I18nString getName() {

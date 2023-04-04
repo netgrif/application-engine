@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -54,6 +55,9 @@ class UserRefsTest {
     private IDataService dataService
 
     @Autowired
+    private SuperCreator superCreator
+
+    @Autowired
     private TestHelper helper
 
     List<Case> newCases
@@ -74,10 +78,10 @@ class UserRefsTest {
         10.times {
             def _case = importHelper.createCase("$it" as String, net)
             String id = userService.findByEmail(userEmails[it % 2], true).getStringId()
-            String taskId = ((new ArrayList<>(_case.getTasks())).get(0) as TaskPair).getTask()
+            String taskId = _case.getTaskStringId("t1")
             dataService.setData(taskId, new DataSet([
                     "user_list_1": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(id)]))
-            ] as Map<String, Field<?>>)).getCase()
+            ] as Map<String, Field<?>>), superCreator.getLoggedSuper()).getCase()
             userIds.add(id)
         }
     }

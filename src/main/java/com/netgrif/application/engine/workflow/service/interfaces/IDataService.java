@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.service.interfaces;
 
+import com.netgrif.application.engine.auth.domain.IUser;
+import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
@@ -22,15 +24,19 @@ import java.util.Locale;
 
 public interface IDataService {
 
-    GetDataEventOutcome getData(String taskId);
+    GetDataEventOutcome getData(String taskId, IUser user);
 
-    GetDataEventOutcome getData(Task task, Case useCase);
+    GetDataEventOutcome getData(Task task, Case useCase, IUser user);
 
-    SetDataEventOutcome setData(String taskId, DataSet values);
+    SetDataEventOutcome setData(String taskId, DataSet values, IUser user);
 
-    SetDataEventOutcome setData(Case useCase, DataSet dataSet);
+    SetDataEventOutcome setData(String taskId, DataSet values, LoggedUser loggedUser);
 
-    SetDataEventOutcome setData(Task task, DataSet values);
+    SetDataEventOutcome setData(Case useCase, DataSet dataSet, IUser user);
+
+    SetDataEventOutcome setData(Task task, DataSet values, IUser user);
+
+    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField, IUser user);
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview);
 
@@ -54,9 +60,9 @@ public interface IDataService {
 
     SetDataEventOutcome deleteFileByName(String taskId, String fieldId, String name);
 
-    SetDataEventOutcome setDataField(Task task, String fieldId, Field<?> newDataField);
+    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, IUser user);
 
-    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale);
+    GetDataGroupsEventOutcome getDataGroups(String taskId, Locale locale, LoggedUser loggedUser);
 
     Page<Task> setImmediateFields(Page<Task> tasks);
 
@@ -67,5 +73,4 @@ public interface IDataService {
     Case applyFieldConnectedChanges(Case useCase, Field<?> field);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
-
 }

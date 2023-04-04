@@ -12,7 +12,7 @@ public class ElasticTaskResourceAssembler implements RepresentationModelAssemble
     public TaskResource toModel(ElasticTask entity) {
         Task taskModel = new Task();
         Task.with()
-                ._id(new ObjectId(entity.getStringId()))
+                .id(new ObjectId(entity.getStringId()))
                 .caseId(entity.getCaseId())
                 .transitionId(entity.getTransitionId())
                 .title(new I18nString(entity.getTitle()))

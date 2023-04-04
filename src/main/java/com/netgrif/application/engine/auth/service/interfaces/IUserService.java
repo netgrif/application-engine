@@ -76,4 +76,6 @@ public interface IUserService {
     IUser createSystemUser();
 
     boolean existsById(String id);
+
+    IUser getUserFromLoggedUser(LoggedUser loggedUser);
 }

@@ -91,15 +91,6 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void createTasks() {
-        Case useCase = workflowService.getAll(new FullPageRequest()).getContent().get(0);
-
-        service.createTasks(useCase);
-
-        assert taskRepository.findAll().size() > 0;
-    }
-
-    @Test
     public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet();
         LoggedUser loggedUser = mockLoggedUser();

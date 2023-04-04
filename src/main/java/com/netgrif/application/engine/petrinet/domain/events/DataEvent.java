@@ -63,7 +63,7 @@ public class DataEvent extends BaseEvent {
         cloned.type = this.type;
         cloned.setTitle(this.getTitle());
         cloned.setMessage(this.getMessage());
-        // TODO: NAE-1645
+        // TODO: release/7.0.0
         cloned.setPreActions(this.getPreActions());
         cloned.setPostActions(this.getPostActions());
         return cloned;

@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 public abstract class Fact {
 
     @Id
-    private ObjectId _id;
+    private ObjectId id;
 
     private LocalDateTime creationDate;
 
     public Fact() {
-        _id = new ObjectId();
+        id = new ObjectId();
         creationDate = LocalDateTime.now();
     }
 }

@@ -106,7 +106,7 @@
         <values>ano</values>
         <values>nie</values>
         <action trigger="set">
-            showFields(["number"], ["0"], [["enum", "E", "ano"]])
+            showFields(["number"], ["1"], [["enum", "E", "ano"]])
         </action>
     </data>
     <data type="number">
@@ -125,7 +125,7 @@
     </data>
     <!-- TRANSITIONS -->
     <transition>
-        <id>0</id>
+        <id>1</id>
         <x>0</x>
         <y>0</y>
         <label>Test</label>

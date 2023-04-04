@@ -1,0 +1,22 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>all_data_configuration</id>
+    <initials>PAD</initials>
+    <title>All Data Configuration</title>
+    <icon>toc</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <transition>
+        <id>petriflow_all_data</id>
+        <x>0</x>
+        <y>0</y>
+        <label>All Data</label>
+        <icon>toc</icon>
+        <dataGroup>
+            <id>petriflow_all_data_datagroup</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <!--  Placeholder data-group for all data  -->
+        </dataGroup>
+    </transition>
+</document>

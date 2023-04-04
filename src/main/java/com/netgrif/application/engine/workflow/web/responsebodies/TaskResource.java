@@ -32,7 +32,7 @@ public class TaskResource extends EntityModel<Task> {
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .cancel((Authentication) null, task.getStringId())).withRel("cancel"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
-                .getData(task.getStringId(), null)).withRel("data"));
+                .getData(task.getStringId(), null, null)).withRel("data"));
         add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .setData((Authentication) null, task.getStringId(), null)).withRel("data-edit"));
         try {

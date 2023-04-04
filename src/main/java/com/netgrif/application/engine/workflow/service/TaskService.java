@@ -15,7 +15,6 @@ import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.application.engine.petrinet.domain.arcs.ResetArc;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
@@ -31,6 +30,7 @@ import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
+import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
@@ -141,7 +141,7 @@ public class TaskService implements ITaskService {
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        IUser user = getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(loggedUser);
         return assignTask(taskOptional.get(), user);
     }
 
@@ -179,7 +179,7 @@ public class TaskService implements ITaskService {
 
         startExecution(transition, useCase);
         task.setUserId(user.getSelfOrImpersonated().getStringId());
-        task.setStartDate(LocalDateTime.now());
+        task.setLastAssigned(LocalDateTime.now());
         task.setUser(user.getSelfOrImpersonated());
 
         workflowService.save(useCase);
@@ -189,7 +189,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public List<FinishTaskEventOutcome> finishTasks(List<Task> tasks, IUser user) throws TransitionNotExecutableException {
         List<FinishTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
@@ -205,14 +204,13 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public FinishTaskEventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
         Task task = taskOptional.get();
-        IUser user = getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(loggedUser);
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
@@ -226,7 +224,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public FinishTaskEventOutcome finishTask(Task task, IUser user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -241,7 +238,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(task.getCaseId());
 
         finishExecution(transition, useCase.getStringId());
-        task.setFinishDate(LocalDateTime.now());
+        task.setLastFinished(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
         task.setUserId(null);
         save(task);
@@ -261,7 +258,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public List<CancelTaskEventOutcome> cancelTasks(List<Task> tasks, IUser user) {
         List<CancelTaskEventOutcome> outcomes = new ArrayList<>();
         for (Task task : tasks) {
@@ -271,18 +267,16 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public CancelTaskEventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
         }
-        IUser user = getUserFromLoggedUser(loggedUser);
+        IUser user = userService.getUserFromLoggedUser(loggedUser);
         return cancelTask(taskOptional.get(), user);
     }
 
     @Override
-    @Transactional
     public CancelTaskEventOutcome cancelTask(Task task, IUser user) {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -344,7 +338,8 @@ public class TaskService implements ITaskService {
         workflowService.updateMarking(useCase);
 
         task.setUserId(null);
-        task.setStartDate(null);
+        // TODO: NAE-1848 should this be null?
+        task.setLastAssigned(null);
         task = save(task);
         workflowService.save(useCase);
 
@@ -355,7 +350,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
-        IUser delegateUser = getUserFromLoggedUser(loggedUser);
+        IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
 
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (taskOptional.isEmpty()) {
@@ -423,40 +418,32 @@ public class TaskService implements ITaskService {
     public void reloadTasks(Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Reloading tasks in [" + useCase.getTitle() + "]");
         PetriNet net = useCase.getPetriNet();
-
-        net.getTransitions().values().forEach(transition -> {
-            List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
+        List<Task> tasks;
+        // create tasks on first reload (create case)
+        if (useCase.getTasks().isEmpty()) {
+            tasks = net.getTransitions().values().stream()
+                    .map(transition -> createFromTransition(transition, useCase))
+                    .collect(Collectors.toList());
+        } else {
+            tasks= taskRepository.findAllByCaseId(useCase.getStringId());
+        }
+        // update tasks state
+        Task autoTriggered = null;
+        for (Task task : tasks) {
+            Transition transition = net.getTransition(task.getTransitionId());
             if (isExecutable(transition, net)) {
-                if (taskIsNotPresent(tasks, transition)) {
-                    createFromTransition(transition, useCase);
+                task.setState(State.ENABLED);
+                if (task.isAutoTriggered()) {
+                    autoTriggered = task;
                 }
             } else {
-                deleteUnassignedNotExecutableTasks(tasks, transition, useCase);
+                task.setState(State.DISABLED);
             }
-        });
-        String systemId = userService.getSystem().getStringId();
-        List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
-        if (tasks.stream().anyMatch(task -> Objects.equals(task.getUserId(), systemId) && task.getStartDate() != null)) {
-            return;
+            save(task);
         }
-        for (Task task : tasks) {
-            if (Objects.equals(task.getUserId(), systemId) && task.getStartDate() == null) {
-                executeTransition(task, workflowService.findOne(useCase.getStringId()));
-                return;
-            }
+        if (autoTriggered != null) {
+            executeTransition(autoTriggered, workflowService.findOne(useCase.getStringId()));
         }
-    }
-
-    @Transactional
-    void deleteUnassignedNotExecutableTasks(List<Task> tasks, Transition transition, Case useCase) {
-        delete(tasks.stream()
-                .filter(task -> task.getTransitionId().equals(transition.getStringId()) && task.getUserId() == null)
-                .collect(Collectors.toList()), useCase);
-    }
-
-    @Transactional
-    boolean taskIsNotPresent(List<Task> tasks, Transition transition) {
-        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()));
     }
 
     @Transactional
@@ -466,7 +453,7 @@ public class TaskService implements ITaskService {
         if (arcsOfTransition == null) {
             return true;
         }
-
+        // TODO: NAE-1858 is this valid check? what about multiple input arcs from same place?
         return arcsOfTransition.stream()
                 .filter(arc -> arc.getDestination().equals(transition)) // todo: from same source error
                 .allMatch(Arc::isExecutable);
@@ -518,7 +505,7 @@ public class TaskService implements ITaskService {
             log.info("assignTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
             outcomes.add(assignTask(task.getStringId()));
             log.info("getData [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
-            outcomes.add(dataService.getData(task.getStringId()));
+            outcomes.add(dataService.getData(task.getStringId(), userService.getSystem()));
             log.info("finishTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
             outcomes.add(finishTask(task.getStringId()));
         } catch (TransitionNotExecutableException e) {
@@ -529,7 +516,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     void validateData(Transition transition, Case useCase) {
-//        TODO: NAE-1645 fix validation
+//        TODO: release/7.0.0 fix validation
 //        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
 //            if (useCase.getPetriNet().getDataSet().get(entry.getKey()) != null
 //                    && useCase.getPetriNet().getDataSet().get(entry.getKey()).getValidations() != null) {
@@ -573,6 +560,7 @@ public class TaskService implements ITaskService {
         return optionalTask.get();
     }
 
+    // TODO: release/7.0.0 check usage and delete/replace with current implementation
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
@@ -598,7 +586,7 @@ public class TaskService implements ITaskService {
             query = (BasicQuery) query.with(pageable);
             tasks = mongoTemplate.find(query, Task.class);
             return loadUsers(new PageImpl<>(tasks, pageable,
-                    mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
+                    mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{id:1}"), Task.class)));
         }
     }
 
@@ -642,30 +630,11 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        return taskRepository.findAllBy_idIn(ids).stream()
+        return taskRepository.findAllByIdIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Task::getStringId))
                 .peek(this::setUser)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public void createTasks(Case useCase) {
-        PetriNet net = useCase.getPetriNet();
-        Collection<Transition> transitions = net.getTransitions().values();
-
-        for (Transition transition : transitions) {
-            if (isExecutable(transition, net)) {
-                Task task = createFromTransition(transition, useCase);
-                // TODO: 16. 3. 2017 there should be some fancy logic
-//                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
-                //figureOutProcessRoles(task, transition);
-                if (task == null)
-                    break;
-                save(task);
-            }
-        }
     }
 
     @Override
@@ -693,8 +662,9 @@ public class TaskService implements ITaskService {
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
         Page<Task> tasks = taskRepository.findAll(predicate, PageRequest.of(0, 1));
-        if (tasks.getTotalElements() > 0)
+        if (tasks.getTotalElements() > 0) {
             return tasks.getContent().get(0);
+        }
         return null;
     }
 
@@ -726,11 +696,10 @@ public class TaskService implements ITaskService {
 
     @Override
     public void resolveUserRef(Case useCase) {
-        useCase.getTasks().forEach(taskPair -> {
-            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
+        useCase.getTasks().values().forEach(taskPair -> {
+            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTaskStringId());
             taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
         });
-
     }
 
     @Override
@@ -757,7 +726,7 @@ public class TaskService implements ITaskService {
         if (userListValue == null) {
             return null;
         }
-        // TODO: NAE-1645 fix null set as user value, remove duplicate code, move this to userservice, optimize to one request to mongo
+        // TODO: release/7.0.0 fix null set as user value, remove duplicate code, move this to userservice, optimize to one request to mongo
         return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
                 .map(UserFieldValue::getId)
@@ -769,7 +738,7 @@ public class TaskService implements ITaskService {
         final Task task = Task.with()
                 .title(transition.getTitle())
                 .processId(useCase.getPetriNetId())
-                .caseId(useCase.get_id().toString())
+                .caseId(useCase.getId().toString())
                 .transitionId(transition.getImportId())
                 .layout(transition.getLayout())
                 .caseColor(useCase.getColor())
@@ -841,7 +810,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void delete(Iterable<? extends Task> tasks, Case useCase) {
+    public void delete(List<Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
         log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
@@ -849,7 +818,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void delete(Iterable<? extends Task> tasks, String caseId) {
+    public void delete(List<Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
         log.info("[" + caseId + "]: Tasks of case are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
         taskRepository.deleteAll(tasks);
@@ -878,7 +847,7 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    // TODO: NAE-1645 refactor, not needed here, should be possible to create main outcome when setting data
+    // TODO: release/7.0.0 refactor, not needed here, should be possible to create main outcome when setting data
     @Override
     public SetDataEventOutcome getMainOutcome(Map<String, SetDataEventOutcome> outcomes, String taskId) {
         SetDataEventOutcome mainOutcome;
@@ -892,12 +861,5 @@ public class TaskService implements ITaskService {
         mainOutcome = outcomes.remove(key);
         mainOutcome.addOutcomes(new ArrayList<>(outcomes.values()));
         return mainOutcome;
-    }
-
-    protected IUser getUserFromLoggedUser(LoggedUser loggedUser) {
-        IUser user = userService.resolveById(loggedUser.getId(), true);
-        IUser fromLogged = loggedUser.transformToUser();
-        user.setImpersonated(fromLogged.getImpersonated());
-        return user;
     }
 }

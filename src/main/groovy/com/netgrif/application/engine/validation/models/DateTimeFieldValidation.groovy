@@ -89,7 +89,7 @@ class DateTimeFieldValidation extends AbstractFieldValidation {
         DayOfWeek dayOfWeek = DayOfWeek.of(day.get(ChronoField.DAY_OF_WEEK));
         return dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY;
     }
-// TODO: NAE-1645 Refactor, each type own validator with common functions
+// TODO: release/7.0.0 Refactor, each type own validator with common functions
     LocalDateTime getDateTimeValue(Field<?> field) {
         if (field instanceof DateTimeField) {
             return ((DateTimeField) field).getRawValue()

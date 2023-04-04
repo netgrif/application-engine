@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.model.LayoutType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
@@ -9,7 +10,7 @@ import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
 import com.netgrif.application.engine.petrinet.domain.*;
-import com.netgrif.application.engine.petrinet.domain.dataset.*;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
@@ -32,7 +33,8 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Autowired
     private ITaskService taskService;
-
+    @Autowired
+    private IUserService userService;
     @Autowired
     private IDataService dataService;
 
@@ -92,7 +94,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         if (transition.getLayout() != null && transition.getLayout().getCols() != null)
             resource.setFormGridCols(transition.getLayout().getCols());
         QTask qTask = new QTask("task");
-        this.taskId = taskService.searchOne(qTask.transitionId.eq(transition.getStringId()).and(qTask.caseId.eq(useCase.get_id().toString()))).getStringId();
+        this.taskId = taskService.searchOne(qTask.transitionId.eq(transition.getStringId()).and(qTask.caseId.eq(useCase.getId().toString()))).getStringId();
         resource.setOriginalCols(resource.getFormGridCols());
     }
 
@@ -116,7 +118,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         lastX = Integer.MAX_VALUE;
         lastY = 0;
 
-        this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale()).getData();
+        this.dataGroups = dataService.getDataGroups(taskId, resource.getTextLocale(), userService.getLoggedOrSystem()).getData();
 
         dataGroups.forEach(dataGroup -> {
             generatePdfDataGroupField(dataGroup);

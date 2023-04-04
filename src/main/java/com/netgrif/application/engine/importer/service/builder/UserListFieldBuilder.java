@@ -15,7 +15,7 @@ public class UserListFieldBuilder extends FieldBuilder<UserListField> {
         UserListField field = new UserListField();
         initialize(field);
         setDefaultValues(field, data, inits -> {
-//            TODO: NAE-1645
+//            TODO: release/7.0.0
         });
         return field;
     }

@@ -20,28 +20,15 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     Page<Task> findByTransitionIdIn(Pageable pageable, Collection<String> ids);
 
-    List<Task> findAllByTransitionIdIn(Collection<String> ids);
-
     Page<Task> findByUserId(Pageable pageable, String userId);
-
-    List<Task> findByUserIdAndFinishDateNotNull(Long userId);
-
-    Task findByTransitionIdAndCaseId(String transitionId, String caseId);
 
     List<Task> findAllByTransitionIdInAndCaseId(Collection<String> transitionIds, String caseId);
 
-    List<Task> findAllBy_idIn(Iterable<String> id);
-
-    void deleteAllByCaseIdAndUserIdIsNull(String caseId);
-
-    void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);
-
-    void deleteAllByCaseId(String caseId);
+    List<Task> findAllByIdIn(Iterable<String> id);
 
     void deleteAllByProcessId(String processId);
 
     @Override
     default void customize(QuerydslBindings bindings, QTask qTask) {
-        //
     }
 }

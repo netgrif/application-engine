@@ -4,6 +4,7 @@ import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.TaskField
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
@@ -55,19 +56,25 @@ class TaskRefInitTest {
     void testInitValue() {
         Case aCase = helper.createCase("Test task ref init", net)
         Task task1 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t1"))
-        Task task2 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t3"))
+        Task task2 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t2"))
+        Task task3 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t3"))
 
-        assert ((List<String>) aCase.dataSet.get("taskRef_0").rawValue).containsAll(Arrays.asList(task1.stringId, task2.stringId))
-        assert ((List<String>) aCase.dataSet.get("taskRef_1").rawValue).isEmpty()
-        assert ((List<String>) aCase.dataSet.get("taskRef_2").rawValue).contains(task1.stringId) & ((List<String>) aCase.dataSet.get("taskRef_2").rawValue).size() == 1
-        assert ((List<String>) aCase.dataSet.get("taskRef_3").rawValue).isEmpty()
+        List<String> taskref_0_values = ((TaskField)aCase.dataSet.get("taskRef_0")).rawValue
+        List<String> taskref_1_values = ((TaskField)aCase.dataSet.get("taskRef_1")).rawValue
+        List<String> taskref_2_values = ((TaskField)aCase.dataSet.get("taskRef_2")).rawValue
+        List<String> taskref_3_values = ((TaskField)aCase.dataSet.get("taskRef_3")).rawValue
+
+        assert taskref_0_values.containsAll([task1.stringId, task3.stringId]) && taskref_0_values.size() == 2
+        assert taskref_1_values.containsAll([task2.stringId]) && taskref_1_values.size() == 1
+        assert taskref_2_values.containsAll([task1.stringId, task2.stringId]) && taskref_2_values.size() == 2
+        assert taskref_3_values.empty
     }
 
     @Test
     void autoTriggerTaskRef() {
         Case bCase = helper.createCase("Task ref init with auto trigger", autoTrigger)
 
-        String taskId = bCase.tasks.stream().filter({ t -> t.transition == "t1" }).findFirst().get().task
+        String taskId = bCase.getTaskStringId("t1")
         List<String> value = bCase.dataSet.get("tema").rawValue as List<String>
         assert value.contains(taskId) &&
                 value.size() == 1

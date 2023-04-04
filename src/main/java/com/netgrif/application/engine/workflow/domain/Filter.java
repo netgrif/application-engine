@@ -25,7 +25,7 @@ public class Filter {
     public static final String TYPE_CASE = "Case";
 
     @Id
-    private ObjectId _id;
+    private ObjectId id;
 
     private I18nString title;
 
@@ -59,6 +59,6 @@ public class Filter {
     }
 
     public String getStringId() {
-        return this._id.toString();
+        return this.id.toString();
     }
 }

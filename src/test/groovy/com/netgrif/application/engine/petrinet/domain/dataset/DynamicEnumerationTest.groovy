@@ -12,6 +12,7 @@ import com.netgrif.application.engine.workflow.domain.repositories.CaseRepositor
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -24,6 +25,7 @@ import java.util.stream.Collectors
 
 @SpringBootTest
 @ActiveProfiles(["test"])
+@CompileStatic
 @ExtendWith(SpringExtension.class)
 class DynamicEnumerationTest {
 
@@ -68,8 +70,8 @@ class DynamicEnumerationTest {
 
         def dataSet = new DataSet([
                 "autocomplete": new EnumerationField(rawValue: new I18nString("Case"))
-        ])
-        dataService.setData(task.stringId, dataSet)
+        ] as Map<String, Field<?>>)
+        dataService.setData(task.stringId, dataSet, superCreator.getSuperUser())
 
         def caseOpt = caseRepository.findById(aCase.stringId)
         assert caseOpt.isPresent()

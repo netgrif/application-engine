@@ -34,7 +34,7 @@ class ActionTest {
     @Test
     void testActionImports() {
         Case dummy = new Case()
-        Task task = Task.with()._id(new ObjectId()).transitionId("0").build()
+        Task task = Task.with().id(new ObjectId()).transitionId("0").build()
         Action testAction = new Action('''
             println LocalDate.now()
             println LocalDate.MAX

@@ -22,7 +22,7 @@ public class AnonymousUser extends User {
 
     @Override
     public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), "n/a", this.getAuthorities());
+        LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), "n/a", this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(true);
         if (!this.getProcessRoles().isEmpty())

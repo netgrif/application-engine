@@ -17,7 +17,6 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -73,7 +72,7 @@ import java.util.stream.Collectors
  */
 @Slf4j
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
-class ActionDelegate {
+class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
 
     public static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
     public static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
@@ -86,8 +85,6 @@ class ActionDelegate {
     public static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
 
     static final String UNCHANGED_VALUE = "unchangedooo"
-    static final String ALWAYS_GENERATE = "always"
-    static final String ONCE_GENERATE = "once"
     static final String TRANSITIONS = "transitions"
 
     @Value('${nae.mail.from}')
@@ -188,13 +185,12 @@ class ActionDelegate {
     FieldActionsRunner actionsRunner
     List<EventOutcome> outcomes
 
-    // TODO: NAE-1645 - <action trigger="set" type="value">
-    // TODO: NAE-1645 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
-    // TODO: NAE-1645 - tasky sa vytvoria pri vytvoreni caseu a nemazu sa
-    //- existuje all_data task ktory sa pouziva pri change value
-    // TODO: NAE-1645 - update field map po setdata na aktualne hodnoty
+    // TODO: release/7.0.0 - <action trigger="set" type="value">
+    // TODO: release/7.0.0 - pretazit findCase, findTask - querydsl alebo caserequest, int page,int size
+    // TODO: release/7.0.0 - setdata with user
+    // TODO: release/7.0.0 - deprecate enum/multichoice with chooices, keep only maps with options
 
-    def init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
+    void init(Action action, Case useCase, Optional<Task> task, Field<?> fieldChanges, FieldActionsRunner actionsRunner) {
         this.action = action
         this.useCase = useCase
         this.task = task
@@ -205,7 +201,7 @@ class ActionDelegate {
         this.outcomes = new ArrayList<>()
     }
 
-    def initFieldsMap(Map<String, String> fieldIds, Case useCase) {
+    void initFieldsMap(Map<String, String> fieldIds, Case useCase) {
         fieldIds.each { name, id ->
             set(name, useCase.getDataSet().get(id))
         }
@@ -217,7 +213,7 @@ class ActionDelegate {
         }
     }
 
-    def copyBehavior(Field field, Transition transition) {
+    void copyBehavior(Field field, Transition transition) {
         Field<?> caseField = useCase.dataSet.get(field.stringId)
         if (caseField.behaviors.get(transition.stringId) == null) {
             caseField.behaviors.put(transition.stringId, transition.dataSet.get(field.stringId).behavior)
@@ -275,6 +271,7 @@ class ActionDelegate {
         fieldBehavior.immediate = initialBehavior.immediate
     }
 
+    // TODO: release/7.0.0 deprecated?
     def unchanged = { return UNCHANGED_VALUE }
 
     def initValueOfField = { Field field ->
@@ -409,10 +406,10 @@ class ActionDelegate {
         }
     }
 
-    SetDataEventOutcome setData(Field<?> field, Map changes) {
+    SetDataEventOutcome setData(Field<?> field, Map changes, IUser user = userService.loggedOrSystem) {
         SetDataEventOutcome outcome = dataService.setData(useCase, new DataSet([
                 (field.stringId): field.class.newInstance(changes)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), user)
         this.outcomes.add(outcome)
         updateCase()
         return outcome
@@ -431,7 +428,7 @@ class ActionDelegate {
     }
 
     def saveChangedValidation(Field field) {
-        // TODO: NAE-1645 setData?
+        // TODO: release/7.0.0 setData?
         Field<?> caseField = useCase.dataSet.get(field.stringId)
         caseField.validations = field.validations
         List<Validation> compiled = field.validations.collect { it.clone() }
@@ -445,7 +442,7 @@ class ActionDelegate {
 
     def execute(String taskId) {
         [with : { DataSet dataSet ->
-            executeTasks(dataSet, taskId, { it._id.isNotNull() })
+            executeTasks(dataSet, taskId, { it.id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
@@ -456,7 +453,7 @@ class ActionDelegate {
 
     def execute(Task task) {
         [with : { DataSet dataSet ->
-            executeTasks(dataSet, task.stringId, { it._id.isNotNull() })
+            executeTasks(dataSet, task.stringId, { it.id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { DataSet dataSet ->
@@ -482,7 +479,7 @@ class ActionDelegate {
 
     private addTaskOutcomes(Task task, DataSet dataSet) {
         this.outcomes.add(taskService.assignTask(task.stringId))
-        this.outcomes.add(dataService.setData(task.stringId, dataSet))
+        this.outcomes.add(dataService.setData(task.stringId, dataSet, userService.loggedOrSystem))
         this.outcomes.add(taskService.finishTask(task.stringId))
     }
 
@@ -594,7 +591,7 @@ class ActionDelegate {
             }
         }
         if (value == null && useCase.dataSet.get(field.stringId).value != null) {
-            // TODO: NAE-1645 should be in data service
+            // TODO: release/7.0.0 should be in data service
             if (field instanceof FileListField && task.isPresent()) {
                 field.value.value.namesPaths.forEach(namePath -> {
                     dataService.deleteFileByName(task.get().stringId, field.stringId, namePath.name)
@@ -606,7 +603,7 @@ class ActionDelegate {
             setData(field, [rawValue: null])
         }
         if (value != null) {
-            // TODO: NAE-1645 should be in data service
+            // TODO: release/7.0.0 should be in data service
             if (field instanceof CaseField) {
                 value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
                 dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
@@ -646,22 +643,6 @@ class ActionDelegate {
         }
         field.validations = newValidations
         saveChangedValidation(field)
-    }
-
-    def always = { return ALWAYS_GENERATE }
-    def once = { return ONCE_GENERATE }
-
-    def generate(String methods, Closure repeated) {
-        [into: { Field field ->
-            if (field.type == DataType.FILE)
-                File f = new FileGenerateReflection(useCase, field as FileField, repeated() == ALWAYS_GENERATE).callMethod(methods) as File
-            else if (field.type == DataType.TEXT)
-                new TextGenerateReflection(useCase, field as TextField, repeated() == ALWAYS_GENERATE).callMethod(methods) as String
-            /*if(f != null) {
-                useCase.dataSet.get(field.objectId).value = f.name
-                field.value = f.name
-            }*/
-        }]
     }
 
     def changeCaseProperty(String property) {
@@ -711,6 +692,10 @@ class ActionDelegate {
         QCase qCase = new QCase("case")
         Page<Case> result = workflowService.search(predicate(qCase), pageable)
         return result.content
+    }
+
+    Case findCase(String id) {
+        return workflowService.findOne(id)
     }
 
     Case findCase(Closure<Predicate> predicate) {
@@ -794,7 +779,7 @@ class ActionDelegate {
     }
 
     Task findTask(String mongoId) {
-        return taskService.searchOne(QTask.task._id.eq(new ObjectId(mongoId)))
+        return taskService.searchOne(QTask.task.id.eq(new ObjectId(mongoId)))
     }
 
     String getTaskId(String transitionId, Case aCase = useCase) {
@@ -844,31 +829,31 @@ class ActionDelegate {
         return removeRole(roleId, net, user)
     }
 
-    SetDataEventOutcome setData(DataSet dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet))
+    SetDataEventOutcome setData(DataSet dataSet, IUser user = userService.loggedOrSystem) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(useCase, dataSet, user))
     }
 
-    SetDataEventOutcome setData(Task task, DataSet dataSet) {
-        return setData(task.stringId, dataSet)
+    SetDataEventOutcome setData(Task task, DataSet dataSet, IUser user = userService.loggedOrSystem) {
+        return setData(task.stringId, dataSet, user)
     }
 
-    SetDataEventOutcome setData(String taskId, DataSet dataSet) {
-        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet))
+    SetDataEventOutcome setData(String taskId, DataSet dataSet, IUser user = userService.loggedOrSystem) {
+        return addSetDataOutcomeToOutcomes(dataService.setData(taskId, dataSet, user))
     }
 
     SetDataEventOutcome setData(Transition transition, DataSet dataSet) {
         return addSetDataOutcomeToOutcomes(setData(transition.importId, this.useCase, dataSet))
     }
 
-    SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet) {
+    SetDataEventOutcome setData(String transitionId, Case useCase, DataSet dataSet, IUser user = userService.loggedOrSystem) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
-        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet))
+        return addSetDataOutcomeToOutcomes(dataService.setData(task.stringId, dataSet, user))
     }
 
     @Deprecated
     SetDataEventOutcome setDataWithPropagation(String transitionId, Case caze, DataSet dataSet) {
-        Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
+        Task task = taskService.findOne(caze.getTaskStringId(transitionId))
         return setDataWithPropagation(task, dataSet)
     }
 
@@ -889,28 +874,28 @@ class ActionDelegate {
         return outcome
     }
 
-    Map<String, Field> getData(Task task) {
+    Map<String, Field> getData(Task task, IUser user = userService.loggedOrSystem) {
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user)))
     }
 
-    Map<String, Field> getData(String taskId) {
+    Map<String, Field> getData(String taskId, IUser user = userService.loggedOrSystem) {
         Task task = taskService.findById(taskId)
         def useCase = workflowService.findOne(task.caseId)
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user)))
     }
 
-    Map<String, Field> getData(Transition transition) {
-        return getData(transition.stringId, this.useCase)
+    Map<String, Field> getData(Transition transition, IUser user = userService.loggedOrSystem) {
+        return getData(transition.stringId, this.useCase, user)
     }
 
-    Map<String, Field> getData(String transitionId, Case useCase) {
+    Map<String, Field> getData(String transitionId, Case useCase, IUser user = userService.loggedOrSystem) {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         if (!task) {
             return new HashMap<String, Field>()
         }
-        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase)))
+        return mapData(addGetDataOutcomeToOutcomesAndReturnData(dataService.getData(task, useCase, user)))
     }
 
     private List<DataRef> addGetDataOutcomeToOutcomesAndReturnData(GetDataEventOutcome outcome) {
@@ -918,7 +903,7 @@ class ActionDelegate {
         return outcome.getData()
     }
 
-    // TODO: NAE-1645 should return dataRef?
+    // TODO: release/7.0.0 should return dataRef?
     protected Map<String, Field> mapData(List<DataRef> data) {
         return data.collectEntries {
             [(it.fieldId): it.field]
@@ -939,7 +924,7 @@ class ActionDelegate {
         if (targetCase.stringId == useCase.stringId) {
             change targetCase.dataSet.get(targetFieldId) value { fieldValue }
         } else {
-            String taskId = targetCase.getTasks().find(taskPair -> taskPair.transition == targetTransitionId).task
+            String taskId = targetCase.getTaskStringId(targetTransitionId)
             DataSet dataSet = new DataSet([
                     (targetFieldId): new FileField(rawValue: fieldValue)
             ] as Map<String, Field<?>>)
@@ -962,6 +947,7 @@ class ActionDelegate {
         if (pdfResource.getOutputFolder()) {
             storagePath = pdfResource.getOutputFolder() + File.separator + targetCase.stringId + "-" + targetFileFieldId + "-" + filename
         } else {
+            // TODO: release/7.0.0 check syntax
             storagePath = new FileFieldValue(filename, "").getPath(targetCase.stringId, targetFileFieldId)
         }
 
@@ -982,30 +968,9 @@ class ActionDelegate {
         saveFileToField(targetCase, targetTransitionId, targetFileFieldId, filename, storagePath)
     }
 
-    void generatePdf(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
-                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
-        if (!sourceTransition || !targetFileField)
-            throw new IllegalArgumentException("Source transition or target file field is null")
-        targetTransition = targetTransition ?: sourceTransition
-        generatePdf(sourceTransition.stringId, targetFileField.importId, sourceCase, targetCase, targetTransition.stringId,
-                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
-    }
-
-    @NamedVariant
-    void generatePDF(String sourceTransitionId, String targetFileFieldId,
-                     Case sourceCase = useCase, Case targetCase = useCase, String targetTransitionId = null,
+    void generatePdf(Transition sourceTransition, FileField targetFileField,
+                     Case sourceCase = useCase, Case targetCase = useCase, Transition targetTransition = null,
                      String template = null, List<String> excludedFields = [], Locale locale = null,
-                     ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 20) {
-        if (!sourceTransitionId || !targetFileFieldId)
-            throw new IllegalArgumentException("Source transition or target file field is null")
-        targetTransitionId = targetTransitionId ?: sourceTransitionId
-        generatePdf(sourceTransitionId, targetFileFieldId, sourceCase, targetCase, targetTransitionId,
-                template, excludedFields, locale, dateZoneId, sideMargin, titleMargin)
-    }
-
-    void generatePDF(Transition sourceTransition, FileField targetFileField, Case sourceCase = useCase, Case targetCase = useCase,
-                     Transition targetTransition = null, String template = null, List<String> excludedFields = [], Locale locale = null,
                      ZoneId dateZoneId = ZoneId.systemDefault(), Integer sideMargin = 75, Integer titleMargin = 0) {
         if (!sourceTransition || !targetFileField)
             throw new IllegalArgumentException("Source transition or target file field is null")
@@ -1343,10 +1308,9 @@ class ActionDelegate {
         filterCase.setIcon(icon)
         filterCase.dataSet.get(DefaultFiltersRunner.FILTER_I18N_TITLE_FIELD_ID).rawValue = (title instanceof I18nString) ? title : new I18nString(title as String)
         filterCase = workflowService.save(filterCase)
-        Task newFilterTask = findTask { it._id.eq(new ObjectId(filterCase.tasks.find { it.transition == DefaultFiltersRunner.AUTO_CREATE_TRANSITION }.task)) }
+        Task newFilterTask = findTask(filterCase.getTaskStringId(DefaultFiltersRunner.AUTO_CREATE_TRANSITION))
         assignTask(newFilterTask)
 
-        // TODO: NAE-1645
         DataSet dataSet = new DataSet([
                 (DefaultFiltersRunner.FILTER_TYPE_FIELD_ID)      : new EnumerationMapField(rawValue: type),
                 (DefaultFiltersRunner.FILTER_VISIBILITY_FIELD_ID): new EnumerationMapField(rawValue: visibility),
@@ -1374,7 +1338,7 @@ class ActionDelegate {
      * @param filter
      * @return
      */
-    // TODO: NAE-1645: missing test on changeFilter action?
+    // TODO: release/7.0.0: missing test on changeFilter action?
     def changeFilter(Case filter) {
         [query         : { cl ->
             updateFilter(filter, [
@@ -1516,6 +1480,7 @@ class ActionDelegate {
          },
          filter      : { cl ->
              def filter = cl() as Case
+             // TODO: release/7.0.0 fix
              setData("change_filter", item, [
                      (PREFERENCE_ITEM_FIELD_NEW_FILTER_ID): ["type": "text", "value": filter.stringId]
              ])
@@ -1528,7 +1493,7 @@ class ActionDelegate {
          }]
     }
 
-    // TODO: NAE-1645: missing test
+    // TODO: release/7.0.0: missing test
     private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
         item = workflowService.findOne(item.stringId)
         def roles = cl()
@@ -1547,11 +1512,12 @@ class ActionDelegate {
      * @return
      */
     def deleteMenuItem(Case item) {
-        String task = item.tasks.find { it.transition == "view" }.task
+        // TODO: release/7.0.0 decouple
+        String task = item.getTaskStringId("view")
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_REMOVE_OPTION): new ButtonField(rawValue: 0)
         ] as Map<String, Field<?>>)
-        dataService.setData(task, dataSet)
+        dataService.setData(task, dataSet, userService.loggedOrSystem)
     }
 
     /**
@@ -1614,10 +1580,12 @@ class ActionDelegate {
         orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
         Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
         itemCase.setUriNodeId(uriService.findByUri(uri).id)
+        // TODO: release/7.0.0 check .options syntax
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
         itemCase = workflowService.save(itemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
+        // TODO: release/7.0.0 decouple
+        Task newItemTask = findTask(itemCase.getTaskStringId("init"))
         assignTask(newItemTask)
         DataSet dataSet = new DataSet([
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE): new CaseField(rawValue: [filter.stringId] as List<String>),
@@ -1626,11 +1594,11 @@ class ActionDelegate {
         ] as Map<String, Field<?>>)
         setData(newItemTask, dataSet)
         finishTask(newItemTask)
-
-        def task = orgGroup.tasks.find { it.transition == "append_menu_item" }.task
+// TODO: release/7.0.0 decouple
+        def task = orgGroup.getTaskStringId("append_menu_item")
         dataService.setData(task, new DataSet([
                 (PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM): new TextField(rawValue: itemCase.stringId)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), userService.loggedOrSystem)
 
         return workflowService.findOne(itemCase.stringId)
     }
@@ -1764,5 +1732,6 @@ class ActionDelegate {
             return
         }
         useCase = workflowService.findOne(useCase.stringId)
+        initFieldsMap(action.fieldIds, useCase)
     }
 }

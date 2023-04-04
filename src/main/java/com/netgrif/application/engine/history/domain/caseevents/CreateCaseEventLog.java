@@ -11,7 +11,7 @@ import java.util.Map;
 public class CreateCaseEventLog extends CaseEventLog {
 
     @Getter
-    @Field("activePlaces") // TODO: NAE-1645
+    @Field("activePlaces") // TODO: release/7.0.0
     private final Map<String, Integer> activePlaces;
 
     @Getter

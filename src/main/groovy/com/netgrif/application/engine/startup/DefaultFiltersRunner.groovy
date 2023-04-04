@@ -64,6 +64,9 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IDataService dataService
 
+    @Autowired
+    private SuperCreator superCreator
+
     @Override
     void run(String... args) throws Exception {
         if (!createDefaultFilters) {
@@ -284,12 +287,12 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
             dataSet.put(viewOrigin ? FILTER_ORIGIN_VIEW_ID_FIELD_ID : FILTER_PARENT_CASE_ID_FIELD_ID, new TextField(rawValue: originId))
         }
 
-
-        this.dataService.setData(newFilterTask, dataSet)
+        // TODO: release/7.0.0 join setData to one call
+        this.dataService.setData(newFilterTask, dataSet, superCreator.getSuperUser())
         if (isImported) {
             this.dataService.setData(newFilterTask, new DataSet([
                     (IS_IMPORTED): new NumberField(rawValue: 1)
-            ] as Map<String, Field<?>>))
+            ] as Map<String, Field<?>>), superCreator.getSuperUser())
         }
 
         I18nString translatedTitle = new I18nString(title)

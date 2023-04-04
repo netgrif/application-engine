@@ -23,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE
 @RequestMapping("/dev/")
 @Profile("dev")
 class DevConsole {
-    // TODO: NAE-1645 fix old syntax
+    // TODO: release/7.0.0 fix old syntax
 
     @Autowired
     private CaseRepository caseRepository

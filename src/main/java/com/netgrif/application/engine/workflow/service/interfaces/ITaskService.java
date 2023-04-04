@@ -38,8 +38,6 @@ public interface ITaskService {
 
     List<Task> findAllById(List<String> ids);
 
-    void createTasks(Case useCase);
-
     Page<Task> findByUser(Pageable pageable, IUser user);
 
     Task findById(String id);
@@ -92,9 +90,9 @@ public interface ITaskService {
 
     Task resolveUserRef(Task task, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, Case useCase);
+    void delete(List<Task> tasks, Case useCase);
 
-    void delete(Iterable<? extends Task> tasks, String caseId);
+    void delete(List<Task> tasks, String caseId);
 
     void deleteTasksByCase(String caseId);
 

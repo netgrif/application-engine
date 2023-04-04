@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-//TODO: NAE-1645 lombok needs default constructor?
+//TODO: release/7.0.0 lombok needs default constructor?
 @Data
 @Document
 @EqualsAndHashCode(callSuper = true)

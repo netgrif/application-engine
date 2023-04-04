@@ -7,12 +7,13 @@ import com.netgrif.application.engine.importer.service.validation.IActionValidat
 import com.netgrif.application.engine.importer.service.validation.IDocumentValidator;
 import com.netgrif.application.engine.importer.service.validation.ILogicValidator;
 import com.netgrif.application.engine.importer.service.validation.ITransitionValidator;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.DataGroup;
+import com.netgrif.application.engine.petrinet.domain.Function;
 import com.netgrif.application.engine.petrinet.domain.Place;
 import com.netgrif.application.engine.petrinet.domain.Transaction;
 import com.netgrif.application.engine.petrinet.domain.Transition;
-import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.petrinet.domain.arcs.Arc;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Reference;
 import com.netgrif.application.engine.petrinet.domain.arcs.reference.Type;
@@ -22,10 +23,14 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
+import com.netgrif.application.engine.petrinet.domain.events.*;
+import com.netgrif.application.engine.petrinet.domain.events.CaseEvent;
 import com.netgrif.application.engine.petrinet.domain.events.CaseEventType;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
+import com.netgrif.application.engine.petrinet.domain.events.Event;
 import com.netgrif.application.engine.petrinet.domain.events.EventType;
+import com.netgrif.application.engine.petrinet.domain.events.ProcessEvent;
 import com.netgrif.application.engine.petrinet.domain.events.ProcessEventType;
 import com.netgrif.application.engine.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.application.engine.petrinet.domain.layout.TaskLayout;
@@ -82,6 +87,9 @@ public class Importer {
     protected Map<String, Action> actions;
     protected Map<String, Action> actionRefs;
     protected List<com.netgrif.application.engine.petrinet.domain.Function> functions;
+
+    @Autowired
+    protected AllDataConfiguration allDataConfiguration;
 
     @Autowired
     protected FieldFactory fieldFactory;
@@ -162,16 +170,17 @@ public class Importer {
         this.functions = new LinkedList<>();
     }
 
-    protected void unmarshallXml(InputStream xml) throws JAXBException {
+    public Document unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
+        return document;
     }
 
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
-        savedFile.getParentFile().mkdirs(); // TODO: NAE-1645 return false? storage should be created so maybe delete this line?
+        savedFile.getParentFile().mkdirs(); // TODO: release/7.0.0 return false? storage should be created so maybe delete this line?
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
         return savedFile.toPath();
@@ -185,6 +194,8 @@ public class Importer {
         document.getI18N().forEach(this::addI18N);
 
         setMetaData();
+        addAllDataTransition();
+
         net.setIcon(document.getIcon());
         net.setDefaultRoleEnabled(document.isDefaultRole() != null && document.isDefaultRole());
         net.setAnonymousRoleEnabled(document.isAnonymousRole() != null && document.isAnonymousRole());
@@ -219,6 +230,46 @@ public class Importer {
         }
 
         return Optional.of(net);
+    }
+
+    protected void addAllDataTransition() {
+        com.netgrif.application.engine.importer.model.Transition allDataConfig = allDataConfiguration.getAllData();
+        if (document.getTransition().stream().anyMatch(transition -> allDataConfig.getId().equals(transition.getId()))) {
+            return;
+        }
+        com.netgrif.application.engine.importer.model.DataGroup configDataGroup = allDataConfig.getDataGroup().get(0);
+        int y = 0;
+        com.netgrif.application.engine.importer.model.Transition allDataTransition = new com.netgrif.application.engine.importer.model.Transition();
+        allDataTransition.setId(allDataConfig.getId());
+        allDataTransition.setX(allDataConfig.getX());
+        allDataTransition.setY(allDataConfig.getY());
+        allDataTransition.setLabel(allDataConfig.getLabel());
+        allDataTransition.setIcon(allDataConfig.getIcon());
+        allDataTransition.setPriority(allDataConfig.getPriority());
+        allDataTransition.setAssignPolicy(allDataConfig.getAssignPolicy());
+        allDataTransition.setFinishPolicy(allDataConfig.getFinishPolicy());
+        // TODO: NAE-1858: all properties
+        com.netgrif.application.engine.importer.model.DataGroup allDataGroup = new com.netgrif.application.engine.importer.model.DataGroup();
+        for (Data field : document.getData()) {
+            DataRef dataRef = new DataRef();
+            dataRef.setId(field.getId());
+            Layout layout = new Layout();
+            layout.setCols(configDataGroup.getCols());
+            layout.setRows(1);
+            layout.setX(0);
+            layout.setY(y);
+            layout.setOffset(0);
+            layout.setTemplate(Template.MATERIAL);
+            layout.setAppearance(Appearance.OUTLINE);
+            dataRef.setLayout(layout);
+            Logic logic = new Logic();
+            logic.getBehavior().add(Behavior.EDITABLE);
+            dataRef.setLogic(logic);
+            allDataGroup.getDataRef().add(dataRef);
+            y++;
+        }
+        allDataTransition.getDataGroup().add(allDataGroup);
+        document.getTransition().add(allDataTransition);
     }
 
     protected void resolveRoleRef(CaseRoleRef roleRef) {
@@ -673,10 +724,11 @@ public class Importer {
     protected void addDataGroup(Transition transition, com.netgrif.application.engine.importer.model.DataGroup importDataGroup, int index) throws MissingIconKeyException {
         DataGroup dataGroup = new DataGroup();
 
-        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0)
+        if (importDataGroup.getId() != null && importDataGroup.getId().length() > 0) {
             dataGroup.setImportId(importDataGroup.getId());
-        else
+        } else {
             dataGroup.setImportId(transition.getImportId() + "_dg_" + index);
+        }
 
         dataGroup.setLayout(new DataGroupLayout(importDataGroup));
 
@@ -758,7 +810,7 @@ public class Importer {
         }
     }
 
-    // TODO: NAE-1645 Behavior REQ,IMM,OPT deprecated
+    // TODO: release/7.0.0 Behavior REQ,IMM,OPT deprecated
     private boolean isNotDeprecated(Behavior behavior) {
         return !Behavior.REQUIRED.equals(behavior) && !Behavior.IMMEDIATE.equals(behavior) && !Behavior.OPTIONAL.equals(behavior);
     }
@@ -876,7 +928,7 @@ public class Importer {
         }
     }
 
-    // TODO: NAE-1645 add atribute "type" to set actions
+    // TODO: release/7.0.0 add atribute "type" to set actions
     protected Action createAction(com.netgrif.application.engine.importer.model.Action importedAction) {
         Action action = new Action(importedAction.getTrigger());
         action.setImportId(buildActionId(importedAction.getId()));
@@ -1013,7 +1065,7 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        role.set_id(new ObjectId());
+        role.setId(new ObjectId());
 
         role.setNetId(net.getStringId());
         net.addRole(role);

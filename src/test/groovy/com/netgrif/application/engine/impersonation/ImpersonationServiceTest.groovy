@@ -316,7 +316,7 @@ class ImpersonationServiceTest {
         ((MultichoiceMapField) caze.dataSet.get("impersonated_roles")).options = (caze.dataSet.get("impersonated_roles").rawValue as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         ((MultichoiceMapField) caze.dataSet.get("impersonated_authorities")).options = (caze.dataSet.get("impersonated_authorities").rawValue as List).collectEntries { [(it): new I18nString(it as String)] } as Map<String, I18nString>
         caze = workflowService.save(caze)
-        def initTask = caze.tasks.find { it.transition == "t2" }.task
+        def initTask = caze.getTaskStringId("t2")
         taskService.assignTask(userService.system.transformToLoggedUser(), initTask)
         taskService.finishTask(userService.system.transformToLoggedUser(), initTask)
         return workflowService.findOne(caze.stringId)
@@ -327,7 +327,7 @@ class ImpersonationServiceTest {
     }
 
     def loadTask(Case caze, String trans) {
-        return taskService.findById(caze.tasks.find { it.transition == trans }.task)
+        return taskService.findById(caze.getTaskStringId(trans))
     }
 
     def reloadTask(Task task) {
