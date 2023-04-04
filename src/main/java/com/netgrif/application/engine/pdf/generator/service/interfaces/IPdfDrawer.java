@@ -1,14 +1,16 @@
 package com.netgrif.application.engine.pdf.generator.service.interfaces;
 
-import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.pdf.generator.domain.PdfField;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface IPdfDrawer {
 
@@ -24,31 +26,39 @@ public interface IPdfDrawer {
 
     void closeContentStream() throws IOException;
 
-    void drawTitleField(PdfField field) throws IOException;
+    PDPageContentStream getContentStream();
 
-    void drawDataGroupField(PdfField field) throws IOException;
+    void setContentStream(PDPageContentStream contentStream);
 
-    void drawTextField(PdfField field) throws IOException;
+    List<PDPage> getPageList();
 
-    void drawI18nDividerField(PdfField field) throws IOException;
+    PDDocument getPdf();
 
-    void drawBooleanField(PdfField field) throws IOException;
+//    void drawTitleField(PdfField field) throws IOException;
+//
+//    void drawDataGroupField(PdfField field) throws IOException;
 
-    void drawEnumerationField(PdfField field) throws IOException;
+//    void drawTextField(PdfField<?> field) throws IOException;
 
-    void drawMultiChoiceField(PdfField field) throws IOException;
+//    void drawI18nDividerField(PdfField field) throws IOException;
+//
+//    void drawBooleanField(PdfField field) throws IOException;
+//
+//    void drawEnumerationField(PdfField field) throws IOException;
+//
+//    void drawMultiChoiceField(PdfField field) throws IOException;
+//
+//    void drawPageNumber() throws IOException;
 
-    void drawPageNumber() throws IOException;
-
-    void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException;
-
-    boolean drawSelectionButton(List<String> values, String choice, int x, int y, DataType fieldType) throws IOException;
+    void drawBooleanBox(Boolean value, Map.Entry<Boolean, String> text, int x, int y) throws IOException;
 
     void drawLine(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth, Color color) throws IOException;
 
     void writeString(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException;
 
     void writeLabel(PDType0Font font, int fontSize, int x, int y, String text, Color color) throws IOException;
+
+    boolean drawSelectionButton(Set<String> values, String choice, int x, int y, String fieldType) throws IOException;
 
     void drawStroke(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException;
 

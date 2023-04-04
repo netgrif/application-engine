@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.pdf.generator.config;
 
-import com.netgrif.application.engine.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfDateFormat;
 import com.netgrif.application.engine.pdf.generator.config.types.PdfPageNumberFormat;
 import lombok.Data;
@@ -20,13 +19,15 @@ public class PdfProperties {
 
     protected PDRectangle pageSize = PDRectangle.A4;
 
-    protected int pageWidth = 600;
+    protected int pageWidth = (int) pageSize.getWidth();
 
-    protected int pageHeight = 820;
+    protected int pageHeight = (int) pageSize.getHeight();
 
     protected int lineHeight = 17;
 
-    protected int marginTitle = 0;
+    protected int titleLineHeight = 25;
+
+    protected int marginTitle = 5;
 
     protected int marginTop = unit;
 
@@ -58,7 +59,9 @@ public class PdfProperties {
 
     protected int fontLabelSize = 10;
 
-    protected int fontValueSize = 10;
+    protected int fontValueSize = 9;
+
+    protected int originalCols;
 
     protected int formGridCols = 4;
 
@@ -93,8 +96,6 @@ public class PdfProperties {
     protected Locale textLocale = new Locale("sk", "SK");
 
     protected ZoneId dateZoneId = ZoneId.systemDefault();
-
-    protected PdfBooleanFormat booleanFormat = PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK;
 
     protected PdfPageNumberFormat pageNumberFormat = PdfPageNumberFormat.SLASH;
 
