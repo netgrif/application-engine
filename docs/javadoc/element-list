@@ -83,7 +83,7 @@ com.netgrif.application.engine.pdf.generator.config
 com.netgrif.application.engine.pdf.generator.config.types
 com.netgrif.application.engine.pdf.generator.domain
 com.netgrif.application.engine.pdf.generator.service
-com.netgrif.application.engine.pdf.generator.service.fieldbuilder
+com.netgrif.application.engine.pdf.generator.service.fieldbuilders
 com.netgrif.application.engine.pdf.generator.service.interfaces
 com.netgrif.application.engine.pdf.generator.service.renderer
 com.netgrif.application.engine.pdf.service

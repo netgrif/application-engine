@@ -1,10 +1,15 @@
 package com.netgrif.application.engine.pdf.generator.service;
 
 import com.netgrif.application.engine.pdf.generator.config.PdfResource;
-import com.netgrif.application.engine.pdf.generator.domain.PdfField;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfDocumentContent;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTitleField;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator;
+import com.netgrif.application.engine.pdf.generator.service.renderer.PageNumberRenderer;
+import com.netgrif.application.engine.pdf.generator.service.renderer.PdfFieldRenderer;
+import com.netgrif.application.engine.pdf.generator.service.renderer.PdfTitleFieldRenderer;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.Transition;
 import com.netgrif.application.engine.workflow.domain.Case;
@@ -17,14 +22,19 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.netgrif.application.engine.pdf.generator.service.renderer.PageNumberRenderer.PAGE_NUMBER_TYPE;
 
 /**
  * Generates PDF from the given transition form
@@ -35,11 +45,17 @@ public class PdfGenerator implements IPdfGenerator {
 
     private PDDocument pdf;
 
-    @Autowired
-    private IPdfDataHelper pdfDataHelper;
+    private final IPdfDataHelper pdfDataHelper;
 
-    @Autowired
-    private IPdfDrawer pdfDrawer;
+    private final IPdfDrawer pdfDrawer;
+
+    private final Map<String, PdfFieldRenderer<?>> rendererMap;
+
+    public PdfGenerator(IPdfDataHelper pdfDataHelper, List<PdfFieldRenderer<?>> renderers, IPdfDrawer pdfDrawer) {
+        this.pdfDataHelper = pdfDataHelper;
+        this.rendererMap = renderers.stream().collect(Collectors.toMap(PdfFieldRenderer::getType, Function.identity()));
+        this.pdfDrawer = pdfDrawer;
+    }
 
     @Override
     public void setupPdfGenerator(PdfResource pdfResource) throws IOException {
@@ -54,6 +70,10 @@ public class PdfGenerator implements IPdfGenerator {
         this.pdf.setVersion(version);
         pdfDataHelper.setupDataHelper(pdfResource);
         pdfDrawer.setupDrawer(pdf, pdfResource);
+        rendererMap.values().parallelStream().forEach(r -> {
+            r.setPdfDrawer(pdfDrawer);
+            r.setResource(pdfResource);
+        });
 
         pdfResource.setTitleFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontTitleResource().getFile()), true));
         pdfResource.setLabelFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontLabelResource().getFile()), true));
@@ -68,7 +88,7 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void addCustomField(PdfField field, PdfResource pdfResource) {
+    public void addCustomField(PdfField<?> field, PdfResource pdfResource) {
         generateData(field, pdfResource);
     }
 
@@ -87,7 +107,7 @@ public class PdfGenerator implements IPdfGenerator {
     @Override
     public File generatePdf(PdfResource pdfResource) {
         try {
-            return transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource);
+            return transformRequestToPdf(pdfDataHelper.getPdfDocumentContent(), pdfResource);
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
         }
@@ -104,7 +124,7 @@ public class PdfGenerator implements IPdfGenerator {
     public void generatePdf(Case formCase, Transition transition, PdfResource pdfResource, OutputStream stream) {
         generateData(formCase.getPetriNet(), formCase, transition, pdfResource);
         try {
-            transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource, stream);
+            transformRequestToPdf(pdfDataHelper.getPdfDocumentContent(), pdfResource, stream);
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
         }
@@ -127,24 +147,23 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void generateData(PdfField pdfField, PdfResource pdfResource) {
-        pdfDataHelper.getPdfFields().add(pdfField);
-        pdfDataHelper.correctFieldsPosition();
+    public void generateData(PdfField<?> pdfField, PdfResource pdfResource) {
+        pdfDataHelper.getPdfDocumentContent().addFormField(pdfField);
     }
 
-    protected File transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource) throws IOException {
+    protected File transformRequestToPdf(PdfDocumentContent documentContent, PdfResource pdfResource) throws IOException {
         File output = new File(((ClassPathResource) pdfResource.getOutputResource()).getPath());
-        transformRequestToPdf(pdfFields, pdfResource, new FileOutputStream(output));
+        transformRequestToPdf(documentContent, pdfResource, new FileOutputStream(output));
         return output;
     }
 
-    protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
+    protected void transformRequestToPdf(PdfDocumentContent documentContent, PdfResource pdfResource, OutputStream stream) throws IOException {
         if (pdfResource.getTemplateResource().exists()) {
             InputStream template = pdfResource.getTemplateResource().getInputStream();
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }
         pdfDrawer.newPage();
-        drawTransitionForm(pdfFields);
+        drawTransitionForm(documentContent);
         pdfDrawer.closeContentStream();
         pdf.save(stream);
         pdfDrawer.closeTemplate();
@@ -153,38 +172,21 @@ public class PdfGenerator implements IPdfGenerator {
         log.info("PDF is generated from transition.");
     }
 
-    protected void drawTransitionForm(List<PdfField> pdfFields) throws IOException {
+    protected void drawTransitionForm(PdfDocumentContent documentContent) throws IOException {
         log.info("Drawing form to PDF.");
 
-        for (PdfField pdfField : pdfFields) {
+        PdfTitleFieldRenderer renderer = (PdfTitleFieldRenderer) rendererMap.get(PdfTitleField.TITLE_TYPE);
+        renderer.setField(documentContent.getTitleField());
+        renderer.renderValue();
 
-            if (pdfField.getFieldId().equals("titleField")) {
-                pdfDrawer.drawTitleField(pdfField);
-            } else if (!pdfField.isDgField()) {
-                switch (pdfField.getType()) {
-                    case MULTICHOICE_MAP:
-                    case MULTICHOICE:
-                        pdfDrawer.drawMultiChoiceField(pdfField);
-                        break;
-                    case ENUMERATION_MAP:
-                    case ENUMERATION:
-                        pdfDrawer.drawEnumerationField(pdfField);
-                        break;
-                    case BOOLEAN:
-                        pdfDrawer.drawBooleanField(pdfField);
-                        break;
-                    case I_18_N:
-                        pdfDrawer.drawI18nDividerField(pdfField);
-                        break;
-                    default:
-                        pdfDrawer.drawTextField(pdfField);
-                        break;
-                }
-            } else {
-                pdfDrawer.drawDataGroupField(pdfField);
-            }
+        for (PdfField<?> pdfField : documentContent.getPdfFormFields()) {
+            PdfFieldRenderer<?> fieldRenderer = rendererMap.get(pdfField.getComponent());
+            fieldRenderer.setField(pdfField);
+            fieldRenderer.renderLabel();
+            fieldRenderer.renderValue();
         }
-        pdfDrawer.drawPageNumber();
+        PageNumberRenderer pageNumberRenderer = (PageNumberRenderer) rendererMap.get(PAGE_NUMBER_TYPE);
+        pageNumberRenderer.renderValue();
     }
 
     protected PDFormXObject getSvg(Resource resource) throws IOException {

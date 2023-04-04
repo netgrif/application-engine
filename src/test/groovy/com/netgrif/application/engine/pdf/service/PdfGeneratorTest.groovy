@@ -2,13 +2,12 @@ package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
 import com.netgrif.application.engine.pdf.generator.config.types.PdfPageNumberFormat
-import com.netgrif.application.engine.pdf.generator.domain.PdfField
-import com.netgrif.application.engine.pdf.generator.domain.PdfTextField
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField
+import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTextField
 import com.netgrif.application.engine.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.application.engine.petrinet.domain.DataGroup
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -202,15 +201,16 @@ class PdfGeneratorTest {
     @Test
     void testingCustomField() {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
-        PdfField pdf = new PdfTextField("footer_company_title",
-                null,
-                "Netgrif Application Engine",
-                DataType.TEXT,
-                pdfResource.getMarginLeft(),
-                pdfResource.getPageHeight() - pdfResource.getMarginBottom(),
-                (int) (pdfResource.getPageDrawableWidth() / pdfResource.getFormGridCols()),
-                pdfResource.getLineHeight(),
-                pdfResource)
+        PdfField pdf = new PdfTextField("footer_company_title")
+        pdf.setLabel(Collections.singletonList("Netgrif Application Engine"))
+        pdf.setValue(["Custom value"])
+        pdf.setX(pdfResource.getMarginLeft())
+        pdf.setOriginalTopY(pdfResource.getPageHeight() - pdfResource.getMarginBottom())
+        pdf.setTopY(pdfResource.getPageHeight() - pdfResource.getMarginBottom())
+        pdf.setBottomY(pdfResource.getPageHeight() - pdfResource.getMarginBottom() - pdfResource.getLineHeight())
+        pdf.setOriginalBottomY(pdfResource.getPageHeight() - pdfResource.getMarginBottom() - pdfResource.getLineHeight())
+        pdf.setWidth((int) (pdfResource.getPageDrawableWidth() / pdfResource.getFormGridCols()))
+        pdf.setHeight(pdfResource.getLineHeight())
 
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
