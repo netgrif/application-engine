@@ -157,7 +157,7 @@ public class WorkflowService implements IWorkflowService {
         return repository.findAllBy_idIn(ids).stream()
                 .filter(Objects::nonNull)
                 .sorted(Ordering.explicit(ids).onResultOf(Case::getStringId))
-                .map(caze ->  {
+                .map(caze -> {
                     caze.setPetriNet(petriNetService.get(caze.getPetriNetObjectId()));
                     decryptDataSet(caze);
                     setImmediateDataFieldsReadOnly(caze);
@@ -241,7 +241,8 @@ public class WorkflowService implements IWorkflowService {
             return null;
         return userListValue.getUserValues().stream().map(UserFieldValue::getId)
                 .filter(id -> userService.resolveById(id, false) != null)
-                .collect(Collectors.toList());    }
+                .collect(Collectors.toList());
+    }
 
     @Override
     public CreateCaseEventOutcome createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
@@ -290,7 +291,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setUriNodeId(uriNode.getId());
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
-        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty() ));
+        outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty()));
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -363,16 +364,21 @@ public class WorkflowService implements IWorkflowService {
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
         CaseSearchRequest request = new CaseSearchRequest();
-        request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(net.getIdentifier(), net.getStringId()));
-
-        long pageCount = (elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false) / 100) + 1;
+        CaseSearchRequest.PetriNet netRequest = new CaseSearchRequest.PetriNet();
+        netRequest.processId = net.getStringId();
+        request.process = Collections.singletonList(netRequest);
+        long countCases = elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false);
+        log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting " + countCases + " cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        long pageCount = (countCases / 100) + 1;
         LongStream.range(0, pageCount)
                 .forEach(i -> elasticCaseService.search(
-                        Collections.singletonList(request),
-                        userService.getLoggedOrSystem().transformToLoggedUser(),
-                        PageRequest.of((int) i, 100),
-                        Locale.getDefault(),
-                        false).getContent().forEach(this::deleteCase));
+                                Collections.singletonList(request),
+                                userService.getLoggedOrSystem().transformToLoggedUser(),
+                                PageRequest.of((int) i, 100),
+                                Locale.getDefault(),
+                                false)
+                        .getContent()
+                        .forEach(this::deleteCase));
     }
 
     @Override
@@ -563,7 +569,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {
-        if(net.getCaseEvents().containsKey(type)){
+        if (net.getCaseEvents().containsKey(type)) {
             outcome.setMessage(net.getCaseEvents().get(type).getMessage());
         }
         return outcome;
