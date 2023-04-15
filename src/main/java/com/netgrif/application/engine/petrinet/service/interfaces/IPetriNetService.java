@@ -70,7 +70,7 @@ public interface IPetriNetService {
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
         List<com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
-        //TODO NAE-1645 resolve
+        //TODO release/7.0.0 resolve
 //        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.application.engine.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
         return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
     }

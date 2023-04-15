@@ -10,7 +10,7 @@ public abstract class PetriNetObject extends Imported {
 
     @Id
     @JsonIgnore
-    protected ObjectId _id;
+    protected ObjectId id;
 
     public String getStringId() {
         return importId;
@@ -18,10 +18,10 @@ public abstract class PetriNetObject extends Imported {
 
     @JsonIgnore
     public ObjectId getObjectId() {
-        return _id;
+        return id;
     }
 
-    public void setObjectId(ObjectId _id) {
-        this._id = _id;
+    public void setObjectId(ObjectId id) {
+        this.id = id;
     }
 }

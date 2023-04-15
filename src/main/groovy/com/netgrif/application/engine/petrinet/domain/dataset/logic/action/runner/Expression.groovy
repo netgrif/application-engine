@@ -7,12 +7,12 @@ import org.bson.types.ObjectId
 
 class Expression {
 
-    protected ObjectId _id
+    protected ObjectId id
 
     protected String definition
 
     Expression() {
-        this._id = new ObjectId()
+        this.id = new ObjectId()
     }
 
     Expression(String definition) {
@@ -21,7 +21,7 @@ class Expression {
     }
 
     String getStringId() {
-        return _id.toString()
+        return id.toString()
     }
 
     String getDefinition() {
@@ -35,7 +35,7 @@ class Expression {
 
     Expression clone() {
         Expression clone =  new Expression()
-        clone._id = this._id
+        clone.id = this.id
         clone.definition = this.definition
         return clone
     }

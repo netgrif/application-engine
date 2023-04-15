@@ -69,7 +69,7 @@ public class Transition extends Node {
     }
 
     public void setDataRefBehavior(Field<?> field, DataFieldBehavior behavior) {
-        // TODO: NAE-1645
+        // TODO: release/7.0.0
         setDataRefAttribute(field, dataRef ->  {
             field.setBehavior(this.importId, behavior);
             dataRef.setBehavior(behavior);

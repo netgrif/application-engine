@@ -25,6 +25,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -108,8 +109,8 @@ public class PublicTaskController extends AbstractTaskController {
 
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Get all task data")
-    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale) {
-        return super.getData(taskId, locale);
+    public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {
+        return super.getData(taskId, locale, auth);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")
@@ -122,8 +123,8 @@ public class PublicTaskController extends AbstractTaskController {
             responseCode = "403",
             description = "Caller doesn't fulfill the authorisation requirements"
     )})
-    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody TaskDataSets dataBody) {
-        return super.setData(taskId, dataBody);
+    public EntityModel<EventOutcomeWithMessage> setData(@PathVariable("id") String taskId, @RequestBody TaskDataSets dataBody, Authentication auth) {
+        return super.setData(taskId, dataBody, auth);
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")

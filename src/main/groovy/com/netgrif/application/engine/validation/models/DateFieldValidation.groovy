@@ -86,7 +86,7 @@ class DateFieldValidation extends AbstractFieldValidation {
         }
     }
 
-    // TODO: NAE-1645 Refactor, each type own validator with common functions
+    // TODO: release/7.0.0 Refactor, each type own validator with common functions
     LocalDate getDateValue(Field<?> field) {
         if (field instanceof DateField) {
             return ((DateField) field).getRawValue()

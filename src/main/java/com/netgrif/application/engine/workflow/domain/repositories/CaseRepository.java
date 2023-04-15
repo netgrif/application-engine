@@ -18,7 +18,7 @@ public interface CaseRepository extends MongoRepository<Case, String>, QuerydslP
 
     List<Case> findAllByProcessIdentifier(String identifier);
 
-    List<Case> findAllBy_idIn(Iterable<String> id);
+    List<Case> findAllByIdIn(Iterable<String> id);
 
     Page<Case> findAllByUriNodeId(String uri, Pageable pageable);
 

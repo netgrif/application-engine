@@ -34,7 +34,7 @@ public class LdapUser extends User {
 
     public LdapUser(ObjectId id) {
         this();
-        this._id = id;
+        this.id = id;
         nextGroups = new HashSet<>();
     }
 
@@ -54,7 +54,7 @@ public class LdapUser extends User {
 
     @Override
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
 
 

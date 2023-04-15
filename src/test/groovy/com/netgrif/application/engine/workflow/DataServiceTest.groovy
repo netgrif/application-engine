@@ -75,7 +75,7 @@ class DataServiceTest {
         assert taskId != null
 
         importHelper.assignTaskToSuper(TASK_TITLE, aCase.stringId)
-        List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH).getData()
+        List<DataGroup> datagroups = dataService.getDataGroups(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
 
         assert datagroups.stream().filter({ it -> it.dataRefs.size() > 0 }).count() == 3
         DataRef fileField = findField(datagroups, FILE_FIELD_TITLE)
@@ -105,7 +105,7 @@ class DataServiceTest {
 
         importHelper.assignTaskToSuper("summary A", aCase.stringId)
 
-        List<DataGroup> dataGroups = dataService.getDataGroups(taskId, Locale.ENGLISH).getData()
+        List<DataGroup> dataGroups = dataService.getDataGroups(taskId, Locale.ENGLISH, superCreator.getLoggedSuper()).getData()
         assert dataGroups.get(1).getParentTaskRefId() == "taskRef_result"
         assert dataGroups.get(2).getParentTaskRefId() == "taskRef_1"
         assert dataGroups.get(3).getParentTaskRefId() == "taskRef_0"

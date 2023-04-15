@@ -46,7 +46,7 @@ public class KnowledgeBaseInitializerTest {
     @Test
     public void testInitializerRuleValidation() {
         StoredRule rule = StoredRule.builder()
-                ._id(new ObjectId())
+                .id(new ObjectId())
                 .when("$item: Object()")
                 .then("log.info('nothing')")
                 .identifier("rule1")
@@ -55,7 +55,7 @@ public class KnowledgeBaseInitializerTest {
                 .build();
 
         StoredRule rule2 = StoredRule.builder()
-                ._id(new ObjectId())
+                .id(new ObjectId())
                 .when("$item: Object()")
                 .then("log.info('nothing')")
                 .identifier("rule2")
@@ -77,7 +77,7 @@ public class KnowledgeBaseInitializerTest {
     public void testInitializerRuleValidation_EXPECT_EXCEPTION() {
         assertThrows(RuleValidationException.class, () -> {
             StoredRule rule3 = StoredRule.builder()
-                    ._id(new ObjectId())
+                    .id(new ObjectId())
                     .when("$item: Object()")
                     .then("log.info(' EXPECTING SYNTAX ERROR")
                     .identifier("rule3")
@@ -93,7 +93,7 @@ public class KnowledgeBaseInitializerTest {
     public void testInitializerRuleValidation_EXPECT_EXCEPTION2() throws RuleValidationException {
         assertThrows(RuleValidationException.class, () -> {
             StoredRule rule4 = StoredRule.builder()
-                    ._id(new ObjectId())
+                    .id(new ObjectId())
                     .when("$item: Object")
                     .then("log.info('nothing')")
                     .identifier("rule4")

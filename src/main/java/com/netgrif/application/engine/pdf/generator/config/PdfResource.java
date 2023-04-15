@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.pdf.generator.config;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+@EqualsAndHashCode(callSuper = true)
 @Component
 @PropertySource("classpath:application.properties")
 @ConfigurationProperties(prefix = "nae.pdf.resources")

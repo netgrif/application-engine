@@ -72,7 +72,7 @@
 					child_task_id_that_set_value: f.child_task_id_that_set_value;
 
 					def childTaskId = (taskRef_0.value as List&lt;String&gt;).stream().filter({taskId -&gt; taskId != child_task_id_that_set_value.value as String}).findFirst().get()
-					setData(findTask({ it._id.eq(childTaskId as String) }), [
+					setData(findTask({ it.id.eq(childTaskId as String) }), [
 					        "parent_set_data_result": [
 					                "value": "Value set from parent using normal setData",
 									"type": "text"

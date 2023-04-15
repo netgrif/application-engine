@@ -91,7 +91,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
-    // TODO: NAE-1645 save sorted by execution priority
+    // TODO: release/7.0.0 save sorted by execution priority
     private Map<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
@@ -139,7 +139,7 @@ public class PetriNet extends PetriNetObject {
     private String importXmlPath;
 
     public PetriNet() {
-        this._id = new ObjectId();
+        this.id = new ObjectId();
         this.identifier = "Default";
         this.initials = "";
         this.title = new I18nString("");
@@ -272,7 +272,7 @@ public class PetriNet extends PetriNetObject {
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {
-            // TODO: NAE-1645 check if number field?
+            // TODO: release/7.0.0 check if number field?
             return (Referencable) dataSet.get(referenceId);
         }
     }
@@ -386,7 +386,7 @@ public class PetriNet extends PetriNetObject {
 
     @Override
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
 
     public PetriNet clone() {
@@ -407,7 +407,7 @@ public class PetriNet extends PetriNetObject {
         clone.setTransactions(this.transactions);
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
-        clone.setObjectId(this._id);
+        clone.setObjectId(this.id);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))

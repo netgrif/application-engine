@@ -58,9 +58,9 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
+    void removeTasksFromCase(List<Task> tasks, String caseId);
 
-    boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
+    void removeTasksFromCase(List<Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
 

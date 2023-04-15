@@ -19,7 +19,7 @@
 				<action>
 					parent_task_id: f.parent_task_id;
 
-					setData(findTask({ it._id.eq(parent_task_id.value as String) }), [
+					setData(findTask({ it.id.eq(parent_task_id.value as String) }), [
 					        "native_text": [
 					                "value": "Value changed from child task using normal setData",
 									"type": "text"

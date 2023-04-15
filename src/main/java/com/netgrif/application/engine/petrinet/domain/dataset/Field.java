@@ -80,7 +80,7 @@ public abstract class Field<T> extends Imported {
     private Component component;
     @JsonIgnore
     private Long version = 0L;
-    // TODO: NAE-1645 6.2.5: parentTaskId, parentCaseId
+    // TODO: release/7.0.0 6.2.5: parentTaskId, parentCaseId
 
     public String getStringId() {
         return importId;
@@ -173,12 +173,12 @@ public abstract class Field<T> extends Imported {
         if (this.behaviors != null) {
             clone.behaviors = this.behaviors.clone();
         }
-//        TODO: NAE-1645 clone value? events
+//        TODO: release/7.0.0 clone value? events
 //        if (this.value != null) {
 //            clone.value = this.value.clone();
 //        }
         clone.immediate = this.immediate;
-        if (this.events != null ) {
+        if (this.events != null) {
             clone.events = this.events.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
@@ -235,7 +235,7 @@ public abstract class Field<T> extends Imported {
         }
         try {
             FieldUtils utils = new FieldUtils();
-            // TODO: NAE-1645 write test on each type of field to check if all properties are cloned
+            // TODO: release/7.0.0 write test on each type of field to check if all properties are cloned
             utils.copyProperties(this, changes);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

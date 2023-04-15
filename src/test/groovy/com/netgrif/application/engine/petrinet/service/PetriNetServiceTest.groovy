@@ -93,7 +93,7 @@ class PetriNetServiceTest {
         importHelper.createCase("Case 1", testNet)
 
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
-        assert taskRepository.count() == taskCount + 2
+        assert taskRepository.count() == taskCount + 3
         assert processRoleRepository.count() == processRoleCount + 2
 
         def user = userService.findByEmail(CUSTOMER_USER_MAIL, false)

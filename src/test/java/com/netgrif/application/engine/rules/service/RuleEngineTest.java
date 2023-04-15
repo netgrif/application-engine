@@ -160,7 +160,7 @@ class RuleEngineTest {
         assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
-                ._id(new ObjectId())
+                .id(new ObjectId())
                 .when("$case: Case() $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
                 .then("$case.title = \"" + NEW_CASE_TITLE + "\";    \n log.info(\"rule 1 matched\");")
                 .identifier("rule1")
@@ -168,7 +168,7 @@ class RuleEngineTest {
                 .enabled(true)
                 .build();
         StoredRule rule2 = StoredRule.builder()
-                ._id(new ObjectId())
+                .id(new ObjectId())
                 .when("$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_1 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
                 .then("insert(com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact.instance($case.stringId, 0));    \n $case.dataSet.get(\"text_data\").setRawValue(\"" + TEXT_VALUE + "\");    \n log.info(\"rule 2 matched\");")
                 .identifier("rule2")
@@ -176,7 +176,7 @@ class RuleEngineTest {
                 .enabled(true)
                 .build();
         StoredRule rule3 = StoredRule.builder()
-                ._id(new ObjectId())
+                .id(new ObjectId())
                 .when("$testFact: com.netgrif.application.engine.rules.service.RuleEngineTest.TestFact()")
                 .then("$testFact.increment();     \n factRepository.save($testFact)    \n log.info(\"rule 3 matched\");")
                 .identifier("rule3")
@@ -184,7 +184,7 @@ class RuleEngineTest {
                 .enabled(true)
                 .build();
         StoredRule rule4 = StoredRule.builder()
-                ._id(new ObjectId())
+                .id(new ObjectId())
                 .when("$case: Case([\"" + TEXT_VALUE + "\"] contains dataSet.get(\"text_data\").value.value) $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + TRANS_2 + "\", type == com.netgrif.application.engine.petrinet.domain.events.EventType.FINISH, phase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)")
                 .then("$case.title = \"" + NEW_CASE_TITLE_2 + "\";    \n log.info(\"rule 4 matched\");")
                 .identifier("rule4")
@@ -333,7 +333,7 @@ class RuleEngineTest {
     void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
-            rule.set_id(new ObjectId());
+            rule.setId(new ObjectId());
             ruleRepository.save(rule);
         });
         StoredRule rule2 = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == com.netgrif.application.engine.petrinet.domain.events.EventPhase.POST)", "$case.title = \"NEW_TITLE\"");
@@ -362,7 +362,7 @@ class RuleEngineTest {
     private StoredRule rule(String when, String then) {
         ObjectId id = new ObjectId();
         return StoredRule.builder()
-                ._id(id)
+                .id(id)
                 .when(when)
                 .then(then)
                 .identifier(id.toString())
@@ -377,7 +377,7 @@ class RuleEngineTest {
     }
 
     private Task findTask(Case caze, String trans) {
-        return taskService.findOne(caze.getTasks().stream().filter(it -> it.getTransition().equals(trans)).findFirst().get().getTask());
+        return taskService.findById(caze.getTaskStringId(trans));
     }
 
     public static class TestFact extends CaseFact {

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
+import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
@@ -45,6 +46,9 @@ class ChangeCasePropertyTest {
 
     @Autowired
     private TestHelper testHelper
+
+    @Autowired
+    private SuperCreator superCreator
 
     String PRE_ASSIGN_TITLE = "Pre assign title"
     String SET_DATA_TITLE = "Set action title"
@@ -92,7 +96,7 @@ class ChangeCasePropertyTest {
         taskService.assignTask(testCaseTask.getStringId())
         dataService.setData(testCaseTask.stringId, new DataSet([
                 "bln": new BooleanField(rawValue: true)
-        ] as Map<String, Field<?>>))
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())
         taskService.finishTask(testCaseTask.getStringId())
 
         testCase = workflowService.findOne(testCase.getStringId())

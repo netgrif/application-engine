@@ -22,7 +22,7 @@ public class User extends AbstractUser implements RegisteredUser {
 
     @Id
     @Getter
-    protected ObjectId _id;
+    protected ObjectId id;
 
     @NotNull
     @Getter
@@ -69,12 +69,12 @@ public class User extends AbstractUser implements RegisteredUser {
 
     public User(ObjectId id) {
         this();
-        this._id = id;
+        this.id = id;
         nextGroups = new HashSet<>();
     }
 
     public User(User user) {
-        this._id = user.get_id();
+        this.id = user.getId();
         this.email = user.getEmail();
         this.surname = user.getSurname();
         this.name = user.getName();
@@ -96,16 +96,11 @@ public class User extends AbstractUser implements RegisteredUser {
 
     @JsonIgnore
     public String getStringId() {
-        return _id.toString();
-    }
-
-    @JsonIgnore
-    public String getId() {
-        return _id.toString();
+        return id.toString();
     }
 
     public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
+        LoggedUser loggedUser = new LoggedUser(this.getId().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
         if (!this.getProcessRoles().isEmpty()) {
@@ -127,7 +122,7 @@ public class User extends AbstractUser implements RegisteredUser {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + _id +
+                "id=" + id +
                 ", email='" + email + '\'' +
                 ", telNumber='" + telNumber + '\'' +
                 ", avatar='" + avatar + '\'' +
@@ -141,6 +136,4 @@ public class User extends AbstractUser implements RegisteredUser {
                 ", groups=" + nextGroups +
                 '}';
     }
-
-
 }

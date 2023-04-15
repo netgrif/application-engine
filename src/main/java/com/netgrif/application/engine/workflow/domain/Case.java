@@ -5,7 +5,6 @@ import com.netgrif.application.engine.auth.domain.Author;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission;
-import com.netgrif.application.engine.petrinet.domain.roles.RolePermission;
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
@@ -32,7 +31,7 @@ public class Case {
 
     @Id
     @Setter(AccessLevel.NONE)
-    private ObjectId _id;
+    private ObjectId id;
     private String uriNodeId;
     @LastModifiedDate
     private LocalDateTime lastModified;
@@ -73,9 +72,8 @@ public class Case {
     @QueryType(PropertyType.NONE)
     private Map<String, Integer> consumedTokens = new HashMap<>();
     @Indexed
-    private Set<TaskPair> tasks = new HashSet<>();
-    // TODO: NAE-1645 review json ignore and refactor to common Permission class
-    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
+    private Map<String, TaskPair> tasks = new HashMap<>();
+    // TODO: release/7.0.0 review json ignore and refactor to common Permission class
     private Set<String> enabledRoles = new HashSet<>();
     //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private Map<String, Map<ProcessRolePermission, Boolean>> permissions = new HashMap<>();
@@ -95,7 +93,7 @@ public class Case {
     private List<String> negativeViewUsers = new ArrayList<>();
 
     public Case() {
-        _id = new ObjectId();
+        id = new ObjectId();
     }
 
     public Case(PetriNet petriNet) {
@@ -127,7 +125,7 @@ public class Case {
     }
 
     public String getStringId() {
-        return _id.toString();
+        return id.toString();
     }
 
     public void resolveImmediateDataFields() {
@@ -136,13 +134,13 @@ public class Case {
     }
 
     public void setColor(String color) {
-        // TODO: NAE-1645
+        // TODO: release/7.0.0
         this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
     }
 
     private String generateVisualId() {
         SecureRandom random = new SecureRandom();
-        int n = _id.getTimestamp() + random.nextInt(99999999);
+        int n = id.getTimestamp() + random.nextInt(99999999);
         if (this.title != null) {
             n += title.length();
         }
@@ -152,19 +150,29 @@ public class Case {
         return n + "";
     }
 
-    public boolean addTask(Task task) {
-        return this.tasks.add(new TaskPair(task.getStringId(), task.getTransitionId()));
+    public ObjectId getTaskId(String transitionId) {
+        if (transitionId == null) {
+            throw new IllegalArgumentException("TransitionId cannot be null");
+        }
+        TaskPair taskPair = tasks.get(transitionId);
+        if (taskPair == null) {
+            throw new IllegalArgumentException("Case does not have task with transitionId [" + transitionId + "]");
+        }
+        return taskPair.getTaskId();
     }
 
-    public boolean removeTask(Task task) {
-        return this.removeTasks(Collections.singletonList(task));
+    public String getTaskStringId(String transitionId) {
+        return getTaskId(transitionId).toString();
     }
 
-    public boolean removeTasks(List<Task> tasks) {
-        int sizeBeforeChange = this.tasks.size();
-        Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
-        this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());
-        return this.tasks.size() != sizeBeforeChange;
+    public void addTask(Task task) {
+        this.tasks.put(task.getTransitionId(), new TaskPair(task));
+    }
+
+    public void removeTasks(List<Task> tasks) {
+        tasks.forEach(task ->
+                this.tasks.remove(task.getTransitionId())
+        );
     }
 
     public String getPetriNetId() {

@@ -46,7 +46,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(ElasticCase.class)
             template.deleteIndex(ElasticTask.class)
-            // TODO: NAE-1645 6.2.5
+            // TODO: release/7.0.0 6.2.5
             template.deleteIndex(UriNode.class)
         }
         if (!template.indexExists(caseIndex)) {

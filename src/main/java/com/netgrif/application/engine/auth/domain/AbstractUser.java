@@ -40,7 +40,7 @@ public abstract class AbstractUser implements IUser {
     }
 
     public void addAuthority(Authority authority) {
-        if (authorities.stream().anyMatch(it -> it.get_id().equals(authority.get_id())))
+        if (authorities.stream().anyMatch(it -> it.getId().equals(authority.getId())))
             return;
         authorities.add(authority);
     }

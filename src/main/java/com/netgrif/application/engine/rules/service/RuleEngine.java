@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 public abstract class RuleEngine implements IRuleEngine {
 
-    // TODO: NAE-1645 properties
+    // TODO: release/7.0.0 properties
     @Value("${rule-engine.rethrow-exceptions:#{false}}")
     protected boolean rethrowExceptions;
 

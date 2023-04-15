@@ -117,6 +117,6 @@ class DynamicValidationTest {
     }
 
     Task task(Case useCase) {
-        return taskService.findOne(useCase.tasks.find { it.transition == "transition" }.task)
+        return taskService.findOne(useCase.tasks.find { it.transitionId == "transition" }.taskId)
     }
 }

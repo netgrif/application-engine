@@ -126,4 +126,11 @@ public abstract class AbstractUserService implements IUserService {
         return users.stream().map(IUser.class::cast).collect(Collectors.toList());
     }
 
+    @Override
+    public IUser getUserFromLoggedUser(LoggedUser loggedUser) {
+        IUser user = resolveById(loggedUser.getId(), true);
+        IUser fromLogged = loggedUser.transformToUser();
+        user.setImpersonated(fromLogged.getImpersonated());
+        return user;
+    }
 }

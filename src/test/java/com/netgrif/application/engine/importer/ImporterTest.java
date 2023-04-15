@@ -2,6 +2,7 @@ package com.netgrif.application.engine.importer;
 
 import com.netgrif.application.engine.TestHelper;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.importer.service.AllDataConfiguration;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.petrinet.domain.VersionType;
@@ -40,7 +41,7 @@ public class ImporterTest {
     private static final String NET_TITLE = "Test";
     private static final String NET_INITIALS = "TST";
     private static final Integer NET_PLACES = 17;
-    private static final Integer NET_TRANSITIONS = 22;
+    private static final Integer NET_TRANSITIONS = 23;
     private static final Integer NET_ARCS = 21;
     private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
@@ -54,6 +55,8 @@ public class ImporterTest {
     private IPetriNetService petriNetService;
     @Autowired
     private SuperCreator superCreator;
+    @Autowired
+    private AllDataConfiguration allDataConfiguration;
 
     @BeforeEach
     public void before() {
@@ -113,7 +116,7 @@ public class ImporterTest {
         String[] noDataTransitions = {"2", "3", "4", "36", "49"};
 
         assert imported.getPlaces().size() == 11;
-        assert imported.getTransitions().size() == 11;
+        assert imported.getTransitions().size() == 12;
         assert imported.getArcs().values().stream()
                 .mapToLong(List::size)
                 .sum() == 34;
@@ -121,6 +124,9 @@ public class ImporterTest {
         assert imported.getRoles().size() == 2;
 
         imported.getTransitions().values().forEach(transition -> {
+            if (allDataConfiguration.getAllData().getId().equals(transition.getImportId())) {
+                return;
+            }
             assert !transition.getRoles().isEmpty();
             if (Arrays.stream(noDataTransitions).anyMatch(x -> x.equals(transition.getImportId()))) {
                 assert transition.getDataSet().isEmpty();
@@ -134,7 +140,7 @@ public class ImporterTest {
         assert repository.count() > 0;
         Page<PetriNet> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
         PetriNet net = nets.getContent().get(0);
-//        TODO: NAE-1645 assertion error
+//        TODO: release/7.0.0 assertion error
         assert net.getTitle().getDefaultValue().equals(NET_TITLE);
         assert net.getInitials().equals(NET_INITIALS);
         assert net.getPlaces().size() == NET_PLACES;

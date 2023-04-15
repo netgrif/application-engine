@@ -174,7 +174,7 @@ class ImportHelper {
     }
 
     SetDataEventOutcome setTaskData(String taskId, DataSet dataSet) {
-        dataService.setData(taskId, dataSet)
+        dataService.setData(taskId, dataSet, superCreator.getSuperUser())
     }
 
     SetDataEventOutcome setTaskData(String taskTitle, String caseId, DataSet data) {
@@ -182,7 +182,7 @@ class ImportHelper {
     }
 
     List<DataRef> getTaskData(String taskTitle, String caseId) {
-        return dataService.getData(getTaskId(taskTitle, caseId)).getData()
+        return dataService.getData(getTaskId(taskTitle, caseId), superCreator.getSuperUser()).getData()
     }
 
     void updateSuperUser() {

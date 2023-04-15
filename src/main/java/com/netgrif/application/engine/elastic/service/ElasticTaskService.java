@@ -52,7 +52,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     private ElasticsearchRestTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    // TODO: NAE-1645 properties
+    // TODO: release/7.0.0 properties
     @Value("${spring.data.elasticsearch.index.task}")
     private String taskIndex;
 

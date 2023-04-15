@@ -184,7 +184,7 @@ public class VariableArcsTest {
             taskService.assignTask(task, testUser);
             finishCase = workflowService.findOne(task.getCaseId());
 
-            // TODO: NAE-1645
+            // TODO: release/7.0.0
             assert !finishCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
 
             taskService.finishTask(task, testUser);
@@ -246,7 +246,7 @@ public class VariableArcsTest {
             if (arcType.equals("read")) {
                 assert cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
             } else {
-//                TODO: NAE-1645
+//                TODO: release/7.0.0
                 assert !cancelCase.getActivePlaces().containsKey(task.getTitle().getDefaultValue() + "_start");
             }
             if (task.getTitle().getDefaultValue().contains("var")) {

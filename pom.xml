@@ -581,7 +581,7 @@
                                 </processor>
                             </processors>
                             <options>
-                                <querydsl.excludedClasses>groovy.lang.MetaClass,com.netgrif.application.engine.importer.model.DataType,DataType,com.netgrif.application.engine.importer.model.DataGroupAlignment,DataGroupAlignment</querydsl.excludedClasses>
+                                <querydsl.excludedClasses>groovy.lang.MetaClass,com.netgrif.application.engine.importer.model.DataType,DataType,com.netgrif.application.engine.importer.model.DataGroupAlignment,DataGroupAlignment,com.netgrif.application.engine.importer.model.TriggerType,TriggerType</querydsl.excludedClasses>
                             </options>
                         </configuration>
                     </execution>
@@ -833,45 +833,45 @@
                     <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
                 </snapshotRepository>
             </distributionManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>repackage</id>
-                                <goals>
-                                    <goal>repackage</goal>
-                                </goals>
-                                <configuration>
-                                    <skip>true</skip>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <!--<build>-->
+            <!--    <plugins>-->
+            <!--        <plugin>-->
+            <!--            <groupId>org.apache.maven.plugins</groupId>-->
+            <!--            <artifactId>maven-gpg-plugin</artifactId>-->
+            <!--            <version>1.5</version>-->
+            <!--            <executions>-->
+            <!--                <execution>-->
+            <!--                    <id>sign-artifacts</id>-->
+            <!--                    <phase>verify</phase>-->
+            <!--                    <goals>-->
+            <!--                        <goal>sign</goal>-->
+            <!--                    </goals>-->
+            <!--                </execution>-->
+            <!--            </executions>-->
+            <!--            <configuration>-->
+            <!--                <gpgArguments>-->
+            <!--                    <arg>&#45;&#45;pinentry-mode</arg>-->
+            <!--                    <arg>loopback</arg>-->
+            <!--                </gpgArguments>-->
+            <!--            </configuration>-->
+            <!--        </plugin>-->
+            <!--        <plugin>-->
+            <!--            <groupId>org.springframework.boot</groupId>-->
+            <!--            <artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--            <executions>-->
+            <!--                <execution>-->
+            <!--                    <id>repackage</id>-->
+            <!--                    <goals>-->
+            <!--                        <goal>repackage</goal>-->
+            <!--                    </goals>-->
+            <!--                    <configuration>-->
+            <!--                        <skip>true</skip>-->
+            <!--                    </configuration>-->
+            <!--                </execution>-->
+            <!--            </executions>-->
+            <!--        </plugin>-->
+            <!--    </plugins>-->
+            <!--</build>-->
         </profile>
     </profiles>
 </project>

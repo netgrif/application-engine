@@ -225,7 +225,7 @@ class ExportService implements IExportService {
     protected List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
-//            TODO: NAE-1645 refactor hasField
+//            TODO: release/7.0.0 refactor hasField
             if (exportCase.getDataSet().getFields().containsKey(dataFieldId)) {
                 recordStringList.add(StringEscapeUtils.escapeCsv(resolveFieldValue(exportCase, dataFieldId)));
             } else
@@ -242,8 +242,8 @@ class ExportService implements IExportService {
             return "";
         }
         switch (field.getType()) {
-            // TODO: NAE-1645 6.2.5
-//            TODO: NAE-1645
+            // TODO: release/7.0.0 6.2.5
+//            TODO: release/7.0.0
 //            case MULTICHOICE_MAP:
 //                fieldValue = ((MultichoiceMapField) field).getValue().stream()
 //                        .filter(value -> ((MultichoiceMapField) field).getOptions().containsKey(value.trim()))
@@ -275,7 +275,7 @@ class ExportService implements IExportService {
 //                fieldValue = field.getValue().toString();
 //                break;
             default:
-                fieldValue= ""; // TODO: NAE-1645
+                fieldValue= ""; // TODO: release/7.0.0
 //                fieldValue = field.getValue() == null ? (String) exportCase.getDataSet().get(exportFieldId).getValue() : (String) field.getValue();
 //                break;
         }

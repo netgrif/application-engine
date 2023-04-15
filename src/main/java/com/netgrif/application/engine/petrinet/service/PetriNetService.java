@@ -131,7 +131,6 @@ public class PetriNetService implements IPetriNetService {
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetNewest()), cacheProperties.getPetriNetNewest()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetCache()), cacheProperties.getPetriNetCache()).clear();
         requireNonNull(cacheManager.getCache(cacheProperties.getPetriNetByIdentifier()), cacheProperties.getPetriNetByIdentifier()).clear();
-
     }
 
     public void evictCache(PetriNet net) {
@@ -148,7 +147,7 @@ public class PetriNetService implements IPetriNetService {
     @Cacheable(value = "petriNetCache", unless = "#result == null")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
         }
         return optional.get();
@@ -319,8 +318,8 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public FileSystemResource getFile(String netId, String title) {
         if (title == null || title.length() == 0) {
-            Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));
-            query.fields().include("_id").include("title");
+            Query query = Query.query(Criteria.where("id").is(new ObjectId(netId)));
+            query.fields().include("id").include("title");
             List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
             if (nets.isEmpty())
                 return null;
@@ -466,7 +465,7 @@ public class PetriNetService implements IPetriNetService {
 
 
         log.info("[" + processId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
-        this.repository.deleteBy_id(petriNet.getObjectId());
+        this.repository.deleteById(petriNet.getObjectId());
         this.evictCache(petriNet);
         // net functions must by removed from cache after it was deleted from repository
         this.functionCacheService.reloadCachedFunctions(petriNet);

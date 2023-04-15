@@ -84,7 +84,7 @@
                     "color-fg-amber-500")
 
                     change taskDoc value {
-                    [document.tasks.first().task, document2.tasks.first().task]
+                    [document.getTaskStringId("doc"), document2.getTaskStringId("doc")]
                     }
 
                     <!-- @formatter:on -->
