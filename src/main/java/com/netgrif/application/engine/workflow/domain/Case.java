@@ -75,23 +75,23 @@ public class Case {
     @Indexed
     private Set<TaskPair> tasks = new HashSet<>();
     // TODO: NAE-1645 review json ignore and refactor to common Permission class
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private Set<String> enabledRoles = new HashSet<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private Map<String, Map<ProcessRolePermission, Boolean>> permissions = new HashMap<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private Map<String, Map<ProcessRolePermission, Boolean>> userRefs = new HashMap<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private Map<String, Map<ProcessRolePermission, Boolean>> users = new HashMap<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private List<String> viewRoles = new ArrayList<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private List<String> viewUserRefs = new ArrayList<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private List<String> viewUsers = new ArrayList<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private List<String> negativeViewRoles = new ArrayList<>();
-    @JsonIgnore
+    //@JsonIgnore TODO: NAE-1866 refactor permission to be used only on backend
     private List<String> negativeViewUsers = new ArrayList<>();
 
     public Case() {

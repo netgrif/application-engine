@@ -1,18 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
-import groovy.lang.GString;
 import lombok.Data;
 
 @Data
-@JsonAutoDetect(
-        getterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE
-)
 public class TextField extends Field<String> {
 
     public TextField() {
