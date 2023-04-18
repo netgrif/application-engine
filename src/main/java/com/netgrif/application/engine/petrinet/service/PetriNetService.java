@@ -22,6 +22,7 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
@@ -32,11 +33,10 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IEventService;
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -63,10 +63,9 @@ import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
+@Slf4j
 @Service
 public class PetriNetService implements IPetriNetService {
-
-    private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -143,10 +142,10 @@ public class PetriNetService implements IPetriNetService {
      * Get read only Petri net.
      */
     @Override
-    @Cacheable(value="petriNetCache", unless="#result == null")
+    @Cacheable(value = "petriNetCache")
     public PetriNet get(ObjectId petriNetId) {
         Optional<PetriNet> optional = repository.findById(petriNetId.toString());
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
         }
         return optional.get();
@@ -163,11 +162,6 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNet clone(ObjectId petriNetId) {
-        return get(petriNetId).clone();
-    }
-
-    @Override
     @Deprecated
     public ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
@@ -179,7 +173,7 @@ public class PetriNetService implements IPetriNetService {
         ByteArrayOutputStream xmlCopy = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, xmlCopy);
         Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(xmlCopy.toByteArray()));
-        if (!imported.isPresent()) {
+        if (imported.isEmpty()) {
             return outcome;
         }
         PetriNet net = imported.get();
@@ -240,12 +234,12 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value="petriNetById", unless="#result == null")
+    @Cacheable(value = "petriNetById")
     public PetriNet getPetriNet(String id) {
         Optional<PetriNet> net = repository.findById(id);
-        if (!net.isPresent())
+        if (net.isEmpty()) {
             throw new IllegalArgumentException("No Petri net with id: " + id + " was found.");
-
+        }
         net.get().initializeArcs();
         return net.get();
     }
@@ -254,8 +248,9 @@ public class PetriNetService implements IPetriNetService {
     @Cacheable(value = "petriNetByIdentifier", key = "#identifier+#version.toString()", unless="#result == null")
     public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
-        if (net == null)
+        if (net == null) {
             return null;
+        }
         net.initializeArcs();
         return net;
     }
@@ -278,8 +273,9 @@ public class PetriNetService implements IPetriNetService {
     @Cacheable(value="petriNetNewest", unless="#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
-        if (nets.isEmpty())
+        if (nets.isEmpty()) {
             return null;
+        }
         return nets.get(0);
     }
 
