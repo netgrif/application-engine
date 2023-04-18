@@ -2,14 +2,11 @@ package com.netgrif.application.engine.elastic
 
 import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.elastic.service.ReindexingTask
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,29 +20,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-class ReindexTest {
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    protected IElasticCaseService elasticCaseService
+@CompileStatic
+class ReindexTest extends EngineTest {
 
     @Autowired
     private ReindexingTask reindexingTask
 
-    @Autowired
-    EngineTest testHelper
-
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

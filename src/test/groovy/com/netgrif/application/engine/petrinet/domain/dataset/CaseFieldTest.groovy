@@ -25,7 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class CaseFieldTest {
+class CaseFieldTest extends EngineTest {
 
     public static final String ALLOWED_NETS_NET_FILE = "change_allowed_nets_action_test.xml"
     public static final String ALLOWED_NETS_TASK_TITLE = "Tran"
@@ -34,31 +34,13 @@ class CaseFieldTest {
     public static final String CHANGE_VALUE_TASK_TITLE = "Tran"
     public static final String CASE_FIELD_ID = "caseref"
 
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private IWorkflowService workflowService
-
     private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
     @BeforeEach
     void setup() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

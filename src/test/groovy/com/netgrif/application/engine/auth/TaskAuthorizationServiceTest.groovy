@@ -5,25 +5,18 @@ import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskAuthorizationService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.json.JsonOutput
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -35,7 +28,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
@@ -45,8 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles(["test"])
+@CompileStatic
 @ExtendWith(SpringExtension.class)
-class TaskAuthorizationServiceTest {
+class TaskAuthorizationServiceTest extends EngineTest {
 
     private static final String ASSIGN_TASK_URL = "/api/task/assign/"
     private static final String DELEGATE_TASK_URL = "/api/task/delegate/"
@@ -60,6 +53,9 @@ class TaskAuthorizationServiceTest {
     private static final String ADMIN_USER_EMAIL = "admin@test.com"
     private static final String USER_EMAIL = "user123987645@test.com"
 
+    @Autowired
+    private ITaskAuthorizationService taskAuthorizationService
+
     private MockMvc mvc
 
     private PetriNet net
@@ -72,45 +68,12 @@ class TaskAuthorizationServiceTest {
     private Authentication userWithoutRoleAuth
     private Authentication adminAuth
 
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private WebApplicationContext wac
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private ITaskAuthorizationService taskAuthorizationService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    EngineTest testHelper
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private IDataService dataService
-
     private String taskId
     private String taskId2
 
     @BeforeEach
     void init() {
-        testHelper.truncateDbs()
+        truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/task_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
@@ -295,7 +258,7 @@ class TaskAuthorizationServiceTest {
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test assign", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("1")
         case_ = dataService.setData(taskId, new DataSet([
-                "assign_pos_ul":new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
+                "assign_pos_ul": new UserListField(rawValue: new UserListFieldValue([dataService.makeUserFieldValue(testUser.stringId)]))
         ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
         workflowService.save(case_)
         sleep(4000)

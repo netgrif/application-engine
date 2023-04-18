@@ -20,23 +20,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class DynamicDefaultValueTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
+class DynamicDefaultValueTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

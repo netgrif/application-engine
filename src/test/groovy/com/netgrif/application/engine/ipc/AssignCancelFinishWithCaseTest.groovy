@@ -1,17 +1,12 @@
 package com.netgrif.application.engine.ipc
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -19,36 +14,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class AssignCancelFinishWithCaseTest {
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private SuperCreator superCreator;
+@CompileStatic
+class AssignCancelFinishWithCaseTest extends EngineTest {
 
     private boolean initialised = false
-
-    private def stream = { String name ->
-        return AssignCancelFinishWithCaseTest.getClassLoader().getResourceAsStream(name)
-    }
 
     @BeforeEach
     void setup() {
         if (!initialised) {
-            testHelper.truncateDbs()
+            truncateDbs()
             initialised = true
         }
     }
@@ -57,7 +31,7 @@ class AssignCancelFinishWithCaseTest {
 
     @Test
     void testAssignCancelFinish() {
-        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE) as InputStream, VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert testNet.getNet() != null
 

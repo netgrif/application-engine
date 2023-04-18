@@ -9,6 +9,7 @@ import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -20,25 +21,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class CaseApiTest {
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
+@CompileStatic
+class CaseApiTest extends EngineTest {
 
     private ImportPetriNetEventOutcome testNet
 
@@ -48,7 +32,7 @@ class CaseApiTest {
 
     @BeforeEach
     void setup() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"
@@ -70,7 +54,7 @@ class CaseApiTest {
 
     @Test
     void testSearch() {
-        testHelper.truncateDbs()
+        truncateDbs()
 
         testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 

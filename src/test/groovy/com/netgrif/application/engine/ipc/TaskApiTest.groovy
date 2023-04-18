@@ -1,23 +1,24 @@
 package com.netgrif.application.engine.ipc
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.history.domain.baseevent.EventLog
 import com.netgrif.application.engine.history.domain.baseevent.repository.EventLogRepository
-import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriNetEventLog
+import com.netgrif.application.engine.history.domain.taskevents.AssignTaskEventLog
+import com.netgrif.application.engine.history.domain.taskevents.CancelTaskEventLog
+import com.netgrif.application.engine.history.domain.taskevents.FinishTaskEventLog
+import com.netgrif.application.engine.history.domain.taskevents.TaskEventLog
+import com.netgrif.application.engine.history.domain.userevents.UserEventLog
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -30,44 +31,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class TaskApiTest {
-
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private TaskRepository taskRepository
-
-    @Autowired
-    private IUserService userService
+@CompileStatic
+class TaskApiTest extends EngineTest {
 
     @Autowired
     private EventLogRepository eventLogRepository
 
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private SuperCreator superCreator;
-
-    private def stream = { String name ->
-        return TaskApiTest.getClassLoader().getResourceAsStream(name)
-    }
     private boolean initialised = false
 
     @BeforeEach
     void setup() {
         if (!initialised) {
-            testHelper.truncateDbs()
+            truncateDbs()
             initialised = true
         }
     }
@@ -75,7 +50,6 @@ class TaskApiTest {
     public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"
 
     @Test
-    @Disabled("GroovyRuntime Could not find matching constructor")
     void testTaskSearch() {
         def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
@@ -83,12 +57,12 @@ class TaskApiTest {
 
         PetriNet net = netOptional.getNet()
         5.times {
-            helper.createCase(TASK_EVENTS_NET_TITLE, net)
+            importHelper.createCase(TASK_EVENTS_NET_TITLE, net)
         }
-        Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
+        Case useCase = importHelper.createCase(TASK_EVENTS_NET_TITLE, net)
 
-        helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
-        helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
+        importHelper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
+        importHelper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
         def caseOpt = caseRepository.findById(useCase.stringId)
 
@@ -106,28 +80,27 @@ class TaskApiTest {
     public static final String TASK_EVENTS_TASK = "Task"
 
     @Test
-    @Disabled()
     void testTaskEventActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.getNet() != null
 
         PetriNet net = netOptional.getNet()
-        Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
-        helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
-        helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
+        Case useCase = importHelper.createCase(TASK_EVENTS_NET_TITLE, net)
+        importHelper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
+        importHelper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
         List<EventLog> log = eventLogRepository.findAll()
 
-//        assert log.findAll {
-//            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")
-//        }.size() == 2
-//        assert log.findAll {
-//            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("canceled")
-//        }.size() == 1
-//        assert log.findAll {
-//            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("finished")
-//        }.size() == 1
+        assert log.findAll {
+            it instanceof AssignTaskEventLog && it.transitionId == "work_task"
+        }.size() == 2
+        assert log.findAll {
+            it instanceof CancelTaskEventLog && it.transitionId == "work_task"
+        }.size() == 1
+        assert log.findAll {
+            it instanceof FinishTaskEventLog && it.transitionId == "work_task"
+        }.size() == 1
     }
 
     public static final String LIMITS_NET_FILE = "test_inter_data_actions_static.xml"
@@ -141,8 +114,8 @@ class TaskApiTest {
     @Test
     @Disabled("spusta 2 krat")
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        ImportPetriNetEventOutcome leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert limitsNetOptional.getNet() != null
         assert leasingNetOptional.getNet() != null
@@ -150,18 +123,15 @@ class TaskApiTest {
         PetriNet limitsNet = limitsNetOptional.getNet()
         PetriNet leasingNet = leasingNetOptional.getNet()
 
-        Case limits = helper.createCase("Limits BA", limitsNet)
-        Case leasing1 = helper.createCase("Leasing 1", leasingNet)
-        Case leasing2 = helper.createCase("Leasing 2", leasingNet)
+        Case limits = importHelper.createCase("Limits BA", limitsNet)
+        Case leasing1 = importHelper.createCase("Leasing 1", leasingNet)
+        Case leasing2 = importHelper.createCase("Leasing 2", leasingNet)
 
-        helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing1.stringId, [
-                "1": [
-                        value: 30_000 as Double,
-                        type : helper.FIELD_NUMBER
-                ]
-        ])
-        helper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
+        importHelper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
+        importHelper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing1.stringId, new DataSet([
+                "1": new NumberField(rawValue: 30_000 as Double)
+        ] as Map<String, Field<?>>))
+        importHelper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
 
         def limitsOpt = caseRepository.findById(limits.stringId)
         def leasing1Opt = caseRepository.findById(leasing1.stringId)
@@ -182,14 +152,11 @@ class TaskApiTest {
         assert leasing2.dataSet.get("1").rawValue as Double == 0 as Double
 //@formatter:on
 
-        helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing2.stringId, [
-                "1": [
-                        value: 20_000 as Double,
-                        type : helper.FIELD_NUMBER
-                ]
-        ])
-        helper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
+        importHelper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
+        importHelper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing2.stringId, new DataSet([
+                "1": new NumberField(rawValue: 20_000 as Double)
+        ] as Map<String, Field<?>>))
+        importHelper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
 
         limitsOpt = caseRepository.findById(limits.stringId)
         leasing1Opt = caseRepository.findById(leasing1.stringId)
@@ -222,12 +189,12 @@ class TaskApiTest {
         PetriNet net = netOptional.getNet()
 
         10.times {
-            helper.createCase("Case $it", net)
+            importHelper.createCase("Case $it", net)
         }
 
-        Case control = helper.createCase("Control case", net)
-        helper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
-        helper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
+        Case control = importHelper.createCase("Control case", net)
+        importHelper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
+        importHelper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
 
         assert taskRepository.findAll(QTask.task.userId.eq(userService.system.getStringId())).size() == 2
     }
@@ -246,14 +213,14 @@ class TaskApiTest {
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()
 
-        def case1 = helper.createCase("Case 1", net)
-        helper.setTaskData(TASK_GETTER_TASK, case1.stringId, new DataSet([
+        def case1 = importHelper.createCase("Case 1", net)
+        importHelper.setTaskData(TASK_GETTER_TASK, case1.stringId, new DataSet([
                 (DATA_TEXT)  : new TextField(rawValue: "text"),
                 (DATA_NUMBER): new NumberField(rawValue: 13)
         ] as Map<String, Field<?>>))
 
-        Case control = helper.createCase("Control case", net)
-        helper.assignTaskToSuper(TASK_GETTER_TASK, control.stringId)
+        Case control = importHelper.createCase("Control case", net)
+        importHelper.assignTaskToSuper(TASK_GETTER_TASK, control.stringId)
 
         def controlOpt = caseRepository.findById(control.stringId)
 
@@ -275,10 +242,10 @@ class TaskApiTest {
         assert netOptional.getNet() != null
         PetriNet net = netOptional.getNet()
 
-        def control = helper.createCase("Control case", net)
-        def case1 = helper.createCase("Case 1", net)
+        def control = importHelper.createCase("Control case", net)
+        def case1 = importHelper.createCase("Case 1", net)
 
-        helper.assignTaskToSuper(TASK_SETTER_TASK, control.stringId)
+        importHelper.assignTaskToSuper(TASK_SETTER_TASK, control.stringId)
         def case1Opt = caseRepository.findById(case1.stringId)
 
         assert case1Opt.isPresent()

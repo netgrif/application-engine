@@ -11,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -22,29 +23,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class ChangeFieldValueInitTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IWorkflowService workflowService
+@CompileStatic
+class ChangeFieldValueInitTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

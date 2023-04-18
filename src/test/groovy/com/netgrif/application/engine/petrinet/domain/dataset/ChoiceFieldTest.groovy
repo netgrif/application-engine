@@ -24,27 +24,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class ChoiceFieldTest {
+class ChoiceFieldTest extends EngineTest {
 
     public static final String LIMITS_NET_FILE = "case_choices_test.xml"
     public static final String LIMITS_NET_TITLE = "CCT"
     public static final String LIMITS_NET_INITIALS = "CCT"
     public static final String LEASING_NET_TASK_EDIT_COST = "Tran"
-
-    @Autowired
-    private Importer importer
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private SuperCreator superCreator;
 
     private Closure<InputStream> stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -52,7 +37,7 @@ class ChoiceFieldTest {
 
     @BeforeEach
     void setup() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test
@@ -67,12 +52,12 @@ class ChoiceFieldTest {
         assert choices.find { it.defaultValue == "Choice 2" }
         assert choices.find { it.defaultValue == "Choice 3" }
 
-        Case choiceCase = helper.createCase("Choices", net)
-        helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
+        Case choiceCase = importHelper.createCase("Choices", net)
+        importHelper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
+        importHelper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>))
-        List<DataRef> fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
+        List<DataRef> fields = importHelper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
@@ -80,11 +65,11 @@ class ChoiceFieldTest {
         assert choices.find { it.defaultValue == "Choice 2" }
         assert choices.find { it.defaultValue == "Choice 3" }
 
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
+        importHelper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: false)
         ] as Map<String, Field<?>>))
 
-        fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
+        fields = importHelper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3
@@ -92,11 +77,11 @@ class ChoiceFieldTest {
         assert choices.find { it.defaultValue == "Choice B" }
         assert choices.find { it.defaultValue == "Choice C" }
 
-        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
+        importHelper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, new DataSet([
                 "bool": new BooleanField(rawValue: true)
         ] as Map<String, Field<?>>))
 
-        fields = helper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
+        fields = importHelper.getTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
         choices = ((EnumerationField) fields.find { it.field.name.defaultValue == "Enum" }.field).choices
 
         assert choices.size() == 3

@@ -15,43 +15,33 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class UserServiceTest {
-
-    @Autowired
-    private EngineTest helper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IUserService service
-
-    @Autowired
-    private IProcessRoleService roleService
+class UserServiceTest extends EngineTest {
 
     @Test
     @Disabled("Create functions or update test")
     void removeRole() {
-        helper.truncateDbs()
+        truncateDbs()
 
-        Optional<PetriNet> netOptional = importHelper.createNet("role_test.xml", VersionType.MAJOR, service.system.transformToLoggedUser())
+        Optional<PetriNet> netOptional = importHelper.createNet("role_test.xml", MAJOR, userService.system.transformToLoggedUser())
         assert netOptional.get() != null
 
         def net = netOptional.get()
-        def roles = roleService.findAll(net.stringId)
-        def roleCount = service.system.processRoles.size()
+        def roles = processRoleService.findAll(net.stringId)
+        def roleCount = userService.system.processRoles.size()
         roles.each {
-            service.addRole(service.system, it.stringId)
+            userService.addRole(userService.system, it.stringId)
         }
-        assert service.system.processRoles.size() == roleCount + 3
+        assert userService.system.processRoles.size() == roleCount + 3
 
         roles.each {
-            service.removeRole(service.system, it.stringId)
+            userService.removeRole(userService.system, it.stringId)
         }
-        assert service.system.processRoles.size() == roleCount
+        assert userService.system.processRoles.size() == roleCount
     }
 }

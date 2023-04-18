@@ -33,29 +33,11 @@ import java.util.stream.Collectors
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 @CompileStatic
-class UserListTest {
-
-    @Autowired
-    private EngineTest testHelper;
-
-    @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
-    private SuperCreator superCreator;
-
-    @Autowired
-    private CaseRepository caseRepository;
-
-    @Autowired
-    private IDataService dataService;
-
-    @Autowired
-    private ITaskService taskService;
+class UserListTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

@@ -1,22 +1,16 @@
 package com.netgrif.application.engine.importer
 
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.importer.service.RoleFactory
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRolePermission
 import com.netgrif.application.engine.petrinet.domain.roles.RolePermission
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,31 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class PredefinedRolesPermissionsTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IProcessRoleService processRoleService
+class PredefinedRolesPermissionsTest extends EngineTest {
 
     @Autowired
     private RoleFactory roleFactory
-
-    @Autowired
-    private AllDataConfiguration configuration
 
     @Value("classpath:predefinedPermissions/role_permissions_default_role_defined.xml")
     private Resource definedDefaultRoleNet
@@ -114,8 +87,8 @@ class PredefinedRolesPermissionsTest {
     private String ANONYMOUS_ROLE_ID
 
     @BeforeEach
-    public void before() {
-        testHelper.truncateDbs()
+    void before() {
+        truncateDbs()
         assert processRoleService.defaultRole() != null
         DEFAULT_ROLE_ID = processRoleService.defaultRole().stringId
         assert DEFAULT_ROLE_ID != null
@@ -464,7 +437,7 @@ class PredefinedRolesPermissionsTest {
         assert aCase.getTasks().size() == 2
 
         List<TaskPair> temp = aCase.getTasks().values() as List<TaskPair>
-        Task task = taskService.findOne(temp.find { it.transitionId != configuration.allData.id }.taskStringId)
+        Task task = taskService.findOne(temp.find { it.transitionId != allDataConfiguration.allData.id }.taskStringId)
 
         assert task != null
 

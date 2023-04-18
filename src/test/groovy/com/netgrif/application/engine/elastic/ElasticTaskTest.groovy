@@ -1,15 +1,11 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ApplicationEngine
-import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.elastic.service.ReindexingTask
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.workflow.domain.QCase
-import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -30,31 +26,18 @@ import java.time.LocalDateTime
         classes = ApplicationEngine.class
 )
 @AutoConfigureMockMvc
-class ElasticTaskTest {
+@CompileStatic
+class ElasticTaskTest extends EngineTest {
 
-    @Autowired
-    private ElasticTaskRepository elasticTaskRepository
-    @Autowired
-    private TaskRepository taskRepository
-    @Autowired
-    private EngineTest testHelper
-    @Autowired
-    private ImportHelper helper
     @Autowired
     private ReindexingTask reindexingTask
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
 
     @Value("classpath:task_reindex_test.xml")
     private Resource netResource
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test
@@ -64,7 +47,7 @@ class ElasticTaskTest {
 
         def net = optional.getNet()
         10.times {
-            helper.createCase("Case $it", net)
+            importHelper.createCase("Case $it", net)
         }
 
         reindexingTask.forceReindexPage(QCase.case$.lastModified.before(LocalDateTime.now()), 0, 1)

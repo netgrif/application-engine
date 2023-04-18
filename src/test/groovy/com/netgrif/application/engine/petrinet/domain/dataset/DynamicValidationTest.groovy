@@ -3,6 +3,7 @@ package com.netgrif.application.engine.petrinet.domain.dataset
 import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
@@ -13,6 +14,7 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutc
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -25,32 +27,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class DynamicValidationTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IWorkflowService workflowService
+@CompileStatic
+class DynamicValidationTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs();
+        truncateDbs();
     }
 
     @Test
@@ -59,9 +41,11 @@ class DynamicValidationTest {
         ImportPetriNetEventOutcome optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         Case useCase = importHelper.createCase("test", optNet.getNet())
         Map<String, Field> data = getData(useCase)
-        assert (data["number"]).validations[0] instanceof DynamicValidation
-        assert (data["number"]).validations[0].compiledRule == ("inrange ${useCase.dataSet["min"].value as Integer},${useCase.dataSet["max"].value as Integer}" as String)
-        assert (data["number"]).validations[0].validationMessage.defaultValue == "Number field validation message"
+        NumberField field = data["number"] as NumberField
+        DynamicValidation validation = field.validations[0] as DynamicValidation
+        assert validation instanceof DynamicValidation
+        assert validation.compiledRule == ("inrange ${useCase.dataSet["min"].value as Integer},${useCase.dataSet["max"].value as Integer}" as String)
+        assert validation.validationMessage.defaultValue == "Number field validation message"
 
         assert (data["text"]).validations[0] instanceof DynamicValidation
         assert (data["text"]).validations[0].compiledRule == ("maxLength ${useCase.dataSet["max"].value as Integer}" as String)
@@ -79,8 +63,8 @@ class DynamicValidationTest {
         assert useCase.dataSet["text"].validations[0].validationRule == "email"
 
         data = getData(useCase)
-        assert !((data["number"]).validations[0] instanceof DynamicValidation)
-        assert (data["number"]).validations[0].validationRule == "odd"
+        assert !(validation instanceof DynamicValidation)
+        assert validation.validationRule == "odd"
 
         assert !((data["text"]).validations[0] instanceof DynamicValidation)
         assert (data["text"]).validations[0].validationRule == "email"
@@ -95,7 +79,7 @@ class DynamicValidationTest {
 
         useCase = workflowService.findOne(useCase.stringId)
         data = getData(useCase)
-        assert data["number"].validations[0].compiledRule == ("inrange 10,20" as String)
+        assert validation.compiledRule == ("inrange 10,20" as String)
         assert data["text"].validations[0].compiledRule == ("maxLength 20" as String)
 
         assert useCase.dataSet["number"].validations[0].validationRule == '''inrange ${min.value as Integer},${max.value as Integer}'''
@@ -108,7 +92,9 @@ class DynamicValidationTest {
 
     Map<String, Field> getData(Case useCase) {
         Task task = task(useCase)
-        return dataService.getData(task, useCase).getData().collectEntries { [(it.importId): (it)] }
+        return dataService.getData(task, useCase, superCreator.superUser)
+                .getData()
+                .collectEntries { [(it.fieldId): (it)] }
     }
 
     SetDataEventOutcome setData(Case useCase, Map<String, Map<String, Object>> values) {

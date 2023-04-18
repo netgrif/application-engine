@@ -25,6 +25,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -39,40 +40,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class ElasticSearchViewPermissionTest {
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IAuthorityService authorityService
-
-    @Autowired
-    private IElasticCaseService elasticCaseService
-
-    @Autowired
-    private IElasticTaskService elasticTaskService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private EngineTest testHelper
+@CompileStatic
+class ElasticSearchViewPermissionTest extends EngineTest {
 
     private static final String USER_EMAIL = "user123987645@test.com"
 
@@ -83,7 +52,7 @@ class ElasticSearchViewPermissionTest {
 
     @BeforeEach
     void inti() {
-        testHelper.truncateDbs()
+        truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/view_permission_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()

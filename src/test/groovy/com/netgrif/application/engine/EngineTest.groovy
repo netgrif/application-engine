@@ -1,11 +1,15 @@
+//file:noinspection GrMethodMayBeStatic
 package com.netgrif.application.engine
 
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.importer.service.AllDataConfiguration
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.FieldActionsRunner
@@ -17,6 +21,7 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.*
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
+import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import com.netgrif.application.engine.workflow.service.interfaces.IFilterImportExportService
@@ -71,7 +76,9 @@ abstract class EngineTest {
     @Autowired
     IUserService userService
     @Autowired
-    IProcessRoleService roleService
+    IAuthorityService authorityService
+    @Autowired
+    ProcessRoleService processRoleService
     @Autowired
     IFieldActionsCacheService actionsCacheService
     @Autowired
@@ -82,6 +89,8 @@ abstract class EngineTest {
     INextGroupService nextGroupService
     @Autowired
     IUriService uriService
+    @Autowired
+    IElasticCaseService elasticCaseService
 
     /**
      * Repositories
@@ -90,6 +99,8 @@ abstract class EngineTest {
     MongoTemplate template
     @Autowired
     CaseRepository caseRepository
+    @Autowired
+    TaskRepository taskRepository
     @Autowired
     UserRepository userRepository
     @Autowired
@@ -109,7 +120,9 @@ abstract class EngineTest {
      * Configurations
      */
     @Autowired
-    SuperAdminConfiguration configuration
+    SuperAdminConfiguration superAdminConfiguration
+    @Autowired
+    AllDataConfiguration allDataConfiguration
 
     void truncateDbs() {
         template.db.drop()
@@ -118,7 +131,7 @@ abstract class EngineTest {
         uriNodeRepository.deleteAll()
         userRepository.deleteAll()
         roleRepository.deleteAll()
-        roleService.clearCache()
+        processRoleService.clearCache()
         actionsCacheService.clearActionCache()
         actionsCacheService.clearFunctionCache()
         actionsCacheService.clearNamespaceFunctionCache()
@@ -132,5 +145,9 @@ abstract class EngineTest {
         impersonationRunner.run()
         superCreator.run()
         finisherRunner.run()
+    }
+
+    InputStream stream(String path) {
+        return EngineTest.getClassLoader().getResourceAsStream(path)
     }
 }

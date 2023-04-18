@@ -19,23 +19,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class Async {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IWorkflowService workflowService
+class Async extends EngineTest {
 
     @Test
     void testAsyncRun() {
-        testHelper.truncateDbs()
+        truncateDbs()
         def netOptional = importHelper.createNet("async.xml")
         assert netOptional.isPresent()
         def net = netOptional.get()

@@ -4,16 +4,9 @@ import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.domain.repositories.UserRepository
-import com.netgrif.application.engine.configuration.properties.SuperAdminConfiguration
-import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.domain.roles.ProcessRoleRepository
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 import org.junit.Assert
@@ -23,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -92,7 +84,7 @@ class RemoveActionTest extends EngineTest {
     @Disabled(" GroovyRuntime Could not find matching")
     void addAndRemoveRole() {
         User user = userRepository.findByEmail(USER_EMAIL)
-        auth = new UsernamePasswordAuthenticationToken(configuration.email, configuration.password)
+        auth = new UsernamePasswordAuthenticationToken(superAdminConfiguration.email, superAdminConfiguration.password)
 
         String adminRoleId = petriNet.getRoles().find { it.value.name.defaultValue == "admin" }.key
 

@@ -30,32 +30,11 @@ import java.time.temporal.ChronoUnit
 @ActiveProfiles(["test"])
 @CompileStatic
 @ExtendWith(SpringExtension.class)
-class DynamicValidationPerformanceTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IWorkflowService workflowService
+class DynamicValidationPerformanceTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

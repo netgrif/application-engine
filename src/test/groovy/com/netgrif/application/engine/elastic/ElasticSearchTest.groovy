@@ -1,19 +1,18 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.ApplicationEngine
+import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -52,8 +50,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(
         locations = "classpath:application-test.properties"
 )
+@CompileStatic
 @Disabled("Fix Test")
-class ElasticSearchTest {
+class ElasticSearchTest extends EngineTest {
 
     private static final String LOCALE_SK = "sk"
     private static final String USER_EMAIL = "test@test.com"
@@ -62,27 +61,6 @@ class ElasticSearchTest {
 
     @Autowired
     private WebApplicationContext wac
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private ElasticCaseRepository repository
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private ElasticsearchRestTemplate template
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private EngineTest testHelper
 
     private Authentication auth
     private MockMvc mvc
@@ -96,7 +74,7 @@ class ElasticSearchTest {
                 .apply(springSecurity())
                 .build()
         auth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
-        testHelper.truncateDbs()
+        truncateDbs()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         def net2 = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
@@ -115,8 +93,8 @@ class ElasticSearchTest {
 
         10.times {
             def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net : net2)
-            _case.dataSet["number"].value = it * 100.0 as Double
-            _case.dataSet["enumeration"].value = _case.petriNet.dataSet["enumeration"].choices[it % 3]
+            (_case.dataSet["number"] as NumberField).rawValue = it * 100.0 as Double
+            (_case.dataSet["enumeration"] as EnumerationField).rawValue = (_case.petriNet.dataSet["enumeration"] as EnumerationField).choices[it % 3]
             workflowService.save(_case)
         }
 
@@ -173,6 +151,7 @@ class ElasticSearchTest {
     }
 
     @Test
+    @CompileDynamic
     void testSearch() {
         testCases.entrySet().each { value ->
             log.info "Testing $value.key"

@@ -31,31 +31,7 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class ChangeBehaviorTest {
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private SuperCreator superCreator
+class ChangeBehaviorTest extends EngineTest {
 
     String TEXT_0_FIELD_ID = "text_0"
     String TEXT_1_FIELD_ID = "text_1"
@@ -74,14 +50,14 @@ class ChangeBehaviorTest {
 
     @BeforeEach
     void initNet() {
-        testHelper.truncateDbs()
+        truncateDbs()
         net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
         assert net != null
     }
 
     @Test
     void changeBehaviorOfSingleFieldOnSingleTransition() {
-        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+        Case testCase = importHelper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
@@ -100,7 +76,7 @@ class ChangeBehaviorTest {
 
     @Test
     void changeBehaviorOnEachTransition() {
-        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+        Case testCase = importHelper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
@@ -128,7 +104,7 @@ class ChangeBehaviorTest {
 
     @Test
     void changeBehaviorOfSingleFieldOnMultipleTransitions() {
-        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+        Case testCase = importHelper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
@@ -149,7 +125,7 @@ class ChangeBehaviorTest {
 
     @Test
     void changeBehaviorOfMultipleFieldsOnMultipleTransitions() {
-        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+        Case testCase = importHelper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask
@@ -172,7 +148,7 @@ class ChangeBehaviorTest {
 
     @Test
     void initialBehaviorTest() {
-        Case testCase = helper.createCase(TEST_CASE_NAME, net)
+        Case testCase = importHelper.createCase(TEST_CASE_NAME, net)
 
         Task mainTask = taskService.searchOne(QTask.task.transitionId.eq(MAIN_TRANSITION) & QTask.task.caseId.eq(testCase.stringId))
         assert mainTask

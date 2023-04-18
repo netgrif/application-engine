@@ -26,6 +26,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.*
 import com.netgrif.application.engine.workflow.web.requestbodies.TaskSearchRequest
 import com.netgrif.application.engine.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -57,42 +58,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class ImpersonationServiceTest {
+//@CompileStatic // TODO: release/7.0.0 too much errors to fix now
+class ImpersonationServiceTest extends EngineTest {
 
     public static final String X_AUTH_TOKEN = "x-auth-token"
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private IElasticCaseService elasticCaseService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private IAuthorityService authorityService
-
-    @Autowired
-    private IImpersonationService impersonationService
-
-    @Autowired
-    private IImpersonationAuthorizationService impersonationAuthorizationService
 
     @Autowired
     private ITaskAuthorizationService taskAuthorizationService
@@ -101,13 +70,19 @@ class ImpersonationServiceTest {
     private IWorkflowAuthorizationService workflowAuthorizationService
 
     @Autowired
+    private IImpersonationService impersonationService
+
+    @Autowired
+    private IImpersonationAuthorizationService impersonationAuthorizationService
+
+    @Autowired
     private WebApplicationContext wac
 
     MockMvc mvc
 
-    Authentication auth1
-    Authentication auth2
-    Authentication adminUserAuth
+    UsernamePasswordAuthenticationToken auth1
+    UsernamePasswordAuthenticationToken auth2
+    UsernamePasswordAuthenticationToken adminUserAuth
 
     IUser user1
     IUser user2
@@ -117,31 +92,31 @@ class ImpersonationServiceTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
 
         SessionRepositoryFilter<?> filter = wac.getBean(SessionRepositoryFilter.class);
         mvc = MockMvcBuilders.webAppContextSetup(wac).addFilters(filter).apply(springSecurity()).build()
 
-        testNet = helper.createNet("impersonation_test.xml").get()
+        testNet = importHelper.createNet("impersonation_test.xml").get()
         def authority = authorityService.getOrCreate(Authority.user)
         def authorityAnon = authorityService.getOrCreate(Authority.anonymous)
         def authorityAdmin = authorityService.getOrCreate(Authority.admin)
 
-        user1 = helper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user1 = importHelper.createUser(new User(name: "Test", surname: "User", email: "test@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority] as Authority[],
                 [] as ProcessRole[])
 
         auth1 = new UsernamePasswordAuthenticationToken(user1.transformToLoggedUser(), (user1 as User).password, user1.authorities)
         auth1.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        user2 = helper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
+        user2 = importHelper.createUser(new User(name: "Test", surname: "User2", email: "test2@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAnon] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
         auth2 = new UsernamePasswordAuthenticationToken(user2.transformToLoggedUser(), (user2 as User).password, user2.authorities)
         auth2.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
-        adminUser = helper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
+        adminUser = importHelper.createUser(new User(name: "Admin", surname: "User", email: "admin@netgrif.com", password: "password", state: UserState.ACTIVE),
                 [authority, authorityAdmin] as Authority[],
                 testNet.roles.values() as ProcessRole[])
 
@@ -294,14 +269,14 @@ class ImpersonationServiceTest {
         assert json["impersonated"] == null
     }
 
-    def setup(List<String> roles = null, List<String> auths = null) {
+    Case setup(List<String> roles = null, List<String> auths = null) {
         def config = createConfigCase(user2, user1.stringId, roles, auths)
         SecurityContextHolder.getContext().setAuthentication(auth1)
         return config
     }
 
-    def createConfigCase(IUser user, String impersonator, List<String> roles = null, List<String> auths = null) {
-        def caze = helper.createCase("config", petriNetService.getNewestVersionByIdentifier(ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER))
+    Case createConfigCase(IUser user, String impersonator, List<String> roles = null, List<String> auths = null) {
+        def caze = importHelper.createCase("config", petriNetService.getNewestVersionByIdentifier(ImpersonationRunner.IMPERSONATION_CONFIG_PETRI_NET_IDENTIFIER))
         def owner = new UserFieldValue(user)
         caze.dataSet.get("impersonated").rawValue = owner
         caze.dataSet.get("impersonated_email").rawValue = owner.email
@@ -322,15 +297,15 @@ class ImpersonationServiceTest {
         return workflowService.findOne(caze.stringId)
     }
 
-    def createTestCase() {
-        return helper.createCase("test", testNet)
+    Case createTestCase() {
+        return importHelper.createCase("test", testNet)
     }
 
-    def loadTask(Case caze, String trans) {
+    Task loadTask(Case caze, String trans) {
         return taskService.findById(caze.getTaskStringId(trans))
     }
 
-    def reloadTask(Task task) {
+    Task reloadTask(Task task) {
         return taskService.findById(task.stringId)
     }
 

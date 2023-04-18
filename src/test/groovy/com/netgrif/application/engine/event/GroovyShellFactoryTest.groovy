@@ -13,6 +13,8 @@ import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleSe
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -36,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class GroovyShellFactoryTest {
+class GroovyShellFactoryTest extends EngineTest {
 
     private static final String USER_EMAIL = "test@test.com"
     private static final String USER_PASSW = "password"
@@ -44,29 +46,13 @@ class GroovyShellFactoryTest {
     public static final String FILE_NAME = "groovy_shell_test.xml"
 
     @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
     private WebApplicationContext wac
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IProcessRoleService roleService
-
-    @Autowired
-    private IUserService userService
 
     private PetriNet net
 
-
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
 
         def testNet = importHelper.createNet(FILE_NAME)
         assert testNet.isPresent()
@@ -109,13 +95,13 @@ class GroovyShellFactoryTest {
 
     @Test
     void roleActionsTest() {
-        roleService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
+        processRoleService.metaClass.groovyShellTestMethod = { String string, I18nString i18nString -> println("groovyShellTestMethod") }
 
         def user = userService.findByEmail(userService.getSystem().getEmail(), false)
         def processRoleCount = user.processRoles.size()
-        def roles = roleService.findAll(net.getStringId())
+        def roles = processRoleService.findAll(net.getStringId())
         assert roles.size() == 1
-        roleService.assignRolesToUser(
+        processRoleService.assignRolesToUser(
                 user.getStringId(),
                 new HashSet<String>(roles.collect { it.stringId } + user.processRoles.collect { it.stringId }),
                 new LoggedUser("", "a", "", [])

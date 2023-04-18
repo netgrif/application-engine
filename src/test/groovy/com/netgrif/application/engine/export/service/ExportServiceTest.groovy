@@ -31,31 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles(["test"])
 @CompileStatic
 @ExtendWith(SpringExtension.class)
-class ExportServiceTest {
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private TaskRepository taskRepository
-
-    @Autowired
-    private ActionDelegate actionDelegate
+class ExportServiceTest extends EngineTest {
 
     @Autowired
     private IExportService exportService
@@ -65,7 +41,7 @@ class ExportServiceTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
         Optional<PetriNet> optionalTestNet = importHelper.createNet("NAE-1290_Export_actions.xml", VersionType.MAJOR)
         assert optionalTestNet.isPresent()
         testNet = optionalTestNet.get()

@@ -24,16 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
 @CompileStatic
-class AllDataTransitionTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
+class AllDataTransitionTest extends EngineTest {
 
     @Value("classpath:petriNets/NAE-1858_allDataTask.xml")
     private Resource resourceFile
@@ -43,7 +34,7 @@ class AllDataTransitionTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

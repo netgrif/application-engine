@@ -29,32 +29,11 @@ import static com.netgrif.application.engine.petrinet.domain.VersionType.MAJOR
 @ActiveProfiles(["test"])
 @CompileStatic
 @ExtendWith(SpringExtension.class)
-class DynamicEnumerationTest {
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private CaseRepository caseRepository
+class DynamicEnumerationTest extends EngineTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test

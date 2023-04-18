@@ -1,33 +1,19 @@
 package com.netgrif.application.engine.elastic
 
-import com.netgrif.application.engine.MockService
 import com.netgrif.application.engine.EngineTest
-import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.MockService
+import com.netgrif.application.engine.auth.web.responsebodies.UserFactory
 import com.netgrif.application.engine.elastic.domain.ElasticCase
-import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTask
-import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticIndexService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.petrinet.domain.VersionType
-import com.netgrif.application.engine.petrinet.domain.dataset.ChoiceField
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.I18nField
-import com.netgrif.application.engine.petrinet.domain.dataset.TextField
-import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue
-import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.application.engine.startup.ImportHelper
-import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.petrinet.domain.dataset.*
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,65 +34,32 @@ import java.time.LocalTime
 @Slf4j
 @SpringBootTest()
 @ActiveProfiles(["test"])
+@CompileStatic
 @ExtendWith(SpringExtension.class)
-class DataSearchRequestTest {
-
-    public static final String PROCESS_TITLE = "Elastic data search request test"
-    public static final String PROCESS_INITIALS = "TST"
+class DataSearchRequestTest extends EngineTest {
 
     @Autowired
     private WebApplicationContext wac
 
     @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
-    private ElasticCaseRepository repository
-
-    @Autowired
     private IElasticIndexService template
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IUserService userService
 
     @Autowired
     private MockService mockService
 
-    @Autowired
-    private IElasticCaseService searchService
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private EngineTest testHelper
-
-    private ArrayList<Map.Entry<String, String>> testCases
+    private List<List<String>> testCases
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
-//        template.deleteIndex(ElasticCase.class)
+        truncateDbs()
+
         template.createIndex(ElasticCase.class)
         template.putMapping(ElasticCase.class)
 
-//        template.deleteIndex(ElasticTask.class)
         template.createIndex(ElasticTask.class)
         template.putMapping(ElasticTask.class)
 
-        repository.deleteAll()
+        elasticCaseRepository.deleteAll()
 
         def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
@@ -116,26 +69,26 @@ class DataSearchRequestTest {
         def testUser1 = users[0]
         def testUser2 = users[1]
         // saving authorities / roles crashes the workflowService (on case save)
-        testUser1.processRoles = []
-        testUser1.authorities = []
-        testUser2.processRoles = []
-        testUser2.authorities = []
+        testUser1.processRoles = new HashSet<>()
+        testUser1.authorities = new HashSet<>()
+        testUser2.processRoles = new HashSet<>()
+        testUser2.authorities = new HashSet<>()
 
         LocalDate date = LocalDate.of(2020, 7, 25);
         Case _case = importHelper.createCase("correct", net.getNet())
-        _case.dataSet.get("number").rawValue = 7.0 as Double
-        _case.dataSet.get("boolean").rawValue = true
-        _case.dataSet.get("text").rawValue = "hello world" as String
-        _case.dataSet.get("user").rawValue = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
-        _case.dataSet.get("date").rawValue = date
-        _case.dataSet.get("datetime").rawValue = date.atTime(13, 37)
-        _case.dataSet.get("enumeration").rawValue = (_case.petriNet.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
-        _case.dataSet.get("multichoice").rawValue = (_case.petriNet.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
-        _case.dataSet.get("enumeration_map").rawValue = "alice"
-        _case.dataSet.get("multichoice_map").rawValue = ["alice", "bob"].toSet()
-        _case.dataSet.get("file").rawValue = FileFieldValue.fromString("singlefile.txt")
-        _case.dataSet.get("fileList").rawValue = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
-        _case.dataSet.get("userList").rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
+        (_case.dataSet.get("number") as NumberField).rawValue = 7.0 as Double
+        (_case.dataSet.get("boolean") as BooleanField).rawValue = true
+        (_case.dataSet.get("text") as TextField).rawValue = "hello world" as String
+        (_case.dataSet.get("user") as UserField).rawValue = new UserFieldValue(testUser1.stringId, testUser1.name, testUser1.surname, testUser1.email)
+        (_case.dataSet.get("date") as DateField).rawValue = date
+        (_case.dataSet.get("datetime") as DateTimeField).rawValue = date.atTime(13, 37)
+        (_case.dataSet.get("enumeration") as EnumerationField).rawValue = (_case.petriNet.dataSet.get("enumeration") as ChoiceField).choices.find({ it.defaultValue == "Alice" })
+        (_case.dataSet.get("multichoice") as MultichoiceField).rawValue = (_case.petriNet.dataSet.get("multichoice") as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
+        (_case.dataSet.get("enumeration_map") as EnumerationMapField).rawValue = "alice"
+        (_case.dataSet.get("multichoice_map") as MultichoiceMapField).rawValue = ["alice", "bob"].toSet()
+        (_case.dataSet.get("file") as FileField).rawValue = FileFieldValue.fromString("singlefile.txt")
+        (_case.dataSet.get("fileList") as FileListField).rawValue = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
+        (_case.dataSet.get("userList") as UserListField).rawValue = new UserListFieldValue([dataService.makeUserFieldValue(testUser1.stringId), dataService.makeUserFieldValue(testUser2.stringId)])
         (_case.dataSet.get("i18n_text") as I18nField).rawValue.defaultValue = "Modified i18n text value"
         (_case.dataSet.get("i18n_divider") as I18nField).rawValue.defaultValue = "Modified i18n divider value"
         workflowService.save(_case)
@@ -152,92 +105,95 @@ class DataSearchRequestTest {
         }
 
         testCases = [
-                new AbstractMap.SimpleEntry<String, String>("number" as String, "7.0" as String),
-                new AbstractMap.SimpleEntry<String, String>("number.numberValue" as String, "7" as String),
-                new AbstractMap.SimpleEntry<String, String>("boolean" as String, "true" as String),
-                new AbstractMap.SimpleEntry<String, String>("boolean.booleanValue" as String, "true" as String),
-                new AbstractMap.SimpleEntry<String, String>("text" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("text.textValue.keyword" as String, "hello world" as String),
-                new AbstractMap.SimpleEntry<String, String>("user" as String, "${testUser1.fullName} ${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.emailValue.keyword" as String, "${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("user.userIdValue" as String, "${testUser1.getId()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("datetime.timestampValue" as String, "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration.textValue.keyword" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration.textValue.keyword" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice" as String, "Bob" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice" as String, "Bobek" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice.textValue.keyword" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice.textValue.keyword" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice.textValue.keyword" as String, "Bob" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice.textValue.keyword" as String, "Bobek" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map.textValue.keyword" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map.textValue.keyword" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map.keyValue" as String, "alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map" as String, "Bob" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map" as String, "Bobek" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map.textValue.keyword" as String, "Alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map.textValue.keyword" as String, "Alica" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map.textValue.keyword" as String, "Bob" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map.textValue.keyword" as String, "Bobek" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map.keyValue" as String, "alice" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map.keyValue" as String, "bob" as String),
-                new AbstractMap.SimpleEntry<String, String>("file" as String, "singlefile.txt" as String),
-                new AbstractMap.SimpleEntry<String, String>("file.fileNameValue.keyword" as String, "singlefile" as String),
-                new AbstractMap.SimpleEntry<String, String>("file.fileExtensionValue.keyword" as String, "txt" as String),
-                new AbstractMap.SimpleEntry<String, String>("fileList" as String, "multifile1.txt" as String),
-                new AbstractMap.SimpleEntry<String, String>("fileList" as String, "multifile2.pdf" as String),
-                new AbstractMap.SimpleEntry<String, String>("fileList.fileNameValue.keyword" as String, "multifile1" as String),
-                new AbstractMap.SimpleEntry<String, String>("fileList.fileNameValue.keyword" as String, "multifile2" as String),
-                new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "txt" as String),
-                new AbstractMap.SimpleEntry<String, String>("fileList.fileExtensionValue.keyword" as String, "pdf" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser1.fullName} ${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList" as String, "${testUser2.fullName} ${testUser2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser1.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.emailValue.keyword" as String, "${testUser2.email}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser1.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.fullName}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser1.getId()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser2.getId()}" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eve" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eva" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eve" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eva" as String),
-                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.keyValue" as String, "eve" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Eve" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Eva" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Felix" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Félix" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Eve" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Eva" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Felix" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Félix" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.keyValue" as String, "eve" as String),
-                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.keyValue" as String, "felix" as String),
-                new AbstractMap.SimpleEntry<String, String>("i18n_text.textValue.keyword" as String, "Modified i18n text value" as String),
-                new AbstractMap.SimpleEntry<String, String>("i18n_divider.textValue.keyword" as String, "Modified i18n divider value" as String),
+                ["number" as String, "7.0" as String],
+                ["number.numberValue" as String, "7" as String],
+                ["boolean" as String, "true" as String],
+                ["boolean.booleanValue" as String, "true" as String],
+                ["text" as String, "hello world" as String],
+                ["text.textValue.keyword" as String, "hello world" as String],
+                ["user" as String, "${testUser1.fullName} ${testUser1.email}" as String],
+                ["user.emailValue.keyword" as String, "${testUser1.email}" as String],
+                ["user.fullNameValue.keyword" as String, "${testUser1.fullName}" as String],
+                ["user.userIdValue" as String, "${testUser1.getStringId()}" as String],
+                ["date.timestampValue" as String, "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}" as String],
+                ["datetime.timestampValue" as String, "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}" as String],
+                ["enumeration" as String, "Alice" as String],
+                ["enumeration" as String, "Alica" as String],
+                ["enumeration.textValue.keyword" as String, "Alice" as String],
+                ["enumeration.textValue.keyword" as String, "Alica" as String],
+                ["multichoice" as String, "Alice" as String],
+                ["multichoice" as String, "Alica" as String],
+                ["multichoice" as String, "Bob" as String],
+                ["multichoice" as String, "Bobek" as String],
+                ["multichoice.textValue.keyword" as String, "Alice" as String],
+                ["multichoice.textValue.keyword" as String, "Alica" as String],
+                ["multichoice.textValue.keyword" as String, "Bob" as String],
+                ["multichoice.textValue.keyword" as String, "Bobek" as String],
+                ["enumeration_map" as String, "Alice" as String],
+                ["enumeration_map" as String, "Alica" as String],
+                ["enumeration_map.textValue.keyword" as String, "Alice" as String],
+                ["enumeration_map.textValue.keyword" as String, "Alica" as String],
+                ["enumeration_map.keyValue" as String, "alice" as String],
+                ["multichoice_map" as String, "Alice" as String],
+                ["multichoice_map" as String, "Alica" as String],
+                ["multichoice_map" as String, "Bob" as String],
+                ["multichoice_map" as String, "Bobek" as String],
+                ["multichoice_map.textValue.keyword" as String, "Alice" as String],
+                ["multichoice_map.textValue.keyword" as String, "Alica" as String],
+                ["multichoice_map.textValue.keyword" as String, "Bob" as String],
+                ["multichoice_map.textValue.keyword" as String, "Bobek" as String],
+                ["multichoice_map.keyValue" as String, "alice" as String],
+                ["multichoice_map.keyValue" as String, "bob" as String],
+                ["file" as String, "singlefile.txt" as String],
+                ["file.fileNameValue.keyword" as String, "singlefile" as String],
+                ["file.fileExtensionValue.keyword" as String, "txt" as String],
+                ["fileList" as String, "multifile1.txt" as String],
+                ["fileList" as String, "multifile2.pdf" as String],
+                ["fileList.fileNameValue.keyword" as String, "multifile1" as String],
+                ["fileList.fileNameValue.keyword" as String, "multifile2" as String],
+                ["fileList.fileExtensionValue.keyword" as String, "txt" as String],
+                ["fileList.fileExtensionValue.keyword" as String, "pdf" as String],
+                ["userList" as String, "${testUser1.fullName} ${testUser1.email}" as String],
+                ["userList" as String, "${testUser2.fullName} ${testUser2.email}" as String],
+                ["userList.emailValue.keyword" as String, "${testUser1.email}" as String],
+                ["userList.emailValue.keyword" as String, "${testUser2.email}" as String],
+                ["userList.fullNameValue.keyword" as String, "${testUser1.fullName}" as String],
+                ["userList.fullNameValue.keyword" as String, "${testUser2.fullName}" as String],
+                ["userList.userIdValue" as String, "${testUser1.getStringId()}" as String],
+                ["userList.userIdValue" as String, "${testUser2.getStringId()}" as String],
+                ["enumeration_map_changed" as String, "Eve" as String],
+                ["enumeration_map_changed" as String, "Eva" as String],
+                ["enumeration_map_changed.textValue.keyword" as String, "Eve" as String],
+                ["enumeration_map_changed.textValue.keyword" as String, "Eva" as String],
+                ["enumeration_map_changed.keyValue" as String, "eve" as String],
+                ["multichoice_map_changed" as String, "Eve" as String],
+                ["multichoice_map_changed" as String, "Eva" as String],
+                ["multichoice_map_changed" as String, "Felix" as String],
+                ["multichoice_map_changed" as String, "Félix" as String],
+                ["multichoice_map_changed.textValue.keyword" as String, "Eve" as String],
+                ["multichoice_map_changed.textValue.keyword" as String, "Eva" as String],
+                ["multichoice_map_changed.textValue.keyword" as String, "Felix" as String],
+                ["multichoice_map_changed.textValue.keyword" as String, "Félix" as String],
+                ["multichoice_map_changed.keyValue" as String, "eve" as String],
+                ["multichoice_map_changed.keyValue" as String, "felix" as String],
+                ["i18n_text.textValue.keyword" as String, "Modified i18n text value" as String],
+                ["i18n_divider.textValue.keyword" as String, "Modified i18n divider value" as String],
         ]
     }
 
     @Test
     void testDataSearchRequests() {
         testCases.each { testCase ->
+            String field = testCase[0]
+            String term = testCase[1]
+
             CaseSearchRequest request = new CaseSearchRequest()
             request.data = new HashMap<>()
-            request.data.put(testCase.getKey(), testCase.getValue())
+            request.data.put(field, term)
 
-            log.info(String.format("Testing %s == %s", testCase.getKey(), testCase.getValue()))
+            log.info(String.format("Testing %s == %s", field, term))
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
+            Page<Case> result = elasticCaseService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
             assert result.size() == 1
         }
     }

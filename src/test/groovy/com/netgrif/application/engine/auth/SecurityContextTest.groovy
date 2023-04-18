@@ -30,31 +30,10 @@ import java.util.stream.Collectors;
 @ActiveProfiles(["test"])
 @SpringBootTest
 @CompileStatic
-class SecurityContextTest {
+class SecurityContextTest extends EngineTest {
 
     @Autowired
     private ISecurityContextService securityContextService
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService
-
-    @Autowired
-    private ActionDelegate delegate
-
-    @Autowired
-    private IProcessRoleService processRoleService
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
 
     private IUser user
 
@@ -62,7 +41,7 @@ class SecurityContextTest {
 
     @BeforeEach
     void before() {
-        testHelper.truncateDbs()
+        truncateDbs()
 
         user = userService.save(new User('test@email.com', 'password', 'Test', 'User'))
         assert user != null

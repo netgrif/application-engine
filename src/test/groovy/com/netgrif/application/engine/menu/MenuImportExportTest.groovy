@@ -2,28 +2,27 @@ package com.netgrif.application.engine.menu
 
 import com.netgrif.application.engine.EngineTest
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
-import com.netgrif.application.engine.auth.service.UserService
-import com.netgrif.application.engine.orgstructure.groups.NextGroupService
 import com.netgrif.application.engine.petrinet.domain.I18nString
+import com.netgrif.application.engine.petrinet.domain.dataset.ButtonField
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
+import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.FileField
 import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
-import com.netgrif.application.engine.startup.*
+import com.netgrif.application.engine.startup.DefaultFiltersRunner
+import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
-import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.menu.MenuAndFilters
-import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
-import com.netgrif.application.engine.workflow.service.UserFilterSearchService
-import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IMenuImportExportService
-import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
-import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
+import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,11 +33,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class MenuImportExportTest {
+@CompileStatic
+class MenuImportExportTest extends EngineTest {
 
     public static final String DUMMY_USER_MAIL = "dummy@netgrif.com"
     public static final String DUMMY_USER_PASSWORD = "password"
@@ -75,61 +74,20 @@ class MenuImportExportTest {
     IMenuImportExportService menuImportExportService
 
     @Autowired
-    FilterRunner filterRunner
-
-    @Autowired
-    EngineTest testHelper
-
-    @Autowired
-    private CaseRepository repository;
-
-    @Autowired
-    IWorkflowService workflowService
-
-    @Autowired
-    ImportHelper importHelper
-
-    @Autowired
     DefaultFiltersRunner defaultFiltersRunner
 
-    @Autowired
-    UserFilterSearchService userFilterSearchService
-
-    @Autowired
-    ITaskService taskService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private GroupRunner groupRunner
-
-    @Autowired
-    private UserService userService
-
-    @Autowired
-    private CaseRepository caseRepository
-
-    @Autowired
-    private NextGroupService nextGroupService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    private User dummyUser;
+    private IUser dummyUser
 
     private Authentication userAuth
 
     @BeforeEach
     void beforeTest() {
-        this.testHelper.truncateDbs();
-        this.defaultFiltersRunner.run()
-        this.dummyUser = createDummyUser();
+        truncateDbs()
+        defaultFiltersRunner.run()
+        this.dummyUser = createDummyUser()
     }
 
-
     @Test
-    @Disabled("Fix IllegalArgument")
     void testMenuImportExport() {
         userAuth = new UsernamePasswordAuthenticationToken(dummyUser.transformToLoggedUser(), DUMMY_USER_PASSWORD)
         SecurityContextHolder.getContext().setAuthentication(userAuth)
@@ -137,23 +95,20 @@ class MenuImportExportTest {
         def testNet = importHelper.createNet(TEST_NET)
         assert testNet.isPresent()
 
-        Optional<Case> caseOptional = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE));
+        Optional<Case> caseOptional = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
         assert caseOptional.isPresent()
         Case groupCase = caseOptional.get()
 
-        File testXmlMenu = new File(TEST_XML_FILE_PATH);
+        File testXmlMenu = new File(TEST_XML_FILE_PATH)
 
-        groupCase.dataSet[IMPORT_FILE_FIELD].value = FileFieldValue.fromString(testXmlMenu.getName() + ":" + testXmlMenu.getPath())
+        (groupCase.dataSet.get(IMPORT_FILE_FIELD) as FileField).rawValue = FileFieldValue.fromString(testXmlMenu.getName() + ":" + testXmlMenu.getPath())
         workflowService.save(groupCase)
 
-        QTask qTask = new QTask("task");
-        Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(groupCase.stringId)));
-        dataService.setData(task, ImportHelper.populateDataset([
-                (IMPORT_BUTTON_FIELD): [
-                        "value": "1",
-                        "type" : "button"
-                ]
-        ]))
+        QTask qTask = new QTask("task")
+        Task task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(groupCase.stringId)))
+        dataService.setData(task, new DataSet([
+                (IMPORT_BUTTON_FIELD): new ButtonField(rawValue: 1)
+        ] as Map<String, Field<?>>), superCreator.superUser)
         Optional<Case> caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
         assert caseOpt.isPresent()
         groupCase = caseOpt.get()
@@ -178,11 +133,17 @@ class MenuImportExportTest {
         menusForExportOptions.put(split1[0] + "," + split2[0], new I18nString(menuName1))
         menusForExportOptions.put(split3[0] + "," + split4[0], new I18nString(menuName2))
 
-        groupCase.dataSet[EXPORT_MENUS_FIELD].setOptions(menusForExportOptions)
+        (groupCase.dataSet[EXPORT_MENUS_FIELD] as EnumerationMapField).setOptions(menusForExportOptions)
         workflowService.save(groupCase)
 
-        task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(groupCase.stringId)));
-        setData(task, [(EXPORT_BUTTON_FIELD): ["type": "button", "value": "1"]])
+        task = taskService.searchOne(qTask.transitionId.eq(GROUP_NAV_TASK).and(qTask.caseId.eq(groupCase.stringId)))
+        dataService.setData(
+                task,
+                new DataSet([
+                        (EXPORT_BUTTON_FIELD): new ButtonField(rawValue: 1)
+                ] as Map<String, Field<?>>),
+                superCreator.superUser
+        )
 
         caseOpt = caseRepository.findOne(QCase.case$.title.eq(DUMMY_USER_GROUP_TITLE))
         assert caseOpt.isPresent()
@@ -195,20 +156,13 @@ class MenuImportExportTest {
         MenuAndFilters original = menuImportExportService.invokeMethod("loadFromXML", [FileFieldValue.fromString(testXmlMenu.getName() + ":" + testXmlMenu.getPath())] as Object[]) as MenuAndFilters
         MenuAndFilters exported = menuImportExportService.invokeMethod("loadFromXML", [exportFileField] as Object[]) as MenuAndFilters
 
-        assert Objects.equals(original, exported);
+        assert Objects.equals(original, exported)
     }
 
-    private User createDummyUser() {
+    private IUser createDummyUser() {
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])
     }
-
-
-    private SetDataEventOutcome setData(task, Map<String, Map<String, Object>> values) {
-        return dataService.setData(task, ImportHelper.populateDataset(values))
-    }
-
-
 }

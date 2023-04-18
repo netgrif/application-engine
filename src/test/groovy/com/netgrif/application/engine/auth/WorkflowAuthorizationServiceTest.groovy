@@ -23,6 +23,8 @@ import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowServi
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -45,7 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class WorkflowAuthorizationServiceTest {
+@CompileStatic
+class WorkflowAuthorizationServiceTest extends EngineTest {
 
     private static final String CREATE_CASE_URL = "/api/workflow/case"
     private static final String DELETE_CASE_URL = "/api/workflow/case/"
@@ -59,28 +62,7 @@ class WorkflowAuthorizationServiceTest {
     private WebApplicationContext wac
 
     @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private SuperCreator superCreator
-
-    @Autowired
-    private ImportHelper importHelper
-
-    @Autowired
     private IWorkflowAuthorizationService workflowAuthorizationService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    EngineTest testHelper
-
-    @Autowired
-    private IUserService userService
 
     private PetriNet net
     private PetriNet netWithUserRefs
@@ -91,7 +73,7 @@ class WorkflowAuthorizationServiceTest {
 
     @BeforeEach
     void init() {
-        testHelper.truncateDbs()
+        truncateDbs()
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/workflow_authorization_service_test.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert net.getNet() != null
         this.net = net.getNet()
@@ -108,6 +90,7 @@ class WorkflowAuthorizationServiceTest {
 
     @Test
     @Disabled
+    @CompileDynamic
     void testDeleteCase() {
         def body = JsonOutput.toJson([
                 title: "test case",

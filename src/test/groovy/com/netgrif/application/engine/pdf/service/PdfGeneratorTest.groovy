@@ -42,40 +42,13 @@ import static org.junit.jupiter.api.Assertions.*
 @ActiveProfiles(["test"])
 @CompileStatic
 @ExtendWith(SpringExtension.class)
-class PdfGeneratorTest {
-
-    @Autowired
-    private Importer importer
+class PdfGeneratorTest extends EngineTest {
 
     @Autowired
     private IPdfGenerator pdfGenerator
 
     @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private UserService userService
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private PdfResource pdfResource
-
-    @Autowired
-    private IDataService dataService;
-
-    @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private SuperCreator superCreator
 
     @Value('${nae.pdf.resources.outputFolder}')
     private String pdfOutputFolder;
@@ -87,7 +60,7 @@ class PdfGeneratorTest {
 
     @BeforeEach
     void beforeTest() {
-        testHelper.truncateDbs()
+        truncateDbs()
     }
 
     @Test
@@ -314,10 +287,4 @@ class PdfGeneratorTest {
         }
         return dataGroupMap
     }
-
-    private InputStream stream(String name) {
-        return TaskApiTest.getClassLoader().getResourceAsStream(name)
-    }
-
-
 }

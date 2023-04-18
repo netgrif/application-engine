@@ -14,6 +14,7 @@ import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.ITaskService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
+import groovy.transform.CompileStatic
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,30 +26,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class ChangeCasePropertyTest {
-    @Autowired
-    private ITaskService taskService
-
-    @Autowired
-    private IWorkflowService workflowService
-
-    @Autowired
-    private IDataService dataService
-
-    @Autowired
-    private ImportHelper helper
-
-    @Autowired
-    private IPetriNetService petriNetService
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private EngineTest testHelper
-
-    @Autowired
-    private SuperCreator superCreator
+@CompileStatic
+class ChangeCasePropertyTest extends EngineTest {
 
     String PRE_ASSIGN_TITLE = "Pre assign title"
     String SET_DATA_TITLE = "Set action title"
@@ -60,14 +39,14 @@ class ChangeCasePropertyTest {
 
     @BeforeEach
     void initNet() {
-        testHelper.truncateDbs()
+        truncateDbs()
         net = petriNetService.importPetriNet(new FileInputStream(RESOURCE_PATH), VersionType.MAJOR, userService.loggedOrSystem.transformToLoggedUser()).getNet()
         assert net != null
     }
 
     @Test
     void setTitleFromEvent() {
-        Case testCase = helper.createCase(TEST_CASE_TITLE, net)
+        Case testCase = importHelper.createCase(TEST_CASE_TITLE, net)
         assert testCase
         assert testCase.getTitle() == TEST_CASE_TITLE
 
@@ -86,7 +65,7 @@ class ChangeCasePropertyTest {
 
     @Test
     void setTitleFromFieldAction() {
-        Case testCase = helper.createCase(TEST_CASE_TITLE, net)
+        Case testCase = importHelper.createCase(TEST_CASE_TITLE, net)
         assert testCase
         assert testCase.getTitle() == TEST_CASE_TITLE
 
