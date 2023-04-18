@@ -20,15 +20,15 @@ abstract class CaseFieldsExpressionRunner {
     @Autowired
     private IGroovyShellFactory shellFactory
 
-    @Autowired
-    private NaeExpressionsProperties naeExpressionsProperties
+    private final NaeExpressionsProperties naeExpressionsProperties
 
     private int cacheSize
 
     private Map<String, Closure> cache = new MaxSizeHashMap<>(cacheSize)
 
     @Autowired
-    CaseFieldsExpressionRunner() {
+    CaseFieldsExpressionRunner(NaeExpressionsProperties naeExpressionsProperties) {
+        this.naeExpressionsProperties = naeExpressionsProperties
         this.cacheSize = naeExpressionsProperties.runner.cacheSize
     }
 
