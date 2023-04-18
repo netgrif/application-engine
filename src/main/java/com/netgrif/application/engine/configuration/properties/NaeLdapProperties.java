@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.configuration.properties;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +13,6 @@ public class NaeLdapProperties {
     private boolean enabled = false;
 
     private boolean ignorePartial = false;
-
-    @Value("${spring.ldap.urls:#{\"\"}}")
-    private String url;
-
-    @Value("${spring.ldap.username:#{\"\"}}")
-    private String username;
-
-    @Value("${spring.ldap.password:#{\"\"}}")
-    private String password;
-
-    @Value("${spring.ldap.base:#{\"\"}}")
-    private String base;
 
     private String superUsername;
 

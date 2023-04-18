@@ -1,9 +1,10 @@
 package com.netgrif.application.engine.configuration.quartz;
 
+import com.netgrif.application.engine.configuration.properties.MongoProperties;
+import com.netgrif.application.engine.configuration.properties.NaeQuartzProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -23,20 +24,20 @@ import java.util.Properties;
 @Configuration
 public class QuartzConfiguration {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
-    @Autowired
-    private AutowiringSpringBeanJobFactory jobFactory;
+    private final AutowiringSpringBeanJobFactory jobFactory;
 
-    @Value("${spring.data.mongodb.host:null}")
-    private String addresses;
+    private final MongoProperties mongoProperties;
 
-    @Value("${spring.data.mongodb.uri:null}")
-    private String uri;
+    private final NaeQuartzProperties quartzProperties;
 
-    @Value("${nae.quartz.dbName:nae}")
-    private String db;
+    public QuartzConfiguration(ApplicationContext applicationContext, AutowiringSpringBeanJobFactory jobFactory, MongoProperties mongoProperties, NaeQuartzProperties quartzProperties) {
+        this.applicationContext = applicationContext;
+        this.jobFactory = jobFactory;
+        this.mongoProperties = mongoProperties;
+        this.quartzProperties = quartzProperties;
+    }
 
     @Bean
     public Properties quartzProperties() throws IOException {
@@ -68,11 +69,11 @@ public class QuartzConfiguration {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         Properties properties = new Properties();
-        if (addresses != null && !addresses.equals("null"))
-            properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://" + addresses + ":27017/");
-        else if (uri != null && !uri.equals("null"))
-            properties.setProperty("org.quartz.jobStore.mongoUri", uri);
-        properties.setProperty("org.quartz.jobStore.dbName", db);
+        if (mongoProperties.getHost() != null && !mongoProperties.getHost().equals("null"))
+            properties.setProperty("org.quartz.jobStore.mongoUri", "mongodb://" + mongoProperties.getHost() + ":27017/");
+        else if (mongoProperties.getUri() != null && !mongoProperties.getUri().equals("null"))
+            properties.setProperty("org.quartz.jobStore.mongoUri", mongoProperties.getUri());
+        properties.setProperty("org.quartz.jobStore.dbName", quartzProperties.getDbName());
         properties.setProperty("org.quartz.jobStore.class", "com.novemberain.quartz.mongodb.MongoDBJobStore");
         properties.setProperty("spring.quartz.properties.org.quartz.jobStore.isClustered", "false");
         properties.setProperty("org.quartz.jobStore.isClustered", "true");

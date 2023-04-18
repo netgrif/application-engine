@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration.drools;
 
 import com.netgrif.application.engine.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.application.engine.configuration.drools.interfaces.IRefreshableKieBase;
+import com.netgrif.application.engine.configuration.properties.DroolsProperties;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.kie.api.KieBase;
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 @Component
 public class RefreshableKieBase implements IRefreshableKieBase {
 
-    @Value("${drools.knowBase.auto-refresh:#{true}}")
-    private boolean autoRefresh;
+    @Autowired
+    private DroolsProperties droolsProperties;
 
     private LocalDateTime lastRefresh;
     private KieBase kieBase;
@@ -35,7 +36,7 @@ public class RefreshableKieBase implements IRefreshableKieBase {
     }
 
     public boolean shouldRefresh() {
-        return autoRefresh && ruleRepository.existsByLastUpdateAfter(lastRefresh);
+        return droolsProperties.getKnowBase().isAutoRefresh() && ruleRepository.existsByLastUpdateAfter(lastRefresh);
     }
 
     public void refresh() {

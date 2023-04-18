@@ -325,7 +325,7 @@ public class PetriNetService implements IPetriNetService {
                 return null;
             title = nets.get(0).getTitle().getDefaultValue();
         }
-        return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
+        return new FileSystemResource(fileStorageConfiguration.getProperties().getArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
     @Override

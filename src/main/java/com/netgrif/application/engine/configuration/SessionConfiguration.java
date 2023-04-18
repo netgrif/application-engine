@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.netgrif.application.engine.configuration.properties.RedisProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +19,13 @@ import org.springframework.session.web.http.HttpSessionIdResolver;
 )
 public class SessionConfiguration {
 
-    @Value("${spring.session.redis.host}")
-    private String hostName;
-
-    @Value("${spring.session.redis.port}")
-    private Integer port;
+    @Autowired
+    private RedisProperties redisProperties;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        hostName = hostName == null ? "localhost" : hostName;
-        port = port == null || port == 0 ? 6379 : port;
+        String hostName = redisProperties.getHost() == null ? "localhost" : redisProperties.getHost();
+        Integer port = redisProperties.getPort() == null || redisProperties.getPort() == 0 ? 6379 : redisProperties.getPort();
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }

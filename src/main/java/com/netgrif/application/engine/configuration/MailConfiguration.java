@@ -1,9 +1,11 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.JndiMailProperties;
+import com.netgrif.application.engine.configuration.properties.MailAdditionalProperties;
+import com.netgrif.application.engine.configuration.properties.MailTlsProperties;
+import com.netgrif.application.engine.configuration.properties.SpringMailProperties;
 import com.netgrif.application.engine.mail.MailService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,51 +16,39 @@ import java.util.Properties;
 @Configuration
 public class MailConfiguration {
 
-    @Autowired
-    private freemarker.template.Configuration configuration;
+    private final freemarker.template.Configuration configuration;
 
-    @Value("${spring.mail.default-encoding}")
-    private String encoding;
-    @Value("${spring.mail.host}")
-    private String host;
-    @Value("${spring.mail.jndi-name.spring.mail.username}")
-    private String username;
-    @Value("${spring.mail.jndi-name.spring.mail.password}")
-    private String password;
-    @Value("${spring.mail.port}")
-    private int port;
-    @Value("${spring.mail.properties.mail.debug}")
-    private boolean debug;
-    @Value("${spring.mail.properties.mail.smtp.debug}")
-    private boolean smtpDebug;
-    @Value("${spring.mail.properties.mail.smtp.auth}")
-    private boolean smtpAuth;
-    @Value("${spring.mail.properties.mail.smtp.starttls}")
-    private boolean smtpStartTls;
-    @Value("${spring.mail.protocol}")
-    private String protocol;
-    @Value("${spring.mail.test-connection}")
-    private boolean testConnection;
-    @Value("${spring.mail.smtp.starttls.enable}")
-    private boolean smtpStartTlsEnable;
-    @Value("${spring.mail.smtp.starttls.required}")
-    private boolean smtpStartTlsRequired;
+    private final SpringMailProperties springMailProperties;
+
+    private final JndiMailProperties jndiMailProperties;
+
+    private final MailAdditionalProperties mailAdditionalProperties;
+
+    private final MailTlsProperties mailTlsProperties;
+
+    public MailConfiguration(freemarker.template.Configuration configuration, SpringMailProperties springMailProperties, JndiMailProperties jndiMailProperties, MailAdditionalProperties mailAdditionalProperties, MailTlsProperties mailTlsProperties) {
+        this.configuration = configuration;
+        this.springMailProperties = springMailProperties;
+        this.jndiMailProperties = jndiMailProperties;
+        this.mailAdditionalProperties = mailAdditionalProperties;
+        this.mailTlsProperties = mailTlsProperties;
+    }
 
     @Bean
     public JavaMailSenderImpl mailSender() {
         Properties mailProperties = new Properties();
-        mailProperties.put("mail.smtp.starttls.enable", smtpStartTlsEnable);
-        mailProperties.put("mail.smtp.starttls.required", smtpStartTlsRequired);
-        mailProperties.put("mail.debug", debug);
-        mailProperties.put("mail.smtp.debug", smtpDebug);
-        mailProperties.put("mail.smtp.auth", smtpAuth);
-        mailProperties.put("mail.smtp.starttls", smtpStartTls);
+        mailProperties.put("mail.smtp.starttls.enable", mailTlsProperties.isEnable());
+        mailProperties.put("mail.smtp.starttls.required", mailTlsProperties.isRequired());
+        mailProperties.put("mail.debug", mailAdditionalProperties.isDebug());
+        mailProperties.put("mail.smtp.debug", mailAdditionalProperties.getSmtp().isDebug());
+        mailProperties.put("mail.smtp.auth", mailAdditionalProperties.getSmtp().isAuth());
+        mailProperties.put("mail.smtp.starttls", mailAdditionalProperties.getSmtp().isStarttls());
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setPort(port);
-        sender.setHost(host);
-        sender.setUsername(username);
-        sender.setPassword(password);
-        sender.setProtocol(protocol);
+        sender.setPort(springMailProperties.getPort());
+        sender.setHost(springMailProperties.getHost());
+        sender.setUsername(jndiMailProperties.getUsername());
+        sender.setPassword(jndiMailProperties.getPassword());
+        sender.setProtocol(springMailProperties.getProtocol());
         sender.setJavaMailProperties(mailProperties);
         return sender;
     }

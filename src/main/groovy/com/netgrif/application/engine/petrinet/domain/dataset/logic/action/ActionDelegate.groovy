@@ -9,6 +9,8 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.configuration.properties.FilterProperties
+import com.netgrif.application.engine.configuration.properties.NaeMailProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -56,7 +58,6 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.quartz.Scheduler
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
@@ -87,11 +88,11 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String TRANSITIONS = "transitions"
 
-    @Value('${nae.mail.from}')
-    private String mailFrom
+    @Autowired
+    private NaeMailProperties mailProperties
 
-    @Value('${nae.create.default.filters:false}')
-    private Boolean createDefaultFilters
+    @Autowired
+    private FilterProperties filterProperties
 
     @Autowired
     FieldFactory fieldFactory
@@ -1000,12 +1001,12 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
     }
 
     void sendEmail(List<String> to, String subject, String body) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).build();
+        MailDraft mailDraft = MailDraft.builder(mailProperties.from, to).subject(subject).body(body).build();
         sendMail(mailDraft)
     }
 
     void sendEmail(List<String> to, String subject, String body, Map<String, File> attachments) {
-        MailDraft mailDraft = MailDraft.builder(mailFrom, to).subject(subject).body(body).attachments(attachments).build();
+        MailDraft mailDraft = MailDraft.builder(mailProperties.from, to).subject(subject).body(body).attachments(attachments).build();
         sendMail(mailDraft)
     }
 
@@ -1252,7 +1253,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
     }
 
     List<Case> findDefaultFilters() {
-        if (!createDefaultFilters) {
+        if (!filterProperties.createDefault) {
             return []
         }
         return findCases({ it.processIdentifier.eq(FilterRunner.FILTER_PETRI_NET_IDENTIFIER).and(it.author.id.eq(userService.system.stringId)) })

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.configuration.properties.FilterProperties
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
@@ -46,8 +47,8 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
     public static final String FILTER_VISIBILITY_PRIVATE = "private"
     public static final String FILTER_VISIBILITY_PUBLIC = "public"
 
-    @Value('${nae.create.default.filters:false}')
-    private Boolean createDefaultFilters
+    @Autowired
+    private FilterProperties filterProperties
 
     @Autowired
     private IPetriNetService petriNetService
@@ -69,7 +70,7 @@ class DefaultFiltersRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        if (!createDefaultFilters) {
+        if (!filterProperties.createDefault) {
             return
         }
         createCaseFilter("All cases", "assignment", FILTER_VISIBILITY_PUBLIC, "", [], [

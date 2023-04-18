@@ -18,7 +18,7 @@ public class Executor {
     private static final long EXECUTOR_TIMEOUT = 10;
 
     private Map<String, ExecutorService> executors;
-    // TODO: release/7.0.0 properties?
+    // TODO: release/7.0.0 properties? treba prerobiť spolu s indexovaním taskov
     public Executor(@Value("${spring.data.elasticsearch.executors.size:500}") long maxSize, @Value("${spring.data.elasticsearch.executors.timeout:5}") long timeout) {
         this.executors = Collections.synchronizedMap(new ExecutorMaxSizeHashMap(maxSize, timeout));
         log.info("Executor created, thread capacity: " + maxSize);

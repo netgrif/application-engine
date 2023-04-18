@@ -3,6 +3,8 @@ package com.netgrif.application.engine.workflow.service;
 import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
+import com.netgrif.application.engine.configuration.properties.NaeImageProperties;
+import com.netgrif.application.engine.configuration.properties.NaeValidationProperties;
 import com.netgrif.application.engine.history.domain.dataevents.GetDataEventLog;
 import com.netgrif.application.engine.history.domain.dataevents.SetDataEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -88,11 +90,11 @@ public class DataService implements IDataService {
     @Autowired
     protected IValidationService validation;
 
-    @Value("${nae.image.preview.scaling.px:400}")
-    protected int imageScale;
+    @Autowired
+    protected NaeValidationProperties naeValidationProperties;
 
-    @Value("${nae.validation.setData.enable:false}")
-    protected boolean validationEnable;
+    @Autowired
+    protected NaeImageProperties naeImageProperties;
 
     @Override
     public GetDataEventOutcome getData(String taskId, IUser user) {
@@ -189,7 +191,7 @@ public class DataService implements IDataService {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
-        if (validationEnable) {
+        if (naeValidationProperties.getSetData().isEnable()) {
             validation.valid(useCase.getDataSet().get(fieldId));
         }
         useCase = workflowService.save(useCase);
@@ -419,6 +421,7 @@ public class DataService implements IDataService {
         int dot = file.getName().lastIndexOf(".");
         PreviewExtension fileType = PreviewExtension.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
         BufferedImage image = getBufferedImageFromFile(file, fileType);
+        int imageScale = naeImageProperties.getPreview().getScaling().getPx();
         if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
             image = scaleImagePreview(image);
         }
@@ -449,6 +452,7 @@ public class DataService implements IDataService {
     }
 
     private BufferedImage scaleImagePreview(BufferedImage image) {
+        int imageScale = naeImageProperties.getPreview().getScaling().getPx();
         float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
         int targetWidth = Math.round(image.getWidth() / ratio);
         int targetHeight = Math.round(image.getHeight() / ratio);

@@ -2,6 +2,7 @@ package com.netgrif.application.engine.startup
 
 import com.netgrif.application.engine.configuration.drools.interfaces.IRefreshableKieBase
 import com.netgrif.application.engine.configuration.drools.interfaces.IRuleEngineGlobalsProvider
+import com.netgrif.application.engine.configuration.properties.DroolsProperties
 import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -21,20 +22,14 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IRuleEngineGlobalsProvider sessionInitializer
 
-    @Value('${drools.template.generate:#{true}}')
-    private boolean generate
-
-    @Value( value = '${drools.template.path:#{"rules/templates/template.drl"}}')
-    private String generatedTemplatePath
-
-    @Value('${drools.template-resource.classpath:#{"rules/templates/template.drl"}}')
-    private String templateResource
+    @Autowired
+    private DroolsProperties droolsProperties
 
     @Override
     void run(String... strings) throws Exception {
         log.info("Rule engine runner starting")
-        if (generate) {
-            log.info("Generating template to " + generatedTemplatePath)
+        if (droolsProperties.template.generate) {
+            log.info("Generating template to " + droolsProperties.template.path)
             generateTemplate()
         }
 
@@ -50,9 +45,9 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
                 globals: sessionInitializer.globals().collect { "${it.toString()}" }.join(""),
         ]
 
-        String template = engine.createTemplate(new ClassPathResource(templateResource).inputStream.getText()).make(binding)
+        String template = engine.createTemplate(new ClassPathResource(droolsProperties.template.classpath).inputStream.getText()).make(binding)
 
-        File templateFile = new File(generatedTemplatePath)
+        File templateFile = new File(droolsProperties.template.path)
         templateFile.getParentFile().mkdirs()
         boolean deleted = templateFile.delete()
         if (!deleted) {

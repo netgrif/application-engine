@@ -1,10 +1,10 @@
 package com.netgrif.application.engine.startup
 
+import com.netgrif.application.engine.configuration.properties.NaeStorageProperties
 import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component
 @CompileStatic
 class StorageRunner extends AbstractOrderedCommandLineRunner {
 
-    @Value('${nae.storage.clean}')
-    private boolean cleanStorage
+    @Autowired
+    private NaeStorageProperties naeStorageProperties
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration
@@ -23,12 +23,12 @@ class StorageRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating storage folder")
-        File storage = new File("${fileStorageConfiguration.getStoragePath()}/uploadedModels/model.txt")
+        File storage = new File("${fileStorageConfiguration.getProperties().getPath()}/uploadedModels/model.txt")
         storage.getParentFile().mkdirs()
 
-        if (cleanStorage) {
+        if (naeStorageProperties.clean) {
             log.info("Removing files from storage folder and it's sub-folders")
-            purgeDirectory(new File(fileStorageConfiguration.getStoragePath()))
+            purgeDirectory(new File(fileStorageConfiguration.getProperties().getPath()))
         }
 
         log.info("Creating log folder")

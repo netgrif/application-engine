@@ -15,12 +15,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 )
 public class SessionConfigurationStaticEnabled {
 
-    @Value("${spring.session.redis.host}")
-    private String hostName;
-
-    @Value("${spring.session.redis.port}")
-    private Integer port;
-
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         return new JedisConnectionFactory();

@@ -4,7 +4,9 @@ package com.netgrif.application.engine.configuration.authentication.providers.ld
 import com.netgrif.application.engine.configuration.authentication.providers.NetgrifAuthenticationProvider;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.ldap.LdapProperties;
 import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
@@ -37,6 +39,9 @@ import java.util.Collection;
 @ConditionalOnExpression("${nae.ldap.enabled:false}")
 public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProvider {
 
+    @Autowired
+    private LdapProperties springLdapProperties;
+
     protected NaeLdapProperties ldapProperties;
 
     protected PasswordEncoder passwordEncoder;
@@ -56,10 +61,11 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
 
     public BaseLdapPathContextSource contextSource() {
         LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl(ldapProperties.getUrl());
-        contextSource.setBase(ldapProperties.getBase());
-        contextSource.setUserDn(ldapProperties.getUsername());
-        contextSource.setPassword(ldapProperties.getPassword());
+        String url = springLdapProperties.getUrls() == null || springLdapProperties.getUrls().length == 0 ? "" : springLdapProperties.getUrls()[0];
+        contextSource.setUrl(url);
+        contextSource.setBase(springLdapProperties.getBase());
+        contextSource.setUserDn(springLdapProperties.getUsername());
+        contextSource.setPassword(springLdapProperties.getPassword());
         contextSource.afterPropertiesSet();
         return contextSource;
     }

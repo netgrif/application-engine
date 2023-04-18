@@ -6,9 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "nae.filter.export")
+@ConfigurationProperties(prefix = "nae.filter")
 public class FilterProperties {
 
-    private String fileName = "filters.xml";
+    private FilterExportProperties export;
 
+    private boolean createDefault = false;
 }

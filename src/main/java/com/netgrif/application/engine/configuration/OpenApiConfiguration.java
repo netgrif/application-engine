@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 
+import com.netgrif.application.engine.configuration.properties.ProjectProperties;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +19,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 public class OpenApiConfiguration {
 
-    @Value("${project.version}")
-    private String projectVersion;
+    @Autowired
+    private ProjectProperties projectProperties;
 
     @Bean
     public OpenAPI applicationEngineOpenApi() {
@@ -29,7 +31,7 @@ public class OpenApiConfiguration {
                 .info(new Info()
                         .title("Netgrif Application Engine")
                         .description("Web services used in every Netgrif application engine project.")
-                        .version(projectVersion)
+                        .version(projectProperties.getVersion())
                         .license(new License()
                                 .name("NETGRIF Community License")
                                 .url("https://netgrif.com/license")))

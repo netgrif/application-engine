@@ -29,4 +29,8 @@ public class ElasticsearchProperties {
     private String url;
 
     private Map<String, String> index;
+
+    private String clusterName;
+
+    private String searchport;
 }
