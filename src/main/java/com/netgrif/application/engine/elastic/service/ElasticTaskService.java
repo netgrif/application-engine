@@ -2,6 +2,7 @@ package com.netgrif.application.engine.elastic.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.domain.ElasticTask;
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository;
@@ -53,8 +54,8 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     // TODO: release/7.0.0 properties
-    @Value("${spring.data.elasticsearch.index.task}")
-    private String taskIndex;
+    @Autowired
+    private ElasticsearchProperties elasticsearchProperties;
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchTemplate;
@@ -154,7 +155,7 @@ public class ElasticTaskService extends ElasticViewPermissionService implements 
         List<Task> taskPage;
         long total;
         if (query != null) {
-            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(taskIndex));
+            SearchHits<ElasticTask> hits = elasticsearchTemplate.search(query, ElasticTask.class, IndexCoordinates.of(elasticsearchProperties.getIndex().get("task")));
             Page<ElasticTask> indexedTasks = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
             total = indexedTasks.getTotalElements();

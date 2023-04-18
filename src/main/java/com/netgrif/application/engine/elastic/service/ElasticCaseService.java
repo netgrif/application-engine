@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.elastic.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
@@ -44,8 +45,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     private IWorkflowService workflowService;
 
-    @Value("${spring.data.elasticsearch.index.case}")
-    private String caseIndex;
+    @Autowired
+    private ElasticsearchProperties elasticsearchProperties;
 
     @Autowired
     private ElasticsearchRestTemplate template;
@@ -125,7 +126,7 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(caseIndex));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(elasticsearchProperties.getIndex().get("case")));
             Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();

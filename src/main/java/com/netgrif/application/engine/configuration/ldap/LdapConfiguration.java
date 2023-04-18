@@ -3,6 +3,7 @@ package com.netgrif.application.engine.configuration.ldap;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.ldap.LdapProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.LdapTemplate;
@@ -13,15 +14,16 @@ import org.springframework.ldap.core.support.LdapContextSource;
 public class LdapConfiguration {
 
     @Autowired
-    private NaeLdapProperties ldapProperties;
+    private LdapProperties springLdapProperties;
 
     @Bean
     public LdapContextSource contextSource() {
+        String url = springLdapProperties.getUrls() == null || springLdapProperties.getUrls().length == 0 ? "" : springLdapProperties.getUrls()[0];
         LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl(ldapProperties.getUrl());
-        contextSource.setUserDn(ldapProperties.getUsername());
-        contextSource.setPassword(ldapProperties.getPassword());
-        contextSource.setBase(ldapProperties.getBase());
+        contextSource.setUrl(url);
+        contextSource.setUserDn(springLdapProperties.getUsername());
+        contextSource.setPassword(springLdapProperties.getPassword());
+        contextSource.setBase(springLdapProperties.getBase());
         return contextSource;
     }
 

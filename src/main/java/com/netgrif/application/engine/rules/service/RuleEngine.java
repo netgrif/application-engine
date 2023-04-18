@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.rules.service;
 
+import com.netgrif.application.engine.configuration.properties.RuleEngineProperties;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.application.engine.rules.domain.facts.NetImportedFact;
@@ -10,6 +11,7 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.kie.api.runtime.KieSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,8 @@ import java.util.List;
 @Service
 public abstract class RuleEngine implements IRuleEngine {
 
-    // TODO: release/7.0.0 properties
-    @Value("${rule-engine.rethrow-exceptions:#{false}}")
-    protected boolean rethrowExceptions;
+    @Autowired
+    private RuleEngineProperties ruleEngineProperties;
 
     @Lookup
     protected abstract KieSession ruleEngine();
@@ -62,7 +63,7 @@ public abstract class RuleEngine implements IRuleEngine {
             session.fireAllRules();
         } catch (Exception e) {
             log.error("Rule engine failure", e);
-            if (rethrowExceptions) {
+            if (ruleEngineProperties.isRethrowExceptions()) {
                 throw e;
             }
         } finally {

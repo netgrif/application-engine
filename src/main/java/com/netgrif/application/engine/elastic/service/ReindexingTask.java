@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.elastic.service;
 
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
@@ -33,7 +34,6 @@ import java.util.List;
 @ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
 public class ReindexingTask {
 
-    private int pageSize;
     private CaseRepository caseRepository;
     private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
@@ -42,7 +42,7 @@ public class ReindexingTask {
     private IElasticCaseMappingService caseMappingService;
     private IElasticTaskMappingService taskMappingService;
     private IWorkflowService workflowService;
-
+    private final ElasticsearchProperties elasticsearchProperties;
     private LocalDateTime lastRun;
 
     @Autowired
@@ -57,8 +57,8 @@ public class ReindexingTask {
             IElasticCaseMappingService caseMappingService,
             IElasticTaskMappingService taskMappingService,
             IWorkflowService workflowService,
-            @Value("${spring.data.elasticsearch.reindexExecutor.size:20}") int pageSize,
-            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
+            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from,
+            ElasticsearchProperties elasticsearchProperties) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
@@ -67,7 +67,7 @@ public class ReindexingTask {
         this.caseMappingService = caseMappingService;
         this.taskMappingService = taskMappingService;
         this.workflowService = workflowService;
-        this.pageSize = pageSize;
+        this.elasticsearchProperties = elasticsearchProperties;
 
         lastRun = LocalDateTime.now();
         if (from != null) {
@@ -91,7 +91,7 @@ public class ReindexingTask {
     }
 
     private void reindexAllPages(BooleanExpression predicate, long count) {
-        long numOfPages = ((count / pageSize) + 1);
+        long numOfPages = ((count / elasticsearchProperties.getReindexExecutor().getSize()) + 1);
         log.info("Reindexing " + numOfPages + " pages");
 
         for (int page = 0; page < numOfPages; page++) {
@@ -105,7 +105,7 @@ public class ReindexingTask {
 
     private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
         log.info("Reindexing " + (page + 1) + " / " + numOfPages);
-        Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, pageSize));
+        Page<Case> cases = this.workflowService.search(predicate, PageRequest.of(page, elasticsearchProperties.getReindexExecutor().getSize()));
 
         for (Case aCase : cases) {
             if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {

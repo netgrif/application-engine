@@ -1,11 +1,12 @@
 package com.netgrif.application.engine.configuration;
 
+import com.netgrif.application.engine.configuration.properties.ElasticsearchProperties;
 import com.netgrif.application.engine.configuration.properties.UriProperties;
 import com.netgrif.application.engine.workflow.service.CaseEventHandler;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -14,20 +15,8 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 @Configuration
 public class ElasticsearchConfiguration {
 
-    @Value("${spring.data.elasticsearch.url}")
-    private String url;
-
-    @Value("${spring.data.elasticsearch.searchport}")
-    private int port;
-
-    @Value("${spring.data.elasticsearch.index.case}")
-    private String caseIndex;
-
-    @Value("${spring.data.elasticsearch.index.task}")
-    private String taskIndex;
-
-    @Value("${spring.data.elasticsearch.reindex}")
-    private String cron;
+    @Autowired
+    private ElasticsearchProperties elasticsearchProperties;
 
     private final UriProperties uriProperties;
 
@@ -37,17 +26,17 @@ public class ElasticsearchConfiguration {
 
     @Bean
     public String springElasticsearchReindex() {
-        return cron;
+        return elasticsearchProperties.getReindex();
     }
 
     @Bean
     public String elasticCaseIndex() {
-        return caseIndex;
+        return elasticsearchProperties.getIndex().get("case");
     }
 
     @Bean
     public String elasticTaskIndex() {
-        return taskIndex;
+        return elasticsearchProperties.getIndex().get("task");
     }
 
     @Bean
@@ -59,7 +48,7 @@ public class ElasticsearchConfiguration {
     public RestHighLevelClient client() {
 
         return new RestHighLevelClient(
-                RestClient.builder(new HttpHost(url, port, "http")));
+                RestClient.builder(new HttpHost(elasticsearchProperties.getUrl(), elasticsearchProperties.getSearchPort(), "http")));
     }
 
     @Bean

@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.manager.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.configuration.properties.RedisProperties;
 import com.netgrif.application.engine.manager.service.interfaces.ISessionManagerService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -20,13 +22,14 @@ public class SessionManagerService implements ISessionManagerService {
 
     protected final RedisIndexedSessionRepository repository;
     protected final SessionRegistry sessionRegistry;
-
     protected final String redisUsernameKey;
+    private final RedisProperties redisProperties;
 
-    public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry, @Value("${spring.session.redis.namespace}") String redisNamespace) {
+    public SessionManagerService(RedisIndexedSessionRepository repository, SessionRegistry sessionRegistry, RedisProperties redisProperties) {
         this.repository = repository;
         this.sessionRegistry = sessionRegistry;
-        this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisNamespace + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
+        this.redisUsernameKey = RedisIndexedSessionRepository.DEFAULT_NAMESPACE + ":" + redisProperties.getNamespace() + ":index:org.springframework.session.FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME:";
+        this.redisProperties = redisProperties;
     }
 
     @Override

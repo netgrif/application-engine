@@ -1,15 +1,13 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner
 
+import com.netgrif.application.engine.configuration.properties.NaeExpressionsProperties
 import com.netgrif.application.engine.elastic.service.executors.MaxSizeHashMap
 import com.netgrif.application.engine.event.IGroovyShellFactory
-import com.netgrif.application.engine.petrinet.domain.dataset.Field
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.application.engine.workflow.domain.Case
-import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Slf4j
@@ -22,13 +20,16 @@ abstract class CaseFieldsExpressionRunner {
     @Autowired
     private IGroovyShellFactory shellFactory
 
+    @Autowired
+    private NaeExpressionsProperties naeExpressionsProperties
+
     private int cacheSize
 
     private Map<String, Closure> cache = new MaxSizeHashMap<>(cacheSize)
 
     @Autowired
-    CaseFieldsExpressionRunner(@Value('${nae.expressions.runner.cache-size}') int cacheSize) {
-        this.cacheSize = cacheSize
+    CaseFieldsExpressionRunner() {
+        this.cacheSize = naeExpressionsProperties.runner.cacheSize
     }
 
     def run(Case useCase, Expression expression) {
@@ -57,6 +58,6 @@ abstract class CaseFieldsExpressionRunner {
     protected void initCode(Object delegate, Case useCase) {
         ActionDelegate ad = ((ActionDelegate) delegate)
         ad.useCase = useCase
-        ad.initFieldsMap(useCase.dataSet.fields.collectEntries {[(it.key): (it.key)]}, useCase)
+        ad.initFieldsMap(useCase.dataSet.fields.collectEntries { [(it.key): (it.key)] }, useCase)
     }
 }

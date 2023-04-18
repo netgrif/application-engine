@@ -2,6 +2,7 @@ package com.netgrif.application.engine.configuration.drools;
 
 import com.netgrif.application.engine.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.application.engine.configuration.drools.throwable.RuleValidationException;
+import com.netgrif.application.engine.configuration.properties.DroolsProperties;
 import com.netgrif.application.engine.rules.domain.RuleRepository;
 import com.netgrif.application.engine.rules.domain.StoredRule;
 import com.netgrif.application.engine.utils.DateUtils;
@@ -31,11 +32,8 @@ import java.util.Map;
 @Service
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
 
-    @Value("${drools.template.path:rules/templates/template.drl}")
-    private String templatePath;
-
-    @Value("${drools.compile.page-size:100}")
-    private Integer pageSize;
+    @Autowired
+    private DroolsProperties droolsProperties;
 
     @Autowired
     private RuleRepository ruleRepository;
@@ -77,11 +75,11 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
 
     protected KieHelper buildAllRules(KieHelper kieHelper) throws IOException {
         Long count = ruleRepository.count();
-        long numOfPages = ((count / pageSize) + 1);
+        long numOfPages = ((count / droolsProperties.getCompile().getPageSize()) + 1);
 
         log.debug("Compiling rules, count=" + count + ", pages=" + numOfPages);
         for (int page = 0; page < numOfPages; page++) {
-            List<StoredRule> rules = ruleRepository.findAll(PageRequest.of(page, pageSize)).getContent();
+            List<StoredRule> rules = ruleRepository.findAll(PageRequest.of(page, droolsProperties.getCompile().getPageSize())).getContent();
             buildRules(rules, kieHelper);
         }
 
@@ -132,7 +130,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
     }
 
     protected InputStream templateInputStream() throws IOException {
-        return new FileInputStream(templatePath);
+        return new FileInputStream(droolsProperties.getTemplate().getPath());
     }
 
     private String formatDate(LocalDate date) {

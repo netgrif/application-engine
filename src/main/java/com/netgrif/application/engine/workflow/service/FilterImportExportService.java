@@ -308,7 +308,7 @@ public class FilterImportExportService implements IFilterImportExportService {
 
     @Transactional
     protected FileFieldValue createXML(FilterImportExportList filters) throws IOException {
-        String filePath = fileStorageConfiguration.getStoragePath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getFileName();
+        String filePath = fileStorageConfiguration.getProperties().getPath() + "/filterExport/" + userService.getLoggedUser().getStringId() + "/" + filterProperties.getExport().getFileName();
         File f = new File(filePath);
         f.getParentFile().mkdirs();
 
@@ -322,7 +322,7 @@ public class FilterImportExportService implements IFilterImportExportService {
         FileOutputStream fos = new FileOutputStream(f);
         baos.writeTo(fos);
 
-        return new FileFieldValue(filterProperties.getFileName(), filePath);
+        return new FileFieldValue(filterProperties.getExport().getFileName(), filePath);
     }
 
     protected FilterImportExport createExportClass(Case filter) {

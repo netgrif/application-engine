@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.configuration.security;
 
 
+import com.netgrif.application.engine.configuration.properties.ServerLoginProperties;
 import com.netgrif.application.engine.configuration.security.interfaces.IAuthenticationService;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
@@ -20,13 +22,8 @@ import java.util.concurrent.ConcurrentMap;
 @Service
 public class AuthenticationService implements IAuthenticationService {
 
-
-    @Value("${server.login.attempts:10}")
-    private int maxLoginAttempts;
-
-    @Value("${server.login.timeout:15}")
-    private int loginTimeout;
-
+    @Autowired
+    private ServerLoginProperties serverLoginProperties;
 
     private ConcurrentMap<String, Attempt> cache;
 
@@ -63,7 +60,7 @@ public class AuthenticationService implements IAuthenticationService {
         timeout(key);
         Attempt attempt = cache.getOrDefault(key, new Attempt());
         attempt.increase();
-        if (attempt.getCount() >= maxLoginAttempts)
+        if (attempt.getCount() >= serverLoginProperties.getAttempts())
             attempt.setBlockTime(LocalDateTime.now());
 
         cache.put(key, attempt);
@@ -79,7 +76,7 @@ public class AuthenticationService implements IAuthenticationService {
         Attempt attempt = cache.get(key);
         if (attempt == null || attempt.getBlockTime() == null)
             return;
-        if (ChronoUnit.SECONDS.between(attempt.getBlockTime(), LocalDateTime.now()) >= loginTimeout)
+        if (ChronoUnit.SECONDS.between(attempt.getBlockTime(), LocalDateTime.now()) >= serverLoginProperties.getTimeout())
             cache.remove(key);
 
     }
