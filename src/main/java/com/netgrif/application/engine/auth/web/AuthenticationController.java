@@ -198,7 +198,7 @@ public class AuthenticationController {
             if (registrationService.stringMatchesUserPassword(user, password)) {
                 registrationService.changePassword(user, newPassword);
                 securityContextService.saveToken(((LoggedUser) auth.getPrincipal()).getId());
-                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
+                securityContextService.reloadSecurityContext((LoggedUser) auth.getPrincipal(), false);
 
             } else {
                 return MessageResource.errorMessage("Incorrect password!");

@@ -157,7 +157,7 @@ public class UserController {
         securityContextService.saveToken(userId);
         if (Objects.equals(loggedUser.getId(), userId)) {
             loggedUser.setFullName(user.getFullName());
-            securityContextService.reloadSecurityContext(loggedUser);
+            securityContextService.reloadSecurityContext(loggedUser, false);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
         return new UserResource(userResponseFactory.getUser(user, locale), "profile");

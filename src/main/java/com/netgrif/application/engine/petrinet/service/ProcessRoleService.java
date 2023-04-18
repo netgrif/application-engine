@@ -104,7 +104,7 @@ public class ProcessRoleService implements IProcessRoleService {
         if (Objects.equals(userId, loggedUser.getId())) {
             loggedUser.getProcessRoles().clear();
             loggedUser.parseProcessRoles(user.getProcessRoles());
-            securityContextService.reloadSecurityContext(loggedUser);
+            securityContextService.reloadSecurityContext(loggedUser, false);
         }
     }
 

@@ -1,7 +1,9 @@
 package com.netgrif.application.engine.security.service;
 
 import com.netgrif.application.engine.auth.domain.LoggedUser;
+import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ public class SecurityContextService implements ISecurityContextService{
         this.cachedTokens = ConcurrentHashMap.newKeySet();
     }
 
+    @Autowired
+    protected IUserService userService;
+
     /**
      * Saves token to the cache if the state of context object was changed and needs to be updated
      * @param token the token string to be cached
@@ -37,10 +42,14 @@ public class SecurityContextService implements ISecurityContextService{
     /**
      * Reloads the security context according to currently logged user
      * @param loggedUser the user whose context needs to be reloaded
+     * @param forceRefresh is true if the {@param loggedUser} needs to be refreshed from database
      * */
     @Override
-    public void reloadSecurityContext(LoggedUser loggedUser) {
+    public void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
+            if (forceRefresh) {
+                loggedUser = userService.findById(loggedUser.getId(), false).transformToLoggedUser();
+            }
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);
             clearToken(loggedUser.getId());
