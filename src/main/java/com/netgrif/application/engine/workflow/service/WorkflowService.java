@@ -279,7 +279,7 @@ public class WorkflowService implements IWorkflowService {
 
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        PetriNet petriNet = petriNetService.get(new ObjectId(netId)).clone();
         Case useCase = new Case(petriNet);
         useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setColor(color);
@@ -315,7 +315,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {
-        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        PetriNet petriNet = petriNetService.get(new ObjectId(netId)).clone();
         Function<Case, String> makeTitle;
         if (petriNet.hasDynamicCaseName()) {
             makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression()).getTranslation(locale);
@@ -556,7 +556,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void setPetriNet(Case useCase) {
-        PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
+        PetriNet model = petriNetService.get(useCase.getPetriNetObjectId()).clone();
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeArcs(useCase.getDataSet());
         useCase.setPetriNet(model);

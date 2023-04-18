@@ -88,8 +88,6 @@ public interface IPetriNetService {
 
     List<PetriNet> get(List<String> petriNetIds);
 
-    PetriNet clone(ObjectId petriNetId);
-
     void deletePetriNet(String id, LoggedUser loggedUser);
 
     void runActions(List<Action> actions, PetriNet petriNet);
