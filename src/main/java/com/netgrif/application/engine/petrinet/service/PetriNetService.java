@@ -22,7 +22,6 @@ import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetM
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
@@ -162,7 +161,12 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNet> get(List<String> petriNetIds) {
-        return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+        return this.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+    }
+
+    @Override
+    public PetriNet clone(ObjectId petriNetId) {
+        return get(petriNetId).clone();
     }
 
     @Override
@@ -267,7 +271,7 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    @Cacheable(value="petriNetNewest", unless="#result == null")
+    @Cacheable(value = "petriNetNewest", unless = "#result == null")
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty()) {
