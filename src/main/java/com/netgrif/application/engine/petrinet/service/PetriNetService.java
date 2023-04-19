@@ -52,6 +52,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.inject.Provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -118,6 +119,9 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private CacheProperties cacheProperties;
 
+    @Resource
+    private IPetriNetService self;
+
     protected Importer getImporter() {
         return importerProvider.get();
     }
@@ -153,12 +157,12 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<PetriNet> get(Collection<ObjectId> petriNetIds) {
-        return petriNetIds.stream().map(this::get).collect(Collectors.toList());
+        return petriNetIds.stream().map(id -> self.get(id)).collect(Collectors.toList());
     }
 
     @Override
     public List<PetriNet> get(List<String> petriNetIds) {
-        return this.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+        return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
     @Override
@@ -191,7 +195,7 @@ public class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net,  new ByteArrayInputStream(xmlCopy.toByteArray()));
         xmlCopy.close();
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
-        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") was saved in a folder: " +savedPath.toString());
+        log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") was saved in a folder: " + savedPath.toString());
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
@@ -217,13 +221,6 @@ public class PetriNetService implements IPetriNetService {
 
     protected void evaluateRules(PetriNet net, EventPhase phase) {
         ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
-    }
-
-    private InputStream copy(InputStream xmlFile) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, baos);
-        byte[] bytes = baos.toByteArray();
-        return new ByteArrayInputStream(bytes);
     }
 
     @Override
