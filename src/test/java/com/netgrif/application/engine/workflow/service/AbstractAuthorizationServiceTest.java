@@ -14,9 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles({"test"})
 @SpringBootTest
+@ActiveProfiles({"test"})
+@ExtendWith(SpringExtension.class)
 class AbstractAuthorizationServiceTest {
 
     static class MockAuthorizationService extends AbstractAuthorizationService { }
