@@ -82,7 +82,7 @@ class SecurityContextTest {
         def updatedUser = userService.findById(user.getStringId(), false)
         assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
 
-        securityContextService.reloadSecurityContext(updatedUser.transformToLoggedUser())
+        securityContextService.reloadSecurityContext(updatedUser.transformToLoggedUser(),true)
         assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
     }
 }
