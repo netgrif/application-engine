@@ -31,7 +31,7 @@ jobs:
   test:
     name: Test
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 200
     services:
       mongo:
