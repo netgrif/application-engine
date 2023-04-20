@@ -8,12 +8,12 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
 
     MultichoiceMapField() {
         super()
-        this.defaultValue = new HashSet<>()
+        this.defaultValue = new LinkedHashSet<>()
     }
 
     MultichoiceMapField(Map<String, I18nString> choices) {
         super(choices)
-        this.defaultValue = new HashSet<>()
+        this.defaultValue = new LinkedHashSet<>()
     }
 
     MultichoiceMapField(Map<String, I18nString> choices, Set<String> defaultValues) {

@@ -8,14 +8,14 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
 
     MultichoiceField() {
         super()
-        super.setValue(new HashSet<I18nString>())
-        super.setDefaultValue(new HashSet<I18nString>())
+        super.setValue(new LinkedHashSet<I18nString>())
+        super.setDefaultValue(new LinkedHashSet<I18nString>())
     }
 
     MultichoiceField(List<I18nString> values) {
         super(values)
-        super.setValue(new HashSet<I18nString>())
-        super.setDefaultValue(new HashSet<I18nString>())
+        super.setValue(new LinkedHashSet<I18nString>())
+        super.setDefaultValue(new LinkedHashSet<I18nString>())
     }
 
     @Override
@@ -28,7 +28,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
             this.defaultValue = null
         } else {
             String[] vls = value.split(",")
-            def defaults = new HashSet()
+            def defaults = new LinkedHashSet()
             vls.each { s ->
                 defaults << choices.find { it ->
                     it.defaultValue == s.trim()
@@ -42,7 +42,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         if (inits == null || inits.isEmpty()) {
             this.defaultValue = null
         } else {
-            Set<I18nString> defaults = new HashSet<>()
+            Set<I18nString> defaults = new LinkedHashSet<>()
             inits.forEach { initValue ->
                 defaults << choices.find { choice ->
                     choice.defaultValue == initValue.trim()
