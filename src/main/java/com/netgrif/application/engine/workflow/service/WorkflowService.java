@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
-import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
@@ -142,13 +141,20 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOne(String caseId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
-        Case useCase = caseOptional.get();
+        Case useCase = findOneNoNet(caseId);
         setPetriNet(useCase);
         decryptDataSet(useCase);
         this.setImmediateDataFieldsReadOnly(useCase);
+        return useCase;
+    }
+
+    @Override
+    public Case findOneNoNet(String caseId) {
+        Optional<Case> caseOptional = repository.findById(caseId);
+        if (caseOptional.isEmpty()) {
+            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
+        }
+        Case useCase = caseOptional.get();
         return useCase;
     }
 
@@ -391,22 +397,24 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
+    public boolean removeTasksFromCase(List<Task> tasks, String caseId) {
+        if (tasks.isEmpty()) {
+            return true;
+        }
         Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
+        if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
+        }
         Case useCase = caseOptional.get();
         return removeTasksFromCase(tasks, useCase);
     }
 
     @Override
-    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
-        if (StreamSupport.stream(tasks.spliterator(), false).count() == 0) {
+    public boolean removeTasksFromCase(List<Task> tasks, Case useCase) {
+        if (tasks.isEmpty()) {
             return true;
         }
-        boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
-        save(useCase);
-        return deleteSuccess;
+        return useCase.removeTasks(tasks);
     }
 
     @Override
