@@ -674,7 +674,6 @@ class ActionDelegate {
                 List<UserFieldValue> users = [] as List
                 value.each {id -> users.add(new UserFieldValue(userService.findById(id as String, false)))}
                 value = new UserListFieldValue(users)
-                workflowService.resolveUserRef(useCase)
             }
             field.value = value
             saveChangedValue(field)
