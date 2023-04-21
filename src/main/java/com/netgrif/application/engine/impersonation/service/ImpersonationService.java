@@ -81,7 +81,7 @@ public class ImpersonationService implements IImpersonationService {
         updateImpersonatedId(loggedUser, impersonatedLogged.getId(), configs);
         loggedUser.impersonate(impersonatedLogged);
         securityContextService.saveToken(loggedUser.getId());
-        securityContextService.reloadSecurityContext(loggedUser, false);
+        securityContextService.reloadSecurityContext(loggedUser);
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
         return loggedUser;
     }
@@ -103,7 +103,7 @@ public class ImpersonationService implements IImpersonationService {
         impersonator.clearImpersonated();
         log.info(impersonator.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
         securityContextService.saveToken(impersonator.getId());
-        securityContextService.reloadSecurityContext(impersonator, false);
+        securityContextService.reloadSecurityContext(impersonator);
         return impersonator;
     }
 

@@ -42,10 +42,22 @@ public class SecurityContextService implements ISecurityContextService{
     /**
      * Reloads the security context according to currently logged user
      * @param loggedUser the user whose context needs to be reloaded
-     * @param forceRefresh is true if the {@param loggedUser} needs to be refreshed from database
      * */
     @Override
-    public void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
+    public void reloadSecurityContext(LoggedUser loggedUser) {
+        reloadSecurityContext(loggedUser, false);
+    }
+
+    /**
+     * Reloads the security context according to currently logged user from database
+     * @param loggedUser the user whose context needs to be reloaded
+     * */
+    @Override
+    public void forceReloadSecurityContext(LoggedUser loggedUser) {
+        reloadSecurityContext(loggedUser, true);
+    }
+
+    private void reloadSecurityContext(LoggedUser loggedUser, boolean forceRefresh) {
         if (isUserLogged(loggedUser) && cachedTokens.contains(loggedUser.getId())) {
             if (forceRefresh) {
                 loggedUser = userService.findById(loggedUser.getId(), false).transformToLoggedUser();
