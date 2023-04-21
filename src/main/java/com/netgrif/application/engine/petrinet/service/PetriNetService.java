@@ -10,6 +10,8 @@ import com.netgrif.application.engine.history.domain.petrinetevents.ImportPetriN
 import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.importer.service.Importer;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.petrinet.domain.*;
 import com.netgrif.application.engine.ldap.service.interfaces.ILdapGroupRefService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.application.engine.petrinet.domain.*;
@@ -40,7 +42,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -163,6 +164,11 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNet> get(List<String> petriNetIds) {
         return self.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+    }
+
+    @Override
+    public PetriNet clone(ObjectId petriNetId) {
+        return self.get(petriNetId).clone();
     }
 
     @Override
