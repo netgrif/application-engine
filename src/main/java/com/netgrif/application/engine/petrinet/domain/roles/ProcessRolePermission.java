@@ -9,6 +9,6 @@ public enum ProcessRolePermission {
 
     @JsonValue
     public String value() {
-        return super.name();
+        return super.name().toLowerCase();
     }
 }
