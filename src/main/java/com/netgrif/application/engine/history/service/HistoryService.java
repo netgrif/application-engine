@@ -23,6 +23,7 @@ import com.netgrif.application.engine.history.domain.taskevents.repository.Finis
 import com.netgrif.application.engine.history.domain.userevents.UserEventLogRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,6 +65,7 @@ public class HistoryService implements IHistoryService {
     private FinishTaskEventLogRepository finishTaskEventLogRepository;
 
     @Override
+    @Async
     public void save(EventLog eventLog) {
         eventLogRepository.save(eventLog);
     }

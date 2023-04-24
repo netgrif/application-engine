@@ -434,7 +434,6 @@ public class TaskService implements ITaskService {
                 executeTransition(task, workflowService.findOne(useCase.getStringId()));
                 return;
             }
-            resolveUserRef(task, useCase);
         }
     }
 
@@ -791,11 +790,10 @@ public class TaskService implements ITaskService {
             task.setTransactionId(transaction.getStringId());
         }
 
-        resolveUserRef(task, useCase);
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
-        useCase = workflowService.save(useCase);
+        workflowService.resolveUserRef(useCase);
 
         return savedTask;
     }
