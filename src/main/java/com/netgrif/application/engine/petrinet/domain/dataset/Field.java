@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -34,7 +35,27 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @Document
 @Data
 @NoArgsConstructor
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = BooleanField.class, name = "BOOLEAN"),
+        @JsonSubTypes.Type(value = ButtonField.class, name = "BUTTON"),
+        @JsonSubTypes.Type(value = CaseField.class, name = "CASE_REF"),
+        @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
+        @JsonSubTypes.Type(value = DateTimeField.class, name = "DATE_TIME"),
+        @JsonSubTypes.Type(value = EnumerationField.class, name = "ENUMERATION"),
+        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP_FIELD"),
+        @JsonSubTypes.Type(value = FileField.class, name = "FILE"),
+        @JsonSubTypes.Type(value = FileListField.class, name = "FILE_LIST"),
+        @JsonSubTypes.Type(value = FilterField.class, name = "FILTER"),
+        @JsonSubTypes.Type(value = I18nField.class, name = "I_18_N"),
+        @JsonSubTypes.Type(value = MultichoiceField.class, name = "MULTICHOICE"),
+        @JsonSubTypes.Type(value = MultichoiceMapField.class, name = "MULTICHOICE_MAP"),
+        @JsonSubTypes.Type(value = NumberField.class, name = "NUMBER"),
+        @JsonSubTypes.Type(value = TaskField.class, name = "TASK_REF"),
+        @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
+        @JsonSubTypes.Type(value = UserField.class, name = "USER"),
+        @JsonSubTypes.Type(value = UserListField.class, name = "USER_LIST"),
+})
 public abstract class Field<T> extends Imported {
 
     @Id

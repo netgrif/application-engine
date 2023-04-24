@@ -32,7 +32,7 @@ public class DataSetInitializer {
             }
             if (useCaseField.isDynamicDefaultValue()) {
                 dynamicValueFields.add(useCaseField);
-            } else if (useCaseField.getDefaultValue() != null) {
+            } else {
                 useCaseField.applyDefaultValue();
             }
             if (useCaseField instanceof ChoiceField) {
