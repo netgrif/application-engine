@@ -62,6 +62,33 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superUser = superUser
         }
 
+        userService.saveNew(new User(
+                name: "Alice",
+                surname: "First",
+                email: "alice_first@netgrif.com",
+                password: superAdminPassword,
+                state: UserState.ACTIVE,
+                authorities: [adminAuthority, systemAuthority] as Set<Authority>,
+                processRoles: processRoleService.findAll() as Set<ProcessRole>))
+
+        userService.saveNew(new User(
+                name: "Bob",
+                surname: "Second",
+                email: "bob_second@netgrif.com",
+                password: superAdminPassword,
+                state: UserState.ACTIVE,
+                authorities: [adminAuthority, systemAuthority] as Set<Authority>,
+                processRoles: processRoleService.findAll() as Set<ProcessRole>))
+
+        userService.saveNew(new User(
+                name: "Carol",
+                surname: "Third",
+                email: "carol_third@netgrif.com",
+                password: superAdminPassword,
+                state: UserState.ACTIVE,
+                authorities: [adminAuthority, systemAuthority] as Set<Authority>,
+                processRoles: processRoleService.findAll() as Set<ProcessRole>))
+
         return this.superUser
     }
 
