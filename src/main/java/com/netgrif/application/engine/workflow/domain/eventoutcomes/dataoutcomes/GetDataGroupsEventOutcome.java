@@ -15,6 +15,10 @@ public class GetDataGroupsEventOutcome extends TaskEventOutcome {
 
     private List<DataGroup> data;
 
+    public GetDataGroupsEventOutcome() {
+        super();
+    }
+
     public GetDataGroupsEventOutcome(Case aCase, Task task) {
         super(aCase, task);
     }

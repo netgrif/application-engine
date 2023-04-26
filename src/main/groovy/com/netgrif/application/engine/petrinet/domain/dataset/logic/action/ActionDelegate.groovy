@@ -424,7 +424,7 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
     }
 
     protected SetDataEventOutcome createSetDataEventOutcome() {
-        return new SetDataEventOutcome(this.useCase, this.task.orElse(null))
+        return new SetDataEventOutcome()
     }
 
     def saveChangedValidation(Field field) {
