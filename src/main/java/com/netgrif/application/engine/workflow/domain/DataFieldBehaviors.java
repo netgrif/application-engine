@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.netgrif.application.engine.mapper.filters.DataFieldBehaviorFilter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,6 +15,7 @@ public class DataFieldBehaviors {
     /**
      * TransitionId: [FieldBehavior]
      */
+    @JsonInclude(content = JsonInclude.Include.CUSTOM, contentFilter = DataFieldBehaviorFilter.class)
     private Map<String, DataFieldBehavior> behaviors;
 
     public DataFieldBehaviors() {

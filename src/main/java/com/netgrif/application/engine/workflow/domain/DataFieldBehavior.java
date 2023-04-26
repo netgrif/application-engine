@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.workflow.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import lombok.Data;
 
@@ -9,10 +11,13 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @Data
 public class DataFieldBehavior {
 
+    @JsonIgnore
     private FieldBehavior behavior;
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean required;
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean immediate;
 
     public DataFieldBehavior() {
@@ -26,20 +31,28 @@ public class DataFieldBehavior {
         this.behavior = behavior;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public boolean isForbidden() {
         return isBehaviorSet(FORBIDDEN);
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public boolean isEditable() {
         return isBehaviorSet(EDITABLE);
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public boolean isHidden() {
         return isBehaviorSet(HIDDEN);
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public boolean isVisible() {
         return isBehaviorSet(VISIBLE);
+    }
+
+    public boolean hasNonDefaultBehaviourSet() {
+        return !isEditable() || isVisible() || isHidden() || isForbidden() || isRequired() || isImmediate();
     }
 
     private boolean isBehaviorSet(FieldBehavior behavior) {

@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.petrinet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldLayout;
@@ -27,7 +28,10 @@ public class DataRef {
     @Transient
     private Field<?> field;
     @Transient
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = DataFieldBehavior.class)
     private DataFieldBehavior behavior;
+
+    @JsonIgnore
     private Map<DataEventType, DataEvent> events;
     private FieldLayout layout;
     private Component component;
