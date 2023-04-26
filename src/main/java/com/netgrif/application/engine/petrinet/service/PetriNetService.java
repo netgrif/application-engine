@@ -204,16 +204,13 @@ public class PetriNetService implements IPetriNetService {
 
         outcome.setOutcomes(eventService.runActions(net.getPreUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.PRE);
-        save(net);
-        this.evictCache(net);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.PRE, net.getObjectId()));
+        save(net);
         outcome.setOutcomes(eventService.runActions(net.getPostUploadActions(), null, Optional.empty()));
         evaluateRules(net, EventPhase.POST);
-        save(net);
         historyService.save(new ImportPetriNetEventLog(null, EventPhase.POST, net.getObjectId()));
         addMessageToOutcome(net, ProcessEventType.UPLOAD, outcome);
         outcome.setNet(imported.get());
-        this.evictCache(net);
         return outcome;
     }
 
@@ -225,12 +222,16 @@ public class PetriNetService implements IPetriNetService {
     }
 
     protected void evaluateRules(PetriNet net, EventPhase phase) {
-        ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
+        int rulesExecuted = ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
+        if (rulesExecuted > 0) {
+            save(net);
+            this.evictCache(net);
+        }
     }
 
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
-        petriNet.initializeArcs();
+        petriNet.initializeArcs(); // TODO: why?
 
         return Optional.of(repository.save(petriNet));
     }

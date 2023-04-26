@@ -130,11 +130,11 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    
     public AssignTaskEventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if (!taskOptional.isPresent())
+        if (taskOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
+        }
 
         IUser user = getUserFromLoggedUser(loggedUser);
         return assignTask(taskOptional.get(), user);
@@ -147,7 +147,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    
     public AssignTaskEventOutcome assignTask(Task task, IUser user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -167,7 +166,6 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    
     protected Case assignTaskToUser(IUser user, Task task, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
         useCase.getPetriNet().initializeArcs();
@@ -387,7 +385,10 @@ public class TaskService implements ITaskService {
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
         Case useCase = workflowService.findOne(caseId);
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
-        ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
+        int rulesExecuted = ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
+        if (rulesExecuted == 0) {
+            return useCase;
+        }
         return workflowService.save(useCase);
     }
 
@@ -411,31 +412,25 @@ public class TaskService implements ITaskService {
         PetriNet net = useCase.getPetriNet();
 
         List<Task> newTasks = new ArrayList<>();
+        List<Task> disabledTasks = new ArrayList<>();
         Map<String, String> tasks = useCase.getTasks().stream().collect(Collectors.toMap(TaskPair::getTransition, TaskPair::getTask));
         for (Transition transition : net.getTransitions().values()) {
             String taskId = tasks.get(transition.getImportId());
-            if (isExecutable(transition, net)) {
-                if (taskId != null) {
-                    // do nothing: task is already created
-                } else {
-                    // create a new task
-                    Task newTask = createFromTransition(transition, useCase);
-                    newTasks.add(newTask);
+            if (isExecutableAndTaskDoesNotExist(net, transition, taskId)) {
+                newTasks.add(createFromTransition(transition, useCase));
+            } else if (taskId != null) {
+                Optional<Task> optionalTask = taskRepository.findById(taskId);
+                if (optionalTask.isEmpty()) {
+                    continue;
                 }
-            } else {
-                if (taskId != null) {
-                    // delete task if not assigned
-                    Task task = taskRepository.findById(taskId).get();
-                    if (task.getUserId() != null && !task.getUserId().isBlank()) {
-                        // task is assigned, do not remove
-                    } else {
-                        delete(List.of(task), useCase);
-                    }
-                } else {
-                    // do nothing: task does not exist
+                Task task = optionalTask.get();
+                if (isNotAssigned(task)) {
+                    disabledTasks.add(task);
                 }
             }
         }
+        save(newTasks);
+        delete(disabledTasks, useCase);
         workflowService.save(useCase);
 
         for (Task task : newTasks) {
@@ -448,6 +443,14 @@ public class TaskService implements ITaskService {
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    private boolean isNotAssigned(Task task) {
+        return !(task.getUserId() != null && !task.getUserId().isBlank());
+    }
+
+    private boolean isExecutableAndTaskDoesNotExist(PetriNet net, Transition transition, String taskId) {
+        return isExecutable(transition, net) && taskId == null;
     }
 
     boolean isExecutable(Transition transition, PetriNet net) {
@@ -770,11 +773,9 @@ public class TaskService implements ITaskService {
             task.setTransactionId(transaction.getStringId());
         }
 
-        Task savedTask = save(task);
+        useCase.addTask(task);
 
-        useCase.addTask(savedTask);
-
-        return savedTask;
+        return task;
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {

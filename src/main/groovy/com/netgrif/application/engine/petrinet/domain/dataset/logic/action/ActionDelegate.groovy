@@ -47,6 +47,7 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.domain.QTask
 import com.netgrif.application.engine.workflow.domain.Task
+import com.netgrif.application.engine.workflow.domain.TaskPair
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome
@@ -1871,4 +1872,31 @@ class ActionDelegate {
         return new I18nString(value, translations)
     }
 
+
+
+    /////////////////////////////////////////////
+    def getChildTaskId(String tableId, String parentTransId, String identifier, String transition = null, Map<String, Object> data = null) {
+        Case table = createTable(useCase.stringId, tableId, parentTransId, identifier, data)
+        return table.tasks.find { it.transition == transition }?.task
+    }
+
+    Case createTable(String parentId, String tableId, String parentTransId, String identifier, Map<String, Object> data = null) {
+        Case titleCase = createCase(identifier)
+        titleCase.dataSet["parentId"].value = parentId
+        titleCase.dataSet["parentTableId"].value = tableId
+        titleCase.dataSet["parentTransId"].value = parentTransId
+
+        if (data) {
+            data.each { key, value -> titleCase.dataSet[key].value = value }
+        }
+
+        return workflowService.save(titleCase)
+    }
+
+    List<String> getTaskIds(List<String> transitionIds, Case aCase = useCase) {
+        return aCase.tasks.stream()
+                .filter(it -> transitionIds.contains(it.transition))
+                .sorted( Comparator.comparing(TaskPair::getTransition, Comparator.comparingInt { transitions -> transitionIds.indexOf(transitions)}))
+                .collect { it -> it.task }
+    }
 }
