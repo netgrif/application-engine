@@ -42,4 +42,8 @@ public class DataFieldBehaviors {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
         return clone;
     }
+
+    public boolean hasAnyBehaviorOnAnyTransition() {
+        return behaviors.values().parallelStream().map(DataFieldBehavior::hasNonDefaultBehaviourSet).reduce(false, (acc, el) -> acc || el);
+    }
 }

@@ -1,8 +1,8 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.mapper.filters.DataFieldBehaviorsFilter;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
@@ -21,7 +21,6 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.annotate.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -68,6 +67,7 @@ public abstract class Field<T> extends Imported {
     private I18nString name;
     private I18nString description;
     private I18nString placeholder;
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = DataFieldBehaviorsFilter.class)
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
     @JsonIgnore
@@ -82,6 +82,11 @@ public abstract class Field<T> extends Imported {
     private Long version = 0L;
     // TODO: release/7.0.0 6.2.5: parentTaskId, parentCaseId
 
+    public String getId() {
+        return id.toString();
+    }
+
+    @JsonIgnore
     public String getStringId() {
         return importId;
     }
