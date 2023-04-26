@@ -8,10 +8,7 @@ import com.netgrif.application.engine.petrinet.domain.repository.UriNodeReposito
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -22,7 +19,7 @@ import java.util.stream.StreamSupport;
 public class UriService implements IUriService {
 
 
-    private static final String DEFAULT_ROOT_URI = "root";
+    private static final String DEFAULT_ROOT_URI = "/";
 
     private static final String DEFAULT_ROOT_NAME = "root";
 
@@ -96,17 +93,6 @@ public class UriService implements IUriService {
     }
 
     /**
-     * Retrieves UriNode based on uri
-     *
-     * @param uri ID of UriNode
-     * @return UriNode
-     */
-    @Override
-    public UriNode findByUri(String uri) {
-        return uriNodeRepository.findByUriPath(uri);
-    }
-
-    /**
      * Collects direct relatives (parent and children) of input UriNode and returns filled object
      *
      * @param uriNode to be filled with relatives
@@ -133,7 +119,7 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode move(String uri, String destUri) {
-        UriNode uriNode = findByUri(uri);
+        UriNode uriNode = findById(uri);
         return move(uriNode, destUri);
     }
 
@@ -154,7 +140,11 @@ public class UriService implements IUriService {
         uriNodeRepository.saveAll(List.of(oldParent, newParent));
 
         node.setParentId(newParent.getId());
-        node.setUriPath(destUri + uriProperties.getSeparator() + node.getName());
+
+        if (destUri.indexOf(DEFAULT_ROOT_URI) != 0) {
+            destUri = DEFAULT_ROOT_URI + destUri;
+        }
+        node.setId(destUri + uriProperties.getSeparator() + node.getName());
         return uriNodeRepository.save(node);
     }
 
@@ -178,28 +168,29 @@ public class UriService implements IUriService {
     }
 
     /**
-     * Creates new UriNode from URI path, or retrieves existing one
+     * Creates new UriNode from URI, or retrieves existing one
      *
      * @param uri         to be used for creating UriNode
      * @param contentType to decide the content type of UriNode
-     * @return the UriNode that was created or modified netgrif/process/test/all_data, netgrif/process
+     * @return the UriNode that was created or modified /netgrif/process/test/all_data, /netgrif/process
      */
     @Override
     public UriNode getOrCreate(String uri, UriContentType contentType) {
         LinkedList<UriNode> uriNodeList = new LinkedList<>();
-        String[] uriComponents = uri.split(uriProperties.getSeparator());
+        List<String> uriComponents = Arrays.asList(DEFAULT_ROOT_URI);
+        uriComponents.addAll(Arrays.asList(uri.split(uriProperties.getSeparator())));
         StringBuilder uriBuilder = new StringBuilder();
-        int pathLength = uriComponents.length;
-        UriNode parent = pathLength > 1 || !uri.equals(DEFAULT_ROOT_URI) ? uriNodeRepository.findByUriPath(DEFAULT_ROOT_URI) : null;
+        int pathLength = uriComponents.size();
+        UriNode parent = pathLength > 1 || !uri.equals(DEFAULT_ROOT_URI) ? uriNodeRepository.findById(DEFAULT_ROOT_URI).orElse(null) : null;
 
         for (int i = 0; i < pathLength; i++) {
-            uriBuilder.append(uriComponents[i]);
-            UriNode uriNode = uriNodeRepository.findByUriPath(uriBuilder.toString());
+            uriBuilder.append(uriComponents.get(i));
+            UriNode uriNode = uriNodeRepository.findById(uriBuilder.toString()).orElse(null);
             if (uriNode == null) {
                 uriNode = new UriNode();
-                uriNode.setName(uriComponents[i]);
+                uriNode.setName(uriComponents.get(i));
                 uriNode.setLevel(i + 1);
-                uriNode.setUriPath(uriBuilder.toString());
+                uriNode.setId(uriBuilder.toString());
                 uriNode.setParentId(parent != null ? parent.getId() : null);
             }
             if (i == pathLength - 1 && contentType != null) {
@@ -224,12 +215,12 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode createDefault() {
-        UriNode uriNode = uriNodeRepository.findByUriPath(DEFAULT_ROOT_URI);
+        UriNode uriNode = uriNodeRepository.findById(DEFAULT_ROOT_URI).orElse(null);
         if (uriNode == null) {
             uriNode = new UriNode();
             uriNode.setName(DEFAULT_ROOT_NAME);
             uriNode.setLevel(FIRST_LEVEL);
-            uriNode.setUriPath(DEFAULT_ROOT_URI);
+            uriNode.setId(DEFAULT_ROOT_URI);
             uriNode.setParentId(null);
             uriNode.addContentType(UriContentType.DEFAULT);
             uriNode = uriNodeRepository.save(uriNode);

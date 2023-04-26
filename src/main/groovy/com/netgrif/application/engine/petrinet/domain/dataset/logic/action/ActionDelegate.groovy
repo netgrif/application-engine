@@ -1375,7 +1375,7 @@ class ActionDelegate {
     }
 
     def getUri(String uri) {
-        return uriService.findByUri(uri);
+        return uriService.findById(uri);
     }
 
     def createUri(String uri, UriContentType type) {
@@ -1533,7 +1533,7 @@ class ActionDelegate {
          uri        : { cl ->
              filter = workflowService.findOne(filter.stringId)
              def uri = cl() as String
-             filter.setUriNodeId(uriService.findByUri(uri).id)
+             filter.setUriNodeId(uriService.findById(uri).id)
              workflowService.save(filter)
          }]
     }
@@ -1628,7 +1628,7 @@ class ActionDelegate {
          uri         : { cl ->
              item = workflowService.findOne(item.stringId)
              def uri = cl() as String
-             item.setUriNodeId(uriService.findByUri(uri).id)
+             item.setUriNodeId(uriService.findById(uri).id)
              workflowService.save(item)
          }]
     }
@@ -1716,7 +1716,7 @@ class ActionDelegate {
         }
         orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
         Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
-        itemCase.setUriNodeId(uriService.findByUri(uri).id)
+        itemCase.setUriNodeId(uriService.findById(uri).id)
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
         itemCase = workflowService.save(itemCase)
@@ -1831,7 +1831,7 @@ class ActionDelegate {
     }
 
     private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
-        UriNode uriNode = uriService.findByUri(uri)
+        UriNode uriNode = uriService.findById(uri)
         if (!orgGroup) {
             return uriNode ? findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"") : null
         }
