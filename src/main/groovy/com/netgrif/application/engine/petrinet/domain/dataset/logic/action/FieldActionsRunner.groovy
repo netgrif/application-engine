@@ -58,8 +58,7 @@ abstract class FieldActionsRunner {
             log.error("Action: $action.definition")
             throw e
         }
-        def outcomes = ((ActionDelegate) code.delegate).outcomes
-        return outcomes
+        return ((ActionDelegate) code.delegate).outcomes
     }
 
     Pair<Closure, ActionDelegate> getActionCode(Action action, List<Function> functions, boolean shouldRewriteCachedActions = false) {
