@@ -157,14 +157,11 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode getOrCreate(PetriNet petriNet, UriContentType contentType) {
-        String identifier = petriNet.getIdentifier();
-        String modifiedUri;
-        if (identifier.contains(uriProperties.getSeparator()))
-            modifiedUri = identifier.substring(0, identifier.lastIndexOf(uriProperties.getSeparator()));
-        else
-            modifiedUri = DEFAULT_ROOT_URI;
-
-        return getOrCreate(modifiedUri, contentType);
+        String uri = petriNet.getUriNodeId();
+        if (uri == null) {
+            uri = DEFAULT_ROOT_URI;
+        }
+        return getOrCreate(uri, contentType);
     }
 
     /**
@@ -176,20 +173,28 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode getOrCreate(String uri, UriContentType contentType) {
+        if (!uri.startsWith(DEFAULT_ROOT_URI)) {
+            uri = DEFAULT_ROOT_URI + uri;
+        }
+
         LinkedList<UriNode> uriNodeList = new LinkedList<>();
-        List<String> uriComponents = Arrays.asList(DEFAULT_ROOT_URI);
-        uriComponents.addAll(Arrays.asList(uri.split(uriProperties.getSeparator())));
+        String[] uriComponents = uri.split(uriProperties.getSeparator());
+        if (uriComponents.length == 0) {
+            uriComponents = new String[]{DEFAULT_ROOT_URI};
+        } else {
+            uriComponents[0] = DEFAULT_ROOT_URI;
+        }
         StringBuilder uriBuilder = new StringBuilder();
-        int pathLength = uriComponents.size();
+        int pathLength = uriComponents.length;
         UriNode parent = pathLength > 1 || !uri.equals(DEFAULT_ROOT_URI) ? uriNodeRepository.findById(DEFAULT_ROOT_URI).orElse(null) : null;
 
         for (int i = 0; i < pathLength; i++) {
-            uriBuilder.append(uriComponents.get(i));
+            uriBuilder.append(uriComponents[i]);
             UriNode uriNode = uriNodeRepository.findById(uriBuilder.toString()).orElse(null);
             if (uriNode == null) {
                 uriNode = new UriNode();
-                uriNode.setName(uriComponents.get(i));
-                uriNode.setLevel(i + 1);
+                uriNode.setName(uriComponents[i]);
+                uriNode.setLevel(i);
                 uriNode.setId(uriBuilder.toString());
                 uriNode.setParentId(parent != null ? parent.getId() : null);
             }
@@ -201,7 +206,9 @@ public class UriService implements IUriService {
                 parent.getChildrenId().add(uriNode.getId());
                 uriNodeRepository.save(parent);
             }
-            uriBuilder.append(uriProperties.getSeparator());
+            if (i > 0) {
+                uriBuilder.append(uriProperties.getSeparator());
+            }
             uriNodeList.add(uriNode);
             parent = uriNode;
         }
