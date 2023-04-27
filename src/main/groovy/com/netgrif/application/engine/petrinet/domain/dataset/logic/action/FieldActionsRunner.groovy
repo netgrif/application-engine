@@ -57,26 +57,8 @@ abstract class FieldActionsRunner {
         } catch (Exception e) {
             log.error("Action: $action.definition")
             throw e
-        } finally {
-            actionsCacheService.getCachedFunctions(functions).each {
-                code.delegate.metaClass."${it.function.name}" = null
-            }
-            actionsCacheService.getNamespaceFunctionCache().each { entry ->
-                entry.getValue().each {
-                    code.delegate.metaClass."${entry.key}"."${it.function.name}".delegate = null
-                    code.delegate.metaClass."${entry.key}"."${it.function.name}".thisObject = null
-                    code.delegate.metaClass."${entry.key}"."${it.function.name}".owner = null
-                    code.delegate.metaClass."${entry.key}"."${it.function.name}" = null
-                }
-
-            }
         }
         def outcomes = ((ActionDelegate) code.delegate).outcomes
-        code.delegate.metaPropertyValues?.each {
-            code.delegate.metaClass."${it}" = null
-        }
-
-        code.delegate = null
         return outcomes
     }
 
@@ -86,7 +68,7 @@ abstract class FieldActionsRunner {
 
     Pair<Closure, ActionDelegate> getActionCode(Closure code, List<Function> functions) {
         def actionDelegate = getActionDeleget()
-        def functionDelegate = getActionDeleget()
+        def namespaceDelegate = getActionDeleget()
 
         actionsCacheService.getCachedFunctions(functions).each {
             actionDelegate.metaClass."${it.function.name}" << it.code
@@ -94,13 +76,13 @@ abstract class FieldActionsRunner {
         actionsCacheService.getNamespaceFunctionCache().each { entry ->
             def namespace = [:]
             entry.getValue().each {
-                namespace["${it.function.name}"] = it.code.rehydrate(functionDelegate, it.code.owner, it.code.thisObject)
+                namespace["${it.function.name}"] = it.code.rehydrate(namespaceDelegate, it.code.owner, it.code.thisObject)
             }
             actionDelegate.metaClass."${entry.key}" = namespace
         }
 
         Closure resultCode = code.rehydrate(actionDelegate, code.owner, code.thisObject)
-        return new Pair<Closure, ActionDelegate>(resultCode, functionDelegate)
+        return new Pair<Closure, ActionDelegate>(resultCode, namespaceDelegate)
     }
 
     void addToCache(String key, Object value) {
