@@ -1871,32 +1871,4 @@ class ActionDelegate {
     I18nString i18n(String value, Map<String, String> translations) {
         return new I18nString(value, translations)
     }
-
-
-
-    /////////////////////////////////////////////
-    def getChildTaskId(String tableId, String parentTransId, String identifier, String transition = null, Map<String, Object> data = null) {
-        Case table = createTable(useCase.stringId, tableId, parentTransId, identifier, data)
-        return table.tasks.find { it.transition == transition }?.task
-    }
-
-    Case createTable(String parentId, String tableId, String parentTransId, String identifier, Map<String, Object> data = null) {
-        Case titleCase = createCase(identifier)
-        titleCase.dataSet["parentId"].value = parentId
-        titleCase.dataSet["parentTableId"].value = tableId
-        titleCase.dataSet["parentTransId"].value = parentTransId
-
-        if (data) {
-            data.each { key, value -> titleCase.dataSet[key].value = value }
-        }
-
-        return workflowService.save(titleCase)
-    }
-
-    List<String> getTaskIds(List<String> transitionIds, Case aCase = useCase) {
-        return aCase.tasks.stream()
-                .filter(it -> transitionIds.contains(it.transition))
-                .sorted( Comparator.comparing(TaskPair::getTransition, Comparator.comparingInt { transitions -> transitionIds.indexOf(transitions)}))
-                .collect { it -> it.task }
-    }
 }

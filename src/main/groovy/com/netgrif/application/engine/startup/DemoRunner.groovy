@@ -3,7 +3,6 @@ package com.netgrif.application.engine.startup
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.elastic.domain.ElasticTaskRepository
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
@@ -46,13 +45,5 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-//        def folder = new File("/home/juraj/Documents/NAE/backend/src/main/resources/petriNets/iw")
-//        List<PetriNet> nets = []
-//        folder.listFiles().each {
-//            nets << helper.createNet("iw/"+it.getName()).get()
-//        }
-        def net = helper.createNet("zmluva (2).xml").get()
-//        helper.createCase("Test case", net)
-//        helper.createCase("record", nets.find {it.identifier == "record_inserting"})
     }
 }
