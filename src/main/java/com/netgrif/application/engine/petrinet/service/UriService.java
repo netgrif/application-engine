@@ -62,8 +62,9 @@ public class UriService implements IUriService {
     @Override
     public UriNode getRoot() {
         List<UriNode> nodes = uriNodeRepository.findAllByLevel(FIRST_LEVEL);
-        if (nodes.size() != 1)
-            throw new IllegalStateException("Excatly one root uri node must exist!");
+        if (nodes.size() != 1) {
+            throw new IllegalStateException("Exactly one root uri node must exist!");
+        }
         return nodes.get(0);
     }
 
@@ -87,8 +88,9 @@ public class UriService implements IUriService {
     @Override
     public UriNode findById(String id) {
         Optional<UriNode> navNodeOptional = uriNodeRepository.findById(id);
-        if (navNodeOptional.isEmpty())
+        if (navNodeOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find NavNode with id [" + id + "]");
+        }
         return navNodeOptional.get();
     }
 
@@ -100,7 +102,9 @@ public class UriService implements IUriService {
      */
     @Override
     public UriNode populateDirectRelatives(UriNode uriNode) {
-        if (uriNode == null) return null;
+        if (uriNode == null) {
+            return null;
+        }
         if (uriNode.getLevel() != FIRST_LEVEL) {
             UriNode parent = findById(uriNode.getParentId());
             uriNode.setParent(parent);
