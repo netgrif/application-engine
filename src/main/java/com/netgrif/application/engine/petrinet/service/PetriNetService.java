@@ -225,14 +225,13 @@ public class PetriNetService implements IPetriNetService {
         int rulesExecuted = ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
         if (rulesExecuted > 0) {
             save(net);
-            this.evictCache(net);
         }
     }
 
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
-        petriNet.initializeArcs(); // TODO: why?
-
+        petriNet.initializeArcs();
+        this.evictCache(petriNet);
         return Optional.of(repository.save(petriNet));
     }
 

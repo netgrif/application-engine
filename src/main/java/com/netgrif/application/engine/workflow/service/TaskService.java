@@ -406,6 +406,7 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public void reloadTasks(Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Reloading tasks in [" + useCase.getTitle() + "]");
@@ -416,16 +417,29 @@ public class TaskService implements ITaskService {
         Map<String, String> tasks = useCase.getTasks().stream().collect(Collectors.toMap(TaskPair::getTransition, TaskPair::getTask));
         for (Transition transition : net.getTransitions().values()) {
             String taskId = tasks.get(transition.getImportId());
-            if (isExecutableAndTaskDoesNotExist(net, transition, taskId)) {
-                newTasks.add(createFromTransition(transition, useCase));
-            } else if (taskId != null) {
-                Optional<Task> optionalTask = taskRepository.findById(taskId);
-                if (optionalTask.isEmpty()) {
-                    continue;
+            if (isExecutable(transition, net)) {
+                if (taskId != null) {
+                    // task exists - do nothing
+                } else {
+                    // task does not exist - create a new task
+                    newTasks.add(createFromTransition(transition, useCase));
                 }
-                Task task = optionalTask.get();
-                if (isNotAssigned(task)) {
-                    disabledTasks.add(task);
+            } else {
+                if (taskId != null) {
+                    // task exists - delete task if not assigned
+                    Optional<Task> optionalTask = taskRepository.findById(taskId);
+                    if (optionalTask.isEmpty()) {
+                        continue;
+                    }
+                    Task task = optionalTask.get();
+                    if (task.getUserId() != null && !task.getUserId().isBlank()) {
+                        // task is assigned - do not delete
+                    } else {
+                        // task is not assigned - delete
+                        disabledTasks.add(task);
+                    }
+                } else {
+                    // task does not exist - do nothing
                 }
             }
         }
