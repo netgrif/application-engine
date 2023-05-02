@@ -18,9 +18,12 @@ public class UriNode {
 
     @Id
     @Getter
+    private String id;
+
+    @Getter
     @Setter
     @Field(type = Keyword)
-    private String id;
+    private String uriPath;
 
     @Getter
     @Setter

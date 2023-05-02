@@ -188,6 +188,7 @@ public class PetriNetService implements IPetriNetService {
         }
         PetriNet net = imported.get();
         UriNode uriNode = uriService.getOrCreate(net, UriContentType.PROCESS);
+        // TODO nasetovat hodnotu z frontendu (active node)
         net.setUriNodeId(uriNode.getId());
 
         PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());

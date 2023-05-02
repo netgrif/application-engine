@@ -42,6 +42,13 @@ public interface IUriService {
     UriNode findById(String id);
 
     /**
+     * Retrieves UriNode based on uri
+     * @param path of UriNode
+     * @return UriNode
+     * */
+    UriNode findByUri(String path);
+
+    /**
      * Collects direct relatives (parent and children) of input UriNode and returns filled object
      * @param uriNode to be filled with relatives
      * @return filled UriNode
@@ -73,7 +80,7 @@ public interface IUriService {
     UriNode getOrCreate(PetriNet petriNet, UriContentType contentType);
 
     /**
-     * Creates new UriNode from URI, or retrieves existing one
+     * Creates new UriNode from URI path, or retrieves existing one
      * @param uri to be used for creating UriNode
      * @param contentType to decide the content type of UriNode
      * @return the UriNode that was created or modified
