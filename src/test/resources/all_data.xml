@@ -8,6 +8,10 @@
         <id>process_role</id>
         <title>Process role</title>
     </role>
+    <role>
+        <id>process_role2</id>
+        <title>Process role2</title>
+    </role>
     <!-- DATA -->
     <data type="number" immediate="true">
         <id>number</id>
