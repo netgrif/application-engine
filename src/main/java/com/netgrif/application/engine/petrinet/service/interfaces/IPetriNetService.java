@@ -37,7 +37,9 @@ public interface IPetriNetService {
 
     List<PetriNet> getByIdentifier(String identifier);
 
-    List<PetriNet> findAllByUri(String uri);
+    List<PetriNet> findAllByUriNodeId(String uriNodeId);
+
+    List<PetriNet> findAllById(List<String> ids);
 
     PetriNet getNewestVersionByIdentifier(String identifier);
 

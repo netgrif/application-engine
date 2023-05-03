@@ -5,10 +5,16 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticPetriNetService;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ElasticPetriNetService implements IElasticPetriNetService {
@@ -18,9 +24,17 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
 
     private final Executor executors;
 
+    private IPetriNetService petriNetService;
+
     public ElasticPetriNetService(ElasticPetriNetRepository repository, Executor executors) {
         this.repository = repository;
         this.executors = executors;
+    }
+
+    @Lazy
+    @Autowired
+    public void setPetriNetService(IPetriNetService petriNetService) {
+        this.petriNetService = petriNetService;
     }
 
     @Override
@@ -69,5 +83,11 @@ public class ElasticPetriNetService implements IElasticPetriNetService {
         }
 
         return elasticPetriNet.getUriNodeId();
+    }
+
+    @Override
+    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
+        List<ElasticPetriNet> elasticPetriNets = repository.findAllByUriNodeId(uriNodeId);
+        return petriNetService.findAllById(elasticPetriNets.stream().map(ElasticPetriNet::getStringId).collect(Collectors.toList()));
     }
 }

@@ -4,6 +4,8 @@ import com.netgrif.application.engine.elastic.domain.ElasticPetriNet;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import org.springframework.scheduling.annotation.Async;
 
+import java.util.List;
+
 public interface IElasticPetriNetService {
 
     @Async
@@ -14,5 +16,7 @@ public interface IElasticPetriNetService {
     void remove(String id);
 
     String findUriNodeId(PetriNet net);
+
+    List<PetriNet> findAllByUriNodeId(String uriNodeId);
 
 }

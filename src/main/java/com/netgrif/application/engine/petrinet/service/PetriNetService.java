@@ -62,6 +62,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
@@ -286,11 +287,15 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNet> findAllByUri(String uri) {
-        // todo from elastic
-        List<PetriNet> nets = repository.findAllByUriNodeId(uri);
+    public List<PetriNet> findAllByUriNodeId(String uriNodeId) {
+        List<PetriNet> nets = elasticPetriNetService.findAllByUriNodeId(uriNodeId);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
+    }
+
+    @Override
+    public List<PetriNet> findAllById(List<String> ids) {
+        return StreamSupport.stream(repository.findAllById(ids).spliterator(), false).collect(Collectors.toList());
     }
 
     @Override
