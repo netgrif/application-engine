@@ -32,6 +32,7 @@ public class Case {
 
     @Getter
     @Setter
+    @Transient
     private String uriNodeId;
 
     @LastModifiedDate

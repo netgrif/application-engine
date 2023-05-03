@@ -13,6 +13,7 @@ import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepos
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.ProcessRoleService
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Filter
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation
@@ -87,6 +88,9 @@ class ImportHelper {
     @Autowired
     private ProcessRoleService processRoleService
 
+    @Autowired
+    private IUriService uriService
+
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
 
@@ -106,13 +110,13 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
-        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().id) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author, uriNodeId)
     }
 
-    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().id) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return Optional.of(petriNetService.importPetriNet(netStream, release, author).getNet())
+        return Optional.of(petriNetService.importPetriNet(netStream, release, uriNodeId, author).getNet())
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {

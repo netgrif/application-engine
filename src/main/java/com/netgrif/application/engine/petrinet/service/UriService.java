@@ -210,26 +210,6 @@ public class UriService implements IUriService {
     }
 
     /**
-     * Creates new UriNode from PetriNet uriNodeId, or retrieves existing one
-     *
-     * @param petriNet    to be used for creating UriNode
-     * @param contentType to decide the content type of UriNode
-     * @return the UriNode that was created or modified
-     */
-    @Override
-    public UriNode getOrCreate(PetriNet petriNet, UriContentType contentType) {
-        String uriNodeId = petriNet.getUriNodeId();
-        String uriNodePath;
-        if (uriNodeId == null) {
-            uriNodePath = DEFAULT_ROOT_URI;
-        } else {
-            UriNode uriNode = findById(uriNodeId);
-            uriNodePath = uriNode.getUriPath();
-        }
-        return getOrCreate(uriNodePath, contentType);
-    }
-
-    /**
      * Creates new UriNode from URI path, or retrieves existing one
      *
      * @param uri         to be used for creating UriNode
