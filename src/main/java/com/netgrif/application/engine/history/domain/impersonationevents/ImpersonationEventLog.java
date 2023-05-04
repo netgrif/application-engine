@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @EqualsAndHashCode(callSuper = true)
-public class ImpersonationEventLog extends EventLog {
+public abstract class ImpersonationEventLog extends EventLog {
 
     @Getter
     private String impersonator;
