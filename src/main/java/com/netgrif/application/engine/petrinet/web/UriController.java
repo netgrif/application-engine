@@ -43,14 +43,14 @@ public class UriController {
         return new UriNodeResource(uriNode);
     }
 
-    @Operation(summary = "Get one UriNode by URI", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Operation(summary = "Get one UriNode by URI path", security = {@SecurityRequirement(name = "BasicAuth")})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
     })
     @GetMapping(value = "/{uri}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<UriNode> getOne(@PathVariable("uri") String uri) {
         uri = new String(Base64.getDecoder().decode(uri));
-        UriNode uriNode = uriService.findById(uri);
+        UriNode uriNode = uriService.findByUri(uri);
         uriNode = uriService.populateDirectRelatives(uriNode);
         return new UriNodeResource(uriNode);
     }
