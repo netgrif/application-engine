@@ -116,7 +116,7 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser(), String uriNodeId = uriService.getRoot().id) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return Optional.of(petriNetService.importPetriNet(netStream, release, uriNodeId, author).getNet())
+        return Optional.of(petriNetService.importPetriNet(netStream, release, author, uriNodeId).getNet())
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
