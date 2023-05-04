@@ -5,9 +5,13 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "eventLogs")
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "eventLog")
 public class DeleteCaseEventLog extends CaseEventLog {
+
+    public DeleteCaseEventLog() {
+        super();
+    }
 
     public DeleteCaseEventLog(Case useCase, EventPhase eventPhase) {
         super(useCase, eventPhase);
