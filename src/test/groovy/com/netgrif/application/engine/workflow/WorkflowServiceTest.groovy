@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow
 
 import com.netgrif.application.engine.TestHelper
+import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
@@ -41,6 +42,9 @@ class WorkflowServiceTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private ElasticCaseRepository elasticCaseRepository
+
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
@@ -66,7 +70,7 @@ class WorkflowServiceTest {
 
     @Test
     void testFirstTransitionAuto() {
-        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+        def testNet = petriNetService.importPetriNet(stream(FIRST_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
         assert testNet
 
         def net = testNet
@@ -80,7 +84,7 @@ class WorkflowServiceTest {
 
     @Test
     void testSecondTransitionAuto() {
-        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), "major", superCreator.getLoggedSuper()).getNet()
+        def net = petriNetService.importPetriNet(stream(SECOND_AUTO_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper()).getNet()
 
         Case aCase = workflowService.createCase(net.stringId, "autoErr", "red", superCreator.getLoggedSuper()).getCase()
         importHelper.assignTask("Manual", aCase.getStringId(), superCreator.getLoggedSuper())
@@ -96,16 +100,18 @@ class WorkflowServiceTest {
 
     @Test
     void createCaseWithLocale() {
-        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), "major", superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNet.getNet() != null
 
         def net = testNet.getNet()
-        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
 
+        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
         assert aCase.title.equals("Slovenský preklad")
+        assert workflowService.findOne(aCase.stringId).uriNodeId == null
+        Thread.sleep(3000)
+        assert elasticCaseRepository.findByStringId(aCase.stringId).uriNodeId == net.uriNodeId
 
         Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
-
         assert enCase.title.equals("English translation")
     }
 }

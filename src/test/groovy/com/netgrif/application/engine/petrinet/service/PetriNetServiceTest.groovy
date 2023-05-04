@@ -5,8 +5,12 @@ import com.netgrif.application.engine.auth.domain.Authority
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.domain.ElasticPetriNet
+import com.netgrif.application.engine.elastic.domain.ElasticPetriNetRepository
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
+import com.netgrif.application.engine.petrinet.domain.UriContentType
+import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.domain.VersionType
 import com.netgrif.application.engine.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
@@ -64,7 +68,14 @@ class PetriNetServiceTest {
     private PetriNetRepository petriNetRepository
 
     @Autowired
+    private UriService uriService
+
+    @Autowired
     private ProcessRoleRepository processRoleRepository
+
+    @Autowired
+    private ElasticPetriNetRepository elasticPetriNetRepository
+
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -80,16 +91,22 @@ class PetriNetServiceTest {
     }
 
     @Test
-    void processDelete() {
+    void processImportAndDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
         int caseCount = workflowService.getAll(new FullPageRequest()).size()
         long taskCount = taskRepository.count()
 
+
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNetOptional.getNet() != null
         assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.getNet()
+        Thread.sleep(2000)
+        ElasticPetriNet elasticTestNet = elasticPetriNetRepository.findByStringId(testNet.stringId)
+        assert elasticTestNet != null && elasticTestNet.getUriNodeId() == uriService.getRoot().id
+        assert testNet.getUriNodeId() == uriService.getRoot().id
+        assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
         importHelper.createCase("Case 1", testNet)
 
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
@@ -109,6 +126,8 @@ class PetriNetServiceTest {
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
+        Thread.sleep(2000)
+        assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
         assert workflowService.getAll(new FullPageRequest()).size() == caseCount
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
@@ -124,5 +143,17 @@ class PetriNetServiceTest {
             assert e.message.contains(testNet.stringId)
         }
         assert exceptionThrown
+    }
+
+    @Test
+    void findAllByUriNodeIdTest() {
+        UriNode myNode = uriService.getOrCreate("/test", UriContentType.DEFAULT)
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
+        petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper(), myNode.id)
+
+        Thread.sleep(2000)
+
+        List<PetriNet> petriNets = petriNetService.findAllByUriNodeId(myNode.id)
+        assert petriNets.size() == 2
     }
 }
