@@ -385,7 +385,7 @@
 		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
 		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
-		<i18nString name="default_headers">Ani za boha neviem :D</i18nString>
+		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
