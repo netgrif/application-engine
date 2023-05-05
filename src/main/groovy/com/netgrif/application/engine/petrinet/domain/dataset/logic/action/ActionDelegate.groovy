@@ -16,8 +16,6 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -70,7 +68,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
-import org.springframework.core.io.FileUrlResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -90,6 +87,7 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
     private static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
     private static final String PREFERENCE_ITEM_FIELD_PARENTID = "parentId"
+    private static final String PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS = "default_headers"
     private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
     private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
@@ -184,9 +182,6 @@ class ActionDelegate {
 
     @Autowired
     IUriService uriService
-
-    @Autowired
-    IHistoryService historyService
 
     @Autowired
     IImpersonationService impersonationService
@@ -1562,8 +1557,8 @@ class ActionDelegate {
      * @param bannedRoles ["role_import_id": "net_import_id"]
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:]) {
-        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> defaultHeaders = []) {
+        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
     }
 
     /**
@@ -1576,8 +1571,8 @@ class ActionDelegate {
      * @param bannedRoles
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = []) {
-        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> defaultHeaders = []) {
+        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
     }
 
     /**
@@ -1589,10 +1584,11 @@ class ActionDelegate {
      * @param allowedRoles ["role_import_id": "net_import_id"]
      * @param bannedRoles ["role_import_id": "net_import_id"]
      * @param group - if null, default group is used
+     * @param group - if null, default group is used
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null) {
-        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
     }
 
     /**
@@ -1605,8 +1601,8 @@ class ActionDelegate {
      * @param group - if null, default group is used
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null) {
-        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles))
+    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> defaultHeaders = []) {
+        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
     }
 
     /**
@@ -1622,6 +1618,13 @@ class ActionDelegate {
         },
          bannedRoles : { cl ->
              updateMenuItemRoles(item, cl as Closure, PREFERENCE_ITEM_FIELD_BANNED_ROLES)
+         },
+         defaultHeaders : {  cl ->
+             String defaultHeaders = cl() as String
+             setData("view", item, [
+                     (PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
+             ])
+             workflowService.save(item)
          },
          filter      : { cl ->
              def filter = cl() as Case
@@ -1681,10 +1684,11 @@ class ActionDelegate {
                             String groupName,
                             Map<String, String> allowedRoles = [:],
                             Map<String, String> bannedRoles = [:],
+                            List<String> defaultHeaders = [],
                             String icon = "",
                             String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE) {
         Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
-        Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles)
+        Case menuItem = createMenuItem(uri, identifier, filter, groupName, allowedRoles, bannedRoles, defaultHeaders)
         return menuItem
     }
 
@@ -1706,15 +1710,16 @@ class ActionDelegate {
     Case createFilterInMenu(String uri, String identifier, def title, String query, String type, List<String> allowedNets,
                             Map<String, String> allowedRoles = [:],
                             Map<String, String> bannedRoles = [:],
+                            List<String> defaultHeaders,
                             String icon = "",
                             String visibility = DefaultFiltersRunner.FILTER_VISIBILITY_PRIVATE,
                             Case orgGroup = null) {
         Case filter = createFilter(title, query, type, allowedNets, icon, visibility, null)
-        Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup)
+        Case menuItem = createMenuItem(uri, identifier, filter, allowedRoles, bannedRoles, orgGroup, defaultHeaders)
         return menuItem
     }
 
-    private Case doCreateMenuItem(String uri, String identifier, Case filter, Case orgGroup, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles) {
+    protected Case doCreateMenuItem(String uri, String identifier, Case filter, Case orgGroup, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles, List<String> defaultHeaders) {
         if (findMenuItem(identifier)) {
             throw new IllegalArgumentException("Menu item identifier $identifier is not unique!")
         }
@@ -1727,15 +1732,19 @@ class ActionDelegate {
         Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
         assignTask(newItemTask)
         def setDataMap = [
-                (PREFERENCE_ITEM_FIELD_FILTER_CASE): [
+                (PREFERENCE_ITEM_FIELD_FILTER_CASE)    : [
                         "type" : "caseRef",
                         "value": [filter.stringId]
                 ],
-                (PREFERENCE_ITEM_FIELD_PARENTID)   : [
+                (PREFERENCE_ITEM_FIELD_PARENTID)       : [
                         "type" : "text",
                         "value": orgGroup.stringId
                 ],
-                (PREFERENCE_ITEM_FIELD_IDENTIFIER) : [
+                (PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS): [
+                        "type" : "text",
+                        "value": defaultHeaders.join(',')
+                ],
+                (PREFERENCE_ITEM_FIELD_IDENTIFIER)     : [
                         "type" : "text",
                         "value": identifier
                 ],
@@ -1873,6 +1882,62 @@ class ActionDelegate {
 
     I18nString i18n(String value, Map<String, String> translations) {
         return new I18nString(value, translations)
+    }
+
+    Map<String, Case> createMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+        if (findMenuItem(id)) {
+            log.info("$id menu exists")
+            return
+        }
+        Case filter = createCaseFilter(title, query, allowedNets, icon, "private")
+        Case menu = createMenuItem(uri, id, filter, roles, bannedRoles, group, defaultHeaders)
+        return [
+                "filter"  : filter,
+                "menuItem": menu
+        ];
+    }
+
+    Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Case group = null, List<String> defaultHeaders = []) {
+        if (findMenuItem(id)) {
+            log.info("$id menu exists")
+            return
+        }
+        Case filter = createTaskFilter(title, query, allowedNets, icon, "private")
+        Case menu = createMenuItem(uri, id, filter, roles, [:], group, defaultHeaders)
+        return [
+                "filter"  : filter,
+                "menuItem": menu
+        ];
+    }
+
+    Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+        return createOrUpdateMenuItem(id, uri, DefaultFiltersRunner.FILTER_TYPE_CASE, query, icon, title, allowedNets, roles, bannedRoles, group, defaultHeaders)
+    }
+
+    Case createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:],  Case group = null, List<String> defaultHeaders = []) {
+        return createOrUpdateMenuItem(id, uri, DefaultFiltersRunner.FILTER_TYPE_TASK, query, icon, title, allowedNets, roles, bannedRoles, group, defaultHeaders)
+    }
+
+    Case createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:],  Case group = null, List<String> defaultHeaders = []) {
+        Case menuItem = findMenuItem(id)
+        if (!menuItem) {
+            Case filter = createFilter(title, query, type, allowedNets, icon, "private", null)
+            createUri(uri, UriContentType.DEFAULT)
+            return createMenuItem(uri, id, filter, roles, bannedRoles)
+
+        } else {
+            Case filter = getFilterFromMenuItem(menuItem)
+            changeFilter filter query { query }
+            changeFilter filter allowedNets { allowedNets }
+            changeFilter filter title { title }
+            changeFilter filter icon { icon }
+            changeMenuItem menuItem allowedRoles { roles }
+            changeMenuItem menuItem bannedRoles { bannedRoles }
+            changeMenuItem menuItem defaultHeaders { defaultHeaders.join(",") }
+            changeMenuItem menuItem uri { uri }
+            changeMenuItem menuItem filter { filter }
+            return workflowService.findOne(menuItem.stringId)
+        }
     }
 
 }
