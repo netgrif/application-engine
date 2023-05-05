@@ -1,5 +1,7 @@
 package com.netgrif.application.engine.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoggedUser extends org.springframework.security.core.userdetails.User {
 
     public static final long serialVersionUID = 3031325636490953409L;
@@ -85,7 +86,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         anonym.setEmail(getUsername());
         anonym.setName("Anonymous");
         anonym.setSurname("User");
-        anonym.setPassword(null);
+        anonym.setPassword("n/a");
         anonym.setState(UserState.ACTIVE);
         anonym.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         anonym.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
@@ -109,6 +110,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return this.impersonated != null;
     }
 
+    @JsonIgnore
     public LoggedUser getSelfOrImpersonated() {
         return this.isImpersonating() ? this.impersonated : this;
     }

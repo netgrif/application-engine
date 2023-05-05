@@ -25,6 +25,7 @@ import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -132,6 +133,11 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+        String key = details.getRemoteAddress();
+        if (key == null) {
+            throw new BadCredentialsException("Bad credentials");
+        }
         final UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
 
         String username = userToken.getName();
@@ -143,6 +149,7 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
 
         if (!StringUtils.hasLength(username)) {
             log.error("Empty Username");
+            loginAttemptService.loginFailed(key);
             throw new BadCredentialsException("Empty Username");
         }
 
@@ -154,19 +161,23 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
             Collection<GrantedAuthority> extraAuthorities = loadUserAuthorities(userData, username, password);
 
             UserDetails user = userDetailsContextMapper.mapUserFromContext(userData, username, extraAuthorities);
-
+            loginAttemptService.loginSucceeded(key);
             return createSuccessfulAuthentication(userToken, user);
         } catch (PasswordPolicyException ppe) {
             log.error(ppe.getStatus().getErrorCode() + ": " + ppe.getStatus().getDefaultMessage());
+            loginAttemptService.loginFailed(key);
             throw new LockedException(ppe.getStatus().getErrorCode() + ": " + ppe.getStatus().getDefaultMessage());
         } catch (UsernameNotFoundException notFound) {
             if (hideUserNotFoundExceptions) {
                 log.error("Bad credentials");
+                loginAttemptService.loginFailed(key);
                 throw new BadCredentialsException("Bad credentials");
             } else {
+                loginAttemptService.loginFailed(key);
                 throw notFound;
             }
         } catch (NamingException ldapAccessFailure) {
+            loginAttemptService.loginFailed(key);
             throw new AuthenticationServiceException(ldapAccessFailure.getMessage(), ldapAccessFailure);
         }
     }
@@ -193,7 +204,3 @@ public class NetgrifLdapAuthenticationProvider extends NetgrifAuthenticationProv
 
 
 }
-
-
-
-

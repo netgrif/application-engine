@@ -5,7 +5,74 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.4](https://github.com/netgrif/application-engine/commits/v6.2.4)
+Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
+
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-03-24)
+
+### Fixed
+
+- [NAE-1761] LoggedUser circular dependency
+- [NAE-1798] UserRefs resolves everytime when case is saved
+- [NAE-1757] Multi-choice and enumeration options not working 
+- [NAE-1759] Update documentation of public views, PDF generator and user list
+- [NAE-1805] Data fields validations are not run on backend
+- [NAE-1811] Process delete does not delete ldap group roles
+- [NAE-1812] Clicking on a column in the case-view that does not have a value has an error behavior
+- [NAE-1829] UserFieldValue does not implements .toString() method
+- [NAE-1831] Task with negative permissions displayed
+- [NAE-1834] ExportService - Export CSV files in given charset
+- [NAE-1840] Configurable timeout for failed login attempts
+- [NAE-1853] Passwords loaded from environment variables are shown in application logs
+- [NAE-1860] Assigning authority to a user via REST API ends up with error
+- [NAE-1861] Requesting unknown endpoint ends with Stackoverflow
+
+### Changed
+
+- [NAE-1638] Elasticsearch executor shutdown
+- [NAE-1762] Public view URL encoding
+
+### Added
+
+- [NAE-1607] Allowed nets configuration for newly created filter
+- [NAE-1630] Add admin endpoint for invalidating user session
+- [NAE-1678] User impersonation
+- [NAE-1793] Security filter for HTTP headers validation
+- [NAE-1794] Configurable security headers
+- [NAE-1833] Configuration priority search
+
+## [6.2.8](https://github.com/netgrif/application-engine/releases/tag/v6.2.8) (2023-03-22)
+
+### Fixed
+
+- [NAE-1853] Passwords loaded from environment variables are shown in application logs
+
+## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
+
+### Fixed
+
+- [NAE-1806] Anonymous user password might not be 'null'
+
+## [6.2.6](https://github.com/netgrif/application-engine/releases/tag/v6.2.6) (2022-12-12)
+
+### Fixed
+
+- [NAE-1799] Multilevel process identifier handling in 6.2.x for public view
+- [NAE-1801] Change DataService
+
+## [6.2.5](https://github.com/netgrif/application-engine/releases/tag/v6.2.5) (2022-12-05)
+
+### Fixed
+
+- [NAE-1755] PetriNetService cache no caching "null"
+- [NAE-1773] Action that sets null value to field does not trigger next actions
+- [NAE-1776] UncaughtExceptionHandler
+- [NAE-1777] JWT Token user detail not show password
+
+### Added
+
+- [NAE-1753] Currency code in PDF
+- [NAE-1756] Delete PetriNet does not call case delete events
+- [NAE-1780] Configurable CORS security settings
 
 ## [6.2.4](https://github.com/netgrif/application-engine/releases/tag/v6.2.4) (2022-10-12)
 
@@ -13,12 +80,6 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.4](h
 
 - [NAE-1747] PDF Generator: incorrect file name shortening
 - [NAE-1748] Incorrect handling for long lines in PDF generator
-
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-01)
-
-### Added
-
-- [NAE-1678] User impersonation
 
 ## [6.2.3](https://github.com/netgrif/application-engine/releases/tag/v6.2.3) (2022-10-06)
 
@@ -35,6 +96,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.2.4](h
 
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
 - [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
+
 
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 

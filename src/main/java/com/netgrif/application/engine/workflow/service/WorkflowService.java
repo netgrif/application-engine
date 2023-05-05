@@ -1,10 +1,12 @@
 package com.netgrif.application.engine.workflow.service;
 
 import com.google.common.collect.Ordering;
+import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.history.domain.caseevents.CreateCaseEventLog;
 import com.netgrif.application.engine.history.domain.caseevents.DeleteCaseEventLog;
 import com.netgrif.application.engine.history.service.IHistoryService;
@@ -56,9 +58,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 @Service
 public class WorkflowService implements IWorkflowService {
@@ -131,8 +131,6 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-        resolveUserRef(useCase);
-        taskService.resolveUserRef(useCase);
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
@@ -220,15 +218,22 @@ public class WorkflowService implements IWorkflowService {
         useCase.getUsers().clear();
         useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && !permission.get("view")) {
-                useCase.getNegativeViewUsers().addAll(userIds);
-            } else if (userIds != null && userIds.size() != 0) {
-                useCase.addUsers(new HashSet<>(userIds), permission);
-            }
+            resolveUserRefPermissions(useCase, id, permission);
         });
         useCase.resolveViewUsers();
-        return repository.save(useCase);
+        taskService.resolveUserRef(useCase);
+        return save(useCase);
+    }
+
+    private void resolveUserRefPermissions(Case useCase, String userListId, Map<String, Boolean> permission) {
+        List<String> userIds = getExistingUsers((UserListFieldValue) useCase.getDataSet().get(userListId).getValue());
+        if (userIds != null && userIds.size() != 0) {
+            if (permission.containsKey("view") && !permission.get("view")) {
+                useCase.getNegativeViewUsers().addAll(userIds);
+            } else {
+                useCase.addUsers(new HashSet<>(userIds), permission);
+            }
+        }
     }
 
     private List<String> getExistingUsers(UserListFieldValue userListValue) {
@@ -333,16 +338,21 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public DeleteCaseEventOutcome deleteCase(String caseId) {
         Case useCase = findOne(caseId);
+        return deleteCase(useCase);
+    }
+
+    @Override
+    public DeleteCaseEventOutcome deleteCase(Case useCase) {
 
         DeleteCaseEventOutcome outcome = new DeleteCaseEventOutcome(useCase, eventService.runActions(useCase.getPetriNet().getPreDeleteActions(), useCase, Optional.empty()));
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.PRE));
-        log.info("[" + caseId + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
+        log.info("[" + useCase.getStringId() + "]: User [" + userService.getLoggedOrSystem().getStringId() + "] is deleting case " + useCase.getTitle());
 
-        taskService.deleteTasksByCase(caseId);
+        taskService.deleteTasksByCase(useCase.getStringId());
         repository.delete(useCase);
 
         outcome.addOutcomes(eventService.runActions(useCase.getPetriNet().getPostDeleteActions(), null, Optional.empty()));
-        addMessageToOutcome(petriNetService.clone(useCase.getPetriNetObjectId()), CaseEventType.DELETE, outcome);
+        addMessageToOutcome(useCase.getPetriNet(), CaseEventType.DELETE, outcome);
         historyService.save(new DeleteCaseEventLog(useCase, EventPhase.POST));
         return outcome;
     }
@@ -352,7 +362,17 @@ public class WorkflowService implements IWorkflowService {
         log.info("[" + net.getStringId() + "]: User " + userService.getLoggedOrSystem().getStringId() + " is deleting all cases and tasks of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
 
         taskService.deleteTasksByPetriNetId(net.getStringId());
-        repository.deleteAllByPetriNetObjectId(net.getObjectId());
+        CaseSearchRequest request = new CaseSearchRequest();
+        request.process = Collections.singletonList(new CaseSearchRequest.PetriNet(net.getIdentifier(), net.getStringId()));
+
+        long pageCount = (elasticCaseService.count(Collections.singletonList(request), userService.getLoggedOrSystem().transformToLoggedUser(), Locale.getDefault(), false) / 100) + 1;
+        LongStream.range(0, pageCount)
+                .forEach(i -> elasticCaseService.search(
+                        Collections.singletonList(request),
+                        userService.getLoggedOrSystem().transformToLoggedUser(),
+                        PageRequest.of((int) i, 100),
+                        Locale.getDefault(),
+                        false).getContent().forEach(this::deleteCase));
     }
 
     @Override

@@ -50,6 +50,12 @@ public class CaseSearchRequest {
     public static class PetriNet {
 
         public String identifier;
+
+        public String processId;
+
+        public PetriNet(String identifier) {
+            this.identifier = identifier;
+        }
     }
 
     @Data

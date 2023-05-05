@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
+import com.netgrif.application.engine.AsyncRunner;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
@@ -70,6 +71,9 @@ public class PetriNetController {
 
     @Autowired
     private StringToVersionConverter converter;
+
+    @Autowired
+    private AsyncRunner asyncRunner;
 
     @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",
@@ -191,8 +195,14 @@ public class PetriNetController {
             return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        this.service.deletePetriNet(decodedProcessId, user);
-        return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+        asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
+        return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
+    }
+
+    @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
+            return service.getNetFromCase(decodeUrl(caseId));
     }
 
     public static String decodeUrl(String s1) {
