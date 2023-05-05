@@ -140,6 +140,7 @@
 					changeMenuItem item filter { filter }
 					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
 					changeMenuItem item uri { uri.value }
+					changeMenuItem item title { title.value }
 				</action>
 			</actions>
 		</event>

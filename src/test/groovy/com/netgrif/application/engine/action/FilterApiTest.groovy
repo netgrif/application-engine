@@ -67,26 +67,24 @@ class FilterApiTest {
         Case defGroup = nextGroupService.findDefaultGroup()
 
         assert item.uriNodeId == uriService.findByUri("netgrif/test").id
-        assert item.dataSet["icon_name"].value == "device_hub"
-        assert item.dataSet["entry_name"].value.toString() == "FILTER"
+        assert item.dataSet["icon"].value == "filter_alt"
+        assert item.dataSet["type"].value.toString() == "view"
+        assert item.dataSet["name"].value.toString() == "FILTER"
         assert item.dataSet["menu_item_identifier"].value.toString() == "new_menu_item"
         assert item.dataSet["parentId"].value.toString() == defGroup.stringId
 
         assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
-        assert filter.dataSet["filter"].allowedNets == ["filter", "preference_filter_item"]
-        assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:preference_filter_item"
+        assert filter.dataSet["filter"].allowedNets == ["filter", "preference_item"]
+        assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:preference_item"
         assert filter.dataSet["filter_type"].value == "Case"
-
-        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
-        assert taskIds.contains(item.tasks.find { it.transition == "view" }.task)
     }
 
 
     @Test
-    @Disabled("Fix  NullPointer")
     void testChangeFilterAndMenu() {
         Case caze = createMenuItem()
         def newUri = uriService.getOrCreate("netgrif/test_new", UriContentType.DEFAULT)
+        Thread.sleep(5000)
         caze = setData(caze, [
                 "uri": newUri.uriPath,
                 "title": "CHANGED FILTER",
@@ -99,8 +97,7 @@ class FilterApiTest {
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        assert item.dataSet["icon_name"].value == ""
-        assert item.dataSet["entry_name"].value.toString() == "CHANGED FILTER"
+        assert item.dataSet["name"].value.toString() == "CHANGED FILTER"
         assert item.dataSet["allowed_roles"].options.entrySet()[0].key.contains("role_2")
         assert item.uriNodeId == newUri.id
 
@@ -108,27 +105,6 @@ class FilterApiTest {
         assert filter.dataSet["filter"].filterMetadata["defaultSearchCategories"] == false
         assert filter.dataSet["filter"].value == "processIdentifier:filter"
     }
-
-    @Test
-    void testDeleteItemAndFilter() {
-        Case caze = createMenuItem()
-
-        Case item = getMenuItem(caze)
-        Case filter = getFilter(caze)
-        caze = setData(caze, [
-                "delete_filter_and_menu": "0"
-        ])
-
-        Case defGroup = nextGroupService.findDefaultGroup()
-        List<String> taskIds = (defGroup.dataSet[ActionDelegate.ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
-        assert !taskIds
-
-        Thread.sleep(10000);
-
-        assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(item.stringId))) == null
-        assert workflowService.searchOne(QCase.case$._id.eq(new ObjectId(filter.stringId))) == null
-    }
-
 
     @Test
     void testFindFilter() {
@@ -147,8 +123,8 @@ class FilterApiTest {
         caze = setData(caze, [
                 "uri": "netgrif/test",
                 "title": "FILTER",
-                "allowed_nets": "filter,preference_filter_item",
-                "query": "processIdentifier:filter OR processIdentifier:preference_filter_item",
+                "allowed_nets": "filter,preference_item",
+                "query": "processIdentifier:filter OR processIdentifier:preference_item",
                 "type": "Case",
                 "group": null,
                 "identifier": "new_menu_item",

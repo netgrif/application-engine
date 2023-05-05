@@ -119,7 +119,7 @@
         <id>new_title</id>
         <title name="filter_name">Filter name</title>
     </data>
-    <data type="enumeration" immediate="true">
+    <data type="i18n" immediate="true">
         <id>i18n_filter_name</id>
         <title></title>
     </data>

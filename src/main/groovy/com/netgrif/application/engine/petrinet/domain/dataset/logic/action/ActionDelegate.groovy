@@ -89,6 +89,8 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
     private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
+    private static final String PREFERENCE_ITEM_FIELD_TYPE = "type"
+    private static final String PREFERENCE_ITEM_FIELD_NAME = "name"
     private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
 
     static final String UNCHANGED_VALUE = "unchangedooo"
@@ -1536,7 +1538,7 @@ class ActionDelegate {
 
     /**
      * deletes filter instance
-     * Note: do not call this method if given instance is references in any preference_filter_item instance
+     * Note: do not call this method if given instance is referenced in any preference_item instance todo zjednodit na case
      * @param filter
      * @return
      */
@@ -1618,14 +1620,14 @@ class ActionDelegate {
          },
          defaultHeaders: { cl ->
              String defaultHeaders = cl() as String
-             setData("view", item, [
+             setData("view_settings", item, [
                      (PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
              ])
              workflowService.save(item)
          },
          filter        : { cl ->
              def filter = cl() as Case
-             setData("change_filter", item, [
+             setData("view_settings", item, [
                      (PREFERENCE_ITEM_FIELD_NEW_FILTER_ID): ["type": "text", "value": filter.stringId]
              ])
          },
@@ -1634,7 +1636,15 @@ class ActionDelegate {
              def uri = cl() as String
              item.setUriNodeId(uriService.findByUri(uri).id)
              workflowService.save(item)
+         },
+         title         : { cl ->
+             item = workflowService.findOne(item.stringId)
+             def value = cl()
+             item.setTitle(value as String)
+             item.dataSet[PREFERENCE_ITEM_FIELD_NAME].value = (value instanceof I18nString) ? value : new I18nString(value as String)
+             workflowService.save(item)
          }]
+
     }
 
     private void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {
@@ -1655,10 +1665,9 @@ class ActionDelegate {
      * @return
      */
     def deleteMenuItem(Case item) {
-        def task = item.tasks.find { it.transition == "view" }.task
-        dataService.setData(task, ImportHelper.populateDataset([
-                (PREFERENCE_ITEM_FIELD_REMOVE_OPTION): ["type": "button", "value": 0]
-        ]))
+        async.run {
+            workflowService.deleteCase(item.stringId)
+        }
     }
 
     /**
@@ -1721,14 +1730,18 @@ class ActionDelegate {
             throw new IllegalArgumentException("Menu item identifier $identifier is not unique!")
         }
         orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
-        Case itemCase = createCase(FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER, filter.title)
+        Case itemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, filter.title)
         itemCase.setUriNodeId(uriService.findByUri(uri).id)
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
         itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
         itemCase = workflowService.save(itemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "init" }.task)) }
+        Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "initialize" }.task)) }
         assignTask(newItemTask)
         def setDataMap = [
+                (PREFERENCE_ITEM_FIELD_TYPE)    : [
+                        "type" : "enumeration_map",
+                        "value": "view"
+                ],
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE)    : [
                         "type" : "caseRef",
                         "value": [filter.stringId]
@@ -1749,11 +1762,6 @@ class ActionDelegate {
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
 
-        def task = orgGroup.tasks.find { it.transition == "append_menu_item" }.task
-        dataService.setData(task, ImportHelper.populateDataset([
-                (PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM): ["type": "text", "value": itemCase.stringId]
-        ]))
-
         return workflowService.findOne(itemCase.stringId)
     }
 
@@ -1773,7 +1781,7 @@ class ActionDelegate {
      * @return
      */
     Case findMenuItem(String menuItemIdentifier) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.menu_item_identifier.textValue.keyword:\"$menuItemIdentifier\"" as String)
     }
 
     /**
@@ -1843,7 +1851,7 @@ class ActionDelegate {
     private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
         UriNode uriNode = uriService.findByUri(uri)
         if (!orgGroup) {
-            return uriNode ? findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_FILTER_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"") : null
+            return uriNode ? findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"") : null
         }
         List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
         if (!taskIds) {

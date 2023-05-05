@@ -1,0 +1,601 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>preference_item</id>
+	<initials>PRI</initials>
+	<title>Preference Item</title>
+	<icon>check_box_outline_blank</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+<!--	GENERIC-->
+	<data type="number">
+		<id>to_is_folder</id>
+		<title>to [is_folder]</title>
+		<init>1</init>
+	</data>
+	<data type="number">
+		<id>to_is_filter</id>
+		<title>to [is_filter]</title>
+		<init>0</init>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>type</id>
+		<title>Instance type</title>
+		<options>
+			<option key="folder">Folder</option>
+			<option key="view">View</option>
+		</options>
+	</data>
+	<data type="text">
+		<id>icon</id>
+		<title>Icon</title>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.icon_preview;
+
+			changeCaseProperty "icon" about { icon.value; }
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>icon_preview</id>
+		<title>Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="i18n">
+		<id>name</id>
+		<title>Name of the item</title>
+		<desc>Will be shown in the menu</desc>
+	</data>
+	<data type="text" immediate="true">
+		<id>parentId</id>
+		<title/>
+	</data>
+	<data type="taskRef">
+		<id>permission_settings_taskRef</id>
+		<title/>
+		<init>permission_settings</init>
+	</data>
+	<data type="button">
+		<id>add_allowed_roles</id>
+		<title/>
+		<placeholder name="allow_roles">Allow view for roles</placeholder>
+		<action trigger="set">
+			allowedRoles: f.allowed_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change allowedRoles options {return configurableMenuService.addSelectedRoles(allowedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_allowed_roles</id>
+		<title/>
+		<placeholder name="remove_from_allowed_roles">Remove from allowed roles</placeholder>
+		<action trigger="set">
+			allowedRoles: f.allowed_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change allowedRoles options {return configurableMenuService.removeSelectedRoles(allowedRoles)}
+
+			change allowedRoles value {[]}
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>add_banned_roles</id>
+		<title/>
+		<placeholder name="ban_roles">Ban view for roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options {return configurableMenuService.addSelectedRoles(bannedRoles, processesAvailable, rolesAvailable)}
+
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="button">
+		<id>remove_banned_roles</id>
+		<title/>
+		<placeholder name="remove_from_banned_roles">Remove from banned roles</placeholder>
+		<action trigger="set">
+			bannedRoles: f.banned_roles,
+			processesAvailable: f.processes_available,
+			rolesAvailable: f.roles_available;
+
+			change bannedRoles options {return configurableMenuService.removeSelectedRoles(bannedRoles)}
+
+			change bannedRoles value {[]}
+			change rolesAvailable value {[]}
+			change rolesAvailable options {[:]}
+			change processesAvailable value {null}
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>processes_available</id>
+		<title name="available_processes">Your processes</title>
+		<desc name="available_processes_desc">Select a process containing roles you wish to add to allowed or banned roles lists.</desc>
+		<action trigger="get">
+			processes: f.this;
+
+			change processes options {return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
+		</action>
+		<action trigger="set">
+			processes: f.this,
+			allowedRoles: f.allowed_roles,
+			bannedRoles: f.banned_roles,
+			rolesAvailable: f.roles_available;
+
+			change rolesAvailable options {return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles)}
+			change rolesAvailable value {[]}
+		</action>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>roles_available</id>
+		<title name="available_roles">Available roles from selected process</title>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>allowed_roles</id>
+		<title name="roles_allowed">Allowed roles</title>
+		<desc name="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>banned_roles</id>
+		<title name="roles_banned">Banned roles</title>
+		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
+	</data>
+
+<!--	VIEW-->
+	<data type="taskRef">
+		<id>filter_preview</id>
+		<title/>
+	</data>
+	<data type="caseRef">
+		<id>filter_case</id>
+		<title/>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+		<action trigger="set">
+			filterTaskRef: f.filter_preview,
+			filterCaseRef: f.filter_case,
+			name: f.name;
+
+			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+
+			change name value {return filterCase.dataSet["i18n_filter_name"].value}
+
+			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+		</action>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title>Identifikátor (Filter API)</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>default_headers</id>
+		<title name="default_headers">Set default headers</title>
+	</data>
+
+	<transition>
+		<id>initialize</id>
+		<x>340</x>
+		<y>220</y>
+		<label>initialize [await sync]</label>
+		<icon>hourglass_empty</icon>
+		<dataGroup>
+			<id>generic</id>
+			<dataRef>
+				<id>type</id>
+				<logic>
+					<behavior>forbidden</behavior>
+					<action trigger="set">
+						to_is_folder: f.to_is_folder,
+						to_is_filter: f.to_is_filter,
+						icon: f.icon,
+						type: f.type;
+
+						def selected = type.value as String
+						if (selected == "folder") {
+							change to_is_folder value { 1.0 }
+							change to_is_filter value { 0.0 }
+							change icon value { "folder" }
+						} else if (selected == "view") {
+							change to_is_folder value { 0.0 }
+							change to_is_filter value { 1.0 }
+							change icon value { "filter_alt" }
+						}
+					</action>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>folder</id>
+
+		</dataGroup>
+		<dataGroup>
+			<id>view</id>
+			<dataRef>
+				<id>filter_case</id>
+				<logic>
+					<behavior>forbidden</behavior>
+					<action trigger="set">
+						filterTaskRef: f.filter_preview,
+						filterCaseRef: f.filter_case,
+						name: f.name;
+
+						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+
+						change name value {return filterCase.dataSet["i18n_filter_name"].value}
+
+						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+					</action>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>folder_settings</id>
+		<x>620</x>
+		<y>100</y>
+		<label>Folder settings</label>
+		<icon>settings</icon>
+		<dataGroup>
+			<id>folder_settings_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>roles</id>
+			<dataRef>
+				<id>permission_settings_taskRef</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>view_settings</id>
+		<x>620</x>
+		<y>340</y>
+		<label>View settings</label>
+		<icon>settings</icon>
+		<dataGroup>
+			<id>view_settings_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>roles</id>
+			<dataRef>
+				<id>permission_settings_taskRef</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>permission_settings</id>
+		<x>220</x>
+		<y>100</y>
+		<label>Permission settings [referenced]</label>
+		<icon>accessibility</icon>
+		<dataGroup>
+			<id>roles_management</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>processes_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>roles_available</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_allowed_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_banned_roles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>uninitialized</id>
+		<x>220</x>
+		<y>220</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>is_folder</id>
+		<x>460</x>
+		<y>100</y>
+		<label>is_folder</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>is_filter</id>
+		<x>460</x>
+		<y>340</y>
+		<label>is_filter</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>uninitialized</sourceId>
+		<destinationId>initialize</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>initialize</sourceId>
+		<destinationId>is_folder</destinationId>
+		<multiplicity>1</multiplicity>
+		<reference>to_is_folder</reference>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>initialize</sourceId>
+		<destinationId>is_filter</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>to_is_filter</reference>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>read</type>
+		<sourceId>is_folder</sourceId>
+		<destinationId>folder_settings</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>is_filter</sourceId>
+		<destinationId>view_settings</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
