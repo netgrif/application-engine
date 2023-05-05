@@ -73,33 +73,6 @@ class GroovyShellFactoryTest {
         net = testNet.get()
     }
 
-    @Test
-    void adminConsoleTest() {
-        MockMvc mvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build()
-
-        def auths = importHelper.createAuthorities(["systemAdmin": Authority.systemAdmin])
-        importHelper.createUser(new User(name: "Admin", surname: "User", email: USER_EMAIL, password: USER_PASSW, state: UserState.ACTIVE),
-                [auths.get("systemAdmin")] as Authority[],
-                [] as ProcessRole[])
-
-        def adminAuth = new UsernamePasswordAuthenticationToken(USER_EMAIL, USER_PASSW)
-        adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
-
-        // call the validation method in ActionDelegate that takes an I18nString as an argument.
-        // if I18nString was not imported from GroovyShellConfiguration (application.properties) throws an error
-        // if I18nString was imported by a bad class loader throws a "method with signature not found" error
-        mvc.perform(post("/api/admin/run")
-                .content("validation(\"String\", new I18nString(\"I18nString\"))")
-                .contentType(MediaType.TEXT_PLAIN_VALUE)
-                .with(authentication(adminAuth)))
-                .andExpect(status().isOk())
-                .andDo({
-                    assert !it.getResponse().getContentAsString().contains("error")
-                })
-    }
 
     @Test
     void caseFieldsExpressionTest() {

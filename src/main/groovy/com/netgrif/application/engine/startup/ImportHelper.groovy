@@ -236,7 +236,7 @@ class ImportHelper {
 
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
         ObjectMapper mapper = new ObjectMapper()
-        String json = JsonOutput.toJson(data)
+        String json = mapper.writeValueAsString(data)
         return mapper.readTree(json) as ObjectNode
     }
 

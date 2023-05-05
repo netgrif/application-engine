@@ -4,11 +4,9 @@ import com.netgrif.application.engine.business.IPostalCodeService
 import com.netgrif.application.engine.business.orsr.IOrsrService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.petrinet.domain.Function
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.Task
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome
-import org.codehaus.groovy.control.CompilerConfiguration
 import com.netgrif.application.engine.workflow.service.interfaces.IFieldActionsCacheService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -70,9 +68,9 @@ abstract class FieldActionsRunner {
             actionDelegate.metaClass."${it.function.name}" << it.code
         }
         actionsCacheService.getNamespaceFunctionCache().each { entry ->
-            def namespace = new Object()
+            def namespace = [:]
             entry.getValue().each {
-                namespace.metaClass."${it.function.name}" << it.code.rehydrate(actionDelegate, actionDelegate, actionDelegate)
+                namespace["${it.function.name}"] = it.code.rehydrate(actionDelegate, it.code.owner, it.code.thisObject)
             }
             actionDelegate.metaClass."${entry.key}" = namespace
         }

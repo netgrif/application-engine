@@ -43,6 +43,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     needs: build
     services:
       mongo:
@@ -242,7 +243,7 @@ jobs:
           zip -r netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip netgrif-application-engine-${{ steps.getVersion.outputs.version }}
 
       - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v3
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: netgrif-application-engine-${{ steps.getVersion.outputs.version }}.zip
