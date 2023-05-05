@@ -59,6 +59,7 @@ class HistoryServiceTest {
         assert count == 0
         String task = caze.tasks.find { it.transition == "1" }.task
         taskService.assignTask(superCreator.getLoggedSuper(), task)
+        Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllAssignTaskEventLogsByCaseId(caze.getStringId()).size() == count + 2 // 2 PRE POST
     }
 
@@ -71,6 +72,7 @@ class HistoryServiceTest {
         taskService.assignTask(superCreator.getLoggedSuper(), task)
         assert historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size() == count
         taskService.finishTask(superCreator.getLoggedSuper(), task)
+        Thread.sleep(1000) // HistoryService::save is @Async
         assert historyService.findAllFinishTaskEventLogsByCaseId(caze.getStringId()).size() == count + 2  // 2 PRE POST
     }
 
