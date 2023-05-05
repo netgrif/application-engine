@@ -445,7 +445,7 @@ public class TaskService implements ITaskService {
         }
         save(newTasks);
         delete(disabledTasks, useCase);
-        workflowService.save(useCase);
+        useCase = workflowService.resolveUserRef(useCase);
 
         for (Task task : newTasks) {
             try {
