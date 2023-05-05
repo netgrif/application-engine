@@ -16,8 +16,6 @@ import com.netgrif.application.engine.elastic.web.requestbodies.ElasticTaskSearc
 import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
-import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
-import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -70,7 +68,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.FileSystemResource
-import org.springframework.core.io.FileUrlResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -185,9 +182,6 @@ class ActionDelegate {
 
     @Autowired
     IUriService uriService
-
-    @Autowired
-    IHistoryService historyService
 
     @Autowired
     IImpersonationService impersonationService
