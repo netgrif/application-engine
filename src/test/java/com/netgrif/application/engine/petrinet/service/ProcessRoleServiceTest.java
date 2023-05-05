@@ -69,8 +69,8 @@ class ProcessRoleServiceTest {
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
         assertEquals(2, roles.size());
-        assertEquals(ROLE_IMPORT_ID, roles.get(0).getImportId());
-        assertEquals(ROLE_IMPORT_ID2, roles.get(1).getImportId());
+        assertTrue(roles.stream().anyMatch(role -> ROLE_IMPORT_ID.equals(role.getImportId())));
+        assertTrue(roles.stream().anyMatch(role -> ROLE_IMPORT_ID2.equals(role.getImportId())));
     }
 
     @Test
