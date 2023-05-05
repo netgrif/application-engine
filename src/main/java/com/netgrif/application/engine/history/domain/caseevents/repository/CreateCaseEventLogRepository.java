@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@Deprecated(since = "6.2.2")
 public interface CreateCaseEventLogRepository extends MongoRepository<CreateCaseEventLog, ObjectId> {
 
     List<CreateCaseEventLog> findAllByCaseId(ObjectId caseId);

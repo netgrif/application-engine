@@ -30,6 +30,8 @@ class ProcessRoleServiceTest {
 
     private final static String ROLE_IMPORT_ID = "process_role";
 
+    private final static String ROLE_IMPORT_ID2 = "process_role2";
+
     @Autowired
     private TestHelper testHelper;
 
@@ -57,7 +59,7 @@ class ProcessRoleServiceTest {
         roles = processRoleService.findAll();
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
-        assertEquals(originalRoles + 2, roles.size()); // + 2 roles from all_data and role_all_data
+        assertEquals(originalRoles + 3, roles.size()); // + 2 roles from all_data and 1 role from role_all_data
     }
 
     @Test
@@ -66,8 +68,9 @@ class ProcessRoleServiceTest {
         List<ProcessRole> roles = processRoleService.findAll(eventOutcome.getNet().getStringId());
         assertNotNull(roles);
         assertFalse(roles.isEmpty());
-        assertEquals(1, roles.size());
+        assertEquals(2, roles.size());
         assertEquals(ROLE_IMPORT_ID, roles.get(0).getImportId());
+        assertEquals(ROLE_IMPORT_ID2, roles.get(1).getImportId());
     }
 
     @Test
