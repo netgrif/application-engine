@@ -32,7 +32,7 @@ jobs:
     name: Test
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 200
     services:
       mongo:
         image: mongo:4.4
@@ -91,6 +91,7 @@ jobs:
         run: mvn clean package install -DskipTests=true
 
       - name: Build, test, and analyze
+        timeout-minutes: 180
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

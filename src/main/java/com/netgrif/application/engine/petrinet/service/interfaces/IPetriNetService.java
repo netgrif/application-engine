@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -104,4 +105,6 @@ public interface IPetriNetService {
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
 
     PetriNet populateUriNodeId(PetriNet petriNet);
+
+    PetriNetImportReference getNetFromCase(String caseId);
 }

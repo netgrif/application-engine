@@ -104,6 +104,24 @@
             function_res.createUser(user)
         </action>
     </data>
+    <data type="boolean">
+        <id>updateOtherField</id>
+        <title>Boolean</title>
+        <init>false</init>
+        <action trigger="set">
+            toBeUpdatedInternally: f.toBeUpdatedInternally;
+            function_res.updateUseCaseFieldValue("toBeUpdated", 1)
+            change toBeUpdatedInternally value { (useCase.getFieldValue("toBeUpdated") as Double) + 1.0 }
+        </action>
+    </data>
+    <data type="number">
+        <id>toBeUpdated</id>
+        <title>Number</title>
+    </data>
+    <data type="number">
+        <id>toBeUpdatedInternally</id>
+        <title>Number</title>
+    </data>
     <!-- TRANSITIONS -->
     <transition>
         <id>0</id>
