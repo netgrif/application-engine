@@ -25,11 +25,14 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1853] Passwords loaded from environment variables are shown in application logs
 - [NAE-1860] Assigning authority to a user via REST API ends up with error
 - [NAE-1861] Requesting unknown endpoint ends with Stackoverflow
+- [NAE-1875] Namespace functions cause memory leak
+- [NAE-1868] Process role refresh
 
 ### Changed
 
 - [NAE-1638] Elasticsearch executor shutdown
 - [NAE-1762] Public view URL encoding
+- [NAE-1865] - Grid rendering performance improvement
 
 ### Added
 
@@ -39,6 +42,10 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 - [NAE-1793] Security filter for HTTP headers validation
 - [NAE-1794] Configurable security headers
 - [NAE-1833] Configuration priority search
+- [NAE-1722] Set default view headers with the CreateMenuItem action method
+- [NAE-1874] Filtering users based on roles when selecting users for UserListField
+- [NAE-1703] Dashboard
+- [NAE-1678] User impersonation
 
 ## [6.2.8](https://github.com/netgrif/application-engine/releases/tag/v6.2.8) (2023-03-22)
 
