@@ -87,7 +87,6 @@ class PetriNetServiceTest {
     void processDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
-        int caseCount = workflowService.getAll(new FullPageRequest()).size()
         long taskCount = taskRepository.count()
 
         ImportPetriNetEventOutcome testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
