@@ -432,7 +432,7 @@ public class PetriNet extends PetriNetObject {
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                        .map(arc -> arc.clone())
+                        .map(Arc::clone)
                         .collect(Collectors.toList())))
         );
         clone.initializeArcs();
