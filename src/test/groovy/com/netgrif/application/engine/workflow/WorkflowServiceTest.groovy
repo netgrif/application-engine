@@ -104,11 +104,10 @@ class WorkflowServiceTest {
         assert testNet.getNet() != null
 
         def net = testNet.getNet()
-
+        Thread.sleep(6000)
         Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk')).getCase()
         assert aCase.title.equals("Slovenský preklad")
         assert workflowService.findOne(aCase.stringId).uriNodeId == null
-        Thread.sleep(6000)
         assert elasticCaseRepository.findByStringId(aCase.stringId).uriNodeId == net.uriNodeId
 
         Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en')).getCase()
