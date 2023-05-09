@@ -80,33 +80,33 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("places")
     @Getter
     @Setter
-    private Map<String, Place> places;
+    private LinkedHashMap<String, Place> places;
 
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
     @Getter
     @Setter
-    private Map<String, Transition> transitions;
+    private LinkedHashMap<String, Transition> transitions;
 
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
-    private Map<String, List<Arc>> arcs;//todo: import id
+    private LinkedHashMap<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     @Getter
     @Setter
-    private Map<String, Field> dataSet;
+    private LinkedHashMap<String, Field> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
     @Getter
     @Setter
-    private Map<String, ProcessRole> roles;
+    private LinkedHashMap<String, ProcessRole> roles;
 
     @org.springframework.data.mongodb.core.mapping.Field("transactions")
     @Getter
     @Setter
-    private Map<String, Transaction> transactions;//todo: import id
+    private LinkedHashMap<String, Transaction> transactions;//todo: import id
 
     @Getter
     @Setter
@@ -149,11 +149,11 @@ public class PetriNet extends PetriNetObject {
         defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
-        places = new HashMap<>();
-        transitions = new HashMap<>();
-        arcs = new HashMap<>();
+        places = new LinkedHashMap<>();
+        transitions = new LinkedHashMap<>();
+        arcs = new LinkedHashMap<>();
         dataSet = new LinkedHashMap<>();
-        roles = new HashMap<>();
+        roles = new LinkedHashMap<>();
         negativeViewRoles = new LinkedList<>();
         transactions = new LinkedHashMap<>();
         processEvents = new LinkedHashMap<>();
@@ -187,7 +187,9 @@ public class PetriNet extends PetriNetObject {
         negativeViewRoles.add(roleId);
     }
 
-    public void addFunction(Function function) { functions.add(function); }
+    public void addFunction(Function function) {
+        functions.add(function);
+    }
 
     public void addUserPermission(String usersRefId, Map<String, Boolean> permissions) {
         if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
@@ -265,14 +267,14 @@ public class PetriNet extends PetriNetObject {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
-                .filter(arc -> arc.getReference() !=null)
+                .filter(arc -> arc.getReference() != null)
                 .forEach(arc -> {
-                        String referenceId = arc.getReference().getReference();
-                        arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
+                    String referenceId = arc.getReference().getReference();
+                    arc.getReference().setReferencable(getArcReference(referenceId, arc.getReference().getType(), dataSet));
                 });
     }
 
-    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet){
+    private Referencable getArcReference(String referenceId, Type type, Map<String, DataField> dataSet) {
         if (type == Type.PLACE) {
             return places.get(referenceId);
         } else {
@@ -422,17 +424,17 @@ public class PetriNet extends PetriNetObject {
         clone.setObjectId(this._id);
         clone.setDataSet(this.dataSet.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new))
         );
         clone.setPlaces(this.places.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone(), (x,y)->y, LinkedHashMap::new))
         );
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                         .map(Arc::clone)
-                        .collect(Collectors.toList())))
+                        .collect(Collectors.toList()), (x,y)->y, LinkedHashMap::new))
         );
         clone.initializeArcs();
         clone.setCaseEvents(this.caseEvents);
