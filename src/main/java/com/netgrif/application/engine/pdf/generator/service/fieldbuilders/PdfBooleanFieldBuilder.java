@@ -30,8 +30,8 @@ public class PdfBooleanFieldBuilder extends PdfFormFieldBuilder<PdfBooleanField>
     }
 
     @Override
-    public String getType() {
-        return DataType.BOOLEAN.value();
+    public String[] getType() {
+        return new String[]{DataType.BOOLEAN.value()};
     }
 
     @Override

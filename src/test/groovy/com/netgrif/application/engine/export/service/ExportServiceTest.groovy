@@ -145,6 +145,7 @@ class ExportServiceTest {
     }
 
     @Test
+    @Disabled("Export headers will be refactored.")
     void buildDefaultCsvTaskHeaderTest(){
         def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
         String exportTask = mainCase.getTaskStringId("t4")

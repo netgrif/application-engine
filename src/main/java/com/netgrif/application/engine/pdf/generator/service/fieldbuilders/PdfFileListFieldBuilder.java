@@ -4,7 +4,6 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfFileListField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListField;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileListFieldValue;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -33,14 +32,16 @@ public class PdfFileListFieldBuilder extends PdfFormFieldBuilder<PdfFileListFiel
     }
 
     @Override
-    public String getType() {
-        return DataType.FILE_LIST.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.FILE_LIST.value()
+        };
     }
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfFileListField pdfField) {
         FileListField field = (FileListField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
-        String rawValue = field.getValue() != null ? resolveFileListNames(field.getValue().getValue()) : "";
+        String rawValue = field.getValue().getValue() != null ? resolveFileListNames(field.getValue().getValue()) : "";
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),

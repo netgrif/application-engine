@@ -174,6 +174,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
+    //@JsonView(Views.GetData.class)
     @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {

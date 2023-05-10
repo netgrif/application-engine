@@ -36,8 +36,8 @@ public class PdfMultiChoiceFieldBuilder extends PdfFormFieldBuilder<PdfMultiChoi
     }
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE.value();
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE.value()};
     }
 
     @Override
@@ -49,7 +49,7 @@ public class PdfMultiChoiceFieldBuilder extends PdfFormFieldBuilder<PdfMultiChoi
                 resource.getPadding(),
                 resource.getSizeMultiplier()
         );
-        if (field.getValue() != null) {
+        if (field.getValue() != null && field.getValue().getValue() != null) {
             Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().stream().map(v -> v.getTranslation(buildingBlock.getLocale())).collect(Collectors.joining(", "))), maxValueLineLength));
             pdfField.setSelectedValues(values);
         }

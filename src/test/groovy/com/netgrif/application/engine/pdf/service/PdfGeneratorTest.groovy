@@ -2,6 +2,7 @@ package com.netgrif.application.engine.pdf.service
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.UserService
+import com.netgrif.application.engine.importer.model.DataType
 import com.netgrif.application.engine.importer.service.Importer
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.pdf.generator.config.PdfResource
@@ -203,6 +204,7 @@ class PdfGeneratorTest {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         PdfField pdf = new PdfTextField("footer_company_title")
         pdf.setLabel(Collections.singletonList("Netgrif Application Engine"))
+        pdf.setComponent(DataType.TEXT.value())
         pdf.setValue(["Custom value"])
         pdf.setX(pdfResource.getMarginLeft())
         pdf.setOriginalTopY(pdfResource.getPageHeight() - pdfResource.getMarginBottom())
@@ -229,7 +231,7 @@ class PdfGeneratorTest {
         PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
         ImportPetriNetEventOutcome net = petriNetService.importPetriNet(stream(TESTING_DATA[4]), VersionType.MAJOR, userService.getSystem().transformToLoggedUser())
         Case testCase = workflowService.createCase(net.getNet().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser()).getCase()
-        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTaskStringId("1"), Locale.ENGLISH, superCreator.getLoggedSuper()).getData()))
+        testCase.getPetriNet().getTransition("t1").setDataGroups(getDataGroupMap(dataService.getDataGroups(testCase.getTaskStringId("t1"), Locale.ENGLISH, superCreator.getLoggedSuper()).getData()))
         pdfResource.setOutputResource(new ClassPathResource(pdfOutputFolder + "/out_" + TESTING_DATA[4] + "_.pdf"))
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(testCase, "t1", pdfResource)

@@ -9,13 +9,19 @@ import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.importer.service.Importer
+import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.VersionType
+import com.netgrif.application.engine.petrinet.domain.dataset.BooleanField
+import com.netgrif.application.engine.petrinet.domain.dataset.DateField
+import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField
+import com.netgrif.application.engine.petrinet.domain.dataset.NumberField
 import com.netgrif.application.engine.petrinet.domain.dataset.TextField
 import com.netgrif.application.engine.petrinet.domain.roles.ProcessRole
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
+import com.netgrif.application.engine.workflow.domain.State
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import com.netgrif.application.engine.workflow.web.responsebodies.DataSet
 import com.netgrif.application.engine.workflow.web.responsebodies.TaskDataSets
@@ -46,6 +52,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -275,6 +283,7 @@ class InsuranceTest {
         ])
         def result = mvc.perform(post(TASK_SEARCH_URL)
                 .accept(MediaTypes.HAL_JSON_VALUE)
+                .param("size", "50")
                 .locale(Locale.forLanguageTag(LOCALE_SK))
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -283,7 +292,7 @@ class InsuranceTest {
                 .andExpect(status().isOk())
                 .andReturn()
         def response = parseResult(result)
-        taskId = response?._embedded?.tasks?.find { it.title == title }?.stringId
+        taskId = response?._embedded?.tasks?.find { it.title == title && it.state == State.ENABLED.ordinal() }?.stringId
         assert taskId != null
     }
 
@@ -338,353 +347,173 @@ class InsuranceTest {
         setData(new DataSet([
                 "101001": new TextField(rawValue:"84105")
         ]))
-        def data = [
-                (mapper[301005]): [
-                        value: [value: "Bratislava"]
-                ],
-                (mapper[101002]): [
-                        value: [value: false]
-                ],
-                (mapper[101003]): [
-                        value: [value: false]
-                ],
-                (mapper[101004]): [
-                        value: [value: false]
-                ],
-                (mapper[101005]): [
-                        value: [value: "6 až 10"]
-                ],
-                (mapper[101006]): [
-                        value: [value: "vlastník nehnuteľnosti"]
-                ],
-                (mapper[101007]): [
-                        value: [value: "2"]
-                ],
-                (mapper[101008]): [
-                        value: [value: "1"]
-                ],
-                (mapper[101012]): [
-                        value: [value: false]
-                ],
-                (mapper[101014]): [
-                        value: [value: false]
-                ],
-                (mapper[101016]): [
-                        value: [value: "0"]
-                ]
-        ]
+        def data = new DataSet([
+                "301005": new EnumerationField(rawValue: new I18nString("Bratislava")),
+                "101002": new BooleanField(rawValue: false),
+                "101003": new BooleanField(rawValue: false),
+                "101004": new BooleanField(rawValue: false),
+                "101005": new EnumerationField(rawValue: new I18nString("6 až 10")),
+                "101006": new EnumerationField(rawValue: new I18nString("vlastník nehnuteľnosti")),
+                "101007": new EnumerationField(rawValue: new I18nString("2")),
+                "101008": new EnumerationField(rawValue: new I18nString("1")),
+                "101012": new BooleanField(rawValue: false),
+                "101014": new BooleanField(rawValue: false),
+                "101016": new EnumerationField(rawValue: new I18nString("0"))
+        ])
         setData(data)
     }
 
     void setDataProperty() {
-        DataSet data = [
-                (mapper[102001]): [
-                        value: [value: "byt"]
-                ],
-                (mapper[105005]): [
-                        value: [value: "50.00 €"]
-                ],
-                (mapper[105001]): [
-                        value: [value: 10],
-                ],
-                (mapper[105002]): [
-                        value: [value: 20],
-                ],
-                (mapper[105003]): [
-                        value: [value: 30],
-                ],
-                (mapper[102002]): [
-                        value: [value: "tehla a/alebo betón"]
-                ],
-                (mapper[102003]): [
-                        value: [value: "škridla"]
-                ],
-                (mapper[102004]): [
-                        value: [value: "6 až 10"]
-                ],
-                (mapper[102006]): [
-                        value: [value: "1"]
-                ],
-                (mapper[102007]): [
-                        value: [value: "1"]
-                ],
-        ]
+        DataSet data = new DataSet([
+                "102001": new EnumerationField(rawValue: new I18nString("byt")),
+                "105005": new EnumerationField(rawValue: new I18nString("50.00 €")),
+                "105001": new NumberField(rawValue: 10D),
+                "105002": new NumberField(rawValue: 20D),
+                "105003": new NumberField(rawValue: 30D),
+                "102002": new EnumerationField(rawValue: new I18nString("tehla a/alebo betón")),
+                "102003": new EnumerationField(rawValue: new I18nString("škridla")),
+                "102004": new EnumerationField(rawValue: new I18nString("6 až 10")),
+                "102006": new EnumerationField(rawValue: new I18nString("1")),
+                "102007": new EnumerationField(rawValue: new I18nString("1"))
+        ])
         setData(data)
-        data = [
-                (mapper[107001]): [
-                        value: [value: "15,000.00 €"],
-                ]
-        ]
+        data = new DataSet([
+                "107001": new EnumerationField(rawValue: new I18nString("15,000.00 €"))
+        ])
         setData(data)
     }
 
     def setDataPropertyAdditional() {
-        def data = [
-                (mapper[105031]): [
-                        value: [value: true]
-                ],
-                (mapper[105033]): [
-                        value: [value: true]
-                ]
-        ]
+        def data = new DataSet([
+                "105031": new BooleanField(rawValue: false),
+                "105033": new BooleanField(rawValue: false)
+        ])
         setData(data)
-        data = [
-                (mapper[105032]): [
-                        value: [value: 500]
-                ],
-                (mapper[105034]): [
-                        value: [value: 500]
-                ]
-        ]
+        data = new DataSet([
+                "105032": new NumberField(rawValue: 500D),
+                "105034": new NumberField(rawValue: 500D)
+        ])
         setData(data)
     }
 
     def setDataPropertyBuildings() {
-        def data = [
-                (mapper[105035]): [
-                        value: [value: true]
-                ],
-                (mapper[105009]): [
-                        value: [value: true]
-                ],
-                (mapper[105011]): [
-                        value: [value: true]
-                ],
-                (mapper[105013]): [
-                        value: [value: true]
-                ],
-                (mapper[105015]): [
-                        value: [value: true]
-                ],
-                (mapper[105017]): [
-                        value: [value: true]
-                ],
-                (mapper[105019]): [
-                        value: [value: true]
-                ],
-                (mapper[105021]): [
-                        value: [value: true]
-                ],
-                (mapper[105023]): [
-                        value: [value: true]
-                ],
-                (mapper[105025]): [
-                        value: [value: true]
-                ],
-                (mapper[105027]): [
-                        value: [value: true]
-                ],
-                (mapper[105029]): [
-                        value: [value: true]
-                ]
-        ]
+        def data = new DataSet([
+                "105035": new BooleanField(rawValue: false),
+                "105009": new BooleanField(rawValue: false),
+                "105011": new BooleanField(rawValue: false),
+                "105013": new BooleanField(rawValue: false),
+                "105015": new BooleanField(rawValue: false),
+                "105017": new BooleanField(rawValue: false),
+                "105019": new BooleanField(rawValue: false),
+                "105021": new BooleanField(rawValue: false),
+                "105023": new BooleanField(rawValue: false),
+                "105025": new BooleanField(rawValue: false),
+                "105027": new BooleanField(rawValue: false),
+                "105029": new BooleanField(rawValue: false)
+        ])
         setData(data)
-        data = [
-                (mapper[105004]): [
-                        value: [value: 100]
-                ],
-                (mapper[105008]): [
-                        value: [value: false]
-                ],
-                (mapper[105007]): [
-                        value: [value: 90_000]
-                ],
-                (mapper[105010]): [
-                        value: [value: 500]
-                ],
-                (mapper[105012]): [
-                        value: [value: 500]
-                ],
-                (mapper[105014]): [
-                        value: [value: 500]
-                ],
-                (mapper[105016]): [
-                        value: [value: 500]
-                ],
-                (mapper[105018]): [
-                        value: [value: 500]
-                ],
-                (mapper[105020]): [
-                        value: [value: 500]
-                ],
-                (mapper[105022]): [
-                        value: [value: 500]
-                ],
-                (mapper[105024]): [
-                        value: [value: 500]
-                ],
-                (mapper[105026]): [
-                        value: [value: 500]
-                ],
-                (mapper[105028]): [
-                        value: [value: 500]
-                ],
-                (mapper[105030]): [
-                        value: [value: 500]
-                ],
-        ]
+        data = new DataSet([
+                "105004": new NumberField(rawValue: 100D),
+                "105008": new BooleanField(rawValue: false),
+                "105007": new NumberField(rawValue: 90_000D),
+                "105010": new NumberField(rawValue: 500D),
+                "105012": new NumberField(rawValue: 500D),
+                "105014": new NumberField(rawValue: 500D),
+                "105016": new NumberField(rawValue: 500D),
+                "105018": new NumberField(rawValue: 500D),
+                "105020": new NumberField(rawValue: 500D),
+                "105022": new NumberField(rawValue: 500D),
+                "105024": new NumberField(rawValue: 500D),
+                "105026": new NumberField(rawValue: 500D),
+                "105028": new NumberField(rawValue: 500D),
+                "105030": new NumberField(rawValue: 500D)
+        ])
         setData(data)
     }
 
     def setDataHousehold() {
-        def data = [
-                (mapper[103001]): [
-                        value: [value: "byt"]
-                ],
-                (mapper[106001]): [
-                        value: [value: "150.00 €"]
-                ],
-                (mapper[106003]): [
-                        value: [value: 100]
-                ],
-                (mapper[103002]): [
-                        value: [value: "trvalá"]
-                ],
-                (mapper[103004]): [
-                        value: [value: true]
-                ],
-                (mapper[103005]): [
-                        value: [value: true]
-                ]
-        ]
+        def data = new DataSet([
+                "103001": new EnumerationField(rawValue: new I18nString("byt")),
+                "106001": new EnumerationField(rawValue: new I18nString("150.00 €")),
+                "106003": new NumberField(rawValue: 100D),
+                "103002": new EnumerationField(rawValue: new I18nString("trvalá")),
+                "103004": new BooleanField(rawValue: false),
+                "103005": new BooleanField(rawValue: false),
+
+
+        ])
         setData(data)
-        data = [
-                (mapper[107003]): [
-                        value: [value: "15,000.00 €"]
-                ],
-                (mapper[104003]): [
-                        value: [value: "Slovenská republika"]
-                ]
-        ]
+        data = new DataSet([
+                "107003": new EnumerationField(rawValue: new I18nString("15,000.00 €")),
+                "104003": new EnumerationField(rawValue: new I18nString("Slovenská republika"))
+        ])
         setData(data)
     }
 
     def setDataHouseholdAdditional() {
-        def data = [
-                (mapper[106004]): [
-                        value: [value: true]
-                ],
-                (mapper[106006]): [
-                        value: [value: true]
-                ],
-                (mapper[106008]): [
-                        value: [value: true]
-                ],
-                (mapper[106010]): [
-                        value: [value: true]
-                ],
-                (mapper[106012]): [
-                        value: [value: true]
-                ],
-                (mapper[106014]): [
-                        value: [value: true]
-                ],
-                (mapper[106016]): [
-                        value: [value: true]
-                ],
-                (mapper[106018]): [
-                        value: [value: true]
-                ],
-                (mapper[106020]): [
-                        value: [value: true]
-                ]
-        ]
+        def data = new DataSet([
+                "106004": new BooleanField(rawValue: true),
+                "106006": new BooleanField(rawValue: true),
+                "106008": new BooleanField(rawValue: true),
+                "106010": new BooleanField(rawValue: true),
+                "106012": new BooleanField(rawValue: true),
+                "106014": new BooleanField(rawValue: true),
+                "106016": new BooleanField(rawValue: true),
+                "106018": new BooleanField(rawValue: true),
+                "106020": new BooleanField(rawValue: true),
+        ])
         setData(data)
-        data = [
-                (mapper[106005]): [
-                        value: [value: 500]
-                ],
-                (mapper[106007]): [
-                        value: [value: 500]
-                ],
-                (mapper[106009]): [
-                        value: [value: 500]
-                ],
-                (mapper[106011]): [
-                        value: [value: 500]
-                ],
-                (mapper[106013]): [
-                        value: [value: 500]
-                ],
-                (mapper[106015]): [
-                        value: [value: 500]
-                ],
-                (mapper[106017]): [
-                        value: [value: 500]
-                ],
-                (mapper[106019]): [
-                        value: [value: 500]
-                ],
-                (mapper[106021]): [
-                        value: [value: 500]
-                ]
-        ]
+        data = new DataSet([
+                "106005": new NumberField(rawValue: 500D),
+                "106007": new NumberField(rawValue: 500D),
+                "106009": new NumberField(rawValue: 500D),
+                "106011": new NumberField(rawValue: 500D),
+                "106013": new NumberField(rawValue: 500D),
+                "106015": new NumberField(rawValue: 500D),
+                "106017": new NumberField(rawValue: 500D),
+                "106019": new NumberField(rawValue: 500D),
+                "106021": new NumberField(rawValue: 500D),
+        ])
         setData(data)
     }
 
     def setDataSummary() {
-        def data = [
-                (mapper[108001]): [
-                        value: [value: "polročná"]
-                ],
-                (mapper[108002]): [
-                        value: [value: true]
-                ],
-                (mapper[108003]): [
-                        value: [value: "20%"]
-                ]
-        ]
+        def data = new DataSet([
+                "108001": new EnumerationField(rawValue: new I18nString("polročná")),
+                "108002": new BooleanField(rawValue: true),
+                "108003": new EnumerationField(rawValue: new I18nString("20%")),
+        ])
         setData(data)
     }
 
     def setDataInfo() {
-        def data = [
-                (mapper[109007]): [
-                        value: [value: "fyzická osoba"]
-                ],
-                (mapper[109010]): [
-                        value: [value: "meno"]
-                ],
-                (mapper[109011]): [
-                        value: [value: "priezvisko"]
-                ],
-                (mapper[109016]): [
-                        value: [value: "OP"]
-                ],
-                (mapper[109017]): [
-                        value: [value: "AB123456"]
-                ],
-                (mapper[109013]): [
-                        value: [value: "SR"]
-                ],
-                (mapper[109014]): [
-                        value: [value: "2018-02-05"]
-                ],
-                (mapper[109015]): [
-                        value: [value: "1234567890"]
-                ],
-                (mapper[109019]): [
-                        value: [value: "test@test.com"]
-                ],
-                (mapper[109045]): [
-                        value: [value: "ulica"]
-                ],
-                (mapper[109046]): [
-                        value: [value: "1"]
-                ]
-        ]
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formatter = formatter.withLocale(Locale.getDefault())
+        LocalDate date = LocalDate.parse("2018-02-05", formatter);
+        def data = new DataSet([
+                "109007": new EnumerationField(rawValue: new I18nString("fyzická osoba")),
+                "109010": new TextField(rawValue: "meno"),
+                "109011": new TextField(rawValue: "priezvisko"),
+                "109016": new EnumerationField(rawValue: new I18nString("OP")),
+                "109017": new TextField(rawValue: "AB123456"),
+                "109013": new EnumerationField(rawValue: new I18nString("SR")),
+                "109014": new DateField(rawValue: date),
+                "109015": new TextField(rawValue: "1234567890"),
+                "109019": new TextField(rawValue: "test@test.com"),
+                "109045": new TextField(rawValue: "ulica"),
+                "109046": new TextField(rawValue: "1"),
+        ])
         setData(data)
     }
 
     def setDataOffer() {
-        def data = [
-                (mapper[109001]): [
-                        value: [value: "2018-02-21"]
-                ],
-                (mapper[109006]): [
-                        value: [value: "prevodom"]
-                ]
-        ]
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formatter = formatter.withLocale(Locale.getDefault())
+        LocalDate date = LocalDate.parse("2018-02-21", formatter);
+        def data = new DataSet([
+                "109001": new DateField(rawValue: date),
+                "109006": new EnumerationField(rawValue: new I18nString("prevodom"))
+        ])
         setData(data)
     }
 

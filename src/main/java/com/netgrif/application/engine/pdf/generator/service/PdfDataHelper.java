@@ -75,7 +75,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     private Map<String, PdfFieldBuilder<?>> pdfFieldBuilders;
 
     public PdfDataHelper(List<PdfFieldBuilder<?>> builders) {
-        this.pdfFieldBuilders = builders.stream().collect(Collectors.toMap(PdfFieldBuilder::getType, Function.identity()));
+        this.pdfFieldBuilders = builders.stream().flatMap(b -> Arrays.stream(b.getType()).map(k -> new AbstractMap.SimpleEntry<>(k, b))).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
     }
 
     @Override

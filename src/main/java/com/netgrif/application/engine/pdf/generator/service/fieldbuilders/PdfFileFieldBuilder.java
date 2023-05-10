@@ -4,9 +4,7 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfFileField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.FileField;
-import com.netgrif.application.engine.petrinet.domain.dataset.FileFieldValue;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,14 +30,17 @@ public class PdfFileFieldBuilder extends PdfFormFieldBuilder<PdfFileField> {
     }
 
     @Override
-    public String getType() {
-        return DataType.FILE.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.FILE.value(),
+                DataType.FILE.value() + "_" +  "preview"
+        };
     }
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfFileField pdfField) {
         FileField field = (FileField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
-        String rawValue = field.getValue() != null ? shortenFileName(field.getValue().getValue().getName()) : "";
+        String rawValue = field.getValue().getValue() != null ? shortenFileName(field.getValue().getValue().getName()) : "";
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),

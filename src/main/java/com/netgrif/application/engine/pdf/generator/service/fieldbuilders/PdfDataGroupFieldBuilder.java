@@ -27,8 +27,8 @@ public class PdfDataGroupFieldBuilder extends PdfFieldBuilder<PdfDataGroupField>
     }
 
     @Override
-    public String getType() {
-        return PdfDataGroupField.DATA_GROUP_TYPE;
+    public String[] getType() {
+        return new String[]{PdfDataGroupField.DATA_GROUP_TYPE};
     }
 
     @Override
@@ -70,6 +70,7 @@ public class PdfDataGroupFieldBuilder extends PdfFieldBuilder<PdfDataGroupField>
         if (buildingBlock.getLastX() != 0) {
             lastY++;
         }
+        pdfField.setComponent(PdfDataGroupField.DATA_GROUP_TYPE);
         pdfField.setLayoutX(0);
         pdfField.setLayoutY(lastY);
         pdfField.setWidth(resource.getPageDrawableWidth());

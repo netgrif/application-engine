@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfNumberField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -15,8 +14,12 @@ import java.io.IOException;
 public class PdfNumberFieldRenderer extends PdfFieldRenderer<PdfNumberField> {
 
     @Override
-    public String getType() {
-        return DataType.NUMBER.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.NUMBER.value(),
+                DataType.NUMBER.value() + "_" + "currency",
+                DataType.NUMBER.value() + "_" + "decimal",
+        };
     }
 
     @Override

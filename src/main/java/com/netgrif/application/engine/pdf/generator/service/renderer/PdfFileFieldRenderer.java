@@ -2,7 +2,6 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfFileField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTextField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,8 +15,11 @@ import java.util.List;
 public class PdfFileFieldRenderer extends PdfFieldRenderer<PdfFileField> {
 
     @Override
-    public String getType() {
-        return DataType.FILE.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.FILE.value(),
+                DataType.FILE.value() + "_" +  "preview"
+        };
     }
 
     @Override

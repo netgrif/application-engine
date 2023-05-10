@@ -29,8 +29,11 @@ public class PdfI18NDividerFieldBuilder extends PdfFormFieldBuilder<PdfI18nDivid
     }
 
     @Override
-    public String getType() {
-        return DataType.I_18_N.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.I_18_N.value(),
+                DataType.I_18_N.value() + "_" + "divider"
+        };
     }
 
     @Override
@@ -41,7 +44,7 @@ public class PdfI18NDividerFieldBuilder extends PdfFormFieldBuilder<PdfI18nDivid
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfI18nDividerField pdfField) {
         I18nField field = (I18nField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
-        String rawValue = field.getValue() != null ? field.getValue().getValue().getTranslation(buildingBlock.getLocale()) : "";
+        String rawValue = field.getValue().getValue() != null ? field.getValue().getValue().getTranslation(buildingBlock.getLocale()) : "";
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),

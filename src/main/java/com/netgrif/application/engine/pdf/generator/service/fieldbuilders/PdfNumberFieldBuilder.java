@@ -29,8 +29,12 @@ public class PdfNumberFieldBuilder extends PdfFormFieldBuilder<PdfNumberField> {
     }
 
     @Override
-    public String getType() {
-        return DataType.NUMBER.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.NUMBER.value(),
+                DataType.NUMBER.value() + "_" + "currency",
+                DataType.NUMBER.value() + "_" + "decimal",
+        };
     }
 
     @Override

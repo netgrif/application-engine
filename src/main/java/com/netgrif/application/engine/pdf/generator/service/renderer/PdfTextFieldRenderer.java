@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTextField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -20,8 +19,17 @@ public class PdfTextFieldRenderer extends PdfFieldRenderer<PdfTextField> {
     }
 
     @Override
-    public String getType() {
-        return DataType.TEXT.value();
+    public String[] getType() {
+        return new String[]{
+                DataType.TEXT.value(),
+                DataType.TEXT.value() + "_" + "password",
+                DataType.TEXT.value() + "_" + "textarea",
+                DataType.TEXT.value() + "_" + "area",
+                DataType.TEXT.value() + "_" + "richtextarea",
+                DataType.TEXT.value() + "_" + "editor",
+                DataType.TEXT.value() + "_" + "htmltextarea",
+                DataType.TEXT.value() + "_" + "htmlEditor"
+        };
     }
 
     @Override

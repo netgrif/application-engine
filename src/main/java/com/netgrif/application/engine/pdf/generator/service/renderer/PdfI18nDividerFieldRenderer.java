@@ -7,11 +7,11 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
-public class I18nDividerFieldRenderer extends PdfFieldRenderer<PdfI18nDividerField> {
+public class PdfI18nDividerFieldRenderer extends PdfFieldRenderer<PdfI18nDividerField> {
 
     @Override
-    public String getType() {
-        return DataType.I_18_N.value();
+    public String[] getType() {
+        return new String[]{DataType.I_18_N.value()};
     }
 
     @Override

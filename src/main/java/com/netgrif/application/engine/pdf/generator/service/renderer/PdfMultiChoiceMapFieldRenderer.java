@@ -1,8 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfMultiChoiceField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfMultiChoiceMapField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -12,15 +10,14 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PdfMultiChoiceMapFieldRenderer extends PdfFieldRenderer<PdfMultiChoiceMapField> {
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE_MAP.value();
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE_MAP.value()};
     }
 
     @Override

@@ -3,12 +3,13 @@ package com.netgrif.application.engine.pdf.generator.domain.fields;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.factories.PdfSelectionFieldCopier;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class PdfMultiChoiceMapField extends PdfSelectionField<Set<String>> {
 
     public PdfMultiChoiceMapField() {
-        super();
+        super(new HashSet<>());
     }
 
     public PdfMultiChoiceMapField(String id) {

@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.pdf.generator.domain.fields;
 
-import com.netgrif.application.engine.pdf.generator.domain.factories.PdfFieldCopier;
-import com.netgrif.application.engine.pdf.generator.domain.factories.PdfSelectionFieldCopier;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,10 +12,11 @@ public abstract class PdfSelectionField<S> extends PdfField<Map<String, List<Str
 
     @Getter
     @Setter
-    protected S selectedValues;
+    private S selectedValues;
 
-    public PdfSelectionField() {
+    public PdfSelectionField(S selectedValues) {
         super();
+        this.selectedValues = selectedValues;
     }
 
     public PdfSelectionField(String id) {

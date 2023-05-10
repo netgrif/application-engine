@@ -2,7 +2,6 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfEnumerationMapField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfMultiChoiceMapField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfSelectionField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -18,8 +17,8 @@ import java.util.Map;
 public class PdfListEnumerationMapFieldRenderer extends PdfEnumerationMapFieldRenderer {
 
     @Override
-    public String getType() {
-        return DataType.ENUMERATION_MAP.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    public String[] getType() {
+        return new String[]{DataType.ENUMERATION_MAP.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME};
     }
 
     @Override

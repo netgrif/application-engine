@@ -26,8 +26,8 @@ public class PdfListMultiChoiceFieldBuilder extends PdfMultiChoiceFieldBuilder {
     }
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME};
     }
 
     @Override
@@ -48,7 +48,7 @@ public class PdfListMultiChoiceFieldBuilder extends PdfMultiChoiceFieldBuilder {
             Map<String, List<String>> choices = field.getChoices().stream().collect(Collectors.toMap(I18nString::getKey, e -> generateMultiLineText(Collections.singletonList(e.getTranslation(buildingBlock.getLocale())), maxValueLineLength)));
             pdfField.setValue(choices);
         }
-        if (field.getValue() != null) {
+        if (field.getValue() != null && field.getValue().getValue() != null) {
             Set<String> values = field.getValue().getValue().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             pdfField.setSelectedValues(values);
         }

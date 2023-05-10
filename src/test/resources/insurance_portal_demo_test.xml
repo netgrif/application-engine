@@ -46,7 +46,7 @@
             field: f.this,
             other: f.109048;
             change other value {
-                return field.rawValue;
+                return field.rawValue.defaultValue;
             }
             <!--@formatter:on-->
         </action>
@@ -79,18 +79,19 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201001;
-            change coeff value {
-            if (field.rawValue=="L5")
-                return 3.8 as Double;
-            if (field.rawValue=="L4")
-                return 3.4 as Double;
-             if (field.rawValue=="L3")
-                return 3.2 as Double;
-            if (field.rawValue=="L2")
-                return 3.0 as Double;
-            if (field.rawValue=="L1")
-                return 2.8 as Double;
-
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="L5")
+                    return 3.8 as Double;
+                if (field.rawValue=="L4")
+                    return 3.4 as Double;
+                 if (field.rawValue=="L3")
+                    return 3.2 as Double;
+                if (field.rawValue=="L2")
+                    return 3.0 as Double;
+                if (field.rawValue=="L1")
+                    return 2.8 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -98,17 +99,19 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201018;
-            change coeff value {
-                if (field.rawValue=="L5")
-                    return 3.8 as Double;
-                if (field.rawValue=="L4")
-                    return 3.4 as Double;
-                if (field.rawValue=="L3")
-                    return 3.2 as Double;
-                if (field.rawValue=="L2")
-                    return 3.0 as Double;
-                if (field.rawValue=="L1")
-                    return 2.8 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                    if (field.rawValue=="L5")
+                        return 3.8 as Double;
+                    if (field.rawValue=="L4")
+                        return 3.4 as Double;
+                    if (field.rawValue=="L3")
+                        return 3.2 as Double;
+                    if (field.rawValue=="L2")
+                        return 3.0 as Double;
+                    if (field.rawValue=="L1")
+                        return 2.8 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -171,15 +174,17 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201005;
-            change coeff value {
-                if (field.rawValue=="menej ako 1")
-                    return 1.0 as Double;
-                if (field.rawValue=="1 až 5")
-                    return 1.0 as Double;
-                if (field.rawValue=="6 až 10")
-                    return 1.0 as Double;
-                if (field.rawValue=="viac ako 10")
-                    return 1.0 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                    if (field.rawValue=="menej ako 1")
+                        return 1.0 as Double;
+                    if (field.rawValue=="1 až 5")
+                        return 1.0 as Double;
+                    if (field.rawValue=="6 až 10")
+                        return 1.0 as Double;
+                    if (field.rawValue=="viac ako 10")
+                        return 1.0 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -197,15 +202,17 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201006;
-            change coeff value {
-                if (field.rawValue=="vlastník nehnuteľnosti")
-                    return 1.0 as Double;
-                if (field.rawValue=="vlastník má úver alebo hypotéku na nehnuteľnosť")
-                    return 1.0 as Double;
-                if (field.rawValue=="poistený je v prenájme")
-                    return 1.1 as Double;
-                if (field.rawValue=="iné")
-                    return 1.1 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                    if (field.rawValue=="vlastník nehnuteľnosti")
+                        return 1.0 as Double;
+                    if (field.rawValue=="vlastník má úver alebo hypotéku na nehnuteľnosť")
+                        return 1.0 as Double;
+                    if (field.rawValue=="poistený je v prenájme")
+                        return 1.1 as Double;
+                    if (field.rawValue=="iné")
+                        return 1.1 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -223,15 +230,17 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201007;
-            change coeff value {
-                if (field.rawValue=="1")
-                    return 0.95 as Double;
-                if (field.rawValue=="2")
-                    return 1.0 as Double;
-                if (field.rawValue=="3")
-                    return 1.05 as Double;
-                if (field.rawValue=="viac ako 3")
-                    return 1.1 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                    if (field.rawValue=="1")
+                        return 0.95 as Double;
+                    if (field.rawValue=="2")
+                        return 1.0 as Double;
+                    if (field.rawValue=="3")
+                        return 1.05 as Double;
+                    if (field.rawValue=="viac ako 3")
+                        return 1.1 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -249,15 +258,17 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201008;
-            change coeff value {
-                if (field.rawValue=="0")
-                    return 1.0 as Double;
-                if (field.rawValue=="1")
-                    return 1.0 as Double;
-                if (field.rawValue=="2")
-                    return 1.05 as Double;
-                if (field.rawValue=="viac ako 2")
-                    return 1.1 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                    if (field.rawValue=="0")
+                        return 1.0 as Double;
+                    if (field.rawValue=="1")
+                        return 1.0 as Double;
+                    if (field.rawValue=="2")
+                        return 1.05 as Double;
+                    if (field.rawValue=="viac ako 2")
+                        return 1.1 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -304,13 +315,15 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201016;
-            change coeff value{
-                 if (field.rawValue=="0")
-                        return 1.0 as Double;
-                 if (field.rawValue=="1")
-                        return 1.1 as Double;
-                 if (field.rawValue=="2 a viac")
-                        return 1.2 as Double;
+            if (field.rawValue != null) {
+                change coeff value{
+                     if (field.rawValue=="0")
+                            return 1.0 as Double;
+                     if (field.rawValue=="1")
+                            return 1.1 as Double;
+                     if (field.rawValue=="2 a viac")
+                            return 1.2 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -328,13 +341,15 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208001;
-            change coeff value {
-            if (field.rawValue=="0.00 €")
-            return 1.1 as Double;
-            if (field.rawValue=="50.00 €")
-            return 1.0 as Double;
-            if (field.rawValue=="150.00 €")
-            return 0.9 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="0.00 €")
+                return 1.1 as Double;
+                if (field.rawValue=="50.00 €")
+                return 1.0 as Double;
+                if (field.rawValue=="150.00 €")
+                return 0.9 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -351,17 +366,20 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202001;
-            change coeff value {
-            if (field.rawValue=="byt")
-            return 1.0 as Double;
-            if (field.rawValue=="rodinný dom")
-            return 1.0 as Double;
-            if (field.rawValue=="chata")
-            return 1.1 as Double;
-            if (field.rawValue=="bungalow")
-            return 1.0 as Double;
-            if (field.rawValue=="rozostavaná stavba")
-            return 1.0 as Double;
+
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="byt")
+                return 1.0 as Double;
+                if (field.rawValue=="rodinný dom")
+                return 1.0 as Double;
+                if (field.rawValue=="chata")
+                return 1.1 as Double;
+                if (field.rawValue=="bungalow")
+                return 1.0 as Double;
+                if (field.rawValue=="rozostavaná stavba")
+                return 1.0 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -369,17 +387,19 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201019;
-            change coeff value {
-            if (field.rawValue=="byt")
-            return 0.9 as Double;
-            if (field.rawValue=="rodinný dom")
-            return 0.9 as Double;
-            if (field.rawValue=="chata")
-            return 1.2 as Double;
-            if (field.rawValue=="bungalow")
-            return 0.9 as Double;
-            if (field.rawValue=="rozostavaná stavba")
-            return 1.2 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="byt")
+                return 0.9 as Double;
+                if (field.rawValue=="rodinný dom")
+                return 0.9 as Double;
+                if (field.rawValue=="chata")
+                return 1.2 as Double;
+                if (field.rawValue=="bungalow")
+                return 0.9 as Double;
+                if (field.rawValue=="rozostavaná stavba")
+                return 1.2 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -387,15 +407,17 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.103001;
-            change coeff value {
-            if (field.rawValue=="byt")
-            return "byt";
-            if (field.rawValue=="rodinný dom")
-            return "rodinný dom";
-            if (field.rawValue=="chata")
-            return "chata";
-            if (field.rawValue=="bungalow")
-            return "bungalow";
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="byt")
+                return "byt";
+                if (field.rawValue=="rodinný dom")
+                return "rodinný dom";
+                if (field.rawValue=="chata")
+                return "chata";
+                if (field.rawValue=="bungalow")
+                return "bungalow";
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -526,17 +548,19 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202002;
-            change coeff value {
-            if (field.rawValue=="tehla a/alebo betón")
-            return 1.0 as Double;
-            if (field.rawValue=="porobetón (ytong)")
-            return 1.05 as Double;
-            if (field.rawValue=="škvarobatón")
-            return 1.05 as Double;
-            if (field.rawValue=="sklo")
-            return 1.3 as Double;
-            if (field.rawValue=="drevo")
-            return 1.5 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="tehla a/alebo betón")
+                return 1.0 as Double;
+                if (field.rawValue=="porobetón (ytong)")
+                return 1.05 as Double;
+                if (field.rawValue=="škvarobatón")
+                return 1.05 as Double;
+                if (field.rawValue=="sklo")
+                return 1.3 as Double;
+                if (field.rawValue=="drevo")
+                return 1.5 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -556,19 +580,21 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202003;
-            change coeff value {
-            if (field.rawValue=="škridla")
-            return 1.0 as Double;
-            if (field.rawValue=="plech")
-            return 1.05 as Double;
-            if (field.rawValue=="asfalt")
-            return 1.1 as Double;
-            if (field.rawValue=="sklo")
-            return 1.15 as Double;
-            if (field.rawValue=="šindel")
-            return 1.05 as Double;
-            if (field.rawValue=="iné")
-            return 1.1 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="škridla")
+                return 1.0 as Double;
+                if (field.rawValue=="plech")
+                return 1.05 as Double;
+                if (field.rawValue=="asfalt")
+                return 1.1 as Double;
+                if (field.rawValue=="sklo")
+                return 1.15 as Double;
+                if (field.rawValue=="šindel")
+                return 1.05 as Double;
+                if (field.rawValue=="iné")
+                return 1.1 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -586,15 +612,17 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202004;
-            change coeff value {
-            if (field.rawValue=="menej ako 5")
-            return 1.0 as Double;
-            if (field.rawValue=="6 až 10")
-            return 1.02 as Double;
-            if (field.rawValue=="11 až 20")
-            return 1.04 as Double;
-            if (field.rawValue=="viac ako 20")
-            return 1.06 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="menej ako 5")
+                return 1.0 as Double;
+                if (field.rawValue=="6 až 10")
+                return 1.02 as Double;
+                if (field.rawValue=="11 až 20")
+                return 1.04 as Double;
+                if (field.rawValue=="viac ako 20")
+                return 1.06 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -613,17 +641,19 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202006;
-            change coeff value {
-            if (field.rawValue=="1")
-            return 0.9 as Double;
-            if (field.rawValue=="2")
-            return 0.95 as Double;
-            if (field.rawValue=="3")
-            return 1.0 as Double;
-            if (field.rawValue=="4")
-            return 1.02 as Double;
-            if (field.rawValue=="viac ako 4")
-            return 1.05 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="1")
+                return 0.9 as Double;
+                if (field.rawValue=="2")
+                return 0.95 as Double;
+                if (field.rawValue=="3")
+                return 1.0 as Double;
+                if (field.rawValue=="4")
+                return 1.02 as Double;
+                if (field.rawValue=="viac ako 4")
+                return 1.05 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -680,13 +710,15 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202007;
-            change coeff value {
-            if (field.rawValue=="1")
-            return 1.0 as Double;
-            if (field.rawValue=="2")
-            return 1.02 as Double;
-            if (field.rawValue=="viac ako 2")
-            return 1.03 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="1")
+                return 1.0 as Double;
+                if (field.rawValue=="2")
+                return 1.02 as Double;
+                if (field.rawValue=="viac ako 2")
+                return 1.03 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -704,15 +736,18 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.203001;
-            change coeff value {
-            if (field.rawValue=="byt")
-            return 1.0 as Double;
-            if (field.rawValue=="rodinný dom")
-            return 1.0 as Double;
-            if (field.rawValue=="chata")
-            return 1.25 as Double;
-            if (field.rawValue=="bungalow")
-            return 1.0 as Double;
+
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="byt")
+                return 1.0 as Double;
+                if (field.rawValue=="rodinný dom")
+                return 1.0 as Double;
+                if (field.rawValue=="chata")
+                return 1.25 as Double;
+                if (field.rawValue=="bungalow")
+                return 1.0 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -767,11 +802,13 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.203002;
-            change coeff value {
-            if (field.rawValue=="trvalá")
-            return 1.0 as Double;
-            if (field.rawValue=="dočasná")
-            return 2.0 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="trvalá")
+                return 1.0 as Double;
+                if (field.rawValue=="dočasná")
+                return 2.0 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -915,11 +952,13 @@
             field: f.this,
             coeff1: f.204002,
             coeff: f.204003;
+            if (field.rawValue != null) {
             change coeff value {
-            if (field.rawValue=="Slovenská republika")
-                return 1.0*coeff1.rawValue as Double;
-             if (field.rawValue=="Európa")
-                return 1.2*coeff1.rawValue as Double;
+                if (field.rawValue=="Slovenská republika")
+                    return 1.0*coeff1.rawValue as Double;
+                 if (field.rawValue=="Európa")
+                    return 1.2*coeff1.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -949,17 +988,19 @@
             field: f.this,
             location: f.301002,
             coeff: f.205002;
-            change coeff value {
-            if (location.rawValue=="L5")
-            return 850*field.rawValue as Double;
-            if (location.rawValue=="L4")
-            return 700*field.rawValue as Double;
-            if (location.rawValue=="L1")
-            return 400*field.rawValue as Double;
-            if (location.rawValue=="L2")
-            return 500*field.rawValue as Double;
-            if (location.rawValue=="L3")
-            return 650*field.rawValue as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (location.rawValue=="L5")
+                return 850*field.rawValue as Double;
+                if (location.rawValue=="L4")
+                return 700*field.rawValue as Double;
+                if (location.rawValue=="L1")
+                return 400*field.rawValue as Double;
+                if (location.rawValue=="L2")
+                return 500*field.rawValue as Double;
+                if (location.rawValue=="L3")
+                return 650*field.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -987,17 +1028,19 @@
             field: f.this,
             location: f.301002,
             coeff: f.205003;
-            change coeff value {
-            if (location.rawValue=="L5")
-            return 1400*field.rawValue as Double;
-            if (location.rawValue=="L4")
-            return 900*field.rawValue as Double;
-            if (location.rawValue=="L1")
-            return 550*field.rawValue as Double;
-            if (location.rawValue=="L2")
-            return 650*field.rawValue as Double;
-            if (location.rawValue=="L3")
-            return 800*field.rawValue as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (location.rawValue=="L5")
+                return 1400*field.rawValue as Double;
+                if (location.rawValue=="L4")
+                return 900*field.rawValue as Double;
+                if (location.rawValue=="L1")
+                return 550*field.rawValue as Double;
+                if (location.rawValue=="L2")
+                return 650*field.rawValue as Double;
+                if (location.rawValue=="L3")
+                return 800*field.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -1026,17 +1069,19 @@
             field: f.this,
             location: f.301002,
             coeff: f.205004;
-            change coeff value {
-            if (location.rawValue=="L5")
-            return 1200*field.rawValue as Double;
-            if (location.rawValue=="L4")
-            return 800*field.rawValue as Double;
-            if (location.rawValue=="L1")
-            return 500*field.rawValue as Double;
-            if (location.rawValue=="L2")
-            return 550*field.rawValue as Double;
-            if (location.rawValue=="L3")
-            return 700*field.rawValue as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (location.rawValue=="L5")
+                return 1200*field.rawValue as Double;
+                if (location.rawValue=="L4")
+                return 800*field.rawValue as Double;
+                if (location.rawValue=="L1")
+                return 500*field.rawValue as Double;
+                if (location.rawValue=="L2")
+                return 550*field.rawValue as Double;
+                if (location.rawValue=="L3")
+                return 700*field.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -1064,17 +1109,19 @@
             field: f.this,
             location: f.301002,
             coeff: f.105007;
-            change coeff value {
-             if (location.rawValue=="L5")
-            return 850*field.rawValue as Double;
-            if (location.rawValue=="L4")
-            return 700*field.rawValue as Double;
-            if (location.rawValue=="L1")
-            return 400*field.rawValue as Double;
-            if (location.rawValue=="L2")
-            return 500*field.rawValue as Double;
-            if (location.rawValue=="L3")
-            return 650*field.rawValue as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                 if (location.rawValue=="L5")
+                return 850*field.rawValue as Double;
+                if (location.rawValue=="L4")
+                return 700*field.rawValue as Double;
+                if (location.rawValue=="L1")
+                return 400*field.rawValue as Double;
+                if (location.rawValue=="L2")
+                return 500*field.rawValue as Double;
+                if (location.rawValue=="L3")
+                return 650*field.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -1106,19 +1153,21 @@
             p2: f.205003,
             p3: f.205004,
             field: f.105006;
-            change field value {
-                if (check.rawValue != "byt")
-                    return p1.rawValue+p2.rawValue+p3.rawValue as Double;
-                if (location.rawValue=="L5")
-                    return 1900*sum.rawValue as Double;
-                if (location.rawValue=="L4")
-                    return 1300*sum.rawValue as Double;
-                if (location.rawValue=="L3")
-                    return 950*sum.rawValue as Double;
-                if (location.rawValue=="L2")
-                    return 700*sum.rawValue as Double;
-                if (location.rawValue=="L1")
-                    return 650*sum.rawValue as Double;
+            if (check.rawValue != null) {
+                change field value {
+                    if (check.rawValue != "byt")
+                        return p1.rawValue+p2.rawValue+p3.rawValue as Double;
+                    if (location.rawValue=="L5")
+                        return 1900*sum.rawValue as Double;
+                    if (location.rawValue=="L4")
+                        return 1300*sum.rawValue as Double;
+                    if (location.rawValue=="L3")
+                        return 950*sum.rawValue as Double;
+                    if (location.rawValue=="L2")
+                        return 700*sum.rawValue as Double;
+                    if (location.rawValue=="L1")
+                        return 650*sum.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -1127,17 +1176,19 @@
             field: f.this,
             location: f.301002,
             coeff: f.205001;
-            change coeff value {
-            if (location.rawValue=="L5")
-            return 1900*field.rawValue as Double;
-            if (location.rawValue=="L4")
-            return 1300*field.rawValue as Double;
-            if (location.rawValue=="L1")
-            return 650*field.rawValue as Double;
-            if (location.rawValue=="L2")
-            return 700*field.rawValue as Double;
-            if (location.rawValue=="L3")
-            return 950*field.rawValue as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (location.rawValue=="L5")
+                return 1900*field.rawValue as Double;
+                if (location.rawValue=="L4")
+                return 1300*field.rawValue as Double;
+                if (location.rawValue=="L1")
+                return 650*field.rawValue as Double;
+                if (location.rawValue=="L2")
+                return 700*field.rawValue as Double;
+                if (location.rawValue=="L3")
+                return 950*field.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -1298,8 +1349,10 @@
             <!--@formatter:off-->
             field: f.this,
             sum: f.305019;
+            if (field.rawValue != null) {
             change sum value {
             return field.rawValue as Double;
+            }
             }
             <!--@formatter:on-->
         </action>
@@ -2686,16 +2739,18 @@
         <placeholder>Spoluúčasť</placeholder>
         <action id="172" trigger="set">
             <!--@formatter:off-->
-        field: f.this,
-        coeff: f.208002;
-        change coeff value {
-        if (field.rawValue=="0.00 €")
-        return 1.1 as Double;
-        if (field.rawValue=="50.00 €")
-        return 1.0 as Double;
-        if (field.rawValue=="150.00 €")
-        return 0.9 as Double;
-        }
+            field: f.this,
+            coeff: f.208002;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="0.00 €")
+                return 1.1 as Double;
+                if (field.rawValue=="50.00 €")
+                return 1.0 as Double;
+                if (field.rawValue=="150.00 €")
+                return 0.9 as Double;
+                }
+            }
         <!--@formatter:on-->
         </action>
         <action id="173" trigger="set">
@@ -3750,8 +3805,10 @@
             <!--@formatter:off-->
             field: f.105006,
             other: f.105036;
-            change other value {
-                return field.rawValue as Double;
+            if (field.rawValue != null) {
+                change other value {
+                    return field.rawValue as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -3890,13 +3947,15 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208004;
-            change coeff value {
-            if (field.rawValue == "ročná")
-            return 0.95 as Double;
-            if (field.rawValue == "polročná")
-            return 0.99 as Double;
-            if (field.rawValue == "štvrťročná")
-            return 1.0 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue == "ročná")
+                return 0.95 as Double;
+                if (field.rawValue == "polročná")
+                return 0.99 as Double;
+                if (field.rawValue == "štvrťročná")
+                return 1.0 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>
@@ -4010,19 +4069,21 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208006;
-            change coeff value {
-            if (field.rawValue=="0%")
-            return 1.0 as Double;
-            if (field.rawValue=="5%")
-            return 0.95 as Double;
-            if (field.rawValue=="10%")
-            return 0.9 as Double;
-            if (field.rawValue=="15%")
-            return 0.85 as Double;
-            if (field.rawValue=="20%")
-            return 0.8 as Double;
-            if (field.rawValue=="25%")
-            return 0.75 as Double;
+            if (field.rawValue != null) {
+                change coeff value {
+                if (field.rawValue=="0%")
+                return 1.0 as Double;
+                if (field.rawValue=="5%")
+                return 0.95 as Double;
+                if (field.rawValue=="10%")
+                return 0.9 as Double;
+                if (field.rawValue=="15%")
+                return 0.85 as Double;
+                if (field.rawValue=="20%")
+                return 0.8 as Double;
+                if (field.rawValue=="25%")
+                return 0.75 as Double;
+                }
             }
             <!--@formatter:on-->
         </action>

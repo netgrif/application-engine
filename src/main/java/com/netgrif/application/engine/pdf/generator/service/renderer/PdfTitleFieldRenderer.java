@@ -1,7 +1,5 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTextField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTitleField;
 import com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -33,7 +31,7 @@ public class PdfTitleFieldRenderer extends PdfFieldRenderer<PdfTitleField> {
     }
 
     @Override
-    public String getType() {
-        return PdfTitleField.TITLE_TYPE;
+    public String[] getType() {
+        return new String[]{PdfTitleField.TITLE_TYPE};
     }
 }

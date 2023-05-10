@@ -18,7 +18,7 @@ public abstract class PdfFieldBuilder<T extends PdfField<?>> {
 
     public abstract T buildField(PdfBuildingBlock buildingBlock);
 
-    public abstract String getType();
+    public abstract String[] getType();
 
     protected abstract void setupValue(PdfBuildingBlock buildingBlock,T pdfField);
 

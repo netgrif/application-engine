@@ -25,8 +25,8 @@ import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUti
 public class PdfListEnumerationFieldBuilder extends PdfEnumerationFieldBuilder {
 
     @Override
-    public String getType() {
-        return DataType.ENUMERATION.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    public String[] getType() {
+        return new String[]{DataType.ENUMERATION.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME};
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PdfListEnumerationFieldBuilder extends PdfEnumerationFieldBuilder {
             Map<String, List<String>> choices = field.getChoices().stream().collect(Collectors.toMap(I18nString::getKey, e -> generateMultiLineText(Collections.singletonList(e.getTranslation(buildingBlock.getLocale())), maxValueLineLength)));
             pdfField.setValue(choices);
         }
-        if (field.getValue() != null) {
+        if (field.getValue() != null  && field.getValue().getValue() != null) {
             Set<String> values = Collections.singleton(field.getValue().getValue().getDefaultValue());
             pdfField.setSelectedValues(values);
         }

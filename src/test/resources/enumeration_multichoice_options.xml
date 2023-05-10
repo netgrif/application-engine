@@ -18,9 +18,9 @@
         <id>enumeration_like_map</id>
         <title>Enumeration options</title>
         <options>
-            <option key="one">Alice</option>
-            <option key="two">Bob</option>
-            <option key="three">Carol</option>
+            <option key="Alice">Alice</option>
+            <option key="Bob">Bob</option>
+            <option key="Carol">Carol</option>
         </options>
         <init>Bob</init>
     </data>
@@ -38,9 +38,9 @@
         <id>multichoice_like_map</id>
         <title>Multichoice options</title>
         <options>
-            <option key="one">Alice</option>
-            <option key="two">Bob</option>
-            <option key="three">Carol</option>
+            <option key="Alice">Alice</option>
+            <option key="Bob">Bob</option>
+            <option key="Carol">Carol</option>
         </options>
         <init>Alice,Bob</init>
     </data>

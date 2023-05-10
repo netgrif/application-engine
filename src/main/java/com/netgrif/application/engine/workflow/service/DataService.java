@@ -539,7 +539,7 @@ public class DataService implements IDataService {
     }
 
     private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) {
-        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+        if (useCase.getDataSet().get(field.getStringId()).getValue() != null && useCase.getDataSet().get(field.getStringId()).getValue().getValue() != null) {
             new File(field.getFilePath(useCase.getStringId())).delete();
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }

@@ -29,7 +29,7 @@ public abstract class PdfFieldRenderer<T extends PdfField<?>> {
         this.field = (T) field;
     }
 
-    public abstract String getType();
+    public abstract String[] getType();
 
     public abstract void renderValue() throws IOException;
 

@@ -1,6 +1,9 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.mapper.filters.DataFieldBehaviorsFilter;
 import com.netgrif.application.engine.petrinet.domain.Component;
@@ -36,26 +39,26 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = BooleanField.class, name = "BOOLEAN"),
-        @JsonSubTypes.Type(value = ButtonField.class, name = "BUTTON"),
-        @JsonSubTypes.Type(value = CaseField.class, name = "CASE_REF"),
-        @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
-        @JsonSubTypes.Type(value = DateTimeField.class, name = "DATE_TIME"),
-        @JsonSubTypes.Type(value = EnumerationField.class, name = "ENUMERATION"),
-        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "ENUMERATION_MAP_FIELD"),
-        @JsonSubTypes.Type(value = FileField.class, name = "FILE"),
-        @JsonSubTypes.Type(value = FileListField.class, name = "FILE_LIST"),
-        @JsonSubTypes.Type(value = FilterField.class, name = "FILTER"),
-        @JsonSubTypes.Type(value = I18nField.class, name = "I_18_N"),
-        @JsonSubTypes.Type(value = MultichoiceField.class, name = "MULTICHOICE"),
-        @JsonSubTypes.Type(value = MultichoiceMapField.class, name = "MULTICHOICE_MAP"),
-        @JsonSubTypes.Type(value = NumberField.class, name = "NUMBER"),
-        @JsonSubTypes.Type(value = TaskField.class, name = "TASK_REF"),
-        @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
-        @JsonSubTypes.Type(value = UserField.class, name = "USER"),
-        @JsonSubTypes.Type(value = UserListField.class, name = "USER_LIST"),
+        @JsonSubTypes.Type(value = NumberField.class, name = "0"),
+        @JsonSubTypes.Type(value = TextField.class, name = "1"),
+        @JsonSubTypes.Type(value = EnumerationField.class, name = "2"),
+        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "3"),
+        @JsonSubTypes.Type(value = MultichoiceField.class, name = "4"),
+        @JsonSubTypes.Type(value = MultichoiceMapField.class, name = "5"),
+        @JsonSubTypes.Type(value = BooleanField.class, name = "6"),
+        @JsonSubTypes.Type(value = DateField.class, name = "7"),
+        @JsonSubTypes.Type(value = FileField.class, name = "8"),
+        @JsonSubTypes.Type(value = FileListField.class, name = "9"),
+        @JsonSubTypes.Type(value = UserField.class, name = "10"),
+        @JsonSubTypes.Type(value = UserListField.class, name = "11"),
+        @JsonSubTypes.Type(value = DateTimeField.class, name = "12"),
+        @JsonSubTypes.Type(value = ButtonField.class, name = "13"),
+        @JsonSubTypes.Type(value = TaskField.class, name = "14"),
+        @JsonSubTypes.Type(value = CaseField.class, name = "15"),
+        @JsonSubTypes.Type(value = FilterField.class, name = "16"),
+        @JsonSubTypes.Type(value = I18nField.class, name = "17"),
 })
-public abstract class Field<T> extends Imported {
+public class Field<T> extends Imported {
 
     @Id
     protected ObjectId id;
@@ -83,6 +86,9 @@ public abstract class Field<T> extends Imported {
     // TODO: release/7.0.0 6.2.5: parentTaskId, parentCaseId
 
     public String getId() {
+        if (id == null) {
+            return null;
+        }
         return id.toString();
     }
 
@@ -92,7 +98,9 @@ public abstract class Field<T> extends Imported {
     }
 
     @QueryType(PropertyType.NONE)
-    public abstract DataType getType();
+    public DataType getType() {
+        return DataType.DATE;
+    };
 
     public void setRawValue(T value) {
         if (this.value == null) {
@@ -134,6 +142,7 @@ public abstract class Field<T> extends Imported {
         }
     }
 
+    @JsonIgnore
     public boolean isDynamicDefaultValue() {
         return initExpression != null;
     }
@@ -193,7 +202,11 @@ public abstract class Field<T> extends Imported {
         clone.component = this.component;
     }
 
-    public abstract Field<T> clone();
+    public  Field<T> clone() {
+        Field field = new Field();
+        clone(field);
+        return field;
+    }
 
     public void setBehavior(String transitionId, DataFieldBehavior behavior) {
         behaviors.put(transitionId, behavior);
