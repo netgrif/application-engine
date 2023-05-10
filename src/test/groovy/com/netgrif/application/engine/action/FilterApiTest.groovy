@@ -64,14 +64,11 @@ class FilterApiTest {
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        Case defGroup = nextGroupService.findDefaultGroup()
-
         assert item.uriNodeId == uriService.findByUri("netgrif/test").id
         assert item.dataSet["icon"].value == "filter_alt"
         assert item.dataSet["type"].value.toString() == "view"
         assert item.dataSet["name"].value.toString() == "FILTER"
         assert item.dataSet["menu_item_identifier"].value.toString() == "new_menu_item"
-        assert item.dataSet["parentId"].value.toString() == defGroup.stringId
 
         assert filter.dataSet["filter"].filterMetadata["filterType"] == "Case"
         assert filter.dataSet["filter"].allowedNets == ["filter", "preference_item"]

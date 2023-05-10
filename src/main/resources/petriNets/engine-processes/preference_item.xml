@@ -56,7 +56,7 @@
 		<title>Name of the item</title>
 		<desc>Will be shown in the menu</desc>
 	</data>
-	<data type="text" immediate="true">
+	<data type="text">
 		<id>parentId</id>
 		<title/>
 	</data>

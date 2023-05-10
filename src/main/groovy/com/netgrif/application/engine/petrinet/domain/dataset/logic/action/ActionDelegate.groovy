@@ -49,6 +49,8 @@ import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.AssignTaskEventOutcome
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.TaskEventOutcome
+import com.netgrif.application.engine.workflow.domain.menu.FolderItemBody
+import com.netgrif.application.engine.workflow.domain.menu.ViewItemBody
 import com.netgrif.application.engine.workflow.service.FileFieldInputStream
 import com.netgrif.application.engine.workflow.service.TaskService
 import com.netgrif.application.engine.workflow.service.interfaces.*
@@ -1557,7 +1559,15 @@ class ActionDelegate {
      * @return
      */
     Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> defaultHeaders = []) {
-        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
+        ViewItemBody body = new ViewItemBody(
+                uri,
+                identifier,
+                filter,
+                defaultHeaders,
+                collectRolesForPreferenceItem(allowedRoles),
+                collectRolesForPreferenceItem(bannedRoles)
+        )
+        return doCreateViewItem(body)
     }
 
     /**
@@ -1571,7 +1581,15 @@ class ActionDelegate {
      * @return
      */
     Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> defaultHeaders = []) {
-        return doCreateMenuItem(uri, identifier, filter, nextGroupService.findByName(groupName), collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
+        ViewItemBody body = new ViewItemBody(
+                uri,
+                identifier,
+                filter,
+                defaultHeaders,
+                collectRolesForPreferenceItem(allowedRoles),
+                collectRolesForPreferenceItem(bannedRoles)
+        )
+        return doCreateViewItem(body)
     }
 
     /**
@@ -1583,11 +1601,18 @@ class ActionDelegate {
      * @param allowedRoles ["role_import_id": "net_import_id"]
      * @param bannedRoles ["role_import_id": "net_import_id"]
      * @param group - if null, default group is used
-     * @param group - if null, default group is used
      * @return
      */
     Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
-        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
+        ViewItemBody body = new ViewItemBody(
+                uri,
+                identifier,
+                filter,
+                defaultHeaders,
+                collectRolesForPreferenceItem(allowedRoles),
+                collectRolesForPreferenceItem(bannedRoles)
+        )
+        return doCreateViewItem(body)
     }
 
     /**
@@ -1601,7 +1626,15 @@ class ActionDelegate {
      * @return
      */
     Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> defaultHeaders = []) {
-        return doCreateMenuItem(uri, identifier, filter, group, collectRolesForPreferenceItem(allowedRoles), collectRolesForPreferenceItem(bannedRoles), defaultHeaders)
+        ViewItemBody body = new ViewItemBody(
+                uri,
+                identifier,
+                filter,
+                defaultHeaders,
+                collectRolesForPreferenceItem(allowedRoles),
+                collectRolesForPreferenceItem(bannedRoles)
+        )
+        return doCreateViewItem(body)
     }
 
     /**
@@ -1725,44 +1758,98 @@ class ActionDelegate {
         return menuItem
     }
 
-    protected Case doCreateMenuItem(String uri, String identifier, Case filter, Case orgGroup, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles, List<String> defaultHeaders) {
-        if (findMenuItem(identifier)) {
-            throw new IllegalArgumentException("Menu item identifier $identifier is not unique!")
+    protected Case doCreateViewItem(ViewItemBody body) {
+        if (findMenuItem(body.identifier)) {
+            throw new IllegalArgumentException("View item identifier $body.identifier is not unique!")
         }
-        orgGroup = orgGroup ?: nextGroupService.findDefaultGroup()
-        Case itemCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, filter.title)
-        itemCase.setUriNodeId(uriService.findByUri(uri).id)
-        itemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = allowedRoles
-        itemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = bannedRoles
-        itemCase = workflowService.save(itemCase)
-        Task newItemTask = findTask { it._id.eq(new ObjectId(itemCase.tasks.find { it.transition == "initialize" }.task)) }
+
+        Case folderCase = getOrCreateFolder(body.uri)
+
+        Case viewCase = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.filter.title)
+        viewCase.setUriNodeId(uriService.findByUri(body.uri).id)
+        viewCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = body.allowedRoles
+        viewCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = body.bannedRoles
+        viewCase = workflowService.save(viewCase)
+        Task newItemTask = findTask { it._id.eq(new ObjectId(viewCase.tasks.find { it.transition == "initialize" }.task)) }
         assignTask(newItemTask)
         def setDataMap = [
                 (PREFERENCE_ITEM_FIELD_TYPE)    : [
                         "type" : "enumeration_map",
                         "value": "view"
                 ],
+                (PREFERENCE_ITEM_FIELD_PARENTID)    : [
+                        "type" : "text",
+                        "value": folderCase?.stringId
+                ],
                 (PREFERENCE_ITEM_FIELD_FILTER_CASE)    : [
                         "type" : "caseRef",
-                        "value": [filter.stringId]
-                ],
-                (PREFERENCE_ITEM_FIELD_PARENTID)       : [
-                        "type" : "text",
-                        "value": orgGroup.stringId
+                        "value": [body.filter.stringId]
                 ],
                 (PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS): [
                         "type" : "text",
-                        "value": defaultHeaders.join(',')
+                        "value": body.defaultHeaders.join(',')
                 ],
                 (PREFERENCE_ITEM_FIELD_IDENTIFIER)     : [
                         "type" : "text",
-                        "value": identifier
+                        "value": body.identifier
                 ],
         ]
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
 
-        return workflowService.findOne(itemCase.stringId)
+        return workflowService.findOne(viewCase.stringId)
+    }
+
+    protected Case getOrCreateFolder(String uri) {
+        UriNode node = uriService.findByUri(uri)
+        FolderItemBody body = new FolderItemBody(new I18nString(node.name))
+        return getOrCreateFolderRecursive(node, body)
+    }
+
+    protected Case getOrCreateFolderRecursive(UriNode node, FolderItemBody body) {
+//        if (node.level < 1) {
+//            return null
+//        }
+        if (node.name == "root") {
+            return null
+        }
+        Case folder = findFolderCase(node)
+        if (folder != null) {
+            return folder
+        }
+
+        folder = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.name.toString())
+        folder.setUriNodeId(node.parentId)
+        folder.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = body.allowedRoles
+        folder.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = body.bannedRoles
+        folder = workflowService.save(folder)
+        Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == "initialize" }.task)) }
+        assignTask(newItemTask)
+        def setDataMap = [
+                (PREFERENCE_ITEM_FIELD_TYPE)    : [
+                        "type" : "enumeration_map",
+                        "value": "folder"
+                ],
+                (PREFERENCE_ITEM_FIELD_NAME)    : [
+                        "type" : "i18n",
+                        "value": body.name
+                ],
+        ]
+        setData(newItemTask, setDataMap)
+        finishTask(newItemTask)
+
+        if (node.parentId != null) {
+            UriNode parentNode = uriService.findById(node.parentId)
+            body = new FolderItemBody(new I18nString(parentNode.name))
+
+            getOrCreateFolderRecursive(parentNode, body)
+        }
+
+        return workflowService.findOne(folder.stringId)
+    }
+
+    protected Case findFolderCase(UriNode node) {
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.type.value:folder AND uriNodeId:\"$node.id\"")
     }
 
     /**
