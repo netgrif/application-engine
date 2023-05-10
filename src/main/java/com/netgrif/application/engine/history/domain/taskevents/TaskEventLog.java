@@ -18,7 +18,7 @@ public abstract class TaskEventLog extends CaseEventLog {
 
     @Getter
     private String transitionId;
-    
+
     @Getter
     private String impersonatorId;
 

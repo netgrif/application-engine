@@ -36,7 +36,7 @@ public class Headers {
      * <p>
      * More <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection">Info</a>
      */
-    private XXSSProtection xxSsProtection = XXSSProtection.ENABLE_MODE;
+    private XXSSProtection xXssProtection = XXSSProtection.ENABLE_MODE;
 
     /**
      * The HTTP Content-Security-Policy response header allows website administrators

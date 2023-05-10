@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class HistoryService implements IHistoryService {
     private MongoTemplate mongoTemplate;
 
     @Override
+    @Async
     public void save(EventLog eventLog) {
         eventLogRepository.save(eventLog);
     }

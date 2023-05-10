@@ -249,19 +249,19 @@ public class UserService extends AbstractUserService {
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
+    public IUser assignAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
-        if (!user.isPresent())
+        if (user.isEmpty())
             throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
-        if (!authority.isPresent())
+        if (authority.isEmpty())
             throw new IllegalArgumentException("Could not find authority with id [" + authorityId + "]");
 
         user.get().addAuthority(authority.get());
         authority.get().addUser(user.get());
 
-        userRepository.save(user.get());
+        return userRepository.save(user.get());
     }
 
     @Override
@@ -289,7 +289,11 @@ public class UserService extends AbstractUserService {
         if (!loggedUser.isAnonymous()) {
             IUser user = findByEmail(loggedUser.getEmail(), false);
             if (loggedUser.isImpersonating()) {
-                user.setImpersonated(loggedUser.getImpersonated().transformToUser());
+                // cannot be simply reloaded from DB, impersonated user holds a subset of roles and authorities.
+                // this reloads the impersonated user's roles as they are not complete (LoggedUser creates incomplete ProcessRole objects)
+                IUser impersonated = loggedUser.getImpersonated().transformToUser();
+                impersonated.setProcessRoles(processRoleService.findByIds(loggedUser.getImpersonated().getProcessRoles()));
+                user.setImpersonated(impersonated);
             }
             return user;
         }

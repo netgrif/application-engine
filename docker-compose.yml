@@ -38,3 +38,12 @@ services:
     image: redis:6
     ports:
       - "6379:6379"
+
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.17.4
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://docker-elastic:9200
+#    depends_on:
+#      - docker-elastic
+#    ports:
+#      - "5601:5601"

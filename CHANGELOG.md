@@ -7,22 +7,57 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](https://github.com/netgrif/application-engine/commits/v6.3.0)
 
-## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2022-10-20)
+## [6.3.0](https://github.com/netgrif/application-engine/releases/tag/v6.3.0) (2023-05-09)
 
 ### Fixed
 
 - [NAE-1761] LoggedUser circular dependency
 - [NAE-1798] UserRefs resolves everytime when case is saved
+- [NAE-1757] Multi-choice and enumeration options not working
+- [NAE-1759] Update documentation of public views, PDF generator and user list
+- [NAE-1805] Data fields validations are not run on backend
+- [NAE-1811] Process delete does not delete ldap group roles
+- [NAE-1812] Clicking on a column in the case-view that does not have a value has an error behavior
+- [NAE-1829] UserFieldValue does not implements .toString() method
+- [NAE-1831] Task with negative permissions displayed
+- [NAE-1834] ExportService - Export CSV files in given charset
+- [NAE-1840] Configurable timeout for failed login attempts
+- [NAE-1853] Passwords loaded from environment variables are shown in application logs
+- [NAE-1860] Assigning authority to a user via REST API ends up with error
+- [NAE-1861] Requesting unknown endpoint ends with Stackoverflow
+- [NAE-1875] Namespace functions cause memory leak
+- [NAE-1868] Process role refresh
 
 ### Changed
 
+- [NAE-1638] Elasticsearch executor shutdown
 - [NAE-1762] Public view URL encoding
+- [NAE-1865] - Grid rendering performance improvement
 
 ### Added
 
+- [NAE-1607] Allowed nets configuration for newly created filter
+- [NAE-1630] Add admin endpoint for invalidating user session
 - [NAE-1678] User impersonation
 - [NAE-1793] Security filter for HTTP headers validation
 - [NAE-1794] Configurable security headers
+- [NAE-1833] Configuration priority search
+- [NAE-1722] Set default view headers with the CreateMenuItem action method
+- [NAE-1874] Filtering users based on roles when selecting users for UserListField
+- [NAE-1703] Dashboard
+- [NAE-1678] User impersonation
+
+## [6.2.9](https://github.com/netgrif/application-engine/releases/tag/v6.2.9) (2023-05-04)
+
+### Added
+
+- [NAE-1865] Grid rendering performance improvement
+
+## [6.2.8](https://github.com/netgrif/application-engine/releases/tag/v6.2.8) (2023-03-22)
+
+### Fixed
+
+- [NAE-1853] Passwords loaded from environment variables are shown in application logs
 
 ## [6.2.7](https://github.com/netgrif/application-engine/releases/tag/v6.2.7) (2022-12-19)
 
@@ -74,6 +109,7 @@ Full Changelog: [https://github.com/netgrif/application-engine/commits/v6.3.0](h
 
 - [NAE-1693] TaskController deleteFile endpoint lacks data about tasks
 - [NAE-1714] Parameter processIdentifier in class CaseSearchRequest
+
 
 ## [6.2.1](https://github.com/netgrif/application-engine/releases/tag/v6.2.1) (2022-09-15)
 
