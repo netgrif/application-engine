@@ -5,6 +5,9 @@ import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.properties.ImpersonationProperties;
+import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationEndEventLog;
+import com.netgrif.application.engine.history.domain.impersonationevents.ImpersonationStartEventLog;
+import com.netgrif.application.engine.history.service.IHistoryService;
 import com.netgrif.application.engine.impersonation.domain.Impersonator;
 import com.netgrif.application.engine.impersonation.domain.repository.ImpersonatorRepository;
 import com.netgrif.application.engine.impersonation.exceptions.ImpersonatedUserHasSessionException;
@@ -31,6 +34,9 @@ public class ImpersonationService implements IImpersonationService {
 
     @Autowired
     protected IUserService userService;
+
+    @Autowired
+    protected IHistoryService historyService;
 
     @Autowired
     protected IImpersonationSessionService sessionService;
@@ -83,7 +89,27 @@ public class ImpersonationService implements IImpersonationService {
         securityContextService.saveToken(loggedUser.getId());
         securityContextService.reloadSecurityContext(loggedUser);
         log.info(loggedUser.getFullName() + " has just impersonated user " + impersonatedLogged.getFullName());
+        historyService.save(
+                new ImpersonationStartEventLog(loggedUser.getId(), impersonatedLogged.getId(),
+                        new ArrayList<>(impersonatedLogged.getProcessRoles()),
+                        impersonatedLogged.getAuthorities().stream().map(au -> ((Authority) au).getStringId()).collect(Collectors.toList()))
+        );
         return loggedUser;
+    }
+
+    @Override
+    public Optional<Impersonator> findImpersonator(String impersonatorId) {
+        return impersonatorRepository.findById(impersonatorId);
+    }
+
+    @Override
+    public void removeImpersonatorByImpersonated(String impersonatedId) {
+        impersonatorRepository.findByImpersonatedId(impersonatedId).ifPresent(impersonatorRepository::delete);
+    }
+
+    @Override
+    public void removeImpersonator(String impersonatorId) {
+        impersonatorRepository.deleteById(impersonatorId);
     }
 
     @Override
@@ -92,19 +118,22 @@ public class ImpersonationService implements IImpersonationService {
     }
 
     @Override
-    public void endImpersonation(String impersonatedId) {
-        impersonatorRepository.findByImpersonatedId(impersonatedId).ifPresent(impersonatorRepository::delete);
-    }
-
-    @Override
     public LoggedUser endImpersonation(LoggedUser impersonator) {
         LoggedUser impersonated = impersonator.getImpersonated();
-        removeImpersonatedId(impersonator);
+        removeImpersonator(impersonator.getId());
         impersonator.clearImpersonated();
         log.info(impersonator.getFullName() + " has stopped impersonating user " + impersonated.getFullName());
         securityContextService.saveToken(impersonator.getId());
         securityContextService.reloadSecurityContext(impersonator);
+        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonated.getId()));
         return impersonator;
+    }
+
+    @Override
+    public void onSessionDestroy(LoggedUser impersonator) {
+        removeImpersonator(impersonator.getId());
+        log.info(impersonator.getFullName() + " has logged out and stopped impersonating user " + impersonator.getImpersonated().getFullName());
+        historyService.save(new ImpersonationEndEventLog(impersonator.getId(), impersonator.getImpersonated().getId()));
     }
 
     @Override
@@ -144,14 +173,10 @@ public class ImpersonationService implements IImpersonationService {
     }
 
     protected void updateImpersonatedId(LoggedUser loggedUser, String id, List<Case> configs, LocalDateTime validUntil) {
-        removeImpersonatedId(loggedUser);
+        removeImpersonator(loggedUser.getId());
         impersonatorRepository.save(new Impersonator(loggedUser.getId(), id,
                 configs.stream().map(Case::getStringId).collect(Collectors.toList()),
                 LocalDateTime.now(), validUntil));
-    }
-
-    protected void removeImpersonatedId(LoggedUser loggedUser) {
-        impersonatorRepository.deleteById(loggedUser.getId());
     }
 
     protected LocalDateTime getConfigValidToTime(Case config) {

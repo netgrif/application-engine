@@ -19,6 +19,7 @@ public class DelegateTaskEventLog extends TaskEventLog {
     private String delegate;
 
     public DelegateTaskEventLog() {
+        super();
     }
 
     public DelegateTaskEventLog(Task task, Case useCase, EventPhase eventPhase, IUser delegator, String delegate) {

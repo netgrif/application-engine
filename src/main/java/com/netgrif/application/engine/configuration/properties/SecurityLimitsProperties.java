@@ -13,6 +13,10 @@ public class SecurityLimitsProperties {
 
     private int loginAttempts = 10;
 
+    private int loginTimeout = 10;
+
+    private TimeUnit loginTimeoutUnit = TimeUnit.MINUTES;
+
     private int emailSendsAttempts = 2;
 
     private int emailBlockDuration = 1;
