@@ -23,7 +23,7 @@ public class UserEventListener {
     }
 
     @EventListener
-    public void onUserLogoutEvent(UserLogoutEvent event) {;
+    public void onUserLogoutEvent(UserLogoutEvent event) {
         repository.save(new UserEventLog(event.getUser().getUsername()));
     }
 

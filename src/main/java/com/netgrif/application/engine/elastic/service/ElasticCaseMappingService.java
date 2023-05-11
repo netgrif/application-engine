@@ -153,7 +153,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (multichoice.getValue() instanceof Set) {
             return Optional.of((Set) multichoice.getValue());
         } else if (multichoice.getValue() instanceof Collection) {
-            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
+//            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
             Set values = new HashSet();
             values.addAll((Collection) multichoice.getValue());
             return Optional.of(values);
@@ -233,7 +233,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             LocalDate date = (LocalDate) dateField.getValue();
             return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dateField.getValue() instanceof Date) {
-            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             LocalDateTime transformed = this.transformDateValueField(dateField);
             return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
         } else {
@@ -247,7 +247,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (dateTimeField.getValue() instanceof LocalDateTime) {
             return formatDateField((LocalDateTime) dateTimeField.getValue());
         } else if (dateTimeField.getValue() instanceof Date) {
-            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+//            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
             return formatDateField(this.transformDateValueField(dateTimeField));
         } else {
             // TODO throw error?

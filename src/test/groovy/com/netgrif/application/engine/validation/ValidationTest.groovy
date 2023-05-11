@@ -703,7 +703,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
+        LocalDate today = LocalDate.of(2020, 3, 3)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         importHelper.setTaskData(task.getStringId(), ["date03": ["type": "date", "value": text]])
@@ -752,7 +752,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
+        LocalDate today = LocalDate.of(2020, 3, 3)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         importHelper.setTaskData(task.getStringId(), ["date04": ["type": "date", "value": text]])
@@ -767,7 +767,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
+        LocalDate today = LocalDate.of(2020, 3, 3)
         today = today.minusDays(1)
         importHelper.setTaskData(task.getStringId(), ["date04": ["type": "date", "value": today.toDate()]])
         Task taskFinish = importHelper.finishTaskAsSuper("Test", aCase.stringId).getTask()
@@ -781,7 +781,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 3, 3)
+        LocalDate today = LocalDate.of(2020, 3, 3)
         today = today.plusDays(1)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
@@ -800,7 +800,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2020, 1, 1)
+        LocalDate today = LocalDate.of(2020, 1, 1)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         importHelper.setTaskData(task.getStringId(), ["date05": ["type": "date", "value": text]])
@@ -815,7 +815,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(2022, 3, 3)
+        LocalDate today = LocalDate.of(2022, 3, 3)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         importHelper.setTaskData(task.getStringId(), ["date05": ["type": "date", "value": text]])
@@ -830,7 +830,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 4)
+        LocalDate today = LocalDate.of(1994, 7, 4)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         importHelper.setTaskData(task.getStringId(), ["date06": ["type": "date", "value": text]])
@@ -845,7 +845,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 3)
+        LocalDate today = LocalDate.of(1994, 7, 3)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -863,7 +863,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 3)
+        LocalDate today = LocalDate.of(1994, 7, 3)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         importHelper.setTaskData(task.getStringId(), ["date07": ["type": "date", "value": text]])
@@ -878,7 +878,7 @@ class ValidationTest {
         assert aCase != null
         Task task = importHelper.assignTaskToSuper("Test", aCase.stringId).getTask()
         assert task != null
-        LocalDate today = new LocalDate(1994, 7, 4)
+        LocalDate today = LocalDate.of(1994, 7, 4)
         DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         String text = today.format(formatters)
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {

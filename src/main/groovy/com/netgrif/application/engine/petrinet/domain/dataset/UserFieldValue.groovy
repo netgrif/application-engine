@@ -46,6 +46,14 @@ class UserFieldValue {
     }
 
     @Override
+    String toString() {
+        return "UserFieldValue{" +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                '}'
+     }
+     
     int hashCode() {
         return this.id.hashCode()
     }
