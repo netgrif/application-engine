@@ -44,6 +44,11 @@
 			}
 		</action>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>use_icon</id>
+		<title name="display_icon">Display menu icon?</title>
+		<init>true</init>
+	</data>
 	<data type="text">
 		<id>icon_preview</id>
 		<title>Menu icon preview</title>
@@ -196,6 +201,11 @@
 		<id>default_headers</id>
 		<title name="default_headers">Set default headers</title>
 	</data>
+<!--	FOLDER-->
+	<data type="text" immediate="true">
+		<id>nodePath</id>
+		<title/>
+	</data>
 
 	<transition>
 		<id>initialize</id>
@@ -262,7 +272,7 @@
 		<icon>settings</icon>
 		<dataGroup>
 			<id>folder_settings_0</id>
-			<cols>4</cols>
+			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
 				<id>name</id>
@@ -279,12 +289,43 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>icon</id>
+				<id>use_icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.icon_preview,
+							icon: f.icon,
+							useIcon: f.use_icon;
+
+							make iconPreview,visible on trans when { useIcon.value }
+							make icon,editable on trans when { useIcon.value }
+
+							make iconPreview,hidden on trans when { !useIcon.value }
+							make icon,hidden on trans when { !useIcon.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -298,7 +339,7 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>4</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -325,7 +366,7 @@
 		<icon>settings</icon>
 		<dataGroup>
 			<id>view_settings_0</id>
-			<cols>4</cols>
+			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
 				<id>name</id>
@@ -342,12 +383,43 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>icon</id>
+				<id>use_icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.icon_preview,
+							icon: f.icon,
+							useIcon: f.use_icon;
+
+							make iconPreview,visible on trans when { useIcon.value }
+							make icon,editable on trans when { useIcon.value }
+
+							make iconPreview,hidden on trans when { !useIcon.value }
+							make icon,hidden on trans when { !useIcon.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -361,7 +433,7 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>4</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>

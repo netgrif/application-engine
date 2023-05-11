@@ -93,6 +93,7 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
     private static final String PREFERENCE_ITEM_FIELD_TYPE = "type"
     private static final String PREFERENCE_ITEM_FIELD_NAME = "name"
+    private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
     private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
 
     static final String UNCHANGED_VALUE = "unchangedooo"
@@ -1833,6 +1834,10 @@ class ActionDelegate {
                 (PREFERENCE_ITEM_FIELD_NAME)    : [
                         "type" : "i18n",
                         "value": body.name
+                ],
+                (PREFERENCE_ITEM_FIELD_NODE_PATH)    : [
+                        "type" : "text",
+                        "value": node.uriPath
                 ],
         ]
         setData(newItemTask, setDataMap)
