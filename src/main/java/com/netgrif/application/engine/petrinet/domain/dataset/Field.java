@@ -62,26 +62,19 @@ public class Field<T> extends Imported {
 
     @Id
     protected ObjectId id;
-    @JsonIgnore
     protected T defaultValue;
-    @JsonIgnore
     protected Expression initExpression;
     protected List<Validation> validations;
     private I18nString name;
     private I18nString description;
     private I18nString placeholder;
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = DataFieldBehaviorsFilter.class)
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
-    @JsonIgnore
     private Boolean immediate;
-    @JsonIgnore
     private Map<DataEventType, DataEvent> events;
-    @JsonIgnore
     private String encryption;
     private Integer length;
     private Component component;
-    @JsonIgnore
     private Long version = 0L;
     // TODO: release/7.0.0 6.2.5: parentTaskId, parentCaseId
 
@@ -92,7 +85,6 @@ public class Field<T> extends Imported {
         return id.toString();
     }
 
-    @JsonIgnore
     public String getStringId() {
         return importId;
     }
@@ -142,7 +134,6 @@ public class Field<T> extends Imported {
         }
     }
 
-    @JsonIgnore
     public boolean isDynamicDefaultValue() {
         return initExpression != null;
     }
@@ -236,7 +227,6 @@ public class Field<T> extends Imported {
         return behavior.equals(dataRefBehavior.getBehavior());
     }
 
-    @JsonIgnore
     public String getTranslatedName(Locale locale) {
         if (name == null) {
             return null;

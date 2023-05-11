@@ -1,8 +1,9 @@
-package com.netgrif.application.engine.petrinet.converter;
+package com.netgrif.application.engine.mapper.converter;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.netgrif.application.engine.mapper.views.Views;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import org.springframework.context.i18n.LocaleContextHolder;
 
