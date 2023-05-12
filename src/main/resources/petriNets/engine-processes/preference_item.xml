@@ -6,7 +6,33 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
-<!--	GENERIC-->
+	<caseEvents>
+		<event type="delete">
+			<id>preference_item_delete</id>
+			<actions phase="pre">
+				<action id="0">
+					removeItemChildCases(useCase)
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<function scope="process" name="removeItemChildCases">
+		{ com.netgrif.application.engine.workflow.domain.Case useCase ->
+
+			def childCaseIds = useCase.dataSet['childItemIds'].options?.keySet() as List
+			if (childCaseIds == null || childCaseIds.isEmpty()) {
+				return
+			}
+
+			def childCases = workflowService.findAllById(childCaseIds)
+			async.run {
+				childCases.each {
+					workflowService.deleteCase(it)
+				}
+			}
+		}
+	</function>
+	<!-- GENERIC-->
 	<data type="number">
 		<id>to_is_folder</id>
 		<title>to [is_folder]</title>

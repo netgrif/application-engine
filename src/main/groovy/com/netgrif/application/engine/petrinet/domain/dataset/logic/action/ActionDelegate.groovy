@@ -1856,6 +1856,7 @@ class ActionDelegate {
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
 
+        folder = workflowService.findOne(folder.stringId)
         if (node.parentId != null) {
             UriNode parentNode = uriService.findById(node.parentId)
             body = new FolderItemBody(new I18nString(parentNode.name))
@@ -1863,7 +1864,7 @@ class ActionDelegate {
             getOrCreateFolderRecursive(parentNode, body, folder)
         }
 
-        return workflowService.findOne(folder.stringId)
+        return folder
     }
     
     private Case appendChildCaseId(Case folderCase, String childFolderCaseId) {
