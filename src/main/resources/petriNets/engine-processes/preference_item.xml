@@ -65,6 +65,10 @@
 		<id>parentId</id>
 		<title/>
 	</data>
+	<data type="enumeration_map">
+		<id>childItemIds</id>
+		<title/>
+	</data>
 	<data type="taskRef">
 		<id>permission_settings_taskRef</id>
 		<title/>

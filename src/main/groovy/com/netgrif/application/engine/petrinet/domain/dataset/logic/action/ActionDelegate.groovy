@@ -85,7 +85,8 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_NEW_FILTER_ID = "new_filter_id"
     private static final String PREFERENCE_ITEM_FIELD_REMOVE_OPTION = "remove_option"
     private static final String PREFERENCE_ITEM_FIELD_FILTER_CASE = "filter_case"
-    private static final String PREFERENCE_ITEM_FIELD_PARENTID = "parentId"
+    private static final String PREFERENCE_ITEM_FIELD_PARENT_ID = "parentId"
+    private static final String PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS= "childItemIds"
     private static final String PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS = "default_headers"
     private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
     private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
@@ -1770,6 +1771,9 @@ class ActionDelegate {
         viewCase.setUriNodeId(uriService.findByUri(body.uri).id)
         viewCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = body.allowedRoles
         viewCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = body.bannedRoles
+        if (folderCase != null) {
+            folderCase = appendChildCaseId(folderCase, viewCase.stringId)
+        }
         viewCase = workflowService.save(viewCase)
         Task newItemTask = findTask { it._id.eq(new ObjectId(viewCase.tasks.find { it.transition == "initialize" }.task)) }
         assignTask(newItemTask)
@@ -1778,7 +1782,7 @@ class ActionDelegate {
                         "type" : "enumeration_map",
                         "value": "view"
                 ],
-                (PREFERENCE_ITEM_FIELD_PARENTID)    : [
+                (PREFERENCE_ITEM_FIELD_PARENT_ID)    : [
                         "type" : "text",
                         "value": folderCase?.stringId
                 ],
@@ -1802,12 +1806,12 @@ class ActionDelegate {
     }
 
     protected Case getOrCreateFolder(String uri) {
-        UriNode node = uriService.findByUri(uri)
+        UriNode node = uriService.getOrCreate(uri, UriContentType.CASE)
         FolderItemBody body = new FolderItemBody(new I18nString(node.name))
         return getOrCreateFolderRecursive(node, body)
     }
 
-    protected Case getOrCreateFolderRecursive(UriNode node, FolderItemBody body) {
+    protected Case getOrCreateFolderRecursive(UriNode node, FolderItemBody body, Case childFolderCase = null) {
 //        if (node.level < 1) {
 //            return null
 //        }
@@ -1816,6 +1820,10 @@ class ActionDelegate {
         }
         Case folder = findFolderCase(node)
         if (folder != null) {
+            if (childFolderCase != null) {
+                folder = appendChildCaseId(folder, childFolderCase.stringId)
+                initializeParentId(childFolderCase, folder.stringId)
+            }
             return folder
         }
 
@@ -1823,7 +1831,12 @@ class ActionDelegate {
         folder.setUriNodeId(node.parentId)
         folder.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = body.allowedRoles
         folder.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = body.bannedRoles
-        folder = workflowService.save(folder)
+        if (childFolderCase != null) {
+            folder = appendChildCaseId(folder, childFolderCase.stringId)
+            initializeParentId(childFolderCase, folder.stringId)
+        } else {
+            folder = workflowService.save(folder)
+        }
         Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == "initialize" }.task)) }
         assignTask(newItemTask)
         def setDataMap = [
@@ -1847,10 +1860,25 @@ class ActionDelegate {
             UriNode parentNode = uriService.findById(node.parentId)
             body = new FolderItemBody(new I18nString(parentNode.name))
 
-            getOrCreateFolderRecursive(parentNode, body)
+            getOrCreateFolderRecursive(parentNode, body, folder)
         }
 
         return workflowService.findOne(folder.stringId)
+    }
+    
+    private Case appendChildCaseId(Case folderCase, String childFolderCaseId) {
+        Map<String, I18nString> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options
+        if (childIds == null) {
+            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = [(childFolderCaseId): new I18nString()]
+        } else {
+            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = childIds + [(childFolderCaseId): new I18nString()]
+        }
+        return workflowService.save(folderCase)
+    }
+    
+    private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
+        childFolderCase.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = parentFolderCaseId
+        return workflowService.save(childFolderCase)
     }
 
     protected Case findFolderCase(UriNode node) {
