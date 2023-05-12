@@ -1866,13 +1866,38 @@ class ActionDelegate {
 
         return folder
     }
-    
-    private Case appendChildCaseId(Case folderCase, String childFolderCaseId) {
+
+    void moveMenuitem(Case item, String destUri) {
+        // todo cyclic paths
+
+        UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
+
+        String parentId = item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
+        if (parentId != null) {
+            Case oldParent = workflowService.findOne(parentId)
+            oldParent.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.remove(item.stringId)
+            workflowService.save(oldParent)
+        }
+        Case newParent = getOrCreateFolder(destNode.uriPath)
+        if (newParent != null) {
+            item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = newParent.stringId
+            appendChildCaseId(newParent, item.stringId)
+        } else {
+            item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = null
+        }
+        item.uriNodeId = destNode.id
+        // todo upravit nodePath
+        workflowService.save(item)
+
+        // zmenit rekurzivne urinodeId pre childs
+    }
+
+    private Case appendChildCaseId(Case folderCase, String childItemCaseId) {
         Map<String, I18nString> childIds = folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options
         if (childIds == null) {
-            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = [(childFolderCaseId): new I18nString()]
+            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = [(childItemCaseId): new I18nString()]
         } else {
-            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = childIds + [(childFolderCaseId): new I18nString()]
+            folderCase.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options = childIds + [(childItemCaseId): new I18nString()]
         }
         return workflowService.save(folderCase)
     }
@@ -1883,7 +1908,7 @@ class ActionDelegate {
     }
 
     protected Case findFolderCase(UriNode node) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.type.value:folder AND uriNodeId:\"$node.id\"")
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.type.keyValue:folder AND dataSet.nodePath.textValue:\"$node.uriPath\"")
     }
 
     /**
@@ -2020,7 +2045,7 @@ class ActionDelegate {
         return [
                 "filter"  : filter,
                 "menuItem": menu
-        ];
+        ]
     }
 
     Map<String, Case> createTaskMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles, Case group = null, List<String> defaultHeaders = []) {
@@ -2033,7 +2058,7 @@ class ActionDelegate {
         return [
                 "filter"  : filter,
                 "menuItem": menu
-        ];
+        ]
     }
 
     Case createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List<String> allowedNets, Map<String, String> roles = [:], Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
