@@ -3,8 +3,10 @@ package com.netgrif.application.engine.history.domain.caseevents;
 import com.netgrif.application.engine.history.domain.petrinetevents.PetriNetEventLog;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.workflow.domain.Case;
+import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 
+@EqualsAndHashCode(callSuper = true)
 public abstract class CaseEventLog extends PetriNetEventLog {
 
     protected String caseId;
@@ -27,19 +29,19 @@ public abstract class CaseEventLog extends PetriNetEventLog {
         this.caseTitle = useCase.getTitle();
     }
 
-    public void setCaseId(String caseId) {
-        this.caseId = caseId;
-    }
-
-    public void setCaseTitle(String caseTitle) {
-        this.caseTitle = caseTitle;
-    }
-
     public String getCaseId() {
         return caseId;
     }
 
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
+    }
+
     public String getCaseTitle() {
         return caseTitle;
+    }
+
+    public void setCaseTitle(String caseTitle) {
+        this.caseTitle = caseTitle;
     }
 }

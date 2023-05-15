@@ -43,6 +43,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     needs: build
     services:
       mongo:

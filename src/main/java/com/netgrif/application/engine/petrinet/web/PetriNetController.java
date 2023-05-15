@@ -195,6 +195,12 @@ public class PetriNetController {
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
     }
 
+    @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
+            return service.getNetFromCase(decodeUrl(caseId));
+    }
+
     public static String decodeUrl(String s1) {
         if (s1 == null)
             return null;

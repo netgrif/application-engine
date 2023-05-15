@@ -12,7 +12,7 @@ import java.util.List;
 public class UserRoleEventLog extends UserEventLog implements IProcessRolesEvent {
 
     @Getter
-    private List<ProcessRole> roles;
+    private final List<ProcessRole> roles;
 
     public UserRoleEventLog(String email, Collection<ProcessRole> roles) {
         super(email);

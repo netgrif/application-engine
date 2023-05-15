@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserEventLog extends EventLog implements IUserEventLog {
 
     @Getter
-    private String email;
+    private final String email;
 
     public UserEventLog(String email) {
         this.email = email;

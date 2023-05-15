@@ -90,7 +90,9 @@ class ImportHelper {
 
     Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return Optional.of(petriNetService.importPetriNet(netStream, release, author).getNet())
+        PetriNet petriNet = petriNetService.importPetriNet(netStream, release, author).getNet()
+        log.info("Imported '${petriNet?.title?.defaultValue}' ['${petriNet?.identifier}', ${petriNet?.stringId}]")
+        return Optional.of(petriNet)
     }
 
     Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = userService.getSystem().transformToLoggedUser()) {

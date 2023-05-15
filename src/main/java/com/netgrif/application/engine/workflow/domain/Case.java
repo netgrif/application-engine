@@ -169,10 +169,11 @@ public class Case {
         this.tasks.put(task.getTransitionId(), new TaskPair(task));
     }
 
-    public void removeTasks(List<Task> tasks) {
-        tasks.forEach(task ->
-                this.tasks.remove(task.getTransitionId())
-        );
+    public boolean removeTasks(List<Task> tasks) {
+        int sizeBeforeChange = this.tasks.size();
+        Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
+        this.tasks = this.tasks.entrySet().stream().filter(pair -> !tasksTransitions.contains(pair.getValue().getTransitionId())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return this.tasks.size() != sizeBeforeChange;
     }
 
     public String getPetriNetId() {

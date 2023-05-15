@@ -22,6 +22,8 @@ public interface IWorkflowService {
 
     Case findOne(String caseId);
 
+    Case findOneNoNet(String caseId);
+
     List<Case> findAllById(List<String> ids);
 
     Page<Case> getAll(Pageable pageable);
@@ -58,9 +60,9 @@ public interface IWorkflowService {
 
     Map<String, I18nString> listToMap(List<Case> cases);
 
-    void removeTasksFromCase(List<Task> tasks, String caseId);
+    boolean removeTasksFromCase(List<Task> tasks, String caseId);
 
-    void removeTasksFromCase(List<Task> tasks, Case useCase);
+    boolean removeTasksFromCase(List<Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
 

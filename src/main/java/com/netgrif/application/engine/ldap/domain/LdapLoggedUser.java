@@ -63,6 +63,7 @@ public class LdapLoggedUser extends LoggedUser {
         user.setMemberOf(this.memberOf);
         user.setHomeDirectory(homeDirectory);
         user.setState(UserState.ACTIVE);
+        user.setPassword("n/a");
         user.setAuthorities(getAuthorities().stream().map(a -> ((Authority) a)).collect(Collectors.toSet()));
         user.setProcessRoles(this.getProcessRoles().stream().map(roleId -> {
             ProcessRole role = new ProcessRole();

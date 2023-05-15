@@ -79,13 +79,28 @@ class SecurityContextTest {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.transformToLoggedUser(), user.transformToLoggedUser().getPassword(), user.transformToLoggedUser().getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(token)
 
+        // situation 1
         processRoleService.assignRolesToUser(user.getStringId(), roleIds, superCreator.getLoggedSuper())
-        IUser updatedUser = userService.findById(user.getStringId(), false)
-        Set<String> updatedUserRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() != updatedUserRoles
+        def updatedUser = userService.findById(user.getStringId(), false)
+        Set<String> loggedUserProcessRoles = ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles()
+        Set<String> updatedUserProcessRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert loggedUserProcessRoles != updatedUserProcessRoles
 
         securityContextService.reloadSecurityContext(updatedUser.transformToLoggedUser())
-        updatedUserRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
-        assert ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles() == updatedUserRoles
+        loggedUserProcessRoles = ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles()
+        updatedUserProcessRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert loggedUserProcessRoles == updatedUserProcessRoles
+
+        // situation 2
+        processRoleService.assignRolesToUser(user.getStringId(), Collections.singleton(roleIds.getAt(0)), superCreator.getLoggedSuper())
+        updatedUser = userService.findById(user.getStringId(), false)
+        loggedUserProcessRoles = ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles()
+        updatedUserProcessRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert loggedUserProcessRoles != updatedUserProcessRoles
+
+        securityContextService.forceReloadSecurityContext((LoggedUser) SecurityContextHolder.getContext().authentication.principal)
+        loggedUserProcessRoles = ((LoggedUser) SecurityContextHolder.getContext().authentication.principal).getProcessRoles()
+        updatedUserProcessRoles = updatedUser.getProcessRoles().stream().map(r -> r.getStringId()).collect(Collectors.toSet())
+        assert loggedUserProcessRoles == updatedUserProcessRoles
     }
 }

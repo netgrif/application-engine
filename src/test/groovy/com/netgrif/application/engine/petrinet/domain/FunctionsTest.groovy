@@ -216,6 +216,21 @@ class FunctionsTest {
     }
 
     @Test
+    void testNamespaceUseCaseUpdate() {
+        def functionResV2Net = petriNetService.importPetriNet(functionResNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+        def functionTestV2Net = petriNetService.importPetriNet(functionTestNetResourceV2.inputStream, VersionType.MAJOR, userService.getLoggedOrSystem().transformToLoggedUser()).getNet()
+
+        Case aCase = workflowService.createCase(functionTestV2Net.stringId, "Test", "", userService.getLoggedOrSystem().transformToLoggedUser()).getCase()
+        DataSet dataSet = new DataSet()
+        dataSet.put("updateOtherField", new BooleanField(rawValue: true))
+        dataService.setData(aCase.tasks.get("0").taskStringId, dataSet, userService.loggedOrSystem.transformToLoggedUser())
+        aCase = workflowService.findOne(aCase.stringId)
+
+        assert aCase.getDataSet().get("toBeUpdated").getValue().getValue() as Double == 1.0
+        assert aCase.getDataSet().get("toBeUpdatedInternally").getValue().getValue() as Double == 2.0
+    }
+
+    @Test
     void testNamespaceMethodOverloading() {
         testMethodOverloading(functionOverloadingNetResource)
     }
