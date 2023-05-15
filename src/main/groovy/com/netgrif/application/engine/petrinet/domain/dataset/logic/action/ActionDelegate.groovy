@@ -95,6 +95,7 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_TYPE = "type"
     private static final String PREFERENCE_ITEM_FIELD_NAME = "name"
     private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
+    private static final String PREFERENCE_ITEM_FIELD_NODE_NAME = "nodeName"
     private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
 
     static final String UNCHANGED_VALUE = "unchangedooo"
@@ -1867,29 +1868,116 @@ class ActionDelegate {
         return folder
     }
 
-    void moveMenuitem(Case item, String destUri) {
-        // todo cyclic paths
+    void moveMenuItem(Case item, String destUri) {
+        if (isFolder(item) && isCyclicNodePath(item, destUri)) {
+            throw new IllegalArgumentException("Cyclic path not supported. Destination path: ${destUri}")
+        }
 
-        UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
+        List<Case> casesToSave = new ArrayList<>()
 
         String parentId = item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
         if (parentId != null) {
-            Case oldParent = workflowService.findOne(parentId)
-            oldParent.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.remove(item.stringId)
-            workflowService.save(oldParent)
+            Case oldParent = removeChildItemFromParentFolder(parentId, item)
+            casesToSave.add(oldParent)
         }
+
+        UriNode destNode = uriService.getOrCreate(destUri, UriContentType.CASE)
         Case newParent = getOrCreateFolder(destNode.uriPath)
         if (newParent != null) {
             item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = newParent.stringId
-            appendChildCaseId(newParent, item.stringId)
+            newParent = appendChildCaseId(newParent, item.stringId)
+            casesToSave.add(newParent)
         } else {
             item.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value = null
         }
-        item.uriNodeId = destNode.id
-        // todo upravit nodePath
-        workflowService.save(item)
 
-        // zmenit rekurzivne urinodeId pre childs
+        item.uriNodeId = destNode.id
+        if (isFolder(item)) {
+            item = resolveAndHandleNewFolderPath(item, destNode.uriPath)
+        }
+        casesToSave.add(item)
+
+        if (isFolder(item) && hasChildren(item)) {
+            List<Case> childrenToSave = updateNodeInChildrenFoldersRecursive(item)
+            casesToSave.addAll(childrenToSave)
+        }
+
+        for (aCase in casesToSave) {
+            if (aCase != null) {
+                workflowService.save(aCase)
+            }
+        }
+    }
+
+    private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
+        List<String> childItemIds = parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options?.collect { it.key }
+        if (childItemIds == null || childItemIds.isEmpty()) {
+            return new ArrayList<Case>()
+        }
+
+        List<Case> children = workflowService.findAllById(childItemIds)
+
+        List<Case> casesToSave = new ArrayList<>()
+        for (child in children) {
+            UriNode parentNode = uriService.getOrCreate(parentFolder.getFieldValue(PREFERENCE_ITEM_FIELD_NODE_PATH) as String, UriContentType.CASE)
+            child.uriNodeId = parentNode.id
+
+            if (isFolder(child)) {
+                child = resolveAndHandleNewFolderPath(child, parentNode.uriPath)
+            }
+
+            casesToSave.add(child)
+            casesToSave.addAll(updateNodeInChildrenFoldersRecursive(child))
+        }
+
+        return casesToSave
+    }
+
+    private Case resolveAndHandleNewFolderPath(Case folderItem, String destUri) {
+        String newNodePath = resolveNewFolderPath(folderItem, destUri)
+        UriNode newNode = uriService.getOrCreate(newNodePath, UriContentType.CASE)
+        folderItem.dataSet[PREFERENCE_ITEM_FIELD_NODE_PATH].value = newNode.uriPath
+
+        return folderItem
+    }
+
+    private String resolveNewFolderPath(Case folderItem, String destUri) {
+        return destUri +
+                uriService.getUriSeparator() +
+                folderItem.getFieldValue(PREFERENCE_ITEM_FIELD_NODE_NAME) as String
+    }
+
+    private Case removeChildItemFromParentFolder(String folderId, Case childItem) {
+        Case parentFolder = workflowService.findOne(folderId)
+        parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options.remove(childItem.stringId)
+        workflowService.save(parentFolder)
+    }
+
+    private boolean isCyclicNodePath(Case folderItem, String destUri) {
+        String oldNodePath = folderItem.getFieldValue(PREFERENCE_ITEM_FIELD_NODE_PATH)
+        return destUri.contains(oldNodePath)
+    }
+
+    private boolean hasChildren(Case folderItem) {
+        Map children = folderItem.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options
+        return children != null && children.size() > 0
+    }
+
+    private boolean isFolder(Case menuItem) {
+        return isItemType(menuItem, "folder")
+    }
+
+    private boolean isView(Case menuItem) {
+        return isItemType(menuItem, "view")
+    }
+
+    private boolean isItemType(Case menuItem, String type) {
+        return menuItem.dataSet[PREFERENCE_ITEM_FIELD_TYPE].value == type
+    }
+
+    private Case appendChildCaseIdAndSave(Case folderCase, String childItemCaseId) {
+        folderCase = appendChildCaseId(folderCase, childItemCaseId)
+        return workflowService.save(folderCase)
     }
 
     private Case appendChildCaseId(Case folderCase, String childItemCaseId) {

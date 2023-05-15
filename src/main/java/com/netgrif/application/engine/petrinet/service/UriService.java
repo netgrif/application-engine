@@ -280,4 +280,8 @@ public class UriService implements IUriService {
         return uriNode;
     }
 
+    @Override
+    public String getUriSeparator() {
+        return uriProperties.getSeparator();
+    }
 }

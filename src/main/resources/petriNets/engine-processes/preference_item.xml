@@ -235,6 +235,24 @@
 	<data type="text" immediate="true">
 		<id>nodePath</id>
 		<title/>
+		<event type="set">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					nodePath: f.nodePath,
+					nodeName: f.nodeName;
+
+					change nodeName value {
+						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
+						return nodePath.value.substring(idx + 1)
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>nodeName</id>
+		<title/>
 	</data>
 
 	<transition>
