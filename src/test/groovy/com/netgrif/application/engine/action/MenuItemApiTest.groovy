@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
-class FilterApiTest {
+class MenuItemApiTest {
 
     @Autowired
     private TestHelper testHelper
@@ -59,12 +59,14 @@ class FilterApiTest {
     }
 
     @Test
-    void testCreateFilterAndMenu() {
+    void testCreateFilterAndMenuItems() {
         Case caze = createMenuItem()
         Case item = getMenuItem(caze)
         Case filter = getFilter(caze)
 
-        assert item.uriNodeId == uriService.findByUri("netgrif/test").id
+        Thread.sleep(4000)
+        item = workflowService.populateUriNodeId(item)
+        assert item.uriNodeId == uriService.findByUri("/netgrif/test").id
         assert item.dataSet["icon"].value == "filter_alt"
         assert item.dataSet["type"].value.toString() == "view"
         assert item.dataSet["name"].value.toString() == "FILTER"
@@ -78,10 +80,9 @@ class FilterApiTest {
 
 
     @Test
-    void testChangeFilterAndMenu() {
+    void testChangeFilterAndMenuItems() {
         Case caze = createMenuItem()
-        def newUri = uriService.getOrCreate("netgrif/test_new", UriContentType.DEFAULT)
-        Thread.sleep(5000)
+        def newUri = uriService.getOrCreate("/netgrif/test_new", UriContentType.DEFAULT)
         caze = setData(caze, [
                 "uri": newUri.uriPath,
                 "title": "CHANGED FILTER",
@@ -92,6 +93,8 @@ class FilterApiTest {
                 "change_filter_and_menu": "0"
         ])
         Case item = getMenuItem(caze)
+        Thread.sleep(3000)
+        item = workflowService.populateUriNodeId(item)
         Case filter = getFilter(caze)
 
         assert item.dataSet["name"].value.toString() == "CHANGED FILTER"
@@ -118,7 +121,7 @@ class FilterApiTest {
     Case createMenuItem() {
         Case caze = getCase()
         caze = setData(caze, [
-                "uri": "netgrif/test",
+                "uri": "/netgrif/test",
                 "title": "FILTER",
                 "allowed_nets": "filter,preference_item",
                 "query": "processIdentifier:filter OR processIdentifier:preference_item",
@@ -132,7 +135,7 @@ class FilterApiTest {
     }
 
     Case getCase() {
-        return workflowService.searchOne(QCase.case$.processIdentifier.eq("netgrif/test/filter_api_test"))
+        return workflowService.searchOne(QCase.case$.processIdentifier.eq("filter_api_test"))
     }
 
     Case getMenuItem(Case caze) {

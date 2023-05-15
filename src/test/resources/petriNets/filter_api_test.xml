@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
-	<id>netgrif/test/filter_api_test</id>
+	<id>filter_api_test</id>
 	<initials>FTT</initials>
 	<title>filter_api_test</title>
 	<icon>device_hub</icon>
@@ -22,7 +22,7 @@
 			<id>upload</id>
 			<actions phase="post">
 				<action>
-					createCase("netgrif/test/filter_api_test")
+					createCase("filter_api_test")
 				</action>
 			</actions>
 		</event>
@@ -41,7 +41,7 @@
 	<data type="text">
 		<id>query</id>
 		<title/>
-		<init>processIdentifier:"netgrif/test/filter_api_test"</init>
+		<init>processIdentifier:"filter_api_test"</init>
 	</data>
 	<data type="text">
 		<id>icon</id>
@@ -93,12 +93,12 @@
 						item = createMenuItem(uri.value, identifier.value,
 								filter,
 								group.value,
-								["role_1": "netgrif/test/filter_api_test"]
+								["role_1": "filter_api_test"]
 						)
 					} else {
 						item = createMenuItem(uri.value, identifier.value,
 								filter,
-								["role_1": "netgrif/test/filter_api_test"]
+								["role_1": "filter_api_test"]
 						)
 					}
 					change menu_stringId value { item.stringId }
@@ -138,7 +138,7 @@
 					] }
 
 					changeMenuItem item filter { filter }
-					changeMenuItem item allowedRoles { ["role_2": "netgrif/test/filter_api_test"] }
+					changeMenuItem item allowedRoles { ["role_2": "filter_api_test"] }
 					changeMenuItem item uri { uri.value }
 					changeMenuItem item title { title.value }
 				</action>
@@ -188,7 +188,7 @@
 							query.value,
 							type.value,
 							allowed_nets.value.split(",") as List,
-							["role_1": "netgrif/test/filter_api_test"],
+							["role_1": "filter_api_test"],
 							[:],
 							icon.value
 					)
