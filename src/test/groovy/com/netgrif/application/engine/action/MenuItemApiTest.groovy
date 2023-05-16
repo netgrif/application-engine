@@ -76,7 +76,7 @@ class MenuItemApiTest {
         item = workflowService.populateUriNodeId(item)
         assert item.uriNodeId == uriService.findByUri("/netgrif/test").id
         assert item.dataSet["icon"].value == "filter_alt"
-        assert item.dataSet["type"].value.toString() == "view"
+        assert item.dataSet["type"].value == "view"
         assert item.dataSet["name"].value.toString() == "FILTER"
         assert item.dataSet["menu_item_identifier"].value.toString() == "new_menu_item"
 
@@ -84,8 +84,24 @@ class MenuItemApiTest {
         assert filter.dataSet["filter"].allowedNets == ["filter", "preference_item"]
         assert filter.dataSet["filter"].value == "processIdentifier:filter OR processIdentifier:preference_item"
         assert filter.dataSet["filter_type"].value == "Case"
-    }
 
+        Case testFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue:\"/netgrif/test\"", PageRequest.of(0, 1))[0]
+        testFolder = workflowService.populateUriNodeId(testFolder)
+        Case netgrifFolder = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
+        netgrifFolder = workflowService.populateUriNodeId(netgrifFolder)
+        UriNode testNode = uriService.findByUri("/netgrif")
+        UriNode netgrifNode = uriService.getRoot()
+
+        assert testFolder != null && testNode != null
+        assert testFolder.uriNodeId == testNode.id
+        assert testFolder.dataSet["parentId"].value == netgrifFolder.stringId
+        assert testFolder.dataSet["type"].value == "folder"
+        assert testFolder.dataSet["childItemIds"].options.keySet().contains(item.stringId)
+        assert item.dataSet["parentId"].value == testFolder.stringId
+        assert netgrifFolder.uriNodeId == netgrifNode.id
+        assert netgrifFolder.dataSet["parentId"].value == null
+        assert netgrifFolder.dataSet["childItemIds"].options.keySet().contains(testFolder.stringId)
+    }
 
     @Test
     void testChangeFilterAndMenuItems() {
@@ -133,6 +149,7 @@ class MenuItemApiTest {
         apiCase = createMenuItem("/netgrif2/test2", "new_menu_item2")
         String viewId2 = apiCase.dataSet["menu_stringId"].value
 
+
         // move view
         Thread.sleep(2000)
         apiCase = setData(apiCase, [
@@ -153,6 +170,8 @@ class MenuItemApiTest {
         Set<String> childIds = folderCase.dataSet["childItemIds"].options.keySet()
         assert childIds.contains(viewId) && childIds.size() == 2
 
+
+        // cyclic move
         assertThrows(IllegalArgumentException.class, () -> {
             setData(apiCase, [
                     "move_dest_uri": "/netgrif2/cyclic",
@@ -162,6 +181,8 @@ class MenuItemApiTest {
             ])
         })
 
+
+        // move folder
         setData(apiCase, [
             "move_dest_uri": "/netgrif/test3",
             "move_item_id": null,
