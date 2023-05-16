@@ -1670,8 +1670,7 @@ class ActionDelegate {
          uri           : { cl ->
              item = workflowService.findOne(item.stringId)
              def uri = cl() as String
-             item.setUriNodeId(uriService.findByUri(uri).id)
-             workflowService.save(item)
+             moveMenuItem(item, uri)
          },
          title         : { cl ->
              item = workflowService.findOne(item.stringId)
@@ -1813,10 +1812,7 @@ class ActionDelegate {
     }
 
     protected Case getOrCreateFolderRecursive(UriNode node, FolderItemBody body, Case childFolderCase = null) {
-//        if (node.level < 1) {
-//            return null
-//        }
-        if (node.name == "root") {
+        if (node.level < 1) {
             return null
         }
         Case folder = findFolderCase(node)
@@ -1996,7 +1992,7 @@ class ActionDelegate {
     }
 
     protected Case findFolderCase(UriNode node) {
-        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.type.keyValue:folder AND dataSet.nodePath.textValue:\"$node.uriPath\"")
+        return findCaseElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.type.keyValue:folder AND dataSet.nodePath.textValue.keyword:\"$node.uriPath\"")
     }
 
     /**

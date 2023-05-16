@@ -26,6 +26,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+import static org.junit.jupiter.api.Assertions.assertThrows
+
 @SpringBootTest
 @ActiveProfiles(["test"])
 @ExtendWith(SpringExtension.class)
@@ -150,6 +152,15 @@ class MenuItemApiTest {
         assert viewCase.uriNodeId == node.id
         Set<String> childIds = folderCase.dataSet["childItemIds"].options.keySet()
         assert childIds.contains(viewId) && childIds.size() == 2
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            setData(apiCase, [
+                    "move_dest_uri": "/netgrif2/cyclic",
+                    "move_item_id": null,
+                    "move_folder_path": "/netgrif2",
+                    "move_item": "0"
+            ])
+        })
 
         setData(apiCase, [
             "move_dest_uri": "/netgrif/test3",
