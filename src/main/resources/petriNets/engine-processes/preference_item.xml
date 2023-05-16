@@ -32,7 +32,8 @@
 			}
 		}
 	</function>
-	<!-- GENERIC-->
+
+	<!-- GENERAL DATA-->
 	<data type="number">
 		<id>to_is_folder</id>
 		<title>to [is_folder]</title>
@@ -91,6 +92,14 @@
 		<id>parentId</id>
 		<title/>
 	</data>
+	<data type="text">
+		<id>move_dest_uri</id>
+		<title>Destination URI</title>
+	</data>
+	<data type="text">
+		<id>duplicate_new_title</id>
+		<title>Title of duplicated view</title>
+	</data>
 	<data type="enumeration_map">
 		<id>childItemIds</id>
 		<title/>
@@ -99,6 +108,11 @@
 		<id>permission_settings_taskRef</id>
 		<title/>
 		<init>permission_settings</init>
+	</data>
+	<data type="taskRef">
+		<id>general_settings_taskRef</id>
+		<title/>
+		<init>general_settings</init>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
@@ -200,7 +214,7 @@
 		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
 	</data>
 
-<!--	VIEW-->
+	<!-- DATA FOR VIEW-->
 	<data type="taskRef">
 		<id>filter_preview</id>
 		<title/>
@@ -225,13 +239,52 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>menu_item_identifier</id>
-		<title>Identifikátor (Filter API)</title>
+		<title>Identifier (Filter API)</title>
 	</data>
 	<data type="text" immediate="true">
 		<id>default_headers</id>
 		<title name="default_headers">Set default headers</title>
 	</data>
-<!--	FOLDER-->
+	<data type="enumeration_map" immediate="true">
+		<id>search_type</id>
+		<title name="search_type">Search type</title>
+		<options>
+			<option key="hidden">Hidden</option>
+			<option key="fulltext">Fulltext</option>
+			<option key="fulltext_advanced">Fulltext and advanced</option>
+		</options>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_title</id>
+		<title name="create_case_button_title">"New case" button title</title>
+	</data>
+	<data type="text">
+		<id>create_case_button_icon_preview</id>
+		<title name="create_case_button_icon_preview">Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon</id>
+		<title name="create_case_button_icon">"New case" button icon identifier</title>
+		<action trigger="set">
+			create_case_button_icon_preview: f.create_case_button_icon_preview,
+			create_case_button_icon: f.create_case_button_icon;
+
+
+			if (create_case_button_icon.value == "") {
+				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change create_case_button_icon_preview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+
+	<!-- DATA FOR FOLDER-->
 	<data type="text" immediate="true">
 		<id>nodePath</id>
 		<title/>
@@ -255,6 +308,7 @@
 		<title/>
 	</data>
 
+	<!-- TRANSITIONS -->
 	<transition>
 		<id>initialize</id>
 		<x>340</x>
@@ -312,6 +366,7 @@
 			</dataRef>
 		</dataGroup>
 	</transition>
+
 	<transition>
 		<id>folder_settings</id>
 		<x>620</x>
@@ -319,11 +374,11 @@
 		<label>Folder settings</label>
 		<icon>settings</icon>
 		<dataGroup>
-			<id>folder_settings_0</id>
+			<id>general</id>
 			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>name</id>
+				<id>general_settings_taskRef</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -331,81 +386,39 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>5</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>use_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							iconPreview: f.icon_preview,
-							icon: f.icon,
-							useIcon: f.use_icon;
-
-							make iconPreview,visible on trans when { useIcon.value }
-							make icon,editable on trans when { useIcon.value }
-
-							make iconPreview,hidden on trans when { !useIcon.value }
-							make icon,hidden on trans when { !useIcon.value }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>icon_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
+			<id>folder_settings_0</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+
+		</dataGroup>
+		<dataGroup>
 			<id>roles</id>
+			<cols>5</cols>
+			<layout>grid</layout>
 			<dataRef>
 				<id>permission_settings_taskRef</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>5</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 	</transition>
+
 	<transition>
 		<id>view_settings</id>
 		<x>620</x>
@@ -413,11 +426,11 @@
 		<label>View settings</label>
 		<icon>settings</icon>
 		<dataGroup>
-			<id>view_settings_0</id>
+			<id>general</id>
 			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>name</id>
+				<id>general_settings_taskRef</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -425,70 +438,16 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>5</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
-			<dataRef>
-				<id>use_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							iconPreview: f.icon_preview,
-							icon: f.icon,
-							useIcon: f.use_icon;
-
-							make iconPreview,visible on trans when { useIcon.value }
-							make icon,editable on trans when { useIcon.value }
-
-							make iconPreview,hidden on trans when { !useIcon.value }
-							make icon,hidden on trans when { !useIcon.value }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>icon_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>view_settings_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
 			<dataRef>
 				<id>filter_preview</id>
 				<logic>
@@ -518,17 +477,174 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>search_type</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
 		<dataGroup>
 			<id>roles</id>
+			<cols>5</cols>
+			<layout>grid</layout>
 			<dataRef>
 				<id>permission_settings_taskRef</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>5</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 	</transition>
+
+	<transition>
+		<id>general_settings</id>
+		<x>220</x>
+		<y>340</y>
+		<label>General settings [referenced]</label>
+		<icon>settings</icon>
+		<dataGroup>
+			<id>roles_management</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.icon_preview,
+							icon: f.icon,
+							useIcon: f.use_icon;
+
+							make iconPreview,visible on trans when { useIcon.value }
+							make icon,editable on trans when { useIcon.value }
+
+							make iconPreview,hidden on trans when { !useIcon.value }
+							make icon,hidden on trans when { !useIcon.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
 	<transition>
 		<id>permission_settings</id>
 		<x>220</x>
@@ -657,6 +773,82 @@
 			</dataRef>
 		</dataGroup>
 	</transition>
+
+	<transition>
+		<id>move_item</id>
+		<x>820</x>
+		<y>220</y>
+		<label>Move item</label>
+		<dataGroup>
+			<id>move</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>move_dest_uri</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="post">
+				<action>
+					move_dest_uri: f.move_dest_uri;
+
+					changeMenuItem useCase uri { move_dest_uri.value }
+				</action>
+			</actions>
+			<title>Move</title>
+		</event>
+	</transition>
+
+	<transition>
+		<id>duplicate_item</id>
+		<x>620</x>
+		<y>460</y>
+		<label>Duplicate item</label>
+		<dataGroup>
+			<id>duplicate</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>duplicate_new_title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>finish</id>
+			<actions phase="post">
+				<action>
+					duplicate_new_title: f.duplicate_new_title;
+
+					duplicateViewItem(useCase, duplicate_new_title.value)
+				</action>
+			</actions>
+			<title>Duplicate</title>
+		</event>
+	</transition>
+
+	<!-- PLACES-->
 	<place>
 		<id>uninitialized</id>
 		<x>220</x>
@@ -681,6 +873,16 @@
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
+	<place>
+		<id>general</id>
+		<x>620</x>
+		<y>220</y>
+		<label>general</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+
+	<!-- ARCS-->
 	<arc>
 		<id>a1</id>
 		<type>regular</type>
@@ -716,6 +918,27 @@
 		<type>read</type>
 		<sourceId>is_filter</sourceId>
 		<destinationId>view_settings</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>initialize</sourceId>
+		<destinationId>general</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>read</type>
+		<sourceId>general</sourceId>
+		<destinationId>move_item</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>read</type>
+		<sourceId>is_filter</sourceId>
+		<destinationId>duplicate_item</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

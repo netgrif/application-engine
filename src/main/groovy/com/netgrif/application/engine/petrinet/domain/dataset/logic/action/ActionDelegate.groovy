@@ -1905,6 +1905,11 @@ class ActionDelegate {
         }
     }
 
+    Case duplicateViewItem(Case originViewItem, String newTitle) {
+        // todo implement
+        return null
+    }
+
     private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
         List<String> childItemIds = parentFolder.dataSet[PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS].options?.collect { it.key }
         if (childItemIds == null || childItemIds.isEmpty()) {
