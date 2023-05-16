@@ -222,6 +222,42 @@
 		<title>found filter</title>
 	</data>
 
+	<data type="button">
+		<id>move_item</id>
+		<title>move item</title>
+		<event type="set">
+			<actions phase="post">
+				<action>
+					move_dest_uri: f.move_dest_uri,
+					move_item_id: f.move_item_id,
+					move_folder_path: f.move_folder_path;
+
+					def item
+					if (move_item_id.value) {
+						item = workflowService.findOne(move_item_id.value)
+					} else if (move_folder_path.value) {
+						def node = uriService.findByUri(move_folder_path.value)
+						item = findFolderCase(node)
+					}
+
+					moveMenuItem(item, move_dest_uri.value)
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>move_dest_uri</id>
+		<title>found filter</title>
+	</data>
+	<data type="text">
+		<id>move_item_id</id>
+		<title>View item id to find</title>
+	</data>
+	<data type="text">
+		<id>move_folder_path</id>
+		<title>Folder item path to find</title>
+	</data>
+
 	<transition>
 		<id>t1</id>
 		<x>700</x>

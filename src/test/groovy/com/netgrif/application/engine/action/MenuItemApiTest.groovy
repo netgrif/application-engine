@@ -3,9 +3,11 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.application.engine.petrinet.domain.UriContentType
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
+import com.netgrif.application.engine.petrinet.domain.UriNode
 import com.netgrif.application.engine.petrinet.service.interfaces.IUriService
 import com.netgrif.application.engine.startup.FilterRunner
 import com.netgrif.application.engine.startup.ImportHelper
@@ -13,13 +15,14 @@ import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.domain.QCase
 import com.netgrif.application.engine.workflow.service.interfaces.IDataService
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
-import org.bson.types.ObjectId
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
@@ -51,6 +54,9 @@ class MenuItemApiTest {
 
     @Autowired
     private INextGroupService nextGroupService
+
+    @Autowired
+    private IElasticCaseService elasticCaseService
 
     @BeforeEach
     void before() {
@@ -118,16 +124,85 @@ class MenuItemApiTest {
         assert caze.dataSet["found_filter"].value == filter.stringId
     }
 
-    Case createMenuItem() {
+    @Test
+    void testMoveMenuItem() {
+        Case apiCase = createMenuItem("/netgrif/test")
+        String viewId = apiCase.dataSet["menu_stringId"].value
+        apiCase = createMenuItem("/netgrif2/test2", "new_menu_item2")
+        String viewId2 = apiCase.dataSet["menu_stringId"].value
+
+        // move view
+        Thread.sleep(2000)
+        apiCase = setData(apiCase, [
+            "move_dest_uri": "/netgrif2",
+            "move_item_id": viewId,
+            "move_folder_path": null,
+            "move_item": "0"
+        ])
+
+        Case viewCase = workflowService.findOne(viewId)
+        Thread.sleep(2000)
+        viewCase = workflowService.populateUriNodeId(viewCase)
+
+        UriNode node = uriService.findByUri("/netgrif2")
+        Case folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue:\"/netgrif2\"", PageRequest.of(0, 1))[0]
+
+        assert viewCase.uriNodeId == node.id
+        Set<String> childIds = folderCase.dataSet["childItemIds"].options.keySet()
+        assert childIds.contains(viewId) && childIds.size() == 2
+
+        setData(apiCase, [
+            "move_dest_uri": "/netgrif/test3",
+            "move_item_id": null,
+            "move_folder_path": "/netgrif2",
+            "move_item": "0"
+        ])
+        Thread.sleep(2000)
+
+        folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue:\"/netgrif/test3\"", PageRequest.of(0, 1))[0]
+        Case folderCase2 = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue:\"/netgrif\"", PageRequest.of(0, 1))[0]
+        assert folderCase != null && folderCase.dataSet["parentId"].value == folderCase2.stringId
+
+        folderCase = findCasesElastic("processIdentifier:$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER AND dataSet.nodePath.textValue:\"/netgrif/test3/netgrif2\"", PageRequest.of(0, 1))[0]
+        assert folderCase != null
+        folderCase = workflowService.populateUriNodeId(folderCase)
+        node = uriService.findByUri("/netgrif/test3")
+        assert node != null
+        assert folderCase.uriNodeId == node.id
+        assert folderCase.dataSet["nodePath"].value == "/netgrif/test3/netgrif2"
+
+        childIds = folderCase.dataSet["childItemIds"].options.keySet()
+        assert childIds.size() == 2
+
+        folderCase = workflowService.findOne(childIds[0])
+        folderCase = workflowService.populateUriNodeId(folderCase)
+        node = uriService.findByUri("/netgrif/test3/netgrif2")
+        assert folderCase.dataSet["nodePath"].value == "/netgrif/test3/netgrif2/test2"
+        assert folderCase.uriNodeId == node.id
+
+        viewCase = workflowService.findOne(viewId2)
+        viewCase = workflowService.populateUriNodeId(viewCase)
+        node = uriService.findByUri("/netgrif/test3/netgrif2/test2")
+        assert viewCase.uriNodeId == node.id
+    }
+
+    List<Case> findCasesElastic(String query, Pageable pageable) {
+        CaseSearchRequest request = new CaseSearchRequest()
+        request.query = query
+        List<Case> result = elasticCaseService.search([request], userService.system.transformToLoggedUser(), pageable, LocaleContextHolder.locale, false).content
+        return result
+    }
+
+    Case createMenuItem(String uri = "/netgrif/test", String identifier = "new_menu_item") {
         Case caze = getCase()
         caze = setData(caze, [
-                "uri": "/netgrif/test",
+                "uri": uri,
                 "title": "FILTER",
                 "allowed_nets": "filter,preference_item",
                 "query": "processIdentifier:filter OR processIdentifier:preference_item",
                 "type": "Case",
                 "group": null,
-                "identifier": "new_menu_item",
+                "identifier": identifier,
                 "icon": "device_hub",
                 "create_filter_and_menu": "0"
         ])
