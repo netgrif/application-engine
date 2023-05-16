@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilders;
 
-import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfMultiChoiceMapField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfSelectionField;
@@ -25,8 +24,8 @@ import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUti
 public class PdfListMultiChoiceMapFieldBuilder extends PdfMultiChoiceMapFieldBuilder {
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE_MAP.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE_MAP.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME};
     }
 
     @Override
@@ -47,7 +46,7 @@ public class PdfListMultiChoiceMapFieldBuilder extends PdfMultiChoiceMapFieldBui
             Map<String, List<String>> choices = field.getOptions().entrySet().stream().collect(Collectors.toMap(e -> e.getValue().getKey(), e -> generateMultiLineText(Collections.singletonList(e.getValue().getTranslation(buildingBlock.getLocale())), maxValueLineLength)));
             pdfField.setValue(choices);
         }
-        if (field.getValue() != null) {
+        if (field.getValue() != null  && field.getValue().getValue() != null) {
             Set<String> values = field.getValue().getValue();
             pdfField.setSelectedValues(values);
         }

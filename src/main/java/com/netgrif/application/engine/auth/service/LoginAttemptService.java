@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -22,14 +21,14 @@ public class LoginAttemptService implements ILoginAttemptService {
 
     private LoadingCache<String, Integer> attemptsCache;
 
-    public LoginAttemptService() {
+    public LoginAttemptService(SecurityLimitsProperties securityLimitsProperties) {
         super();
         attemptsCache = CacheBuilder.newBuilder().
-                expireAfterWrite(1, TimeUnit.DAYS).build(new CacheLoader<String, Integer>() {
-            public Integer load(String key) {
-                return 0;
-            }
-        });
+                expireAfterWrite(securityLimitsProperties.getLoginTimeout(), securityLimitsProperties.getLoginTimeoutUnit()).build(new CacheLoader<>() {
+                    public Integer load(String key) {
+                        return 0;
+                    }
+                });
     }
 
 

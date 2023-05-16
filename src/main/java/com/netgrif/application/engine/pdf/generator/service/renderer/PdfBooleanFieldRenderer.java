@@ -2,7 +2,6 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfBooleanField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,8 +15,8 @@ import java.util.Map;
 public class PdfBooleanFieldRenderer extends PdfFieldRenderer<PdfBooleanField> {
 
     @Override
-    public String getType() {
-        return DataType.BOOLEAN.value();
+    public String[] getType() {
+        return new String[]{DataType.BOOLEAN.value()};
     }
 
     @Override

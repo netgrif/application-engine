@@ -540,7 +540,7 @@
 				<action>
 					impersonated: f.impersonated;
 
-					impersonationService.endImpersonation(impersonated.rawValue.id)
+					impersonationService.removeImpersonatorByImpersonated(impersonated.rawValue.id)
 				</action>
 				<action>
 					is_active: f.is_active;

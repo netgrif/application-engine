@@ -32,8 +32,9 @@ public class SecurityContextFilter extends OncePerRequestFilter {
      * */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (securityContextService.isAuthenticatedPrincipalLoggedUser())
-            securityContextService.reloadSecurityContext((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        if (securityContextService.isAuthenticatedPrincipalLoggedUser()) {
+            securityContextService.forceReloadSecurityContext((LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        }
         filterChain.doFilter(request, response);
     }
 }

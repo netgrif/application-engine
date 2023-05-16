@@ -31,8 +31,8 @@ public class PdfDateFieldBuilder extends PdfFormFieldBuilder<PdfDateField> {
     }
 
     @Override
-    public String getType() {
-        return DataType.DATE.value();
+    public String[] getType() {
+        return new String[]{DataType.DATE.value()};
     }
 
     @Override
@@ -48,7 +48,7 @@ public class PdfDateFieldBuilder extends PdfFormFieldBuilder<PdfDateField> {
     }
 
     private String formatDate(Field<?> field) {
-        if (field.getValue() != null) {
+        if (field.getValue().getValue() != null) {
             ZonedDateTime value = DateUtils.localDateToZonedDate((LocalDate) field.getValue().getValue(), resource.getDateZoneId());
             return DateTimeFormatter.ofPattern(resource.getDateFormat().getValue()).format(value);
         } else {

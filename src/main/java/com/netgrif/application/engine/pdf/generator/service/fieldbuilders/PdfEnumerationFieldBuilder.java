@@ -4,15 +4,12 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfEnumerationField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
-import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationField;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils.generateMultiLineText;
 import static com.netgrif.application.engine.pdf.generator.utils.PdfGeneratorUtils.getMaxLineSize;
@@ -36,8 +33,8 @@ public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerati
     }
 
     @Override
-    public String getType() {
-        return DataType.ENUMERATION.value();
+    public String[] getType() {
+        return new String[]{DataType.ENUMERATION.value()};
     }
 
     @Override
@@ -49,7 +46,7 @@ public class PdfEnumerationFieldBuilder extends PdfFormFieldBuilder<PdfEnumerati
                 resource.getPadding(),
                 resource.getSizeMultiplier()
         );
-        if (field.getValue() != null) {
+        if (field.getValue() != null && field.getValue().getValue() != null) {
             Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().getTranslation(buildingBlock.getLocale())), maxValueLineLength));
             pdfField.setSelectedValues(values);
         }

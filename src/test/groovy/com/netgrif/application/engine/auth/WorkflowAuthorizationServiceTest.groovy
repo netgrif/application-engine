@@ -201,10 +201,9 @@ class WorkflowAuthorizationServiceTest {
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
-        workflowService.save(case_)
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())
 
         assert workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
 
@@ -222,10 +221,10 @@ class WorkflowAuthorizationServiceTest {
 
         Case case_ = workflowService.createCase(netWithUserRefs.getStringId(), "Test delete", "", testUser.transformToLoggedUser()).getCase()
         String taskId = case_.getTaskStringId("1")
-        case_ = dataService.setData(taskId, new DataSet([
+        dataService.setData(taskId, new DataSet([
                 "pos_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)])),
                 "neg_user_list": new UserListField(rawValue: new UserListFieldValue(userValues: [dataService.makeUserFieldValue(testUser.stringId)]))
-        ] as Map<String, Field<?>>), superCreator.getSuperUser()).getCase()
+        ] as Map<String, Field<?>>), superCreator.getSuperUser())
 
         assert !workflowAuthorizationService.canCallDelete(testUser.transformToLoggedUser(), case_.getStringId())
 

@@ -10,6 +10,11 @@
             return x * y
         }
     </function>
+    <function name="updateUseCaseFieldValue" scope="namespace">
+        { def fieldId, def newValue ->
+            change useCase.getDataSet().get(fieldId) value { newValue }
+        }
+    </function>
     <!-- ROLE -->
     <!-- DATA -->
     <data type="number">

@@ -32,6 +32,7 @@ import com.netgrif.application.engine.validation.service.interfaces.IValidationS
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
+import com.netgrif.application.engine.workflow.domain.TaskPair;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.taskoutcomes.*;
@@ -49,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -57,7 +59,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -347,7 +348,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public DelegateTaskEventOutcome delegateTask(LoggedUser loggedUser, String delegatedId, String taskId) throws TransitionNotExecutableException {
         IUser delegatedUser = userService.resolveById(delegatedId, true);
         IUser delegateUser = userService.getUserFromLoggedUser(loggedUser);
@@ -360,7 +360,6 @@ public class TaskService implements ITaskService {
 
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-
 
         log.info("[" + useCase.getStringId() + "]: Delegating task [" + task.getTitle() + "] to user [" + delegatedUser.getEmail() + "]");
 
@@ -395,7 +394,10 @@ public class TaskService implements ITaskService {
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
         Case useCase = workflowService.findOne(caseId);
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
-        ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
+        int rulesExecuted = ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
+        if (rulesExecuted == 0) {
+            return useCase;
+        }
         return workflowService.save(useCase);
     }
 
@@ -413,8 +415,8 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    @Transactional
     public void reloadTasks(Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Reloading tasks in [" + useCase.getTitle() + "]");
         PetriNet net = useCase.getPetriNet();
@@ -425,7 +427,7 @@ public class TaskService implements ITaskService {
                     .map(transition -> createFromTransition(transition, useCase))
                     .collect(Collectors.toList());
         } else {
-            tasks= taskRepository.findAllByCaseId(useCase.getStringId());
+            tasks = taskRepository.findAllByCaseId(useCase.getStringId());
         }
         // update tasks state
         Task autoTriggered = null;
@@ -446,7 +448,6 @@ public class TaskService implements ITaskService {
         }
     }
 
-    @Transactional
     boolean isExecutable(Transition transition, PetriNet net) {
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
 
@@ -459,7 +460,6 @@ public class TaskService implements ITaskService {
                 .allMatch(Arc::isExecutable);
     }
 
-    @Transactional
     void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(useCaseId);
         log.info("[" + useCaseId + "]: Finish execution of task [" + transition.getTitle() + "] in case [" + useCase.getTitle() + "]");
@@ -469,13 +469,11 @@ public class TaskService implements ITaskService {
         workflowService.save(useCase);
     }
 
-    @Transactional
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         log.info("[" + useCase.getStringId() + "]: Start execution of " + transition.getTitle() + " in case " + useCase.getTitle());
         execute(transition, useCase, arc -> arc.getDestination().equals(transition));
     }
 
-    @Transactional
     protected void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
         Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
 
@@ -496,10 +494,8 @@ public class TaskService implements ITaskService {
         workflowService.updateMarking(useCase);
     }
 
-    @Transactional
     protected List<EventOutcome> executeTransition(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: executeTransition [" + task.getTransitionId() + "] in case [" + useCase.getTitle() + "]");
-        useCase = workflowService.decrypt(useCase);
         List<EventOutcome> outcomes = new ArrayList<>();
         try {
             log.info("assignTask [" + task.getTitle() + "] in case [" + useCase.getTitle() + "]");
@@ -514,7 +510,6 @@ public class TaskService implements ITaskService {
         return outcomes;
     }
 
-    @Transactional
     void validateData(Transition transition, Case useCase) {
 //        TODO: release/7.0.0 fix validation
 //        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
@@ -539,7 +534,6 @@ public class TaskService implements ITaskService {
 //        }
     }
 
-    @Transactional
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Task " + task.getTitle() + " scheduled to run at " + time.toString());
         scheduler.schedule(() -> {
@@ -606,10 +600,11 @@ public class TaskService implements ITaskService {
     @Override
     public long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
-        if (searchPredicate != null)
+        if (searchPredicate != null) {
             return taskRepository.count(searchPredicate);
-        else
+        } else {
             return 0;
+        }
     }
 
     @Override
@@ -785,12 +780,10 @@ public class TaskService implements ITaskService {
             task.setTransactionId(transaction.getStringId());
         }
 
-        Task savedTask = save(task);
-
-        useCase.addTask(savedTask);
+        useCase.addTask(task);
         workflowService.resolveUserRef(useCase);
 
-        return savedTask;
+        return task;
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
@@ -812,7 +805,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(List<Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
-        log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
+        log.info("[" + useCase.getStringId() + "]: Tasks of case " + useCase.getTitle() + " are being deleted");
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
@@ -820,7 +813,7 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(List<Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
-        log.info("[" + caseId + "]: Tasks of case are being deleted by user [" + userService.getLoggedOrSystem().getStringId() + "]");
+        log.info("[" + caseId + "]: Tasks of case are being deleted");
         taskRepository.deleteAll(tasks);
         tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
@@ -836,8 +829,9 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null)
+        if (task.getUserId() != null) {
             task.setUser(userService.resolveById(task.getUserId(), true));
+        }
     }
 
     private EventOutcome addMessageToOutcome(Transition transition, EventType type, TaskEventOutcome outcome) {

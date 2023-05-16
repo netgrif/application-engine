@@ -1,8 +1,10 @@
 package com.netgrif.application.engine.workflow.web;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.application.engine.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
+import com.netgrif.application.engine.mapper.views.Views;
 import com.netgrif.application.engine.workflow.domain.MergeFilterOperation;
 import com.netgrif.application.engine.workflow.domain.Task;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
@@ -174,6 +176,7 @@ public class TaskController extends AbstractTaskController {
     }
 
     @Override
+    @JsonView(Views.GetData.class)
     @Operation(summary = "Get all task data", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> getData(@PathVariable("id") String taskId, Locale locale, Authentication auth) {

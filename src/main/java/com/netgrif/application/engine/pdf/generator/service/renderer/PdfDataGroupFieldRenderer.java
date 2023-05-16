@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfDataGroupField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,8 +15,8 @@ public class PdfDataGroupFieldRenderer extends PdfFieldRenderer<PdfDataGroupFiel
 
 
     @Override
-    public String getType() {
-        return PdfDataGroupField.DATA_GROUP_TYPE;
+    public String[] getType() {
+        return new String[]{PdfDataGroupField.DATA_GROUP_TYPE};
     }
 
     @Override

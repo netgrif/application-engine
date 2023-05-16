@@ -15,6 +15,15 @@ public class SetDataEventOutcome extends TaskEventOutcome {
 
     private DataSet changedFields = new DataSet();
 
+    public SetDataEventOutcome() {
+        super();
+    }
+
+    public SetDataEventOutcome(List<EventOutcome> outcomes) {
+        this();
+        this.setOutcomes(outcomes);
+    }
+
     public SetDataEventOutcome(Case aCase, Task task) {
         super(aCase, task);
     }

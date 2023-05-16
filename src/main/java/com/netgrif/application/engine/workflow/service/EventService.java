@@ -44,6 +44,9 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
+        if (actions.isEmpty()) {
+            return allOutcomes;
+        }
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, null, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
@@ -61,6 +64,9 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runEventActions(Case useCase, Task task, Field<?> newDataField, List<Action> actions, DataEventType trigger) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
+        if (actions.isEmpty()) {
+            return allOutcomes;
+        }
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), newDataField, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream()

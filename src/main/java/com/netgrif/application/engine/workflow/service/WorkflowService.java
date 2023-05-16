@@ -143,6 +143,14 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOne(String caseId) {
+        Case useCase = findOneNoNet(caseId);
+        setPetriNet(useCase);
+        decryptDataSet(useCase);
+        return useCase;
+    }
+
+    @Override
+    public Case findOneNoNet(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
@@ -221,7 +229,7 @@ public class WorkflowService implements IWorkflowService {
         return userListValue.getUserValues().stream()
                 .filter(Objects::nonNull)
                 .map(UserFieldValue::getId)
-                .filter(id -> id != null && userService.existsById(id))
+                .filter(id -> id != null && userService.resolveById(id, false) != null)
                 .collect(Collectors.toList());
     }
 
@@ -262,6 +270,7 @@ public class WorkflowService implements IWorkflowService {
     public CreateCaseEventOutcome createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        int rulesExecuted;
         Case useCase = new Case(petriNet);
         dataSetInitializer.populateDataSet(useCase);
         useCase.setColor(color);
@@ -274,8 +283,10 @@ public class WorkflowService implements IWorkflowService {
 
         CreateCaseEventOutcome outcome = new CreateCaseEventOutcome();
         outcome.addOutcomes(eventService.runActions(petriNet.getPreCreateActions(), null, Optional.empty()));
-        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
-        useCase = save(useCase);
+        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
+        if (rulesExecuted > 0) {
+            useCase = save(useCase);
+        }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.PRE));
         log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
@@ -288,8 +299,10 @@ public class WorkflowService implements IWorkflowService {
         useCase = findOne(useCase.getStringId());
         outcome.addOutcomes(eventService.runActions(petriNet.getPostCreateActions(), useCase, Optional.empty()));
         useCase = findOne(useCase.getStringId());
-        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
-        useCase = save(useCase);
+        rulesExecuted = ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+        if (rulesExecuted > 0) {
+            useCase = save(useCase);
+        }
 
         historyService.save(new CreateCaseEventLog(useCase, EventPhase.POST));
         outcome.setCase(useCase);
@@ -374,22 +387,24 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void removeTasksFromCase(List<Task> tasks, String caseId) {
+    public boolean removeTasksFromCase(List<Task> tasks, String caseId) {
+        if (tasks.isEmpty()) {
+            return true;
+        }
         Optional<Case> caseOptional = repository.findById(caseId);
         if (caseOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         }
         Case useCase = caseOptional.get();
-        removeTasksFromCase(tasks, useCase);
+        return removeTasksFromCase(tasks, useCase);
     }
 
     @Override
-    public void removeTasksFromCase(List<Task> tasks, Case useCase) {
-        if (tasks == null || tasks.isEmpty()) {
-            return;
+    public boolean removeTasksFromCase(List<Task> tasks, Case useCase) {
+        if (tasks.isEmpty()) {
+            return true;
         }
-        useCase.removeTasks(tasks);
-        save(useCase);
+        return useCase.removeTasks(tasks);
     }
 
     @Override
@@ -480,10 +495,13 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void setPetriNet(Case useCase) {
-        PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
+        PetriNet model = useCase.getPetriNet();
+        if (model == null) {
+            model = petriNetService.clone(useCase.getPetriNetObjectId());
+            useCase.setPetriNet(model);
+        }
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeArcs(useCase.getDataSet());
-        useCase.setPetriNet(model);
     }
 
     private EventOutcome addMessageToOutcome(PetriNet net, CaseEventType type, EventOutcome outcome) {

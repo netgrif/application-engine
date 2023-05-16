@@ -159,13 +159,6 @@
 			}
 			<!-- @formatter:on -->
 		</action>
-		<action trigger="get">
-			filterAutocomplete: f.this,
-			previewTaskRef: f.filter_preview,
-			referencedFiltersList: f.referenced_filters;
-
-			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, referencedFiltersList)
-		</action>
 	</data>
 	<data type="button">
 		<id>add_filter_to_menu</id>

@@ -4,7 +4,6 @@ import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfMultiChoiceMapField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
-import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceField;
 import com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,21 +34,21 @@ public class PdfMultiChoiceMapFieldBuilder extends PdfFormFieldBuilder<PdfMultiC
     }
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE_MAP.value();
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE_MAP.value()};
     }
 
     @Override
     protected void setupValue(PdfBuildingBlock buildingBlock, PdfMultiChoiceMapField pdfField) {
-        MultichoiceField field = (MultichoiceField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
+        MultichoiceMapField field = (MultichoiceMapField) ((PdfFormFieldBuildingBlock) buildingBlock).getDataRef().getField();
         int maxValueLineLength = getMaxLineSize(
                 pdfField.getWidth() - 3 * resource.getPadding(),
                 resource.getFontValueSize(),
                 resource.getPadding(),
                 resource.getSizeMultiplier()
         );
-        if (field.getValue() != null) {
-            Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().stream().map(v -> v.getTranslation(buildingBlock.getLocale())).collect(Collectors.joining(", "))), maxValueLineLength));
+        if (field.getValue() != null && field.getValue().getValue() != null) {
+            Set<String> values = new HashSet<>(generateMultiLineText(Collections.singletonList(field.getValue().getValue().stream().map(v -> field.getOptions().get(v).getTranslation(buildingBlock.getLocale())).collect(Collectors.joining(", "))), maxValueLineLength));
             pdfField.setSelectedValues(values);
         }
     }

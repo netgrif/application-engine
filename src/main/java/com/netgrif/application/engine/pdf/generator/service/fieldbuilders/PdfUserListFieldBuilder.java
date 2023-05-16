@@ -1,15 +1,11 @@
 package com.netgrif.application.engine.pdf.generator.service.fieldbuilders;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTextField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfUserListField;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfBuildingBlock;
 import com.netgrif.application.engine.pdf.generator.service.fieldbuilders.blocks.PdfFormFieldBuildingBlock;
-import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue;
 import com.netgrif.application.engine.petrinet.domain.dataset.UserListField;
-import com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue;
-import org.jsoup.Jsoup;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -36,8 +32,8 @@ public class PdfUserListFieldBuilder extends PdfFormFieldBuilder<PdfUserListFiel
     }
 
     @Override
-    public String getType() {
-        return DataType.USER_LIST.value();
+    public String[] getType() {
+        return new String[]{DataType.USER_LIST.value()};
     }
 
     @Override

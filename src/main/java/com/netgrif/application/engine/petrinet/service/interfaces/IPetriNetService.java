@@ -10,6 +10,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Actio
 import com.netgrif.application.engine.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.application.engine.petrinet.domain.version.Version;
 import com.netgrif.application.engine.petrinet.web.responsebodies.DataFieldReference;
+import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetImportReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.application.engine.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
@@ -23,6 +24,8 @@ import java.io.InputStream;
 import java.util.*;
 
 public interface IPetriNetService {
+
+    PetriNet clone(ObjectId petriNetId);
 
     @Deprecated
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
@@ -89,11 +92,11 @@ public interface IPetriNetService {
 
     List<PetriNet> get(List<String> petriNetIds);
 
-    PetriNet clone(ObjectId petriNetId);
-
     void deletePetriNet(String id, LoggedUser loggedUser);
 
     void runActions(List<Action> actions, PetriNet petriNet);
 
     List<String> getExistingPetriNetIdentifiersFromIdentifiersList(List<String> identifiers);
+
+    PetriNetImportReference getNetFromCase(String caseId);
 }

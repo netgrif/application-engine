@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +17,8 @@ import java.util.Map;
 public class PdfListMultiChoiceFieldRenderer extends PdfMultiChoiceFieldRenderer {
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME};
     }
 
     @Override

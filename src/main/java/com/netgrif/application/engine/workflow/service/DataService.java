@@ -167,7 +167,7 @@ public class DataService implements IDataService {
             outcomes.add(setDataField(task, fieldId, newDataField, user));
         }
         Case useCase = workflowService.findOne(task.getCaseId());
-        return new SetDataEventOutcome(useCase, task, outcomes);
+        return new SetDataEventOutcome(outcomes);
     }
 
     @Override
@@ -232,7 +232,7 @@ public class DataService implements IDataService {
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
         Transition transition = net.getTransition(task.getTransitionId());
-        GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome(useCase, task);
+        GetDataGroupsEventOutcome outcome = new GetDataGroupsEventOutcome();
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
         List<DataRef> data = getData(task, useCase, user).getData();
@@ -539,7 +539,7 @@ public class DataService implements IDataService {
     }
 
     private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) {
-        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+        if (useCase.getDataSet().get(field.getStringId()).getValue() != null && useCase.getDataSet().get(field.getStringId()).getValue().getValue() != null) {
             new File(field.getFilePath(useCase.getStringId())).delete();
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }

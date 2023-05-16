@@ -17,8 +17,8 @@ import java.util.Map;
 public class PdfListMultiChoiceMapFieldRenderer extends PdfMultiChoiceMapFieldRenderer {
 
     @Override
-    public String getType() {
-        return DataType.MULTICHOICE_MAP.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME;
+    public String[] getType() {
+        return new String[]{DataType.MULTICHOICE_MAP.value() + "_" + PdfSelectionField.LIST_COMPONENT_NAME};
     }
 
     @Override

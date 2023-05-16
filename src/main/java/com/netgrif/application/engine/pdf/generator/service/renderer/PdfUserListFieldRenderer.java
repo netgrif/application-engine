@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfTextField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfUserListField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -16,8 +15,8 @@ import java.util.List;
 public class PdfUserListFieldRenderer extends PdfFieldRenderer<PdfUserListField> {
 
     @Override
-    public String getType() {
-        return DataType.USER_LIST.value();
+    public String[] getType() {
+        return new String[]{DataType.USER_LIST.value()};
     }
 
     @Override

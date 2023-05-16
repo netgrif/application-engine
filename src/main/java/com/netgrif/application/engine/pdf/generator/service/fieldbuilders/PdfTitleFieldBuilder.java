@@ -26,8 +26,8 @@ public class PdfTitleFieldBuilder extends PdfFieldBuilder<PdfTitleField> {
     }
 
     @Override
-    public String getType() {
-        return PdfTitleField.TITLE_TYPE;
+    public String[] getType() {
+        return new String[]{PdfTitleField.TITLE_TYPE};
     }
 
     @Override

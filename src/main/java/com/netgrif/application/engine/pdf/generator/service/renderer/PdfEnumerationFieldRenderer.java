@@ -2,8 +2,6 @@ package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfEnumerationField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfField;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfMultiChoiceField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -11,23 +9,21 @@ import org.springframework.stereotype.Component;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PdfEnumerationFieldRenderer extends PdfFieldRenderer<PdfEnumerationField> {
 
     @Override
-    public String getType() {
-        return DataType.ENUMERATION.value();
+    public String[] getType() {
+        return new String[]{DataType.ENUMERATION.value()};
     }
 
     @Override
     public void renderValue() throws IOException {
         PdfEnumerationField clonedField = (PdfEnumerationField) getField().getCopier().copyOf();
-        List<String> multiLineText = new ArrayList<>(clonedField.getSelectedValues());
+        List<String> multiLineText = new ArrayList<>();
         int lineCounter = getLineCounter();
         int x = clonedField.getX() + getResource().getPadding(), y = renderLinePosY(clonedField, lineCounter);
         int strokeLineCounter = 0;

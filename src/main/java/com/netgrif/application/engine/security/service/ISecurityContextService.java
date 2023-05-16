@@ -8,5 +8,7 @@ public interface ISecurityContextService {
 
     void reloadSecurityContext(LoggedUser loggedUser);
 
+    void forceReloadSecurityContext(LoggedUser loggedUser);
+
     boolean isAuthenticatedPrincipalLoggedUser();
 }

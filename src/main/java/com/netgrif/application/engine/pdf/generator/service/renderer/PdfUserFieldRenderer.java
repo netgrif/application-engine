@@ -1,7 +1,6 @@
 package com.netgrif.application.engine.pdf.generator.service.renderer;
 
 import com.netgrif.application.engine.importer.model.DataType;
-import com.netgrif.application.engine.pdf.generator.domain.fields.PdfDateField;
 import com.netgrif.application.engine.pdf.generator.domain.fields.PdfUserField;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -15,8 +14,8 @@ import java.io.IOException;
 public class PdfUserFieldRenderer extends PdfFieldRenderer<PdfUserField> {
 
     @Override
-    public String getType() {
-        return DataType.USER.value();
+    public String[] getType() {
+        return new String[]{DataType.USER.value()};
     }
 
     @Override

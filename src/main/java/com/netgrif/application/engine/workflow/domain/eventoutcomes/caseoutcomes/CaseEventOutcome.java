@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.workflow.domain.eventoutcomes.caseoutcomes;
 
 import com.netgrif.application.engine.petrinet.domain.I18nString;
+import com.netgrif.application.engine.petrinet.domain.PetriNet;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.EventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.PetriNetEventOutcome;
@@ -41,6 +42,7 @@ public abstract class CaseEventOutcome extends PetriNetEventOutcome {
 
     public void setCase(Case aCase) {
         this.aCase = aCase;
-        setNet(aCase.getPetriNet());
+        PetriNet net = aCase.getPetriNet() != null ? aCase.getPetriNet() : null;
+        setNet(net);
     }
 }

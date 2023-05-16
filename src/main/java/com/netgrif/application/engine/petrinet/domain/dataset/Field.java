@@ -1,7 +1,11 @@
 package com.netgrif.application.engine.petrinet.domain.dataset;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.netgrif.application.engine.importer.model.DataType;
+import com.netgrif.application.engine.mapper.filters.DataFieldBehaviorsFilter;
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.Imported;
@@ -20,7 +24,6 @@ import com.querydsl.core.annotations.QueryType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.annotate.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -34,14 +37,32 @@ import static com.netgrif.application.engine.petrinet.domain.dataset.logic.Field
 @Document
 @Data
 @NoArgsConstructor
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@type")
-public abstract class Field<T> extends Imported {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = NumberField.class, name = "0"),
+        @JsonSubTypes.Type(value = TextField.class, name = "1"),
+        @JsonSubTypes.Type(value = EnumerationField.class, name = "2"),
+        @JsonSubTypes.Type(value = EnumerationMapField.class, name = "3"),
+        @JsonSubTypes.Type(value = MultichoiceField.class, name = "4"),
+        @JsonSubTypes.Type(value = MultichoiceMapField.class, name = "5"),
+        @JsonSubTypes.Type(value = BooleanField.class, name = "6"),
+        @JsonSubTypes.Type(value = DateField.class, name = "7"),
+        @JsonSubTypes.Type(value = FileField.class, name = "8"),
+        @JsonSubTypes.Type(value = FileListField.class, name = "9"),
+        @JsonSubTypes.Type(value = UserField.class, name = "10"),
+        @JsonSubTypes.Type(value = UserListField.class, name = "11"),
+        @JsonSubTypes.Type(value = DateTimeField.class, name = "12"),
+        @JsonSubTypes.Type(value = ButtonField.class, name = "13"),
+        @JsonSubTypes.Type(value = TaskField.class, name = "14"),
+        @JsonSubTypes.Type(value = CaseField.class, name = "15"),
+        @JsonSubTypes.Type(value = FilterField.class, name = "16"),
+        @JsonSubTypes.Type(value = I18nField.class, name = "17"),
+})
+public class Field<T> extends Imported {
 
     @Id
     protected ObjectId id;
-    @JsonIgnore
     protected T defaultValue;
-    @JsonIgnore
     protected Expression initExpression;
     protected List<Validation> validations;
     private I18nString name;
@@ -49,24 +70,29 @@ public abstract class Field<T> extends Imported {
     private I18nString placeholder;
     private DataFieldBehaviors behaviors;
     private DataFieldValue<T> value;
-    @JsonIgnore
     private Boolean immediate;
-    @JsonIgnore
     private Map<DataEventType, DataEvent> events;
-    @JsonIgnore
     private String encryption;
     private Integer length;
     private Component component;
-    @JsonIgnore
     private Long version = 0L;
     // TODO: release/7.0.0 6.2.5: parentTaskId, parentCaseId
+
+    public String getId() {
+        if (id == null) {
+            return null;
+        }
+        return id.toString();
+    }
 
     public String getStringId() {
         return importId;
     }
 
     @QueryType(PropertyType.NONE)
-    public abstract DataType getType();
+    public DataType getType() {
+        return DataType.DATE;
+    };
 
     public void setRawValue(T value) {
         if (this.value == null) {
@@ -167,7 +193,11 @@ public abstract class Field<T> extends Imported {
         clone.component = this.component;
     }
 
-    public abstract Field<T> clone();
+    public  Field<T> clone() {
+        Field field = new Field();
+        clone(field);
+        return field;
+    }
 
     public void setBehavior(String transitionId, DataFieldBehavior behavior) {
         behaviors.put(transitionId, behavior);
@@ -197,7 +227,6 @@ public abstract class Field<T> extends Imported {
         return behavior.equals(dataRefBehavior.getBehavior());
     }
 
-    @JsonIgnore
     public String getTranslatedName(Locale locale) {
         if (name == null) {
             return null;
