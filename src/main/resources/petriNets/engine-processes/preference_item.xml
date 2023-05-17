@@ -32,6 +32,30 @@
 			}
 		}
 	</function>
+	<function scope="process" name="updateFilterAutocompleteOptions">
+		{
+			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField filterAutocomplete,
+			com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
+			com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
+			com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
+			com.netgrif.application.engine.petrinet.domain.Transition trans
+			->
+			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
+				change previewTaskRef value {
+					return [findTask({it.caseId.eq(filterAutocomplete.value).and(it.transitionId.eq("view_filter"))}).stringId]
+				}
+				make updateBtn,editable on trans when { true }
+			} else {
+				change filterAutocomplete options {
+				return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+						.findAll({filterCase -&gt; !selectedFilterRef.value.contains(filterCase.stringId)})
+						.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+				}
+				change previewTaskRef value { [] }
+				make updateBtn,visible on trans when { true }
+			}
+		}
+	</function>
 
 	<!-- GENERAL DATA-->
 	<data type="number">
@@ -221,26 +245,77 @@
 
 	<!-- DATA FOR VIEW-->
 	<data type="taskRef">
-		<id>filter_preview</id>
+		<id>selected_filter_preview</id>
 		<title/>
+	</data>
+	<data type="taskRef">
+		<id>current_filter_preview</id>
+		<title/>
+	</data>
+	<data type="i18n">
+		<id>divider</id>
+		<title>Current filter</title>
+		<init>Current filter</init>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="enumeration_map">
+		<id>filter_autocomplete_selection</id>
+		<title name="select_menu_item_filter">Select new filter</title>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<action trigger="set">
+			trans: t.view_settings,
+			filterAutocomplete: f.this,
+			filter_case: f.filter_case,
+			update_filter: f.update_filter,
+			previewTaskRef: f.selected_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+		</action>
+		<action trigger="get">
+			trans: t.view_settings,
+			filterAutocomplete: f.this,
+			filter_case: f.filter_case,
+			update_filter: f.update_filter,
+			previewTaskRef: f.selected_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+		</action>
+	</data>
+	<data type="button">
+		<id>update_filter</id>
+		<title/>
+		<placeholder name="update_filter">Update view with selected filter</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			trans: t.view_settings,
+			update_filter: f.update_filter,
+			filter_case: f.filter_case,
+			filterAutocomplete: f.filter_autocomplete_selection;
+
+			change filter_case value { [filterAutocomplete.value] }
+			change filterAutocomplete value { "" }
+			make update_filter,visible on trans when { true }
+		</action>
 	</data>
 	<data type="caseRef">
 		<id>filter_case</id>
 		<title/>
+		<action trigger="set">
+			filterTaskRef: f.current_filter_preview,
+			filterCaseRef: f.filter_case;
+
+			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+		</action>
 		<allowedNets>
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
-		<action trigger="set">
-			filterTaskRef: f.filter_preview,
-			filterCaseRef: f.filter_case,
-			name: f.name;
-
-			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-
-			change name value {return filterCase.dataSet["i18n_filter_name"].value}
-
-			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
-		</action>
 	</data>
 	<data type="text" immediate="true">
 		<id>menu_item_identifier</id>
@@ -357,15 +432,11 @@
 				<logic>
 					<behavior>forbidden</behavior>
 					<action trigger="set">
-						filterTaskRef: f.filter_preview,
 						filterCaseRef: f.filter_case,
 						name: f.name;
 
 						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-
 						change name value {return filterCase.dataSet["i18n_filter_name"].value}
-
-						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
 					</action>
 				</logic>
 			</dataRef>
@@ -454,27 +525,13 @@
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>filter_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>default_headers</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>2</y>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>4</cols>
 					<offset>0</offset>
@@ -489,7 +546,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>3</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -504,7 +561,7 @@
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>4</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -519,7 +576,7 @@
 				</logic>
 				<layout>
 					<x>2</x>
-					<y>4</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -534,12 +591,93 @@
 				</logic>
 				<layout>
 					<x>3</x>
-					<y>4</y>
+					<y>3</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>filter_update</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title>Filter section</title>
+			<dataRef>
+				<id>filter_autocomplete_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>update_filter</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>selected_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>current_filter</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>current_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
@@ -571,7 +709,7 @@
 		<label>General settings [referenced]</label>
 		<icon>settings</icon>
 		<dataGroup>
-			<id>roles_management</id>
+			<id>general_0</id>
 			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
@@ -660,6 +798,7 @@
 			<id>roles_management</id>
 			<cols>5</cols>
 			<layout>grid</layout>
+			<title>Roles section</title>
 			<dataRef>
 				<id>processes_available</id>
 				<logic>
