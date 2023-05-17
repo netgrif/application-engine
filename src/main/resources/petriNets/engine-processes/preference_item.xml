@@ -96,9 +96,14 @@
 		<id>move_dest_uri</id>
 		<title>Destination URI</title>
 	</data>
-	<data type="text">
+	<data type="i18n">
 		<id>duplicate_new_title</id>
 		<title>Title of duplicated view</title>
+	</data>
+	<data type="text">
+		<id>duplicate_view_identifier</id>
+		<title>View identifier</title>
+		<desc>Must be unique</desc>
 	</data>
 	<data type="enumeration_map">
 		<id>childItemIds</id>
@@ -779,6 +784,7 @@
 		<x>820</x>
 		<y>220</y>
 		<label>Move item</label>
+		<icon>move_down</icon>
 		<dataGroup>
 			<id>move</id>
 			<cols>4</cols>
@@ -787,6 +793,7 @@
 				<id>move_dest_uri</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -800,11 +807,15 @@
 		</dataGroup>
 		<event type="finish">
 			<id>finish</id>
-			<actions phase="post">
+			<actions phase="pre">
 				<action>
-					move_dest_uri: f.move_dest_uri;
+					dest: f.move_dest_uri;
 
-					changeMenuItem useCase uri { move_dest_uri.value }
+					if (dest.value == "") {
+						throw new IllegalArgumentException("URI must not be empty!")
+					}
+
+					changeMenuItem useCase uri { dest.value }
 				</action>
 			</actions>
 			<title>Move</title>
@@ -816,6 +827,7 @@
 		<x>620</x>
 		<y>460</y>
 		<label>Duplicate item</label>
+		<icon>content_copy</icon>
 		<dataGroup>
 			<id>duplicate</id>
 			<cols>4</cols>
@@ -824,6 +836,7 @@
 				<id>duplicate_new_title</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -834,14 +847,30 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>duplicate_view_identifier</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>finish</id>
-			<actions phase="post">
+			<actions phase="pre">
 				<action>
-					duplicate_new_title: f.duplicate_new_title;
+					identifier: f.duplicate_view_identifier,
+					title: f.duplicate_new_title;
 
-					duplicateViewItem(useCase, duplicate_new_title.value)
+					duplicateViewItem(useCase, title.value, identifier.value)
 				</action>
 			</actions>
 			<title>Duplicate</title>

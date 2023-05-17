@@ -96,7 +96,9 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_NAME = "name"
     private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
     private static final String PREFERENCE_ITEM_FIELD_NODE_NAME = "nodeName"
-    private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks"
+    private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE= "duplicate_new_title"
+    private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER = "duplicate_view_identifier"
+    private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks" // todo doesnt exist anymore
 
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
@@ -1905,9 +1907,39 @@ class ActionDelegate {
         }
     }
 
-    Case duplicateViewItem(Case originViewItem, String newTitle) {
-        // todo implement
-        return null
+    Case duplicateViewItem(Case originViewItem, I18nString newTitle, String newIdentifier = null) {
+        if (!newIdentifier) {
+            throw new IllegalArgumentException("View item identifier is null!")
+        }
+        if (findMenuItem(newIdentifier)) {
+            throw new IllegalArgumentException("View item identifier $newIdentifier is not unique!")
+        }
+        if (newTitle == null || newTitle.defaultValue == "") {
+            throw new IllegalArgumentException("Default title is empty")
+        }
+
+        originViewItem = workflowService.populateUriNodeId(originViewItem)
+
+        Case duplicated = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newTitle.defaultValue)
+        duplicated.uriNodeId = originViewItem.uriNodeId
+        duplicated.dataSet = originViewItem.dataSet
+        duplicated.dataSet[PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE].value = null
+        duplicated.dataSet[PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER].value = null
+        duplicated.title = newTitle.defaultValue
+        duplicated.dataSet[PREFERENCE_ITEM_FIELD_NAME].value = newTitle
+        duplicated.dataSet[PREFERENCE_ITEM_FIELD_IDENTIFIER].value = newIdentifier
+        duplicated = workflowService.save(duplicated)
+
+        Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == "initialize" }.task)) }
+        assignTask(newItemTask)
+        finishTask(newItemTask)
+
+        String parentId = originViewItem.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
+        if (parentId) {
+            Case parent = workflowService.findOne(parentId)
+            appendChildCaseIdAndSave(parent, duplicated.stringId)
+        }
+        return workflowService.findOne(duplicated.stringId)
     }
 
     private List<Case> updateNodeInChildrenFoldersRecursive(Case parentFolder) {
