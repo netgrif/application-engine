@@ -1923,15 +1923,30 @@ class ActionDelegate {
         Case duplicated = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, newTitle.defaultValue)
         duplicated.uriNodeId = originViewItem.uriNodeId
         duplicated.dataSet = originViewItem.dataSet
-        duplicated.dataSet[PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE].value = null
-        duplicated.dataSet[PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER].value = null
         duplicated.title = newTitle.defaultValue
-        duplicated.dataSet[PREFERENCE_ITEM_FIELD_NAME].value = newTitle
-        duplicated.dataSet[PREFERENCE_ITEM_FIELD_IDENTIFIER].value = newIdentifier
         duplicated = workflowService.save(duplicated)
 
         Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == "initialize" }.task)) }
+        Map updatedDataSet = [
+                (PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE): [
+                        "value": null,
+                        "type": "text"
+                ],
+                (PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER): [
+                        "value": null,
+                        "type": "text"
+                ],
+                (PREFERENCE_ITEM_FIELD_NAME): [
+                        "value": newTitle,
+                        "type": "i18n"
+                ],
+                (PREFERENCE_ITEM_FIELD_IDENTIFIER): [
+                        "value": newIdentifier,
+                        "type": "text"
+                ],
+        ]
         assignTask(newItemTask)
+        dataService.setData(newItemTask, ImportHelper.populateDataset(updatedDataSet))
         finishTask(newItemTask)
 
         String parentId = originViewItem.dataSet[PREFERENCE_ITEM_FIELD_PARENT_ID].value
