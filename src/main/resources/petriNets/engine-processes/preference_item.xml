@@ -70,7 +70,7 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>type</id>
-		<title>Instance type</title>
+		<title name="type">Instance type</title>
 		<options>
 			<option key="folder">Folder</option>
 			<option key="view">View</option>
@@ -78,7 +78,8 @@
 	</data>
 	<data type="text">
 		<id>icon</id>
-		<title>Icon</title>
+		<title name="icon_identifier">Icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
 		<action trigger="set">
 			icon: f.this,
 			iconPreview: f.icon_preview;
@@ -102,15 +103,15 @@
 	</data>
 	<data type="text">
 		<id>icon_preview</id>
-		<title>Menu icon preview</title>
+		<title name="icon_preview">Icon preview</title>
 		<component>
 			<name>htmltextarea</name>
 		</component>
 	</data>
 	<data type="i18n">
 		<id>name</id>
-		<title>Name of the item</title>
-		<desc>Will be shown in the menu</desc>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Will be shown in the menu</desc>
 	</data>
 	<data type="text">
 		<id>parentId</id>
@@ -118,16 +119,16 @@
 	</data>
 	<data type="text">
 		<id>move_dest_uri</id>
-		<title>Destination URI</title>
+		<title name="move_dest_uri">Destination URI</title>
 	</data>
 	<data type="i18n">
 		<id>duplicate_new_title</id>
-		<title>Title of duplicated view</title>
+		<title name="duplicate_new_title">Title of duplicated view</title>
 	</data>
 	<data type="text">
 		<id>duplicate_view_identifier</id>
-		<title>View identifier</title>
-		<desc>Must be unique</desc>
+		<title name="duplicate_view_identifier">View identifier</title>
+		<desc name="duplicate_view_identifier_desc">Must be unique</desc>
 	</data>
 	<data type="enumeration_map">
 		<id>childItemIds</id>
@@ -254,15 +255,16 @@
 	</data>
 	<data type="i18n">
 		<id>divider</id>
-		<title>Current filter</title>
+		<title/>
 		<init>Current filter</init>
+<!--		todo with translations, maybe get action-->
 		<component>
 			<name>divider</name>
 		</component>
 	</data>
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
-		<title name="select_menu_item_filter">Select new filter</title>
+		<title name="filter_autocomplete_selection">Select new filter</title>
 		<component>
 			<name>autocomplete_dynamic</name>
 		</component>
@@ -387,6 +389,78 @@
 		<id>nodeName</id>
 		<title/>
 	</data>
+
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="menu_item_title">Názov položky menu</i18nString>
+		<i18nString name="display_icon">Zobrazovať ikonu?</i18nString>
+		<i18nString name="icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
+		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="allow_roles">Pridaj k povoleným roliam</i18nString>
+		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
+		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
+		<i18nString name="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
+		<i18nString name="processes_available">Vaše procesy</i18nString>
+		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
+		<i18nString name="roles_available">Dostupné roly</i18nString>
+		<i18nString name="allowed_roles">Povolené roly</i18nString>
+		<i18nString name="banned_roles">Zakázané roly</i18nString>
+		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
+		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
+		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
+		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
+		<i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
+		<i18nString name="type">todo</i18nString>
+		<i18nString name="folder">todo</i18nString>
+		<i18nString name="view">todo</i18nString>
+		<i18nString name="name">todo</i18nString>
+		<i18nString name="name_desc">todo</i18nString>
+		<i18nString name="move_dest_uri">todo</i18nString>
+		<i18nString name="duplicate_new_title">todo</i18nString>
+		<i18nString name="duplicate_view_identifier">todo</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">todo</i18nString>
+		<i18nString name="update_filter">todo</i18nString>
+		<i18nString name="search_type">todo</i18nString>
+		<i18nString name="hidden">todo</i18nString>
+		<i18nString name="fulltext">todo</i18nString>
+		<i18nString name="fulltext_advanced">todo</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
+		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
+		<i18nString name="icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="icon_identifier">Ikone ID</i18nString>
+		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="allow_roles">Zu zulässigen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
+		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
+		<i18nString name="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
+		<i18nString name="processes_available">Ihre Prozesse</i18nString>
+		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
+		<i18nString name="roles_available">Verfügbare Rollen</i18nString>
+		<i18nString name="allowed_roles">Zulässige Rollen</i18nString>
+		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
+		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
+		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
+		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
+		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+		<i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
+		<i18nString name="type">todo</i18nString>
+		<i18nString name="folder">todo</i18nString>
+		<i18nString name="view">todo</i18nString>
+		<i18nString name="name">todo</i18nString>
+		<i18nString name="name_desc">todo</i18nString>
+		<i18nString name="move_dest_uri">todo</i18nString>
+		<i18nString name="duplicate_new_title">todo</i18nString>
+		<i18nString name="duplicate_view_identifier">todo</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">todo</i18nString>
+		<i18nString name="update_filter">todo</i18nString>
+		<i18nString name="search_type">todo</i18nString>
+		<i18nString name="hidden">todo</i18nString>
+		<i18nString name="fulltext">todo</i18nString>
+		<i18nString name="fulltext_advanced">todo</i18nString>
+	</i18n>
 
 	<!-- TRANSITIONS -->
 	<transition>
