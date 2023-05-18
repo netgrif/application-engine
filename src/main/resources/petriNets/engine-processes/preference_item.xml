@@ -16,6 +16,10 @@
 			</actions>
 		</event>
 	</caseEvents>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
 	<function scope="process" name="removeItemChildCases">
 		{ com.netgrif.application.engine.workflow.domain.Case useCase ->
 
@@ -108,7 +112,7 @@
 			<name>htmltextarea</name>
 		</component>
 	</data>
-	<data type="i18n">
+	<data type="i18n" immediate="true">
 		<id>name</id>
 		<title name="name">Name of the item</title>
 		<desc name="name_desc">Will be shown in the menu</desc>
@@ -261,6 +265,10 @@
 		<component>
 			<name>divider</name>
 		</component>
+	</data>
+	<data type="text">
+		<id>new_filter_id</id>
+		<title/>
 	</data>
 	<data type="enumeration_map">
 		<id>filter_autocomplete_selection</id>
@@ -798,6 +806,12 @@
 		<y>340</y>
 		<label>General settings [referenced]</label>
 		<icon>settings</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>general_0</id>
 			<cols>5</cols>
@@ -884,6 +898,12 @@
 		<y>100</y>
 		<label>Permission settings [referenced]</label>
 		<icon>accessibility</icon>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>roles_management</id>
 			<cols>5</cols>
@@ -1106,6 +1126,40 @@
 		</event>
 	</transition>
 
+	<transition>
+		<id>change_filter</id>
+		<x>460</x>
+		<y>460</y>
+		<label>[Change filter]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataRef>
+			<id>new_filter_id</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<event type="set">
+				<id>set_event_0</id>
+				<actions phase="post">
+					<action>
+						new_filter_id: f.new_filter_id,
+						filterTaskRef: f.current_filter_preview,
+						filterCaseRef: f.filter_case;
+
+						change filterCaseRef value { [new_filter_id.value] }
+						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+						change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+					</action>
+				</actions>
+			</event>
+		</dataRef>
+	</transition>
+
 	<!-- PLACES-->
 	<place>
 		<id>uninitialized</id>
@@ -1197,6 +1251,13 @@
 		<type>read</type>
 		<sourceId>is_filter</sourceId>
 		<destinationId>duplicate_item</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>read</type>
+		<sourceId>is_filter</sourceId>
+		<destinationId>change_filter</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>

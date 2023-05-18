@@ -98,7 +98,6 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_NODE_NAME = "nodeName"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE= "duplicate_new_title"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_IDENTIFIER = "duplicate_view_identifier"
-    private static final String ORG_GROUP_FIELD_FILTER_TASKS = "filter_tasks" // todo doesnt exist anymore
 
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
@@ -1380,7 +1379,7 @@ class ActionDelegate {
     }
 
     def getUri(String uri) {
-        return uriService.findByUri(uri);
+        return uriService.findByUri(uri)
     }
 
     def createUri(String uri, UriContentType type) {
@@ -1665,7 +1664,7 @@ class ActionDelegate {
          },
          filter        : { cl ->
              def filter = cl() as Case
-             setData("view_settings", item, [
+             setData("change_filter", item, [
                      (PREFERENCE_ITEM_FIELD_NEW_FILTER_ID): ["type": "text", "value": filter.stringId]
              ])
          },
@@ -2073,7 +2072,8 @@ class ActionDelegate {
      * @return
      */
     Case findMenuItem(String uri, String name) {
-        return findMenuItemInGroup(uri, name, null)
+        UriNode uriNode = uriService.findByUri(uri)
+        return findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"")
     }
 
     /**
@@ -2083,9 +2083,9 @@ class ActionDelegate {
      * @param groupName
      * @return
      */
+    @Deprecated
     Case findMenuItem(String uri, String name, String groupName) {
-        Case orgGroup = nextGroupService.findByName(groupName)
-        return findMenuItemInGroup(uri, name, orgGroup)
+        return findMenuItem(uri, name)
     }
 
     /**
@@ -2095,8 +2095,9 @@ class ActionDelegate {
      * @param orgGroup
      * @return
      */
+    @Deprecated
     Case findMenuItemInGroup(String uri, String name, Case orgGroup) {
-        return findMenuItemByUriNameProcessAndGroup(uri, name, orgGroup)
+        return findMenuItem(uri, name)
     }
 
     /**
@@ -2130,18 +2131,9 @@ class ActionDelegate {
         return result
     }
 
+    @Deprecated
     private Case findMenuItemByUriNameProcessAndGroup(String uri, String name, Case orgGroup) {
-        UriNode uriNode = uriService.findByUri(uri)
-        if (!orgGroup) {
-            return uriNode ? findCaseElastic("processIdentifier:\"$FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER\" AND title.keyword:\"$name\" AND uriNodeId:\"$uriNode.id\"") : null
-        }
-        List<String> taskIds = (orgGroup.dataSet[ORG_GROUP_FIELD_FILTER_TASKS].value ?: []) as List
-        if (!taskIds) {
-            return null
-        }
-        List<Task> tasks = taskService.findAllById(taskIds)
-        List<Case> preferenceItemsOfGroup = workflowService.findAllById(tasks.collect { it.stringId })
-        return preferenceItemsOfGroup.find { it.title == name && it.uriNodeId == uriNode.id }
+        return findMenuItem(uri, name)
     }
 
     private Map<String, I18nString> collectRolesForPreferenceItem(List<ProcessRole> roles) {
