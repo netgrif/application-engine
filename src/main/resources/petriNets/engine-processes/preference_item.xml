@@ -425,6 +425,14 @@
 		<i18nString name="hidden">todo</i18nString>
 		<i18nString name="fulltext">todo</i18nString>
 		<i18nString name="fulltext_advanced">todo</i18nString>
+		<i18nString name="folder_settings">todo</i18nString>
+		<i18nString name="view_settings">todo</i18nString>
+		<i18nString name="filter_update_title">todo</i18nString>
+		<i18nString name="roles_management_title">todo</i18nString>
+		<i18nString name="move_item">todo</i18nString>
+		<i18nString name="move_item_finish">todo</i18nString>
+		<i18nString name="duplicate_item">todo</i18nString>
+		<i18nString name="duplicate_item_finish">todo</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
@@ -460,6 +468,14 @@
 		<i18nString name="hidden">todo</i18nString>
 		<i18nString name="fulltext">todo</i18nString>
 		<i18nString name="fulltext_advanced">todo</i18nString>
+		<i18nString name="folder_settings">todo</i18nString>
+		<i18nString name="view_settings">todo</i18nString>
+		<i18nString name="filter_update_title">todo</i18nString>
+		<i18nString name="roles_management_title">todo</i18nString>
+		<i18nString name="move_item">todo</i18nString>
+		<i18nString name="move_item_finish">todo</i18nString>
+		<i18nString name="duplicate_item">todo</i18nString>
+		<i18nString name="duplicate_item_finish">todo</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -521,7 +537,7 @@
 		<id>folder_settings</id>
 		<x>620</x>
 		<y>100</y>
-		<label>Folder settings</label>
+		<label name="folder_settings">Folder settings</label>
 		<icon>settings</icon>
 		<dataGroup>
 			<id>general</id>
@@ -573,7 +589,7 @@
 		<id>view_settings</id>
 		<x>620</x>
 		<y>340</y>
-		<label>View settings</label>
+		<label name="view_settings">View settings</label>
 		<icon>settings</icon>
 		<dataGroup>
 			<id>general</id>
@@ -678,7 +694,7 @@
 			<id>filter_update</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-			<title>Filter section</title>
+			<title name="filter_update_title">Filter section</title>
 			<dataRef>
 				<id>filter_autocomplete_selection</id>
 				<logic>
@@ -872,7 +888,7 @@
 			<id>roles_management</id>
 			<cols>5</cols>
 			<layout>grid</layout>
-			<title>Roles section</title>
+			<title name="roles_management_title">Roles section</title>
 			<dataRef>
 				<id>processes_available</id>
 				<logic>
@@ -996,7 +1012,7 @@
 		<id>move_item</id>
 		<x>820</x>
 		<y>220</y>
-		<label>Move item</label>
+		<label name="move_item">Move item</label>
 		<icon>move_down</icon>
 		<dataGroup>
 			<id>move</id>
@@ -1031,7 +1047,7 @@
 					changeMenuItem useCase uri { dest.value }
 				</action>
 			</actions>
-			<title>Move</title>
+			<title name="move_item_finish">Move</title>
 		</event>
 	</transition>
 
@@ -1039,7 +1055,7 @@
 		<id>duplicate_item</id>
 		<x>620</x>
 		<y>460</y>
-		<label>Duplicate item</label>
+		<label name="duplicate_item">Duplicate item</label>
 		<icon>content_copy</icon>
 		<dataGroup>
 			<id>duplicate</id>
@@ -1086,7 +1102,7 @@
 					duplicateViewItem(useCase, title.value, identifier.value)
 				</action>
 			</actions>
-			<title>Duplicate</title>
+			<title name="duplicate_item_finish">Duplicate</title>
 		</event>
 	</transition>
 
