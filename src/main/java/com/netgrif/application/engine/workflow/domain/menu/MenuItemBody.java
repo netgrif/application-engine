@@ -12,17 +12,18 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ViewItemBody extends ItemBody {
+public class MenuItemBody {
+    private I18nString name;
+    private String icon;
     private String uri;
     private String identifier;
     private Case filter;
     private List<String> defaultHeaders;
+    private Map<String, I18nString> allowedRoles;
+    private Map<String, I18nString> bannedRoles;
 
-    public ViewItemBody(String uri, String identifier, Case filter, List<String> defaultHeaders, Map<String, I18nString> allowedRoles, Map<String, I18nString> bannedRoles) {
-        super(allowedRoles, bannedRoles);
-        this.uri = uri;
-        this.identifier = identifier;
-        this.filter = filter;
-        this.defaultHeaders = defaultHeaders;
+    public MenuItemBody(I18nString name, String icon) {
+        this.name = name;
+        this.icon = icon;
     }
 }

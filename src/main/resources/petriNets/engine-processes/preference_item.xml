@@ -28,6 +28,8 @@
 				return
 			}
 
+			removeChildItemFromParent(useCase.dataSet['parentId'].value, useCase)
+
 			def childCases = workflowService.findAllById(childCaseIds)
 			async.run {
 				childCases.each {
@@ -61,26 +63,7 @@
 		}
 	</function>
 
-	<!-- GENERAL DATA-->
-	<data type="number">
-		<id>to_is_folder</id>
-		<title>to [is_folder]</title>
-		<init>1</init>
-	</data>
-	<data type="number">
-		<id>to_is_filter</id>
-		<title>to [is_filter]</title>
-		<init>0</init>
-	</data>
-	<data type="enumeration_map" immediate="true">
-		<id>type</id>
-		<title name="type">Instance type</title>
-		<options>
-			<option key="folder">Folder</option>
-			<option key="view">View</option>
-		</options>
-	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>icon</id>
 		<title name="icon_identifier">Icon identifier</title>
 		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
@@ -138,15 +121,20 @@
 		<id>childItemIds</id>
 		<title/>
 	</data>
-	<data type="taskRef">
-		<id>permission_settings_taskRef</id>
+	<data type="boolean" immediate="true">
+		<id>hasChildren</id>
 		<title/>
-		<init>permission_settings</init>
 	</data>
-	<data type="taskRef">
-		<id>general_settings_taskRef</id>
+	<data type="button">
+		<id>duplicate_reset_childItemIds</id>
 		<title/>
-		<init>general_settings</init>
+		<action trigger="set">
+			hasChildren: f.hasChildren,
+			childItemIds: f.childItemIds;
+
+			change childItemIds options { [:] }
+			change hasChildren value { false }
+		</action>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
@@ -247,8 +235,6 @@
 		<title name="roles_banned">Banned roles</title>
 		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
 	</data>
-
-	<!-- DATA FOR VIEW-->
 	<data type="taskRef">
 		<id>selected_filter_preview</id>
 		<title/>
@@ -277,7 +263,7 @@
 			<name>autocomplete_dynamic</name>
 		</component>
 		<action trigger="set">
-			trans: t.view_settings,
+			trans: t.item_settings,
 			filterAutocomplete: f.this,
 			filter_case: f.filter_case,
 			update_filter: f.update_filter,
@@ -286,7 +272,7 @@
 			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
 		</action>
 		<action trigger="get">
-			trans: t.view_settings,
+			trans: t.item_settings,
 			filterAutocomplete: f.this,
 			filter_case: f.filter_case,
 			update_filter: f.update_filter,
@@ -303,7 +289,7 @@
 			<name>raised</name>
 		</component>
 		<action trigger="set">
-			trans: t.view_settings,
+			trans: t.item_settings,
 			update_filter: f.update_filter,
 			filter_case: f.filter_case,
 			filterAutocomplete: f.filter_autocomplete_selection;
@@ -373,8 +359,6 @@
 			}
 		</action>
 	</data>
-
-	<!-- DATA FOR FOLDER-->
 	<data type="text" immediate="true">
 		<id>nodePath</id>
 		<title/>
@@ -383,9 +367,9 @@
 			<actions phase="post">
 				<action>
 					nodePath: f.nodePath,
-					nodeName: f.nodeName;
+					menu_item_identifier: f.menu_item_identifier;
 
-					change nodeName value {
+					change menu_item_identifier value {
 						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
 						return nodePath.value.substring(idx + 1)
 					}
@@ -393,14 +377,9 @@
 			</actions>
 		</event>
 	</data>
-	<data type="text">
-		<id>nodeName</id>
-		<title/>
-	</data>
 
 	<!-- I18NS -->
 	<i18n locale="sk">
-		<i18nString name="menu_item_title">Názov položky menu</i18nString>
 		<i18nString name="display_icon">Zobrazovať ikonu?</i18nString>
 		<i18nString name="icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
@@ -419,9 +398,6 @@
 		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
 		<i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
-		<i18nString name="type">todo</i18nString>
-		<i18nString name="folder">todo</i18nString>
-		<i18nString name="view">todo</i18nString>
 		<i18nString name="name">todo</i18nString>
 		<i18nString name="name_desc">todo</i18nString>
 		<i18nString name="move_dest_uri">todo</i18nString>
@@ -433,8 +409,7 @@
 		<i18nString name="hidden">todo</i18nString>
 		<i18nString name="fulltext">todo</i18nString>
 		<i18nString name="fulltext_advanced">todo</i18nString>
-		<i18nString name="folder_settings">todo</i18nString>
-		<i18nString name="view_settings">todo</i18nString>
+		<i18nString name="item_settings">todo</i18nString>
 		<i18nString name="filter_update_title">todo</i18nString>
 		<i18nString name="roles_management_title">todo</i18nString>
 		<i18nString name="move_item">todo</i18nString>
@@ -443,7 +418,6 @@
 		<i18nString name="duplicate_item_finish">todo</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="menu_item_title">Menüpunkttitel</i18nString>
 		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="icon_identifier">Ikone ID</i18nString>
@@ -462,9 +436,6 @@
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 		<i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
-		<i18nString name="type">todo</i18nString>
-		<i18nString name="folder">todo</i18nString>
-		<i18nString name="view">todo</i18nString>
 		<i18nString name="name">todo</i18nString>
 		<i18nString name="name_desc">todo</i18nString>
 		<i18nString name="move_dest_uri">todo</i18nString>
@@ -476,8 +447,7 @@
 		<i18nString name="hidden">todo</i18nString>
 		<i18nString name="fulltext">todo</i18nString>
 		<i18nString name="fulltext_advanced">todo</i18nString>
-		<i18nString name="folder_settings">todo</i18nString>
-		<i18nString name="view_settings">todo</i18nString>
+		<i18nString name="item_settings">todo</i18nString>
 		<i18nString name="filter_update_title">todo</i18nString>
 		<i18nString name="roles_management_title">todo</i18nString>
 		<i18nString name="move_item">todo</i18nString>
@@ -493,36 +463,6 @@
 		<y>220</y>
 		<label>initialize [await sync]</label>
 		<icon>hourglass_empty</icon>
-		<dataGroup>
-			<id>generic</id>
-			<dataRef>
-				<id>type</id>
-				<logic>
-					<behavior>forbidden</behavior>
-					<action trigger="set">
-						to_is_folder: f.to_is_folder,
-						to_is_filter: f.to_is_filter,
-						icon: f.icon,
-						type: f.type;
-
-						def selected = type.value as String
-						if (selected == "folder") {
-							change to_is_folder value { 1.0 }
-							change to_is_filter value { 0.0 }
-							change icon value { "folder" }
-						} else if (selected == "view") {
-							change to_is_folder value { 0.0 }
-							change to_is_filter value { 1.0 }
-							change icon value { "filter_alt" }
-						}
-					</action>
-				</logic>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>folder</id>
-
-		</dataGroup>
 		<dataGroup>
 			<id>view</id>
 			<dataRef>
@@ -542,17 +482,17 @@
 	</transition>
 
 	<transition>
-		<id>folder_settings</id>
-		<x>620</x>
+		<id>item_settings</id>
+		<x>460</x>
 		<y>100</y>
-		<label name="folder_settings">Folder settings</label>
+		<label name="item_settings">Item settings</label>
 		<icon>settings</icon>
 		<dataGroup>
-			<id>general</id>
+			<id>general_0</id>
 			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>general_settings_taskRef</id>
+				<id>name</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -560,66 +500,73 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>5</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>folder_settings_0</id>
-			<cols>5</cols>
-			<layout>grid</layout>
+			<dataRef>
+				<id>use_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.icon_preview,
+							icon: f.icon,
+							useIcon: f.use_icon;
 
-		</dataGroup>
-		<dataGroup>
-			<id>roles</id>
-			<cols>5</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>permission_settings_taskRef</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>5</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
+							make iconPreview,visible on trans when { useIcon.value }
+							make icon,editable on trans when { useIcon.value }
 
-	<transition>
-		<id>view_settings</id>
-		<x>620</x>
-		<y>340</y>
-		<label name="view_settings">View settings</label>
-		<icon>settings</icon>
-		<dataGroup>
-			<id>general</id>
-			<cols>5</cols>
-			<layout>grid</layout>
+							make iconPreview,hidden on trans when { !useIcon.value }
+							make icon,hidden on trans when { !useIcon.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
 			<dataRef>
-				<id>general_settings_taskRef</id>
+				<id>icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>0</x>
+					<x>3</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>5</cols>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
 		<dataGroup>
-			<id>view_settings_0</id>
+			<id>item_settings_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
@@ -780,131 +727,6 @@
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
-			<id>roles</id>
-			<cols>5</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>permission_settings_taskRef</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>5</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-
-	<transition>
-		<id>general_settings</id>
-		<x>220</x>
-		<y>340</y>
-		<label>General settings [referenced]</label>
-		<icon>settings</icon>
-		<roleRef>
-			<id>system</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<dataGroup>
-			<id>general_0</id>
-			<cols>5</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>name</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>use_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							iconPreview: f.icon_preview,
-							icon: f.icon,
-							useIcon: f.use_icon;
-
-							make iconPreview,visible on trans when { useIcon.value }
-							make icon,editable on trans when { useIcon.value }
-
-							make iconPreview,hidden on trans when { !useIcon.value }
-							make icon,hidden on trans when { !useIcon.value }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>icon_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>4</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-
-	<transition>
-		<id>permission_settings</id>
-		<x>220</x>
-		<y>100</y>
-		<label>Permission settings [referenced]</label>
-		<icon>accessibility</icon>
-		<roleRef>
-			<id>system</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<dataGroup>
 			<id>roles_management</id>
 			<cols>5</cols>
 			<layout>grid</layout>
@@ -1030,8 +852,8 @@
 
 	<transition>
 		<id>move_item</id>
-		<x>820</x>
-		<y>220</y>
+		<x>580</x>
+		<y>140</y>
 		<label name="move_item">Move item</label>
 		<icon>move_down</icon>
 		<dataGroup>
@@ -1073,8 +895,8 @@
 
 	<transition>
 		<id>duplicate_item</id>
-		<x>620</x>
-		<y>460</y>
+		<x>580</x>
+		<y>300</y>
 		<label name="duplicate_item">Duplicate item</label>
 		<icon>content_copy</icon>
 		<dataGroup>
@@ -1119,7 +941,7 @@
 					identifier: f.duplicate_view_identifier,
 					title: f.duplicate_new_title;
 
-					duplicateViewItem(useCase, title.value, identifier.value)
+					duplicateMenuItem(useCase, title.value, identifier.value)
 				</action>
 			</actions>
 			<title name="duplicate_item_finish">Duplicate</title>
@@ -1129,7 +951,7 @@
 	<transition>
 		<id>change_filter</id>
 		<x>460</x>
-		<y>460</y>
+		<y>340</y>
 		<label>[Change filter]</label>
 		<roleRef>
 			<id>system</id>
@@ -1170,26 +992,10 @@
 		<static>false</static>
 	</place>
 	<place>
-		<id>is_folder</id>
+		<id>initialized</id>
 		<x>460</x>
-		<y>100</y>
-		<label>is_folder</label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>is_filter</id>
-		<x>460</x>
-		<y>340</y>
-		<label>is_filter</label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>general</id>
-		<x>620</x>
 		<y>220</y>
-		<label>general</label>
+		<label>initialized</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1203,60 +1009,37 @@
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
-		<id>a2</id>
-		<type>regular</type>
-		<sourceId>initialize</sourceId>
-		<destinationId>is_folder</destinationId>
-		<multiplicity>1</multiplicity>
-		<reference>to_is_folder</reference>
-	</arc>
-	<arc>
-		<id>a3</id>
-		<type>regular</type>
-		<sourceId>initialize</sourceId>
-		<destinationId>is_filter</destinationId>
-		<multiplicity>0</multiplicity>
-		<reference>to_is_filter</reference>
-	</arc>
-	<arc>
-		<id>a6</id>
-		<type>read</type>
-		<sourceId>is_folder</sourceId>
-		<destinationId>folder_settings</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
 		<id>a7</id>
 		<type>read</type>
-		<sourceId>is_filter</sourceId>
-		<destinationId>view_settings</destinationId>
+		<sourceId>initialized</sourceId>
+		<destinationId>item_settings</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a8</id>
 		<type>regular</type>
 		<sourceId>initialize</sourceId>
-		<destinationId>general</destinationId>
+		<destinationId>initialized</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a9</id>
 		<type>read</type>
-		<sourceId>general</sourceId>
+		<sourceId>initialized</sourceId>
 		<destinationId>move_item</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a10</id>
 		<type>read</type>
-		<sourceId>is_filter</sourceId>
+		<sourceId>initialized</sourceId>
 		<destinationId>duplicate_item</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>a12</id>
 		<type>read</type>
-		<sourceId>is_filter</sourceId>
+		<sourceId>initialized</sourceId>
 		<destinationId>change_filter</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
