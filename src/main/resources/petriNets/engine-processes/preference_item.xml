@@ -322,13 +322,24 @@
 		<title name="default_headers">Set default headers</title>
 	</data>
 	<data type="enumeration_map" immediate="true">
-		<id>search_type</id>
-		<title name="search_type">Search type</title>
+		<id>case_view_search_type</id>
+		<title name="case_view_search_type">case Search type</title>
 		<options>
 			<option key="hidden">Hidden</option>
 			<option key="fulltext">Fulltext</option>
 			<option key="fulltext_advanced">Fulltext and advanced</option>
 		</options>
+		<init>fulltext_advanced</init>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>task_view_search_type</id>
+		<title name="task_view_search_type">task Search type</title>
+		<options>
+			<option key="hidden">Hidden</option>
+			<option key="fulltext">Fulltext</option>
+			<option key="fulltext_advanced">Fulltext and advanced</option>
+		</options>
+		<init>fulltext_advanced</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>create_case_button_title</id>
@@ -376,6 +387,11 @@
 				</action>
 			</actions>
 		</event>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>show_item_advanced</id>
+		<title name="show_item_advanced">Show advanced options for item</title>
+		<init>true</init>
 	</data>
 
 	<!-- I18NS -->
@@ -585,12 +601,42 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>search_type</id>
+				<id>case_view_search_type</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_view_search_type</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>show_item_advanced</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
 					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
