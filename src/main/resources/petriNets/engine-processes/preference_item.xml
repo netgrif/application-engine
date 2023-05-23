@@ -44,7 +44,8 @@
 			com.netgrif.application.engine.petrinet.domain.dataset.TaskField previewTaskRef,
 			com.netgrif.application.engine.petrinet.domain.dataset.CaseField selectedFilterRef,
 			com.netgrif.application.engine.petrinet.domain.dataset.ButtonField updateBtn,
-			com.netgrif.application.engine.petrinet.domain.Transition trans
+			com.netgrif.application.engine.petrinet.domain.Transition trans,
+			boolean taskTypeOnly
 			->
 			if (filterAutocomplete.getOptions().containsKey(filterAutocomplete.value)) {
 				change previewTaskRef value {
@@ -53,9 +54,18 @@
 				make updateBtn,editable on trans when { true }
 			} else {
 				change filterAutocomplete options {
-				return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
-						.findAll({filterCase -&gt; !selectedFilterRef.value.contains(filterCase.stringId)})
-						.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
+					def findAllPredicate
+					if (taskTypeOnly) {
+						findAllPredicate = { filterCase ->
+							!selectedFilterRef.value.contains(filterCase.stringId) &amp;&amp;
+							filterCase.dataSet["filter_type"].value == "Task"
+						}
+					} else {
+						findAllPredicate = { filterCase -> !selectedFilterRef.value.contains(filterCase.stringId) }
+					}
+					return findFilters(filterAutocomplete.value != null ? filterAutocomplete.value : "")
+							.findAll(findAllPredicate)
+							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
 				}
 				change previewTaskRef value { [] }
 				make updateBtn,visible on trans when { true }
@@ -243,8 +253,16 @@
 		<id>current_filter_preview</id>
 		<title/>
 	</data>
+	<data type="taskRef">
+		<id>selected_additional_filter_preview</id>
+		<title/>
+	</data>
+	<data type="taskRef">
+		<id>current_additional_filter_preview</id>
+		<title/>
+	</data>
 	<data type="i18n">
-		<id>divider</id>
+		<id>filter_header</id>
 		<title/>
 		<init>Current filter</init>
 <!--		todo with translations, maybe get action-->
@@ -269,7 +287,7 @@
 			update_filter: f.update_filter,
 			previewTaskRef: f.selected_filter_preview;
 
-			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
 		</action>
 		<action trigger="get">
 			trans: t.item_settings,
@@ -278,7 +296,7 @@
 			update_filter: f.update_filter,
 			previewTaskRef: f.selected_filter_preview;
 
-			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans)
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
 		</action>
 	</data>
 	<data type="button">
@@ -303,15 +321,124 @@
 		<id>filter_case</id>
 		<title/>
 		<action trigger="set">
+			additionalFilterCase: f.additional_filter_case,
+			additionalAutocomplete: f.additional_filter_autocomplete_selection,
+			additionalUpdate: f.update_additional_filter,
+			additionalFilterPreview: f.selected_additional_filter_preview,
+			mergeFilters: f.merge_filters,
+			filterHeader: f.filter_header,
+			currentAdditionalFilterPreview: f.current_additional_filter_preview,
+			taskSettingsTrans: t.task_view_settings,
+			settingsTrans: t.item_settings,
+			caseViewHeader: f.case_view_header,
+			caseViewSettingsTaskRef: f.case_view_settings_taskRef,
+			taskViewHeader: f.task_view_header,
+			taskViewSettingsTaskRef: f.task_view_settings_taskRef,
 			filterTaskRef: f.current_filter_preview,
 			filterCaseRef: f.filter_case;
 
 			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
 			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+
+			if (filterCase.dataSet["filter_type"].value == "Case") {
+				make caseViewHeader,editable on settingsTrans when { true }
+				make caseViewSettingsTaskRef,editable on settingsTrans when { true }
+
+				make additionalAutocomplete,editable on taskSettingsTrans when { true }
+				make additionalUpdate,visible on taskSettingsTrans when { true }
+				make additionalFilterPreview,visible on taskSettingsTrans when { true }
+				make mergeFilters,visible on taskSettingsTrans when { true }
+				make filterHeader,visible on taskSettingsTrans when { true }
+				make currentAdditionalFilterPreview,visible on taskSettingsTrans when { true }
+			} else {
+				make caseViewHeader,hidden on settingsTrans when { true }
+				make caseViewSettingsTaskRef,hidden on settingsTrans when { true }
+
+				make additionalAutocomplete,hidden on taskSettingsTrans when { true }
+				make additionalUpdate,hidden on taskSettingsTrans when { true }
+				make additionalFilterPreview,hidden on taskSettingsTrans when { true }
+				make mergeFilters,hidden on taskSettingsTrans when { true }
+				make filterHeader,hidden on taskSettingsTrans when { true }
+				make currentAdditionalFilterPreview,hidden on taskSettingsTrans when { true }
+			}
+			make taskViewHeader,editable on settingsTrans when { true }
+			make taskViewSettingsTaskRef,editable on settingsTrans when { true }
+
+			change additionalFilterCase value { [] }
 		</action>
 		<allowedNets>
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
+	</data>
+	<data type="enumeration_map">
+		<id>additional_filter_autocomplete_selection</id>
+		<title name="filter_autocomplete_selection">Select new filter</title>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<action trigger="set">
+			trans: t.task_view_settings,
+			filterAutocomplete: f.this,
+			filterCase: f.additional_filter_case,
+			updateFilter: f.update_additional_filter,
+			previewTaskRef: f.selected_additional_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filterCase, updateFilter, trans, true)
+		</action>
+		<action trigger="get">
+			trans: t.task_view_settings,
+			filterAutocomplete: f.this,
+			filterCase: f.additional_filter_case,
+			updateFilter: f.update_additional_filter,
+			previewTaskRef: f.selected_additional_filter_preview;
+
+			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filterCase, updateFilter, trans, true)
+		</action>
+	</data>
+	<data type="button">
+		<id>update_additional_filter</id>
+		<title/>
+		<placeholder name="update_filter">Update view with selected filter</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			trans: t.task_view_settings,
+			updateFilter: f.update_additional_filter,
+			filterCase: f.additional_filter_case,
+			filterAutocomplete: f.additional_filter_autocomplete_selection;
+
+			change filterCase value { [filterAutocomplete.value] }
+			change filterAutocomplete value { "" }
+			make updateFilter,visible on trans when { true }
+		</action>
+	</data>
+	<data type="caseRef">
+		<id>additional_filter_case</id>
+		<title/>
+		<action trigger="set">
+			taskViewTrans: t.task_view_settings,
+			mergeFilters: f.merge_filters,
+			filterTaskRef: f.current_additional_filter_preview,
+			filterCaseRef: f.additional_filter_case;
+
+			if (filterCaseRef.value[0] == null) {
+				make mergeFilters,visible on taskViewTrans when { true }
+				return
+			}
+
+			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
+			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+			make mergeFilters,editable on taskViewTrans when { true }
+		</action>
+		<allowedNets>
+			<allowedNet>filter</allowedNet>
+		</allowedNets>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>merge_filters</id>
+		<title>Merge with main filter?</title>
+		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>menu_item_identifier</id>
@@ -392,6 +519,34 @@
 		<id>show_item_advanced</id>
 		<title name="show_item_advanced">Show advanced options for item</title>
 		<init>true</init>
+	</data>
+	<data type="taskRef">
+		<id>case_view_settings_taskRef</id>
+		<title/>
+		<init>case_view_settings</init>
+	</data>
+	<data type="i18n">
+		<id>case_view_header</id>
+		<title/>
+		<init>Case view settings</init>
+		<!--		todo with translations, maybe get action-->
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="taskRef">
+		<id>task_view_settings_taskRef</id>
+		<title/>
+		<init>task_view_settings</init>
+	</data>
+	<data type="i18n">
+		<id>task_view_header</id>
+		<title/>
+		<init>Task view settings</init>
+		<!--		todo with translations, maybe get action-->
+		<component>
+			<name>divider</name>
+		</component>
 	</data>
 
 	<!-- I18NS -->
@@ -601,42 +756,12 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>case_view_search_type</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>task_view_search_type</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>show_item_advanced</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>2</x>
+					<x>0</x>
 					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
@@ -645,51 +770,7 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
-			<dataRef>
-				<id>create_case_button_title</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>create_case_button_icon_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>create_case_button_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>3</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
+
 		</dataGroup>
 		<dataGroup>
 			<id>filter_update</id>
@@ -744,7 +825,7 @@
 			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>divider</id>
+				<id>filter_header</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -894,6 +975,72 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<dataGroup>
+			<id>case_view_settings_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>case_view_header</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_view_settings_taskRef</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>task_view_settings_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>task_view_header</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_view_settings_taskRef</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 	</transition>
 
 	<transition>
@@ -1026,6 +1173,200 @@
 				</actions>
 			</event>
 		</dataRef>
+	</transition>
+
+	<transition>
+		<id>case_view_settings</id>
+		<x>340</x>
+		<y>100</y>
+		<label>Case view settings</label>
+		<dataGroup>
+			<id>case_view_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>case_view_search_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>create_case_button_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+
+	<transition>
+		<id>task_view_settings</id>
+		<x>340</x>
+		<y>340</y>
+		<label>Task view settings</label>
+		<dataGroup>
+			<id>task_view_dataGroup</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>task_view_search_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>additional_filter_update</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="filter_update_title">Filter section</title>
+			<dataRef>
+				<id>additional_filter_autocomplete_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>update_additional_filter</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>merge_filters</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>selected_additional_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>current_additional_filter</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_header</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>current_additional_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 	</transition>
 
 	<!-- PLACES-->
