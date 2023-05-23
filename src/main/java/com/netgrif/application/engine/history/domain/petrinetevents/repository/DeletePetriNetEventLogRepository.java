@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@Deprecated(since = "6.2.2")
+@Deprecated(since = "6.3.0")
 public interface DeletePetriNetEventLogRepository extends MongoRepository<DeletePetriNetEventLog, ObjectId> {
 
     List<DeletePetriNetEventLog> findAllByNetId(ObjectId netId);
