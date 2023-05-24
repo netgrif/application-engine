@@ -471,6 +471,11 @@
 		<title/>
 		<init>case_view_settings</init>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>show_delete_menu</id>
+		<title>Show delete menu for item?</title>
+		<init>false</init>
+	</data>
 
 	<!-- TASK VIEW CONFIGURATION DATA -->
 	<data type="taskRef">
@@ -1276,7 +1281,22 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>show_delete_menu</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
