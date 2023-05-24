@@ -92,8 +92,10 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
     private static final String PREFERENCE_ITEM_FIELD_BANNED_ROLES = "banned_roles"
-    private static final String PREFERENCE_ITEM_FIELD_NAME = "name"
-    private static final String PREFERENCE_ITEM_FIELD_ICON = "icon"
+    private static final String PREFERENCE_ITEM_FIELD_MENU_NAME = "menu_name"
+    private static final String PREFERENCE_ITEM_FIELD_MENU_ICON = "menu_icon"
+    private static final String PREFERENCE_ITEM_FIELD_TAB_NAME = "tab_name"
+    private static final String PREFERENCE_ITEM_FIELD_TAB_ICON = "tab_icon"
     private static final String PREFERENCE_ITEM_FIELD_NODE_PATH = "nodePath"
     private static final String PREFERENCE_ITEM_FIELD_NODE_NAME = "nodeName"
     private static final String PREFERENCE_ITEM_FIELD_DUPLICATE_TITLE= "duplicate_new_title"
@@ -1688,7 +1690,7 @@ class ActionDelegate {
              item = workflowService.findOne(item.stringId)
              def value = cl()
              item.setTitle(value as String)
-             item.dataSet[PREFERENCE_ITEM_FIELD_NAME].value = (value instanceof I18nString) ? value : new I18nString(value as String)
+             item.dataSet[PREFERENCE_ITEM_FIELD_MENU_NAME].value = (value instanceof I18nString) ? value : new I18nString(value as String)
              workflowService.save(item)
          }]
 
@@ -1792,14 +1794,24 @@ class ActionDelegate {
         uriService.getOrCreate(nodePath, UriContentType.CASE)
 
         assignTask(newItemTask)
+        I18nString newName = body.name ? body.name : (body.filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString)
+        String newIcon = body.icon ? body.icon : "filter_alt"
         def setDataMap = [
-                (PREFERENCE_ITEM_FIELD_NAME)    : [
+                (PREFERENCE_ITEM_FIELD_MENU_NAME)    : [
                         "type" : "i18n",
-                        "value": body.name ? body.name : body.filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value
+                        "value": newName
                 ],
-                (PREFERENCE_ITEM_FIELD_ICON)    : [
+                (PREFERENCE_ITEM_FIELD_MENU_ICON)    : [
                         "type" : "text",
-                        "value": body.icon ? body.icon : "filter_alt"
+                        "value": newIcon
+                ],
+                (PREFERENCE_ITEM_FIELD_TAB_NAME)    : [
+                        "type" : "i18n",
+                        "value": newName
+                ],
+                (PREFERENCE_ITEM_FIELD_TAB_ICON)    : [
+                        "type" : "text",
+                        "value": newIcon
                 ],
                 (PREFERENCE_ITEM_FIELD_NODE_PATH)    : [
                         "type" : "text",
@@ -1866,11 +1878,19 @@ class ActionDelegate {
         Task newItemTask = findTask { it._id.eq(new ObjectId(folder.tasks.find { it.transition == "initialize" }.task)) }
         assignTask(newItemTask)
         def setDataMap = [
-                (PREFERENCE_ITEM_FIELD_NAME)    : [
+                (PREFERENCE_ITEM_FIELD_MENU_NAME)    : [
                         "type" : "i18n",
                         "value": body.name
                 ],
-                (PREFERENCE_ITEM_FIELD_ICON)    : [
+                (PREFERENCE_ITEM_FIELD_MENU_ICON)    : [
+                        "type" : "text",
+                        "value": body.icon
+                ],
+                (PREFERENCE_ITEM_FIELD_TAB_NAME)    : [
+                        "type" : "i18n",
+                        "value": body.name
+                ],
+                (PREFERENCE_ITEM_FIELD_TAB_ICON)    : [
                         "type" : "text",
                         "value": body.icon
                 ],
@@ -1965,7 +1985,11 @@ class ActionDelegate {
                         "value": null,
                         "type": "text"
                 ],
-                (PREFERENCE_ITEM_FIELD_NAME): [
+                (PREFERENCE_ITEM_FIELD_MENU_NAME): [
+                        "value": newTitle,
+                        "type": "i18n"
+                ],
+                (PREFERENCE_ITEM_FIELD_TAB_NAME): [
                         "value": newTitle,
                         "type": "i18n"
                 ],

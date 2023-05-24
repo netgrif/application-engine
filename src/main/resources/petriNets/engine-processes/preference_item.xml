@@ -73,43 +73,6 @@
 		}
 	</function>
 
-	<data type="text" immediate="true">
-		<id>icon</id>
-		<title name="icon_identifier">Icon identifier</title>
-		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
-		<action trigger="set">
-			icon: f.this,
-			iconPreview: f.icon_preview;
-
-			changeCaseProperty "icon" about { icon.value; }
-
-			if (icon.value == "") {
-				change iconPreview value {<![CDATA["""<span></span>"""]]>}
-				return;
-			}
-
-			change iconPreview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
-			}
-		</action>
-	</data>
-	<data type="boolean" immediate="true">
-		<id>use_icon</id>
-		<title name="display_icon">Display menu icon?</title>
-		<init>true</init>
-	</data>
-	<data type="text">
-		<id>icon_preview</id>
-		<title name="icon_preview">Icon preview</title>
-		<component>
-			<name>htmltextarea</name>
-		</component>
-	</data>
-	<data type="i18n" immediate="true">
-		<id>name</id>
-		<title name="name">Name of the item</title>
-		<desc name="name_desc">Will be shown in the menu</desc>
-	</data>
 	<data type="text">
 		<id>parentId</id>
 		<title/>
@@ -145,6 +108,97 @@
 			change childItemIds options { [:] }
 			change hasChildren value { false }
 		</action>
+	</data>
+	<data type="text" immediate="true">
+		<id>menu_item_identifier</id>
+		<title>Identifier (Filter API)</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>nodePath</id>
+		<title/>
+		<event type="set">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					nodePath: f.nodePath,
+					menu_item_identifier: f.menu_item_identifier;
+
+					change menu_item_identifier value {
+					def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
+					return nodePath.value.substring(idx + 1)
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<!-- GENERAL CONFIGURATION DATA -->
+	<data type="text" immediate="true">
+		<id>menu_icon</id>
+		<title name="icon_identifier">Menu icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.menu_icon_preview;
+
+			changeCaseProperty "icon" about { icon.value; }
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>menu_icon_preview</id>
+		<title name="icon_preview">Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="i18n" immediate="true">
+		<id>menu_name</id>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Will be shown in the menu</desc>
+	</data>
+	<data type="text" immediate="true">
+		<id>tab_icon</id>
+		<title>Tab icon identifier</title>
+		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<action trigger="set">
+			icon: f.this,
+			iconPreview: f.tab_icon_preview;
+
+			if (icon.value == "") {
+				change iconPreview value {<![CDATA["""<span></span>"""]]>}
+				return;
+			}
+
+			change iconPreview value {
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>tab_icon_preview</id>
+		<title>Tab icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_tab_icon</id>
+		<title name="display_icon">Display tab icon?</title>
+		<init>true</init>
+	</data>
+	<data type="i18n" immediate="true">
+		<id>tab_name</id>
+		<title name="name">Name of the item</title>
+		<desc name="name_desc">Will be shown in tab</desc>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
@@ -251,14 +305,6 @@
 	</data>
 	<data type="taskRef">
 		<id>current_filter_preview</id>
-		<title/>
-	</data>
-	<data type="taskRef">
-		<id>selected_additional_filter_preview</id>
-		<title/>
-	</data>
-	<data type="taskRef">
-		<id>current_additional_filter_preview</id>
 		<title/>
 	</data>
 	<data type="i18n">
@@ -370,6 +416,71 @@
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
 	</data>
+
+	<!-- CASE VIEW CONFIGURATION DATA -->
+	<data type="enumeration_map" immediate="true">
+		<id>case_view_search_type</id>
+		<title name="case_view_search_type">case Search type</title>
+		<options>
+			<option key="hidden">Hidden</option>
+			<option key="fulltext">Fulltext</option>
+			<option key="fulltext_advanced">Fulltext and advanced</option>
+		</options>
+		<init>fulltext_advanced</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_title</id>
+		<title name="create_case_button_title">"New case" button title</title>
+	</data>
+	<data type="text">
+		<id>create_case_button_icon_preview</id>
+		<title name="create_case_button_icon_preview">Menu icon preview</title>
+		<component>
+			<name>htmltextarea</name>
+		</component>
+	</data>
+	<data type="text" immediate="true">
+		<id>create_case_button_icon</id>
+		<title name="create_case_button_icon">"New case" button icon identifier</title>
+		<action trigger="set">
+			create_case_button_icon_preview: f.create_case_button_icon_preview,
+			create_case_button_icon: f.create_case_button_icon;
+
+
+			if (create_case_button_icon.value == "") {
+			change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+			return;
+			}
+
+			change create_case_button_icon_preview value {
+			<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+			}
+		</action>
+	</data>
+	<data type="i18n">
+		<id>case_view_header</id>
+		<title/>
+		<init>Case view settings</init>
+		<!--		todo with translations, maybe get action-->
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="taskRef">
+		<id>case_view_settings_taskRef</id>
+		<title/>
+		<init>case_view_settings</init>
+	</data>
+
+	<!-- TASK VIEW CONFIGURATION DATA -->
+	<data type="taskRef">
+		<id>selected_additional_filter_preview</id>
+		<title/>
+	</data>
+	<data type="taskRef">
+		<id>current_additional_filter_preview</id>
+		<title/>
+	</data>
 	<data type="enumeration_map">
 		<id>additional_filter_autocomplete_selection</id>
 		<title name="filter_autocomplete_selection">Select new filter</title>
@@ -440,100 +551,6 @@
 		<title>Merge with base filter?</title>
 		<init>true</init>
 	</data>
-	<data type="text" immediate="true">
-		<id>menu_item_identifier</id>
-		<title>Identifier (Filter API)</title>
-	</data>
-	<data type="text" immediate="true">
-		<id>default_headers</id>
-		<title name="default_headers">Set default headers</title>
-	</data>
-	<data type="enumeration_map" immediate="true">
-		<id>case_view_search_type</id>
-		<title name="case_view_search_type">case Search type</title>
-		<options>
-			<option key="hidden">Hidden</option>
-			<option key="fulltext">Fulltext</option>
-			<option key="fulltext_advanced">Fulltext and advanced</option>
-		</options>
-		<init>fulltext_advanced</init>
-	</data>
-	<data type="enumeration_map" immediate="true">
-		<id>task_view_search_type</id>
-		<title name="task_view_search_type">task Search type</title>
-		<options>
-			<option key="hidden">Hidden</option>
-			<option key="fulltext">Fulltext</option>
-			<option key="fulltext_advanced">Fulltext and advanced</option>
-		</options>
-		<init>fulltext_advanced</init>
-	</data>
-	<data type="text" immediate="true">
-		<id>create_case_button_title</id>
-		<title name="create_case_button_title">"New case" button title</title>
-	</data>
-	<data type="text">
-		<id>create_case_button_icon_preview</id>
-		<title name="create_case_button_icon_preview">Menu icon preview</title>
-		<component>
-			<name>htmltextarea</name>
-		</component>
-	</data>
-	<data type="text" immediate="true">
-		<id>create_case_button_icon</id>
-		<title name="create_case_button_icon">"New case" button icon identifier</title>
-		<action trigger="set">
-			create_case_button_icon_preview: f.create_case_button_icon_preview,
-			create_case_button_icon: f.create_case_button_icon;
-
-
-			if (create_case_button_icon.value == "") {
-				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
-				return;
-			}
-
-			change create_case_button_icon_preview value {
-				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
-			}
-		</action>
-	</data>
-	<data type="text" immediate="true">
-		<id>nodePath</id>
-		<title/>
-		<event type="set">
-			<id>0</id>
-			<actions phase="post">
-				<action>
-					nodePath: f.nodePath,
-					menu_item_identifier: f.menu_item_identifier;
-
-					change menu_item_identifier value {
-						def idx = nodePath.value.lastIndexOf(uriService.getUriSeparator())
-						return nodePath.value.substring(idx + 1)
-					}
-				</action>
-			</actions>
-		</event>
-	</data>
-	<data type="boolean" immediate="true">
-		<id>show_item_advanced</id>
-		<title name="show_item_advanced">Show advanced options for item</title>
-		<init>true</init>
-	</data>
-	<data type="taskRef">
-		<id>case_view_settings_taskRef</id>
-		<title/>
-		<init>case_view_settings</init>
-	</data>
-	<data type="i18n">
-		<id>case_view_header</id>
-		<title/>
-		<init>Case view settings</init>
-		<!--		todo with translations, maybe get action-->
-		<component>
-			<name>divider</name>
-		</component>
-	</data>
 	<data type="taskRef">
 		<id>task_view_settings_taskRef</id>
 		<title/>
@@ -547,6 +564,27 @@
 		<component>
 			<name>divider</name>
 		</component>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>task_view_search_type</id>
+		<title name="task_view_search_type">task Search type</title>
+		<options>
+			<option key="hidden">Hidden</option>
+			<option key="fulltext">Fulltext</option>
+			<option key="fulltext_advanced">Fulltext and advanced</option>
+		</options>
+		<init>fulltext_advanced</init>
+	</data>
+
+
+	<data type="boolean" immediate="true">
+		<id>show_item_advanced</id>
+		<title name="show_item_advanced">Show advanced options for item</title>
+		<init>true</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>default_headers</id>
+		<title name="default_headers">Set default headers</title>
 	</data>
 
 	<!-- I18NS -->
@@ -642,10 +680,12 @@
 					<behavior>forbidden</behavior>
 					<action trigger="set">
 						filterCaseRef: f.filter_case,
-						name: f.name;
+						tab_name: f.tab_name,
+						menu_name: f.menu_name;
 
 						def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-						change name value {return filterCase.dataSet["i18n_filter_name"].value}
+						change tab_name value {return filterCase.dataSet["i18n_filter_name"].value}
+						change menu_name value {return filterCase.dataSet["i18n_filter_name"].value}
 					</action>
 				</logic>
 			</dataRef>
@@ -663,7 +703,7 @@
 			<cols>5</cols>
 			<layout>grid</layout>
 			<dataRef>
-				<id>name</id>
+				<id>menu_name</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -677,38 +717,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>use_icon</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-				</layout>
-				<event type="set">
-					<id>0</id>
-					<actions phase="post">
-						<action>
-							trans: t.this,
-							iconPreview: f.icon_preview,
-							icon: f.icon,
-							useIcon: f.use_icon;
-
-							make iconPreview,visible on trans when { useIcon.value }
-							make icon,editable on trans when { useIcon.value }
-
-							make iconPreview,hidden on trans when { !useIcon.value }
-							make icon,hidden on trans when { !useIcon.value }
-						</action>
-					</actions>
-				</event>
-			</dataRef>
-			<dataRef>
-				<id>icon</id>
+				<id>menu_icon</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -722,13 +731,86 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>icon_preview</id>
+				<id>menu_icon_preview</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>4</x>
 					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_tab_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							iconPreview: f.tab_icon_preview,
+							icon: f.tab_icon,
+							useIcon: f.use_tab_icon;
+
+							make iconPreview,visible on trans when { useIcon.value }
+							make icon,editable on trans when { useIcon.value }
+
+							make iconPreview,hidden on trans when { !useIcon.value }
+							make icon,hidden on trans when { !useIcon.value }
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tab_icon_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
@@ -1276,7 +1358,7 @@
 			<id>additional_filter_update</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-			<title name="filter_update_title">Filter section</title>
+			<title>Filter section</title>
 			<dataRef>
 				<id>additional_filter_autocomplete_selection</id>
 				<logic>
