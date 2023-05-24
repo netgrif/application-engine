@@ -4,7 +4,7 @@ import com.netgrif.application.engine.petrinet.domain.I18nString
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class MultichoiceField extends ChoiceField<Set<I18nString>> {
+class MultichoiceField extends ChoiceField<LinkedHashSet<I18nString>> {
 
     MultichoiceField() {
         super()
@@ -75,7 +75,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
     }
 
     @Override
-    void setValue(Set<I18nString> value) {
+    void setValue(LinkedHashSet<I18nString> value) {
         super.setValue(value)
     }
 

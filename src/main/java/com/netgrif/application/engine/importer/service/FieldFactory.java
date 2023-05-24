@@ -236,7 +236,7 @@ public final class FieldFactory {
         setFieldOptions(field, data, importer);
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(new HashSet<>(init));
+                field.setDefaultValue(new LinkedHashSet<>(init));
             }
         });
         return field;
