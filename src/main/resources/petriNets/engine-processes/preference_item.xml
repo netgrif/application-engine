@@ -437,7 +437,7 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>merge_filters</id>
-		<title>Merge with main filter?</title>
+		<title>Merge with base filter?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
@@ -1286,27 +1286,13 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>3</cols>
 					<template>material</template>
 					<appearance>standard</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
 				<id>update_additional_filter</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>merge_filters</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -1362,6 +1348,20 @@
 					<y>1</y>
 					<rows>1</rows>
 					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>merge_filters</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>standard</appearance>
 				</layout>
