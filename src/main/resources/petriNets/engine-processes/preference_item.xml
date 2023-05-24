@@ -72,6 +72,31 @@
 			}
 		}
 	</function>
+	<function scope="process" name="updateOptionsBasedOnValue">
+		{
+			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField toBeUpdated,
+			com.netgrif.application.engine.petrinet.domain.dataset.MultichoiceMapField valueSelector,
+			com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField optionsHolder
+			->
+			def existingOptions = optionsHolder.options
+			def selectedValues = valueSelector.value
+			def newOptions = [:]
+
+			if (selectedValues != null) {
+				existingOptions.each { key, value ->
+					if (selectedValues.contains(key)) {
+						newOptions.put(key, value)
+					}
+				}
+			}
+
+			if (!newOptions.containsKey(toBeUpdated.value)) {
+				change toBeUpdated value { null }
+			}
+
+			change toBeUpdated options { newOptions }
+		}
+	</function>
 
 	<data type="text">
 		<id>parentId</id>
@@ -476,6 +501,54 @@
 		<title>Show delete menu for item?</title>
 		<init>false</init>
 	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>case_headers_mode</id>
+		<title>Headers mode</title>
+		<options>
+			<option key="order">Order</option>
+			<option key="search">Search</option>
+			<option key="edit">Edit</option>
+			<option key="table">Table</option>
+		</options>
+		<init>order</init>
+		<action trigger="set">
+			headersMode: f.case_headers_mode,
+			defaultMode: f.case_headers_default_mode,
+			holder: f.case_headers_options_holder;
+
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+		<action trigger="get">
+			headersMode: f.case_headers_mode,
+			defaultMode: f.case_headers_default_mode,
+			holder: f.case_headers_options_holder;
+
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>case_headers_default_mode</id>
+		<title>Default headers mode</title>
+		<options>
+			<option key="order">Order</option>
+		</options>
+		<init>order</init>
+	</data>
+	<data type="enumeration_map">
+		<id>case_headers_options_holder</id>
+		<title/>
+		<options>
+			<option key="order">Order</option>
+			<option key="search">Search</option>
+			<option key="edit">Edit</option>
+			<option key="table">Table</option>
+		</options>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>case_is_header_mode_changeable</id>
+		<title>Can be header mode changed?</title>
+		<init>true</init>
+	</data>
 
 	<!-- TASK VIEW CONFIGURATION DATA -->
 	<data type="taskRef">
@@ -580,13 +653,51 @@
 		</options>
 		<init>fulltext_advanced</init>
 	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>task_headers_mode</id>
+		<title>Headers mode</title>
+		<options>
+			<option key="order">Order</option>
+			<option key="edit">Edit</option>
+		</options>
+		<init>order</init>
+		<action trigger="set">
+			headersMode: f.task_headers_mode,
+			defaultMode: f.task_headers_default_mode,
+			holder: f.task_headers_options_holder;
 
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+		<action trigger="get">
+			headersMode: f.case_headers_mode,
+			defaultMode: f.case_headers_default_mode,
+			holder: f.case_headers_options_holder;
 
+			updateOptionsBasedOnValue(defaultMode, headersMode, holder)
+		</action>
+	</data>
+	<data type="enumeration_map" immediate="true">
+		<id>task_headers_default_mode</id>
+		<title>Default headers mode</title>
+		<options>
+			<option key="order">Order</option>
+		</options>
+		<init>order</init>
+	</data>
+	<data type="enumeration_map">
+		<id>task_headers_options_holder</id>
+		<title/>
+		<options>
+			<option key="order">Order</option>
+			<option key="edit">Edit</option>
+		</options>
+	</data>
 	<data type="boolean" immediate="true">
-		<id>show_item_advanced</id>
-		<title name="show_item_advanced">Show advanced options for item</title>
+		<id>task_is_header_mode_changeable</id>
+		<title>Can be header mode changed?</title>
 		<init>true</init>
 	</data>
+
 	<data type="text" immediate="true">
 		<id>default_headers</id>
 		<title name="default_headers">Set default headers</title>
@@ -612,24 +723,6 @@
 		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
 		<i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
-		<i18nString name="name">todo</i18nString>
-		<i18nString name="name_desc">todo</i18nString>
-		<i18nString name="move_dest_uri">todo</i18nString>
-		<i18nString name="duplicate_new_title">todo</i18nString>
-		<i18nString name="duplicate_view_identifier">todo</i18nString>
-		<i18nString name="duplicate_view_identifier_desc">todo</i18nString>
-		<i18nString name="update_filter">todo</i18nString>
-		<i18nString name="search_type">todo</i18nString>
-		<i18nString name="hidden">todo</i18nString>
-		<i18nString name="fulltext">todo</i18nString>
-		<i18nString name="fulltext_advanced">todo</i18nString>
-		<i18nString name="item_settings">todo</i18nString>
-		<i18nString name="filter_update_title">todo</i18nString>
-		<i18nString name="roles_management_title">todo</i18nString>
-		<i18nString name="move_item">todo</i18nString>
-		<i18nString name="move_item_finish">todo</i18nString>
-		<i18nString name="duplicate_item">todo</i18nString>
-		<i18nString name="duplicate_item_finish">todo</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
@@ -650,24 +743,6 @@
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 		<i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
-		<i18nString name="name">todo</i18nString>
-		<i18nString name="name_desc">todo</i18nString>
-		<i18nString name="move_dest_uri">todo</i18nString>
-		<i18nString name="duplicate_new_title">todo</i18nString>
-		<i18nString name="duplicate_view_identifier">todo</i18nString>
-		<i18nString name="duplicate_view_identifier_desc">todo</i18nString>
-		<i18nString name="update_filter">todo</i18nString>
-		<i18nString name="search_type">todo</i18nString>
-		<i18nString name="hidden">todo</i18nString>
-		<i18nString name="fulltext">todo</i18nString>
-		<i18nString name="fulltext_advanced">todo</i18nString>
-		<i18nString name="item_settings">todo</i18nString>
-		<i18nString name="filter_update_title">todo</i18nString>
-		<i18nString name="roles_management_title">todo</i18nString>
-		<i18nString name="move_item">todo</i18nString>
-		<i18nString name="move_item_finish">todo</i18nString>
-		<i18nString name="duplicate_item">todo</i18nString>
-		<i18nString name="duplicate_item_finish">todo</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -842,22 +917,6 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
-			<dataRef>
-				<id>show_item_advanced</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>2</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-
 		</dataGroup>
 		<dataGroup>
 			<id>filter_update</id>
@@ -1347,6 +1406,75 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<dataGroup>
+			<id>case_view_headers</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>case_is_header_mode_changeable</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						trans: t.this,
+						isChangeable: f.case_is_header_mode_changeable,
+						mode: f.case_headers_mode,
+						defaultMode: f.case_headers_default_mode;
+
+						make mode,editable on trans when { isChangeable.value }
+						make mode,required on trans when { isChangeable.value }
+						make defaultMode,editable on trans when { isChangeable.value }
+						make defaultMode,required on trans when { isChangeable.value }
+
+						make mode,hidden on trans when { !isChangeable.value }
+						make mode,optional on trans when { !isChangeable.value }
+						make defaultMode,hidden on trans when { !isChangeable.value }
+						make defaultMode,optional on trans when { !isChangeable.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_headers_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_headers_default_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 	</transition>
 
 	<transition>
@@ -1369,6 +1497,73 @@
 					<y>0</y>
 					<rows>1</rows>
 					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>task_view_headers</id>
+			<cols>5</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>task_is_header_mode_changeable</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						trans: t.this,
+						isChangeable: f.task_is_header_mode_changeable,
+						mode: f.task_headers_mode,
+						defaultMode: f.task_headers_default_mode;
+
+						make mode,editable on trans when { isChangeable.value }
+						make mode,required on trans when { isChangeable.value }
+						make defaultMode,editable on trans when { isChangeable.value }
+						make defaultMode,required on trans when { isChangeable.value }
+
+						make mode,hidden on trans when { !isChangeable.value }
+						make mode,optional on trans when { !isChangeable.value }
+						make defaultMode,hidden on trans when { !isChangeable.value }
+						make defaultMode,optional on trans when { !isChangeable.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_headers_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_headers_default_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
