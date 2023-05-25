@@ -25,6 +25,8 @@ import java.util.*;
 
 public interface IPetriNetService {
 
+    PetriNet clone(ObjectId petriNetId);
+
     @Deprecated
     ImportPetriNetEventOutcome importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException;
 
@@ -95,8 +97,6 @@ public interface IPetriNetService {
     List<PetriNet> get(Collection<ObjectId> petriNetId);
 
     List<PetriNet> get(List<String> petriNetIds);
-
-    PetriNet clone(ObjectId petriNetId);
 
     void deletePetriNet(String id, LoggedUser loggedUser);
 

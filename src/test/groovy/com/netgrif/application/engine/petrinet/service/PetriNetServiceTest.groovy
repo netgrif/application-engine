@@ -21,6 +21,7 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import com.netgrif.application.engine.utils.FullPageRequest
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome
+import com.netgrif.application.engine.workflow.domain.repositories.CaseRepository
 import com.netgrif.application.engine.workflow.domain.repositories.TaskRepository
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import org.bson.types.ObjectId
@@ -71,6 +72,9 @@ class PetriNetServiceTest {
     private UriService uriService
 
     @Autowired
+    private CaseRepository caseRepository
+
+    @Autowired
     private ProcessRoleRepository processRoleRepository
 
     @Autowired
@@ -94,7 +98,6 @@ class PetriNetServiceTest {
     void processImportAndDelete() {
         long processRoleCount = processRoleRepository.count()
         long processCount = petriNetRepository.count()
-        int caseCount = workflowService.getAll(new FullPageRequest()).size()
         long taskCount = taskRepository.count()
 
 
@@ -109,7 +112,7 @@ class PetriNetServiceTest {
         assert petriNetRepository.findById(testNet.stringId).get().uriNodeId == null
         importHelper.createCase("Case 1", testNet)
 
-        assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
+        assert caseRepository.findAllByProcessIdentifier(testNet.getImportId()).size() == 1
         assert taskRepository.count() == taskCount + 2
         assert processRoleRepository.count() == processRoleCount + 2
 
@@ -123,12 +126,12 @@ class PetriNetServiceTest {
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-
+        Thread.sleep(2000)  //Elastic Index
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
         Thread.sleep(2000)
         assert elasticPetriNetRepository.findByStringId(testNet.stringId) == null
-        assert workflowService.getAll(new FullPageRequest()).size() == caseCount
+        assert caseRepository.findAllByProcessIdentifier(testNetOptional.getNet().getImportId()).size() == 0
         assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
         user = userService.findByEmail(CUSTOMER_USER_MAIL, false)
