@@ -30,31 +30,31 @@ class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
     private PostalCodeRepository repository
 
     void run(String... strings) {
-        if (importPostalCode) {
-            log.info("Importing postal codes from file " + postalCodesPath)
-            def importFile = new ClassPathResource(postalCodesPath).inputStream
-
-            def lineCount = 0
-            importFile.readLines().each {
-                lineCount++
-            }
-
-            if (repository.count() == lineCount) {
-                log.info("All $lineCount postal codes have been already imported")
-                return
-            }
-
-            repository.deleteAll()
-
-            importFile = new ClassPathResource(postalCodesPath).inputStream
-            def codes = []
-            importFile.splitEachLine(',') { items ->
-                codes << new PostalCode(items[0].replaceAll("\\s", "").trim(), items[1].trim())
-            }
-            service.savePostalCodes(codes)
-            log.info("Postal codes imported")
-        } else {
+        if (!importPostalCode) {
             log.info("Skip import postal codes")
+            return
         }
+        log.info("Importing postal codes from file " + postalCodesPath)
+        def importFile = new ClassPathResource(postalCodesPath).inputStream
+
+        def lineCount = 0
+        importFile.readLines().each {
+            lineCount++
+        }
+
+        if (repository.count() == lineCount) {
+            log.info("All $lineCount postal codes have been already imported")
+            return
+        }
+
+        repository.deleteAll()
+
+        importFile = new ClassPathResource(postalCodesPath).inputStream
+        def codes = []
+        importFile.splitEachLine(',') { items ->
+            codes << new PostalCode(items[0].replaceAll("\\s", "").trim(), items[1].trim())
+        }
+        service.savePostalCodes(codes)
+        log.info("Postal codes imported")
     }
 }
