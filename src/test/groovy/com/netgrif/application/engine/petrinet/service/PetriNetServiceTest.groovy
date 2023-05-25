@@ -126,7 +126,6 @@ class PetriNetServiceTest {
         assert user.processRoles.size() == 2
         assert petriNetService.get(new ObjectId(testNet.stringId)) != null
 
-        Thread.sleep(2000)  //Elastic Index
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.count() == processCount
         Thread.sleep(2000)
