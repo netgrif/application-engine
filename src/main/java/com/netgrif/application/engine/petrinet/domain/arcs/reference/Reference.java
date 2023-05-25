@@ -30,4 +30,9 @@ public class Reference {
         }
         return multiplicity;
     }
+
+    public Reference clone() {
+        return new Reference(this.reference, this.type);
+    }
+
 }

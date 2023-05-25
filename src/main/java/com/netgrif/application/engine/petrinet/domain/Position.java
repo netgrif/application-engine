@@ -20,4 +20,12 @@ public class Position {
 
     public Position() {
     }
+
+    @Override
+    public Position clone() {
+        Position clone = new Position();
+        clone.setX(this.x);
+        clone.setY(this.y);
+        return clone;
+    }
 }
