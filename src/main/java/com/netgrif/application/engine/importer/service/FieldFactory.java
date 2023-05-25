@@ -236,7 +236,7 @@ public final class FieldFactory {
         setFieldOptions(field, data, importer);
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(new HashSet<>(init));
+                field.setDefaultValue(new LinkedHashSet<>(init));
             }
         });
         return field;
@@ -585,7 +585,7 @@ public final class FieldFactory {
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toSet());
+            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
             return (Set<I18nString>) values;
         }
@@ -594,7 +594,7 @@ public final class FieldFactory {
     public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toSet());
+            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toCollection( LinkedHashSet::new ));
         } else {
             return (Set<String>) values;
         }
