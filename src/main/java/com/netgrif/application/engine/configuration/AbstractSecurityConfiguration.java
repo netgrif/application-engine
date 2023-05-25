@@ -93,10 +93,10 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     protected void setXXSSProtection(HttpSecurity http) throws Exception {
         XXSSProtection mode;
         if (!existConfigurationHeaders()
-                || getSecurityConfigProperties().getHeaders().getXxSsProtection() == null) {
+                || getSecurityConfigProperties().getHeaders().getXXssProtection() == null) {
             mode = XXSSProtection.ENABLE;
         } else {
-            mode = getSecurityConfigProperties().getHeaders().getXxSsProtection();
+            mode = getSecurityConfigProperties().getHeaders().getXXssProtection();
         }
         switch (mode) {
             case DISABLE:

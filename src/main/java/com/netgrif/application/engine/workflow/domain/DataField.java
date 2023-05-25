@@ -12,7 +12,9 @@ import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,10 @@ public class DataField implements Referencable {
     @Setter
     @JsonIgnore
     private String encryption;
+
+    @Getter
+    @Setter
+    private LocalDateTime lastModified;
 
     @Getter
     @Setter

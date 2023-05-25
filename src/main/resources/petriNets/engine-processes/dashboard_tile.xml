@@ -1,0 +1,1547 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+    <id>dashboard_tile</id>
+    <initials>DST</initials>
+    <title name="model_title">Dashboard Tile</title>
+    <icon>dashboard_customize</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <caseName name="model_default_case_name">Dashboard Tile</caseName>
+    <function scope="process" name="mergeParentsFilter">
+        { String parentFilterId, String query ->
+            try {
+                def parentFilterCase = workflowService.findOne(parentFilterId)
+            } catch (IllegalArgumentException ex) {
+                if (!parentFilterCase) {
+                    return query
+                }
+            }
+            String parentQuery = parentFilterCase.dataSet["filter"].value
+            if (!parentQuery) {
+                return query
+            }
+            query = "(${query}) AND (${parentQuery})"
+            String grandparentCaseId = parentFilterCase.dataSet["parent_filter_id"].value
+            if (!grandparentCaseId) {
+                return query
+            } else {
+                return mergeParentsFilter(grandparentCaseId, query)
+            }
+        }
+    </function>
+    <data type="text">
+        <id>parent_dashboard_id</id>
+        <title/>
+    </data>
+    <data type="number">
+        <id>x</id>
+        <title name="data_x_title">X</title>
+    </data>
+    <data type="number">
+        <id>y</id>
+        <title name="data_y_title">Y</title>
+    </data>
+    <data type="number">
+        <id>rows</id>
+        <title name="data_rows_title">Rows</title>
+    </data>
+    <data type="number">
+        <id>cols</id>
+        <title name="data_cols_title">Cols</title>
+    </data>
+    <data type="text">
+        <id>dashboard_count</id>
+        <title/>
+        <component>
+            <name>dashboard_count</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>dashboard_iframe</id>
+        <title/>
+        <component>
+            <name>dashboard_iframe</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>dashboard_bar_chart</id>
+        <title/>
+        <component>
+            <name>dashboard_bar_chart</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>dashboard_pie_chart</id>
+        <title/>
+        <component>
+            <name>dashboard_pie_chart</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>dashboard_line_chart</id>
+        <title/>
+        <component>
+            <name>dashboard_line_chart</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>dashboard_linear_gauge</id>
+        <title/>
+        <component>
+            <name>dashboard_linear_gauge</name>
+        </component>
+    </data>
+    <data type="text">
+        <id>dashboard_portal</id>
+        <title/>
+        <component>
+            <name>dashboard_portal</name>
+        </component>
+    </data>
+    <data type="filter">
+        <id>dashboard_filter_case</id>
+		<title name="data_dashboard_filter_case_title">Case view filter</title>
+        <component>
+            <name>filter-tab-view</name>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>tile_type</id>
+        <title name="data_tile_type_title">Type</title>
+        <options>
+            <option key="count" name="data_tile_type_option_count">Count</option>
+            <option key="iframe" name="data_tile_type_option_iframe">iframe</option>
+            <option key="bar_chart" name="data_tile_type_option_bar_chart">Bar Chart</option>
+            <option key="pie_chart" name="data_tile_type_option_pie_chart">Pie Chart</option>
+            <option key="line_chart" name="data_tile_type_option_line_chart">Line Chart</option>
+            <option key="linear_gauge" name="data_tile_type_option_linear_gauge">Linear Gauge</option>
+            <option key="portal" name="data_tile_type_option_portal">Portal</option>
+			<option key="filter_case" name="data_tile_type_option_filter_case">Case filter</option>
+        </options>
+        <event type="set">
+            <id>tile_type_set</id>
+            <actions phase="post">
+                <action id="action_0">tile_type: f.tile_type;
+                tile_type.options.keySet().each { option -&gt;
+                    change useCase.getField("is_${option}" as String) value { 0 }
+                }
+                change useCase.getField("is_${tile_type.value}" as String) value { 1 }</action>
+            </actions>
+        </event>
+    </data>
+    <data type="text">
+        <id>name</id>
+        <title name="data_name_title">Name</title>
+    </data>
+    <data type="number">
+        <id>is_count</id>
+        <title name="data_is_count_title">Count</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_iframe</id>
+        <title name="data_is_iframe_title">iframe</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_bar_chart</id>
+        <title name="data_is_bar_chart_title">Bar chart</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_pie_chart</id>
+        <title name="data_is_pie_chart_title">Pie chart</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_line_chart</id>
+        <title name="data_is_line_chart_title">Line chart</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_linear_gauge</id>
+        <title name="data_is_linear_gauge_title">Linear Gauge</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_portal</id>
+        <title name="data_is_portal_title">Portal</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+		<id>is_filter_case</id>
+		<title name="data_is_filter_case_title">Filter Case</title>
+		<init>0</init>
+	</data>
+	<data type="button">
+		<id>save_btn</id>
+		<title/>
+		<placeholder name="data_save_btn_placeholder">Save</placeholder>
+		<component>
+			<name>flat</name>
+		</component>
+        <event type="set">
+			<id>save_btn_set</id>
+			<actions phase="post">
+				<action>
+                    tile_type: f.tile_type;
+
+                    if (tile_type.value) {
+                        finishTask("t1")
+                    } else {
+                        throw new IllegalArgumentException("Type not selected")
+                    }
+                </action>
+			</actions>
+        </event>
+	</data>
+	<data type="enumeration_map">
+		<id>dashboard_filter_case_select</id>
+		<title name="data_dashboard_filter_case_select_title">Filter</title>
+        <event type="get">
+            <id>dashboard_filter_case_select_get</id>
+            <actions phase="pre">
+                <action>
+                    filterSelect: f.dashboard_filter_case_select;
+
+                    def cases = findAllFilters()
+                    change filterSelect options {
+                        cases.collectEntries { [it.stringId, new com.netgrif.application.engine.petrinet.domain.I18nString(it.title)] }
+                    }
+                </action>
+            </actions>
+        </event>
+        <event type="set">
+            <id>dashboard_filter_case_select_set</id>
+            <actions phase="post">
+                <action>
+                    caseFilterField: f.dashboard_filter_case,
+                    filterSelect: f.dashboard_filter_case_select,
+                    name: f.name;
+
+                    def caze = findCase { it._id.eq(filterSelect.value) }
+
+                    useCase.dataSet["dashboard_filter_case"].allowedNets = caze.dataSet["filter"].allowedNets
+                    useCase.dataSet["dashboard_filter_case"].filterMetadata = caze.dataSet["filter"].filterMetadata
+                    useCase.dataSet["dashboard_filter_case"].filterMetadata["tabTitle"] = name.value
+
+                    useCase.dataSet["dashboard_filter_case"].filterMetadata["tabTitle"] = name.value
+
+                    change caseFilterField value {
+                        mergeParentsFilter(caze.dataSet["parent_filter_id"].value, caze.dataSet["filter"].value)
+                    }
+                </action>
+            </actions>
+        </event>
+	</data>
+    <i18n locale="sk">
+        <i18nString name="data_rows_title">Počet riadkov</i18nString>
+        <i18nString name="data_cols_title">Počet stĺpcov</i18nString>
+        <i18nString name="data_tile_type_title">Typ</i18nString>
+        <i18nString name="data_name_title">Názov</i18nString>
+        <i18nString name="data_save_btn_placeholder">Uložiť</i18nString>
+        <i18nString name="model_title">Dlaždica nástenky</i18nString>
+        <i18nString name="model_default_case_name">Dlaždica</i18nString>
+        <i18nString name="task_t1_title">Vytvoriť</i18nString>
+        <i18nString name="task_t3_title">iframe</i18nString>
+        <i18nString name="task_t4_title">Počítadlo</i18nString>
+        <i18nString name="task_t5_title">Stĺpcový graf</i18nString>
+        <i18nString name="task_t6_title">Koláčový graf</i18nString>
+        <i18nString name="task_t7_title">Spojnicový graf</i18nString>
+        <i18nString name="task_t8_title">Lineárne meradlo</i18nString>
+        <i18nString name="task_t9_title">Portál</i18nString>
+        <i18nString name="task_t10_title">Filter prípadov</i18nString>
+        <i18nString name="data_x_title">X</i18nString>
+        <i18nString name="data_y_title">Y</i18nString>
+        <i18nString name="data_dashboard_filter_case_title">Filter prípadov</i18nString>
+        <i18nString name="data_tile_type_option_count">Počítadlo</i18nString>
+        <i18nString name="data_tile_type_option_iframe">iframe</i18nString>
+        <i18nString name="data_tile_type_option_bar_chart">Stĺpcový graf</i18nString>
+        <i18nString name="data_tile_type_option_pie_chart">Koláčový graf</i18nString>
+        <i18nString name="data_tile_type_option_line_chart">Spojnicový graf</i18nString>
+        <i18nString name="data_tile_type_option_linear_gauge">Lineárne meradlo</i18nString>
+        <i18nString name="data_tile_type_option_portal">Portál</i18nString>
+        <i18nString name="data_tile_type_option_filter_case">Filter prípadov</i18nString>
+        <i18nString name="data_dashboard_filter_case_select_title">Filter</i18nString>
+    </i18n>
+	<i18n locale="de">
+        <i18nString name="data_rows_title"> Anzahl der Reihen</i18nString>
+        <i18nString name="data_cols_title">Anzahl der Spalten</i18nString>
+        <i18nString name="data_tile_type_title">Typ</i18nString>
+        <i18nString name="data_name_title">Titel</i18nString>
+        <i18nString name="data_save_btn_placeholder">Speichern</i18nString>
+        <i18nString name="model_title">Dashboard Kachel</i18nString>
+        <i18nString name="model_default_case_name">Kachel</i18nString>
+        <i18nString name="task_t1_title">Schaffen</i18nString>
+        <i18nString name="task_t3_title">iframe</i18nString>
+        <i18nString name="task_t4_title">Zähler</i18nString>
+        <i18nString name="task_t5_title">Säulendiagramm</i18nString>
+        <i18nString name="task_t6_title">Kreisdiagramm</i18nString>
+        <i18nString name="task_t7_title">Liniendiagramm</i18nString>
+        <i18nString name="task_t8_title">Tachometerdiagramm</i18nString>
+        <i18nString name="task_t9_title">Portal</i18nString>
+        <i18nString name="task_t10_title">Fallfilter</i18nString>
+        <i18nString name="data_x_title">X</i18nString>
+        <i18nString name="data_y_title">Y</i18nString>
+        <i18nString name="data_dashboard_filter_case_title">Fallfilter</i18nString>
+        <i18nString name="data_tile_type_option_count">Zähler</i18nString>
+        <i18nString name="data_tile_type_option_iframe">iframe</i18nString>
+        <i18nString name="data_tile_type_option_bar_chart">Säulendiagramm</i18nString>
+        <i18nString name="data_tile_type_option_pie_chart">Kreisdiagramm</i18nString>
+        <i18nString name="data_tile_type_option_line_chart">Liniendiagramm</i18nString>
+        <i18nString name="data_tile_type_option_linear_gauge">Tachometerdiagramm</i18nString>
+        <i18nString name="data_tile_type_option_portal">Portal</i18nString>
+        <i18nString name="data_tile_type_option_filter_case">Fallfilter</i18nString>
+        <i18nString name="data_dashboard_filter_case_select_title">Filter</i18nString>
+    </i18n>
+    <transition>
+        <id>t1</id>
+        <x>380</x>
+        <y>340</y>
+        <label name="task_t1_title">Create</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>t1_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>x</id>
+                <logic>
+					<behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+					<behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>2</y>
+                    <rows>1</rows>
+					<cols>3</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+			<dataRef>
+				<id>save_btn</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>parent_dashboard_id</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>t1_assign</id>
+        </event>
+        <event type="finish">
+            <id>t1_finish</id>
+			<actions phase="post">
+				<action>
+                    parent_dashboard_id: f.parent_dashboard_id;
+
+                    def parentDashboardCase = findCase { it._id.eq(parent_dashboard_id.value) }
+                    def dashboardValue = parentDashboardCase.dataSet["dashboard"].value as List
+                    dashboardValue.remove(task.get().stringId)
+                    dashboardValue.add(useCase.tasks.first().task)
+                    setData("t2", parentDashboardCase, [
+                            "dashboard": [
+                                    "value": dashboardValue,
+                                    "type": "taskRef"
+                            ]
+                    ])
+                </action>
+			</actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t3</id>
+        <x>740</x>
+        <y>180</y>
+        <label name="task_t3_title">iframe</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_iframe</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t4</id>
+        <x>740</x>
+        <y>100</y>
+        <label name="task_t4_title">Counter</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_count</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t5</id>
+        <x>740</x>
+        <y>260</y>
+        <label name="task_t5_title">Bar Chart</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_bar_chart</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t6</id>
+        <x>740</x>
+        <y>340</y>
+        <label name="task_t6_title">Pie Chart</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_pie_chart</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t7</id>
+        <x>740</x>
+        <y>420</y>
+        <label name="task_t7_title">Line Chart</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_line_chart</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t8</id>
+        <x>740</x>
+        <y>500</y>
+        <label name="task_t8_title">Linear Gauge</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_linear_gauge</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t9</id>
+        <x>740</x>
+        <y>580</y>
+        <label name="task_t9_title">Portal</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_portal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+	</transition>
+	<transition>
+		<id>t10</id>
+		<x>740</x>
+		<y>660</y>
+		<label name="task_t10_title">Case Filter</label>
+        <dataGroup>
+            <id>t3_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>dashboard_filter_case</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>x</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>y</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>rows</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+					<y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>cols</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>3</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>tile_type</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+					<y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>dashboard_filter_case_select</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <place>
+        <id>p1</id>
+        <x>260</x>
+        <y>340</y>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>620</x>
+        <y>180</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>620</x>
+        <y>100</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>620</x>
+        <y>260</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p5</id>
+        <x>620</x>
+        <y>340</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p6</id>
+        <x>620</x>
+        <y>420</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p7</id>
+        <x>620</x>
+        <y>500</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p8</id>
+        <x>620</x>
+        <y>580</y>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+	<place>
+		<id>p9</id>
+		<x>620</x>
+		<y>660</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_iframe</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>180</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p3</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_count</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>100</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_bar_chart</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>260</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_pie_chart</reference>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p6</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_line_chart</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>420</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a10</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p8</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_portal</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>580</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a11</id>
+        <type>regular</type>
+        <sourceId>t1</sourceId>
+        <destinationId>p7</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_linear_gauge</reference>
+        <breakpoint>
+            <x>380</x>
+            <y>500</y>
+        </breakpoint>
+    </arc>
+    <arc>
+        <id>a12</id>
+        <type>read</type>
+        <sourceId>p3</sourceId>
+        <destinationId>t4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a13</id>
+        <type>read</type>
+        <sourceId>p4</sourceId>
+        <destinationId>t5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>read</type>
+        <sourceId>p5</sourceId>
+        <destinationId>t6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a15</id>
+        <type>read</type>
+        <sourceId>p6</sourceId>
+        <destinationId>t7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a16</id>
+        <type>read</type>
+        <sourceId>p7</sourceId>
+        <destinationId>t8</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a17</id>
+        <type>read</type>
+        <sourceId>p8</sourceId>
+        <destinationId>t9</destinationId>
+        <multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a18</id>
+		<type>read</type>
+		<sourceId>p9</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a19</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p9</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>is_filter_case</reference>
+		<breakpoint>
+			<x>380</x>
+			<y>660</y>
+		</breakpoint>
+    </arc>
+</document>

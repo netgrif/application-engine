@@ -1,0 +1,292 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>dashboard</id>
+	<initials>DSH</initials>
+	<title name="model_title">Dashboard</title>
+	<icon>dashboard</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseName name="model_default_case_name">Dashboard</caseName>
+	<data type="text" immediate="true">
+		<id>name</id>
+		<title name="data_name_title">Name</title>
+	</data>
+	<data type="text" immediate="true">
+		<id>description</id>
+		<title name="data_description_title">Description</title>
+	</data>
+	<data type="number">
+		<id>cols</id>
+		<title name="data_cols_title">Columns</title>
+		<init>2</init>
+	</data>
+	<data type="number">
+		<id>rows</id>
+		<title name="data_rows_title">Rows</title>
+		<init>2</init>
+	</data>
+	<data type="taskRef">
+		<id>dashboard</id>
+		<title/>
+		<component>
+			<name>dashboard</name>
+		</component>
+	</data>
+	<i18n locale="sk">
+		<i18nString name="task_t1_title">Konfigurácia</i18nString>
+		<i18nString name="data_name_title">Názov</i18nString>
+		<i18nString name="data_description_title">Popis</i18nString>
+		<i18nString name="data_cols_title">Počet stĺpcov</i18nString>
+		<i18nString name="data_rows_title">Počet riadkov</i18nString>
+		<i18nString name="data_group_share_title">Zdieľať so skupinami</i18nString>
+		<i18nString name="task_t2_event_t2_assign_title">Upraviť</i18nString>
+		<i18nString name="task_t2_event_t2_finish_title">Uložiť</i18nString>
+		<i18nString name="model_title">Nástenka</i18nString>
+		<i18nString name="model_default_case_name">Nástenka</i18nString>
+		<i18nString name="task_t2_title">Zobrazenie</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="task_t1_title">Aufbau</i18nString>
+		<i18nString name="data_name_title">Titel</i18nString>
+		<i18nString name="data_description_title">Beschreibung</i18nString>
+		<i18nString name="data_cols_title">Anzahl der Spalten</i18nString>
+		<i18nString name="data_rows_title">Anzahl der Reihen</i18nString>
+		<i18nString name="data_group_share_title">Mit Gruppen teilen</i18nString>
+		<i18nString name="task_t2_event_t2_assign_title">Anpassen</i18nString>
+		<i18nString name="task_t2_event_t2_finish_title">Speichern</i18nString>
+		<i18nString name="model_title">Dashboard</i18nString>
+		<i18nString name="model_default_case_name">Dashboard</i18nString>
+		<i18nString name="task_t2_title">Anzeige</i18nString>
+	</i18n>
+	<transition>
+		<id>t1</id>
+		<x>380</x>
+		<y>180</y>
+		<label name="task_t1_title">Configure</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>description</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>cols</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>rows</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t1_assign</id>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+			<actions phase="post">
+				<action id="1">name: f.name;
+				changeCaseProperty "title" about { name.value; }</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t1_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>620</x>
+		<y>180</y>
+		<label name="task_t2_title">Display</label>
+		<roleRef>
+			<id>default</id>
+			<logic>
+				<view>true</view>
+				<cancel>false</cancel>
+				<assign>true</assign>
+				<delegate>false</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>dashboard</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>cols</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>rows</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+			<title name="task_t2_event_t2_assign_title">Edit</title>
+			<actions phase="pre">
+				<action>
+					dashboard: f.dashboard;
+
+					for (dashboardTile in dashboard.value) {
+						try {
+							setData(dashboardTile, [
+									"dashboard_filter_case_hidden": [
+											"value": "false",
+											"type": "boolean"
+									]
+							])
+						} catch (Exception ignored) {
+							log.error(dashboardTile+":"+(ignored as String))
+						}
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+			<title name="task_t2_event_t2_finish_title">Save</title>
+			<actions phase="pre">
+				<action>
+					dashboard: f.dashboard;
+
+					for (dashboardTile in dashboard.value) {
+						try {
+							setData(dashboardTile, [
+							        "dashboard_filter_case_hidden": [
+							                "value": "true",
+											"type": "boolean"
+							        ]
+							])
+						} catch (Exception ignored) {
+							log.error(dashboardTile+":"+(ignored as String))
+						}
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>260</x>
+		<y>180</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>500</x>
+		<y>180</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

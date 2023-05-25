@@ -48,6 +48,9 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runActions(List<Action> actions, Case useCase, Optional<Task> task) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
+        if (actions.isEmpty()) {
+            return allOutcomes;
+        }
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task, useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
@@ -66,6 +69,9 @@ public class EventService implements IEventService {
     @Override
     public List<EventOutcome> runEventActions(Case useCase, Task task, List<Action> actions, DataEventType trigger) {
         List<EventOutcome> allOutcomes = new ArrayList<>();
+        if (actions.isEmpty()) {
+            return allOutcomes;
+        }
         actions.forEach(action -> {
             List<EventOutcome> outcomes = actionsRunner.run(action, useCase, task == null ? Optional.empty() : Optional.of(task), useCase == null ? Collections.emptyList() : useCase.getPetriNet().getFunctions());
             outcomes.stream().filter(SetDataEventOutcome.class::isInstance)
@@ -86,11 +92,14 @@ public class EventService implements IEventService {
         }
         if (task != null) {
             Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-            if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty())
+            if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty()) {
                 fieldActions.addAll(DataFieldLogic.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents().get(actionTrigger), phase));
+            }
         }
 
-        if (fieldActions.isEmpty()) return Collections.emptyList();
+        if (fieldActions.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         return runEventActions(useCase, task, fieldActions, actionTrigger);
     }
