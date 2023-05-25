@@ -47,18 +47,26 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void addDefaultAuthorities(IUser user) {
         if (user.getAuthorities().isEmpty()) {
-            HashSet<Authority> authorities = new HashSet<>();
-            authorities.add(authorityService.getOrCreate(Authority.user));
-            user.setAuthorities(authorities);
+            user.setAuthorities(authorityService.getDefaultUserAuthorities());
         }
     }
 
     @Override
-    public void assignAuthority(String userId, String authorityId) {
+    public void assignAuthority(String userId, String authorityName) {
         IUser user = resolveById(userId, true);
-        Authority authority = authorityService.getOne(authorityId);
+        Authority authority = authorityService.findByName(authorityName);
         user.addAuthority(authority);
         authority.addUser(user);
+
+        save(user);
+    }
+
+    @Override
+    public void removeAuthority(String userId, String authorityName) {
+        IUser user = resolveById(userId, true);
+        Authority authority = authorityService.findByName(authorityName);
+        user.removeAuthority(authority);
+        authority.removeUser(user);
 
         save(user);
     }
@@ -102,9 +110,7 @@ public abstract class AbstractUserService implements IUserService {
     @Override
     public void removeRoleOfDeletedPetriNet(PetriNet net) {
         List<IUser> users = findAllByProcessRoles(net.getRoles().keySet(), false);
-        users.forEach(u -> {
-            net.getRoles().forEach((k, role) -> removeRole(u, role));
-        });
+        users.forEach(u -> net.getRoles().forEach((k, role) -> removeRole(u, role)));
     }
 
     @Override
@@ -116,6 +122,31 @@ public abstract class AbstractUserService implements IUserService {
             repository.save(system);
         }
         return system;
+    }
+
+    @Override
+    public boolean hasAuthority(IUser user, Authority authority) {
+        return user.getAuthorities().stream().anyMatch(a -> a.getStringId().equals(authority.getStringId()));
+    }
+
+    @Override
+    public boolean hasAuthority(IUser user, String authority) {
+        return user.getAuthorities().stream().anyMatch(a -> a.getName().equals(authority));
+    }
+
+    @Override
+    public boolean isLoggedByEmail(String email) {
+        return this.getLoggedUser().getEmail().equals(email);
+    }
+
+    @Override
+    public boolean isLogged(String id) {
+        return this.getLoggedUser().getStringId().equals(id);
+    }
+
+    @Override
+    public boolean isLogged(IUser user) {
+        return isLogged(user.getStringId());
     }
 
     public <T> Page<IUser> changeType(Page<T> users, Pageable pageable) {

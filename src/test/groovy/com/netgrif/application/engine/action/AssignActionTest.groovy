@@ -2,6 +2,7 @@ package com.netgrif.application.engine.action
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorizingObject
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.domain.repositories.UserRepository
@@ -35,7 +36,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 
 @ExtendWith(SpringExtension.class)
@@ -93,10 +96,12 @@ class AssignActionTest {
 
         createMainAndSecondaryNet()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
+                                                             AuthorizingObject.FILTER_DELETE_OWN.name()], "admin": AuthorizingObject.stringValues()])
+        def authorityList = Stream.concat(auths.get("user").stream(), auths.get("admin").stream()).collect(Collectors.toList()).toArray()
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
-                [auths.get("user"), auths.get("admin")] as Authority[],
+                authorityList as Authority[],
 //                [org] as Group[],
                 [] as ProcessRole[])
     }

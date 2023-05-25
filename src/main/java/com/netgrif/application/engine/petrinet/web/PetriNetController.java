@@ -1,5 +1,6 @@
 package com.netgrif.application.engine.petrinet.web;
 
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.eventoutcomes.LocalisedEventOutcomeFactory;
 import com.netgrif.application.engine.importer.service.Importer;
@@ -11,7 +12,6 @@ import com.netgrif.application.engine.petrinet.domain.version.StringToVersionCon
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.application.engine.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.application.engine.petrinet.web.responsebodies.*;
-import com.netgrif.application.engine.workflow.domain.FileStorageConfiguration;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetEventOutcome;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessage;
 import com.netgrif.application.engine.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
@@ -36,16 +36,16 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/petrinet")
@@ -60,9 +60,6 @@ public class PetriNetController {
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
     @Autowired
-    private FileStorageConfiguration fileStorageConfiguration;
-
-    @Autowired
     private IPetriNetService service;
 
     @Autowired
@@ -71,7 +68,7 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Authorize(authority = "PROCESS_UPLOAD")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -82,7 +79,7 @@ public class PetriNetController {
     })
     @PostMapping(value = "/import", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EventOutcomeWithMessage> importPetriNet(
-            @RequestParam(value = "file", required = true) MultipartFile multipartFile,
+            @RequestParam(value = "file") MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
         try {
@@ -96,6 +93,7 @@ public class PetriNetController {
         }
     }
 
+    @Authorize(authority = "PROCESS_VIEW_ALL")
     @Operation(summary = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
@@ -104,7 +102,7 @@ public class PetriNetController {
             return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
         } else if (identifier == null && version != null) {
             return new PetriNetReferenceResources(service.getReferencesByVersion(converter.convert(version), user, locale));
-        } else if (identifier != null && version != null) {
+        } else if (identifier != null) {
             return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)));
         } else {
             return new PetriNetReferenceResources(service.getReferences(user, locale));
@@ -113,8 +111,32 @@ public class PetriNetController {
 
     @Operation(summary = "Get process by id", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
+    public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
+    }
+
+    @Authorize(authority = "PROCESS_VIEW_OWN")
+    @Operation(description = "Get all processes", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetReferenceResources getMy(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        List<PetriNetReference> references;
+        if (identifier != null && version == null) {
+            references = service.getReferencesByIdentifier(identifier, user, locale).stream().filter(ref -> ref.getAuthor().getId().equals(user.getId())).collect(Collectors.toList());
+            return new PetriNetReferenceResources(references);
+        } else if (identifier == null && version != null) {
+            references = service.getReferencesByVersion(converter.convert(version), user, locale).stream().filter(ref -> ref.getAuthor().getId().equals(user.getId())).collect(Collectors.toList());
+            return new PetriNetReferenceResources(references);
+        } else if (identifier != null) {
+            PetriNetReference reference = service.getReference(identifier, converter.convert(version), user, locale);
+            if (reference.getAuthor().getId().equals(user.getId()))
+                return new PetriNetReferenceResources(Collections.singletonList(reference));
+            else
+                return new PetriNetReferenceResources(new ArrayList<PetriNetReference>());
+        } else {
+            references = service.getReferences(user, locale).stream().filter(ref -> ref.getAuthor().getId().equals(user.getId())).collect(Collectors.toList());
+            return new PetriNetReferenceResources(references);
+        }
     }
 
     @Operation(summary = "Get process by identifier and version", security = {@SecurityRequirement(name = "BasicAuth")})
@@ -127,7 +149,7 @@ public class PetriNetController {
     @Operation(summary = "Get transitions of processes", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
-        ids.forEach(id -> id = decodeUrl(id));
+        ids.forEach(PetriNetController::decodeUrl);
         return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
     }
 
@@ -153,7 +175,7 @@ public class PetriNetController {
 
     @Operation(summary = "Download process model", security = {@SecurityRequirement(name = "BasicAuth")})
     @GetMapping(value = "/{netId}/file", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
+    public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, HttpServletResponse response) {
         FileSystemResource fileResource = service.getFile(decodeUrl(netId), decodeUrl(title));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileResource.getFilename() + Importer.FILE_EXTENSION + "\"");
@@ -175,7 +197,7 @@ public class PetriNetController {
         return resources;
     }
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallProcessDelete(#auth.getPrincipal(), #processId)")
+    @Authorize(authority = "PROCESS_DELETE_ALL")
     @Operation(summary = "Delete process",
             description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -195,14 +217,33 @@ public class PetriNetController {
         return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
     }
 
-    public static String decodeUrl(String s1) {
-        try {
-            if (s1 == null)
-                return null;
-            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            log.error("Decoding URL failed: ", e);
-            return "";
+    @Authorize(authority = "PROCESS_DELETE_OWN")
+    @Operation(summary = "Delete process",
+            description = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
+            security = {@SecurityRequirement(name = "BasicAuth")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "403", description = "Caller doesn't fulfill the authorisation requirements")
+    })
+    @RequestMapping(value = "/my/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource deleteMyPetriNet(@PathVariable("id") String processId, Authentication auth) {
+        String decodedProcessId = decodeUrl(processId);
+        if (Objects.equals(decodedProcessId, "")) {
+            log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
+            return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
         }
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        PetriNet net = service.getPetriNet(processId);
+        if (net != null && net.getAuthor().getId().equals(user.getId())) {
+            this.service.deletePetriNet(decodedProcessId, user);
+            return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+        }
+        return MessageResource.errorMessage("Petri net " + decodedProcessId + " was not deleted.");
+    }
+
+    public static String decodeUrl(String s1) {
+        if (s1 == null)
+            return null;
+        return URLDecoder.decode(s1, StandardCharsets.UTF_8);
     }
 }

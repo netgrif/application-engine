@@ -1,9 +1,8 @@
-package com.netgrif.application.engine.petrinet.webprocessRolesAndPermissionses
+package com.netgrif.application.engine.petrinet.web
 
 import com.netgrif.application.engine.TestHelper
-import com.netgrif.application.engine.auth.domain.Authority
-import com.netgrif.application.engine.auth.domain.User
-import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.auth.domain.*
+import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.ipc.TaskApiTest
 import com.netgrif.application.engine.petrinet.domain.PetriNet
 import com.netgrif.application.engine.petrinet.domain.VersionType
@@ -13,15 +12,16 @@ import com.netgrif.application.engine.startup.ImportHelper
 import com.netgrif.application.engine.startup.SuperCreator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 //import com.netgrif.application.engine.orgstructure.domain.Group
 
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -32,6 +32,7 @@ import org.springframework.web.context.WebApplicationContext
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ExtendWith(SpringExtension.class)
@@ -40,8 +41,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PetriNetControllerTest {
 
     public static final String NET_FILE = "process_delete_test.xml"
+    public static final String USER_NET_FILE = "all_data.xml"
 
     private static final String DELETE_PROCESS_URL = "/api/petrinet/"
+    private static final String DELETE_MY_PROCESS_URL = "/api/petrinet/my/"
+
+    private static final String VIEW_MY_PROCESS_URL = "/api/petrinet/my"
 
     private static final String USER_EMAIL = "user@test.com"
     private static final String ADMIN_EMAIL = "admin@test.com"
@@ -63,7 +68,10 @@ class PetriNetControllerTest {
     @Autowired
     private TestHelper testHelper
 
-    private PetriNet net
+    @Autowired
+    private IUserService userService
+
+    private PetriNet net, userNet
 
     private Authentication userAuth
     private Authentication adminAuth
@@ -76,20 +84,18 @@ class PetriNetControllerTest {
     void before() {
         testHelper.truncateDbs()
 
-        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
-        assert net.getNet() != null
-
-        this.net = net.getNet()
-
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
 
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("user")] as Authority[],
+        def auths = importHelper.createAuthorities(["user": [AuthorizingObject.FILTER_UPLOAD.name(),
+                                                             AuthorizingObject.FILTER_DELETE_OWN.name(), AuthorizingObject.PROCESS_DELETE_OWN.name(), AuthorizingObject.PROCESS_VIEW_OWN.name()],
+                                                    "admin": AuthorizingObject.stringValues()])
+
+        IUser basicUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
+                auths.get("user").toArray() as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
@@ -97,14 +103,23 @@ class PetriNetControllerTest {
         userAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
 
         importHelper.createUser(new User(name: "Admin", surname: "User", email: ADMIN_EMAIL, password: "password", state: UserState.ACTIVE),
-                [auths.get("admin")] as Authority[],
+                auths.get("admin").toArray() as Authority[],
 //                [] as Group[],
                 [] as ProcessRole[])
 
-        adminAuth = new UsernamePasswordAuthenticationToken(ADMIN_EMAIL, "password")
+        adminAuth = new UsernamePasswordAuthenticationToken(userService.findByEmail(ADMIN_EMAIL, false).transformToLoggedUser(), "password", auths.get("admin"))
         adminAuth.setDetails(new WebAuthenticationDetails(new MockHttpServletRequest()))
-    }
 
+        def net = petriNetService.importPetriNet(stream(NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        assert net.getNet() != null
+        this.net = net.getNet()
+
+        def userNet = petriNetService.importPetriNet(stream(USER_NET_FILE), VersionType.MAJOR, basicUser.transformToLoggedUser())
+        assert userNet.getNet() != null
+        this.userNet = userNet.getNet()
+
+
+    }
 
     @Test
     void testDeleteProcess() {
@@ -114,6 +129,21 @@ class PetriNetControllerTest {
 
         mvc.perform(delete(DELETE_PROCESS_URL + net.stringId)
                 .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+    }
+
+    @Test
+    void testDeleteMyProcess() {
+        mvc.perform(delete(DELETE_MY_PROCESS_URL + userNet.stringId)
+                .with(authentication(this.userAuth)))
+                .andExpect(status().isOk())
+    }
+
+    @Test
+    void testViewMyProcess() {
+        mvc.perform(get(VIEW_MY_PROCESS_URL)
+                .param("identifier", userNet.stringId)
+                .with(authentication(this.userAuth)))
                 .andExpect(status().isOk())
     }
 }

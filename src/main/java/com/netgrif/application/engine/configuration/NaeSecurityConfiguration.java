@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.configuration;
 
 import com.netgrif.application.engine.auth.domain.Authority;
+import com.netgrif.application.engine.auth.domain.AuthorityProperties;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
@@ -34,6 +35,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.HashSet;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
@@ -72,6 +74,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     protected NaeLdapProperties ldapProperties;
 
+    @Autowired
+    private AuthorityProperties authorityProperties;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -107,7 +112,7 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(getPatterns()).permitAll()
+                .antMatchers(naeAuthProperties.getServerPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -121,7 +126,6 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
-
         setCsrf(http);
     }
 
@@ -156,13 +160,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return env;
     }
 
-    protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
-        Authority authority = authorityService.getOrCreate(Authority.anonymous);
-        authority.setUsers(new HashSet<>());
+    private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
+        List<Authority> authorities = authorityService.getOrCreate(authorityProperties.getDefaultAnonymousAuthorities());
+        authorities.forEach(a -> a.setUsers(new HashSet<>()));
         return new PublicAuthenticationFilter(
                 authenticationManager(),
                 new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                authority,
+                authorities,
                 this.naeAuthProperties.getServerPatterns(),
                 this.naeAuthProperties.getAnonymousExceptions(),
                 this.jwtService,

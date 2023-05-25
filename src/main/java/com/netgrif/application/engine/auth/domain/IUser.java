@@ -48,6 +48,8 @@ public interface IUser {
 
     void addAuthority(Authority authority);
 
+    void removeAuthority(Authority authority);
+
     void addProcessRole(ProcessRole role);
 
     void removeProcessRole(ProcessRole role);

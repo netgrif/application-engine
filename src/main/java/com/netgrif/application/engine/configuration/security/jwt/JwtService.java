@@ -53,13 +53,13 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public LoggedUser getLoggedUser(String token, Authority anonymousAuthority) {
+    public LoggedUser getLoggedUser(String token, List<Authority> anonymousAuthority) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>) getAllClaimsFromToken(token).get("user");
         LoggedUser user = new LoggedUser(
                 userMap.get("id").toString(),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
-                Collections.singleton(anonymousAuthority)
+                anonymousAuthority
         );
         user.setFullName(userMap.get("fullName").toString());
         user.setAnonymous((boolean) userMap.get("anonymous"));

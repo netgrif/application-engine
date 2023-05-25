@@ -47,10 +47,6 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         processRoles.forEach(role -> this.processRoles.add(role.getStringId()));
     }
 
-    public boolean isAdmin() {
-        return getAuthorities().contains(new Authority(Authority.admin));
-    }
-
     public String getEmail() {
         return getUsername();
     }
@@ -108,5 +104,9 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         author.setFullName(this.fullName);
 
         return author;
+    }
+
+    public boolean hasAuthority(String authorityName) {
+        return this.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(authorityName));
     }
 }

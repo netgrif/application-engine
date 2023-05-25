@@ -3,36 +3,28 @@ package com.netgrif.application.engine.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.*;
 
 @Document
 public class Authority implements GrantedAuthority {
 
     public static final long serialVersionUID = 2839744057647464485L;
 
-    public static final String PERMISSION = "PERM_";
-    public static final String ROLE = "ROLE_";
+    public static final String defaultAdminAuthority = "*";
 
-    public static final String admin = ROLE + "ADMIN";
-    public static final String systemAdmin = ROLE + "SYSTEMADMIN";
-    public static final String user = ROLE + "USER";
-    public static final String anonymous = ROLE + "ANONYMOUS";
-
+    public static final List<String> defaultUserAuthorities = Arrays.asList("FILTER_*",
+            AuthorizingObject.GROUP_VIEW_OWN.name());
+    public static final List<String> defaultAnonymousAuthorities = Collections.emptyList();
 
     @Id
-    @Getter
-    private ObjectId _id;
-
     @NotNull
     @JsonIgnore
     @Getter
-    @Setter
     private String name;
 
     @JsonIgnore
@@ -41,26 +33,28 @@ public class Authority implements GrantedAuthority {
     private Set<String> users;
 
     public Authority() {
+        this.users = new HashSet<>();
     }
 
     public Authority(String name) {
+        this();
         this.name = name;
     }
 
-    public static Authority createRole(String name) {
-        return new Authority(ROLE + name);
-    }
-
-    public static Authority createPermission(String name) {
-        return new Authority(PERMISSION + name);
+    public Authority(AuthorizingObject authority) {
+        this(authority.name());
     }
 
     public void addUser(IUser user) {
         users.add(user.getStringId());
     }
 
+    public void removeUser(IUser user) {
+        users.remove(user.getStringId());
+    }
+
     public String getStringId() {
-        return _id.toString();
+        return name;
     }
 
     @Override
@@ -85,7 +79,7 @@ public class Authority implements GrantedAuthority {
     @Override
     public String toString() {
         return "Authority{" +
-                "id=" + _id +
+                "id=" + name +
                 ", name='" + name + '\'' +
                 '}';
     }

@@ -404,6 +404,13 @@
             <version>2.2.0-rc2</version>
         </dependency>
 
+        <!-- Language injection -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.0.0</version>
+        </dependency>
+
         <!-- Dev tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

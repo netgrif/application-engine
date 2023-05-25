@@ -2,6 +2,7 @@ package com.netgrif.application.engine.menu
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.UserService
@@ -116,6 +117,9 @@ class MenuImportExportTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private User dummyUser;
 
     private Authentication userAuth
@@ -199,7 +203,7 @@ class MenuImportExportTest {
     }
 
     private User createDummyUser() {
-        def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
+        def auths = importHelper.createAuthorities(["user": authorityProperties.defaultUserAuthorities, "admin": authorityProperties.defaultAdminAuthorities])
         return importHelper.createUser(new User(name: "Dummy", surname: "User", email: DUMMY_USER_MAIL, password: DUMMY_USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [] as ProcessRole[])

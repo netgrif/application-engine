@@ -93,7 +93,7 @@ class AuthenticationControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
-        controller.invite(new NewUserRequest(email: EMAIL, groups: [], processRoles: []), null)
+        controller.invite(new NewUserRequest(email: EMAIL, groups: [], processRoles: []))
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)

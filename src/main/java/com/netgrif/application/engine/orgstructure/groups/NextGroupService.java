@@ -10,6 +10,7 @@ import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchReques
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService;
 import com.netgrif.application.engine.mail.interfaces.IMailService;
 import com.netgrif.application.engine.orgstructure.groups.interfaces.INextGroupService;
+import com.netgrif.application.engine.orgstructure.web.responsebodies.Group;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -283,6 +284,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
+    public Set<Case> getGroupCasesOfUser(IUser groupUser) {
+        List<Case> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getStringId()))).toList();
+        return new HashSet<>(groupList);
+    }
+
+    @Override
     public String getGroupOwnerId(String groupId) {
         return this.getGroupOwnerId(this.findGroup(groupId));
     }
@@ -300,6 +307,15 @@ public class NextGroupService implements INextGroupService {
     @Override
     public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
         return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Group> getGroupsOfUser(String userId) {
+        List<Case> groups = this.findAllGroups();
+        return groups.stream()
+                .filter(aCase -> aCase.getAuthor().getId().equals(userId))
+                .map(aCase -> new Group(aCase.getStringId(), aCase.getTitle()))
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     protected static BooleanExpression groupCase() {

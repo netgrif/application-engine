@@ -2,7 +2,10 @@ package com.netgrif.application.engine.auth.domain;
 
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Set;
 
 @Document
 @Data

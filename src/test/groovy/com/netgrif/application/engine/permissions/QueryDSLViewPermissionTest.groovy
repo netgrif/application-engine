@@ -2,6 +2,7 @@ package com.netgrif.application.engine.permissions
 
 import com.netgrif.application.engine.TestHelper
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
@@ -64,12 +65,15 @@ class QueryDSLViewPermissionTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private static final String USER_EMAIL = "user123987645@test.com"
 
     private PetriNet net
     private PetriNet netWithUserRefs
     private IUser testUser
-    private Authority userAuthority
+    private List<Authority> userAuthority
 
     @BeforeEach
     void inti() {
@@ -82,10 +86,10 @@ class QueryDSLViewPermissionTest {
         assert netWithUserRefs.getNet() != null
         this.netWithUserRefs = netWithUserRefs.getNet()
 
-        userAuthority = authorityService.getOrCreate(Authority.user)
+        userAuthority = authorityService.getOrCreate(authorityProperties.defaultUserAuthorities)
 
         testUser = importHelper.createUser(new User(name: "Role", surname: "User", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
-                [userAuthority] as Authority[], [] as ProcessRole[])
+                userAuthority.toArray() as Authority[], [] as ProcessRole[])
     }
 
     @Test

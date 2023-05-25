@@ -98,14 +98,14 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
     public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
         Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.ASSIGN);
         Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.ASSIGN);
-        return loggedUser.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        return userPerm == null ? (rolePerm != null && rolePerm) : userPerm;
     }
 
     @Override
     public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
         Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.DELEGATE);
         Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.DELEGATE);
-        return loggedUser.isAdmin() || (userPerm == null ? (rolePerm != null && rolePerm) : userPerm);
+        return userPerm == null ? (rolePerm != null && rolePerm) : userPerm;
     }
 
     @Override
@@ -115,7 +115,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
         Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.FINISH);
         Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.FINISH);
-        return loggedUser.isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId));
+        return (userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId);
     }
 
     private boolean canAssignedCancel(IUser user, String taskId) {
@@ -133,16 +133,16 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
         Boolean rolePerm = userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.CANCEL);
         Boolean userPerm = userHasUserListPermission(loggedUser, taskId, RolePermission.CANCEL);
-        return loggedUser.isAdmin() || ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
+        return ((userPerm == null ? (rolePerm != null && rolePerm) : userPerm) && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
     }
 
     @Override
     public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+        return isAssignee(loggedUser, taskId);
     }
 
     @Override
     public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
-        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
+        return isAssignee(loggedUser, taskId);
     }
 }

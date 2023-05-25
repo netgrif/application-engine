@@ -1,9 +1,9 @@
 package com.netgrif.application.engine.auth.web;
 
+import com.netgrif.application.engine.auth.domain.Authorize;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.auth.domain.RegisteredUser;
 import com.netgrif.application.engine.auth.service.InvalidUserTokenException;
-import com.netgrif.application.engine.auth.service.UserDetailsServiceImpl;
 import com.netgrif.application.engine.auth.service.interfaces.IRegistrationService;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.auth.web.requestbodies.ChangePasswordRequest;
@@ -50,9 +50,6 @@ public class AuthenticationController {
     private IRegistrationService registrationService;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private IMailService mailService;
 
     @Autowired
@@ -91,14 +88,15 @@ public class AuthenticationController {
     }
 
     @Operation(summary = "Send invitation to a new user", security = {@SecurityRequirement(name = "BasicAuth")})
+    @Authorize(authority = "USER_CREATE")
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
+    public MessageResource invite(@RequestBody NewUserRequest newUserRequest) {
         try {
-            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
-                return MessageResource.errorMessage("Only admin can invite new users!");
+            if (!serverAuthProperties.isOpenRegistration()) {
+                return MessageResource.errorMessage("Registration is disabled.");
             }
 
-            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8);
             if (mailAttemptService.isBlocked(newUserRequest.email)) {
                 return MessageResource.successMessage("Done");
             }

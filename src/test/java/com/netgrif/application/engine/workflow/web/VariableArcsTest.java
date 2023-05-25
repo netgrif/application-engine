@@ -2,10 +2,7 @@ package com.netgrif.application.engine.workflow.web;
 
 import com.netgrif.application.engine.MockService;
 import com.netgrif.application.engine.TestHelper;
-import com.netgrif.application.engine.auth.domain.Authority;
-import com.netgrif.application.engine.auth.domain.IUser;
-import com.netgrif.application.engine.auth.domain.User;
-import com.netgrif.application.engine.auth.domain.UserState;
+import com.netgrif.application.engine.auth.domain.*;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.application.engine.petrinet.domain.PetriNet;
@@ -88,6 +85,9 @@ public class VariableArcsTest {
     @Autowired
     private TestHelper testHelper;
 
+    @Autowired
+    private AuthorityProperties authorityProperties;
+
     private PetriNet loaded;
 
     private IUser testUser;
@@ -115,7 +115,7 @@ public class VariableArcsTest {
         user.setState(UserState.ACTIVE);
         user.setEmail("VariableArcsTest@test.com");
         testUser = importHelper.createUser(user,
-                new Authority[]{authorityService.getOrCreate(Authority.user)},
+                authorityService.getOrCreate(authorityProperties.getDefaultUserAuthorities()).toArray(new Authority[]{}),
                 new ProcessRole[]{});
 
         finishCase = importHelper.createCase("finish case", loaded);

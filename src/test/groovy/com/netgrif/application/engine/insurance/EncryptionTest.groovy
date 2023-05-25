@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.insurance
 
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.AuthorityProperties
 import com.netgrif.application.engine.auth.domain.LoggedUser
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.importer.service.Importer
@@ -46,6 +47,9 @@ class EncryptionTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private AuthorityProperties authorityProperties
+
     private final String FIELD_NAME = "City"
     private final String FIELD_VALUE = "Bratislava"
 
@@ -87,7 +91,7 @@ class EncryptionTest {
     }
 
     LoggedUser mockLoggedUser() {
-        def authorityUser = authorityService.getOrCreate(Authority.user)
-        return new LoggedUser(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", [authorityUser])
+        def authorityUser = authorityService.getOrCreate(authorityProperties.defaultUserAuthorities)
+        return new LoggedUser(superCreator.getSuperUser().getStringId(), "super@netgrif.com", "password", authorityUser)
     }
 }
