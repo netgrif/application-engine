@@ -6,10 +6,13 @@ import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.configuration.authentication.providers.NaeAuthProperties;
 import com.netgrif.application.engine.configuration.properties.NaeLdapProperties;
 import com.netgrif.application.engine.configuration.properties.SecurityConfigProperties;
+import com.netgrif.application.engine.configuration.security.ImpersonationRequestFilter;
 import com.netgrif.application.engine.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.application.engine.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.application.engine.configuration.security.SecurityContextFilter;
+import com.netgrif.application.engine.configuration.security.filter.HostValidationRequestFilter;
 import com.netgrif.application.engine.configuration.security.jwt.IJwtService;
+import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService;
 import com.netgrif.application.engine.security.service.ISecurityContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +28,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -73,6 +77,9 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     protected NaeLdapProperties ldapProperties;
 
+    @Autowired
+    protected IImpersonationService impersonationService;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -109,8 +116,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .httpBasic()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
+                .addFilterBefore(new ForwardedHeaderFilter(), WebAsyncManagerIntegrationFilter.class)
                 .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(createSecurityContextFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(impersonationRequestFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(hostValidationRequestFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -119,14 +129,10 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
                 .logout()
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
-                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-                .and()
-                .headers()
-                .frameOptions().disable()
-                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
-                .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
-
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+        configureFilters(http);
+        configureSession(http);
+        setHeaders(http);
         setCsrf(http);
         corsEnable(http);
     }
@@ -166,6 +172,11 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
         return env;
     }
 
+    @Override
+    protected SecurityConfigProperties getSecurityConfigProperties() {
+        return properties;
+    }
+
     protected PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
         Authority authority = authorityService.getOrCreate(Authority.anonymous);
         authority.setUsers(new HashSet<>());
@@ -182,5 +193,13 @@ public class NaeSecurityConfiguration extends AbstractSecurityConfiguration {
 
     private SecurityContextFilter createSecurityContextFilter() {
         return new SecurityContextFilter(securityContextService);
+    }
+
+    private HostValidationRequestFilter hostValidationRequestFilter() {
+        return new HostValidationRequestFilter(properties);
+    }
+
+    private ImpersonationRequestFilter impersonationRequestFilter() {
+        return new ImpersonationRequestFilter(impersonationService);
     }
 }

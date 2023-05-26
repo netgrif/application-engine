@@ -101,7 +101,7 @@ public class PublicPetriNetController {
     @Operation(summary = "Get transitions of processes")
     @GetMapping(value = "/transitions", produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
-        ids.forEach(id -> id = decodeUrl(id));
+        ids.forEach(PetriNetController::decodeUrl);
         return new TransitionReferencesResource(petriNetService.getTransitionReferences(ids, userService.getAnonymousLogged(), locale));
     }
 }

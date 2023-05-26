@@ -53,9 +53,10 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
 
         if (requestQuery.containsKey(PETRINET)) {
-            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
+            builder.and(petriNet(requestQuery.get(PETRINET), loggedOrImpersonated, locale));
         }
         if (requestQuery.containsKey(AUTHOR)) {
             builder.and(author(requestQuery.get(AUTHOR)));
@@ -76,17 +77,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
+            Predicate groupPredicate = group(requestQuery.get(GROUP), loggedOrImpersonated, locale);
             if (groupPredicate != null) {
                 builder.and(groupPredicate);
             } else {
                 return null;
             }
         }
-        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(user));
-        permissionConstraints.or(buildViewUserQueryConstraint(user));
-        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(user));
+        BooleanBuilder permissionConstraints = new BooleanBuilder(buildViewRoleQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewRoleQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.or(buildViewUserQueryConstraint(loggedOrImpersonated));
+        permissionConstraints.andNot(buildNegativeViewUsersQueryConstraint(loggedOrImpersonated));
         builder.and(permissionConstraints);
         return builder;
     }

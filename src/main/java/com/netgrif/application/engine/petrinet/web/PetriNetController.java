@@ -75,7 +75,7 @@ public class PetriNetController {
     @Autowired
     private AsyncRunner asyncRunner;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@authorizationService.hasAuthority('ADMIN')")
     @Operation(summary = "Import new process",
             description = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             security = {@SecurityRequirement(name = "BasicAuth")})
@@ -197,6 +197,12 @@ public class PetriNetController {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         asyncRunner.execute(() -> this.service.deletePetriNet(decodedProcessId, user));
         return MessageResource.successMessage("Petri net " + decodedProcessId + " is being deleted");
+    }
+
+    @Operation(summary = "Get net by case id", security = {@SecurityRequirement(name = "BasicAuth")})
+    @GetMapping(value = "/case/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    public PetriNetImportReference getOne(@PathVariable("id") String caseId) {
+            return service.getNetFromCase(decodeUrl(caseId));
     }
 
     public static String decodeUrl(String s1) {
