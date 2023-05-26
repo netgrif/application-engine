@@ -1,0 +1,96 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>impersonation_users_select</id>
+	<version>1.0.0</version>
+	<initials>IPU</initials>
+	<title name="title">Impersonators configuration - user select</title>
+	<icon>home</icon>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+
+	<i18n locale="sk">
+		<i18nString name="select_impersonator">Výber zastupiteľa</i18nString>
+		<i18nString name="select_impersonator_placeholder">Vyhľadajte podľa mena alebo emailovej adresy</i18nString>
+		<i18nString name="title">Konfigurácia zastupiteľov - user select</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="select_impersonator">Vertreter auswählen</i18nString>
+		<i18nString name="select_impersonator_placeholder">Suche nach Name oder E-Mail-Adresse</i18nString>
+		<i18nString name="title">Vertreter Konfiguration - user select</i18nString>
+	</i18n>
+
+	<data type="text">
+		<id>parentId</id>
+		<title/>
+	</data>
+	<data type="enumeration_map">
+		<id>select_impersonator</id>
+		<title name="select_impersonator">Select impersonator</title>
+		<component>
+			<name>autocomplete_dynamic</name>
+		</component>
+		<placeholder name="select_impersonator_placeholder">Search by name or email address</placeholder>
+		<event type="set">
+			<id>select_impersonator_set</id>
+
+			<actions phase="post">
+				<action>
+					select_impersonator: f.select_impersonator;
+
+					if (!select_impersonator.value) {
+						change select_impersonator options { [:] }
+
+					} else if (!select_impersonator.options.containsKey(select_impersonator.value)) {
+						def selectableUsers = userService.searchAllCoMembers(
+								select_impersonator.value,
+								userService.loggedUser.transformToLoggedUser(),
+								false,
+								new com.netgrif.application.engine.utils.FullPageRequest()).content
+						change select_impersonator options {
+							[*selectableUsers].sort { it?.surname }.collectEntries { [(it.id): ("${it?.fullName} ($it.email)" as String)] }
+						}
+					}
+				</action>
+			</actions>
+		</event>
+	</data>
+
+	<transition>
+		<id>select_user</id>
+		<x>500</x>
+		<y>180</y>
+		<label>[select user]</label>
+		<dataGroup>
+			<id>select_user_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>select_impersonator</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t2_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t2_delegate</id>
+		</event>
+	</transition>
+</document>

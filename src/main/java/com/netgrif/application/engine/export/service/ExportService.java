@@ -26,13 +26,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-class ExportService implements IExportService {
+public class ExportService implements IExportService {
 
     @Autowired
     private IWorkflowService workflowService;
@@ -137,10 +138,16 @@ class ExportService implements IExportService {
         return buildCaseCsv(exportCases, config, outFile);
     }
 
-    protected OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    @Override
+    public OutputStream buildCaseCsv(List<Case> exportCases, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvCaseHeader(exportCases) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
-        PrintWriter writer = new PrintWriter(outStream, true);
+        PrintWriter writer;
+        if (config == null || config.getStandardCharsets() == null) {
+            writer = new PrintWriter(outStream, true, StandardCharsets.UTF_8);
+        } else {
+            writer = new PrintWriter(outStream, true, config.getStandardCharsets());
+        }
         writer.println(String.join(",", csvHeader));
         for (Case exportCase : exportCases) {
             writer.println(String.join(",", buildRecord(csvHeader, exportCase)).replace("\n", "\\n"));
@@ -209,7 +216,8 @@ class ExportService implements IExportService {
         return buildTaskCsv(exportTasks, config, outFile);
     }
 
-    protected OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
+    @Override
+    public OutputStream buildTaskCsv(List<Task> exportTasks, ExportDataConfig config, File outFile) throws FileNotFoundException {
         Set<String> csvHeader = config == null ? buildDefaultCsvTaskHeader(exportTasks) : config.getDataToExport();
         OutputStream outStream = new FileOutputStream(outFile, false);
         PrintWriter writer = new PrintWriter(outStream, true);
@@ -222,7 +230,8 @@ class ExportService implements IExportService {
         return outStream;
     }
 
-    protected List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
+    @Override
+    public List<String> buildRecord(Set<String> csvHeader, Case exportCase) {
         List<String> recordStringList = new LinkedList<>();
         for (String dataFieldId : csvHeader) {
             if (exportCase.getDataSet().containsKey(dataFieldId)) {
@@ -233,7 +242,8 @@ class ExportService implements IExportService {
         return recordStringList;
     }
 
-    protected String resolveFieldValue(Case exportCase, String exportFieldId) {
+    @Override
+    public String resolveFieldValue(Case exportCase, String exportFieldId) {
         String fieldValue;
         Field field = exportCase.getField(exportFieldId);
         Object fieldData = exportCase.getDataField(exportFieldId).getValue();
@@ -266,10 +276,10 @@ class ExportService implements IExportService {
                 fieldValue = ((UserFieldValue) fieldData).getEmail();
                 break;
             case DATE:
-                fieldValue =((LocalDate) fieldData).toString();
+                fieldValue = ((LocalDate) fieldData).toString();
                 break;
             case DATETIME:
-                fieldValue =((Date) fieldData).toString();
+                fieldValue = ((Date) fieldData).toString();
                 break;
             case USERLIST:
                 fieldValue = ((UserListField) fieldData).getValue().getUserValues().stream().map(UserFieldValue::getId).collect(Collectors.joining(";"));

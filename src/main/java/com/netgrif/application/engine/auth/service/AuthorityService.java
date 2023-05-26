@@ -3,12 +3,14 @@ package com.netgrif.application.engine.auth.service;
 import com.netgrif.application.engine.auth.domain.Authority;
 import com.netgrif.application.engine.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -55,5 +57,10 @@ public class AuthorityService implements IAuthorityService {
         if (!authority.isPresent())
             throw new IllegalArgumentException("Could not find authority with id [" + id + "]");
         return authority.get();
+    }
+
+    @Override
+    public List<Authority> findAllByIds(List<String> ids) {
+        return repository.findAllBy_idIn(ids.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 }
