@@ -18,7 +18,8 @@ public class MenuItemBody {
     private String uri;
     private String identifier;
     private Case filter;
-    private List<String> defaultHeaders;
+    private List<String> caseDefaultHeaders;
+    private List<String> taskDefaultHeaders;
     private Map<String, I18nString> allowedRoles;
     private Map<String, I18nString> bannedRoles;
 

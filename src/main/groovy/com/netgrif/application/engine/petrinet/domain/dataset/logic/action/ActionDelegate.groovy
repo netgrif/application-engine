@@ -87,7 +87,8 @@ class ActionDelegate {
     private static final String PREFERENCE_ITEM_FIELD_PARENT_ID = "parentId"
     private static final String PREFERENCE_ITEM_FIELD_CHILD_ITEM_IDS= "childItemIds"
     private static final String PREFERENCE_ITEM_FIELD_HAS_CHILDREN= "hasChildren"
-    private static final String PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS = "default_headers"
+    private static final String PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS = "case_default_headers"
+    private static final String PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS = "task_default_headers"
     private static final String PREFERENCE_ITEM_FIELD_IDENTIFIER = "menu_item_identifier"
     private static final String PREFERENCE_ITEM_FIELD_APPEND_MENU_ITEM = "append_menu_item_stringId"
     private static final String PREFERENCE_ITEM_FIELD_ALLOWED_ROLES = "allowed_roles"
@@ -1567,14 +1568,15 @@ class ActionDelegate {
      * @param bannedRoles ["role_import_id": "net_import_id"]
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> defaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
                 filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
                 null,
                 uri,
                 identifier,
                 filter,
-                defaultHeaders,
+                caseDefaultHeaders,
+                taskDefaultHeaders,
                 collectRolesForPreferenceItem(allowedRoles),
                 collectRolesForPreferenceItem(bannedRoles)
         )
@@ -1591,14 +1593,15 @@ class ActionDelegate {
      * @param bannedRoles
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> defaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, String groupName, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
                 filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
                 null,
                 uri,
                 identifier,
                 filter,
-                defaultHeaders,
+                caseDefaultHeaders,
+                taskDefaultHeaders,
                 collectRolesForPreferenceItem(allowedRoles),
                 collectRolesForPreferenceItem(bannedRoles)
         )
@@ -1616,14 +1619,15 @@ class ActionDelegate {
      * @param group - if null, default group is used
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> defaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, Map<String, String> allowedRoles, Map<String, String> bannedRoles = [:], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
                 filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
                 null,
                 uri,
                 identifier,
                 filter,
-                defaultHeaders,
+                caseDefaultHeaders,
+                taskDefaultHeaders,
                 collectRolesForPreferenceItem(allowedRoles),
                 collectRolesForPreferenceItem(bannedRoles)
         )
@@ -1640,14 +1644,15 @@ class ActionDelegate {
      * @param group - if null, default group is used
      * @return
      */
-    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> defaultHeaders = []) {
+    Case createMenuItem(String uri, String identifier, Case filter, List<ProcessRole> allowedRoles, List<ProcessRole> bannedRoles = [], Case group = null, List<String> caseDefaultHeaders = [], List<String> taskDefaultHeaders = []) {
         MenuItemBody body = new MenuItemBody(
                 filter.dataSet[FILTER_FIELD_I18N_FILTER_NAME].value as I18nString,
                 null,
                 uri,
                 identifier,
                 filter,
-                defaultHeaders,
+                caseDefaultHeaders,
+                taskDefaultHeaders,
                 collectRolesForPreferenceItem(allowedRoles),
                 collectRolesForPreferenceItem(bannedRoles)
         )
@@ -1668,10 +1673,17 @@ class ActionDelegate {
          bannedRoles   : { cl ->
              updateMenuItemRoles(item, cl as Closure, PREFERENCE_ITEM_FIELD_BANNED_ROLES)
          },
-         defaultHeaders: { cl ->
+         caseDefaultHeaders: { cl ->
              String defaultHeaders = cl() as String
-             setData("view_settings", item, [
-                     (PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
+             setData("item_settings", item, [
+                     (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
+             ])
+             workflowService.save(item)
+         },
+         taskDefaultHeaders: { cl ->
+             String defaultHeaders = cl() as String
+             setData("item_settings", item, [
+                     (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
              ])
              workflowService.save(item)
          },
@@ -1825,9 +1837,13 @@ class ActionDelegate {
                         "type" : "caseRef",
                         "value": [body.filter.stringId]
                 ],
-                (PREFERENCE_ITEM_FIELD_DEFAULT_HEADERS): [
+                (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): [
                         "type" : "text",
-                        "value": body.defaultHeaders.join(',')
+                        "value": body.caseDefaultHeaders.join(',')
+                ],
+                (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): [
+                        "type" : "text",
+                        "value": body.taskDefaultHeaders.join(',')
                 ],
                 (PREFERENCE_ITEM_FIELD_IDENTIFIER)     : [
                         "type" : "text",

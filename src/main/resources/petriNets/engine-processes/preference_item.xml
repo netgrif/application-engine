@@ -549,6 +549,16 @@
 		<title>Can be header mode changed?</title>
 		<init>true</init>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>use_case_default_headers</id>
+		<title>Use custom default headers?</title>
+		<init>true</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>case_default_headers</id>
+		<title name="default_headers">Set default headers</title>
+		<desc>Example: "meta-title,meta-visualId"</desc>
+	</data>
 
 	<!-- TASK VIEW CONFIGURATION DATA -->
 	<data type="taskRef">
@@ -698,10 +708,15 @@
 		<title>Can be header mode changed?</title>
 		<init>true</init>
 	</data>
-
+	<data type="boolean" immediate="true">
+		<id>use_task_default_headers</id>
+		<title>Use custom default headers?</title>
+		<init>true</init>
+	</data>
 	<data type="text" immediate="true">
-		<id>default_headers</id>
+		<id>task_default_headers</id>
 		<title name="default_headers">Set default headers</title>
+		<desc>Example: "meta-title,meta-user"</desc>
 	</data>
 
 	<!-- I18NS -->
@@ -903,21 +918,7 @@
 			<id>item_settings_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-			<dataRef>
-				<id>default_headers</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
+
 		</dataGroup>
 		<dataGroup>
 			<id>filter_update</id>
@@ -1475,6 +1476,44 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>use_case_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						trans: t.this,
+						use: f.use_case_default_headers,
+						headers: f.case_default_headers;
+
+						make headers,editable on trans when { use.value }
+						make headers,visible on trans when { !use.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
 	</transition>
 
@@ -1565,6 +1604,44 @@
 					<y>0</y>
 					<rows>1</rows>
 					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>use_task_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						trans: t.this,
+						use: f.use_task_default_headers,
+						headers: f.task_default_headers;
+
+						make headers,editable on trans when { use.value }
+						make headers,visible on trans when { !use.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_default_headers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
