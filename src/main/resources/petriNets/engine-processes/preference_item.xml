@@ -505,12 +505,11 @@
 		<id>case_headers_mode</id>
 		<title>Headers mode</title>
 		<options>
-			<option key="order">Order</option>
+			<option key="sort">Sort</option>
 			<option key="search">Search</option>
 			<option key="edit">Edit</option>
-			<option key="table">Table</option>
 		</options>
-		<init>order</init>
+		<init>sort,edit,search</init>
 		<action trigger="set">
 			headersMode: f.case_headers_mode,
 			defaultMode: f.case_headers_default_mode,
@@ -530,18 +529,19 @@
 		<id>case_headers_default_mode</id>
 		<title>Default headers mode</title>
 		<options>
-			<option key="order">Order</option>
+			<option key="sort">Sort</option>
+			<option key="search">Search</option>
+			<option key="edit">Edit</option>
 		</options>
-		<init>order</init>
+		<init>sort</init>
 	</data>
 	<data type="enumeration_map">
 		<id>case_headers_options_holder</id>
 		<title/>
 		<options>
-			<option key="order">Order</option>
+			<option key="sort">Sort</option>
 			<option key="search">Search</option>
 			<option key="edit">Edit</option>
-			<option key="table">Table</option>
 		</options>
 	</data>
 	<data type="boolean" immediate="true">
@@ -657,10 +657,10 @@
 		<id>task_headers_mode</id>
 		<title>Headers mode</title>
 		<options>
-			<option key="order">Order</option>
+			<option key="sort">Sort</option>
 			<option key="edit">Edit</option>
 		</options>
-		<init>order</init>
+		<init>sort,edit</init>
 		<action trigger="set">
 			headersMode: f.task_headers_mode,
 			defaultMode: f.task_headers_default_mode,
@@ -680,15 +680,16 @@
 		<id>task_headers_default_mode</id>
 		<title>Default headers mode</title>
 		<options>
-			<option key="order">Order</option>
+			<option key="sort">Sort</option>
+			<option key="edit">Edit</option>
 		</options>
-		<init>order</init>
+		<init>sort</init>
 	</data>
 	<data type="enumeration_map">
 		<id>task_headers_options_holder</id>
 		<title/>
 		<options>
-			<option key="order">Order</option>
+			<option key="sort">Sort</option>
 			<option key="edit">Edit</option>
 		</options>
 	</data>
