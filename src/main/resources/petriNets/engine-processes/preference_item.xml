@@ -68,7 +68,6 @@
 							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
 				}
 				change previewTaskRef value { [] }
-				make updateBtn,visible on trans when { true }
 			}
 		}
 	</function>
@@ -353,21 +352,27 @@
 		</component>
 		<action trigger="set">
 			trans: t.item_settings,
+			useCustomView: f.use_custom_view,
 			filterAutocomplete: f.this,
 			filter_case: f.filter_case,
 			update_filter: f.update_filter,
 			previewTaskRef: f.selected_filter_preview;
 
 			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
+
+			make update_filter,visible on trans when { !useCustomView.value }
 		</action>
 		<action trigger="get">
 			trans: t.item_settings,
+			useCustomView: f.use_custom_view,
 			filterAutocomplete: f.this,
 			filter_case: f.filter_case,
 			update_filter: f.update_filter,
 			previewTaskRef: f.selected_filter_preview;
 
 			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
+
+			make update_filter,visible on trans when { !useCustomView.value }
 		</action>
 	</data>
 	<data type="button">
@@ -440,6 +445,16 @@
 		<allowedNets>
 			<allowedNet>filter</allowedNet>
 		</allowedNets>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>use_custom_view</id>
+		<title>Use custom view?</title>
+		<init>false</init>
+	</data>
+	<data type="text" immediate="true">
+		<id>custom_view_selector</id>
+		<title>Custom view configuration selector</title>
+		<desc>Example: "demo-tabbed-views"</desc>
 	</data>
 
 	<!-- CASE VIEW CONFIGURATION DATA -->
@@ -796,7 +811,7 @@
 		<icon>settings</icon>
 		<dataGroup>
 			<id>general_0</id>
-			<cols>5</cols>
+			<cols>4</cols>
 			<layout>grid</layout>
 			<dataRef>
 				<id>menu_name</id>
@@ -818,7 +833,7 @@
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>2</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -832,7 +847,7 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>4</x>
+					<x>3</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -896,7 +911,7 @@
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
-					<appearance>standard</appearance>
+					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
@@ -913,91 +928,89 @@
 					<appearance>standard</appearance>
 				</layout>
 			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>item_settings_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-
-		</dataGroup>
-		<dataGroup>
-			<id>filter_update</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<title name="filter_update_title">Filter section</title>
 			<dataRef>
-				<id>filter_autocomplete_selection</id>
+				<id>use_custom_view</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>3</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>update_filter</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
+					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>selected_filter_preview</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>standard</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>current_filter</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>filter_header</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
+				<event type="set">
+					<id>0</id>
+					<actions phase="post">
+						<action>
+							trans: t.this,
+							caseHeader: f.case_view_header,
+							caseTaskRef: f.case_view_settings_taskRef,
+							taskHeader: f.task_view_header,
+							taskTaskRef: f.task_view_settings_taskRef,
+
+							useTabIcon: f.use_tab_icon,
+							tabIconPreview: f.tab_icon_preview,
+							tabName: f.tab_name,
+							tabIcon: f.tab_icon,
+							filterSelection: f.filter_autocomplete_selection,
+							updateFilter: f.update_filter,
+							selectedFilterPreview: f.selected_filter_preview,
+							currentFilterHeader: f.filter_header,
+							currentFilterPreview: f.current_filter_preview,
+
+							use: f.use_custom_view,
+							selector: f.custom_view_selector;
+
+							make selector,editable on trans when { use.value }
+							make selector,visible on trans when { !use.value }
+
+							make caseHeader,visible on trans when { !use.value }
+							make caseHeader,hidden on trans when { use.value }
+							make caseTaskRef,editable on trans when { !use.value }
+							make caseTaskRef,hidden on trans when { use.value }
+
+							make taskHeader,visible on trans when { !use.value }
+							make taskHeader,hidden on trans when { use.value }
+							make taskTaskRef,editable on trans when { !use.value }
+							make taskTaskRef,hidden on trans when { use.value }
+
+							make useTabIcon,editable on trans when { !use.value }
+							make useTabIcon,hidden on trans when { use.value }
+							make tabIconPreview,visible on trans when { !use.value }
+							make tabIconPreview,hidden on trans when { use.value }
+							make tabName,editable on trans when { !use.value }
+							make tabName,hidden on trans when { use.value }
+							make tabIcon,editable on trans when { !use.value }
+							make tabIcon,hidden on trans when { use.value }
+							make filterSelection,editable on trans when { !use.value }
+							make filterSelection,hidden on trans when { use.value }
+							make updateFilter,visible on trans when { !use.value }
+							make updateFilter,hidden on trans when { use.value }
+							make selectedFilterPreview,visible on trans when { !use.value }
+							make selectedFilterPreview,hidden on trans when { use.value }
+							make currentFilterHeader,visible on trans when { !use.value }
+							make currentFilterHeader,hidden on trans when { use.value }
+							make currentFilterPreview,visible on trans when { !use.value }
+							make currentFilterPreview,hidden on trans when { use.value }
+						</action>
+					</actions>
+				</event>
 			</dataRef>
 			<dataRef>
-				<id>current_filter_preview</id>
+				<id>custom_view_selector</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>0</x>
-					<y>1</y>
+					<x>1</x>
+					<y>2</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
 					<template>material</template>
-					<appearance>standard</appearance>
+					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
@@ -1120,6 +1133,87 @@
 					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>filter_update</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<title name="filter_update_title">Filter section</title>
+			<dataRef>
+				<id>filter_autocomplete_selection</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>update_filter</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>selected_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>current_filter</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_header</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>current_filter_preview</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
