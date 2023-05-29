@@ -10,13 +10,13 @@ import com.netgrif.application.engine.workflow.domain.Task;
 
 public interface IRuleEngine {
 
-    void evaluateRules(Case useCase, CaseCreatedFact caseCreatedFact);
+    int evaluateRules(Case useCase, CaseCreatedFact caseCreatedFact);
 
-    void evaluateRules(Case useCase, Task task, TransitionEventFact transitionEventFact);
+    int evaluateRules(Case useCase, Task task, TransitionEventFact transitionEventFact);
 
-    void evaluateRules(Case useCase, ScheduledRuleFact scheduledRuleFact);
+    int evaluateRules(Case useCase, ScheduledRuleFact scheduledRuleFact);
 
-    void evaluateRules(PetriNet petriNet, NetImportedFact fact);
+    int evaluateRules(PetriNet petriNet, NetImportedFact fact);
 
-    void evaluateRules(PetriNet petriNet, ScheduledRuleFact scheduledRuleFact);
+    int evaluateRules(PetriNet petriNet, ScheduledRuleFact scheduledRuleFact);
 }

@@ -1,11 +1,11 @@
 package com.netgrif.application.engine.elastic.service;
 
-import com.google.common.collect.ImmutableMap;
 import com.netgrif.application.engine.auth.domain.LoggedUser;
 import com.netgrif.application.engine.elastic.domain.ElasticCase;
 import com.netgrif.application.engine.elastic.domain.ElasticCaseRepository;
 import com.netgrif.application.engine.elastic.domain.ElasticQueryConstants;
 import com.netgrif.application.engine.elastic.service.executors.Executor;
+import com.netgrif.application.engine.elastic.service.interfaces.IElasticCasePrioritySearch;
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
@@ -15,22 +15,20 @@ import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -51,7 +49,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Value("${spring.data.elasticsearch.index.case}")
     private String caseIndex;
 
-
     @Autowired
     private ElasticsearchRestTemplate template;
 
@@ -59,6 +56,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private IElasticCasePrioritySearch iElasticCasePrioritySearch;
 
     @Autowired
     public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
@@ -71,23 +71,6 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
     @Lazy
     public void setWorkflowService(IWorkflowService workflowService) {
         this.workflowService = workflowService;
-    }
-
-    private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
-            "title.keyword", 2f,
-            "authorName", 1f,
-            "authorEmail", 1f,
-            "visualId.keyword", 2f
-    );
-
-    /**
-     * See {@link QueryStringQueryBuilder#fields(Map)}
-     *
-     * @return map where keys are ElasticCase field names and values are boosts of these fields
-     */
-    @Override
-    public Map<String, Float> fullTextFields() {
-        return fullTextFieldMap;
     }
 
     @Override
@@ -138,12 +121,14 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        pageable = resolveUnmappedSortAttributes(pageable);
+        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
-            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class,  IndexCoordinates.of(caseIndex));
-            Page<ElasticCase> indexedCases = (Page)SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
+            SearchHits<ElasticCase> hits = template.search(query, ElasticCase.class, IndexCoordinates.of(caseIndex));
+            Page<ElasticCase> indexedCases = (Page) SearchHitSupport.unwrapSearchHits(SearchHitSupport.searchPageFor(hits, query.getPageable()));
             casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
             total = indexedCases.getTotalElements();
         } else {
@@ -160,7 +145,8 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        LoggedUser loggedOrImpersonated = user.getSelfOrImpersonated();
+        NativeSearchQuery query = buildQuery(requests, loggedOrImpersonated, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
         } else {
@@ -225,6 +211,9 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         for (CaseSearchRequest.PetriNet process : request.process) {
             if (process.identifier != null) {
                 petriNetQuery.should(termQuery("processIdentifier", process.identifier));
+            }
+            if (process.processId != null) {
+                petriNetQuery.should(termQuery("processId", process.processId));
             }
         }
 
@@ -365,16 +354,13 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
         query.filter(dataQuery);
     }
 
-    /**
-     * Full text search on fields defined by {@link #fullTextFields()}.
-     */
     private void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
         }
 
         // TODO: improvement? wildcard does not scale good
-        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(iElasticCasePrioritySearch.fullTextFields());
         query.must(fullTextQuery);
     }
 
@@ -464,5 +450,11 @@ public class ElasticCaseService extends ElasticViewPermissionService implements 
                 .forEach(groupQuery::should);
         query.filter(groupQuery);
         return false;
+    }
+
+    private Pageable resolveUnmappedSortAttributes(Pageable pageable) {
+        List<Sort.Order> modifiedOrders = new ArrayList<>();
+        pageable.getSort().iterator().forEachRemaining(order -> modifiedOrders.add(new Order(order.getDirection(), order.getProperty()).withUnmappedType("keyword")));
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()).withSort(Sort.by(modifiedOrders));
     }
 }

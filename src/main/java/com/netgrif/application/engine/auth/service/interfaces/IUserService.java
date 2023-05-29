@@ -49,7 +49,7 @@ public interface IUserService {
 
     void addDefaultAuthorities(IUser user);
 
-    void assignAuthority(String userId, String authorityId);
+    IUser assignAuthority(String userId, String authorityId);
 
     IUser getLoggedOrSystem();
 
@@ -58,6 +58,8 @@ public interface IUserService {
     IUser getSystem();
 
     LoggedUser getAnonymousLogged();
+
+    LoggedUser getLoggedUserFromContext();
 
     IUser addRole(IUser user, String roleStringId);
 

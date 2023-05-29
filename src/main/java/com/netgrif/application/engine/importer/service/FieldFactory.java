@@ -81,7 +81,7 @@ public final class FieldFactory {
                 field = buildUserField(data, importer);
                 break;
             case USER_LIST:
-                field = buildUserListField(data);
+                field = buildUserListField(data, importer);
                 break;
             case CASE_REF:
                 field = buildCaseField(data);
@@ -187,7 +187,14 @@ public final class FieldFactory {
         }
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
-                field.setDefaultValues(init);
+                init = init.stream().map(String::trim).collect(Collectors.toList());
+                List<String> finalInits = init.stream().filter(i -> field.getChoices().stream().anyMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
+                List<String> unresolvedChoices = init.stream().filter(i -> field.getChoices().stream().noneMatch(ch -> ch.getDefaultValue().equals(i))).collect(Collectors.toList());
+                if (!unresolvedChoices.isEmpty()) {
+                    finalInits.addAll(unresolvedChoices.stream().map(uch -> data.getOptions().getOption().stream().filter(o -> o.getKey().equals(uch)).findFirst().orElse(new Option()).getValue()).collect(Collectors.toList()));
+                    finalInits.removeAll(Collections.singletonList(null));
+                }
+                field.setDefaultValues(finalInits);
             }
         });
         return field;
@@ -202,6 +209,10 @@ public final class FieldFactory {
         }
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
+                String tempInit = init;
+                if (field.getChoices().stream().filter(ch -> ch.getDefaultValue().equals(tempInit)).findAny().isEmpty()) {
+                    init = data.getOptions().getOption().stream().filter(o -> o.getKey().equals(tempInit)).findFirst().orElse(new Option()).getValue();
+                }
                 field.setDefaultValue(init);
             }
         });
@@ -346,8 +357,11 @@ public final class FieldFactory {
         return field;
     }
 
-    private UserListField buildUserListField(Data data) {
-        UserListField field = new UserListField();
+    private UserListField buildUserListField(Data data, Importer importer) {
+        String[] roles = data.getValues().stream()
+                .map(value -> importer.getRoles().get(value.getValue()).getStringId())
+                .toArray(String[]::new);
+        UserListField field = new UserListField(roles);
         setDefaultValues(field, data, inits -> {
         });
         return field;
@@ -560,6 +574,11 @@ public final class FieldFactory {
     }
 
     private void parseUserListValues(UserListField field, Case useCase, String fieldId) {
+        DataField userListField = useCase.getDataField(fieldId);
+        if (userListField.getChoices() != null) {
+            Set<String> roles = userListField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+            field.setRoles(roles);
+        }
         field.setValue((UserListFieldValue) useCase.getFieldValue(fieldId));
     }
 

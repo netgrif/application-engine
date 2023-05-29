@@ -116,9 +116,10 @@ public class User extends AbstractUser implements RegisteredUser {
         loggedUser.setAnonymous(false);
         if (!this.getProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getProcessRoles());
-        if (!this.getNextGroups().isEmpty())
-            loggedUser.getGroups();
-
+        loggedUser.setGroups(this.getNextGroups());
+        if (this.isImpersonating()) {
+            loggedUser.impersonate(this.getImpersonated().transformToLoggedUser());
+        }
         return loggedUser;
     }
 
