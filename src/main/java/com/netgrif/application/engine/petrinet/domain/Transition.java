@@ -248,7 +248,7 @@ public class Transition extends Node {
         clone.setTitle(this.getTitle() == null ? null : this.getTitle().clone());
         clone.setPosition(this.getPosition().getX(), this.getPosition().getY());
         clone.setImportId(this.importId);
-        clone.setDataGroups(this.dataGroups == null ? null : dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone())));
+        clone.setDataGroups(this.dataGroups == null ? null : dataGroups.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         clone.setDataSet(this.dataSet == null ? null : dataSet.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y.clone(), LinkedHashMap::new)));
         clone.setRoles(this.roles == null ? null : roles.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new HashMap<>(e.getValue()))));
         clone.setNegativeViewRoles(new ArrayList<>(negativeViewRoles));
