@@ -512,8 +512,8 @@
 		<init>case_view_settings</init>
 	</data>
 	<data type="boolean" immediate="true">
-		<id>show_delete_menu</id>
-		<title>Show delete menu for item?</title>
+		<id>case_show_more_menu</id>
+		<title>Show more menu for case item?</title>
 		<init>false</init>
 	</data>
 	<data type="multichoice_map" immediate="true">
@@ -732,6 +732,11 @@
 		<id>task_default_headers</id>
 		<title name="default_headers">Set default headers</title>
 		<desc>Example: "meta-title,meta-user"</desc>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>task_show_more_menu</id>
+		<title>Show more menu for task item?</title>
+		<init>false</init>
 	</data>
 
 	<!-- I18NS -->
@@ -1442,7 +1447,7 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>show_delete_menu</id>
+				<id>case_show_more_menu</id>
 				<logic>
 					<behavior>editable</behavior>
 					<behavior>required</behavior>
@@ -1630,7 +1635,22 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_show_more_menu</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
