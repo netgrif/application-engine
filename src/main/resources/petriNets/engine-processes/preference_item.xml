@@ -68,6 +68,7 @@
 							.collectEntries({filterCase -&gt; [filterCase.stringId, filterCase.title]})
 				}
 				change previewTaskRef value { [] }
+				make updateBtn,visible on trans when { true }
 			}
 		}
 	</function>
@@ -360,7 +361,7 @@
 
 			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
 
-			make update_filter,visible on trans when { !useCustomView.value }
+			make update_filter,hidden on trans when { useCustomView.value }
 		</action>
 		<action trigger="get">
 			trans: t.item_settings,
@@ -372,7 +373,7 @@
 
 			updateFilterAutocompleteOptions(filterAutocomplete, previewTaskRef, filter_case, update_filter, trans, false)
 
-			make update_filter,visible on trans when { !useCustomView.value }
+			make update_filter,hidden on trans when { useCustomView.value }
 		</action>
 	</data>
 	<data type="button">
@@ -515,6 +516,11 @@
 		<id>case_show_more_menu</id>
 		<title>Show more menu for case item?</title>
 		<init>false</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>case_allow_header_table_mode</id>
+		<title>Allow table mode for headers?</title>
+		<init>true</init>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>case_headers_mode</id>
@@ -724,6 +730,11 @@
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
+		<id>task_allow_header_table_mode</id>
+		<title>Allow table mode for headers?</title>
+		<init>true</init>
+	</data>
+	<data type="boolean" immediate="true">
 		<id>use_task_default_headers</id>
 		<title>Use custom default headers?</title>
 		<init>true</init>
@@ -736,7 +747,7 @@
 	<data type="boolean" immediate="true">
 		<id>task_show_more_menu</id>
 		<title>Show more menu for task item?</title>
-		<init>false</init>
+		<init>true</init>
 	</data>
 
 	<!-- I18NS -->
@@ -1544,13 +1555,29 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>case_headers_mode</id>
+				<id>case_allow_header_table_mode</id>
 				<logic>
 					<behavior>editable</behavior>
 					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_headers_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>2</cols>
@@ -1566,10 +1593,10 @@
 					<behavior>required</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>4</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
@@ -1693,13 +1720,28 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>task_headers_mode</id>
+				<id>task_allow_header_table_mode</id>
 				<logic>
 					<behavior>editable</behavior>
 					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>task_headers_mode</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>2</cols>
@@ -1714,10 +1756,10 @@
 					<behavior>required</behavior>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>4</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
