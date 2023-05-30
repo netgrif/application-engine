@@ -498,6 +498,17 @@
 			}
 		</action>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>case_require_title_in_creation</id>
+		<title>Required title input in case creation?</title>
+		<init>true</init>
+	</data>
+	<data type="multichoice_map" immediate="true">
+		<id>case_banned_nets_in_creation</id>
+		<title>Banned processes for creation</title>
+		<desc>Select processes, that can't be used for case creation</desc>
+		<!--		todo options from filter.allowedNets-->
+	</data>
 	<data type="i18n">
 		<id>case_view_header</id>
 		<title/>
@@ -1481,7 +1492,7 @@
 					<x>0</x>
 					<y>1</y>
 					<rows>1</rows>
-					<cols>2</cols>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
@@ -1493,7 +1504,7 @@
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
-					<x>2</x>
+					<x>1</x>
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
@@ -1508,10 +1519,40 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_require_title_in_creation</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
 					<x>3</x>
 					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>case_banned_nets_in_creation</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>standard</appearance>
