@@ -3,30 +3,31 @@ package com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
 import com.netgrif.application.engine.petrinet.domain.I18nString
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression
 import org.springframework.data.annotation.Transient
+import java.util.List
 
 class DynamicValidation extends Validation {
 
     @Transient
-    private String compiledRule
+    private List compiledRule
 
     private Expression expression
 
-    DynamicValidation(String validationRule) {
-        this(validationRule, null)
+    DynamicValidation(String name, List validationRule) {
+        this(name, validationRule, null)
     }
 
-    DynamicValidation(String validationRule, I18nString validationMessage) {
-        super(validationRule, validationMessage)
+    DynamicValidation(String name, List validationRule, I18nString validationMessage) {
+        super(name, validationRule, validationMessage)
         this.expression = new Expression("\"$validationRule\"" as String)
     }
 
     DynamicValidation() {}
 
-    String getCompiledRule() {
+    List getCompiledRule() {
         return compiledRule
     }
 
-    void setCompiledRule(String compiledRule) {
+    void setCompiledRule(List compiledRule) {
         this.compiledRule = compiledRule
     }
 
@@ -35,12 +36,12 @@ class DynamicValidation extends Validation {
     }
 
     LocalizedValidation getLocalizedValidation(Locale locale) {
-        LocalizedValidation ret = new LocalizedValidation(this.compiledRule, getTranslatedValidationMessage(locale))
+        LocalizedValidation ret = new LocalizedValidation(this.name, this.compiledRule, getTranslatedValidationMessage(locale))
         return ret
     }
 
     @Override
     Validation clone() {
-        return new DynamicValidation(this.validationRule, this.validationMessage)
+        return new DynamicValidation(this.name, this.validationRule, this.validationMessage)
     }
 }

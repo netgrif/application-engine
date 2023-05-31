@@ -1,0 +1,161 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/Users/bawix/Documents/Netgrif/Netgrif/Application-Engine/Community/Backend2/src/main/resources/petriNets/petriflow_schema.xsd">
+	<id>test</id>
+	<initials>ttk</initials>
+	<title>Totok</title>
+	<icon>paid</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+
+    <data type="text">
+        <id>text_0</id>
+		<title></title>
+		<validations>
+			<validation>
+				<name>regex</name>
+				<arguments>
+					<argument key="expression">{0-9}[5]</argument>
+				</arguments>
+				<message name="neplatne_psc">Neplatné PSČ</message>
+			</validation>
+		</validations>
+    </data>
+
+	<data type="date">
+		<id>deadline</id>
+		<title></title>
+	</data>
+
+	<data type="date">
+		<id>date_0</id>
+		<title></title>
+		<validations>
+			<validation>
+				<name>between</name>
+				<arguments>
+					<argument key="start">past</argument>
+					<argument key="end" dynamic="true">deadline.rawValue</argument>
+				</arguments>
+				<message>Date field validation message</message>
+			</validation>
+		</validations>
+	</data>
+
+	<i18n locale="sk">
+		<i18nString name="neplatne_psc">totok</i18nString>
+	</i18n>
+
+	<transition>
+		<id>t1</id>
+		<x>260</x>
+		<y>20</y>
+		<label/>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>deadline</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t1_assign</id>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+		</event>
+		<event type="cancel">
+			<id>t1_cancel</id>
+		</event>
+		<event type="delegate">
+			<id>t1_delegate</id>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>260</x>
+		<y>100</y>
+		<label/>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>140</x>
+		<y>60</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>380</x>
+		<y>60</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

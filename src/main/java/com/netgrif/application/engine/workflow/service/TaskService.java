@@ -28,7 +28,7 @@ import com.netgrif.application.engine.rules.domain.facts.TransitionEventFact;
 import com.netgrif.application.engine.rules.service.interfaces.IRuleEngine;
 import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.utils.FullPageRequest;
-import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
+import com.netgrif.application.engine.validation.service.ValidationRegistry;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.State;
 import com.netgrif.application.engine.workflow.domain.Task;
@@ -110,7 +110,10 @@ public class TaskService implements ITaskService {
     protected IHistoryService historyService;
 
     @Autowired
-    protected IValidationService validation;
+    protected ValidationRegistry valid; // JOZII
+
+//    @Autowired
+//    protected IValidationService validation;
 
     @Autowired
     public void setElasticTaskService(IElasticTaskService elasticTaskService) {
@@ -230,6 +233,8 @@ public class TaskService implements ITaskService {
 
         log.info("[" + useCase.getStringId() + "]: Finishing task [" + task.getTitle() + "] to user [" + user.getSelfOrImpersonated().getEmail() + "]");
 
+//        valid.validate(task);
+        valid.validate(transition, useCase);
         validateData(transition, useCase);
         List<EventOutcome> outcomes = new ArrayList<>(eventService.runActions(transition.getPreFinishActions(), workflowService.findOne(task.getCaseId()), task, transition));
         useCase = workflowService.findOne(task.getCaseId());

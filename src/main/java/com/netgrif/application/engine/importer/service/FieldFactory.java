@@ -1,6 +1,7 @@
 package com.netgrif.application.engine.importer.service;
 
 import com.netgrif.application.engine.configuration.properties.DatabaseProperties;
+import com.netgrif.application.engine.importer.model.Argument;
 import com.netgrif.application.engine.importer.model.Data;
 import com.netgrif.application.engine.importer.model.DataType;
 import com.netgrif.application.engine.importer.model.Valid;
@@ -10,17 +11,17 @@ import com.netgrif.application.engine.importer.service.validation.IDataValidator
 import com.netgrif.application.engine.petrinet.domain.Component;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.ValidationRule;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@org.springframework.stereotype.Component
 @Slf4j
+@org.springframework.stereotype.Component
 public final class FieldFactory {
 
     private final DatabaseProperties properties;
@@ -55,18 +56,27 @@ public final class FieldFactory {
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
+
         if (data.getValid() != null) {
             List<Valid> list = data.getValid();
             for (Valid item : list) {
-                field.addValidation(makeValidation(item.getValue(), null, item.isDynamic()));
+                System.out.println(item);
+//                field.addValidation(item);
+//                field.addValidation(makeValidation(item.getValue(), null, item.isDynamic())); //TODO: JOZIII
             }
         }
+
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
+                if (item != null
+                        && item.getName() != null
+                        && item.getArguments() != null) {
+                    field.addValidation(makeValidation(item.getName().getValue(), item.getArguments().getArgument(), importer.toI18NString(item.getMessage().get(0)))); //TODO: JOZIII
+                }
             }
         }
+
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);
@@ -84,8 +94,31 @@ public final class FieldFactory {
         return field;
     }
 
-    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
+    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String name, List rule, I18nString message) {
+//        return dynamic ?
+//                new DynamicValidation(rule, message) :
+        return new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(name, makeValidationRules(rule), message);
+    }
+
+
+    private Map<String, ValidationRule> makeValidationRules(List rule) {
+        return (Map<String, ValidationRule>) rule.stream()
+                .filter(Objects::nonNull)
+                .map(this::convertToValidationRule)
+                .collect(Collectors.toMap(ValidationRule::getName, Function.identity()));
+    }
+
+    private ValidationRule convertToValidationRule(Object object) {
+        if (object instanceof Argument) {
+            Argument argument = (Argument) object;
+            ValidationRule validationRule = new ValidationRule();
+            validationRule.setName(argument.getKey());
+            validationRule.setRule(argument.getValue());
+            validationRule.setDynamic(Boolean.TRUE.equals(argument.isDynamic()));
+            return validationRule;
+        } else {
+            return null;
+        }
     }
 
     private void setEncryption(Field<?> field, Data data) {

@@ -1,12 +1,16 @@
 package com.netgrif.application.engine.petrinet.domain.dataset.logic.validation
 
+
 class LocalizedValidation {
 
-    private String validationRule
+    protected String name
+
+    private Map<String, ValidationRule> validationRule
 
     private String validationMessage
 
-    LocalizedValidation(String validationRule, String validationMessage) {
+    LocalizedValidation(String  name, Map<String, ValidationRule> validationRule, String validationMessage) {
+        this.name = name
         this.validationRule = validationRule
         this.validationMessage = validationMessage
     }
@@ -19,11 +23,11 @@ class LocalizedValidation {
         this.validationMessage = valMessage
     }
 
-    String getValidationRule() {
+    Map<String, ValidationRule> getValidationRule() {
         return validationRule
     }
 
-    void setValidationRule(String validationRule) {
+    void setValidationRule(Map<String, ValidationRule> validationRule) {
         this.validationRule = validationRule
     }
 }

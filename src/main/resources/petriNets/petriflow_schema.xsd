@@ -3,6 +3,6 @@
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
-    <xs:include schemaLocation="https://petriflow.com/petriflow.schema.xsd"/>
+    <xs:include schemaLocation="newSchema.xsd"/>
 
 </xs:schema>

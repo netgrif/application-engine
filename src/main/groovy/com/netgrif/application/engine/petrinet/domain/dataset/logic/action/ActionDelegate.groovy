@@ -1144,13 +1144,13 @@ class ActionDelegate /*TODO: release/7.0.0: implements ActionAPI*/ {
         }
     }
 
-    Validation validation(String rule, I18nString message) {
-        return new Validation(rule, message)
-    }
-
-    DynamicValidation dynamicValidation(String rule, I18nString message) {
-        return new DynamicValidation(rule, message)
-    }
+//    Validation validation(String rule, I18nString message) {
+//        return new Validation(rule, message)
+//    }
+//
+//    DynamicValidation dynamicValidation(String rule, I18nString message) {
+//        return new DynamicValidation(rule, message)
+//    }
 
     List<Case> findFilters(String userInput) {
         return filterSearchService.autocompleteFindFilters(userInput)

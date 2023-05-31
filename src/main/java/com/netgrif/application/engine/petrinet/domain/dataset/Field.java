@@ -9,7 +9,6 @@ import com.netgrif.application.engine.petrinet.domain.Imported;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.utils.FieldUtils;
@@ -18,6 +17,7 @@ import com.netgrif.application.engine.workflow.domain.DataFieldBehaviors;
 import com.netgrif.application.engine.workflow.domain.DataFieldValue;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 
 import static com.netgrif.application.engine.petrinet.domain.dataset.logic.FieldBehavior.*;
 
+@Data
 @Slf4j
 @Document
-@Data
 @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
@@ -60,24 +60,38 @@ public abstract class Field<T> extends Imported {
 
     @Id
     protected ObjectId id;
+
     @JsonIgnore
     protected T defaultValue;
+
     @JsonIgnore
     protected Expression initExpression;
-    protected List<Validation> validations;
+
+    protected Map<String, Validation> validations;
+
     private I18nString name;
+
     private I18nString description;
+
     private I18nString placeholder;
+
     private DataFieldBehaviors behaviors;
+
     private DataFieldValue<T> value;
+
     @JsonIgnore
     private Boolean immediate;
+
     @JsonIgnore
     private Map<DataEventType, DataEvent> events;
+
     @JsonIgnore
     private String encryption;
+
     private Integer length;
+
     private Component component;
+
     @JsonIgnore
     private Long version = 0L;
     // TODO: release/7.0.0 6.2.5: parentTaskId, parentCaseId
@@ -134,11 +148,18 @@ public abstract class Field<T> extends Imported {
     }
 
     public void addValidation(Validation validation) {
-        if (validations == null) {
-            this.validations = new ArrayList<>();
+        if (this.validations == null) {
+            this.validations = new HashMap<>();
         }
-        this.validations.add(validation);
+        this.validations.put(validation.getName(), validation);
     }
+
+//    public void addValidation(Validation validation) {
+//        if (validations == null) {
+//            this.validations = new ArrayList<>();
+//        }
+//        this.validations.add(validation);
+//    }
 
     public void clearValue() {
         this.value = null;
@@ -165,8 +186,9 @@ public abstract class Field<T> extends Imported {
             clone.initExpression = this.initExpression.clone();
         }
         if (this.validations != null) {
-            clone.validations = this.validations.stream().map(Validation::clone).collect(Collectors.toList());
+            clone.validations = this.validations;
         }
+
         clone.name = this.name;
         clone.description = this.description;
         clone.placeholder = this.placeholder;

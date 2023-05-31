@@ -17,6 +17,7 @@ import com.netgrif.application.engine.petrinet.domain.events.DataEvent;
 import com.netgrif.application.engine.petrinet.domain.events.DataEventType;
 import com.netgrif.application.engine.petrinet.domain.events.EventPhase;
 import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.application.engine.validation.service.ValidationRegistry;
 import com.netgrif.application.engine.validation.service.interfaces.IValidationService;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataFieldBehavior;
@@ -87,6 +88,9 @@ public class DataService implements IDataService {
 
     @Autowired
     protected IValidationService validation;
+
+    @Autowired
+    protected ValidationRegistry valid; // JOZII
 
     @Value("${nae.image.preview.scaling.px:400}")
     protected int imageScale;
@@ -189,6 +193,9 @@ public class DataService implements IDataService {
             setOutcomeMessage(task, useCase, outcome, fieldId, field, DataEventType.SET);
         }
         useCase.getDataSet().get(fieldId).applyChanges(newDataField);
+
+        valid.validate(useCase.getDataSet().get(fieldId), useCase);  // TODO: JOZIII
+
         if (validationEnable) {
             validation.valid(useCase.getDataSet().get(fieldId));
         }

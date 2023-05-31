@@ -28,8 +28,16 @@ public class PropertyLogger {
                 .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
                 .flatMap(Arrays::stream)
                 .distinct()
-                .filter(prop -> !(prop.contains("credentials") || prop.contains("password")))
-                .forEach(prop -> log.info("{}: {}", prop, env.getProperty(prop)));
+                .forEach(prop -> {
+                    if (prop.toLowerCase().contains("credentials")
+                            || prop.toLowerCase().contains("heslo")
+                            || prop.toLowerCase().contains("secret")
+                            || prop.toLowerCase().contains("password")) {
+                        log.info("{}: {}", prop, "*************************");
+                    } else {
+                        log.info("{}: {}", prop, env.getProperty(prop));
+                    }
+                });
         log.info("===========================================");
-    }
+}
 }

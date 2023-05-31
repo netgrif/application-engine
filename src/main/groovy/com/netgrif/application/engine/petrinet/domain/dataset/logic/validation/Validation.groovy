@@ -6,25 +6,36 @@ import com.querydsl.core.annotations.QueryType
 
 class Validation {
 
-    protected String validationRule
+    protected String name
+
+    protected Map<String, ValidationRule> validationRule
 
     protected I18nString validationMessage
 
-    Validation(String validationRule) {
-        this(validationRule, null)
+    Validation(String name, Map<String, ValidationRule> validationRule) {
+        this(name, validationRule, null)
     }
 
-    Validation(String validationRule, I18nString validationMessage) {
+    Validation(String name, Map<String, ValidationRule> validationRule, I18nString validationMessage) {
         this()
+        this.name = name
         this.validationRule = validationRule
         this.validationMessage = validationMessage
     }
 
     Validation() {}
 
-    LocalizedValidation getLocalizedValidation(Locale locale) {
-        LocalizedValidation ret = new LocalizedValidation(this.validationRule, getTranslatedValidationMessage(locale))
+    LocalizedValidation getLocalizedValidation(String name, Locale locale) {
+        LocalizedValidation ret = new LocalizedValidation(name, this.validationRule, getTranslatedValidationMessage(locale))
         return ret
+    }
+
+    String getName() {
+        return name
+    }
+
+    void setName(String name) {
+        this.name = name
     }
 
     I18nString getValidationMessage() {
@@ -39,11 +50,11 @@ class Validation {
         return validationMessage?.getTranslation(locale)
     }
 
-    String getValidationRule() {
+    Map<String, ValidationRule> getValidationRule() {
         return validationRule
     }
 
-    void setValidationRule(String validationRule) {
+    void setValidationRule(Map<String, ValidationRule> validationRule) {
         this.validationRule = validationRule
     }
 

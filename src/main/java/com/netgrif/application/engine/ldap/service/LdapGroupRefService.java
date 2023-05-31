@@ -99,7 +99,10 @@ public class LdapGroupRefService implements ILdapGroupRefService {
 
     @Override
     public Set<ProcessRole> getProcessRoleByLdapGroup(Set<String> groupDn) {
-        return ldapGroupRoleRepository.findAllByDnIn(groupDn).stream().map(LdapGroup::getProcessesRoles).flatMap(Collection::stream).collect(Collectors.toSet());
+        return ldapGroupRoleRepository.findAllByDnIn(groupDn).stream()
+                .map(LdapGroup::getProcessesRoles)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
