@@ -669,23 +669,43 @@
 			make updateFilter,visible on trans when { true }
 		</action>
 	</data>
+	<data type="button">
+		<id>remove_additional_filter</id>
+		<title/>
+		<placeholder name="remove_additional_filter">Remove additional filter</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			filterCase: f.additional_filter_case;
+
+			change filterCase value { [] }
+		</action>
+	</data>
 	<data type="caseRef">
 		<id>additional_filter_case</id>
 		<title/>
 		<action trigger="set">
 			taskViewTrans: t.task_view_settings,
 			mergeFilters: f.merge_filters,
+			filterHeader: f.filter_header,
 			filterTaskRef: f.current_additional_filter_preview,
+			removeButton: f.remove_additional_filter,
 			filterCaseRef: f.additional_filter_case;
 
 			if (filterCaseRef.value[0] == null) {
-				make mergeFilters,visible on taskViewTrans when { true }
+				make mergeFilters,hidden on taskViewTrans when { true }
+				make filterHeader,hidden on taskViewTrans when { true }
+				make removeButton,hidden on taskViewTrans when { true }
+				change filterTaskRef value { [] }
 				return
 			}
 
-			def filterCase = findCase({it._id.eq(filterCaseRef.value[0])})
-			change filterTaskRef value {return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId]}
+			def filterCase = findCase({ it._id.eq(filterCaseRef.value[0]) })
+			change filterTaskRef value { return [findTask({it.caseId.eq(filterCase.stringId).and(it.transitionId.eq("view_filter"))}).stringId] }
 			make mergeFilters,editable on taskViewTrans when { true }
+			make filterHeader,visible on taskViewTrans when { true }
+			make removeButton,editable on taskViewTrans when { true }
 		</action>
 		<allowedNets>
 			<allowedNet>filter</allowedNet>
@@ -872,6 +892,7 @@
 		<i18nString name="roles_banned_desc">Zoznam zakázaných rolí, ktoré nemôžu zobraziť túto položku</i18nString>
 		<i18nString name="item_settings_general">Všeobecné</i18nString>
 		<i18nString name="menu_item_identifier">Identifikátor položky</i18nString>
+		<i18nString name="remove_additional_filter">Odstrániť dodatočný filter</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
@@ -952,6 +973,7 @@
 		<i18nString name="roles_banned_desc">List of roles not allowed to view this menu entry.</i18nString>
 		<i18nString name="item_settings_general">Allgemein</i18nString>
 		<i18nString name="menu_item_identifier">Artikel Identifikationsnummer</i18nString>
+		<i18nString name="remove_additional_filter">Zusatzfilter entfernen</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -1620,6 +1642,12 @@
 		<x>340</x>
 		<y>100</y>
 		<label>Case view settings [referenced]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>case_view_dataGroup</id>
 			<cols>4</cols>
@@ -1860,6 +1888,12 @@
 		<x>340</x>
 		<y>340</y>
 		<label>Task view settings [referenced]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>task_view_dataGroup</id>
 			<cols>4</cols>
@@ -2070,7 +2104,7 @@
 			<dataRef>
 				<id>filter_header</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -2098,10 +2132,24 @@
 			<dataRef>
 				<id>merge_filters</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>standard</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>remove_additional_filter</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
 					<y>2</y>
 					<rows>1</rows>
 					<cols>1</cols>
