@@ -1983,8 +1983,9 @@ class ActionDelegate {
         if (!newIdentifier) {
             throw new IllegalArgumentException("View item identifier is null!")
         }
-        if (findMenuItem(newIdentifier)) {
-            throw new IllegalArgumentException("View item identifier $newIdentifier is not unique!")
+        String sanitizedIdentifier = sanitize(newIdentifier)
+        if (findMenuItem(sanitizedIdentifier)) {
+            throw new IllegalArgumentException("View item identifier $sanitizedIdentifier is not unique!")
         }
         if (newTitle == null || newTitle.defaultValue == "") {
             throw new IllegalArgumentException("Default title is empty")
@@ -1999,7 +2000,7 @@ class ActionDelegate {
         duplicated = workflowService.save(duplicated)
 
         UriNode node = uriService.findById(originItem.uriNodeId)
-        String newNodePath = createNodePath(node.uriPath, newIdentifier)
+        String newNodePath = createNodePath(node.uriPath, sanitizedIdentifier)
         uriService.getOrCreate(newNodePath, UriContentType.CASE)
 
         Task newItemTask = findTask { it._id.eq(new ObjectId(duplicated.tasks.find { it.transition == "initialize" }.task)) }
