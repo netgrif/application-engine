@@ -70,6 +70,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
+import java.text.Normalizer
 import java.time.ZoneId
 import java.util.stream.Collectors
 
@@ -1787,8 +1788,10 @@ class ActionDelegate {
     }
 
     Case createMenuItem(MenuItemBody body) {
-        if (findMenuItem(body.identifier)) {
-            throw new IllegalArgumentException("Menu item identifier $body.identifier is not unique!")
+        String sanitizedIdentifier = sanitize(body.identifier)
+
+        if (findMenuItem(sanitizedIdentifier)) {
+            throw new IllegalArgumentException("Menu item identifier $sanitizedIdentifier is not unique!")
         }
 
         Case parentItemCase = getOrCreateFolderItem(body.uri)
@@ -1802,7 +1805,7 @@ class ActionDelegate {
         }
         menuItemCase = workflowService.save(menuItemCase)
         Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == "initialize" }.task)) }
-        String nodePath = createNodePath(body.uri, body.identifier)
+        String nodePath = createNodePath(body.uri, sanitizedIdentifier)
         uriService.getOrCreate(nodePath, UriContentType.CASE)
 
         assignTask(newItemTask)
@@ -1847,13 +1850,21 @@ class ActionDelegate {
                 ],
                 (PREFERENCE_ITEM_FIELD_IDENTIFIER)     : [
                         "type" : "text",
-                        "value": body.identifier
+                        "value": sanitizedIdentifier
                 ],
         ]
         setData(newItemTask, setDataMap)
         finishTask(newItemTask)
 
         return workflowService.findOne(menuItemCase.stringId)
+    }
+
+    private String sanitize(String input) {
+        return Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("[\\W-]+", "-")
+                .toLowerCase()
     }
 
     private String createNodePath(String uri, String identifier) {

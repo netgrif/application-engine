@@ -136,7 +136,7 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>menu_item_identifier</id>
-		<title>Identifier (Filter API)</title>
+		<title name="menu_item_identifier">Menu item identifier</title>
 	</data>
 	<data type="text" immediate="true">
 		<id>nodePath</id>
@@ -192,8 +192,8 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>tab_icon</id>
-		<title>Tab icon identifier</title>
-		<desc name="icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
+		<title name="tab_icon">Tab icon identifier</title>
+		<desc name="tab_icon_identifier_desc">Material icon identifier. List of icons with identifiers is available online.</desc>
 		<action trigger="set">
 			icon: f.this,
 			iconPreview: f.tab_icon_preview;
@@ -217,13 +217,13 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_tab_icon</id>
-		<title name="display_icon">Display tab icon?</title>
+		<title name="display_tab_icon">Display tab icon?</title>
 		<init>true</init>
 	</data>
 	<data type="i18n" immediate="true">
 		<id>tab_name</id>
-		<title name="name">Name of the item</title>
-		<desc name="name_desc">Will be shown in tab</desc>
+		<title name="tab_name">Name of the item</title>
+		<desc name="tab_name_desc">Will be shown in tab</desc>
 	</data>
 	<data type="button">
 		<id>add_allowed_roles</id>
@@ -283,12 +283,12 @@
 			processesAvailable: f.processes_available,
 			rolesAvailable: f.roles_available;
 
-			change bannedRoles options {return configurableMenuService.removeSelectedRoles(bannedRoles)}
+			change bannedRoles options { return configurableMenuService.removeSelectedRoles(bannedRoles) }
 
-			change bannedRoles value {[]}
-			change rolesAvailable value {[]}
-			change rolesAvailable options {[:]}
-			change processesAvailable value {null}
+			change bannedRoles value { [] }
+			change rolesAvailable value { [] }
+			change rolesAvailable options { [:] }
+			change processesAvailable value { null }
 		</action>
 	</data>
 	<data type="enumeration_map" immediate="true">
@@ -298,7 +298,7 @@
 		<action trigger="get">
 			processes: f.this;
 
-			change processes options {return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale)}
+			change processes options { return configurableMenuService.getNetsByAuthorAsMapOptions(loggedUser(), org.springframework.context.i18n.LocaleContextHolder.locale) }
 		</action>
 		<action trigger="set">
 			processes: f.this,
@@ -306,8 +306,12 @@
 			bannedRoles: f.banned_roles,
 			rolesAvailable: f.roles_available;
 
-			change rolesAvailable options {return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles)}
-			change rolesAvailable value {[]}
+			if (processes.value != null) {
+				change rolesAvailable options { return configurableMenuService.getAvailableRolesFromNet(processes, allowedRoles, bannedRoles) }
+			} else {
+				change rolesAvailable options { [:] }
+			}
+			change rolesAvailable value { [] }
 		</action>
 	</data>
 	<data type="multichoice_map" immediate="true">
@@ -318,11 +322,17 @@
 		<id>allowed_roles</id>
 		<title name="roles_allowed">Allowed roles</title>
 		<desc name="roles_allowed_desc">List of roles allowed to view this menu entry.</desc>
+		<options>
+			<init dynamic="true">[:]</init>
+		</options>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>banned_roles</id>
 		<title name="roles_banned">Banned roles</title>
 		<desc name="roles_banned_desc">List of roles not allowed to view this menu entry.</desc>
+		<options>
+			<init dynamic="true">[:]</init>
+		</options>
 	</data>
 	<data type="taskRef">
 		<id>selected_filter_preview</id>
@@ -335,8 +345,7 @@
 	<data type="i18n">
 		<id>filter_header</id>
 		<title/>
-		<init>Current filter</init>
-<!--		todo with translations, maybe get action-->
+		<init name="filter_header">Current filter</init>
 		<component>
 			<name>divider</name>
 		</component>
@@ -449,23 +458,23 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_custom_view</id>
-		<title>Use custom view?</title>
+		<title name="use_custom_view">Use custom view?</title>
 		<init>false</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>custom_view_selector</id>
-		<title>Custom view configuration selector</title>
-		<desc>Example: "demo-tabbed-views"</desc>
+		<title name="custom_view_selector">Custom view configuration selector</title>
+		<desc name="custom_view_selector_desc">Example: "demo-tabbed-views"</desc>
 	</data>
 
 	<!-- CASE VIEW CONFIGURATION DATA -->
 	<data type="enumeration_map" immediate="true">
 		<id>case_view_search_type</id>
-		<title name="case_view_search_type">case Search type</title>
+		<title name="case_view_search_type">Search type for case view</title>
 		<options>
-			<option key="hidden">Hidden</option>
-			<option key="fulltext">Fulltext</option>
-			<option key="fulltext_advanced">Fulltext and advanced</option>
+			<option name="hidden" key="hidden">Hidden</option>
+			<option name="fulltext" key="fulltext">Fulltext</option>
+			<option name="fulltext_advanced" key="fulltext_advanced">Fulltext and advanced</option>
 		</options>
 		<init>fulltext_advanced</init>
 	</data>
@@ -475,7 +484,8 @@
 	</data>
 	<data type="text">
 		<id>create_case_button_icon_preview</id>
-		<title name="create_case_button_icon_preview">Menu icon preview</title>
+		<title name="create_case_button_icon_preview">Icon preview</title>
+		<init><![CDATA[<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">add</span>]]></init>
 		<component>
 			<name>htmltextarea</name>
 		</component>
@@ -483,30 +493,31 @@
 	<data type="text" immediate="true">
 		<id>create_case_button_icon</id>
 		<title name="create_case_button_icon">"New case" button icon identifier</title>
+		<init>add</init>
 		<action trigger="set">
 			create_case_button_icon_preview: f.create_case_button_icon_preview,
 			create_case_button_icon: f.create_case_button_icon;
 
 
 			if (create_case_button_icon.value == "") {
-			change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
-			return;
+				change create_case_button_icon_preview value {<![CDATA["""<span></span>"""]]>}
+				return;
 			}
 
 			change create_case_button_icon_preview value {
-			<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
+				<![CDATA["""<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><span class="material-icons">"""]]> + create_case_button_icon.value + <![CDATA["""</span>"""]]>
 			}
 		</action>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_require_title_in_creation</id>
-		<title>Required title input in case creation?</title>
+		<title name="case_require_title_in_creation">Required title input in case creation?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>case_banned_nets_in_creation</id>
-		<title>Banned processes for creation</title>
-		<desc>Write down process identifiers separated by comma. Example: mynet1,mynet2</desc>
+		<title name="case_banned_nets_in_creation">Banned processes for creation</title>
+		<desc name="case_banned_nets_in_creation_desc">Write down process identifiers separated by comma. Example: mynet1,mynet2</desc>
 		<action trigger="set">
 			bannedNets: f.this;
 
@@ -519,8 +530,7 @@
 	<data type="i18n">
 		<id>case_view_header</id>
 		<title/>
-		<init>Case view settings</init>
-		<!--		todo with translations, maybe get action-->
+		<init name="case_view_header">Case view</init>
 		<component>
 			<name>divider</name>
 		</component>
@@ -532,21 +542,21 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_show_more_menu</id>
-		<title>Show more menu for case item?</title>
+		<title name="case_show_more_menu">Show more menu for case item?</title>
 		<init>false</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_allow_header_table_mode</id>
-		<title>Allow table mode for headers?</title>
+		<title name="case_allow_header_table_mode">Allow table mode for headers?</title>
 		<init>true</init>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>case_headers_mode</id>
-		<title>Headers mode</title>
+		<title name="case_headers_mode">Headers mode</title>
 		<options>
-			<option key="sort">Sort</option>
-			<option key="search">Search</option>
-			<option key="edit">Edit</option>
+			<option name="sort" key="sort">Sort</option>
+			<option name="search" key="search">Search</option>
+			<option name="edit" key="edit">Edit</option>
 		</options>
 		<init>sort,edit,search</init>
 		<action trigger="set">
@@ -566,11 +576,11 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>case_headers_default_mode</id>
-		<title>Default headers mode</title>
+		<title name="case_headers_default_mode">Default headers mode</title>
 		<options>
-			<option key="sort">Sort</option>
-			<option key="search">Search</option>
-			<option key="edit">Edit</option>
+			<option name="sort" key="sort">Sort</option>
+			<option name="search" key="search">Search</option>
+			<option name="edit" key="edit">Edit</option>
 		</options>
 		<init>sort</init>
 	</data>
@@ -578,25 +588,33 @@
 		<id>case_headers_options_holder</id>
 		<title/>
 		<options>
-			<option key="sort">Sort</option>
-			<option key="search">Search</option>
-			<option key="edit">Edit</option>
+			<option name="sort" key="sort">Sort</option>
+			<option name="search" key="search">Search</option>
+			<option name="edit" key="edit">Edit</option>
 		</options>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_is_header_mode_changeable</id>
-		<title>Can be header mode changed?</title>
+		<title name="case_is_header_mode_changeable">Can be header mode changed?</title>
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_case_default_headers</id>
-		<title>Use custom default headers?</title>
+		<title name="use_case_default_headers">Use custom default headers?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>case_default_headers</id>
 		<title name="default_headers">Set default headers</title>
-		<desc>Example: "meta-title,meta-visualId"</desc>
+		<desc name="default_headers_desc">Example: "meta-title,meta-visualId"</desc>
+		<action trigger="set">
+			defaultHeaders: f.this;
+
+			String trimmed = defaultHeaders.value?.replaceAll("\\s","")
+			if (defaultHeaders.value != trimmed) {
+				change defaultHeaders value { trimmed }
+			}
+		</action>
 	</data>
 
 	<!-- TASK VIEW CONFIGURATION DATA -->
@@ -675,7 +693,7 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>merge_filters</id>
-		<title>Merge with base filter?</title>
+		<title name="merge_filters">Merge with base filter?</title>
 		<init>true</init>
 	</data>
 	<data type="taskRef">
@@ -686,28 +704,27 @@
 	<data type="i18n">
 		<id>task_view_header</id>
 		<title/>
-		<init>Task view settings</init>
-		<!--		todo with translations, maybe get action-->
+		<init name="task_view_header">Task view</init>
 		<component>
 			<name>divider</name>
 		</component>
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>task_view_search_type</id>
-		<title name="task_view_search_type">task Search type</title>
+		<title name="task_view_search_type">Search type for task view</title>
 		<options>
-			<option key="hidden">Hidden</option>
-			<option key="fulltext">Fulltext</option>
-			<option key="fulltext_advanced">Fulltext and advanced</option>
+			<option name="hidden" key="hidden">Hidden</option>
+			<option name="fulltext" key="fulltext">Fulltext</option>
+			<option name="fulltext_advanced" key="fulltext_advanced">Fulltext and advanced</option>
 		</options>
 		<init>fulltext_advanced</init>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>task_headers_mode</id>
-		<title>Headers mode</title>
+		<title name="task_headers_mode">Headers mode</title>
 		<options>
-			<option key="sort">Sort</option>
-			<option key="edit">Edit</option>
+			<option name="sort" key="sort">Sort</option>
+			<option name="edit" key="edit">Edit</option>
 		</options>
 		<init>sort,edit</init>
 		<action trigger="set">
@@ -727,10 +744,10 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>task_headers_default_mode</id>
-		<title>Default headers mode</title>
+		<title name="task_headers_default_mode">Default headers mode</title>
 		<options>
-			<option key="sort">Sort</option>
-			<option key="edit">Edit</option>
+			<option name="sort" key="sort">Sort</option>
+			<option name="edit" key="edit">Edit</option>
 		</options>
 		<init>sort</init>
 	</data>
@@ -738,33 +755,41 @@
 		<id>task_headers_options_holder</id>
 		<title/>
 		<options>
-			<option key="sort">Sort</option>
-			<option key="edit">Edit</option>
+			<option name="sort" key="sort">Sort</option>
+			<option name="edit" key="edit">Edit</option>
 		</options>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>task_is_header_mode_changeable</id>
-		<title>Can be header mode changed?</title>
+		<title name="task_is_header_mode_changeable">Can be header mode changed?</title>
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>task_allow_header_table_mode</id>
-		<title>Allow table mode for headers?</title>
+		<title name="task_allow_header_table_mode">Allow table mode for headers?</title>
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_task_default_headers</id>
-		<title>Use custom default headers?</title>
+		<title name="use_task_default_headers">Use custom default headers?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
 		<id>task_default_headers</id>
-		<title name="default_headers">Set default headers</title>
-		<desc>Example: "meta-title,meta-user"</desc>
+		<title name="task_default_headers">Set default headers</title>
+		<desc name="task_default_headers_desc">Example: "meta-title,meta-user"</desc>
+		<action trigger="set">
+			defaultHeaders: f.this;
+
+			String trimmed = defaultHeaders.value?.replaceAll("\\s","")
+			if (defaultHeaders.value != trimmed) {
+				change defaultHeaders value { trimmed }
+			}
+		</action>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>task_show_more_menu</id>
-		<title>Show more menu for task item?</title>
+		<title name="task_show_more_menu">Show more menu for task item?</title>
 		<init>true</init>
 	</data>
 
@@ -778,16 +803,75 @@
 		<i18nString name="remove_from_allowed_roles">Odstráň z povolených rolí</i18nString>
 		<i18nString name="ban_roles">Pridaj k zakázaným roliam</i18nString>
 		<i18nString name="remove_from_banned_roles">Odstráň zo zakázaných rolí</i18nString>
-		<i18nString name="processes_available">Vaše procesy</i18nString>
+		<i18nString name="available_processes">Vaše procesy</i18nString>
 		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
-		<i18nString name="roles_available">Dostupné roly</i18nString>
+		<i18nString name="available_roles">Dostupné roly</i18nString>
 		<i18nString name="allowed_roles">Povolené roly</i18nString>
 		<i18nString name="banned_roles">Zakázané roly</i18nString>
 		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
 		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
 		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="default_headers">Predvolené hlavičky</i18nString>
+		<i18nString name="default_headers_desc">Napríklad: "meta-title,meta-visualId"</i18nString>
 		<i18nString name="filter_autocomplete_selection">Zvoľte nový filter</i18nString>
+		<i18nString name="move_dest_uri">Cieľové URI</i18nString>
+		<i18nString name="duplicate_new_title">Názov duplikovanej položky</i18nString>
+		<i18nString name="duplicate_view_identifier">Identifikátor duplikovanej položky</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Musí byť jedinečný</i18nString>
+		<i18nString name="name">Názov položky</i18nString>
+		<i18nString name="name_desc">Bude zobrazený v menu</i18nString>
+		<i18nString name="tab_icon">Identifikátor ikony v karte</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
+		<i18nString name="display_tab_icon">Zobraziť ikonu v karte?</i18nString>
+		<i18nString name="tab_name">Názov položky</i18nString>
+		<i18nString name="tab_name_desc">Bude zobrazený v karte</i18nString>
+		<i18nString name="update_filter">Aktualizovať zobrazenie s vybraným filtrom</i18nString>
+		<i18nString name="use_custom_view">Použiť vlastné zobrazenie?</i18nString>
+		<i18nString name="custom_view_selector">Konfiguračný identifikátor vlastného zobrazenia</i18nString>
+		<i18nString name="custom_view_selector_desc">Napríklad: "demo-tabbed-views"</i18nString>
+		<i18nString name="case_view_search_type">Typ vyhľadávania prípadov</i18nString>
+		<i18nString name="hidden">Skryté</i18nString>
+		<i18nString name="fulltext">Fulltext</i18nString>
+		<i18nString name="fulltext_advanced">Fulltext a rozšírené</i18nString>
+		<i18nString name="case_require_title_in_creation">Vyžadovať názov inštancii pri vytváraní?</i18nString>
+		<i18nString name="case_banned_nets_in_creation">Zakázané siete pri vytváraní</i18nString>
+		<i18nString name="case_banned_nets_in_creation_desc">Uveďte identifikátory procesov oddelené čiarkou. Napríklad: mynet1,mynet2</i18nString>
+		<i18nString name="case_show_more_menu">Zobrazovať menu pre prípadovú položku?</i18nString>
+		<i18nString name="case_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+		<i18nString name="case_headers_mode">Mód hlavičiek</i18nString>
+		<i18nString name="sort">Zoraďovanie</i18nString>
+		<i18nString name="search">Vyhľadávanie</i18nString>
+		<i18nString name="edit">Upravovanie</i18nString>
+		<i18nString name="case_headers_default_mode">Predvolený mód hlavičiek</i18nString>
+		<i18nString name="case_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+		<i18nString name="use_case_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+		<i18nString name="merge_filters">Zjednotiť filter so základným filtrom?</i18nString>
+		<i18nString name="task_view_search_type">Typ vyhľadávania úloh</i18nString>
+		<i18nString name="task_headers_mode">Mód hlavičiek</i18nString>
+		<i18nString name="task_headers_default_mode">Predvolený mód hlavičiek</i18nString>
+		<i18nString name="task_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+		<i18nString name="task_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+		<i18nString name="use_task_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+		<i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
+		<i18nString name="task_default_headers_desc">Napríklad: "meta-title,meta-user"</i18nString>
+		<i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
+		<i18nString name="item_settings">Nastavenie položky</i18nString>
+		<i18nString name="roles_management_title">Roly</i18nString>
+		<i18nString name="filter_update_title">Filter</i18nString>
+		<i18nString name="move_item">Presunúť položku</i18nString>
+		<i18nString name="move_item_finish">Presunúť</i18nString>
+		<i18nString name="duplicate_item">Duplikovať položku</i18nString>
+		<i18nString name="duplicate_item_finish">Duplikovať</i18nString>
+		<i18nString name="additional_filter_update">Dodatočný filter</i18nString>
+		<i18nString name="filter_header">Súčasný filter</i18nString>
+		<i18nString name="case_view_header">Zobrazenie prípadov</i18nString>
+		<i18nString name="task_view_header">Zobrazenie úloh</i18nString>
+		<i18nString name="roles_allowed">Povolené roly</i18nString>
+		<i18nString name="roles_allowed_desc">Zoznam povolených rolí, ktoré môžu zobraziť túto položku</i18nString>
+		<i18nString name="roles_banned">Zakázané roly</i18nString>
+		<i18nString name="roles_banned_desc">Zoznam zakázaných rolí, ktoré nemôžu zobraziť túto položku</i18nString>
+		<i18nString name="item_settings_general">Všeobecné</i18nString>
+		<i18nString name="menu_item_identifier">Identifikátor položky</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
@@ -808,6 +892,66 @@
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 		<i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
+
+		<i18nString name="default_headers_desc">Beispiel: "meta-title,meta-visualId"</i18nString>
+		<i18nString name="move_dest_uri">Destination URI</i18nString>
+		<i18nString name="duplicate_new_title">Title of duplicated view</i18nString>
+		<i18nString name="duplicate_view_identifier">View identifier</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Must be unique</i18nString>
+		<i18nString name="name">Name of the item</i18nString>
+		<i18nString name="name_desc">Will be shown in the menu</i18nString>
+		<i18nString name="tab_icon">Tab icon identifier</i18nString>
+		<i18nString name="tab_icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
+		<i18nString name="display_tab_icon">Display tab icon?</i18nString>
+		<i18nString name="tab_name">Name of the item</i18nString>
+		<i18nString name="tab_name_desc">Will be shown in tab</i18nString>
+		<i18nString name="update_filter">Update view with selected filter</i18nString>
+		<i18nString name="use_custom_view">Use custom view?</i18nString>
+		<i18nString name="custom_view_selector">Custom view configuration selector</i18nString>
+		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
+		<i18nString name="case_view_search_type">Search type for case view</i18nString>
+		<i18nString name="hidden">Versteckt</i18nString>
+		<i18nString name="fulltext">Fulltext</i18nString>
+		<i18nString name="fulltext_advanced">Fulltext and advanced</i18nString>
+		<i18nString name="case_require_title_in_creation">Required title input in case creation?</i18nString>
+		<i18nString name="case_banned_nets_in_creation">Banned processes for creation</i18nString>
+		<i18nString name="case_banned_nets_in_creation_desc">Write down process identifiers separated by comma. Example: mynet1,mynet2</i18nString>
+		<i18nString name="case_show_more_menu">Show more menu for case item?</i18nString>
+		<i18nString name="case_allow_header_table_mode">Allow table mode for headers?</i18nString>
+		<i18nString name="case_headers_mode">Headers mode</i18nString>
+		<i18nString name="sort">Sortieren</i18nString>
+		<i18nString name="search">Suchen</i18nString>
+		<i18nString name="edit">Bearbeiten</i18nString>
+		<i18nString name="case_headers_default_mode">Default headers mode</i18nString>
+		<i18nString name="case_is_header_mode_changeable">Can be header mode changed?</i18nString>
+		<i18nString name="use_case_default_headers">Use custom default headers?</i18nString>
+		<i18nString name="merge_filters">Merge with base filter?</i18nString>
+		<i18nString name="task_view_search_type">Search type for task view</i18nString>
+		<i18nString name="task_headers_mode">Headers mode</i18nString>
+		<i18nString name="task_headers_default_mode">Default headers mode</i18nString>
+		<i18nString name="task_is_header_mode_changeable">Can be header mode changed?</i18nString>
+		<i18nString name="task_allow_header_table_mode">Allow table mode for headers?</i18nString>
+		<i18nString name="use_task_default_headers">Use custom default headers?</i18nString>
+		<i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
+		<i18nString name="task_default_headers_desc">Beispiel: "meta-title,meta-user"</i18nString>
+		<i18nString name="task_show_more_menu">Show more menu for task item?</i18nString>
+		<i18nString name="item_settings">Item settings</i18nString>
+		<i18nString name="roles_management_title">Rollen</i18nString>
+		<i18nString name="filter_update_title">Filter</i18nString>
+		<i18nString name="move_item">Move item</i18nString>
+		<i18nString name="move_item_finish">Move</i18nString>
+		<i18nString name="duplicate_item">Duplicate item</i18nString>
+		<i18nString name="duplicate_item_finish">Duplicate</i18nString>
+		<i18nString name="additional_filter_update">Zusätzlicher Filter</i18nString>
+		<i18nString name="filter_header">Aktueller Filter</i18nString>
+		<i18nString name="case_view_header">Case view</i18nString>
+		<i18nString name="task_view_header">Task view</i18nString>
+		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
+		<i18nString name="roles_allowed_desc">List of roles allowed to view this menu entry.</i18nString>
+		<i18nString name="roles_banned">Verbotene Rollen</i18nString>
+		<i18nString name="roles_banned_desc">List of roles not allowed to view this menu entry.</i18nString>
+		<i18nString name="item_settings_general">Allgemein</i18nString>
+		<i18nString name="menu_item_identifier">Artikel Identifikationsnummer</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -844,9 +988,29 @@
 		<label name="item_settings">Item settings</label>
 		<icon>settings</icon>
 		<dataGroup>
+			<id>pre_general</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>menu_item_identifier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
 			<id>general_0</id>
 			<cols>4</cols>
 			<layout>grid</layout>
+			<title name="item_settings_general">General</title>
 			<dataRef>
 				<id>menu_name</id>
 				<logic>
@@ -1052,7 +1216,7 @@
 			<id>roles_management</id>
 			<cols>5</cols>
 			<layout>grid</layout>
-			<title name="roles_management_title">Roles section</title>
+			<title name="roles_management_title">Roles</title>
 			<dataRef>
 				<id>processes_available</id>
 				<logic>
@@ -1174,7 +1338,7 @@
 			<id>filter_update</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-			<title name="filter_update_title">Filter section</title>
+			<title name="filter_update_title">Filter</title>
 			<dataRef>
 				<id>filter_autocomplete_selection</id>
 				<logic>
@@ -1186,7 +1350,7 @@
 					<rows>1</rows>
 					<cols>3</cols>
 					<template>material</template>
-					<appearance>standard</appearance>
+					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
@@ -1455,7 +1619,7 @@
 		<id>case_view_settings</id>
 		<x>340</x>
 		<y>100</y>
-		<label>Case view settings</label>
+		<label>Case view settings [referenced]</label>
 		<dataGroup>
 			<id>case_view_dataGroup</id>
 			<cols>4</cols>
@@ -1695,7 +1859,7 @@
 		<id>task_view_settings</id>
 		<x>340</x>
 		<y>340</y>
-		<label>Task view settings</label>
+		<label>Task view settings [referenced]</label>
 		<dataGroup>
 			<id>task_view_dataGroup</id>
 			<cols>4</cols>
@@ -1855,7 +2019,7 @@
 			<id>additional_filter_update</id>
 			<cols>4</cols>
 			<layout>grid</layout>
-			<title>Filter section</title>
+			<title name="additional_filter_update">Additional filter</title>
 			<dataRef>
 				<id>additional_filter_autocomplete_selection</id>
 				<logic>
@@ -1867,7 +2031,7 @@
 					<rows>1</rows>
 					<cols>3</cols>
 					<template>material</template>
-					<appearance>standard</appearance>
+					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
