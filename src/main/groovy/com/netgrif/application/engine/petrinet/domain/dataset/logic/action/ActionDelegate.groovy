@@ -9,6 +9,7 @@ import com.netgrif.application.engine.auth.service.interfaces.IRegistrationServi
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
 import com.netgrif.application.engine.auth.web.requestbodies.NewUserRequest
 import com.netgrif.application.engine.configuration.ApplicationContextProvider
+import com.netgrif.application.engine.configuration.PublicViewProperties
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.application.engine.elastic.service.interfaces.IElasticTaskService
 import com.netgrif.application.engine.elastic.web.requestbodies.CaseSearchRequest
@@ -17,6 +18,7 @@ import com.netgrif.application.engine.export.configuration.ExportConfiguration
 import com.netgrif.application.engine.export.domain.ExportDataConfig
 import com.netgrif.application.engine.export.service.interfaces.IExportService
 import com.netgrif.application.engine.impersonation.service.interfaces.IImpersonationService
+import com.netgrif.application.engine.history.service.IHistoryService
 import com.netgrif.application.engine.importer.service.FieldFactory
 import com.netgrif.application.engine.mail.domain.MailDraft
 import com.netgrif.application.engine.mail.interfaces.IMailAttemptService
@@ -197,6 +199,12 @@ class ActionDelegate {
 
     @Autowired
     IImpersonationService impersonationService
+
+    @Autowired
+    IHistoryService historyService
+
+    @Autowired
+    PublicViewProperties publicViewProperties
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -2300,4 +2308,7 @@ class ActionDelegate {
         }
     }
 
+    String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
+        return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
+    }
 }
