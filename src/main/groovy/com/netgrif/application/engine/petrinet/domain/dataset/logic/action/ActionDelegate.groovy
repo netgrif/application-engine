@@ -2311,4 +2311,68 @@ class ActionDelegate {
     String makeUrl(String publicViewUrl = publicViewProperties.url, String identifier) {
         return "${publicViewUrl}/${Base64.getEncoder().encodeToString(identifier.bytes)}" as String
     }
+
+    void updateMultichoiceWithCurrentNode(MultichoiceMapField field, UriNode node) {
+        List<String> splitPathList = splitUriPath(node.uriPath)
+
+        change field value { splitPathList }
+        change field options { findOptionsBasedOnSelectedNode(node, splitPathList) }
+    }
+
+    List<String> splitUriPath(String uri) {
+        String rootUri = "/"
+        String[] splitPath = uri.split(uriService.getUriSeparator())
+        if (splitPath.length == 0 && uri == rootUri) {
+            splitPath = [rootUri]
+        } else if (splitPath.length == 0) {
+            throw new IllegalArgumentException("Wrong uri value: \"${uri}\"")
+        } else {
+            splitPath[0] = rootUri
+        }
+        return splitPath as ArrayList
+    }
+
+    Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node) {
+        return findOptionsBasedOnSelectedNode(node, splitUriPath(node.uriPath))
+    }
+
+    Map<String, I18nString> findOptionsBasedOnSelectedNode(UriNode node, List<String> splitPathList) {
+        Map<String, I18nString> options = new HashMap<>()
+
+        options.putAll(splitPathList.collectEntries { [(it): new I18nString(it)]})
+
+        Set<String> childrenIds = node.getChildrenId()
+        if (!childrenIds.isEmpty()) {
+            for (String id : childrenIds) {
+                UriNode childNode = uriService.findById(id)
+                options.put(childNode.name, new I18nString(childNode.name))
+            }
+        }
+
+        return options
+    }
+
+    String getCorrectedUri(String uncheckedUri) {
+        String rootUri = "/"
+        if (uncheckedUri == "") {
+            return rootUri
+        }
+
+        UriNode node = uriService.findByUri(uncheckedUri)
+
+        while (node == null) {
+            int lastIdx = uncheckedUri.lastIndexOf(uriService.getUriSeparator())
+            if (lastIdx == -1) {
+                return rootUri
+            }
+            uncheckedUri = uncheckedUri.substring(0, uncheckedUri.lastIndexOf(uriService.getUriSeparator()))
+            if (uncheckedUri == "") {
+                return rootUri
+            }
+            node = uriService.findByUri(uncheckedUri)
+        }
+
+        return node.uriPath
+    }
+
 }

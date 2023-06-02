@@ -103,8 +103,43 @@
 		<title/>
 	</data>
 	<data type="text">
+		<id>move_dest_uri_test</id>
+		<title>Destination URI TEST</title>
+	</data>
+	<data type="text">
+		<id>move_previous_dest_uri</id>
+		<title/>
+	</data>
+	<data type="multichoice_map">
 		<id>move_dest_uri</id>
 		<title name="move_dest_uri">Destination URI</title>
+		<desc>todo</desc>
+		<component>
+			<name>autocomplete</name>
+		</component>
+		<action trigger="get">
+			moveDestUri: f.move_dest_uri;
+
+			String uriNodeId = elasticCaseService.findUriNodeId(useCase)
+			def node = uriService.findById(uriNodeId)
+			updateMultichoiceWithCurrentNode(moveDestUri, node)
+		</action>
+		<action trigger="set">
+			prevDestUri: f.move_previous_dest_uri,
+			moveDestUri: f.move_dest_uri;
+
+			String newUri = moveDestUri.value.join("/")
+			newUri = newUri.replace("//","/")
+
+			String corrected = getCorrectedUri(newUri)
+
+			if (corrected == newUri) {
+				def node = uriService.findByUri(newUri)
+				change moveDestUri options { findOptionsBasedOnSelectedNode(node) }
+			} else {
+				change moveDestUri value { splitUriPath(corrected) }
+			}
+		</action>
 	</data>
 	<data type="i18n">
 		<id>duplicate_new_title</id>
@@ -1530,12 +1565,27 @@
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
+			<dataRef>
+				<id>move_dest_uri_test</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>finish</id>
 			<actions phase="pre">
 				<action>
-					dest: f.move_dest_uri;
+					dest: f.move_dest_uri_test;
 
 					if (dest.value == "") {
 						throw new IllegalArgumentException("URI must not be empty!")
