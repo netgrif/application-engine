@@ -1,6 +1,5 @@
 package com.netgrif.application.engine.importer.service;
 
-import com.netgrif.application.engine.auth.domain.IUser;
 import com.netgrif.application.engine.auth.service.interfaces.IUserService;
 import com.netgrif.application.engine.importer.model.*;
 import com.netgrif.application.engine.importer.service.throwable.MissingIconKeyException;
@@ -9,7 +8,8 @@ import com.netgrif.application.engine.petrinet.domain.Format;
 import com.netgrif.application.engine.petrinet.domain.I18nString;
 import com.netgrif.application.engine.petrinet.domain.dataset.*;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.runner.Expression;
-import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.DynamicValidation;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Argument;
+import com.netgrif.application.engine.validation.converter.LegacyValidationConverter;
 import com.netgrif.application.engine.petrinet.domain.views.View;
 import com.netgrif.application.engine.workflow.domain.Case;
 import com.netgrif.application.engine.workflow.domain.DataField;
@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
@@ -48,6 +49,13 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
+
+    private LegacyValidationConverter legacyValidationConverter;
+
+    @Autowired
+    public void setLegacyValidationConverter(LegacyValidationConverter legacyValidationConverter) {
+        this.legacyValidationConverter = legacyValidationConverter;
+    }
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
@@ -123,16 +131,11 @@ public final class FieldFactory {
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
-        if (data.getValid() != null) {
-            List<Valid> list = data.getValid();
-            for (Valid item : list) {
-                field.addValidation(makeValidation(item.getValue(), null, item.isDynamic()));
-            }
-        }
+
         if (data.getValidations() != null) {
             List<com.netgrif.application.engine.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.application.engine.importer.model.Validation item : list) {
-                field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
+                field.addValidation(makeValidation(item, importer));
             }
         }
 
@@ -158,8 +161,28 @@ public final class FieldFactory {
         return field;
     }
 
-    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
-        return dynamic ? new DynamicValidation(rule, message) : new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(rule, message);
+    private com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation makeValidation(Validation validation, Importer importer) {
+        if (validation.getExpression() != null && validation.getExpression().getValue() != null) {
+            com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation converted = legacyValidationConverter.convert(validation);
+            return new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(converted.getName(), converted.getArguments(), importer.toI18NString(validation.getMessage()));
+        }
+        List<com.netgrif.application.engine.importer.model.Argument> arguments = new ArrayList<>();
+        if (validation.getArguments() != null && validation.getArguments().getArgument() != null) {
+            arguments = validation.getArguments().getArgument();
+        }
+        return new com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation(validation.getName(), makeValidationRules(arguments), importer.toI18NString(validation.getMessage()));
+    }
+
+
+    private Map<String, Argument> makeValidationRules(List<com.netgrif.application.engine.importer.model.Argument> rule) {
+        return rule.stream()
+                .filter(Objects::nonNull)
+                .map(this::convertToValidationRule)
+                .collect(Collectors.toMap(Argument::getName, Function.identity()));
+    }
+
+    private Argument convertToValidationRule(com.netgrif.application.engine.importer.model.Argument argument) {
+        return new Argument(argument.getKey(), argument.getValue(), argument.isDynamic());
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions) {
@@ -467,9 +490,12 @@ public final class FieldFactory {
         if (field.getValidations() == null) return;
 
         ((List<com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
-                .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
-                    valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
-                });
+                .filter(it -> it.getArguments() != null
+                        && !it.getArguments().values().isEmpty()
+                        && it.getArguments().values().stream().anyMatch(arg -> arg.getDynamic()))
+                .forEach(dynamic -> dynamic.getArguments().values().stream().filter(arg -> arg.getDynamic())
+                            .forEach(argument -> argument.setValue(dataValidationExpressionEvaluator.compile(useCase, new Expression(argument.getValue()))))
+                );
     }
 
     private void resolveChoices(ChoiceField field, Case useCase) {

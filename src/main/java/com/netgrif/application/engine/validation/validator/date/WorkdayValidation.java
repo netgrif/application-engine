@@ -1,0 +1,57 @@
+package com.netgrif.application.engine.validation.validator.date;
+
+import com.netgrif.application.engine.petrinet.domain.dataset.DateField;
+import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
+import com.netgrif.application.engine.petrinet.domain.dataset.Field;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
+import com.netgrif.application.engine.validation.exception.ValidationException;
+import com.netgrif.application.engine.validation.validator.IValidator;
+import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.stereotype.Component;
+
+import java.text.ParseException;
+import java.time.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
+
+@Component
+public class WorkdayValidation implements IValidator<Field<?>> {
+    @Override
+    public void validate(Field<?> field, DataField dataField) throws ValidationException, ParseException {
+        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        if (possibleValidation.isEmpty()) {
+            return;
+        }
+
+        Date value;
+        if (dataField.getValue() == null) {
+            value = null;
+        } else if (field instanceof DateField) {
+            value = Date.from(((LocalDate) dataField.getValue()).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        } else if (field instanceof DateTimeField) {
+            value = Date.from(((LocalDateTime) dataField.getValue()).atZone(ZoneId.systemDefault()).toInstant());
+        } else {
+            return;
+        }
+
+        if (value == null) {
+            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+        }
+
+        if (isWeekend(value)) {
+            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be day of workdays" );
+        }
+    }
+
+    protected static boolean isWeekend(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        DayOfWeek dayOfWeek = DayOfWeek.of(calendar.get(Calendar.DAY_OF_WEEK));
+        return dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY;
+    }
+
+    public String getName() {
+        return "workday";
+    }
+}
