@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.validation.exception.ValidationException;
 import com.netgrif.application.engine.validation.validator.IValidator;
 import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -14,17 +15,17 @@ public class RequiredTrueValidation implements IValidator<BooleanField> {
 
     @Override
     public void validate(BooleanField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
+        Validation validation = possibleValidation.get();
         Boolean value = (Boolean) dataField.getValue();
         if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+            return;
         }
-
         if (!value) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] should set to true");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] should set to true");
         }
     }
 

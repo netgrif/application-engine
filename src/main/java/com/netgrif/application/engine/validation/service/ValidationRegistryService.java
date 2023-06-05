@@ -35,7 +35,9 @@ class ValidationRegistryService implements IValidationRegistryService {
             IValidator<T> validator = (IValidator<T>) registry.get(validation.getName());
             try {
                 validator.validate(field, dataField);
-            } catch (ValidationException | ParseException e) {
+            } catch (ValidationException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
         });

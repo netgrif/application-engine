@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.validation.exception.ValidationException;
 import com.netgrif.application.engine.validation.validator.IValidator;
 import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,17 +17,17 @@ public class EmailValidation implements IValidator<TextField> {
 
     @Override
     public void validate(TextField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
-
+        Validation validation = possibleValidation.get();
         String value = (String) dataField.getValue();
-        if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+        if (value == null || value.length() == 0) {
+            return;
         }
         if (!value.matches(emailRegex)) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] is not a valid e-mail");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] is not a valid e-mail");
         }
 
     }

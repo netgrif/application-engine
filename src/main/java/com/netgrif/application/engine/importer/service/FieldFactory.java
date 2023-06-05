@@ -182,7 +182,11 @@ public final class FieldFactory {
     }
 
     private Argument convertToValidationRule(com.netgrif.application.engine.importer.model.Argument argument) {
-        return new Argument(argument.getKey(), argument.getValue(), argument.isDynamic());
+        return Argument.builder()
+                .name(argument.getKey())
+                .dynamic(argument.isDynamic())
+                .value(argument.getValue())
+                .build();
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions) {
@@ -494,7 +498,7 @@ public final class FieldFactory {
                         && !it.getArguments().values().isEmpty()
                         && it.getArguments().values().stream().anyMatch(arg -> arg.getDynamic()))
                 .forEach(dynamic -> dynamic.getArguments().values().stream().filter(arg -> arg.getDynamic())
-                            .forEach(argument -> argument.setValue(dataValidationExpressionEvaluator.compile(useCase, new Expression(argument.getValue()))))
+                            .forEach(argument -> argument.setValue(dataValidationExpressionEvaluator.compile(useCase, new Expression(argument.getDynamicValue()))))
                 );
     }
 

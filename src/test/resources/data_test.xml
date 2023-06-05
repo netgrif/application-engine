@@ -10,7 +10,6 @@
         <title>Number</title>
         <placeholder>Number field placeholder</placeholder>
         <desc>Number field description</desc>
-        <valid>inrange 0,inf</valid>
         <validations>
             <validation>
                 <expression>inrange 0,inf</expression>
@@ -25,7 +24,6 @@
         <title>Text</title>
         <placeholder>Text field placeholder</placeholder>
         <desc>Text field description</desc>
-        <valid>email</valid>
         <validations>
             <validation>
                 <expression>email</expression>
@@ -67,7 +65,6 @@
         <title>Boolean</title>
         <placeholder>Boolean field placeholder</placeholder>
         <desc>Boolean field description</desc>
-        <valid>requiredTrue</valid>
         <validations>
             <validation>
                 <expression>requiredTrue</expression>
@@ -82,7 +79,6 @@
         <title>Date</title>
         <placeholder>Date field placeholder</placeholder>
         <desc>Date field description</desc>
-        <valid>between today,future</valid>
         <validations>
             <validation>
                 <expression>between today,future</expression>
@@ -114,7 +110,6 @@
         <title>DateTime</title>
         <placeholder>DateTime field placeholder</placeholder>
         <desc>DateTime field description</desc>
-        <valid>between today,future</valid>
         <validations>
             <validation>
                 <expression>between today,future</expression>

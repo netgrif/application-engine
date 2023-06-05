@@ -493,7 +493,7 @@ class ActionDelegate {
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.findAll { it.getArguments().any {arg -> arg.value.dynamic}}.each {
             it.getArguments().findAll {arg -> arg.value.dynamic}.each {
-                arg -> arg.value.value = dataValidationExpressionEvaluator.compile(useCase, new Expression(arg.value.value))
+                arg -> arg.value.value = dataValidationExpressionEvaluator.compile(useCase, new Expression(arg.value.dynamicValue))
             }
         }
         ChangedField changedField = new ChangedField(field.stringId)

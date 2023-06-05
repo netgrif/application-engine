@@ -16,21 +16,21 @@ public class TelNumberValidation implements IValidator<TextField> {
 
     @Override
     public void validate(TextField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
-
+        Validation validation = possibleValidation.get();
         String value = (String) dataField.getValue();
-        if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+        if (value == null || value.length() == 0) {
+            return;
         }
         if (!value.matches(telNumberRegex)) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] is not a valid phone number");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] is not a valid phone number");
         }
     }
 
     public String getName() {
-        return "telNumber";
+        return "telnumber";
     }
 }

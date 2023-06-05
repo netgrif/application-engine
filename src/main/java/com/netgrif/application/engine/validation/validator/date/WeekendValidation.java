@@ -4,9 +4,11 @@ import com.netgrif.application.engine.petrinet.domain.dataset.DateField;
 import com.netgrif.application.engine.petrinet.domain.dataset.DateTimeField;
 import com.netgrif.application.engine.petrinet.domain.dataset.Field;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.Validation;
+import com.netgrif.application.engine.utils.DateUtils;
 import com.netgrif.application.engine.validation.exception.ValidationException;
 import com.netgrif.application.engine.validation.validator.IValidator;
 import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -23,35 +25,33 @@ public class WeekendValidation implements IValidator<Field<?>> {
 
     @Override
     public void validate(Field<?> field, DataField dataField) throws ValidationException, ParseException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
 
+        Validation validation = possibleValidation.get();
         Date value;
         if (dataField.getValue() == null) {
             value = null;
         } else if (field instanceof DateField) {
-            value = Date.from(((LocalDate) dataField.getValue()).atStartOfDay().toInstant(ZoneOffset.of(ZoneId.systemDefault().getId())));
+            value = dataField.getValue() instanceof LocalDate ? DateUtils.localDateToDate((LocalDate) dataField.getValue()) : (Date) dataField.getValue();
         } else if (field instanceof DateTimeField) {
-            value = Date.from(((LocalDateTime) dataField.getValue()).toInstant(ZoneOffset.of(ZoneId.systemDefault().getId())));
+            value = dataField.getValue() instanceof LocalDateTime ? DateUtils.localDateTimeToDate((LocalDateTime) dataField.getValue()) : (Date) dataField.getValue();
         } else {
             return;
         }
-
         if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+            return;
         }
-
         if (!(isWeekend(value))) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be day of weekend" );
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be day of weekend" );
         }
     }
 
-    protected static boolean isWeekend(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        DayOfWeek dayOfWeek = DayOfWeek.of(calendar.get(Calendar.DAY_OF_WEEK));
+    protected boolean isWeekend(Date date) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        DayOfWeek dayOfWeek = DayOfWeek.of(localDate.get(ChronoField.DAY_OF_WEEK));
         return dayOfWeek == DayOfWeek.SUNDAY || dayOfWeek == DayOfWeek.SATURDAY;
     }
 

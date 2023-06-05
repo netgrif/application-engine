@@ -13,22 +13,22 @@ import java.util.Optional;
 public class MaxLengthValidation implements IValidator<TextField> {
     @Override
     public void validate(TextField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
         Validation validation = possibleValidation.get();
-        double maxLength = Double.parseDouble(validation.getArguments().get("max").getValue());
+        double maxLength = Double.parseDouble(validation.getArguments().get("length").getValue());
         String value = (String) dataField.getValue();
-        if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+        if (value == null || value.length() == 0) {
+            return;
         }
         if (value.length() > maxLength) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] is longer than [" + maxLength + "] characters.");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] is longer than [" + maxLength + "] characters.");
         }
     }
 
     public String getName() {
-        return "maxLength";
+        return "maxlength";
     }
 }

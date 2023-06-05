@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.validation.exception.ValidationException;
 import com.netgrif.application.engine.validation.validator.IValidator;
 import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class InRangeValidation implements IValidator<NumberField> {
 
     @Override
     public void validate(NumberField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
@@ -24,21 +25,20 @@ public class InRangeValidation implements IValidator<NumberField> {
         String from = validation.getArguments().get("from").getValue();
         String to = validation.getArguments().get("to").getValue();
         Double value = (Double) dataField.getValue();
-
-        if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+        if (value == null || value.equals(0D)) {
+            return;
         }
 
         if (from.equals(INF) && value > Double.parseDouble(to)) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be in range [" + from + ", " + to + "]" );
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be in range [" + from + ", " + to + "]" );
         }
 
         if (value < Double.parseDouble(from) && to.equals(INF)) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be in range [" + from + ", " + to + "]" );
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be in range [" + from + ", " + to + "]" );
         }
 
         if (!(Double.parseDouble(from) <= value && value <= Double.parseDouble(to))) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be in range [" + from + ", " + to + "]" );
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] should be in range [" + from + ", " + to + "]" );
         }
     }
 

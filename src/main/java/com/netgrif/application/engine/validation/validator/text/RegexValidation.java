@@ -5,6 +5,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.validation.exception.ValidationException;
 import com.netgrif.application.engine.validation.validator.IValidator;
 import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class RegexValidation implements IValidator<TextField> {
 
     @Override
     public void validate(TextField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
@@ -24,12 +25,12 @@ public class RegexValidation implements IValidator<TextField> {
         String patternString = validation.getArguments().get("expression").getValue();
         String value = (String) dataField.getValue();
         if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+            return;
         }
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(value);
         if (!matcher.matches()) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] does not match the pattern [" + patternString + "]");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] does not match the pattern [" + patternString + "]");
         }
     }
 

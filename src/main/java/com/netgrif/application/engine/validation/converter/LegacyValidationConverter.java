@@ -42,14 +42,14 @@ public class LegacyValidationConverter {
     }
 
     private String getValidationName(String rule) {
-        if (rule.startsWith("minLength")) {
-            return "minLength";
-        } else if (rule.startsWith("maxLength")) {
-            return "maxLength";
+        if (rule.startsWith("minlength")) {
+            return "minlength";
+        } else if (rule.startsWith("maxlength")) {
+            return "maxlength";
         } else if (rule.startsWith("regex")) {
             return "regex";
-        } else if (rule.startsWith("telNumber")) {
-            return "telNumber";
+        } else if (rule.startsWith("telnumber")) {
+            return "telnumber";
         } else if (rule.startsWith("email")) {
             return "email";
         }  else if (rule.startsWith("between")) {
@@ -81,32 +81,36 @@ public class LegacyValidationConverter {
     }
 
     private Map<String, Argument> getValidationArguments(String rule, boolean isDynamic) {
-        if (rule.startsWith("minLength")) {
-            return Collections.singletonMap("length", new Argument("length", rule.split(" ")[1], isDynamic));
-        } else if (rule.startsWith("maxLength")) {
-            return Collections.singletonMap("length", new Argument("length", rule.split(" ")[1], isDynamic));
+        if (rule.startsWith("minlength")) {
+            return Collections.singletonMap("length", Argument.builder().name("length").dynamic(isDynamic).value(fillIfDynamic(rule.replace("minlength ", ""), isDynamic)).build());
+        } else if (rule.startsWith("maxlength")) {
+            return Collections.singletonMap("length", Argument.builder().name("length").dynamic(isDynamic).value(fillIfDynamic(rule.replace("maxlength ", ""), isDynamic)).build());
         } else if (rule.startsWith("regex")) {
             if(rule.startsWith("regex(")) {
-                return Collections.singletonMap("expression", new Argument("expression", rule.substring(7, rule.length() - 2), isDynamic));
+                return Collections.singletonMap("expression", Argument.builder().name("expression").dynamic(isDynamic).value(fillIfDynamic(rule.substring(7, rule.length() - 2), isDynamic)).build());
             }
-            return Collections.singletonMap("expression", new Argument("expression", rule.substring(6), isDynamic));
+            return Collections.singletonMap("expression", Argument.builder().name("expression").dynamic(isDynamic).value(fillIfDynamic(rule.substring(6), isDynamic)).build());
         } else if (rule.startsWith("between")) {
-            String[] fromTo = rule.split(" ")[1].split(",");
+            String[] fromTo = rule.replace("between ", "").split(",");
             return new HashMap<>(){{
-                put("from", new Argument("from", fromTo[0], isDynamic));
-                put("to", new Argument("to", fromTo[1], isDynamic));
+                put("from", Argument.builder().name("from").dynamic(isDynamic).value(fillIfDynamic(fromTo[0], isDynamic)).build());
+                put("to", Argument.builder().name("to").dynamic(isDynamic).value(fillIfDynamic(fromTo[1], isDynamic)).build());
             }};
         } else if (rule.startsWith("translationRequired")) {
-            return Collections.singletonMap("languages", new Argument("languages", rule.split(" ")[1], isDynamic));
+            return Collections.singletonMap("languages", Argument.builder().name("languages").dynamic(isDynamic).value(fillIfDynamic(rule.replace("translationRequired ", ""), isDynamic)).build());
         } else if (rule.startsWith("translationOnly")) {
-            return Collections.singletonMap("languages", new Argument("languages", rule.split(" ")[1], isDynamic));
+            return Collections.singletonMap("languages", Argument.builder().name("languages").dynamic(isDynamic).value(fillIfDynamic(rule.replace("translationOnly ", ""), isDynamic)).build());
         } else if (rule.startsWith("inrange")) {
-            String[] fromTo = rule.split(" ")[1].split(",");
+            String[] fromTo =  rule.replace("inrange ", "").split(",");
             return new HashMap<>(){{
-                put("from", new Argument("from", fromTo[0], isDynamic));
-                put("to", new Argument("to", fromTo[1], isDynamic));
+                put("from", Argument.builder().name("from").dynamic(isDynamic).value(fillIfDynamic(fromTo[0], isDynamic)).build());
+                put("to", Argument.builder().name("to").dynamic(isDynamic).value(fillIfDynamic(fromTo[1], isDynamic)).build());
             }};
         }
         return null;
+    }
+
+    private String fillIfDynamic(String expression, boolean isDynamic) {
+        return isDynamic ? "\"" + expression + "\"" : expression;
     }
 }

@@ -20,6 +20,8 @@ class DynamicValidation extends Validation {
         this.expression = new Expression("\"$validationRule\"" as String)
     }
 
+
+
     DynamicValidation() {}
 
     String getCompiledRule() {

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.petrinet.domain.dataset.logic.validation.V
 import com.netgrif.application.engine.validation.exception.ValidationException;
 import com.netgrif.application.engine.validation.validator.IValidator;
 import com.netgrif.application.engine.workflow.domain.DataField;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ public class TranslationOnlyValidation implements IValidator<I18nField> {
 
     @Override
     public void validate(I18nField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
@@ -26,10 +27,10 @@ public class TranslationOnlyValidation implements IValidator<I18nField> {
         String[] languages = languagesString.split(",");
         I18nString value = (I18nString) dataField.getValue();
         if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+            return;
         }
         if (!new HashSet<>(Arrays.asList(languages)).containsAll(value.getTranslations().keySet())) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] has other translations than allowed [" + languagesString + "]");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] has other translations than allowed [" + languagesString + "]");
         }
     }
 

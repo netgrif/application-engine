@@ -13,16 +13,17 @@ import java.util.Optional;
 public class PositiveValidation implements IValidator<NumberField> {
     @Override
     public void validate(NumberField field, DataField dataField) throws ValidationException {
-        Optional<Validation> possibleValidation = field.getValidations().stream().filter(v -> v.getName().equals(getName())).findFirst();
+        Optional<Validation> possibleValidation = getPossibleValidation(field);
         if (possibleValidation.isEmpty()) {
             return;
         }
+        Validation validation = possibleValidation.get();
         Double value = (Double) dataField.getValue();
-        if (value == null) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value is NULL");
+        if (value == null || value.equals(0D)) {
+            return;
         }
         if (value < 0) {
-            throw new ValidationException("Invalid value of field [" + field.getImportId() + "], value [" + value + "] is negative, but should be positive.");
+            throwValidationException(validation, "Invalid value of field [" + field.getImportId() + "], value [" + value + "] is negative, but should be positive.");
         }
     }
 
