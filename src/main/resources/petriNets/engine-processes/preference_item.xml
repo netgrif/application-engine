@@ -1042,7 +1042,7 @@
 		<i18nString name="menu_item_identifier">Artikel Identifikationsnummer</i18nString>
 		<i18nString name="remove_additional_filter">Zusatzfilter entfernen</i18nString>
 		<i18nString name="nodePath">Artikel-URI</i18nString>
-		<i18nString name="move_dest_uri_new_node">New node</i18nString>
+		<i18nString name="move_dest_uri_new_node">Neuer Knoten</i18nString>
 		<i18nString name="move_dest_uri_new_node_desc">Write down node name, that you wish to add</i18nString>
 		<i18nString name="move_dest_uri_desc">List of nodes representing destination URI</i18nString>
 		<i18nString name="move_add_node">Hinzufügen</i18nString>
