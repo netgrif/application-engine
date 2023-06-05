@@ -103,17 +103,13 @@
 		<title/>
 	</data>
 	<data type="text">
-		<id>move_dest_uri_test</id>
-		<title>Destination URI TEST</title>
-	</data>
-	<data type="text">
 		<id>move_previous_dest_uri</id>
 		<title/>
 	</data>
 	<data type="multichoice_map">
 		<id>move_dest_uri</id>
 		<title name="move_dest_uri">Destination URI</title>
-		<desc>todo</desc>
+		<desc name="move_dest_uri_desc">List of nodes representing destination URI</desc>
 		<component>
 			<name>autocomplete</name>
 		</component>
@@ -139,6 +135,37 @@
 			} else {
 				change moveDestUri value { splitUriPath(corrected) }
 			}
+		</action>
+	</data>
+	<data type="text">
+		<id>move_dest_uri_new_node</id>
+		<title name="move_dest_uri_new_node">New node to be added</title>
+		<desc name="move_dest_uri_new_node_desc">Write down node name, that you wish to add</desc>
+	</data>
+	<data type="button">
+		<id>move_add_node</id>
+		<title/>
+		<placeholder name="move_add_node">Add</placeholder>
+		<component>
+			<name>raised</name>
+		</component>
+		<action trigger="set">
+			newNodeName: f.move_dest_uri_new_node,
+			selectedUri: f.move_dest_uri;
+
+			if (newNodeName.value == null || newNodeName.value == "") {
+				return
+			}
+
+			String prefixUri = selectedUri.value.join("/")
+			prefixUri = prefixUri.replace("//","/")
+
+			String newUri = prefixUri + uriService.getUriSeparator() + newNodeName.value
+			def newNode = uriService.getOrCreate(newUri, com.netgrif.application.engine.petrinet.domain.UriContentType.CASE)
+
+			change selectedUri value { splitUriPath(newNode.uriPath) }
+
+			change newNodeName value { null }
 		</action>
 	</data>
 	<data type="i18n">
@@ -175,7 +202,7 @@
 	</data>
 	<data type="text" immediate="true">
 		<id>nodePath</id>
-		<title/>
+		<title name="nodePath">Item URI</title>
 		<event type="set">
 			<id>0</id>
 			<actions phase="post">
@@ -928,6 +955,11 @@
 		<i18nString name="item_settings_general">Všeobecné</i18nString>
 		<i18nString name="menu_item_identifier">Identifikátor položky</i18nString>
 		<i18nString name="remove_additional_filter">Odstrániť dodatočný filter</i18nString>
+		<i18nString name="nodePath">URI položky</i18nString>
+		<i18nString name="move_dest_uri_new_node">Nový uzol</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Uveďte názov uzlu, ktorý chcete pridať</i18nString>
+		<i18nString name="move_dest_uri_desc">Zoznam uzlov reprezentujúce cieľovú URI</i18nString>
+		<i18nString name="move_add_node">Pridať</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
@@ -1009,6 +1041,11 @@
 		<i18nString name="item_settings_general">Allgemein</i18nString>
 		<i18nString name="menu_item_identifier">Artikel Identifikationsnummer</i18nString>
 		<i18nString name="remove_additional_filter">Zusatzfilter entfernen</i18nString>
+		<i18nString name="nodePath">Artikel-URI</i18nString>
+		<i18nString name="move_dest_uri_new_node">New node</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Write down node name, that you wish to add</i18nString>
+		<i18nString name="move_dest_uri_desc">List of nodes representing destination URI</i18nString>
+		<i18nString name="move_add_node">Hinzufügen</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
@@ -1057,7 +1094,21 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>nodePath</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -1560,22 +1611,35 @@
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>2</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>move_dest_uri_test</id>
+				<id>move_dest_uri_new_node</id>
 				<logic>
 					<behavior>editable</behavior>
-					<behavior>required</behavior>
 				</logic>
 				<layout>
-					<x>0</x>
-					<y>1</y>
+					<x>2</x>
+					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>move_add_node</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -1585,13 +1649,16 @@
 			<id>finish</id>
 			<actions phase="pre">
 				<action>
-					dest: f.move_dest_uri_test;
+					dest: f.move_dest_uri;
 
-					if (dest.value == "") {
+					if (dest.value == null || dest.value == []) {
 						throw new IllegalArgumentException("URI must not be empty!")
 					}
 
-					changeMenuItem useCase uri { dest.value }
+					String newUri = dest.value.join("/")
+					newUri = newUri.replace("//","/")
+
+					changeMenuItem useCase uri { newUri }
 				</action>
 			</actions>
 			<title name="move_item_finish">Move</title>

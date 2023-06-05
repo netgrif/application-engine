@@ -1703,9 +1703,12 @@ class ActionDelegate {
              ])
          },
          uri           : { cl ->
-             item = workflowService.findOne(item.stringId)
              def uri = cl() as String
-             moveMenuItem(item, uri)
+             if (item.stringId == useCase.stringId) {
+                 moveMenuItem(useCase, uri)
+             } else {
+                 moveMenuItem(workflowService.findOne(item.stringId), uri)
+             }
          },
          title         : { cl ->
              item = workflowService.findOne(item.stringId)
@@ -1809,7 +1812,7 @@ class ActionDelegate {
         menuItemCase.dataSet[PREFERENCE_ITEM_FIELD_ALLOWED_ROLES].options = body.allowedRoles
         menuItemCase.dataSet[PREFERENCE_ITEM_FIELD_BANNED_ROLES].options = body.bannedRoles
         if (parentItemCase != null) {
-            parentItemCase = appendChildCaseId(parentItemCase, menuItemCase.stringId)
+            parentItemCase = appendChildCaseIdAndSave(parentItemCase, menuItemCase.stringId)
         }
         menuItemCase = workflowService.save(menuItemCase)
         Task newItemTask = findTask { it._id.eq(new ObjectId(menuItemCase.tasks.find { it.transition == "initialize" }.task)) }
@@ -1896,7 +1899,7 @@ class ActionDelegate {
         Case folder = findFolderCase(node)
         if (folder != null) {
             if (childFolderCase != null) {
-                folder = appendChildCaseId(folder, childFolderCase.stringId)
+                folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
                 initializeParentId(childFolderCase, folder.stringId)
             }
             return folder
@@ -1905,7 +1908,7 @@ class ActionDelegate {
         folder = createCase(FilterRunner.PREFERRED_ITEM_NET_IDENTIFIER, body.name.toString())
         folder.setUriNodeId(node.parentId)
         if (childFolderCase != null) {
-            folder = appendChildCaseId(folder, childFolderCase.stringId)
+            folder = appendChildCaseIdAndSave(folder, childFolderCase.stringId)
             initializeParentId(childFolderCase, folder.stringId)
         } else {
             folder = workflowService.save(folder)
@@ -2118,7 +2121,7 @@ class ActionDelegate {
 
         folderCase.dataSet[PREFERENCE_ITEM_FIELD_HAS_CHILDREN].value = hasChildren(folderCase)
 
-        return workflowService.save(folderCase)
+        return folderCase
     }
     
     private Case initializeParentId(Case childFolderCase, String parentFolderCaseId) {
