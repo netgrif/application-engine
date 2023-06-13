@@ -299,7 +299,7 @@ public class DataService implements IDataService {
                         resource.setParentTaskId(taskId);
                     }
                     resources.add(resource);
-                    if (field.getType() == FieldType.TASK_REF) {
+                    if (field.getType() == FieldType.TASK_REF && shouldResolveTaskRefData(field, transition.getDataSet().get(field.getStringId()))) {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
                     }
                 }
@@ -308,6 +308,22 @@ public class DataService implements IDataService {
         }
         outcome.setData(resultDataGroups);
         return outcome;
+    }
+
+    private boolean shouldResolveTaskRefData(Field<?> field, DataFieldLogic dataRef) {
+        if (dataRef.getComponent() != null) {
+            return hasRequiredComponentProperty(dataRef.getComponent(), "resolve_data", "true");
+        } else if (field.getComponent() != null) {
+            return hasRequiredComponentProperty(field.getComponent(), "resolve_data", "true");
+        }
+        return true;
+    }
+
+    private boolean hasRequiredComponentProperty(Component component, String propertyName, String propertyValue) {
+        return  component != null
+                && component.getProperties() != null
+                && component.getProperties().containsKey(propertyName)
+                && component.getProperties().get(propertyName).equals(propertyValue);
     }
 
     private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
