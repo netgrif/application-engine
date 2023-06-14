@@ -140,7 +140,7 @@
 	<data type="text">
 		<id>move_dest_uri_new_node</id>
 		<title name="move_dest_uri_new_node">New node to be added</title>
-		<desc name="move_dest_uri_new_node_desc">Write down node name, that you wish to add</desc>
+		<desc name="move_dest_uri_new_node_desc">Enter new node name</desc>
 	</data>
 	<data type="button">
 		<id>move_add_node</id>
@@ -573,7 +573,7 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_require_title_in_creation</id>
-		<title name="case_require_title_in_creation">Required title input in case creation?</title>
+		<title name="case_require_title_in_creation">Require title input in case creation?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
@@ -609,12 +609,12 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_allow_header_table_mode</id>
-		<title name="case_allow_header_table_mode">Allow table mode for headers?</title>
+		<title name="allow_header_table_mode">Allow table mode for headers?</title>
 		<init>true</init>
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>case_headers_mode</id>
-		<title name="case_headers_mode">Headers mode</title>
+		<title name="headers_mode">Header mode</title>
 		<options>
 			<option name="sort" key="sort">Sort</option>
 			<option name="search" key="search">Search</option>
@@ -638,7 +638,7 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>case_headers_default_mode</id>
-		<title name="case_headers_default_mode">Default headers mode</title>
+		<title name="headers_default_mode">Default header mode</title>
 		<options>
 			<option name="sort" key="sort">Sort</option>
 			<option name="search" key="search">Search</option>
@@ -657,12 +657,12 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>case_is_header_mode_changeable</id>
-		<title name="case_is_header_mode_changeable">Can be header mode changed?</title>
+		<title name="is_header_mode_changeable">Can header mode be changed?</title>
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_case_default_headers</id>
-		<title name="use_case_default_headers">Use custom default headers?</title>
+		<title name="case_default_headers">Use custom default headers?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
@@ -803,7 +803,7 @@
 	</data>
 	<data type="multichoice_map" immediate="true">
 		<id>task_headers_mode</id>
-		<title name="task_headers_mode">Headers mode</title>
+		<title name="headers_mode">Header mode</title>
 		<options>
 			<option name="sort" key="sort">Sort</option>
 			<option name="edit" key="edit">Edit</option>
@@ -826,7 +826,7 @@
 	</data>
 	<data type="enumeration_map" immediate="true">
 		<id>task_headers_default_mode</id>
-		<title name="task_headers_default_mode">Default headers mode</title>
+		<title name="headers_default_mode">Default header mode</title>
 		<options>
 			<option name="sort" key="sort">Sort</option>
 			<option name="edit" key="edit">Edit</option>
@@ -843,17 +843,17 @@
 	</data>
 	<data type="boolean" immediate="true">
 		<id>task_is_header_mode_changeable</id>
-		<title name="task_is_header_mode_changeable">Can be header mode changed?</title>
+		<title name="is_header_mode_changeable">Can header mode be changed?</title>
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>task_allow_header_table_mode</id>
-		<title name="task_allow_header_table_mode">Allow table mode for headers?</title>
+		<title name="allow_header_table_mode">Allow table mode for headers?</title>
 		<init>true</init>
 	</data>
 	<data type="boolean" immediate="true">
 		<id>use_task_default_headers</id>
-		<title name="use_task_default_headers">Use custom default headers?</title>
+		<title name="use_default_headers">Use custom default headers?</title>
 		<init>true</init>
 	</data>
 	<data type="text" immediate="true">
@@ -877,7 +877,6 @@
 
 	<!-- I18NS -->
 	<i18n locale="sk">
-		<i18nString name="display_icon">Zobrazovať ikonu?</i18nString>
 		<i18nString name="icon_preview">Náhľad ikony</i18nString>
 		<i18nString name="icon_identifier">Identifikátor ikony</i18nString>
 		<i18nString name="icon_identifier_desc">Identifikátor Material ikony. Zoznam ikon s identifikátormi je dostupný online.</i18nString>
@@ -888,8 +887,6 @@
 		<i18nString name="available_processes">Vaše procesy</i18nString>
 		<i18nString name="available_processes_desc">Vyberte proces obsahujúci roly ktoré chcete pridať do zoznamu povolených alebo zakázaných rolí.</i18nString>
 		<i18nString name="available_roles">Dostupné roly</i18nString>
-		<i18nString name="allowed_roles">Povolené roly</i18nString>
-		<i18nString name="banned_roles">Zakázané roly</i18nString>
 		<i18nString name="create_case_button_title">Názov tlačidla "Nová inštancia"</i18nString>
 		<i18nString name="create_case_button_icon">Identifikátor ikony tlačidla "Nová inštancia"</i18nString>
 		<i18nString name="create_case_button_icon_preview">Náhľad ikony</i18nString>
@@ -919,21 +916,16 @@
 		<i18nString name="case_banned_nets_in_creation">Zakázané siete pri vytváraní</i18nString>
 		<i18nString name="case_banned_nets_in_creation_desc">Uveďte identifikátory procesov oddelené čiarkou. Napríklad: mynet1,mynet2</i18nString>
 		<i18nString name="case_show_more_menu">Zobrazovať menu pre prípadovú položku?</i18nString>
-		<i18nString name="case_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
-		<i18nString name="case_headers_mode">Mód hlavičiek</i18nString>
 		<i18nString name="sort">Zoraďovanie</i18nString>
 		<i18nString name="search">Vyhľadávanie</i18nString>
 		<i18nString name="edit">Upravovanie</i18nString>
-		<i18nString name="case_headers_default_mode">Predvolený mód hlavičiek</i18nString>
-		<i18nString name="case_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
-		<i18nString name="use_case_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
 		<i18nString name="merge_filters">Zjednotiť filter so základným filtrom?</i18nString>
 		<i18nString name="task_view_search_type">Typ vyhľadávania úloh</i18nString>
-		<i18nString name="task_headers_mode">Mód hlavičiek</i18nString>
-		<i18nString name="task_headers_default_mode">Predvolený mód hlavičiek</i18nString>
-		<i18nString name="task_is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
-		<i18nString name="task_allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
-		<i18nString name="use_task_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
+		<i18nString name="headers_mode">Mód hlavičiek</i18nString>
+		<i18nString name="headers_default_mode">Predvolený mód hlavičiek</i18nString>
+		<i18nString name="is_header_mode_changeable">Môže byť mód hlavičiek zmenený?</i18nString>
+		<i18nString name="allow_header_table_mode">Povoliť tabuľkový mód pre hlavičky?</i18nString>
+		<i18nString name="use_default_headers">Použiť vlastné predvolené hlavičky?</i18nString>
 		<i18nString name="task_default_headers">Predvolené hlavičky</i18nString>
 		<i18nString name="task_default_headers_desc">Napríklad: "meta-title,meta-user"</i18nString>
 		<i18nString name="task_show_more_menu">Zobrazovať menu pre úlohovú položku?</i18nString>
@@ -962,7 +954,6 @@
 		<i18nString name="move_add_node">Pridať</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="display_icon">Menüikone anzeigen</i18nString>
 		<i18nString name="icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="icon_identifier">Ikone ID</i18nString>
 		<i18nString name="icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
@@ -970,82 +961,74 @@
 		<i18nString name="remove_from_allowed_roles">Aus zulässigen Rollen entfernen</i18nString>
 		<i18nString name="ban_roles">Zu verbotenen Rollen hinzufügen</i18nString>
 		<i18nString name="remove_from_banned_roles">Aus verbotenen Rollen entfernen</i18nString>
-		<i18nString name="processes_available">Ihre Prozesse</i18nString>
+		<i18nString name="available_processes">Ihre Prozesse</i18nString>
 		<i18nString name="available_processes_desc">Wählen Sie einen Prozess mit Rollen aus, die Sie zu Listen mit zulässigen oder verbotenen Rollen hinzufügen möchten.</i18nString>
-		<i18nString name="roles_available">Verfügbare Rollen</i18nString>
-		<i18nString name="allowed_roles">Zulässige Rollen</i18nString>
-		<i18nString name="banned_roles">Verbotene Rollen</i18nString>
+		<i18nString name="available_roles">Verfügbare Rollen</i18nString>
 		<i18nString name="create_case_button_title">Schaltflächentitel "Neuer Fall"</i18nString>
 		<i18nString name="create_case_button_icon">Ikone ID</i18nString>
 		<i18nString name="create_case_button_icon_preview">Ikonevorschau</i18nString>
 		<i18nString name="default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 		<i18nString name="filter_autocomplete_selection">Neue Filter auswählen</i18nString>
-
 		<i18nString name="default_headers_desc">Beispiel: "meta-title,meta-visualId"</i18nString>
-		<i18nString name="move_dest_uri">Destination URI</i18nString>
-		<i18nString name="duplicate_new_title">Title of duplicated view</i18nString>
-		<i18nString name="duplicate_view_identifier">View identifier</i18nString>
-		<i18nString name="duplicate_view_identifier_desc">Must be unique</i18nString>
-		<i18nString name="name">Name of the item</i18nString>
-		<i18nString name="name_desc">Will be shown in the menu</i18nString>
-		<i18nString name="tab_icon">Tab icon identifier</i18nString>
 		<i18nString name="tab_icon_identifier_desc">Material Ikone ID. Liste den Ikonen mit IDs ist online verfügbar.</i18nString>
-		<i18nString name="display_tab_icon">Display tab icon?</i18nString>
-		<i18nString name="tab_name">Name of the item</i18nString>
-		<i18nString name="tab_name_desc">Will be shown in tab</i18nString>
-		<i18nString name="update_filter">Update view with selected filter</i18nString>
-		<i18nString name="use_custom_view">Use custom view?</i18nString>
-		<i18nString name="custom_view_selector">Custom view configuration selector</i18nString>
 		<i18nString name="custom_view_selector_desc">Beispiel: "demo-tabbed-views"</i18nString>
-		<i18nString name="case_view_search_type">Search type for case view</i18nString>
 		<i18nString name="hidden">Versteckt</i18nString>
-		<i18nString name="fulltext">Fulltext</i18nString>
-		<i18nString name="fulltext_advanced">Fulltext and advanced</i18nString>
-		<i18nString name="case_require_title_in_creation">Required title input in case creation?</i18nString>
-		<i18nString name="case_banned_nets_in_creation">Banned processes for creation</i18nString>
-		<i18nString name="case_banned_nets_in_creation_desc">Write down process identifiers separated by comma. Example: mynet1,mynet2</i18nString>
-		<i18nString name="case_show_more_menu">Show more menu for case item?</i18nString>
-		<i18nString name="case_allow_header_table_mode">Allow table mode for headers?</i18nString>
-		<i18nString name="case_headers_mode">Headers mode</i18nString>
+		<i18nString name="fulltext">Einfacher Suchmodus</i18nString>
 		<i18nString name="sort">Sortieren</i18nString>
 		<i18nString name="search">Suchen</i18nString>
 		<i18nString name="edit">Bearbeiten</i18nString>
-		<i18nString name="case_headers_default_mode">Default headers mode</i18nString>
-		<i18nString name="case_is_header_mode_changeable">Can be header mode changed?</i18nString>
-		<i18nString name="use_case_default_headers">Use custom default headers?</i18nString>
-		<i18nString name="merge_filters">Merge with base filter?</i18nString>
-		<i18nString name="task_view_search_type">Search type for task view</i18nString>
-		<i18nString name="task_headers_mode">Headers mode</i18nString>
-		<i18nString name="task_headers_default_mode">Default headers mode</i18nString>
-		<i18nString name="task_is_header_mode_changeable">Can be header mode changed?</i18nString>
-		<i18nString name="task_allow_header_table_mode">Allow table mode for headers?</i18nString>
-		<i18nString name="use_task_default_headers">Use custom default headers?</i18nString>
+		<i18nString name="headers_mode">Kopfzeilenmodus</i18nString>
+		<i18nString name="headers_default_mode">Standardkopfzeilenmodus</i18nString>
+		<i18nString name="is_header_mode_changeable">Erlaube Änderung des Kopfzeilenmodus?</i18nString>
+		<i18nString name="allow_header_table_mode">Erlaube Tabellenmodus?</i18nString>
+		<i18nString name="use_default_headers">Eigene Kopfzeilen verwenden?</i18nString>
 		<i18nString name="task_default_headers">Anzuzeigende Attributmenge auswählen</i18nString>
 		<i18nString name="task_default_headers_desc">Beispiel: "meta-title,meta-user"</i18nString>
-		<i18nString name="task_show_more_menu">Show more menu for task item?</i18nString>
-		<i18nString name="item_settings">Item settings</i18nString>
 		<i18nString name="roles_management_title">Rollen</i18nString>
 		<i18nString name="filter_update_title">Filter</i18nString>
-		<i18nString name="move_item">Move item</i18nString>
-		<i18nString name="move_item_finish">Move</i18nString>
-		<i18nString name="duplicate_item">Duplicate item</i18nString>
-		<i18nString name="duplicate_item_finish">Duplicate</i18nString>
 		<i18nString name="additional_filter_update">Zusätzlicher Filter</i18nString>
 		<i18nString name="filter_header">Aktueller Filter</i18nString>
-		<i18nString name="case_view_header">Case view</i18nString>
-		<i18nString name="task_view_header">Task view</i18nString>
 		<i18nString name="roles_allowed">Zulässige Rollen</i18nString>
-		<i18nString name="roles_allowed_desc">List of roles allowed to view this menu entry.</i18nString>
-		<i18nString name="roles_banned">Verbotene Rollen</i18nString>
-		<i18nString name="roles_banned_desc">List of roles not allowed to view this menu entry.</i18nString>
 		<i18nString name="item_settings_general">Allgemein</i18nString>
-		<i18nString name="menu_item_identifier">Artikel Identifikationsnummer</i18nString>
+		<i18nString name="menu_item_identifier">Identifikationsnummer des Menüeintrages</i18nString>
 		<i18nString name="remove_additional_filter">Zusatzfilter entfernen</i18nString>
-		<i18nString name="nodePath">Artikel-URI</i18nString>
+		<i18nString name="nodePath">Menüeintrag-URI</i18nString>
 		<i18nString name="move_dest_uri_new_node">Neuer Knoten</i18nString>
-		<i18nString name="move_dest_uri_new_node_desc">Write down node name, that you wish to add</i18nString>
-		<i18nString name="move_dest_uri_desc">List of nodes representing destination URI</i18nString>
 		<i18nString name="move_add_node">Hinzufügen</i18nString>
+		<i18nString name="move_dest_uri">Ziel URI</i18nString>
+		<i18nString name="duplicate_new_title">Titel der kopierten Ansicht</i18nString>
+		<i18nString name="duplicate_view_identifier">Identifikator der kopierten Ansicht</i18nString>
+		<i18nString name="duplicate_view_identifier_desc">Muss einzigartig sein</i18nString>
+		<i18nString name="name">Titel des Eintrages</i18nString>
+		<i18nString name="name_desc">Wird im Menü angezeigt</i18nString>
+		<i18nString name="tab_icon">Ikonen Identifikator der Registerkarte</i18nString>
+		<i18nString name="display_tab_icon">Zeige die Registerkarte Ikone an?</i18nString>
+		<i18nString name="tab_name">Titel der Registerkarte</i18nString>
+		<i18nString name="tab_name_desc">Wird in der Registerkarte angezeigt</i18nString>
+		<i18nString name="update_filter">Aktualisiere die Ansicht mit dem ausgewählten Filter</i18nString>
+		<i18nString name="use_custom_view">Eigener Ansicht anwenden?</i18nString>
+		<i18nString name="custom_view_selector">Konfigurationsidentifikator der eigenen Ansicht</i18nString>
+		<i18nString name="case_view_search_type">Suchmodus im Fallansicht</i18nString>
+		<i18nString name="fulltext_advanced">Einfacher und erweiterter Suchmodus</i18nString>
+		<i18nString name="case_require_title_in_creation">Erforde den Titel beim erzeugen von Fällen?</i18nString>
+		<i18nString name="case_banned_nets_in_creation">Ausgeschlossene Prozesse</i18nString>
+		<i18nString name="case_banned_nets_in_creation_desc">Trenne die Prozessidentifikatoren mit einer Komma. z.B.: netz1,netz2</i18nString>
+		<i18nString name="case_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Fällen anzeigen</i18nString>
+		<i18nString name="merge_filters">Mit dem Basisfilter kombinieren?</i18nString>
+		<i18nString name="task_view_search_type">Suchmodus im Aufgabenansicht</i18nString>
+		<i18nString name="task_show_more_menu">"Erweiterte Optionen" Taste bei einzelnen Aufgaben anzeigen</i18nString>
+		<i18nString name="item_settings">Menüeintrageinstellungen</i18nString>
+		<i18nString name="move_item">Menüeintrag verschieben</i18nString>
+		<i18nString name="move_item_finish">verschieben</i18nString>
+		<i18nString name="duplicate_item">Menüeintrag duplizieren</i18nString>
+		<i18nString name="duplicate_item_finish">duplizieren</i18nString>
+		<i18nString name="case_view_header">Fallansicht</i18nString>
+		<i18nString name="task_view_header">Aufgabenansicht</i18nString>
+		<i18nString name="roles_allowed_desc">Rollen mit Zugriff auf diesen Menüeintrag</i18nString>
+		<i18nString name="roles_banned">Verbotene Rollen</i18nString>
+		<i18nString name="roles_banned_desc">Rollen, für die wird den Menüeintrag ausgeblendet</i18nString>
+		<i18nString name="move_dest_uri_new_node_desc">Nächste URI-Teil angeben</i18nString>
+		<i18nString name="move_dest_uri_desc">Teile der Ziel URI</i18nString>
 	</i18n>
 
 	<!-- TRANSITIONS -->
