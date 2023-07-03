@@ -1687,14 +1687,12 @@ class ActionDelegate {
              setData("item_settings", item, [
                      (PREFERENCE_ITEM_FIELD_CASE_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
              ])
-             workflowService.save(item)
          },
          taskDefaultHeaders: { cl ->
              String defaultHeaders = cl() as String
              setData("item_settings", item, [
                      (PREFERENCE_ITEM_FIELD_TASK_DEFAULT_HEADERS): ["type": "text", "value": defaultHeaders]
              ])
-             workflowService.save(item)
          },
          filter        : { cl ->
              def filter = cl() as Case
